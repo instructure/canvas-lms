@@ -1794,11 +1794,13 @@ zh-Hant:
   add_course_406cb773: 添加課程
   add_course_assignments_628ed6d0: 添加課程作業
   add_course_calendar_events_146154a5: 添加課程月曆事件
+  add_course_files_4e0f1abc: 添加課程檔案
   add_criterion_eb9587ef: 添加標準
   add_custom_link_22059c0: 添加自定義連結
   add_designers_to_courses_9588820b: 添加設計者至課程
   add_discussion_653dab4c: 添加討論區
   add_domain_f15bc6c1: 添加網域
+  add_edit_delete_files_573a4d62: "添加 / 編輯 / 刪除檔案"
   add_edit_delete_sections_d32c5b4d: 添加/編輯/刪除分班
   add_email_address_aef3b61: 添加電郵地址
   add_existing_content_7e36da66: 添加現有內容
@@ -1809,6 +1811,7 @@ zh-Hant:
   add_grading_period_6f774dc3: 添加評分時段
   add_grading_scheme_81e23c05: 添加評分方案
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: 添加等級評分方式至管理員評分報告
+  add_granularity_to_permissions_around_managing_cou_2244c94a: 添加有關管理課程檔案的細微權限
   add_granularity_to_permissions_around_managing_cou_4a5bc486: 添加有關管理課程分班的細微權限
   add_group_c84f9e9d: 添加小組
   add_group_set_f9809e11: 添加小組集合
@@ -2104,6 +2107,8 @@ zh-Hant:
   allow_users_to_comment_45b8f753: 允許使用者評論
   allowed_attempts_4e229caa: 允許的嘗試
   allowed_domains_ee7868c8: 獲允許網域
+  allowed_for_subaccounts_courses_default_off_da598c11: 允許子帳戶/課程使用，預設為關閉
+  allowed_for_subaccounts_courses_default_on_e485ec7f: 允許子帳戶/課程使用，預設為開啟
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: 允許使用者於學生群組卡上存取「作為使用者」連結
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "允許使用者於其他使用者的登入詳細資料中查看 SIS ID。"
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "允許使用者於課程成員頁面中查看使用者 SIS ID。"
@@ -3158,6 +3163,7 @@ zh-Hant:
     assignment_group_selector: 
       assignment_group: 作業群組
       assignment_group_options: 
+        create_group: 建立群組
         new_group: 新群組
     assignment_groups_count: 
       one: "%{count} 個群組"
@@ -5095,6 +5101,7 @@ zh-Hant:
   classic_quizzes_dee3c7b7: 傳統測驗
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: 計時測驗的經典測驗選項（不提交測驗）
   clear_2084585f: 清除
+  clear_search_field_75f595c7: 清除搜尋欄位
   clear_selected_file_82388e50: 清除所選擇的檔案
   clear_user_cache_ef079f7f: 清除使用者緩存
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "如果您不希望顯示 QR 碼，請點擊「取消」。"
@@ -5340,6 +5347,7 @@ zh-Hant:
   collapse_all_50275533: 全部收起
   collapse_group_c2af7cad: 收起群組
   collapse_list_of_group_members_for_groupname_d6c66fa0: "收起 %{groupName} 群組成員列表"
+  collapse_outcome_description_de471564: 收起成果說明
   collapse_subdiscussion_89af1f5c: 收起分組討論
   collapse_tutorial_tray_66ee7dc1: 收起教學列表
   collapsed_510aa02a: 已收起
@@ -6553,6 +6561,9 @@ zh-Hant:
   count_files_were_ignored_2f9c054a: 
     one: "(%{count}) 個檔案遭到忽略"
     other: "(%{count}) 個檔案遭到忽略"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "%{count} 個「%{groupTitle}」 成果"
+    other: "%{count} 個「%{groupTitle}」 成果"
   count_hidden_e8d2c57c: "%{count} 已隱藏"
   count_images_found_for_term_a93635ed: "找到 %{term} 的 %{count} 影像"
   count_items_deleted_successfully_a287aa53: 
@@ -6581,6 +6592,9 @@ zh-Hant:
     one: "%{count} 選項"
     other: "%{count} 選項"
   count_options_loaded_cd59cc3b: "%{count} 個選項已載入。"
+  count_outcomes_selected_55902958: 
+    one: "已選擇 %{count} 個成果"
+    other: "已選擇 %{count} 個成果"
   count_page_views_b40102b3: 
     one: "%{count} 次頁面檢視"
     other: "%{count} 頁面檢視"
@@ -6819,7 +6833,10 @@ zh-Hant:
   course_favorites_from_dashboard_27a3515a: 儀錶板課程收藏夾
   course_files_62deb8f8: 課程文檔
   course_files_a31f97fc: 課程檔案
+  course_files_add_2eede390: "課程檔案 - 添加"
   course_files_add_edit_delete_24678a2f: "課程檔案 - 添加 / 編輯 / 刪除"
+  course_files_delete_fae0effe: "課程檔案 - 刪除"
+  course_files_edit_d05d4e8b: "課程檔案 - 編輯"
   course_found_f5a40cd3: 找到課程
   course_found_not_deleted_a20f72f0: 找到課程（未刪除）
   course_grade_grade_in_course_code_9fa854db: "課程評分：%{grade}%日期%{course_code}"
@@ -7612,6 +7629,8 @@ zh-Hant:
   create_edit_line_item_scores_116482c7: 建立/編輯細項分數
   create_educational_resources_8219326e: 創建教育資源
   create_failed_15d07ad4: 創建失敗
+  create_file_71aa1922: "[ 創建檔案 ]"
+  create_file_s_188549e6: "[ 創建檔案 ]"
   create_files_after_rce_media_upload_recording_77d75a96: "上傳/錄製 RCE 媒體後建立檔案"
   create_interactive_course_content_76665336: 創建互動課程內容
   create_item_base: 
@@ -8056,6 +8075,7 @@ zh-Hant:
   delete_comment_a71040c3: 刪除註解
   delete_comment_comment_d32ffc85: "刪除評論：%{comment}"
   delete_comment_commenttext_c8afe129: "刪除意見：%{commentText}"
+  delete_course_files_ee9e769: 刪除課程檔案
   delete_criterion_row_80c3b3b: 刪除標準行
   delete_current_message_5da0221a: 刪除當前郵件
   delete_current_module_item_21fefc54: 刪除當前單元/項目
@@ -8352,6 +8372,7 @@ zh-Hant:
   disabled_3b1b332a: 已停用
   disabled_and_locked_d14dc6c2: 停用並鎖定
   disabled_by_default_7d822dcb: 默認停用
+  disabled_for_all_subaccounts_courses_6c8938e0: 已為所有子帳戶/課程停用
   disabled_in_course_settings_d15ee35d: "* 已在課程設定內停用"
   disabled_links_b3bdea99: 已停用的連結
   disabled_locked_dab351d6: 已停用（已鎖定）
@@ -8841,6 +8862,7 @@ zh-Hant:
   download_submission_comments_2a6c0395: 下載提交項目評論
   download_submissions_7454665f: 下載提交件
   download_the_complete_list_of_errors_and_warnings__7d993f7b: 於此下載完整錯誤和警告清單。
+  download_these_results_as_csv_9a890883: "以 CSV 格式下載結果"
   download_this_file_669f9174: 下載此文檔
   downloading_course_content_allows_access_to_conten_164d9336: 下載課程内容可以允許離綫瀏覽課程内容。内容包括文檔、頁面、作業、討論話題或測試。按一下『生成ePub』按鈕，生成個課程文檔，並用任何電子書軟件瀏覽。
   draft_92507c72: （草稿）
@@ -8977,6 +8999,7 @@ zh-Hant:
   edit_collaboration_b014c18b: 編輯協作
   edit_comment_comment_e74afa04: "編輯評論：%{comment}"
   edit_conference_title_6e234815: "編輯『%{conference_title}』"
+  edit_course_files_d046ef82: 編輯課程檔案
   edit_course_role_3b992fc2: 編輯課程角色
   edit_criterion_5e4dadca: 編輯標準
   edit_criterion_description_5828919: 編輯標準描述
@@ -9182,6 +9205,7 @@ zh-Hant:
   enabled_and_locked_49ff3de4: 啟用並鎖定
   enabled_ba7cab66: 啟用
   enabled_by_default_e530d6ed: 默認啟用
+  enabled_for_all_subaccounts_courses_e2ee4b2: 已為所有子帳戶/課程啟用
   enabled_links_be110215: 已啟用的連接
   enabled_locked_3cf7c256: 已啟用（已鎖定）
   enabled_unlocked_8d3a5df7: 已啟用（已解鎖）
@@ -9747,6 +9771,7 @@ zh-Hant:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "展開 %{groupName} 群組成員列表"
   expand_or_collapse_calendars_9854b0d0: 展開或摺疊月曆
   expand_or_collapse_undated_items_b901de09: 展開或摺疊未注日期的項目
+  expand_outcome_description_c5bdd70b: 展開成果說明
   expand_permission_b45bf097: "展開 %{permission}"
   expand_permission_c61d5958: 擴展權限
   expand_subdiscussion_cd226ed4: 展開分組討論
@@ -11347,6 +11372,7 @@ zh-Hant:
   granular_contexttype_notification_settings_will_be_c5dfc901: "將來在此配置細微 %{contextType} 通知設定。"
   granular_course_notification_settings_will_be_conf_68f122db: 將來在此配置細微課程通知設定。
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: 從課程添加/移除管理員身份的細微權限
+  granular_permissions_for_managing_course_files_1ed7f019: 管理課程檔案的細微權限
   granular_permissions_for_managing_course_sections_da4b04b: 管理課程分班的細微權限
   granular_permissions_for_managing_wiki_pages_3ed89a84: 管理維基頁面的細微權限
   graph_bar_b5daa23d: 圖表欄
@@ -12383,6 +12409,7 @@ zh-Hant:
   importing_outcomes_e62a0375: 正在匯入學習成果
   improve_accessibility_of_left_hand_menu_through_be_908fb002: 使用顏色加未啟用選單項目的視覺效果和螢幕讀取器指示器改善左側選單的可存取性。
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: 讓檔案上載內的拖放功能更清晰可見
+  improved_interface_with_ongoing_updates_7316bdef: 已更新的介面及持續進行的更新
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: 新測驗的單元支援功能已改良，包括可從單元建立新測驗
   improved_outcomes_management_4692f886: 已改善學習成果管理程序
   improved_visual_reminders_to_encourage_instructors_f203c7f: 改善視覺提醒，以鼓勵導師發佈課程
@@ -13186,6 +13213,7 @@ zh-Hant:
   loading_last_attended_date_5a42463: 載入最後一次加入日期
   loading_mastery_paths_c558a766: 正在載入精通路徑...
   loading_media_32847745: 載入媒體
+  loading_message_list_226a131e: 正在載入訊息列表
   loading_more_grade_history_results_b235de5: 載入更多評分紀錄結果。
   loading_more_gradebook_history_results_810f6d2e: 載入更多成績單紀錄結果。
   loading_more_results_1d437202: 載入更多結果
@@ -13428,6 +13456,7 @@ zh-Hant:
   malformed_csv_aaa4b7f2: "CSV 格式錯誤"
   maltese_916925e8: 馬爾他語
   manage_access_bd923d8d: 管理權限
+  manage_add_edit_delete_course_files_162c1a65: 管理（添加/編輯/刪除）課程文檔
   manage_add_edit_delete_pages_5c73f2fb: "管理 (增加/編輯/刪除) 頁面"
   manage_announcement_with_title_title_f2ce92de: "管理通告標題%{title}"
   manage_app_list_994cc26c: 管理應用列表
@@ -13441,6 +13470,7 @@ zh-Hant:
       delete_avatar: 是否確定要刪除這個使用者的個人檔案圖片？
       lock_avatar: 鎖定這張照片將會核準該照片，並防止使用者對其進行更新。繼續？
   manage_b88f7150: 管理
+  manage_course_files_57e07038: 管理課程檔案
   manage_course_sections_f482d1b3: 管理課程分班
   manage_discussion_title_a2ecb3fb: "管理討論%{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: 管理註冊狀態，創建組以及從此頁面添加使用者。
@@ -15962,6 +15992,7 @@ zh-Hant:
   nav_text_active_a924ae88: 導航文字活躍
   navigation_allows_user_to_view_the_people_link_in__dd533d29: 導航工具允許使用者查看課程導航中的成員連結。
   navigation_icon_45db938e: 導覽圖標
+  navigation_menu_fd782ff8: 導航工具選單
   near_mastery_f25174a4: 接近掌握程度
   need_a_canvas_account_221d18ed: "需要新的 Canvas 帳戶？"
   need_help_setting_up_your_course_2b763141: 是否需要支援您設置課程？
@@ -16829,6 +16860,7 @@ zh-Hant:
   outcome_imports_c496a81f: 學習成果匯入
   outcome_mastery_scales_8c3a814d: 學習成果掌握程度
   outcome_mastery_scales_add_edit_171551c: "學習成果掌握程度 - 添加/編輯"
+  outcome_menu_4fe5813: 成果選單
   outcome_path_mastery_points: "%{path} 精通分數"
   outcome_path_result: "%{path} 結果"
   outcome_proficiency_calculations_5959b681: 結果能力計算
@@ -19051,6 +19083,7 @@ zh-Hant:
           select_all_banks: 全選
           view_question_banks: 瀏覽課程題庫
         options: 
+          create_group: "[ 建立群組 ]"
           new_group: "[新群組]"
           no_group: "[沒有群組]"
         select_a_question_bank: 請從以下清單中選擇一個題庫，以將其連結到此測驗，作為問題群組。
@@ -20041,6 +20074,7 @@ zh-Hant:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: 不論此權限啟用或停用，使用者均仍能於自己的個人行事曆中管理活動。
   regenerate_3e4679f8: 重新生成
   regenerate_epub_395c8e56: "重新生成 ePub 文檔"
+  regenerating_themes_462e6cd9: 正在重新生成外觀主題…
   region_47e29025: 區域：
   region_939f2a6c: 區域
   register_email_efc06d59: 註冊電子郵件
@@ -20776,6 +20810,7 @@ zh-Hant:
   search_discussion_by_title_30466604: 按標題搜索討論區
   search_endpoints_d5abf37f: 搜索端點
   search_entries_or_author_63fb0a86: 搜索輸入項目或作者
+  search_field_234156fc: 搜尋欄位
   search_flickr_6f28b02e: "搜索 flickr 分享"
   search_for_a_deleted_course_by_id_f553398d: "根據 ID 搜索已刪除的課程"
   search_for_files_7541fb28: 搜索文檔
@@ -20790,6 +20825,7 @@ zh-Hant:
   search_term_must_be_at_least_num_characters_669098ed: "搜索項必須至少為 %{num} 個字元"
   search_title_body_or_author_1d26711f: 搜索標題、正文或作者
   search_users_48b1789e: 搜索使用者...
+  search_within_grouptitle_4d38272f: "在 %{groupTitle} 內搜尋"
   searching_b0207e7f: 搜索
   searching_for_announcements_in_sections_must_span__80e4dfe4: 在分班中搜索通告必須跨越一個課程
   second_reviewer_90046c68: "第 2 檢閱人"
@@ -20980,6 +21016,7 @@ zh-Hant:
   select_one_8e0af564: 選擇一個
   select_one_b647b384: 選擇一個
   select_one_of_the_options_c8b0c6e4: 選取一個選項：
+  select_outcome_7e6e2562: 選擇成果
   select_page_e93fc123: 選取頁面
   select_prerequisite_module_57894963: 選取必修單元
   select_prerequite_module_e9042bb0: 選取必修單元
@@ -20990,11 +21027,17 @@ zh-Hant:
   select_students_for_review_6e004a12: 選擇待評閲的學生
   select_sub_account_6704196a: 選擇子賬戶
   select_term_f8083fb0: 選擇學期
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: 選擇您要關聯的檔案，或選擇「創建檔案」添加檔案。
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: 選擇您要關聯的文檔，或選擇『新文檔』添加文檔。
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: 選擇您想要關聯至此*單元*的檔案，或者透過選擇「新檔案」添加檔案。
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: 選擇您想要關聯至此*單元*的檔案，或者透過選擇「創建檔案」添加檔案。
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: 選擇您要關聯的檔案，或選擇「創建檔案」添加檔案。
   select_the_files_you_want_to_associate_or_add_file_9acd7878: 選擇您要關聯的檔案，或選擇「新檔案」添加檔案。
   select_the_files_you_want_to_associate_with_this_m_82677c50: 選擇您想要關聯至此*單元*的檔案，或者透過選擇「新檔案」添加檔案。
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: 選擇您想要關聯至此*單元*的檔案，或者透過選擇「創建檔案」添加檔案。
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "選取您想連結的頁面或選取 \"新頁面\" 增加一個新頁面。"
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: 選取您想連結的頁面，或者透過選擇「創建頁面」以添加頁面。
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: 選取您想與此*單元*連結的頁面，或者透過選擇「創建頁面」以添加頁面。
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "選取您想與此 *單元* 連結的頁面或選取\"新頁面\"增加一個新頁面。"
   select_title_for_deletion_45b08247: "選取要刪除的 %{title}"
   select_type_of_prerequisite_8d6fa902: 選取必修項目
@@ -21708,10 +21751,21 @@ zh-Hant:
       add_to_module: "添加 %{item} 至*單元*"
       assignment_item: "作業 ID"
       assignment_item_select_label: 選擇您希望關聯的課程，或選擇『新作業』，以添加作業。
+      assignment_item_select_label_create: 選擇您希望關聯的作業，或選擇「創建作業」，以添加作業。
+      assignment_item_select_label_new: 選擇您希望關聯的課程，或選擇「新作業」，以添加作業。
       assignment_notice: 選擇您想要關聯至此*單元*的作業，或者透過選擇『新作業』添加作業。
       content_page_item: 頁面
+      create_assignment_notice: 選擇您想要關聯至*單元*的作業，或者透過選擇「創建作業」添加作業。
+      create_assignment_option: "[ 創建作業 ]"
+      create_page_option: "[ 創建頁面 ]"
+      create_quiz_notice: 選擇您想要關聯至此*單元*的測驗，或者透過選擇「創建測驗」添加測驗。
+      create_quiz_option: "[ 創建測驗 ]"
+      create_topic_notice: 選擇您想要關聯至此*單元*的主題，或者透過選擇「創建主題」添加主題。
+      create_topic_option: "[ 創建主題 ]"
       discussion_item: 討論
       discussion_topic_select_label: 選擇您要關聯的話題，或選擇『新話題』添加話題。
+      discussion_topic_select_label_create: 選擇您要關聯的主題，或選擇「創建主題」添加主題。
+      discussion_topic_select_label_new: 選擇您要關聯的主題，或選擇「新主題」添加話題。
       domain_match_notice: "要使用此工具，網域必須與 %{domain} 相符"
       external_tool_item: 外部工具
       external_tool_notice: "從以下清單中選擇一個工具，或輸入您已經知道且設置了基本 LTI 的外部工具 URL，以添加至此*單元*的連結。"
@@ -21731,6 +21785,7 @@ zh-Hant:
         header: 標題
         indentation: 縮排
         page_name: 頁面名稱
+        quiz_engine: 測驗引擎
         quiz_group: 群組
         quiz_name: 測驗名稱
         topic_name: 主題名稱
@@ -21738,16 +21793,21 @@ zh-Hant:
         wiki_page_name: 頁面名稱
         wiki_page_namem: 作業名稱
       loading: 正在載入...
+      new_assignment_notice: 選擇您想要關聯至*單元*的作業，或者透過選擇「新作業」添加作業。
       new_assignment_option: "[新作業]"
       new_page_option: "[新頁面]"
+      new_quiz_notice: 選擇您想要關聯至此*單元*的測驗，或者透過選擇「新測驗」添加測驗。
       new_quiz_option: "[新測驗]"
       new_tab: 載入新標籤
+      new_topic_notice: 選擇您想要關聯至此*單元*的主題，或者透過選擇「新主題」添加主題。
       new_topic_option: "[新主题]"
       options: 
         assignments: 作業
       quiz_item: 測驗
       quiz_notice: 選擇您想要關聯至此*單元*的測驗，或者透過選擇『新測驗』添加測驗。
       quiz_select_label: 選擇您要關聯的測驗，或選擇『新測驗』添加測驗。
+      quiz_select_label_create: 選擇您要關聯的測驗，或選擇「創建測驗」添加測驗。
+      quiz_select_label_new: 選擇您要關聯的測驗，或選擇「新測驗」添加測驗。
       select_item_type_label: 選擇要添加的內容類型。
       sub_header_notice: 鍵入您想作為*單元*子標題而添加的文字
       text_header_item: 文字标题
@@ -23127,6 +23187,7 @@ zh-Hant:
   the_module_item_is_locked_27fe420b: 該單元項目已鎖定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "用户 %{current_user_name} 的最新分数和成果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "此課程可供選擇的預約是*%{date}*"
+  the_original_quizzes_interface_fcda53bc: 原有測驗介面
   the_preceding_content_is_partner_provided_d753928c: 上述內容由合作夥伴提供
   the_previous_sis_batch_was_aborted_d7d89955: "已捨棄先前 SIS 批次"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 能力計算由您的管理員設定，並且套用到此帳戶中的所有課程。
@@ -24249,7 +24310,9 @@ zh-Hant:
   unable_to_find_extension_3fe61b3c: 找不到副檔名
   unable_to_find_filetype_7b620f02: 找不到檔案類型
   unable_to_find_matches_for_these_email_addresses_i_c2305106: 無法在您的機構中為這些電郵地址找到吻合。選擇那些您要創建為新使用者的。未選擇的將被略過。
+  unable_to_load_courses_menu_7074ea04: 無法載入課程選單
   unable_to_load_lti_1_3_tools_cf169f9: "無法載入 Lti 1.3 工具"
+  unable_to_load_messages_2b158fd0: "無法載入訊息。 "
   unable_to_read_file_2d04b0c: 無法讀取檔案
   unable_to_remove_app_4293cb53: 無法刪除應用程式
   unable_to_save_new_discussion_topic_99239f3f: 無法儲存新的討論主題

@@ -1794,11 +1794,13 @@ nl:
   add_course_406cb773: "Cursus toevoegen"
   add_course_assignments_628ed6d0: "Cursus toevoegen"
   add_course_calendar_events_146154a5: "Gebeurtenissen aan de cursuskalender toevoegen"
+  add_course_files_4e0f1abc: "Cursusbestanden toevoegen"
   add_criterion_eb9587ef: "Criterium toevoegen"
   add_custom_link_22059c0: "Aangepaste link toevoegen"
   add_designers_to_courses_9588820b: "Ontwerpers aan cursussen toevoegen"
   add_discussion_653dab4c: "Discussie toevoegen"
   add_domain_f15bc6c1: "Domein toevoegen"
+  add_edit_delete_files_573a4d62: "Bestanden toevoegen/bewerken/verwijderen"
   add_edit_delete_sections_d32c5b4d: "Secties toevoegen/bewerken/verwijderen"
   add_email_address_aef3b61: "E-mailadres toevoegen"
   add_existing_content_7e36da66: "Bestaande inhoud toevoegen"
@@ -1809,6 +1811,7 @@ nl:
   add_grading_period_6f774dc3: "Beoordelingsperiode toevoegen"
   add_grading_scheme_81e23c05: "Beoordelingsschema toevoegen"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Beoordelingsschema toevoegen aan cijferrapporten voor beheerders"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Voegt details toe aan machtigingen rondom het beheer van cursusbestanden"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Voegt details toe aan machtigingen rondom het beheer van cursussecties"
   add_group_c84f9e9d: "Groep toevoegen"
   add_group_set_f9809e11: "Groepsreeks toevoegen"
@@ -2104,6 +2107,8 @@ nl:
   allow_users_to_comment_45b8f753: "Geef gebruikers de mogelijkheid om opmerkingen te geven"
   allowed_attempts_4e229caa: "Toegestane aantal pogingen"
   allowed_domains_ee7868c8: "Toegestane domeinen"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Toegestaan voor subaccounts/cursussen, standaard uitgeschakeld"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Toegestaan voor subaccounts/cursussen, standaard ingeschakeld"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Hiermee kan een gebruiker de link Optreden als gebruiker openen in contextkaarten van een cursist"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Hiermee kan een gebruiker de SIS-ID in de aanmeldingsgegevens van een gebruiker bekijken."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Hiermee kan een gebruiker de SIS-ID van gebruikers op de pagina Personen in een cursus bekijken."
@@ -3159,6 +3164,7 @@ nl:
     assignment_group_selector: 
       assignment_group: Opdrachtgroep
       assignment_group_options: 
+        create_group: "Groep maken"
         new_group: "Nieuwe groep"
     assignment_groups_count: 
       one: "1 Groep"
@@ -5092,6 +5098,7 @@ nl:
   classic_quizzes_dee3c7b7: "Klassieke toetsen"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Optie Klassieke toetsen voor Tijdgebonden toetsen zonder inlevering"
   clear_2084585f: Wissen
+  clear_search_field_75f595c7: "Zoekveld wissen"
   clear_selected_file_82388e50: "Verwijder geselecteerd bestand"
   clear_user_cache_ef079f7f: "Gebruikerscache wissen"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klik op \"Annuleren\" als je niet wilt dat de code wordt weergegeven."
@@ -5338,6 +5345,7 @@ nl:
   collapse_all_50275533: "Alles invouwen"
   collapse_group_c2af7cad: "Groep invouwen"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Lijst van de groepsleden invouwen voor %{groupName}"
+  collapse_outcome_description_de471564: "Leerdoelbeschrijving samenvouwen"
   collapse_subdiscussion_89af1f5c: "Subdiscussie invouwen"
   collapse_tutorial_tray_66ee7dc1: "Zelfstudiemenu samenvouwen"
   collapsed_510aa02a: Invouwen
@@ -6545,6 +6553,9 @@ nl:
   count_files_were_ignored_2f9c054a: 
     one: "Er is (1) bestand genegeerd"
     other: "Er zijn (%{count}) bestanden genegeerd"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 \"%{groupTitle}\" leerdoel"
+    other: "%{count} \"%{groupTitle}\" leerdoelen"
   count_hidden_e8d2c57c: "%{count} verborgen"
   count_images_found_for_term_a93635ed: "%{count} afbeeldingen gevonden voor %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -6573,6 +6584,9 @@ nl:
     one: "1 optie"
     other: "%{count} Opties"
   count_options_loaded_cd59cc3b: "%{count} opties geladen."
+  count_outcomes_selected_55902958: 
+    one: "1 leerdoel geselecteerd"
+    other: "%{count} leerdoelen geselecteerd"
   count_page_views_b40102b3: 
     one: "1 paginaweergave"
     other: "%{count} paginaweergaven"
@@ -6811,7 +6825,10 @@ nl:
   course_favorites_from_dashboard_27a3515a: "Cursusfavorieten van dashboard"
   course_files_62deb8f8: Cursusbestanden
   course_files_a31f97fc: Cursusbestanden
+  course_files_add_2eede390: "Cursusbestanden - toevoegen"
   course_files_add_edit_delete_24678a2f: "Cursusbestanden - toevoegen/bewerken/verwijderen"
+  course_files_delete_fae0effe: "Cursusbestanden - verwijderen"
+  course_files_edit_d05d4e8b: "Cursusbestanden - bewerken"
   course_found_f5a40cd3: "Cursus gevonden"
   course_found_not_deleted_a20f72f0: "Cursus gevonden (niet verwijderd)"
   course_grade_grade_in_course_code_9fa854db: "Cursuscijfer: %{grade}% in %{course_code}"
@@ -7599,6 +7616,8 @@ nl:
   create_edit_line_item_scores_116482c7: "Regelitemscores maken/bewerken"
   create_educational_resources_8219326e: "Maak onderwijsbronnen"
   create_failed_15d07ad4: "Aanmaken mislukt"
+  create_file_71aa1922: "[ Bestand maken ]"
+  create_file_s_188549e6: "[ Bestand(en) maken ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Bestanden maken na uploaden/opnemen van media via RCE"
   create_interactive_course_content_76665336: "Maak interactieve cursusinhoud"
   create_item_base: 
@@ -8044,6 +8063,7 @@ nl:
   delete_comment_a71040c3: "Opmerking verwijderen"
   delete_comment_comment_d32ffc85: "Opmerking verwijderen: %{comment}"
   delete_comment_commenttext_c8afe129: "Opmerking verwijderen: %{commentText}"
+  delete_course_files_ee9e769: "Cursusbestanden verwijderen"
   delete_criterion_row_80c3b3b: "Rij met criterium verwijderen"
   delete_current_message_5da0221a: "Huidig bericht verwijderen"
   delete_current_module_item_21fefc54: "Huidige module/huidig item verwijderen"
@@ -8341,6 +8361,7 @@ nl:
   disabled_3b1b332a: Uitgeschakeld
   disabled_and_locked_d14dc6c2: "Uitgeschakeld en vergrendeld"
   disabled_by_default_7d822dcb: "Standaard uitgeschakeld"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Uitgeschakeld voor alle subaccounts/cursussen"
   disabled_in_course_settings_d15ee35d: "* Uitgeschakeld in cursusinstellingen"
   disabled_links_b3bdea99: "Uitgeschakelde koppelingen"
   disabled_locked_dab351d6: "Uitgeschakeld  (vergrendeld)"
@@ -8832,6 +8853,7 @@ nl:
   download_submission_comments_2a6c0395: "Opmerkingen bij inlevering downloaden"
   download_submissions_7454665f: "Inzendingen downloaden"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Download hier de volledige lijst met fouten en waarschuwingen."
+  download_these_results_as_csv_9a890883: "Deze resultaten als CSV downloaden"
   download_this_file_669f9174: "Dit bestand downloaden"
   downloading_course_content_allows_access_to_conten_164d9336: "Het downloaden van cursuscontent maakt offline toegang tot de content mogelijk. Content kan bestanden, pagina's, beoordelingen, gespreksonderwerpen of toetsen inhouden. Klik op 'ePub genereren\" voor elke cursus en open met een eReader software om weer te geven."
   draft_92507c72: (concept)
@@ -8968,6 +8990,7 @@ nl:
   edit_collaboration_b014c18b: "Samenwerking bewerken"
   edit_comment_comment_e74afa04: "Opmerking bewerken: %{comment}"
   edit_conference_title_6e234815: "\"%{conference_title}\" bewerken"
+  edit_course_files_d046ef82: "Cursusbestanden bewerken"
   edit_course_role_3b992fc2: "Cursusnavigatie bewerken"
   edit_criterion_5e4dadca: "Criterium bewerken"
   edit_criterion_description_5828919: "Bewerken van standaard beschrijving"
@@ -9175,6 +9198,7 @@ nl:
   enabled_and_locked_49ff3de4: "Ingeschakeld en vergrendeld"
   enabled_ba7cab66: Ingeschakeld
   enabled_by_default_e530d6ed: "Standaard ingeschakeld"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Ingeschakeld voor alle subaccounts/cursussen"
   enabled_links_be110215: "Ingeschakelde koppelingen"
   enabled_locked_3cf7c256: "Ingeschakeld (vergrendeld)"
   enabled_unlocked_8d3a5df7: "Ingeschakeld (ontgrendeld)"
@@ -9740,6 +9764,7 @@ nl:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Lijst van groepsleden uitvouwen voor %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Kalenders uit- of invouwen "
   expand_or_collapse_undated_items_b901de09: "Items zonder datum uit- en invouwen "
+  expand_outcome_description_c5bdd70b: "Leerdoelbeschrijving uitvouwen"
   expand_permission_b45bf097: "%{permission} uitvouwen"
   expand_permission_c61d5958: "Machtiging uitvouwen"
   expand_subdiscussion_cd226ed4: "Subdiscussie uitvouwen"
@@ -11346,6 +11371,7 @@ nl:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Specifieke instellingen voor %{contextType} kunnen hier in de toekomst worden geconfigureerd."
   granular_course_notification_settings_will_be_conf_68f122db: "Specifieke instellingen voor cursusmeldingen kunnen hier in de toekomst worden geconfigureerd."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Gedetailleerde machtigingen voor Toevoegen/Verwijderen van beheerdersrollen van cursus"
+  granular_permissions_for_managing_course_files_1ed7f019: "Gedetailleerde machtigingen voor beheer van cursusbestanden"
   granular_permissions_for_managing_course_sections_da4b04b: "Gedetailleerde machtigingen voor beheer van cursussecties"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Specifieke machtigingen voor het beheren van wiki-pagina's"
   graph_bar_b5daa23d: Grafiekbalk
@@ -12383,6 +12409,7 @@ nl:
   importing_outcomes_e62a0375: "leerdoelen importeren"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Verbeter de toegankelijkheid van het menu links door een beter gebruik van kleur en visuals en indicatoren in de schermlezer van inactieve menu-items."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Detectie van slepen en neerzetten in Bestanden verbeteren"
+  improved_interface_with_ongoing_updates_7316bdef: "Verbeterde interface met voortdurende updates"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Verbeterde ondersteuning van Nieuwe toetsen met Modules, inclusief het maken van Nieuwe toetsen vanaf Modules"
   improved_outcomes_management_4692f886: "Verbeterd beheer van leerdoelen"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Verbeterde visuele herinneringen om cursusleiders aan te sporen cursussen te publiceren"
@@ -13183,6 +13210,7 @@ nl:
   loading_last_attended_date_5a42463: "Datum laatste keer bijgewoond wordt geladen"
   loading_mastery_paths_c558a766: "Bezig met het laden van Meesterschap Paths..."
   loading_media_32847745: "Media laden"
+  loading_message_list_226a131e: "Bezig met berichtenlijst laden"
   loading_more_grade_history_results_b235de5: "Meer resultaten van cijfergeschiedenis laden."
   loading_more_gradebook_history_results_810f6d2e: "Meer resultaten van cijferlijstgeschiedenis laden."
   loading_more_results_1d437202: "Bezig met laden van meer resultaten"
@@ -13425,6 +13453,7 @@ nl:
   malformed_csv_aaa4b7f2: "Ongeldige CSV"
   maltese_916925e8: Maltees
   manage_access_bd923d8d: "Toegang beheren"
+  manage_add_edit_delete_course_files_162c1a65: "Cursusbestanden beheren (toevoegen/bewerken/verwijderen)"
   manage_add_edit_delete_pages_5c73f2fb: "Pagina's beheren (toevoegen/bewerken/verwijderen)"
   manage_announcement_with_title_title_f2ce92de: "Beheren van aankondiging met titel %{title}"
   manage_app_list_994cc26c: "App lijst beheren"
@@ -13438,6 +13467,7 @@ nl:
       delete_avatar: "Weet je zeker dat je de profielafbeelding van deze gebruiker wilt verwijderen?"
       lock_avatar: "Door de afbeelding te vergrendelen wordt de afbeelding goedgekeurd en kan de gebruiker deze niet meer bijwerken. Doorgaan?"
   manage_b88f7150: Beheren
+  manage_course_files_57e07038: "Cursusbestanden beheren"
   manage_course_sections_f482d1b3: "Cursussecties beheren"
   manage_discussion_title_a2ecb3fb: "Discussie beheren %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Inschrijvingsstatus beheren, groepen maken en gebruikers toevoegen vanaf deze pagina."
@@ -15961,6 +15991,7 @@ nl:
   nav_text_active_a924ae88: "Nav tekst actief"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigatie - Hiermee kan een gebruiker de link Personen in Cursusnavigatie weergeven."
   navigation_icon_45db938e: "Navigatie icoon"
+  navigation_menu_fd782ff8: Navigatiemenu
   near_mastery_f25174a4: "Bijna Meesterschap"
   need_a_canvas_account_221d18ed: "Heb je een Canvas-account nodig?"
   need_help_setting_up_your_course_2b763141: "Hulp nodig bij het instellen van je cursus?"
@@ -16825,6 +16856,7 @@ nl:
   outcome_imports_c496a81f: "Importbestanden voor leerdoelen"
   outcome_mastery_scales_8c3a814d: "Vakbeheersingsschalen voor leerdoelen"
   outcome_mastery_scales_add_edit_171551c: "Vakbeheersingsschalen voor leerdoelen - toevoegen/bewerken"
+  outcome_menu_4fe5813: Leerdoelmenu
   outcome_path_mastery_points: "%{path} bekwam punten"
   outcome_path_result: "%{path} resultaat"
   outcome_proficiency_calculations_5959b681: "Vaardigheidsberekeningen voor leerdoel"
@@ -19053,6 +19085,7 @@ nl:
           select_all_banks: "Alles selecteren"
           view_question_banks: "Cursus vragenbanken weergeven"
         options: 
+          create_group: "[ Groep maken ]"
           new_group: "[ Nieuwe groep ]"
           no_group: "[ Geen groep ]"
         select_a_question_bank: "Een toetsbank uit de onderstaande lijst selecteren om deze te koppelen aan deze toets als groep met vragen."
@@ -20045,6 +20078,7 @@ nl:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Ongeacht of deze machtiging wel of niet is ingeschakeld, gebruikers kunnen nog steeds evenementen in hun persoonlijke kalender beheren."
   regenerate_3e4679f8: "Opnieuw genereren"
   regenerate_epub_395c8e56: "ePub opnieuw genereren"
+  regenerating_themes_462e6cd9: "Thema's regenereren..."
   region_47e29025: "Regio:"
   region_939f2a6c: Regio
   register_email_efc06d59: "E-mailadres registreren"
@@ -20780,6 +20814,7 @@ nl:
   search_discussion_by_title_30466604: "Discussie zoeken op naam"
   search_endpoints_d5abf37f: "Eindpunten zoeken"
   search_entries_or_author_63fb0a86: "Vermeldingen of auteur zoeken"
+  search_field_234156fc: Zoekveld
   search_flickr_6f28b02e: "Zoeken in flickr"
   search_for_a_deleted_course_by_id_f553398d: "Met ID naar verwijderde cursus zoeken"
   search_for_files_7541fb28: "Bestanden zoeken"
@@ -20794,6 +20829,7 @@ nl:
   search_term_must_be_at_least_num_characters_669098ed: "Zoekterm moet ten minste %{num} tekens bevatten"
   search_title_body_or_author_1d26711f: "Zoeken op titel, hoofdtekst of auteur "
   search_users_48b1789e: "Gebruikers zoeken..."
+  search_within_grouptitle_4d38272f: "Zoeken binnen %{groupTitle}"
   searching_b0207e7f: "Bezig met zoeken..."
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Het zoeken naar aankondigingen in secties moet precies één cursus omvatten"
   searching_for_courses_8cc5f904: "Zoeken naar cursussen..."
@@ -20985,6 +21021,7 @@ nl:
   select_one_8e0af564: "Eén selecteren"
   select_one_b647b384: "Selecteer er één"
   select_one_of_the_options_c8b0c6e4: "Selecteer een van de opties:"
+  select_outcome_7e6e2562: "Leerdoel selecteren"
   select_page_e93fc123: "Selecteer pagina"
   select_prerequisite_module_57894963: "Vereiste module selecteren"
   select_prerequite_module_e9042bb0: "Vereiste module selecteren"
@@ -20995,11 +21032,17 @@ nl:
   select_students_for_review_6e004a12: "Studenten selecteren voor beoordeling"
   select_sub_account_6704196a: "Subaccount selecteren"
   select_term_f8083fb0: "Periode selecteren"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Selecteer het bestand dat je wilt koppelen of voeg een bestand toe door \"Bestand maken\" te selecteren."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Het bestand selecteren die je wilt koppelen, of een bestand toevoegen door \"Nieuw bestand\" te selecteren."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Selecteer het bestand dat je aan deze *module* wilt koppelen of voeg een bestand toe door \"Nieuw bestand\" te selecteren."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Selecteer het bestand dat je aan deze *module* wilt koppelen of voeg een bestand toe door \"Bestand maken\" te selecteren."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Selecteer de bestanden die je wilt koppelen of voeg bestanden toe door \"Bestand(en) maken\" te selecteren."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Selecteer de bestanden die je wilt koppelen of voeg bestanden toe door \"Nieuwe bestanden\" te selecteren."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Selecteer de bestanden die je aan deze *module* wilt koppelen of voeg bestanden toe door \"Nieuwe bestanden\" te selecteren."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Selecteer de bestanden die je aan deze *module* wilt koppelen of voeg bestanden toe door \"Bestand(en) maken\" te selecteren."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Selecteer de pagina die je wilt koppelen of voeg een nieuwe pagina toe door \"Nieuwe pagina\" te selecteren."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Selecteer de pagina die je wilt koppelen of voeg een nieuwe pagina door \"Pagina maken\" te selecteren."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Selecteer de pagina die je aan deze *module* wilt koppelen of voeg een nieuwe pagina toe door \"Pagina maken\" te selecteren."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Selecteer de pagina die je wilt koppelen met deze *module* of voeg een nieuwe pagina toe door \"Nieuwe pagina\" te selecteren."
   select_title_for_deletion_45b08247: "Selecteer %{title} om te verwijderen"
   select_type_of_prerequisite_8d6fa902: "Selecteer soort vereiste"
@@ -21713,10 +21756,21 @@ nl:
       add_to_module: "%{item} aan *module* toevoegen"
       assignment_item: Opdracht
       assignment_item_select_label: "De opdracht selecteren die je wilt koppelen, of een opdracht toevoegen door \"Nieuwe opdracht\" te selecteren."
+      assignment_item_select_label_create: "Selecteer de opdracht die je wilt koppelen of voeg een opdracht toe door \"Opdracht maken\" te selecteren."
+      assignment_item_select_label_new: "Selecteer de opdracht die je wilt koppelen of voeg een opdracht toe door \"Nieuwe opdracht\" te selecteren."
       assignment_notice: "De opdracht selecteren die je aan deze *module* wilt koppelen of een opdracht toevoegen door \"Nieuwe opdracht\" te selecteren."
       content_page_item: Pagina
+      create_assignment_notice: "Selecteer de opdracht die je aan deze *module* wilt koppelen of voeg een opdracht toe door \"Opdracht maken\" te selecteren."
+      create_assignment_option: "[ Opdracht maken ]"
+      create_page_option: "[ Pagina maken ]"
+      create_quiz_notice: "Selecteer de toets die je aan deze *module* wilt koppelen of voeg een nieuwe toe door \"Toets maken\" te selecteren."
+      create_quiz_option: "[ Toets maken ]"
+      create_topic_notice: "Selecteer het onderwerp dat je aan deze *module* wilt koppelen of voeg een onderwerp toe door \"Onderwerp maken\" te selecteren."
+      create_topic_option: "[ Onderwerp maken ]"
       discussion_item: Discussie
       discussion_topic_select_label: "Het onderwerp selecteren die je wilt koppelen, of een onderwerp toevoegen door \"Nieuw onderwerp\" te selecteren."
+      discussion_topic_select_label_create: "Selecteer het onderwerp dat je wilt koppelen of voeg een onderwerp toe door \"Onderwerp maken\" te selecteren."
+      discussion_topic_select_label_new: "Selecteer het onderwerp dat je wilt koppelen of voeg een onderwerp toe door \"Nieuw onderwerp\" te selecteren."
       domain_match_notice: "om deze tool te kunnen gebruiken moet het domein overeenkomen met %{domain}"
       external_tool_item: "Externe tool"
       external_tool_notice: "Een tool uit onderstaande lijst selecteren of een URL invoeren voor een extern tool waarvan je al weet dat deze geconfigureerd wordt met Basic LTI, om aan deze *module*een link toe te voegen."
@@ -21736,6 +21790,7 @@ nl:
         header: Koptekst
         indentation: Inspringing
         page_name: Paginanaam
+        quiz_engine: Toets-engine
         quiz_group: Groep
         quiz_name: "Naam van toets"
         topic_name: "Naam van onderwerp"
@@ -21743,16 +21798,21 @@ nl:
         wiki_page_name: Paginanaam
         wiki_page_namem: "Naam van de opdracht"
       loading: "Bezig met laden..."
+      new_assignment_notice: "Selecteer de opdracht die je aan deze *module* wilt koppelen of voeg een opdracht toe door \"Nieuwe opdracht\" te selecteren."
       new_assignment_option: "[ Nieuwe opdracht ]"
       new_page_option: "[ Nieuwe pagina ]"
+      new_quiz_notice: "Selecteer de toets die je aan deze *module* wilt koppelen of voeg een nieuwe toe door \"Nieuwe toets\" te selecteren."
       new_quiz_option: "Nieuwe toets"
       new_tab: "In een nieuw tabblad laden"
+      new_topic_notice: "Selecteer het onderwerp dat je aan deze *module* wilt koppelen of voeg een onderwerp toe door \"Nieuw onderwerp\" te selecteren."
       new_topic_option: "[ Nieuw onderwerp ]"
       options: 
         assignments: Opdrachten
       quiz_item: Toets
       quiz_notice: "De toets selecteren die je aan deze *module*wilt koppelen of een nieuwe toevoegen door \"Nieuwe toets\" te selecteren."
       quiz_select_label: "De toets selecteren die je wilt koppelen of een nieuwe toevoegen door \"Nieuwe toets\" te selecteren."
+      quiz_select_label_create: "Selecteer de toets die je wilt koppelen of voeg een nieuwe toe door \"Toets maken\" te selecteren."
+      quiz_select_label_new: "Selecteer de toets die je wilt koppelen of voeg een nieuwe toe door \"Nieuwe toets\" te selecteren."
       select_item_type_label: "Het toe te voegen type van inhoud selecteren."
       sub_header_notice: "De tekst intypen die je als subkop voor deze *module* wilt toevoegen"
       text_header_item: Koptekst
@@ -23140,6 +23200,7 @@ nl:
   the_module_item_is_locked_27fe420b: "Het item van de module is vergrendeld."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De meest recente scores voor gebruiker %{current_user_name} en %{outcome_name} resultaat."
   the_next_available_appointment_in_this_course_is_o_da10316c: "De eerstvolgende beschikbare afspraak in deze cursus is op *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "De originele toetseninterface"
   the_preceding_content_is_partner_provided_d753928c: "De voorgaande inhoud is door een partner geleverd"
   the_previous_sis_batch_was_aborted_d7d89955: "De vorige SIS-batch is afgebroken"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "De vaardigheidsberekening is ingesteld door je beheerder en geldt voor alle cursussen in dit account."
@@ -24262,7 +24323,9 @@ nl:
   unable_to_find_extension_3fe61b3c: "kan extensie niet vinden"
   unable_to_find_filetype_7b620f02: "kan bestandstype niet vinden"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Kan in je instituut geen overeenkomsten vinden voor deze e-mailadressen. Selecteer de adressen die je wilt gebruiken om nieuwe gebruikers te maken. Niet-geselecteerde adressen worden overgeslagen."
+  unable_to_load_courses_menu_7074ea04: "Kan cursussenmenu niet laden."
   unable_to_load_lti_1_3_tools_cf169f9: "Kan LTI 1.3 Tools niet laden"
+  unable_to_load_messages_2b158fd0: "Kan berichten niet laden. "
   unable_to_read_file_2d04b0c: "Kan bestand niet lezen"
   unable_to_remove_app_4293cb53: "Kan app niet verwijderen"
   unable_to_save_new_discussion_topic_99239f3f: "kan nieuw discussieonderwerp niet opslaan"

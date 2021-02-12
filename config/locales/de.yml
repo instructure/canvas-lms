@@ -1767,11 +1767,13 @@ de:
   add_course_406cb773: "Kurs hinzufügen"
   add_course_assignments_628ed6d0: "Kursaufgaben hinzufügen"
   add_course_calendar_events_146154a5: "Kurskalenderevents hinzufügen"
+  add_course_files_4e0f1abc: "Verwalten (Hinzufügen / Bearbeiten / Löschen) von Kursdateien"
   add_criterion_eb9587ef: "Kriterium hinzufügen"
   add_custom_link_22059c0: "Angepassten Link hinzufügen"
   add_designers_to_courses_9588820b: "Designer zu Kursen hinzufügen"
   add_discussion_653dab4c: "Diskussion hinzufügen"
   add_domain_f15bc6c1: "Domäne hinzufügen"
+  add_edit_delete_files_573a4d62: "Dateien hinzufügen/bearbeiten/löschen"
   add_edit_delete_sections_d32c5b4d: "Abschnitte hinzufügen/bearbeiten/löschen"
   add_email_address_aef3b61: "E-Mail-Adresse hinzufügen"
   add_existing_content_7e36da66: "Vorhandenen Inhalt hinzufügen"
@@ -1782,6 +1784,7 @@ de:
   add_grading_period_6f774dc3: "Benotungsperiode hinzufügen"
   add_grading_scheme_81e23c05: "Benotungsschema hinzufügen"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Bewertungsschema zu den Admin-Bewertungsberichte hinzufügen"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Granularität für Berechtigungen für die Verwaltung von Kursdateien hinzufügen"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Fügt Granularität zu Berechtigungen bezüglich der Verwaltung von Kursabschnitten hinzu"
   add_group_c84f9e9d: "Gruppe hinzufügen"
   add_group_set_f9809e11: "Gruppenset hinzufügen"
@@ -2076,6 +2079,8 @@ de:
   allow_users_to_comment_45b8f753: "Benutzern Kommentare erlauben"
   allowed_attempts_4e229caa: "Zulässige Versuche"
   allowed_domains_ee7868c8: "Erlaubte Domänen."
+  allowed_for_subaccounts_courses_default_off_da598c11: "Erlaubt für Unterkonten/Kurse, Standardeinstellung aus"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Erlaubt für Unterkonten/Kurse, Standardeinstellung ein"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Erlaubt einem Benutzer, auf den Link „Handeln als Benutzer“ auf studentischen Kontextkarten zuzugreifen"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Erlaubt einem Benutzer die Anzeige der SIS-ID in den Anmeldedetails eines Benutzer."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Erlaubt einem Benutzer, Benutzer-SIS-IDs auf einer „Kurse und Teilnehmer“-Seite anzuzeigen."
@@ -3129,6 +3134,7 @@ de:
     assignment_group_selector: 
       assignment_group: Aufgabengruppe
       assignment_group_options: 
+        create_group: "Gruppe erstellen"
         new_group: "Neue Gruppe"
     assignment_groups_count: 
       one: "1 Gruppe"
@@ -5062,6 +5068,7 @@ de:
   classic_quizzes_dee3c7b7: "Klassische Quizze"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassische Quiz-Option für zeitlich beschränkte Quizzes ohne Abgabe"
   clear_2084585f: Löschen
+  clear_search_field_75f595c7: "Suchfeld löschen"
   clear_selected_file_82388e50: "Ausgewählte Datei löschen"
   clear_user_cache_ef079f7f: "Benutzer-Cache löschen"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klicken Sie auf „Abbrechen“, wenn Sie den Code nicht anzeigen möchten."
@@ -5300,6 +5307,7 @@ de:
   collapse_all_50275533: "Alle minimieren"
   collapse_group_c2af7cad: "Gruppe minimieren"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Liste der Gruppenmitglieder für %{groupName} reduzieren"
+  collapse_outcome_description_de471564: "Beschreibung des Ergebnisses einklappen"
   collapse_subdiscussion_89af1f5c: "Subdiskussion reduzieren"
   collapse_tutorial_tray_66ee7dc1: "Übungsfach ausblenden"
   collapsed_510aa02a: Reduziert
@@ -6510,6 +6518,9 @@ de:
   count_files_were_ignored_2f9c054a: 
     one: "(1) Datei wurde ignoriert."
     other: "(%{count}) Dateien wurden ignoriert."
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 „%{groupTitle}“-Lernziel"
+    other: "%{count} „%{groupTitle}“-Lernziele"
   count_hidden_e8d2c57c: "%{count} ausgeblendet"
   count_images_found_for_term_a93635ed: "%{count} Bilder wurden für %{term} gefunden."
   count_items_deleted_successfully_a287aa53: 
@@ -6537,6 +6548,9 @@ de:
     one: "1 Option"
     other: "%{count} Optionen"
   count_options_loaded_cd59cc3b: "%{count} Optionen geladen."
+  count_outcomes_selected_55902958: 
+    one: "1 Lernziel ausgewählt"
+    other: "%{count} Lernziele ausgewählt"
   count_page_views_b40102b3: 
     one: 1 Seitenansicht
     other: "%{count} Seitenansichten"
@@ -6570,7 +6584,7 @@ de:
   count_replies_a685c742: "%{count} Antworten"
   count_respondents_fc4c2da4: 
     one: "1 Befragter"
-    other: "%{count} Befragte"
+    other: "%{count} Befragte"
   count_results_9926447c: 
     one: "Ein Ergebnis"
     other: "%{count} Ergebnisse"
@@ -6597,8 +6611,8 @@ de:
     other: "%{count} Studenten"
     zero: "0 Studenten"
   count_students_in_percentile_percentile_d0adecfe: 
-    one: "1 Student im Perzentil %{percentile} "
-    other: "%{count} Studenten im Perzentil %{percentile} "
+    one: "1 Student im Perzentil %{percentile} "
+    other: "%{count} Studenten im Perzentil %{percentile} "
   count_students_will_get_num_points_c970fc01: 
     one: "1 Student erhält %{num} Punkte"
     other: "%{count} Studenten erhalten %{num} Punkte"
@@ -6772,7 +6786,10 @@ de:
   course_favorites_from_dashboard_27a3515a: "Kursfavoriten vom Dashboard"
   course_files_62deb8f8: Kurs-Dateien
   course_files_a31f97fc: Kursdateien
+  course_files_add_2eede390: "Kursdateien hinzufügen"
   course_files_add_edit_delete_24678a2f: "Kursdateien – hinzufügen/bearbeiten/löschen"
+  course_files_delete_fae0effe: "Kursdateien - löschen"
+  course_files_edit_d05d4e8b: "Kursdateien - bearbeiten"
   course_found_f5a40cd3: "Kurs gefunden"
   course_found_not_deleted_a20f72f0: "Kurs gefunden (nicht gelöscht)"
   course_grade_grade_in_course_code_9fa854db: "Kursnote %{grade}% in %{course_code}"
@@ -7565,6 +7582,8 @@ de:
   create_edit_line_item_scores_116482c7: "Punktzahlen für Positionen erstellen/ändern"
   create_educational_resources_8219326e: "Erstellen von pädagogischen Ressourcen."
   create_failed_15d07ad4: "Erstellung fehlgeschlagen"
+  create_file_71aa1922: "[ Datei erstellen ]"
+  create_file_s_188549e6: "[ Datei(en) erstellen ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Dateien nach dem Hochladen/Aufzeichnen von RCE-Medien erstellen"
   create_interactive_course_content_76665336: "Interaktive Kursinhalte erstellen"
   create_item_base: 
@@ -8009,6 +8028,7 @@ de:
   delete_comment_a71040c3: "Kommentar löschen"
   delete_comment_comment_d32ffc85: "Kommentar löschen: %{comment}"
   delete_comment_commenttext_c8afe129: "Kommentar löschen: %{commentText}"
+  delete_course_files_ee9e769: "Kursdateien löschen"
   delete_criterion_row_80c3b3b: "Kriterienzeile löschen"
   delete_current_message_5da0221a: "Aktuelle Nachricht löschen"
   delete_current_module_item_21fefc54: "Aktuelles Modul/Element löschen"
@@ -8175,8 +8195,8 @@ de:
   description_61f4296: "*-Beschreibung"
   description_for_mastery_level_position_description_cc17114b: "Beschreibung für die Leistungszielstufe %{position}: %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Beschreibung für die Kompetenzeinstufung %{position}: %{description}"
-  designers_add_fe7e1ea9: "Designer – Hinzufügen"
-  designers_remove_3e590bff: "Designer – Entfernen"
+  designers_add_fe7e1ea9: "Designer – Hinzufügen"
+  designers_remove_3e590bff: "Designer – Entfernen"
   details_98a31b68: Details
   details_a6f427c3: "Details:"
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: "Bestimmt die Sichtbarkeit und Verwaltung der Lernziele in der Kontonavigation. Erlaubt dem Benutzer, auf der Konto und der Kursebene, Lernziele und Lernzielgruppen zu erstellen, zu ändern und zu löschen."
@@ -8305,6 +8325,7 @@ de:
   disabled_3b1b332a: Deaktiviert
   disabled_and_locked_d14dc6c2: "Deaktiviert und gesperrt"
   disabled_by_default_7d822dcb: "Standardmäßig deaktiviert"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Deaktiviert für alle Unterkonten/Kurse"
   disabled_in_course_settings_d15ee35d: "* In den Kurseinstellungen deaktiviert"
   disabled_links_b3bdea99: "Deaktivierte Links"
   disabled_locked_dab351d6: "Deaktiviert (gesperrt)"
@@ -8796,6 +8817,7 @@ de:
   download_submission_comments_2a6c0395: "Abgabekommentare herunterladen"
   download_submissions_7454665f: "Einsendungen herunterladen"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Vollständige Liste der Fehler und Warnungen hier herunterladen"
+  download_these_results_as_csv_9a890883: "Download der Ergebnisse als CSV"
   download_this_file_669f9174: "Diese Datei herunterladen"
   downloading_course_content_allows_access_to_conten_164d9336: "Das Herunterladen von Kursinhalten ermöglicht den Offline-Zugang zu den Inhalten. Die Inhalte können aus Dateien, Seiten, Aufgaben, Diskussionsthemen oder Quizzen bestehen. Klicken Sie für jeden Kurs auf „ePub erzeugen“ und öffnen Sie sie mit jeder beliebigen eReader-Software, um sie anzusehen."
   draft_92507c72: (Entwurf)
@@ -8931,6 +8953,7 @@ de:
   edit_collaboration_b014c18b: "Zusammenarbeit ändern"
   edit_comment_comment_e74afa04: "Kommentar bearbeiten: %{comment}"
   edit_conference_title_6e234815: "„%{conference_title}“ ändern"
+  edit_course_files_d046ef82: "Kursdateien bearbeiten"
   edit_course_role_3b992fc2: "Kursrolle bearbeiten"
   edit_criterion_5e4dadca: "Kriterium bearbeiten"
   edit_criterion_description_5828919: "Kriteriumsbeschreibung bearbeiten"
@@ -9135,6 +9158,7 @@ de:
   enabled_and_locked_49ff3de4: "Aktiviert und gesperrt"
   enabled_ba7cab66: Aktiviert
   enabled_by_default_e530d6ed: "Standardmäßig aktiviert"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Aktiviert für alle Unterkonten/Kurse"
   enabled_links_be110215: "Aktivierte Links"
   enabled_locked_3cf7c256: "Aktiviert (gesperrt)"
   enabled_unlocked_8d3a5df7: "Aktiviert (entsperrt)"
@@ -9699,6 +9723,7 @@ de:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Liste der Gruppenmitglieder für %{groupName} erweitern"
   expand_or_collapse_calendars_9854b0d0: "Kalender maximieren oder minimieren"
   expand_or_collapse_undated_items_b901de09: "Nicht datierte Elemente maximieren oder minimieren"
+  expand_outcome_description_c5bdd70b: "Beschreibung des Ergebnisses erweitern"
   expand_permission_b45bf097: "%{permission} einblenden"
   expand_permission_c61d5958: "Berechtigung erweitern"
   expand_subdiscussion_cd226ed4: "Subdiskussion erweitern"
@@ -11295,6 +11320,7 @@ de:
   granular_contexttype_notification_settings_will_be_c5dfc901: "In Zukunft wird es hier möglich sein, granulare %{contextType}-Benachrichtigungseinstellungen zu konfigurieren."
   granular_course_notification_settings_will_be_conf_68f122db: "In Zukunft werden hier granulare Kursbenachrichtigungseinstellungen konfigurierbar sein."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Granulare Berechtigungen zum Hinzufügen/Entfernen von Admin-Rollen zum/vom Kurs"
+  granular_permissions_for_managing_course_files_1ed7f019: "Granulare Berechtigungen für die Verwaltung von Kursdateien"
   granular_permissions_for_managing_course_sections_da4b04b: "Granulare Berechtigungen für die Verwaltung von Kursabschnitten"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Granulare Berechtigungen für die Verwaltung von Wiki-Seiten"
   graph_bar_b5daa23d: Diagrammbalken
@@ -12331,6 +12357,7 @@ de:
   importing_outcomes_e62a0375: "Ergebnisse werden importiert"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Verbessern Sie die Bedienbarkeit des linken Menüs durch bessere Nutzung von Farbe sowie visuelle und Screenreader-Indikatoren für inaktive Menüelemente."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Verbesserung der Erkennbarkeit von Drag-and-Drop in Dateien"
+  improved_interface_with_ongoing_updates_7316bdef: "Verbesserte Oberfläche mit laufenden Updates"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Verbesserte Unterstützung für neue Quizze mit Modulen, einschließlich der Erstellung neuer Quizze aus Modulen"
   improved_outcomes_management_4692f886: "Verbesserte Lernzieleverwaltung"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Verbesserte visuelle Erinnerungen, um Kursleiter zur Veröffentlichung von Kurse zu ermutigen"
@@ -13132,6 +13159,7 @@ de:
   loading_last_attended_date_5a42463: "Letztes Anwesenheitsdatum laden"
   loading_mastery_paths_c558a766: "Leistungsziel-Pfade werden geladen..."
   loading_media_32847745: "Medien werden geladen"
+  loading_message_list_226a131e: "Nachrichtenliste laden"
   loading_more_gradebook_history_results_810f6d2e: "Mehr Benotungsverlaufsergebnisse laden."
   loading_more_results_1d437202: "Weitere Ergebnisse laden"
   loading_more_results_def6df65: "Weitere Ergebnisse werden geladen ..."
@@ -13371,6 +13399,7 @@ de:
   malformed_csv_aaa4b7f2: "Fehlerhafte CSV-Datei"
   maltese_916925e8: Maltesisch
   manage_access_bd923d8d: "Zugang verwalten"
+  manage_add_edit_delete_course_files_162c1a65: "Kursdateien verwalten (hinzufügen/bearbeiten/löschen)"
   manage_add_edit_delete_pages_5c73f2fb: "Seiten verwalten (hinzufügen/bearbeiten/löschen)"
   manage_announcement_with_title_title_f2ce92de: "Ankündigung mit Titel %{title} verwalten"
   manage_app_list_994cc26c: "App-Liste verwalten"
@@ -13384,6 +13413,7 @@ de:
       delete_avatar: "Möchten Sie das Profilbild dieses Benutzers wirklich löschen?"
       lock_avatar: "Durch die Sperrung wird das Bild genehmigt und die Aktualisierung des Bildes durch den Benutzer verhindert. Fortfahren?"
   manage_b88f7150: Verwalten
+  manage_course_files_57e07038: "Kursdateien verwalten"
   manage_course_sections_f482d1b3: "Kursabschnitte verwalten"
   manage_discussion_title_a2ecb3fb: "Diskussion verwalten %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Anmeldestatus verwalten, Gruppen einrichten und Benutzer von dieser Seite hinzufügen."
@@ -15907,6 +15937,7 @@ de:
   nav_text_active_a924ae88: "Nav Text aktiv"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: " Navigation-Link „Erlaubt dem Benutzer, die Leute zu sehen“ in der Kursnavigation."
   navigation_icon_45db938e: Navigations-Icon
+  navigation_menu_fd782ff8: Navigationsmenü
   near_mastery_f25174a4: "Leistungsziel knapp erreicht"
   need_a_canvas_account_221d18ed: "Sie brauchen ein Canvas-Konto?"
   need_help_setting_up_your_course_2b763141: "Sie brauchen Hilfe bei der Einrichtung Ihres Kurses?"
@@ -16584,9 +16615,9 @@ de:
     errors: 
       invalid: "Pairing-Code ungültig"
   observers_672971d: Beobachter
-  observers_add_ab95f683: "Beobachter – Hinzufügen"
+  observers_add_ab95f683: "Beobachter – Hinzufügen"
   observers_add_remove_b61eaaa5: "Beobachter – hinzufügen/entfernen"
-  observers_remove_aafc8a88: "Beobachter – Entfernen"
+  observers_remove_aafc8a88: "Beobachter – Entfernen"
   observing_f3c5e759: Beobachtet
   observing_observee_d31d5fa2: "Beobachten: %{observee}"
   occurrence_s_c12d1aad: Vorfall/Vorfälle
@@ -16769,6 +16800,7 @@ de:
   outcome_imports_c496a81f: Lernzielimporte
   outcome_mastery_scales_8c3a814d: Lernziel-Leistungszielmaßstäbe
   outcome_mastery_scales_add_edit_171551c: "Leistungszielmaßstäbe – hinzufügen/bearbeiten"
+  outcome_menu_4fe5813: "Menü Lernziele"
   outcome_path_mastery_points: "%{path}-Leistungszielpunkte"
   outcome_path_result: "%{path}-Ergebnis"
   outcome_proficiency_calculations_5959b681: "Berechnungen des Kenntnisstands"
@@ -18468,7 +18500,7 @@ de:
         action_log: Aktionsprotokoll
       notices: 
         no_events_available: "Bei der Quiz-Sitzung wurden keine Ereignisse protokolliert."
-      page_blurred: "Die Seite für das Canvas-Quiz wurde nicht mehr angezeigt ..."
+      page_blurred: "Die Seite für das Canvas-Quiz wurde nicht mehr angezeigt ..."
       page_focused: Fortgesetzt
       question_answered: 
         one: "Hat folgende Frage beantwortet:"
@@ -18541,7 +18573,7 @@ de:
     generate_item_analysis_report: "Erstellen Sie den Elementanalysebericht."
     generate_student_analysis_report: "Erstellen Sie den Studentenanalysebericht."
     generated_at: "Erzeugt: %{date}"
-    generating: "Bericht wird erstellt ..."
+    generating: "Bericht wird erstellt ..."
     generation_almost_done: "Fast fertig."
     generation_complete: "Bericht wurde erstellt."
     generation_halfway: "Mehr als die Hälfte ist schon geschafft."
@@ -18604,12 +18636,12 @@ de:
       other: "%{count} Stunden"
     duration_in_hours_and_minutes: "%{hours} und %{minutes}"
     duration_in_minutes: 
-      one: 1 Minute
+      one: "1 Minute"
       other: "%{count} Minuten"
     duration_in_minutes_and_seconds: "%{minutes} und %{seconds}"
     duration_in_seconds: 
-      one: 1 Sekunde
-      other: "%{count} Sekunden"
+      one: "1 Sekunde"
+      other: "%{count} Sekunden"
     empty_question_breakdown: "Es sind keine Fragestatistiken verfügbar."
     essay_score: "Punktzahl: %{score}"
     loading_questions: "Die Fragestatistik wird geladen. Bitte warten Sie eine Weile."
@@ -18631,7 +18663,7 @@ de:
       high_score: "Höchste Punktzahl"
       low_score: "Niedrigste Punktzahl"
       mean: Punktedurchschnitt
-      not_available_abbrev: k. A.
+      not_available_abbrev: "k. A."
       quiz_summary: Quiz-Zusammenfassung
       stdev: Standardabweichung
       students_who_got_a_certain_score: 
@@ -18982,6 +19014,7 @@ de:
           select_all_banks: "Alle auswählen"
           view_question_banks: "Kurs-Fragenpools ansehen"
         options: 
+          create_group: "[ Gruppe erstellen ]"
           new_group: "[ Neue Gruppe ]"
           no_group: "[ Keine Gruppe ]"
         select_a_question_bank: "Wählen Sie aus der Liste unten einen Fragenpool aus, der diesem Quiz als Fragengruppe zugeordnet werden soll."
@@ -19971,6 +20004,7 @@ de:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Unabhängig davon, ob diese Berechtigung aktiviert oder deaktiviert ist, können Benutzer immer noch Ereignisse auf Ihren persönlichen Kalendern verwalten."
   regenerate_3e4679f8: Regenerieren
   regenerate_epub_395c8e56: "ePub erneut erzeugen"
+  regenerating_themes_462e6cd9: "Designs werden neu generiert ..."
   region_47e29025: "Region:"
   region_939f2a6c: Region
   register_email_efc06d59: "E-Mail registrieren"
@@ -20706,6 +20740,7 @@ de:
   search_discussion_by_title_30466604: "Diskussionen nach Titel suchen"
   search_endpoints_d5abf37f: "Endpunkte suchen"
   search_entries_or_author_63fb0a86: "Nach Einträgen oder Autoren suchen"
+  search_field_234156fc: Suchfeld
   search_flickr_6f28b02e: "flickr durchsuchen"
   search_for_a_deleted_course_by_id_f553398d: "Anhand der ID nach einem gelöschten Kurs suchen"
   search_for_files_7541fb28: "Nach Dateien suchen"
@@ -20719,6 +20754,7 @@ de:
   search_term_must_be_at_least_num_characters_669098ed: "Der Suchbegriff muss mind. %{num} Zeichen haben."
   search_title_body_or_author_1d26711f: "Nach Titel, Text oder Autor suchen"
   search_users_48b1789e: "Benutzer suchen..."
+  search_within_grouptitle_4d38272f: "Innerhalb von %{groupTitle} suchen"
   searching_b0207e7f: "Wird gesucht"
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Suchen Ankündigungen in den Abschnitten muss span genau einen Kurs"
   second_reviewer_90046c68: "Zweiter Prüfer"
@@ -20909,6 +20945,7 @@ de:
   select_one_8e0af564: "Einen auswählen"
   select_one_b647b384: "Eine auswählen"
   select_one_of_the_options_c8b0c6e4: "Eine der Optionen auswählen:"
+  select_outcome_7e6e2562: "Lernziel auswählen"
   select_page_e93fc123: "Seite wählen"
   select_prerequisite_module_57894963: "Erforderliches Modul auswählen"
   select_prerequite_module_e9042bb0: "Erforderliches Modul auswählen"
@@ -20919,11 +20956,17 @@ de:
   select_students_for_review_6e004a12: "Studenten zur Prüfung auswählen"
   select_sub_account_6704196a: "Unterkonto auswählen"
   select_term_f8083fb0: "Semester auswählen"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Wählen Sie die Datei aus, die zugeordnet werden soll, oder fügen Sie eine Datei hinzu, indem Sie „Datei erstellen“ auswählen."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Wählen Sie die Datei aus, die zugeordnet werden soll, oder fügen Sie eine Datei hinzu, indem Sie „Neue Datei“ auswählen."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Wählen Sie die Datei aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neue Datei“, um eine Datei hinzuzufügen."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Wählen Sie die Datei aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Datei erstellen“, um eine Datei hinzuzufügen."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Wählen Sie die Dateien aus, die zugeordnet werden sollen, oder fügen Sie Dateien hinzu, indem Sie „Datei(en) erstellen“ auswählen."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Wählen Sie die Dateien aus, die Sie zuordnen möchten, oder wählen Sie „Neue Datei(en)“, um Dateien hinzuzufügen."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Wählen Sie die Dateien aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neue Datei(en)“, um Dateien hinzuzufügen."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Wählen Sie die Datei aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Datei(en) erstellen“, um Dateien hinzuzufügen."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Wählen Sie die eine Seite aus, die zugeordnet werden soll, oder fügen Sie eine neue Seite hinzu, indem Sie „Neue Seite“ auswählen."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Wählen Sie die eine Seite aus, die zugeordnet werden soll, oder fügen Sie eine neue Seite hinzu, indem Sie „Seite erstellen“ auswählen."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Wählen Sie die Seite aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Seite erstellen“, um eine neue Seite hinzuzufügen."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Wählen Sie die Seite aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neue Seite“, um eine neue Seite hinzuzufügen."
   select_title_for_deletion_45b08247: "%{title} zum Löschen auswählen"
   select_type_of_prerequisite_8d6fa902: "Die Art der Voraussetzung auswählen"
@@ -21641,10 +21684,21 @@ de:
       add_to_module: "%{item} zum *Modul* hinzufügen"
       assignment_item: Aufgabe
       assignment_item_select_label: "Wählen Sie die Aufgabe aus, die zugeordnet werden soll, oder fügen Sie eine Aufgabe hinzu, indem Sie „Neue Aufgabe“ auswählen."
+      assignment_item_select_label_create: "Wählen Sie die Aufgabe aus, die zugeordnet werden soll, oder fügen Sie eine Aufgabe hinzu, indem Sie „Aufgabe erstellen“ auswählen."
+      assignment_item_select_label_new: "Wählen Sie die Aufgabe aus, die zugeordnet werden soll, oder fügen Sie eine Aufgabe hinzu, indem Sie „Neue Aufgabe“ auswählen."
       assignment_notice: "Wählen Sie die Aufgabe aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neue Aufgabe“, um eine Aufgabe hinzuzufügen."
       content_page_item: Seite
+      create_assignment_notice: "Wählen Sie die Aufgabe aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Aufgabe erstellen“, um eine Aufgabe hinzuzufügen."
+      create_assignment_option: "[ Aufgabe erstellen ]"
+      create_page_option: "[ Seite erstellen ]"
+      create_quiz_notice: "Wählen Sie das Quiz aus, das Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Quiz erstellen“, um ein neues Quiz hinzuzufügen."
+      create_quiz_option: "[ Quiz erstellen ]"
+      create_topic_notice: "Wählen Sie das Thema aus, das Sie diesem *Modul* zuordnen möchten oder klicken Sie auf „Thema erstellen“, um ein Thema hinzuzufügen."
+      create_topic_option: "[ Thema erstellen ]"
       discussion_item: Diskussion
       discussion_topic_select_label: "Wählen Sie das Thema aus, das zugeordnet werden soll, oder fügen Sie ein Thema hinzu, indem Sie „Neues Thema“ auswählen."
+      discussion_topic_select_label_create: "Wählen Sie das Thema aus, das zugeordnet werden soll, oder fügen Sie ein Thema hinzu, indem Sie „Thema erstellen“ auswählen."
+      discussion_topic_select_label_new: "Wählen Sie das Thema aus, das zugeordnet werden soll, oder fügen Sie ein Thema hinzu, indem Sie „Neues Thema“ auswählen."
       domain_match_notice: "um dieses Tool zu verwenden, muss die Domäne mit %{domain} übereinstimmen."
       external_tool_item: "Externes Tool"
       external_tool_notice: "Wählen Sie ein Tool aus folgender Liste aus, oder geben Sie den URL eines externen Tools ein, das mit Basic LTI konfiguriert wurde, um einen Link zu diesem *Modul* hinzuzufügen."
@@ -21664,6 +21718,7 @@ de:
         header: Kopfzeile
         indentation: Einrückung
         page_name: "Name der Seite"
+        quiz_engine: Quiz-Engine
         quiz_group: Gruppe
         quiz_name: "Name des Quiz"
         topic_name: "Name des Themas"
@@ -21671,16 +21726,21 @@ de:
         wiki_page_name: "Name der Seite"
         wiki_page_namem: "Name der Aufgabe"
       loading: "Wird geladen ..."
+      new_assignment_notice: "Wählen Sie die Aufgabe aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neue Aufgabe“, um eine Aufgabe hinzuzufügen."
       new_assignment_option: "[ Neue Aufgabe ]"
       new_page_option: "[ Neue Seite ]"
+      new_quiz_notice: "Wählen Sie das Quiz aus, das Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neues Quiz“, um ein neues Quiz hinzuzufügen."
       new_quiz_option: "[ Neues Quiz ]"
       new_tab: "Auf neuer Registerkarte laden"
+      new_topic_notice: "Wählen Sie das Thema aus, das Sie diesem *Modul* zuordnen möchten oder klicken Sie auf „Neues Thema“, um ein Thema hinzuzufügen."
       new_topic_option: "[ Neues Thema ]"
       options: 
         assignments: Aufgaben
       quiz_item: Quiz
       quiz_notice: "Wählen Sie das Quiz aus, das Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf „Neues Quiz“, um ein neues Quiz hinzuzufügen."
       quiz_select_label: "Wählen Sie das Quiz aus, das zugeordnet werden soll, oder fügen Sie ein Quiz hinzu, indem Sie „Neues Quiz“ auswählen."
+      quiz_select_label_create: "Wählen Sie das Quiz aus, das zugeordnet werden soll, oder fügen Sie ein Quiz hinzu, indem Sie „Quiz erstellen“ auswählen."
+      quiz_select_label_new: "Wählen Sie das Quiz aus, das zugeordnet werden soll, oder fügen Sie ein Quiz hinzu, indem Sie „Neues Quiz“ auswählen."
       select_item_type_label: "Wählen Sie den Typ des hinzuzufügenden Inhalts aus."
       sub_header_notice: "Geben Sie den Text ein, den Sie als zweite Kopfzeile des *Moduls* hinzufügen möchten."
       text_header_item: Textüberschrift
@@ -22816,9 +22876,9 @@ de:
   take_the_survey_again_24ce22c2: "Erneut an Befragung teilnehmen"
   target_link_uri_bbed67d1: "* Ziel-Link-URI"
   target_link_uri_d166858: Ziel-Link-URI
-  tas_add_f4a16393: "TAs – Hinzufügen"
+  tas_add_f4a16393: "TAs – Hinzufügen"
   tas_observers_designers_b705118a: "TAs / Beobachter / Designer"
-  tas_remove_11059e14: "TAs – Entfernen"
+  tas_remove_11059e14: "TAs – Entfernen"
   teacher_5a73b637: Dozent
   teacher_count_teachers_a92f7199: "%{teacher_count} Dozenten"
   teacher_s_fdefb2c: Dozent
@@ -23056,6 +23116,7 @@ de:
   the_module_item_is_locked_27fe420b: "Das Modulelement ist gesperrt."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Die letzten Punkte für den Benutzer %{current_user_name} sowie das Lernziel %{outcome_name}"
   the_next_available_appointment_in_this_course_is_o_da10316c: "Der nächste verfügbare Termin in diesem Kurs ist am *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "Die ursprüngliche Quiz-Oberfläche"
   the_preceding_content_is_partner_provided_d753928c: "Der vorhergehende Content stammt von einem Partner."
   the_previous_sis_batch_was_aborted_d7d89955: "Der vorherige SIS-Stapel wurde abgebrochen."
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Die Kompetenzberechnung wurde von Ihrem Administrator eingestellt und gilt für alle Kurse in diesem Konto."
@@ -23768,7 +23829,7 @@ de:
   to_create_announcements_discussions_moderate_must__8a8278f2: "Zur Erstellung von Ankündigungen muss „Diskussionen – moderieren“ ebenfalls aktiviert sein."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um eine Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um die Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
-  to_cross_list_a_section_manage_course_sections_edi_93a73729: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte verwalten – ändern“ ebenfalls aktiviert sein. Um eine Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
+  to_cross_list_a_section_manage_course_sections_edi_93a73729: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte verwalten – ändern“ ebenfalls aktiviert sein. Um eine Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Um Abschnitte über Kreuz zu listen, muss „Kursabschnitte – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "Um Abschnitte neu zu kombinieren, muss „Kursabschnitte - bearbeiten“ aktiviert sein. Der Benutzer muss außerdem als Kursleiter in den Kursen eingeschrieben sein, die neu kombiniert werden sollen."
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Um Abschnitte über Kreuz zu listen, muss „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
@@ -24177,7 +24238,9 @@ de:
   unable_to_find_extension_3fe61b3c: "Erweiterung konnte nicht gefunden werden"
   unable_to_find_filetype_7b620f02: "Dateityp konnte nicht gefunden werden"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Es konnten in Ihrer Institution keine Übereinstimmungen mit diesen E-Mail-Adressen gefunden werden. Wählen Sie diejenigen aus, die Sie als neue Benutzer einrichten möchten. Nichtausgewählte werden übersprungen."
+  unable_to_load_courses_menu_7074ea04: "Das Menü „Kurse“ kann nicht geladen werden."
   unable_to_load_lti_1_3_tools_cf169f9: "Lti 1.3-Tools konnten nicht geladen werden"
+  unable_to_load_messages_2b158fd0: "Nachrichten können nicht geladen werden. "
   unable_to_read_file_2d04b0c: "Die Datei konnte nicht gelesen werden."
   unable_to_remove_app_4293cb53: "Die App kann nicht entfernt werden."
   unable_to_save_new_discussion_topic_99239f3f: "Neues Diskussionsthema konnte nicht gespeichert werden"

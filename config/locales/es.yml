@@ -1794,11 +1794,13 @@ es:
   add_course_406cb773: "Agregar curso"
   add_course_assignments_628ed6d0: "Agregar tareas del curso"
   add_course_calendar_events_146154a5: "Agregar eventos al calendario del curso"
+  add_course_files_4e0f1abc: "Agregar archivos del curso"
   add_criterion_eb9587ef: "Agregar criterio"
   add_custom_link_22059c0: "Agregar un vínculo personalizado"
   add_designers_to_courses_9588820b: "Agregar diseñadores a los cursos"
   add_discussion_653dab4c: "Agregar un foro de discusión"
   add_domain_f15bc6c1: "Agregar dominio"
+  add_edit_delete_files_573a4d62: "agregar/editar/eliminar archivos"
   add_edit_delete_sections_d32c5b4d: "Agregar/editar/eliminar secciones"
   add_email_address_aef3b61: "Agregar una dirección de correo electrónico"
   add_existing_content_7e36da66: "Agregar contenido existente"
@@ -1809,6 +1811,7 @@ es:
   add_grading_period_6f774dc3: "Agregar período de calificación"
   add_grading_scheme_81e23c05: " Agregar esquema de calificaciones"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Agregar esquema de calificaciones a los reportes de calificación del administrador"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Agregar granularidad a los permisos relacionados con la administración de archivos del curso"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Agregar granularidad a permisos alrededor de la administración de las secciones del curso"
   add_group_c84f9e9d: "Agregar grupo"
   add_group_set_f9809e11: "Agregar conjunto de grupos"
@@ -2104,6 +2107,8 @@ es:
   allow_users_to_comment_45b8f753: "Permitir que los usuarios comenten"
   allowed_attempts_4e229caa: "Intentos permitidos"
   allowed_domains_ee7868c8: "Dominios permitidos"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Permitido para subcuentas/cursos, la opción predeterminada es desactivado"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Permitido para subcuentas/cursos, la opción predeterminada es activado"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permite a un usuario acceder al vínculo Actuar como usuario en las tarjetas de contexto del estudiante."
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Permite a un usuario ver la ID de SIS en los detalles de inicio de sesión de un usuario."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permite a un usuario ver las ID de SIS en una página de Personas del curso."
@@ -2754,9 +2759,9 @@ es:
   answer_text_80_character_limit_2fce1113: "Texto de la Respuesta (límite de 80 caracteres)"
   answer_text_909894d6: "Texto de la respuesta"
   answer_weight_43420dc5: "Ponderación de respuestas"
-  answers_which_scored_in_the_bottom_27_74409483: "Las respuestas que obtuvieron un puntaje en el 27 % más bajo"
-  answers_which_scored_in_the_middle_46_46466ffd: "Las respuestas que obtuvieron un puntaje en el 46 % del medio"
-  answers_which_scored_in_the_top_27_a605232d: "Las respuestas que obtuvieron un puntaje en el 27 % más alto"
+  answers_which_scored_in_the_bottom_27_74409483: "Las respuestas que obtuvieron un puntaje en el 27 % más bajo"
+  answers_which_scored_in_the_middle_46_46466ffd: "Las respuestas que obtuvieron un puntaje en el 46 % del medio"
+  answers_which_scored_in_the_top_27_a605232d: "Las respuestas que obtuvieron un puntaje en el 27 % más alto"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
   any_sub_account_ec7069f2: "Cualquier subcuenta"
   any_term_d49af19f: "Cualquier período"
@@ -3158,6 +3163,7 @@ es:
     assignment_group_selector: 
       assignment_group: "Grupo de tareas"
       assignment_group_options: 
+        create_group: "Crear grupo"
         new_group: "Nuevo grupo"
     assignment_groups_count: 
       one: "1 Grupo"
@@ -5095,6 +5101,7 @@ es:
   classic_quizzes_dee3c7b7: "Exámenes clásicos"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Opción de evaluaciones clásicas para evaluaciones limitadas por tiempo sin presentación"
   clear_2084585f: Eliminar
+  clear_search_field_75f595c7: "Borrar campo de búsqueda"
   clear_selected_file_82388e50: "Borrar archivo seleccionado"
   clear_user_cache_ef079f7f: "Borrar caché del usuario"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Haga clic en Cancelar (\"Cancel\") si no desea que se muestre el código."
@@ -5340,6 +5347,7 @@ es:
   collapse_all_50275533: "Colapsar Todo"
   collapse_group_c2af7cad: "Colapsar el Grupo"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Colapsar la lista de miembros del grupo por %{groupName}"
+  collapse_outcome_description_de471564: "Colapsar la descripción de la competencia"
   collapse_subdiscussion_89af1f5c: "Colapsar subforo de discusión"
   collapse_tutorial_tray_66ee7dc1: "Bandeja de tutoriales: colapsar"
   collapsed_510aa02a: Contraído
@@ -6553,6 +6561,9 @@ es:
   count_files_were_ignored_2f9c054a: 
     one: "Se ignoró (1) archivo"
     other: "Se ignoraron (%{count}) archivos"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 competencia «%{groupTitle}»"
+    other: "%{count} competencias «%{groupTitle}»"
   count_hidden_e8d2c57c: "%{count} oculto"
   count_images_found_for_term_a93635ed: "Se encontraron %{count} imágenes para %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -6581,6 +6592,9 @@ es:
     one: "1 opción"
     other: "%{count} opciones"
   count_options_loaded_cd59cc3b: "%{count} opciones cargadas."
+  count_outcomes_selected_55902958: 
+    one: "1 competencia seleccionada"
+    other: "%{count} competencias seleccionadas"
   count_page_views_b40102b3: 
     one: "1 visualización de la página"
     other: "%{count} visualizaciones de la página"
@@ -6641,8 +6655,8 @@ es:
     other: "%{count} alumnos"
     zero: "0 estudiantes"
   count_students_in_percentile_percentile_d0adecfe: 
-    one: "1 estudiante en percentil %{percentile}. "
-    other: "%{count} estudiantes en percentil %{percentile}. "
+    one: "1 estudiante en percentil %{percentile}. "
+    other: "%{count} estudiantes en percentil %{percentile}. "
   count_students_will_get_num_points_c970fc01: 
     one: "1 alumno obtendrá %{num} puntos"
     other: "%{count} alumnos obtendrán %{num} puntos"
@@ -6819,7 +6833,10 @@ es:
   course_favorites_from_dashboard_27a3515a: "Favoritos del curso desde el Tablero"
   course_files_62deb8f8: "Archivos del curso"
   course_files_a31f97fc: "Archivos del curso"
+  course_files_add_2eede390: "Archivos del curso: agregar"
   course_files_add_edit_delete_24678a2f: "Archivos del curso: agregar/editar/eliminar"
+  course_files_delete_fae0effe: "Archivos del curso: eliminar"
+  course_files_edit_d05d4e8b: "Archivos del curso: editar"
   course_found_f5a40cd3: "Curso encontrado"
   course_found_not_deleted_a20f72f0: "Curso encontrado (no eliminado)"
   course_grade_grade_in_course_code_9fa854db: "Calificación del curso: %{grade}% en %{course_code}"
@@ -7612,6 +7629,8 @@ es:
   create_edit_line_item_scores_116482c7: "Crear/editar los puntajes de los elementos de línea"
   create_educational_resources_8219326e: "Crear recursos educativos"
   create_failed_15d07ad4: "La creación no se pudo completar"
+  create_file_71aa1922: "[ Crear archivo ]"
+  create_file_s_188549e6: "[ Crear archivo(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Crear archivos luego de la grabación/carga de elementos multimedia mediante el RCE"
   create_interactive_course_content_76665336: "Cree contenido interactivo del curso"
   create_item_base: 
@@ -8056,6 +8075,7 @@ es:
   delete_comment_a71040c3: "Eliminar comentario"
   delete_comment_comment_d32ffc85: "Eliminar comentario: %{comment}"
   delete_comment_commenttext_c8afe129: "Eliminar comentario: %{commentText}"
+  delete_course_files_ee9e769: "Eliminar archivos del curso"
   delete_criterion_row_80c3b3b: "Eliminar fila de criterio"
   delete_current_message_5da0221a: "Eliminar el mensaje actual"
   delete_current_module_item_21fefc54: "Eliminar el módulo/Item actual"
@@ -8351,6 +8371,7 @@ es:
   disabled_3b1b332a: Deshabilitado
   disabled_and_locked_d14dc6c2: "Desactivado y bloqueado"
   disabled_by_default_7d822dcb: "Desactivado por configuración predeterminada"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Deshabilitado para cualquier subcuenta/curso"
   disabled_in_course_settings_d15ee35d: "* Deshabilitado en la configuración del curso"
   disabled_links_b3bdea99: "Desactivar vínculos"
   disabled_locked_dab351d6: "Deshabilitado (bloqueado)"
@@ -8842,6 +8863,7 @@ es:
   download_submission_comments_2a6c0395: "Descargar comentarios de la entrega"
   download_submissions_7454665f: "Descargar entregas"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Descargar la lista completa de errores y advertencias aquí."
+  download_these_results_as_csv_9a890883: "Descargar estos resultados como CSV"
   download_this_file_669f9174: "Descargar este archivo"
   downloading_course_content_allows_access_to_conten_164d9336: "La descarga de los contenidos del curso permite el acceso al contenido incluso sin estar conectado. El contenido puede incluir archivos, páginas, tareas, temas de foro de discusión o exámenes. Haga clic en \"Generar ePub\" para cada curso y abra con cualquier software eReader para ver."
   draft_92507c72: (borrador)
@@ -8978,6 +9000,7 @@ es:
   edit_collaboration_b014c18b: "Editar colaboración"
   edit_comment_comment_e74afa04: "Editar comentario: %{comment}"
   edit_conference_title_6e234815: "Editar \"%{conference_title}\""
+  edit_course_files_d046ef82: "Editar archivos del curso"
   edit_course_role_3b992fc2: "Editar el rol del curso"
   edit_criterion_5e4dadca: "Editar criterio"
   edit_criterion_description_5828919: "Editar descripción del criterio"
@@ -9183,6 +9206,7 @@ es:
   enabled_and_locked_49ff3de4: "Activado y bloqueado"
   enabled_ba7cab66: Habilitado
   enabled_by_default_e530d6ed: "Activado por configuración predeterminada"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Habilitado para cualquier subcuenta/curso"
   enabled_links_be110215: "Enlaces habilitados"
   enabled_locked_3cf7c256: "Habilitado (bloqueado)"
   enabled_unlocked_8d3a5df7: "Habilitado (desbloqueado)"
@@ -9748,6 +9772,7 @@ es:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Expandir lista de los miembros del grupo para %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Expandir o contraer calendarios "
   expand_or_collapse_undated_items_b901de09: "Expandir o contraer elementos sin fecha"
+  expand_outcome_description_c5bdd70b: "Expandir la descripción de la competencia"
   expand_permission_b45bf097: "Expandir %{permission}"
   expand_permission_c61d5958: "Expandir permiso"
   expand_subdiscussion_cd226ed4: "Expandir subforo de discusión"
@@ -11348,6 +11373,7 @@ es:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Las configuraciones de notificaciones granulares de %{contextType} se podrán configurar desde aquí en el futuro."
   granular_course_notification_settings_will_be_conf_68f122db: "Las configuraciones granulares de las notificaciones del curso se podrán configurar aquí en el futuro."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Permisos granulares para agregar/eliminar roles de administrador del curso"
+  granular_permissions_for_managing_course_files_1ed7f019: "Permisos granulares para administrar archivos del curso"
   granular_permissions_for_managing_course_sections_da4b04b: "Permisos granulares para administrar las secciones del curso"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Permisos granulares para administrar páginas wiki"
   graph_bar_b5daa23d: "Barra de gráfico"
@@ -12387,6 +12413,7 @@ es:
   importing_outcomes_e62a0375: "importando resultados"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Para mejorar la accesibilidad del menú izquierdo, haga un mejor uso de los indicadores visuales, de color y del lector de pantalla de los elementos inactivos en el menú."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Mejorar la detección de la acción de arrastrar y soltar en los archivos"
+  improved_interface_with_ongoing_updates_7316bdef: "Interfaz mejorada con actualizaciones en curso"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Soporte mejorado para Nuevos exámenes con módulos que incluye crear nuevos exámenes para módulos"
   improved_outcomes_management_4692f886: "Administración de competencias mejorada"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Recordatorios visuales mejorados para alentar a los profesores a publicar cursos"
@@ -13190,6 +13217,7 @@ es:
   loading_last_attended_date_5a42463: "Cargando la fecha de la última asistencia"
   loading_mastery_paths_c558a766: "Cargando los caminos del dominio..."
   loading_media_32847745: "Cargando multimedia"
+  loading_message_list_226a131e: "Cargando lista de mensajes"
   loading_more_grade_history_results_b235de5: "Cargando más resultados del historial de calificación."
   loading_more_gradebook_history_results_810f6d2e: "Cargando más resultados del historial del libro de calificaciones."
   loading_more_results_1d437202: "Cargando más resultados"
@@ -13432,6 +13460,7 @@ es:
   malformed_csv_aaa4b7f2: "CSV con formato incorrecto"
   maltese_916925e8: Maltés
   manage_access_bd923d8d: "Administrar el acceso"
+  manage_add_edit_delete_course_files_162c1a65: "Administrar (agregar/editar/eliminar) archivos del curso"
   manage_add_edit_delete_pages_5c73f2fb: "Administrar páginas (agregar, editar o eliminar)"
   manage_announcement_with_title_title_f2ce92de: "Gestionar anuncios con título %{title}"
   manage_app_list_994cc26c: "Administrar lista de aplicaciones"
@@ -13445,6 +13474,7 @@ es:
       delete_avatar: "¿Está seguro de que desea eliminar la imagen de perfil de este usuario?"
       lock_avatar: "Bloquear esta imagen la aprobará y ayudará a prevenir que el usuario la actualice.  ¿Desea continuar?"
   manage_b88f7150: Administrar
+  manage_course_files_57e07038: "Administrar archivos del curso"
   manage_course_sections_f482d1b3: "Administrar secciones del curso"
   manage_discussion_title_a2ecb3fb: "Gestionar foro %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Administrar estados de la inscripción, crear grupos y agregar usuarios desde esta página."
@@ -15967,6 +15997,7 @@ es:
   nav_text_active_a924ae88: "Activo del texto de navegación"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navegación: permite al usuario ver el vínculo de Personas en la navegación del curso."
   navigation_icon_45db938e: "Ícono de navegación"
+  navigation_menu_fd782ff8: "Menú de navegación"
   near_mastery_f25174a4: "Cerca del dominio"
   need_a_canvas_account_221d18ed: "¿Necesita un cuenta de Canvas?"
   need_help_setting_up_your_course_2b763141: "¿Necesita ayuda para instalar su curso?"
@@ -16834,6 +16865,7 @@ es:
   outcome_imports_c496a81f: "Importaciones de resultados"
   outcome_mastery_scales_8c3a814d: "Escalas de dominio de competencias"
   outcome_mastery_scales_add_edit_171551c: "Escalas de dominio de competencias: agregar/editar"
+  outcome_menu_4fe5813: "Menú de competencias"
   outcome_path_mastery_points: "%{path} puntos de dominio"
   outcome_path_result: "%{path} resultado"
   outcome_proficiency_calculations_5959b681: "Cálculos de competencia de resultados"
@@ -18676,16 +18708,16 @@ es:
     discrimination_index_help: "* Esta métrica ofrece una medida sobre lo bien que una sola pregunta puede marcar la diferencia (o discriminar) entre alumnos que hacen un buen trabajo en un examen y aquellos que no. * ** Divide a los alumnos en tres grupos según su puntaje en la evaluación entera y muestra esos grupos por orden, en función de quién respondió a la pregunta correctamente. ** *** ****Más información disponible aquí.**** ***"
     download_submissions: "Descargar todos los archivos"
     duration_in_hours: 
-      one: 1 hora
-      other: "%{count} horas"
+      one: "1 hora"
+      other: "%{count} horas"
     duration_in_hours_and_minutes: "%{hours} y %{minutes}"
     duration_in_minutes: 
-      one: 1 minuto
-      other: "%{count} minutos"
+      one: "1 minuto"
+      other: "%{count} minutos"
     duration_in_minutes_and_seconds: "%{minutes} y %{seconds}"
     duration_in_seconds: 
-      one: 1 segundo
-      other: "%{count} segundos"
+      one: "1 segundo"
+      other: "%{count} segundos"
     empty_question_breakdown: "No hay estadísticas de preguntas disponibles."
     essay_score: "Puntuación: %{score}"
     loading_questions: "Las estadísticas de la pregunta se están cargando. Espere un momento."
@@ -19058,6 +19090,7 @@ es:
           select_all_banks: "Seleccionar todo"
           view_question_banks: "Ver bancos de preguntas del curso"
         options: 
+          create_group: "[ Crear grupo ]"
           new_group: "[ Nuevo grupo ]"
           no_group: "[ Sin grupo ]"
         select_a_question_bank: "Seleccione un banco de preguntas de la siguiente lista para vincularlo como banco de preguntas a este examen."
@@ -20048,6 +20081,7 @@ es:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Sin importar si el permiso está activado o desactivado, los usuarios aún podrán administrar eventos en su calendario personal."
   regenerate_3e4679f8: Regenerar
   regenerate_epub_395c8e56: "Regenerar publicación electrónica"
+  regenerating_themes_462e6cd9: "Volviendo a generar temas…"
   region_47e29025: "Región:"
   region_939f2a6c: Región
   register_email_efc06d59: "Registrar correo electrónico"
@@ -20783,6 +20817,7 @@ es:
   search_discussion_by_title_30466604: "Buscar foro de discusión por título"
   search_endpoints_d5abf37f: "Buscar criterios de valoración"
   search_entries_or_author_63fb0a86: "Buscar entradas o autor"
+  search_field_234156fc: "Campo de búsqueda"
   search_flickr_6f28b02e: "Buscar en flickr"
   search_for_a_deleted_course_by_id_f553398d: "Buscar un curso eliminado por identificador"
   search_for_files_7541fb28: "Buscar archivos"
@@ -20797,6 +20832,7 @@ es:
   search_term_must_be_at_least_num_characters_669098ed: "Buscar el período debe contener al menos %{num} caracteres"
   search_title_body_or_author_1d26711f: "Buscar título, texto o autor"
   search_users_48b1789e: "Buscar usuarios..."
+  search_within_grouptitle_4d38272f: "Buscar en %{groupTitle}"
   searching_b0207e7f: Buscando
   searching_for_announcements_in_sections_must_span__80e4dfe4: "La búsqueda de anuncios en secciones debe abarcar exactamente un curso"
   second_reviewer_90046c68: "Segundo evaluador"
@@ -20987,6 +21023,7 @@ es:
   select_one_8e0af564: "Seleccionar uno"
   select_one_b647b384: "Seleccionar uno"
   select_one_of_the_options_c8b0c6e4: "Seleccionar una de las siguientes opciones."
+  select_outcome_7e6e2562: "Seleccionar competencia"
   select_page_e93fc123: "Seleccionar página"
   select_prerequisite_module_57894963: "Seleccionar módulo de prerrequisitos"
   select_prerequite_module_e9042bb0: "Seleccionar módulo de requisitos"
@@ -20997,11 +21034,17 @@ es:
   select_students_for_review_6e004a12: "Seleccionar a los alumnos para la revisión"
   select_sub_account_6704196a: "Seleccionar subcuenta"
   select_term_f8083fb0: "Seleccionar período"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Seleccione el archivo que desea asociar o seleccione «Crear archivo» para agregar un archivo."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Seleccione el archivo que desea asociar o agregue un archivo seleccionando \"Nuevo archivo\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Seleccione el archivo que desea asociar con este *módulo* o agregue un archivo seleccionando \"Archivo nuevo\" (New File)."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Seleccione el archivo que desea asociar con este *módulo* o seleccione «Crear archivo» para agregar uno."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Seleccione los archivos que desea asociar o seleccione «Crear archivo(s)» para agregar archivos."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Seleccione los archivos que desea asociar o agregue archivos seleccionando \"Archivos nuevos\" (New File(s))."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Seleccione los archivos que desea asociar con este *módulo* o agregue archivos seleccionando \"Archivos nuevos\" (New File(s))."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Seleccione los archivos que desea asociar con este *módulo* o seleccione «Crear archivo(s)» para agregar otros."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Seleccione la página que usted desea vincular o agregue una nueva página al seleccionar la opción \"New Page\" (Nueva página)."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Seleccione la página que desea asociar o seleccione «Crear página» para agregar una nueva."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Seleccione la página que desea asociar con este *módulo* o seleccione «Crear página» para agregar una nueva."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Seleccione la página que usted desea vincular con este *módulo* o agregue una nueva página al seleccionar la opción \"Nueva página\"."
   select_title_for_deletion_45b08247: "Seleccionar %{title} para su eliminación"
   select_type_of_prerequisite_8d6fa902: "Seleccionar el tipo de prerrequisito"
@@ -21717,10 +21760,21 @@ es:
       add_to_module: "Agregar %{item} al *módulo*"
       assignment_item: Tarea
       assignment_item_select_label: "Seleccione la tarea que desea asociar o agregue una tarea seleccionando \"Nueva tarea\"."
+      assignment_item_select_label_create: "Seleccione la tarea que desea asociar o seleccione «Crear tarea» para agregar una."
+      assignment_item_select_label_new: "Seleccione la tarea que desea asociar o agregue una tarea seleccionando \"Nueva tarea\"."
       assignment_notice: "Seleccione la tarea que desea asociar con este *módulo* o agregue una tarea seleccionando \"Tarea nueva\"."
       content_page_item: Página
+      create_assignment_notice: "Seleccione la tarea que desea asociar con este *módulo* o seleccione «Crear tarea» para agregar una."
+      create_assignment_option: "[ Crear tarea ]"
+      create_page_option: "[ Crear página ]"
+      create_quiz_notice: "Seleccione el examen que desea asociar con este *módulo* o seleccione «Crear examen» para agregar uno nuevo."
+      create_quiz_option: "[ Crear examen ]"
+      create_topic_notice: "Seleccione el tema que desea asociar con este *módulo* o seleccione «Crear tema» para agregar uno."
+      create_topic_option: "[ Crear tema ]"
       discussion_item: Foro
       discussion_topic_select_label: "Seleccione el tema que quiera asociar o agregue un tema seleccionando \"Nuevo tema\"."
+      discussion_topic_select_label_create: "Seleccione el tema que desea asociar o seleccione «Crear tema» para agregar uno."
+      discussion_topic_select_label_new: "Seleccione el tema que quiera asociar o agregue un tema seleccionando \"Nuevo tema\"."
       domain_match_notice: "para usar esta herramienta, el dominio debe coincidir con %{domain}"
       external_tool_item: "Herramienta Externa"
       external_tool_notice: "Seleccione una herramienta de la siguiente lista o ingrese la URL de una herramienta externa que esté configurada con Basic LTI para agregar un vínculo entre esa herramienta y este *módulo*."
@@ -21740,6 +21794,7 @@ es:
         header: Encabezado
         indentation: "Colocación de sangría"
         page_name: "Nombre de la página"
+        quiz_engine: "Motor de exámenes"
         quiz_group: Grupo
         quiz_name: "Nombre del examen"
         topic_name: "Nombre del tema"
@@ -21747,16 +21802,21 @@ es:
         wiki_page_name: "Nombre de la página"
         wiki_page_namem: "Nombre de la tarea"
       loading: Cargando...
+      new_assignment_notice: "Seleccione la tarea que desea asociar con este *módulo* o seleccione «Tarea nueva» para agregar una."
       new_assignment_option: "[ Nueva tarea ]"
       new_page_option: "[ Nueva página ]"
+      new_quiz_notice: "Seleccione el examen que desea asociar con este *módulo* o seleccione «Nuevo examen» para agregar uno nuevo."
       new_quiz_option: "[ Nuevo examen ]"
       new_tab: "Cargar en una pestaña nueva"
+      new_topic_notice: "Seleccionar el tema que desea asociar con este *módulo* o seleccione «Tema nuevo» para agregar uno."
       new_topic_option: "[ Nuevo tema ]"
       options: 
         assignments: Tareas
       quiz_item: Examen
       quiz_notice: "Seleccione el examen que desea asociar con este *módulo* o agregue uno nuevo seleccionando \"Nuevo examen\"."
       quiz_select_label: "Seleccione el examen que desea asociar o agregue uno nuevo seleccionando \"Nuevo examen\"."
+      quiz_select_label_create: "Seleccione el examen que desea asociar o seleccione «Crear examen» para agregar uno nuevo."
+      quiz_select_label_new: "Seleccione el examen que desea asociar o agregue uno nuevo seleccionando \"Nuevo examen\"."
       select_item_type_label: "Seleccione el tipo de contenido que desea agregar."
       sub_header_notice: "Ingrese el texto que desea agregar como un subtítulo del *módulo*"
       text_header_item: "Texto de encabezado"
@@ -23133,6 +23193,7 @@ es:
   the_module_item_is_locked_27fe420b: "El item del módulo está bloqueado."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Los puntajes más recientes para el usuario %{current_user_name} y la competencia %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "La siguiente cita disponible en este curso es el *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "La interfaz original de los exámenes"
   the_preceding_content_is_partner_provided_d753928c: "El contenido anterior está proporcionado por un socio"
   the_previous_sis_batch_was_aborted_d7d89955: "El lote del SIS anterior fue abortado"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "El cálculo de dominio lo estableció su administrador y se aplica a todos los cursos en esta cuenta."
@@ -24254,7 +24315,9 @@ es:
   unable_to_find_extension_3fe61b3c: "no se puede encontrar la extensión"
   unable_to_find_filetype_7b620f02: "no se puede encontrar el tipo de archivo"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "No se pueden encontrar coincidencias para estas direcciones de correo electrónico en su institución. Seleccione aquellas que le gustaría crear como nuevos usuarios. Se omitirán las no seleccionadas."
+  unable_to_load_courses_menu_7074ea04: "No se pudo cargar el menú de los cursos."
   unable_to_load_lti_1_3_tools_cf169f9: "No se pueden cargar las herramientas Lti 1.3"
+  unable_to_load_messages_2b158fd0: "No se pudieron cargar los mensajes. "
   unable_to_read_file_2d04b0c: "No se pudo leer el archivo"
   unable_to_remove_app_4293cb53: "No se ha podido eliminar la aplicación"
   unable_to_save_new_discussion_topic_99239f3f: "no se pudo guardar el nuevo tema de foro de discusión"
