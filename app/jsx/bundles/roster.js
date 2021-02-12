@@ -78,7 +78,7 @@ const resendInvitationsView = new ResendInvitationsView({
   canResend:
     ENV.permissions.manage_students ||
     ENV.permissions.manage_admin_users ||
-    ENV.permissions.allow_course_admin_actions
+    ENV.permissions.can_allow_course_admin_options
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}

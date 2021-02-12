@@ -23,13 +23,10 @@ describe "course people" do
   include_context "in-process server selenium tests"
 
   before :each do
-    # in the people table, the kyle menu can be off the screen
-    # and uninteractable if the window is too small
-
-
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account # for custom roles
     @custom_student_role = custom_student_role("custom stu")
+    Account.default.root_account.disable_feature!(:granular_permissions_manage_users)
   end
 
   def add_user(email, type, section_name=nil)
@@ -105,7 +102,8 @@ describe "course people" do
       username = "user@example.com"
       student_in_course(:name => username, :role => @custom_student_role)
       add_section('Section1')
-      @enrollment.course_section = @course_section; @enrollment.save!
+      @enrollment.course_section = @course_section
+      @enrollment.save!
 
       go_to_people_page
       expect(f('.roster')).to include_text(username)
@@ -131,8 +129,8 @@ describe "course people" do
       expect(f("#user_#{@student.id}")).to include_text(section_name)
       expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
-      @student.enrollments.each{|e|expect(e.role_id).to eq role.id}
-      @student.enrollments.each{|e|expect(e.workflow_state).to eq enrollment_state}
+      @student.enrollments.each{|e| expect(e.role_id).to eq role.id}
+      @student.enrollments.each{|e| expect(e.workflow_state).to eq enrollment_state}
     end
 
     it "should add a user without custom role to another section" do
@@ -265,7 +263,7 @@ describe "course people" do
       end
       # expect
       expect(obs.reload.not_ended_enrollments.count).to eq 2
-      expect(obs.reload.not_ended_enrollments.map { |e| e.associated_user_id }.sort).to include(students[2].id)
+      expect(obs.reload.not_ended_enrollments.map(&:associated_user_id).sort).to include(students[2].id)
     end
 
     it "should handle deleted observee enrollments" do
@@ -274,8 +272,16 @@ describe "course people" do
       obs = user_model(:name => "The Observer")
       student_in_course(:name => "Student 1", :active_all => true, :role => @custom_student_role)
       @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role => custom_observer_role)
-      student = student_in_course(:name => "Student 2", :active_all => true, :role => @custom_student_role)
-      obs_enrollment = @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true, :role => custom_observer_role)
+      student_in_course(:name => "Student 2", :active_all => true, :role => @custom_student_role)
+      obs_enrollment =
+        @course.enroll_user(
+          obs,
+          'ObserverEnrollment',
+          :enrollment_state => 'active',
+          :associated_user_id => @student.id,
+          :allow_multiple_enrollments => true,
+          :role => custom_observer_role
+        )
 
       # bye bye Student 2
       obs_enrollment.destroy
@@ -288,7 +294,7 @@ describe "course people" do
 
       # dialog loads too
       use_link_dialog(obs) do
-        input = fj("#link_students")
+        input = f("#link_students")
         expect(input.text).to include "Student 1"
         expect(input.text).not_to include "Student 2"
       end
@@ -317,6 +323,30 @@ describe "course people" do
       expect(f("#content")).not_to contain_css(".student_enrollments #user_#{@fake_student.id}")
     end
 
+    context 'with granular permissions enabled' do
+      before do
+        @account.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it "should remove a user from the course" do
+        username = "user@example.com"
+        student_in_course(:name => username, :role => @custom_student_role)
+        add_section('Section1')
+        @enrollment.course_section = @course_section
+        @enrollment.save!
+
+        go_to_people_page
+        expect(f('.roster')).to include_text(username)
+
+        remove_user(@student)
+        expect(f('.roster')).not_to include_text(username)
+      end
+
+      it "should add a user without custom role to another section" do
+        add_user_to_second_section
+      end
+    end
+
     context "multiple enrollments" do
       it "should link an observer enrollment when other enrollment types exist" do
         course_with_student :course => @course, :active_all => true, :name => 'teh student'
@@ -337,7 +367,7 @@ describe "course people" do
       it "should create new observer enrollments as custom type when adding observees" do
         role = custom_observer_role("custom observer")
         student_in_course :course => @course
-        e = course_with_observer(:course => @course, :role => role)
+        course_with_observer(:course => @course, :role => role)
 
         go_to_people_page
 
@@ -346,7 +376,7 @@ describe "course people" do
         end
 
         @observer.reload
-        @observer.enrollments.each{|e|expect(e.role_id).to eq role.id}
+        @observer.enrollments.each{|e| expect(e.role_id).to eq role.id}
       end
 
       it "should create new enrollments as custom type when adding sections" do
@@ -367,6 +397,21 @@ describe "course people" do
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
+        end
+      end
+
+      context 'with granular permissions enabled' do
+        before do
+          @account.root_account.enable_feature!(:granular_permissions_manage_users)
+        end
+
+        %w[student teacher ta designer observer].each do |base_type|
+          it "should allow adding custom #{base_type} enrollments" do
+            user = user_with_pseudonym(:active_user => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
+            send "custom_#{base_type}_role", "custom"
+            add_user(user.name, "custom")
+            expect(f("#user_#{user.id} .admin-links")).not_to be_nil
+          end
         end
       end
     end

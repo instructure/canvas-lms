@@ -22,10 +22,17 @@ require_relative '../grades/pages/gradebook_page'
 require_relative '../grades/pages/gradebook_cells_page'
 require_relative 'pages/student_context_tray_page'
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe "admin avatars" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before do
+    set_granular_permission
+  end
+
+  before(:each) do
     course_with_admin_logged_in
     Account.default.enable_service(:avatars)
     Account.default.settings[:avatars] = 'enabled_pending'
@@ -43,7 +50,7 @@ describe "admin avatars" do
   end
 
   def verify_avatar_state(user, opts={})
-    if (opts.empty?)
+    if opts.empty?
       expect(f("#submitted_profile")).to include_text "Submitted 1"
       f("#submitted_profile").click
     else
@@ -65,12 +72,12 @@ describe "admin avatars" do
     user
   end
 
-  it "should verify that the profile pictures is submitted " do
+  it "should verify that the profile picture is submitted " do
     user = create_avatar_state
     verify_avatar_state(user)
   end
 
-  it "should verify that the profile pictures is reported " do
+  it "should verify that the profile picture is reported " do
     user = create_avatar_state("reported")
     opts = {"#reported_profile" => "Reported 1"}
     verify_avatar_state(user, opts)
@@ -140,5 +147,18 @@ describe "admin avatars" do
 
       expect(student_avatar_link).to be_displayed
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_manage_users) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_manage_users) }
   end
 end

@@ -1272,7 +1272,7 @@ class AccountsController < ApplicationController
       @items = @account.report_snapshots.progressive.last.try(:report_value_over_time, params[:attribute])
       respond_to do |format|
         format.json { render :json => @items }
-        format.csv {
+        format.csv do
           res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
             @items.each do |item|
@@ -1280,20 +1280,25 @@ class AccountsController < ApplicationController
             end
           end
           cancel_cache_buster
-          # TODO i18n
+          # TODO: i18n
           send_data(
             res,
             :type => "text/csv",
             :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv",
             :disposition => "attachment"
           )
-        }
+        end
       end
     end
   end
 
   def avatars
-    if authorized_action(@account, @current_user, :manage_admin_users)
+    # multi-line ternary is not ideal, but is a clean solution for temp granular check
+    is_authorized = @domain_root_account.feature_enabled?(:granular_permissions_manage_users) ?
+      authorized_action(@account, @current_user, :allow_course_admin_actions) :
+      authorized_action(@account, @current_user, :manage_admin_users)
+
+    if is_authorized
       @users = @account.all_users(nil)
       @avatar_counts = {
         :all => format_avatar_count(@users.with_avatar_state('any').count),
@@ -1304,14 +1309,12 @@ class AccountsController < ApplicationController
       if params[:avatar_state]
         @users = @users.with_avatar_state(params[:avatar_state])
         @avatar_state = params[:avatar_state]
+      elsif @domain_root_account && @domain_root_account.settings[:avatars] == 'enabled_pending'
+        @users = @users.with_avatar_state('submitted')
+        @avatar_state = 'submitted'
       else
-        if @domain_root_account && @domain_root_account.settings[:avatars] == 'enabled_pending'
-          @users = @users.with_avatar_state('submitted')
-          @avatar_state = 'submitted'
-        else
-          @users = @users.with_avatar_state('reported')
-          @avatar_state = 'reported'
-        end
+        @users = @users.with_avatar_state('reported')
+        @avatar_state = 'reported'
       end
       @users = Api.paginate(@users, self, account_avatars_url)
     end
@@ -1320,6 +1323,7 @@ class AccountsController < ApplicationController
   def sis_import
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
+
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order('created_at DESC').first
       @terms = @account.enrollment_terms.active
@@ -1336,9 +1340,9 @@ class AccountsController < ApplicationController
 
   def course_user_search
     return unless authorized_action(@account, @current_user, :read)
+
     can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
     can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
-    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
 
     unless can_read_course_list || can_read_roster
       if @redirect_on_unauth
@@ -1364,11 +1368,11 @@ class AccountsController < ApplicationController
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
-      can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
+      can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups), # access to view user groups?
     }
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
       js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :allow_course_admin_actions)
-      js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
+      js_permissions[:can_allow_course_admin_options] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
     else
       js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users)
       js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
@@ -1391,8 +1395,8 @@ class AccountsController < ApplicationController
       @account ||= @context
       return course_user_search
     end
-
     return unless authorized_action(@context, @current_user, :read_roster)
+
     @root_account = @context.root_account
     @query = params[:term]
     GuardRail.activate(:secondary) do

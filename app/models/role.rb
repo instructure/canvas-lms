@@ -330,8 +330,8 @@ class Role < ActiveRecord::Base
       custom_roles.each do |custom_role|
         custom_role[:manageable_by_user] = is_manageable unless granular_admin
         if granular_admin
-          role[:addable_by_user] = is_addable
-          role[:deleteable_by_user] = is_deleteable
+          custom_role[:addable_by_user] = is_addable
+          custom_role[:deleteable_by_user] = is_deleteable
         end
         roles << custom_role
       end

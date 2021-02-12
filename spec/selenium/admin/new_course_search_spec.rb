@@ -38,6 +38,7 @@ describe "new account course search" do
 
   before do
     user_session(@user)
+    @account.root_account.disable_feature!(:granular_permissions_manage_users)
   end
 
   it "should not show the courses tab without permission" do
@@ -214,5 +215,41 @@ describe "new account course search" do
     visit_courses(@account)
     click_add_user_button(named_course.name)
     expect(add_people_header).to include_text(named_course.name)
+  end
+
+  context 'with granular permissions enabled' do
+    before do
+      @account.root_account.enable_feature!(:granular_permissions_manage_users)
+    end
+
+    it "should only show non-admin manageable roles in new enrollment dialog" do
+      custom_name = 'Custom Student role'
+      custom_student_role(custom_name, account: @account)
+
+      @account.role_overrides.create!(permission: "add_ta_to_course", enabled: false, role: admin_role)
+      @account.role_overrides.create!(permission: "add_designer_to_course", enabled: false, role: admin_role)
+      @account.role_overrides.create!(permission: "add_teacher_to_course", enabled: false, role: admin_role)
+
+      course_factory(account: @account)
+
+      visit_courses(@account)
+      click_add_users_to_course(@course)
+
+      expect(add_people_modal).to be_displayed
+      expect(role_options).to match_array(["Student", "Observer", custom_name])
+    end
+
+    it "should show all admin manageable roles in new enrollment dialog" do
+      custom_name = 'Custom Student role'
+      custom_student_role(custom_name, account: @account)
+
+      course_factory(account: @account)
+
+      visit_courses(@account)
+      click_add_users_to_course(@course)
+
+      expect(add_people_modal).to be_displayed
+      expect(role_options).to match_array([custom_name, "Designer", "Observer", "Student", "TA", "Teacher"])
+    end
   end
 end
