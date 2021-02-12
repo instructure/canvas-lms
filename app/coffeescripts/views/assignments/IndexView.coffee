@@ -128,8 +128,6 @@ export default class IndexView extends Backbone.View
 
     @filterKeyBindings() if !@canManage()
 
-    @ensureContentStyle()
-
     unless (ENV.disable_keyboard_shortcuts)
       @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
       window.onkeydown = @focusOnAssignments
@@ -232,11 +230,6 @@ export default class IndexView extends Backbone.View
 
   canManage: ->
     ENV.PERMISSIONS.manage
-
-  ensureContentStyle: ->
-    # when loaded from homepage, need to change content style
-    if !@canManage() && window.location.href.indexOf('assignments') == -1
-      $("#content").css("padding", "0em")
 
   filterKeyBindings: =>
     @keyBindings = @keyBindings.filter (binding) ->
