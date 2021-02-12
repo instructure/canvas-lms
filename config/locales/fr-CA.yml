@@ -197,7 +197,7 @@ fr-CA:
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Un niveau de confidentialité publique enverra les informations d'identification personnelle de l'utilisateur de lancement au fournisseur de l'outil. Le réglage de ce paramètre à Privé peut affecter négativement les outils qui dépendent de cette information."
   a_redirect_uri_is_required_please_supply_one_471908db: "Un redirect_uri est requis, veuillez en fournir un."
   a_section_is_required_64103992: "Une section est requise."
-  a_simplified_canvas_interface_for_k_5_80b33391: "Une interface Canvas simplifiée pour « maternelle jusqu’à 5e année » (K-5)"
+  a_simplified_canvas_interface_for_k_5_80b33391: "Une interface Canvas simplifiée pour « maternelle jusqu’à 5e année » (K-5)"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "L'intégration SIS n'est pas configurée et les paramètres d’activation de nouvelle intégration SIS ne sont pas activés"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Un étudiant vient de remettre une tâche en retard pour %{assignment_name} dans le cours %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Un étudiant vient de remettre une resoumission pour %{assignment_title} dans le cours %{course_name}"
@@ -1729,11 +1729,13 @@ fr-CA:
   add_course_406cb773: "Ajouter un cours"
   add_course_assignments_628ed6d0: "Ajouter des tâches pour le cours"
   add_course_calendar_events_146154a5: "Ajouter des événements de calendrier pour le cours"
+  add_course_files_4e0f1abc: "Ajouter les fichiers de cours"
   add_criterion_eb9587ef: "Ajouter un critère"
   add_custom_link_22059c0: "Ajouter un lien personnalisé"
   add_designers_to_courses_9588820b: "Ajouter des concepteurs aux cours"
   add_discussion_653dab4c: "Ajouter une discussion"
   add_domain_f15bc6c1: "Ajouter un domaine"
+  add_edit_delete_files_573a4d62: "ajout/modification/suppression de fichiers"
   add_edit_delete_sections_d32c5b4d: "ajout/modification/suppression de sections"
   add_email_address_aef3b61: "Ajouter une adresse courriel"
   add_existing_content_7e36da66: "Ajouter du contenu existant"
@@ -1744,6 +1746,7 @@ fr-CA:
   add_grading_period_6f774dc3: "Ajouter une période de notation"
   add_grading_scheme_81e23c05: "Ajouter un système de notation"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Ajouter un système de notation aux rapports de notation d'administrateur"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Ajouter de la granularité aux autorisations de gestion des fichiers de cours"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Ajouter de la granularité aux autorisations de gestion des sections de cours"
   add_group_c84f9e9d: "Ajouter un groupe"
   add_group_set_f9809e11: "Ajouter un ensemble de groupes"
@@ -2030,6 +2033,8 @@ fr-CA:
   allow_users_to_comment_45b8f753: "Autoriser les utilisateurs à commenter"
   allowed_attempts_4e229caa: "Tentatives autorisées"
   allowed_domains_ee7868c8: "Domaines autorisés"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Autorisé pour les sous-comptes/cours, désactivé par défaut"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Autorisé pour les sous-comptes/cours, activé par défaut"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permet à un utilisateur d'accéder au lien « Agir en tant qu'utilisateur » sur les cartes de contexte de l'étudiant"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Permet à un utilisateur de voir l'ID SIS dans les détails de connexion d’un utilisateur."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permet à un utilisateur de voir les ID utilisateur SIS dans une page de Personnes d’un cours."
@@ -2067,7 +2072,7 @@ fr-CA:
   allows_uer_to_delete_a_submission_file_5302db48: "Autorise l’utilisateur à supprimer un fichier d’envoi."
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Permet à l'utilisateur d'accéder et de modifier les paramètres d'administration dans Commons. Permet à l’utilisateur de créer et gérer des groupes. Permet à l'utilisateur de gérer des ressources partagées dans le compte."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Permet à l'utilisateur d’accéder à SpeedGrader depuis une tâche."
-  allows_user_to_access_the_act_as_user_link_on_stud_c7391722: "Permet à un utilisateur d'accéder au lien « Agir en tant qu'utilisateur » sur les cartes de contexte de l'étudiant"
+  allows_user_to_access_the_act_as_user_link_on_stud_c7391722: "Permet à un utilisateur d'accéder au lien « Agir en tant qu'utilisateur » sur les cartes de contexte de l'étudiant"
   allows_user_to_access_the_announcements_link_in_co_2783579a: "Permet à l’utilisateur d’accéder au lien Annonces dans la navigation du cours. Permet à l’utilisateur de voir les annonces de cours. Permet à l’utilisateur de voir les annonces récentes sur la page d’accueil du cours."
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
       Permet à l'utilisateur d'accéder au lien Annonces dans la navigation du cours.
@@ -2668,9 +2673,9 @@ fr-CA:
   answer_sequence_cfeda025: "Séquence des réponses"
   answer_text_909894d6: "Texte de réponse"
   answer_weight_43420dc5: "Coefficient de la réponse"
-  answers_which_scored_in_the_bottom_27_74409483: "Les réponses qui ont un résultat dans les 27 % les plus bas"
-  answers_which_scored_in_the_middle_46_46466ffd: "Les réponses qui ont un résultat dans les 46 % médians"
-  answers_which_scored_in_the_top_27_a605232d: "Les réponses qui ont un résultat dans les 27 % les plus hauts"
+  answers_which_scored_in_the_bottom_27_74409483: "Les réponses qui ont un résultat dans les 27 % les plus bas"
+  answers_which_scored_in_the_middle_46_46466ffd: "Les réponses qui ont un résultat dans les 46 % médians"
+  answers_which_scored_in_the_top_27_a605232d: "Les réponses qui ont un résultat dans les 27 % les plus hauts"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Les réponses apparaîtront après votre dernière tentative"
   any_sub_account_ec7069f2: "Tout sous-compte"
   any_term_d49af19f: "Toute période"
@@ -3049,6 +3054,7 @@ fr-CA:
     assignment_group_selector: 
       assignment_group: "Groupe de tâches"
       assignment_group_options: 
+        create_group: "Créer un groupe"
         new_group: "Nouveau groupe"
     assignment_list_item: 
       delete: Supprimer
@@ -4852,6 +4858,7 @@ fr-CA:
   classic_quizzes_dee3c7b7: "Questionnaires classiques"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Option de questionnaires classiques pour les questionnaires chronométrés sans envoi"
   clear_2084585f: Effacer
+  clear_search_field_75f595c7: "Effacer le champ de recherche"
   clear_selected_file_82388e50: "Effacer le fichier sélectionné"
   clear_user_cache_ef079f7f: "Effacer le cache utilisateurs"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Cliquez sur « Annuler » si vous ne souhaitez pas que le code s'affiche."
@@ -5079,6 +5086,7 @@ fr-CA:
   collapse_all_50275533: "Tout réduire"
   collapse_group_c2af7cad: "Réduire le groupe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Réduire la liste des membres du groupe %{groupName}"
+  collapse_outcome_description_de471564: "Réduire la description de l’acquis"
   collapse_subdiscussion_89af1f5c: "Réduire la sous-discussion"
   collapse_tutorial_tray_66ee7dc1: "Réduire le tutoriel volant"
   collapsed_510aa02a: Réduit(e)
@@ -6134,7 +6142,7 @@ fr-CA:
   correct_answers_are_no_longer_available_c67dfc28: "Les réponses correctes ne sont plus disponibles."
   correct_answers_will_be_available_from_to_5762e8c6: "Les réponses correctes sont disponibles du %{from} au %{to}."
   correct_answers_will_be_available_on_date_48137: "Les réponses correctes seront disponibles le %{date}."
-  correct_check_icon_617da6c3: "icône de marque « correct »"
+  correct_check_icon_617da6c3: "icône de marque « correct »"
   costa_rica_506_d63d2ea1: "Costa Rica (+506)"
   could_not_duplicate_discussion_953ed67f: "Impossible de dupliquer la discussion"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Impossible de trouver une configuration LTI pour l'ID client %{clientId}"
@@ -6145,8 +6153,8 @@ fr-CA:
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Impossible de modifier les dates sur la tâche %{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Impossible de trouver une autorisation à mettre à jour"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "En-têtes d’importation CSV Canvas introuvables"
-  couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Impossible de trouver des paramètres valides pour ce lien : Lien de ressource introuvable"
-  couldn_t_find_valid_settings_for_this_link_resourc_cab9f16a: "Impossible de trouver des paramètres valides pour ce lien : Lien de ressource non valide pour l'outil"
+  couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Impossible de trouver des paramètres valides pour ce lien : Lien de ressource introuvable"
+  couldn_t_find_valid_settings_for_this_link_resourc_cab9f16a: "Impossible de trouver des paramètres valides pour ce lien : Lien de ressource non valide pour l'outil"
   couldn_t_generate_diff_message_a0528b20: "N'a pu produire de comparaison : %{message}"
   couldn_t_update_standards_for_authority_auth_81206187: "Impossible de mettre à jour les critères de l'autorisation %{auth}"
   count_alignments_40fbc23c: 
@@ -6200,6 +6208,9 @@ fr-CA:
   count_files_were_ignored_2f9c054a: 
     one: "(1) fichier ignoré"
     other: "(%{count}) fichiers ont été ignorés"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 acquis « %{groupTitle} »"
+    other: "%{count} acquis « %{groupTitle} »"
   count_hidden_e8d2c57c: "%{count} masqués"
   count_images_found_for_term_a93635ed: "%{count} images trouvées pour %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -6228,6 +6239,9 @@ fr-CA:
     one: "1 Option"
     other: "%{count} Options"
   count_options_loaded_cd59cc3b: "%{count} options chargées."
+  count_outcomes_selected_55902958: 
+    one: "1 acquis sélectionné"
+    other: "%{count} acquis sélectionnés"
   count_page_views_b40102b3: 
     one: "1 consultation de page"
     other: "%{count} consultations de page"
@@ -6452,7 +6466,10 @@ fr-CA:
   course_favorites_from_dashboard_27a3515a: "Favoris du cours depuis le tableau de bord"
   course_files_62deb8f8: "Fichiers de cours"
   course_files_a31f97fc: "Fichiers du cours"
+  course_files_add_2eede390: "Fichiers de cours - ajouter"
   course_files_add_edit_delete_24678a2f: "Fichiers de cours - ajouter/modifier/supprimer"
+  course_files_delete_fae0effe: "Fichiers de cours - supprimer"
+  course_files_edit_d05d4e8b: "Fichiers de cours - modifier"
   course_found_f5a40cd3: "Cours détecté"
   course_found_not_deleted_a20f72f0: "Cours détecté (non supprimé)"
   course_grade_grade_in_course_code_9fa854db: "Note de cours : %{grade}% dans %{course_code}"
@@ -7191,6 +7208,8 @@ fr-CA:
   create_edit_line_item_scores_116482c7: "Créer/modifier les scores de poste"
   create_educational_resources_8219326e: "Créez des ressources éducatives"
   create_failed_15d07ad4: "La création a échoué"
+  create_file_71aa1922: "[Créer fichier]"
+  create_file_s_188549e6: "[Créer fichier(s)]"
   create_files_after_rce_media_upload_recording_77d75a96: "Créer des fichiers après le téléversement/enregistrement de supports RCE"
   create_interactive_course_content_76665336: "Créer du contenu de cours interactif"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Créer des abonnements à des événements en direct sur ToolProxy"
@@ -7603,6 +7622,7 @@ fr-CA:
   delete_comment_a71040c3: "Supprimer le commentaire"
   delete_comment_comment_d32ffc85: "Supprimer le commentaire : %{comment}"
   delete_comment_commenttext_c8afe129: "Supprimer le commentaire : %{commentText}"
+  delete_course_files_ee9e769: "Supprimer les fichiers de cours"
   delete_criterion_row_80c3b3b: "Supprimer la ligne de critère"
   delete_current_message_5da0221a: "Supprimer le message actuel"
   delete_current_module_item_21fefc54: "Supprimer le module/l'élément actuel"
@@ -7889,6 +7909,7 @@ fr-CA:
   disabled_3b1b332a: Désactivé
   disabled_and_locked_d14dc6c2: "Désactivé et verrouillé"
   disabled_by_default_7d822dcb: "Désactivé par défaut"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Désactivé pour tous les sous-comptes/cours"
   disabled_in_course_settings_d15ee35d: "* Désactivé dans les paramètres de cours"
   disabled_links_b3bdea99: "Liens désactivés"
   disabled_locked_dab351d6: "Désactivé (verrouillé)"
@@ -8335,6 +8356,7 @@ fr-CA:
   download_submission_comments_2a6c0395: "Télécharger des commentaires sur l’envoi"
   download_submissions_7454665f: "Télécharger les envois"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Télécharger la liste complète des erreurs et avertissements ici."
+  download_these_results_as_csv_9a890883: "Téléchargez ces résultats en format CSV"
   download_this_file_669f9174: "Télécharger ce fichier"
   downloading_course_content_allows_access_to_conten_164d9336: "Télécharger le contenu du cours permet d'y accéder sans être connecté. Le contenu peut inclure des fichiers, des pages, des évaluations, des sujets de discussion ou encore des questionnaires. Cliquez sur « Générer au format ePub » pour chaque cours puis ouvrir avec un logiciel eReader pour le visualiser."
   draft_92507c72: (ébauche)
@@ -8455,6 +8477,7 @@ fr-CA:
   edit_collaboration_b014c18b: "Modifier la collaboration"
   edit_comment_comment_e74afa04: "Modifier un commentaire : %{comment}"
   edit_conference_title_6e234815: "Modifier « %{conference_title} »"
+  edit_course_files_d046ef82: "Modifier les fichiers de cours"
   edit_course_role_3b992fc2: "Modifier le rôle du cours"
   edit_criterion_5e4dadca: "Modifier le critère"
   edit_criterion_description_5828919: "Modifier la description du critère"
@@ -8653,6 +8676,7 @@ fr-CA:
   enabled_and_locked_49ff3de4: "Activé et Verrouillé"
   enabled_ba7cab66: Activé
   enabled_by_default_e530d6ed: "Activé par défaut"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Activé pour tous les sous-comptes/cours"
   enabled_links_be110215: "Liens activés"
   enabled_locked_3cf7c256: "Activé (verrouillé)"
   enabled_unlocked_8d3a5df7: "Activé (déverrouillé)"
@@ -8733,15 +8757,15 @@ fr-CA:
   enrollments_may_be_added_by_your_institution_stude_213d41a4: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par l'intermédiaire de SIS, seuls les administrateurs peuvent la supprimer du cours.
               Si le paramètre d'ouverture de compte d'inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter les observateurs à un cours à partir de la page des Personnes du cours par l'intermédiaire d'adresse de courriel ou d’ID de connexion même si l'observateur ne dispose pas déjà d'un compte Canvas.
-              Pour lier un observateur à un étudiant, « Utilisateurs - gérer les détails de connexion » et « Conversations - envoyer aux membres individuels du cours » doivent être activés.
-              Pour générer un code d'appariement pour le compte d'un étudiant à partager avec un observateur, « Utilisateurs - Générer un code d'appariement d'observateur pour les étudiants » doit également être activé.
-              Pour voir la liste des observateurs dans le cours, « Utilisateurs - voir la liste » doit être activé.
-              Pour voir les ID SIS, « SIS Data - lecture » doit être activé. Pour ajouter un observateur à un cours par l’intermédiaire de l’ID SIS, « SIS Data - gérer » doit également être activé.
+              Pour lier un observateur à un étudiant, « Utilisateurs - gérer les détails de connexion » et « Conversations - envoyer aux membres individuels du cours » doivent être activés.
+              Pour générer un code d'appariement pour le compte d'un étudiant à partager avec un observateur, « Utilisateurs - Générer un code d'appariement d'observateur pour les étudiants » doit également être activé.
+              Pour voir la liste des observateurs dans le cours, « Utilisateurs - voir la liste » doit être activé.
+              Pour voir les ID SIS, « SIS Data - lecture » doit être activé. Pour ajouter un observateur à un cours par l’intermédiaire de l’ID SIS, « SIS Data - gérer » doit également être activé.
   enrollments_may_be_added_by_your_institution_stude_40297562: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent la supprimer du cours.
-              Pour modifier une section du concepteur, « Conversations - envoyer des messages aux membres individuels du cours » doit également être activé.
-              Pour voir la liste des concepteurs dans le cours, « Utilisateurs - voir la liste » doit être activé.
-              Pour voir les ID SIS, « SIS Data - lecture » doit être activé. Pour ajouter un concepteur à un cours par l’intermédiaire de l’ID SIS, « SIS Data - gérer » doit également être activé.
+              Pour modifier une section du concepteur, « Conversations - envoyer des messages aux membres individuels du cours » doit également être activé.
+              Pour voir la liste des concepteurs dans le cours, « Utilisateurs - voir la liste » doit être activé.
+              Pour voir les ID SIS, « SIS Data - lecture » doit être activé. Pour ajouter un concepteur à un cours par l’intermédiaire de l’ID SIS, « SIS Data - gérer » doit également être activé.
   enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent supprimer l’inscription du cours.
               Pour accéder à la page des Personnes, « Utilisateurs - voir la liste » doit être activé. Si le paramètre d’ouverture de compte d’inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter les étudiants à un cours par l’intermédiaire d’adresse de courriel si l’utilisateur ne dispose pas déjà d’un compte Canvas. Pour voir les ID SIS, « Données SIS — lecture » doit être activé. Pour ajouter un utilisateur à un cours par l’intermédiaire de l’ID SIS, « Données du SIS - gérer » doit également être activé. Pour modifier une section de l’étudiant(e), « Utilisateurs — voir la liste » et « Conversations — envoyer des messages aux membres individuels du cours » doivent également être activés. Pour lier un observateur à un(e) étudiant(e), « Conversations — envoyer des messages aux membres individuels du cours » doit également être activé.
@@ -8754,30 +8778,30 @@ fr-CA:
   enrollments_may_be_added_by_your_institution_stude_88111dff: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent la supprimer du cours.
               Si le paramètre d'ouverture de compte d'inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter des concepteurs à un cours à partir de la page des personnes du cours par l'intermédiaire d'adresse de courriel ou d'ID de connexion même si l'observateur ne dispose pas déjà d'un compte Canvas.
-              Pour modifier une section du concepteur, « Conversations - envoyer des messages aux membres individuels du cours » doit également être activé.
-              Pour voir la liste des concepteurs dans le cours, « Utilisateurs - voir la liste » doit être activé.
-              Pour voir les ID SIS, « SIS Data - lecture » doit être activé. Pour ajouter un concepteur à un cours par l’intermédiaire de l’ID SIS, « SIS Data - gérer » doit également être activé.
+              Pour modifier une section du concepteur, « Conversations - envoyer des messages aux membres individuels du cours » doit également être activé.
+              Pour voir la liste des concepteurs dans le cours, « Utilisateurs - voir la liste » doit être activé.
+              Pour voir les ID SIS, « SIS Data - lecture » doit être activé. Pour ajouter un concepteur à un cours par l’intermédiaire de l’ID SIS, « SIS Data - gérer » doit également être activé.
   enrollments_may_be_added_by_your_institution_stude_8e8fcd3d: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent la supprimer du cours.
               Si le paramètre d'ouverture de compte d'inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter les enseignants à un cours à partir de la page Personnes du cours par l'intermédiaire d'adresse de courriel ou ID de connexion même si l'enseignant ne dispose pas déjà d'un compte Canvas.
-              Pour modifier une section de l'enseignant(e). « Conversations - envoyer aux membres individuels du cours » doit également être activé.
-              Pour voir la liste des enseignants dans le cours, « Utilisateurs - voir la liste » doit être activé.
-              Pour voir les ID SIS, « SIS Data - Lecture » doit être activé. Pour ajouter des enseignants à un cours par l’intermédiaire de l’ID SIS, « SIS Data - Gérer » doit également être activé.
+              Pour modifier une section de l'enseignant(e). « Conversations - envoyer aux membres individuels du cours » doit également être activé.
+              Pour voir la liste des enseignants dans le cours, « Utilisateurs - voir la liste » doit être activé.
+              Pour voir les ID SIS, « SIS Data - Lecture » doit être activé. Pour ajouter des enseignants à un cours par l’intermédiaire de l’ID SIS, « SIS Data - Gérer » doit également être activé.
   enrollments_may_be_added_by_your_institution_stude_9e5d79eb: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent la supprimer du cours.
               Si le paramètre d'ouverture de compte d'inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter les enseignants à un cours à partir de la page Personnes du cours par l'intermédiaire d'adresse de courriel ou ID de connexion même si l'observateur ne dispose pas déjà d'un compte Canvas.
-              Pour modifier une section de l'enseignant(e), « Conversations - envoyer aux membres individuels du cours » doit également être activé.
-              Pour voir la liste des enseignants dans le cours, « Utilisateurs - voir la liste » doit être activé.
-              Pour voir les ID SIS, « SIS Data - Lecture » doit être activé. Pour ajouter des enseignants à un cours par l’intermédiaire de l’ID SIS, « SIS Data - Gérer » doit également être activé.
+              Pour modifier une section de l'enseignant(e), « Conversations - envoyer aux membres individuels du cours » doit également être activé.
+              Pour voir la liste des enseignants dans le cours, « Utilisateurs - voir la liste » doit être activé.
+              Pour voir les ID SIS, « SIS Data - Lecture » doit être activé. Pour ajouter des enseignants à un cours par l’intermédiaire de l’ID SIS, « SIS Data - Gérer » doit également être activé.
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent la supprimer du cours.
               Pour voir la liste des utilisateurs dans le cours, « Utilisateurs - voir la liste » doit être activé. Pour voir les ID SIS, « Données SIS — lecture » doit être activé. Pour ajouter un utilisateur à un cours par l’intermédiaire de l’ID SIS, « Données du SIS - gérer » doit également être activé. Pour modifier une section de l’enseignant ou de l’AE, « Conversations — envoyer des messages aux membres individuels du cours » doit également être activé. Pour lier un observateur à un(e) étudiant(e), « Conversations — envoyer des messages aux membres individuels du cours » doit également être activé.
   enrollments_may_be_added_by_your_institution_stude_f600bc5a: |-
       Les inscriptions peuvent être ajoutées par le système d'information des étudiants (SIS) de votre établissement. Si une inscription est créée par le biais de SIS, seuls les administrateurs peuvent la supprimer du cours.
               Si le paramètre d'ouverture de compte d'inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter des AE à un cours à partir de la page Personnes du cours par l'intermédiaire d'adresse de courriel ou ID de connexion même si l'AE ne dispose pas déjà d'un compte Canvas.
-              Pour modifier une section de l'AE, « Conversations - envoyer aux membres individuels du cours » doit également être activé.
-              Pour voir la liste des AE dans le cours, « Utilisateurs - voir la liste » doit être activé.
-              Pour voir les ID SIS, « SIS Data - Lecture » doit être activé. Pour ajouter un AE à un cours par l’intermédiaire de l’ID SIS, « SIS Data - Gérer » doit également être activé.
+              Pour modifier une section de l'AE, « Conversations - envoyer aux membres individuels du cours » doit également être activé.
+              Pour voir la liste des AE dans le cours, « Utilisateurs - voir la liste » doit être activé.
+              Pour voir les ID SIS, « SIS Data - Lecture » doit être activé. Pour ajouter un AE à un cours par l’intermédiaire de l’ID SIS, « SIS Data - Gérer » doit également être activé.
   enrollments_observers: Observateur
   enrollments_students: Étudiants
   enrollments_tas: "Assistants d’enseignement"
@@ -9202,6 +9226,7 @@ fr-CA:
   expand_global_navigation_2c28d5d4: "Développer la navigation globale"
   expand_group_53765272: "Développer le groupe"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Développer la liste des membres du groupe %{groupName}"
+  expand_outcome_description_c5bdd70b: "Développer la description de l’acquis"
   expand_permission_b45bf097: "Développer %{permission}"
   expand_permission_c61d5958: "Développer autorisation"
   expand_subdiscussion_cd226ed4: "Développer la sous-discussion"
@@ -10544,6 +10569,7 @@ fr-CA:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Les paramètres notification de parcours granulaire de %{contextType} seront configurables ici à l’avenir."
   granular_course_notification_settings_will_be_conf_68f122db: "Les paramètres de notification de parcours granulaire seront configurables ici à l’avenir."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Autorisations granulaires pour ajouter/supprimer des rôles d’administrateur du cours"
+  granular_permissions_for_managing_course_files_1ed7f019: "Autorisations granulaires pour la gestion des fichiers de cours"
   granular_permissions_for_managing_course_sections_da4b04b: "Autorisations granulaires pour la gestion des sections du cours"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Autorisations granulaires pour la gestion de pages Wiki"
   graph_bar_b5daa23d: Histogramme
@@ -11525,6 +11551,7 @@ fr-CA:
   importing_outcomes_e62a0375: "importation d’acquis en cours"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Améliorer l'accessibilité du menu de gauche grâce à une meilleure utilisation des couleurs ainsi que des indicateurs visuels et du lecteur d'écran des éléments inactifs du menu."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Améliorer la découverte du glisser-déplacer dans les fichiers"
+  improved_interface_with_ongoing_updates_7316bdef: "Interface améliorée avec des mises à jour continues"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Prise en charge améliorée des nouveaux questionnaires avec les modules, y compris la création de nouveaux questionnaires à partir des modules"
   improved_outcomes_management_4692f886: "Gestion améliorée des résultats"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Amélioration des rappels visuels pour encourager les instructeurs à publier des cours"
@@ -12297,6 +12324,7 @@ fr-CA:
   loading_graders_f6a76142: "Chargement des correcteurs"
   loading_last_attended_date_5a42463: "Chargement de la date de dernière participation"
   loading_media_32847745: "Chargement du support"
+  loading_message_list_226a131e: "Chargement de la liste de messages"
   loading_more_grade_history_results_b235de5: "Chargement de plus de résultats d’historique de notes."
   loading_more_gradebook_history_results_810f6d2e: "Chargement de plus de résultats d’historique de Carnet de notes."
   loading_more_results_1d437202: "Chargement de résultats supplémentaires"
@@ -12510,6 +12538,7 @@ fr-CA:
   malformed_csv_aaa4b7f2: "CSV mal formé"
   maltese_916925e8: Maltais
   manage_access_bd923d8d: "Gérer l'accès"
+  manage_add_edit_delete_course_files_162c1a65: "Gérer (ajouter/modifier/supprimer) des fichiers de cours"
   manage_add_edit_delete_pages_5c73f2fb: "Gérer (ajouter / modifier / supprimer) les pages"
   manage_announcement_with_title_title_f2ce92de: "Gérer les annonces avec titre %{title}"
   manage_app_list_994cc26c: "Gérer la liste des applications"
@@ -12523,6 +12552,7 @@ fr-CA:
       delete_avatar: "Voulez-vous vraiment supprimer la photo de ce profil utilisateur?"
       lock_avatar: "Le verrouillage de cette photo permet de l’approuver et empêchera l’utilisateur de la mettre à jour. Continuer?"
   manage_b88f7150: Gérer
+  manage_course_files_57e07038: "Gérer les fichiers de cours"
   manage_course_sections_f482d1b3: "Gérer les sections du cours"
   manage_discussion_title_a2ecb3fb: "Gestion des discussions %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Gérer l’état des inscriptions, créer des groupes et ajouter des utilisateurs à partir de cette page."
@@ -14745,6 +14775,7 @@ fr-CA:
   nav_text_94206145: "Texte de navigation"
   nav_text_active_a924ae88: "Texte de navigation activé"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "La navigation permet à l'utilisateur de voir le lien Personnes dans la Navigation du cours."
+  navigation_menu_fd782ff8: "Menu de navigation"
   near_mastery_f25174a4: "Proche du niveau de maîtrise"
   need_a_canvas_account_221d18ed: "Besoin d'un compte Canvas?"
   need_help_setting_up_your_course_2b763141: "Besoin d'aide pour mettre votre cours en place?"
@@ -15030,7 +15061,7 @@ fr-CA:
   nothing_to_split_off_of_this_user_28ba9dd5: "Rien à détacher de cet utilisateur"
   notice_concluded_student_6d416c4: "Notice : Étudiant ayant terminé"
   notice_inactive_student_bcc4248a: "Notice : Étudiant inactif"
-  notice_some_notifications_may_contain_confidential_5985f52a: "Avis : Certaines notifications peuvent contenir des informations confidentielles. Si vous décidez de recevoir les notifications à une autre adresse courriel que celle fournie par votre institution, des détails confidentiels sur les cours et les groupes Canvas risquent de sortir du cadre de l’institution."
+  notice_some_notifications_may_contain_confidential_5985f52a: "Avis : Certaines notifications peuvent contenir des informations confidentielles. Si vous décidez de recevoir les notifications à une autre adresse courriel que celle fournie par votre institution, des détails confidentiels sur les cours et les groupes Canvas risquent de sortir du cadre de l’institution."
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Note : La période de notation est fermée pour cet étudiant"
   notification: 
     account_notification_description: "Annonces à l'échelle de l'institution (également affichées sur les pages du tableau de bord)"
@@ -15577,6 +15608,7 @@ fr-CA:
   outcome_imports_c496a81f: "Importation d’acquis"
   outcome_mastery_scales_8c3a814d: "Échelles de maîtrise des acquis"
   outcome_mastery_scales_add_edit_171551c: "Échelles de maîtrise des acquis — ajouter/modifier"
+  outcome_menu_4fe5813: "Menu des acquis"
   outcome_path_mastery_points: "Points pour la maîtrise de %{path}"
   outcome_path_result: "%{path} – Résultat"
   outcome_proficiency_calculations_5959b681: "Calculs de compétence des acquis"
@@ -17223,19 +17255,19 @@ fr-CA:
       page_blurred: "A arrêté de consulter la page de réponse aux questionnaires Canvas..."
       page_focused: "Opération reprise."
       question_answered: 
-        one: "A répondu à la question :"
-        other: "A répondu aux questions suivantes :"
-      question_flagged: "Question signalée :"
-      question_unflagged: "Question non signalée :"
+        one: "A répondu à la question :"
+        other: "A répondu aux questions suivantes :"
+      question_flagged: "Question signalée :"
+      question_unflagged: "Question non signalée :"
       question_viewed: 
         one: "Consultation (et éventuellement lecture) de la question"
-        other: "Consultation (et éventuellement lecture) des questions suivantes :"
+        other: "Consultation (et éventuellement lecture) des questions suivantes :"
       session_started: "Session démarrée"
     inverted_table_view: 
       headers: 
         question: Question
     links: 
-      log_accessibility_warning: "Avertissement : Pour l'amélioration de l'accessibilité lors de l'utilisation de journaux de quiz, veuillez demeurer dans la vue de flux actuelle."
+      log_accessibility_warning: "Avertissement : Pour l'amélioration de l'accessibilité lors de l'utilisation de journaux de quiz, veuillez demeurer dans la vue de flux actuelle."
     loading: Chargement...
     navigation: 
       links: 
@@ -17291,7 +17323,7 @@ fr-CA:
     generating: "Génération du rapport..."
     generation_almost_done: "Opération presque terminée."
     generation_complete: "Le rapport a été généré."
-    generation_halfway: "Opération effectuée à plus de 50 %."
+    generation_halfway: "Opération effectuée à plus de 50 %."
     generation_started: "Génération du rapport en cours."
     item_analysis: "Analyse d’élément"
     non_generatable_report_notice: "Le rapport ne peut pas être généré pour les questionnaires d’enquête."
@@ -17304,9 +17336,9 @@ fr-CA:
   quiz_score_to_keep_d1f7c4b1: "Notation du questionnaire à conserver"
   quiz_settings_4e17f005: "Paramètres de questionnaire"
   quiz_statistics: 
-    attempts: "Tentatives : %{count} sur %{total}"
+    attempts: "Tentatives : %{count} sur %{total}"
     discrimination_index: 
-      audible_discrimination_index: "Indice de discrimination : %{number}."
+      audible_discrimination_index: "Indice de discrimination : %{number}."
       discrimination_index: "Indice de discrimination"
       discrimination_index_dialog_title: "L’indice de discrimination"
       discrimination_index_dialog_trigger: "Apprenez-en davantage sur l’indice de discrimination."
@@ -17666,6 +17698,7 @@ fr-CA:
           select_all_banks: "Sélectionner tout"
           view_question_banks: "Voir les banques de question des cours"
         options: 
+          create_group: "[Créer un groupe]"
           new_group: "[ Nouveau groupe ]"
           no_group: "[ Aucun groupe ]"
         select_a_question_bank: "Sélectionnez une banque de questions dans la liste ci-dessous afin de la lier au questionnaire comme groupe de questions."
@@ -18493,6 +18526,7 @@ fr-CA:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Indépendamment de la question de savoir si cette autorisation est activée ou désactivée, les utilisateurs seront toujours en mesure de gérer les événements dans leur calendrier personnel."
   regenerate_3e4679f8: Régénérer
   regenerate_epub_395c8e56: "Regénérer un format ePub"
+  regenerating_themes_462e6cd9: "Régénération des thèmes…"
   region_47e29025: "Région :"
   region_939f2a6c: Region
   register_email_efc06d59: "Enregistrer un courriel"
@@ -19195,6 +19229,7 @@ fr-CA:
   search_discussion_by_title_30466604: "Recherche de discussion par titre"
   search_endpoints_d5abf37f: "Rechercher points d’extrémité"
   search_entries_or_author_63fb0a86: "Rechercher les entrées ou l’auteur"
+  search_field_234156fc: "Champ de recherche"
   search_flickr_6f28b02e: "Rechercher dans flickr"
   search_for_a_deleted_course_by_id_f553398d: "Rechercher un cours supprimé par son ID"
   search_for_files_7541fb28: "Chercher des fichiers"
@@ -19209,6 +19244,7 @@ fr-CA:
   search_term_must_be_at_least_num_characters_669098ed: "Le terme de recherche doit être long d'au moins %{num} caractères"
   search_title_body_or_author_1d26711f: "Rechercher un titre, bloc de texte ou auteur"
   search_users_48b1789e: "Chercher les utilisateurs..."
+  search_within_grouptitle_4d38272f: "Rechercher dans %{groupTitle}"
   searching_b0207e7f: "Recherche en cours"
   searching_for_announcements_in_sections_must_span__80e4dfe4: "La recherche d'annonces dans les sections doivent exactement couvrir un cours"
   searching_for_courses_8cc5f904: "Rechercher des cours..."
@@ -19399,6 +19435,7 @@ fr-CA:
   select_one_8e0af564: "Sélectionner un élément"
   select_one_b647b384: "Sélectionner un élément"
   select_one_of_the_options_c8b0c6e4: "Sélectionnez l'une de ces options :"
+  select_outcome_7e6e2562: "Sélectionner acquis"
   select_page_e93fc123: "Sélectionner la page"
   select_prerequisite_module_57894963: "Sélectionnez un module prérequis"
   select_prerequite_module_e9042bb0: "Sélectionnez un module prérequis"
@@ -19409,11 +19446,17 @@ fr-CA:
   select_students_for_review_6e004a12: "Sélectionner les étudiants à examiner"
   select_sub_account_6704196a: "Sélectionner un sous-compte"
   select_term_f8083fb0: "Sélectionner la période"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Sélectionnez le fichier que vous souhaitez associer, ou ajoutez-en un en choisissant « Créer fichier »."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Sélectionnez le fichier que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau fichier »."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Sélectionnez le fichier que vous souhaitez associer à ce *module*, ou ajoutez un fichier en sélectionnant « Nouveau fichier »."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Sélectionnez le fichier que vous souhaitez associer à ce *module*, ou ajoutez un fichier en sélectionnant « Créer fichier »."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Sélectionnez les fichiers que vous souhaitez associer, ou ajoutez des fichiers en choisissant « Créer fichier (s)»."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Sélectionnez les fichiers que vous souhaitez associer, ou ajoutez des fichiers en choisissant « Nouveau(x) fichier (s)»."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Sélectionnez les fichiers que vous souhaitez associer à ce *module*, ou ajoutez des fichiers en sélectionnant « Nouveau(x) fichier(s) »."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Sélectionnez les fichiers que vous souhaitez associer à ce *module*, ou ajoutez des fichiers en sélectionnant « Créer fichier(s) »."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Sélectionnez la page que vous souhaitez associer, ou ajoutez une nouvelle page en sélectionnant « Nouvelle page »."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Sélectionnez la page que vous souhaitez associer, ou ajoutez une nouvelle page en sélectionnant « Créer page »."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Sélectionnez la page que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant « Créer page »."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Sélectionnez la page que vous souhaitez associer à ce *module*, ou ajoutez une nouvelle page en sélectionnant « Nouvelle page »."
   select_title_for_deletion_45b08247: "Sélectionner %{title} pour suppression"
   select_type_of_prerequisite_8d6fa902: "Sélectionner un type de prérequis"
@@ -20048,10 +20091,21 @@ fr-CA:
       add_to_module: "Ajouter %{item} au *module*"
       assignment_item: Tâche
       assignment_item_select_label: "Sélectionnez le tâche que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau tâche »."
+      assignment_item_select_label_create: "Sélectionnez la tâche que vous souhaitez associer, ou ajoutez-en une en choisissant « Créer une tâche »."
+      assignment_item_select_label_new: "Sélectionnez la tâche que vous souhaitez associer, ou ajoutez-en une en choisissant « Nouvelle tâche »."
       assignment_notice: "Sélectionnez le tâche que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant « Nouvelle tâche »."
       content_page_item: Page
+      create_assignment_notice: "Sélectionnez la tâche que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant « Créer tâche »."
+      create_assignment_option: "[Créer une tâche]"
+      create_page_option: "[Créer une page]"
+      create_quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant « Créer questionnaire »."
+      create_quiz_option: "[Créer questionnaire]"
+      create_topic_notice: "Sélectionnez le sujet que vous souhaitez associer à ce *module*, ou ajoutez un sujet en sélectionnant « Créer sujet »."
+      create_topic_option: "[Créer une tâche]"
       discussion_item: Discussion
       discussion_topic_select_label: "Sélectionnez le sujet que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau sujet »."
+      discussion_topic_select_label_create: "Sélectionnez le sujet que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau sujet »."
+      discussion_topic_select_label_new: "Sélectionnez le sujet que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau sujet »."
       domain_match_notice: "pour utiliser cet outil, le domaine doit correspondre à %{domain}"
       external_tool_item: "Outil externe"
       external_tool_notice: "Dans la liste ci-dessous, sélectionnez un outil, ou entrez l’URL d’un outil externe dont vous savez qu’il est déjà configuré avec Basic LTI, afin de créer un lien entre l’outil et ce *module*."
@@ -20071,6 +20125,7 @@ fr-CA:
         header: En-tête
         indentation: Retrait
         page_name: "Nom de la page"
+        quiz_engine: "Moteur de questionnaire"
         quiz_group: Groupe
         quiz_name: "Nom du questionnaire"
         topic_name: "Nom du sujet"
@@ -20078,16 +20133,21 @@ fr-CA:
         wiki_page_name: "Nom de la page"
         wiki_page_namem: "Nom de la tâche"
       loading: Chargement...
+      new_assignment_notice: "Sélectionnez la tâche que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant « Nouvelle tâche »."
       new_assignment_option: "[ Nouvelle tâche]"
       new_page_option: "[ Nouvelle page ]"
+      new_quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant « Nouveau questionnaire »."
       new_quiz_option: "[ Nouveau questionnaire ]"
       new_tab: "Ouvrir dans un nouvel onglet"
+      new_topic_notice: "Sélectionnez le sujet que vous souhaitez associer à ce *module*, ou ajoutez un sujet en sélectionnant « Nouveau sujet »."
       new_topic_option: "[ Nouveau sujet ]"
       options: 
         assignments: Tâches
       quiz_item: Questionnaire
       quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant « Nouveau questionnaire »."
       quiz_select_label: "Sélectionnez le questionnaire que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau questionnaire »."
+      quiz_select_label_create: "Sélectionnez le questionnaire que vous souhaitez associer, ou ajoutez-en un en choisissant « Créer questionnaire »."
+      quiz_select_label_new: "Sélectionnez le questionnaire que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau questionnaire »."
       select_item_type_label: "Sélectionnez le type de contenu à ajouter."
       sub_header_notice: "Saisissez le texte du titre de paragraphe à ajouter pour le *module*"
       text_header_item: "Texte de l’en-tête"
@@ -20802,7 +20862,7 @@ fr-CA:
   subject_1bc03dea: "Objet :"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Objet doit contenir moins de 255 caractères."
   subject_reply_to: "Re : %{subject}"
-  subject_subject_9e1057f7: "Objet : %{subject}"
+  subject_subject_9e1057f7: "Objet : %{subject}"
   submission: 
     atom_no_author: "Aucun auteur"
     attached_files_comment: "Voir les fichiers joints."
@@ -21064,7 +21124,7 @@ fr-CA:
       support_desk_livechat: "Dialogue en direct avec le service d’assistance"
   support_favorite_lti_tools_in_the_rce_1680436d: "Prend en charge les outils LTI préférés dans le RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Prend en charge les équations mathématiques LaTex presque partout"
-  supported_file_types_vtt_srt_8cb75c13: "Types de fichier pris en charge : .vtt, .srt"
+  supported_file_types_vtt_srt_8cb75c13: "Types de fichier pris en charge : .vtt, .srt"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Suède (+46)"
@@ -21381,6 +21441,7 @@ fr-CA:
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et le résultat %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Le prochain rendez-vous disponible dans ce cours est le *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "L’interface initiale des questionnaires"
   the_preceding_content_is_partner_provided_d753928c: "Le contenu précédent est fourni par le partenaire"
   the_previous_sis_batch_was_aborted_d7d89955: "Le précédent lot SIS a été annulé"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Le calcul de compétence a été défini par votre administrateur et s’applique à tous les cours dans ce compte."
@@ -22081,9 +22142,9 @@ fr-CA:
   to_create_announcements_discussions_moderate_must__8a8278f2: "Pour créer des annonces, « Discussions - modérer » doit également être activé."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Pour transférer une section, « Sections de cours - ajouter/modifier/supprimer » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Pour transférer une section, « Sections de cours - ajouter/modifier/supprimer » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
-  to_cross_list_a_section_manage_course_sections_edi_93a73729: "Pour transférer une section, « Sections de gestion de cours - modifier » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
+  to_cross_list_a_section_manage_course_sections_edi_93a73729: "Pour transférer une section, « Sections de gestion de cours - modifier » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Pour transférer des sections, « Cours - ajouter/modifier/supprimer » doit également être activé."
-  to_cross_list_sections_course_sections_edit_must_b_4ffea833: "Pour transférer des sections, « Sections de cours - modifier » doit être activé. L'utilisateur doit également être inscrit à titre d'instructeur dans les cours qu'il essaie de transférer."
+  to_cross_list_sections_course_sections_edit_must_b_4ffea833: "Pour transférer des sections, « Sections de cours - modifier » doit être activé. L'utilisateur doit également être inscrit à titre d'instructeur dans les cours qu'il essaie de transférer."
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Pour transférer des sections, « Cours - ajouter/modifier/supprimer » doit également être activé."
   to_date_can_t_come_before_from_date_cf9e18aa: "La « date de fin » ne peut pas venir avant la « date de début »."
   to_date_cannot_come_before_from_date_3eeb2633: "La « date de fin » ne peut pas venir avant la « date de début »."
@@ -22118,7 +22179,7 @@ fr-CA:
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Pour modifier les paramètres de verrouillage du modèle de la page d’index de Discussions, « Cours — ajouter/modifier/supprimer » et « Discussions - Modérer » doivent également être activés. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Pour modifier les paramètres de verrouillage du modèle de la page d’index de Discussions, « Cours — ajouter/modifier/supprimer » et « Discussions — voir » doivent également être activés. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » et « Discussions — voir » sont activés, les paramètres de verrouillage du Modèle peuvent être modifiés sur les discussions individuelles."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des Pages, « Cours — ajouter/modifier/supprimer » doit également être activé. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » est activé, les paramètres de verrouillage du Modèle peuvent être modifiés sur les pages individuelles."
-  to_edit_blueprint_lock_settings_on_the_pages_index_f68745bf: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des Pages, « Cours — ajouter/modifier/supprimer » doit également être activé. Toutefois, si « Cours - ajouter/modifier/supprimer » est activé, mais « Pages - Mettre à jour l’autorisation » n'est pas activé, l'utilisateur peut toujours régler les paramètres de verrouillage du contenu sur des pages individuelles dans un cours modèle maître."
+  to_edit_blueprint_lock_settings_on_the_pages_index_f68745bf: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des Pages, « Cours — ajouter/modifier/supprimer » doit également être activé. Toutefois, si « Cours - ajouter/modifier/supprimer » est activé, mais « Pages - Mettre à jour l’autorisation » n'est pas activé, l'utilisateur peut toujours régler les paramètres de verrouillage du contenu sur des pages individuelles dans un cours modèle maître."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Pour modifier des systèmes de notation de cours, « Cours - ajouter/modifier/supprimer » doit également être activé."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Pour modifier les paramètres de cours, « Cours - ajouter/modifier/supprimer » doit également être activé."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Pour modifier les paramètres de cours, « Cours — ajouter/modifier/supprimer » doit également être activé."
@@ -22483,7 +22544,9 @@ fr-CA:
   unable_to_find_extension_3fe61b3c: "impossible de trouver l’extension"
   unable_to_find_filetype_7b620f02: "impossible de trouver le type de fichier"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Impossible de trouver des correspondances pour ces adresses courriel dans votre institution. Sélectionner celles que vous souhaitez créer en tant que nouveaux utilisateurs. Les éléments non sélectionnés seront ignorés."
+  unable_to_load_courses_menu_7074ea04: "Impossible de charger le menu des cours."
   unable_to_load_lti_1_3_tools_cf169f9: "Impossible de charger les outils de LTI 1.3"
+  unable_to_load_messages_2b158fd0: "Impossible de charger les messages. "
   unable_to_read_file_2d04b0c: "Impossible de lire le fichier"
   unable_to_remove_app_4293cb53: "Impossible de supprimer l’application"
   unable_to_save_new_discussion_topic_99239f3f: "impossible de sauvegarder de nouvelle rubrique de discussion"
