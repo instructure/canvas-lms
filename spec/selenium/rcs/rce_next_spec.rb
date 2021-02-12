@@ -938,7 +938,12 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       driver.action.send_keys(:escape).perform
 
-      expect(tray_container_exists?).to eq false # Press esc key
+      # tray_container_exists disables implicit waits,
+      # and because we're waiting for something to _disappear_
+      # we can't use implicit waits, so just keep trying for a bit
+      keep_trying_until do
+        expect(tray_container_exists?).to eq false # Press esc key
+      end
     end
 
     it 'should close the course images tray when pressing esc', ignore_js_errors: true do
@@ -950,7 +955,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       driver.action.send_keys(:escape).perform
 
-      expect(tray_container_exists?).to eq false # Press esc key
+      keep_trying_until do
+        expect(tray_container_exists?).to eq false # Press esc key
+      end
     end
 
     it 'should open upload image modal when clicking upload option' do
@@ -1185,6 +1192,8 @@ describe 'RCE next tests', ignore_js_errors: true do
       it 'should display the lti tool modal', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
+        # have to visit the page before we can interact with local storage
+        visit_existing_wiki_edit(@course, page_title)
         driver.local_storage.clear
 
         visit_existing_wiki_edit(@course, page_title)
