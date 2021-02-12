@@ -158,6 +158,7 @@ path 'gems' do
   gem 'canvas_unzip'
   gem 'config_file'
   gem 'diigo'
+  gem 'dynamic_settings'
   gem 'event_stream'
   gem 'google_drive'
   gem 'html_text_helper'

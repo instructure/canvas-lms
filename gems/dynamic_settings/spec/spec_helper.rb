@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,11 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Looking for the DynamicSettings initializer?
-# It used to be here, but we actually need our consul
-# initialization to happen early enough that other
-# initializing things can read their consul settings,
-# so all of the "setup" stuff for reading from consul is
-# in lib/canvas/dynamic_settings.rb and it gets invoked
-# from application.rb as the "canvas.init_dynamic_settings"
-# initializer.
+require 'dynamic_settings'
+require 'imperium/testing'
+require 'rails'
+
+Rails.env = 'test'
+
+RSpec.configure do |config|
+  config.mock_with :rspec do |mocks|
+    mocks.verify_partial_doubles = true
+  end
+
+  config.order = 'random'
+end

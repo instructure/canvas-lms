@@ -314,11 +314,14 @@ module CanvasRails
     initializer "canvas.init_dynamic_settings", before: "canvas.extend_shard" do
       settings = ConfigFile.load("consul")
       if settings.present?
-        begin
-          Canvas::DynamicSettings.config = settings
-        rescue Imperium::UnableToConnectError
-          Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
-        end
+        # this is not just for speed in non-consul installations^
+        # We also do things like building javascript assets with the base
+        # container that only has as many ruby assets as strictly necessary,
+        # and these resources actually aren't even on disk in those cases.
+        # do not remove this conditional until the asset build no longer
+        # needs the rails app for anything.
+        require_dependency 'canvas/dynamic_settings'
+        Canvas::DynamicSettingsInitializer.bootstrap!
       end
     end
 

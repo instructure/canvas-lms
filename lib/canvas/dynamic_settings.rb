@@ -16,128 +16,44 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-require_dependency 'local_cache'
-require_dependency 'canvas/dynamic_settings/fallback_proxy'
-require_dependency 'canvas/dynamic_settings/prefix_proxy'
-require 'imperium'
+require 'dynamic_settings'
 
 module Canvas
-  class DynamicSettings
+  # temporary shim rather than replacing all callsites at once
+  # TODO: remove references to DynamicSettings through the Canvas module
+  # individually, and then remove this file.
+  DynamicSettings = ::DynamicSettings
 
-    class Error < StandardError; end
-    class ConsulError < Error; end
-
-    CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
-    KV_NAMESPACE = "config/canvas".freeze
-    CACHE_KEY_PREFIX = "dynamic_settings/".freeze
-
-    Canvas::Reloader.on_reload { @root_fallback_proxy = nil }
-
-    class << self
-      attr_accessor :config, :environment
-      attr_reader :fallback_data, :kv_client
-
-      def config=(conf_hash)
-        @config = conf_hash
-        if conf_hash.present?
-          Imperium.configure do |config|
-            config.ssl = conf_hash.fetch('ssl', true)
-            config.host = conf_hash.fetch('host')
-            config.port = conf_hash.fetch('port')
-            config.token = conf_hash.fetch('acl_token', nil)
-
-            config.connect_timeout = conf_hash['connect_timeout'] if conf_hash['connect_timeout']
-            config.send_timeout = conf_hash['send_timeout'] if conf_hash['send_timeout']
-            config.receive_timeout = conf_hash['receive_timeout'] if conf_hash['receive_timeout']
-          end
-
-          @environment = conf_hash['environment']
-          @kv_client = Imperium::KV.default_client
-          @data_center = conf_hash.fetch('global_dc', nil)
-          @default_service = conf_hash.fetch('service', :canvas)
-        else
-          @environment = nil
-          @kv_client = nil
-          @default_service = :canvas
+  module DynamicSettingsInitializer
+    # this is expected to be invoked from application.rb
+    # as an initializer so that consul-based settings are available
+    # before we start bootstrapping other things in the app.
+    def self.bootstrap!
+      settings = ConfigFile.load("consul")
+      if settings.present?
+        begin
+          ::DynamicSettings.config = settings
+        rescue Imperium::UnableToConnectError
+          Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
         end
       end
 
-      # if we don't clear out the kv_client we can end up
-      # with a shared file descriptor between processes
-      def on_fork!
-        @kv_client = Imperium::KV.default_client unless @kv_client.nil?
+      # these used to be in an initializer, but initializing this
+      # library in 2 places seems like a recipe for confusion, so
+      # config/initializers/consul.rb got moved in here
+      handle_fallbacks = -> do
+        # dumps the whole cache, even if it's a shared local redis,
+        # and removes any local data loaded from yml on disk as a fallback.
+        # (will reload if still present on disk)
+        ::DynamicSettings.on_reload!
       end
-
-      # Set the fallback data to use in leiu of Consul
-      #
-      # This isn't really meant for use in production, but as a convenience for
-      # development where most won't want to run a consul agent/server.
-      def fallback_data=(value)
-        @fallback_data = value
-        if @fallback_data
-          @root_fallback_proxy = DynamicSettings::FallbackProxy.new(@fallback_data.with_indifferent_access)
-        else
-          @root_fallback_proxy = nil
-        end
-      end
-
-      def root_fallback_proxy
-        @root_fallback_proxy ||= DynamicSettings::FallbackProxy.new(ConfigFile.load("dynamic_settings").dup)
-      end
-
-      # Build an object used to interacting with consul for the given
-      # keyspace prefix.
-      #
-      # If using fallback data for values it is queried by the returned object
-      # instead of a Consul agent/server. The decision between using fallback
-      # data or consul is driven by whether or not consul is configured.
-      #
-      # @param prefix [String] The portion to extend the base prefix with
-      #   (base prefix: 'config/canvas/<environment>')
-      # @param tree [String] Which tree to use (config, private, store)
-      # @param service [String] The service name to use (i.e. who owns the configuration). Defaults to canvas
-      # @param cluster [String] An optional cluster to override region or global settings
-      # @param default_ttl [ActiveSupport::Duration] How long to retain cached
-      #   values
-      # @param data_center [String] location of the data_center the proxy is pointing to
-      def find( prefix = nil,
-                tree: :config,
-                service: nil,
-                cluster: nil,
-                default_ttl: DynamicSettings::PrefixProxy::DEFAULT_TTL,
-                data_center: nil
-              )
-        service ||= @default_service || :canvas
-        if kv_client
-          PrefixProxy.new(
-            prefix,
-            tree: tree,
-            service: service,
-            environment: @environment,
-            cluster: cluster,
-            default_ttl: default_ttl,
-            kv_client: kv_client,
-            data_center: @data_center,
-            query_logging: @config.fetch('query_logging', true)
-          )
-        else
-          proxy = root_fallback_proxy
-          proxy = proxy.for_prefix(tree)
-          proxy = proxy.for_prefix(service)
-          proxy = proxy.for_prefix(prefix) if prefix
-          proxy
-        end
-      end
-      alias kv_proxy find
-
-      def kv_client
-        @kv_client
-      end
-
-      def reset_cache!
-        LocalCache.delete_matched(/^#{CACHE_KEY_PREFIX}/)
-      end
+      handle_fallbacks.call
+      Canvas::Reloader.on_reload(&handle_fallbacks)
+      # dependency injection stuff from when
+      # this got pulled out into a local gem
+      ::DynamicSettings.cache = LocalCache
+      ::DynamicSettings.fallback_recovery_lambda = ->(e){ Canvas::Errors.capture_exception(:consul, e, :warn) }
+      ::DynamicSettings.logger = Rails.logger
     end
   end
 end
