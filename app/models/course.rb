@@ -1054,26 +1054,6 @@ class Course < ActiveRecord::Base
     true
   end
 
-  def update_course_section_names
-    return if @course_name_was == self.name || !@course_name_was
-    sections = self.course_sections
-    fields_to_possibly_rename = [:name]
-    sections.each do |section|
-      something_changed = false
-      fields_to_possibly_rename.each do |field|
-        section.send("#{field}=", section.default_section ?
-          self.name :
-          (section.send(field) || self.name).sub(@course_name_was, self.name) )
-        something_changed = true if section.send(field) != section.send("#{field}_was")
-      end
-      if something_changed
-        attr_hash = {:updated_at => Time.now.utc}
-        fields_to_possibly_rename.each { |key| attr_hash[key] = section.send(key) }
-        CourseSection.where(:id => section).update_all(attr_hash)
-      end
-    end
-  end
-
   def update_enrollments_later
     self.update_enrolled_users if !self.new_record? && !(self.changes.keys & ['workflow_state', 'name', 'course_code', 'start_at', 'conclude_at', 'enrollment_term_id']).empty?
     true
