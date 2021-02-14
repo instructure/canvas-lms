@@ -414,8 +414,9 @@ describe RoleOverride do
       end
     end
 
-    context "account_only" do
+    context "account_only with granular_permissions_manage_users FF off" do
       before :once do
+        Account.default.disable_feature! :granular_permissions_manage_users
         @site_admin = User.create!
         Account.site_admin.account_users.create!(user: @site_admin)
         @root_admin = User.create!
@@ -457,6 +458,26 @@ describe RoleOverride do
         expect(@sub_account.grants_right?(@site_admin, :manage_admin_users)).to be_truthy
         expect(@sub_account.grants_right?(@root_admin, :manage_admin_users)).to be_truthy
         expect(@sub_account.grants_right?(@sub_admin, :manage_admin_users)).to be_falsey
+      end
+    end
+
+    context "account_only with granular_permissions_manage_users FF on" do
+      before :once do
+        Account.default.enable_feature! :granular_permissions_manage_users
+        @site_admin = User.create!
+        Account.site_admin.account_users.create!(user: @site_admin)
+        @root_admin = User.create!
+        Account.default.account_users.create!(user: @root_admin)
+        @sub_admin = User.create!
+        @sub_account = Account.default.sub_accounts.create!
+        @sub_account.account_users.create!(user: @sub_admin)
+      end
+
+      it "should not allow a sub-account to revoke a permission granted to a parent account" do
+        @sub_account.role_overrides.create!(role: admin_role, enabled: false, permission: :allow_course_admin_actions)
+        expect(@sub_account.grants_right?(@site_admin, :allow_course_admin_actions)).to be_truthy
+        expect(@sub_account.grants_right?(@root_admin, :allow_course_admin_actions)).to be_truthy
+        expect(@sub_account.grants_right?(@sub_admin, :allow_course_admin_actions)).to be_falsey
       end
     end
 
