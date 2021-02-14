@@ -207,6 +207,7 @@ class ApplicationController < ActionController::Base
         @js_env[:lolcalize] = true if ENV['LOLCALIZE']
         @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
         @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
+        @js_env[:HOMEROOM_COURSE] = @context.elementary_homeroom_course? if @context.is_a?(Course)
       end
     end
 
