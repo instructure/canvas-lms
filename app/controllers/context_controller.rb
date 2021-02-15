@@ -138,11 +138,12 @@ class ContextController < ApplicationController
       else
         @context.grants_right?(@current_user, session, :manage_admin_users)
       end
+      can_add_enrollments = @context.grants_any_right?(@current_user, session, *add_enrollment_permissions(@context))
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
         manage_students: manage_students,
-        add_users: manage_students || manage_admins,
+        add_users_to_course: can_add_enrollments,
         read_reports: @context.grants_right?(@current_user, session, :read_reports)
       }
       if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
@@ -172,13 +173,13 @@ class ContextController < ApplicationController
       })
       set_tutorial_js_env
 
-      if manage_students || manage_admins
-        js_env :ROOT_ACCOUNT_NAME => @domain_root_account.name
+      if can_add_enrollments
+        js_env({ROOT_ACCOUNT_NAME: @domain_root_account.name})
         if @context.root_account.open_registration? || @context.root_account.grants_right?(@current_user, session, :manage_user_logins)
-          js_env({:INVITE_USERS_URL => course_invite_users_url(@context)})
+          js_env({INVITE_USERS_URL: course_invite_users_url(@context)})
         end
       end
-      if @context.grants_right? @current_user, session, :read_as_admin
+      if @context.grants_right?(@current_user, session, :read_as_admin)
         set_student_context_cards_js_env
       end
     elsif @context.is_a?(Group)
@@ -391,6 +392,23 @@ class ContextController < ApplicationController
       @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item
+    end
+  end
+
+  def add_enrollment_permissions(context)
+    if context.root_account.feature_enabled?(:granular_permissions_manage_users)
+      [
+        :add_teacher_to_course,
+        :add_ta_to_course,
+        :add_designer_to_course,
+        :add_student_to_course,
+        :add_observer_to_course,
+      ]
+    else
+      [
+        :manage_students,
+        :manage_admin_users
+      ]
     end
   end
 end

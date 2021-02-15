@@ -1369,12 +1369,11 @@ class AccountsController < ApplicationController
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
       can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups), # access to view user groups?
+      can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
     }
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
-      js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :allow_course_admin_actions)
       js_permissions[:can_allow_course_admin_options] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
     else
-      js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users)
       js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
     end
     js_env({
@@ -1611,4 +1610,20 @@ class AccountsController < ApplicationController
     }
   end
 
+  def add_enrollment_permissions(context)
+    if context.root_account.feature_enabled?(:granular_permissions_manage_users)
+      [
+        :add_teacher_to_course,
+        :add_ta_to_course,
+        :add_designer_to_course,
+        :add_student_to_course,
+        :add_observer_to_course,
+      ]
+    else
+      [
+        :manage_students,
+        :manage_admin_users
+      ]
+    end
+  end
 end

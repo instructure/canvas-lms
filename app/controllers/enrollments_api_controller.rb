@@ -586,8 +586,7 @@ class EnrollmentsApiController < ApplicationController
   #   students the ability to drop the course if desired. Defaults to false.
   #
   # @argument enrollment[associated_user_id] [Integer]
-  #   For an observer enrollment, the ID of a student to observe. The
-  #   caller must have +manage_students+ permission in the course.
+  #   For an observer enrollment, the ID of a student to observe. 
   #   This is a one-off operation; to automatically observe all a
   #   student's enrollments (for example, as a parent), please use
   #   the {api:UserObserveesController#create User Observees API}.
