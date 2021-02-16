@@ -78,13 +78,12 @@ const resendInvitationsView = new ResendInvitationsView({
   canResend:
     ENV.permissions.manage_students ||
     ENV.permissions.manage_admin_users ||
-    ENV.permissions.can_allow_course_admin_options
+    ENV.permissions.can_allow_course_admin_actions
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
-GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${
-  ENV.course && ENV.course.id
-}/group_categories?per_page=50`
+GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${ENV.course &&
+  ENV.course.id}/group_categories?per_page=50`
 
 const groupCategories = new GroupCategoryCollectionForThisCourse()
 
@@ -117,7 +116,9 @@ users.once('reset', () =>
         userCount: numUsers
       })
     }
-    return $('#aria_alerts').empty().text(msg)
+    return $('#aria_alerts')
+      .empty()
+      .text(msg)
   })
 )
 

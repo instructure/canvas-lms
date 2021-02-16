@@ -1372,7 +1372,7 @@ class AccountsController < ApplicationController
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
     }
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
-      js_permissions[:can_allow_course_admin_options] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
+      js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
     else
       js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
     end

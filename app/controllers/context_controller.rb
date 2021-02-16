@@ -147,7 +147,7 @@ class ContextController < ApplicationController
         read_reports: @context.grants_right?(@current_user, session, :read_reports)
       }
       if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-        js_permissions[:allow_course_admin_actions] = manage_admins
+        js_permissions[:can_allow_course_admin_actions] = manage_admins
       else
         js_permissions[:manage_admin_users] = manage_admins
       end

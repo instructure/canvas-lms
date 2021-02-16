@@ -105,7 +105,7 @@ export default class RosterUserView extends Backbone.View {
     json.canViewSisIdColumn = ENV.permissions.read_sis
 
     const candoAdminActions =
-      ENV.permissions.can_allow_course_admin_options || ENV.permissions.manage_admin_users
+      ENV.permissions.can_allow_course_admin_actions || ENV.permissions.manage_admin_users
     json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )

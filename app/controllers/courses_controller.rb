@@ -1402,7 +1402,7 @@ class CoursesController < ApplicationController
         :manage => @context.grants_right?(@current_user, session, :manage)
       }
       if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-        js_permissions[:can_allow_course_admin_options] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+        js_permissions[:can_allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
       else
         js_permissions[:manage_admin_users] = @context.grants_right?(@current_user, session, :manage_admin_users)
       end
