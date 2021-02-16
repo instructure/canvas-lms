@@ -43,19 +43,19 @@
   <ul>
     <li id="course_details_tab"><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
     <li id="sections_tab"><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
-    <% if can_do @context, @current_user, :update %>
+    <% if can_do(@context, @current_user, :update) && !@context.elementary_homeroom_course? %>
       <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
     <% end %>
-    <% if can_do @context, @current_user, :read_as_admin %>
+    <% if can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
       <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
     <% end %>
-    <% if @publishing_enabled %>
+    <% if @publishing_enabled && !@context.elementary_homeroom_course? %>
       <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('Grade Syncing') %></a></li>
     <% end %>
-    <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+    <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) && !@context.elementary_homeroom_course? %>
       <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
     <% end %>
-    <% if can_do @context, @current_user, :view_feature_flags %>
+    <% if can_do(@context, @current_user, :view_feature_flags) && !@context.elementary_homeroom_course? %>
       <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature Options}) %></a></li>
     <% end %>
   </ul>
@@ -493,81 +493,83 @@
               %>
             <% end %>
           </span>
-          <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-<%= direction('left') %>: 20px;"><%= t('links.more_options', %{more options}) %></a>
-          <div class="course_form_more_options" style="display: none; padding-<%= direction('left') %>: 20px;">
-            <% if @context.self_enrollment_allowed? %>
+          <% if !@context.elementary_homeroom_course? %>
+            <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-<%= direction('left') %>: 20px;"><%= t('links.more_options', %{more options}) %></a>
+            <div class="course_form_more_options" style="display: none; padding-<%= direction('left') %>: 20px;">
+              <% if @context.self_enrollment_allowed? %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
+                  <label for="course_self_enrollment">
+                    <% if @context.root_account.self_registration? %>
+                      <%= t :self_enrollment, "Let students self-enroll by sharing with them a secret URL or code" %>
+                    <% else %>
+                      <%= t :self_enrollment_without_code, "Let students self-enroll by sharing with them a secret URL" %>
+                    <% end %>
+                  </label>
+                </div>
+                <br/>
+                <div class="open_enrollment_holder checkbox-flex-container" style="display: none;">
+                <%= f.check_box :open_enrollment, :disabled => !can_manage %>
+                <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
+                </div>
+              <% end %>
               <div class="checkbox-flex-container">
-                <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
-                <label for="course_self_enrollment">
-                  <% if @context.root_account.self_registration? %>
-                    <%= t :self_enrollment, "Let students self-enroll by sharing with them a secret URL or code" %>
-                  <% else %>
-                    <%= t :self_enrollment_without_code, "Let students self-enroll by sharing with them a secret URL" %>
-                  <% end %>
-                </label>
+              <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
+              <%= f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
               </div>
-              <br/>
-              <div class="open_enrollment_holder checkbox-flex-container" style="display: none;">
-              <%= f.check_box :open_enrollment, :disabled => !can_manage %>
-              <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
-              </div>
-            <% end %>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
-            <%= f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
-            </div>
-            <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
-            <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :allow_student_forum_attachments, :disabled => !can_manage %>
-            <%= f.label :allow_student_forum_attachments, :en => "Let students attach files to discussions" %><br/>
-            </div>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :allow_student_discussion_topics, :disabled => !can_manage %>
-            <%= f.label :allow_student_discussion_topics, :en => "Let students create discussion topics" %><br/>
-            </div>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :allow_student_discussion_editing, :disabled => !can_manage %>
-            <%= f.label :allow_student_discussion_editing, :en => "Let students edit or delete their own discussion posts" %><br/>
-            </div>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :allow_student_organized_groups, :disabled => !can_manage %>
-            <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
-            </div>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
-            <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
-            </div>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
-            <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-            </div>
-            <% if has_multiple_sections %>
+              <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
+              <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
               <div class="checkbox-flex-container">
-                <%= f.check_box :hide_sections_on_course_users_page, :disabled => !can_manage %>
-                <%= f.label :hide_sections_on_course_users_page, :en => "Hide sections on the People page from students" %><br/>
+              <%= f.check_box :allow_student_forum_attachments, :disabled => !can_manage %>
+              <%= f.label :allow_student_forum_attachments, :en => "Let students attach files to discussions" %><br/>
               </div>
-            <% end %>
-            <div class="checkbox-flex-container">
-            <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
-            <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+              <div class="checkbox-flex-container">
+              <%= f.check_box :allow_student_discussion_topics, :disabled => !can_manage %>
+              <%= f.label :allow_student_discussion_topics, :en => "Let students create discussion topics" %><br/>
+              </div>
+              <div class="checkbox-flex-container">
+              <%= f.check_box :allow_student_discussion_editing, :disabled => !can_manage %>
+              <%= f.label :allow_student_discussion_editing, :en => "Let students edit or delete their own discussion posts" %><br/>
+              </div>
+              <div class="checkbox-flex-container">
+              <%= f.check_box :allow_student_organized_groups, :disabled => !can_manage %>
+              <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
+              </div>
+              <div class="checkbox-flex-container">
+              <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
+              <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+              </div>
+              <div class="checkbox-flex-container">
+              <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
+              <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
+              </div>
+              <% if has_multiple_sections %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :hide_sections_on_course_users_page, :disabled => !can_manage %>
+                  <%= f.label :hide_sections_on_course_users_page, :en => "Hide sections on the People page from students" %><br/>
+                </div>
+              <% end %>
+              <div class="checkbox-flex-container">
+              <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
+              <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+              </div>
+              <%= f.select :default_wiki_editing_roles, [
+                [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
+                [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
+                [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]], {}, :disabled => !can_manage %>
+              <label for="course_default_wiki_editing_roles">
+                <%= t(%{can create, rename, and edit course pages by default}) %>
+              </label><br/>
+              <div class="changed_default_wiki_editing_roles" style="display: none; padding-<%= direction('left') %>: 20px; font-size: 0.8em;">
+                <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
+                <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
+              </div>
+              <% if @context.root_account.feature_enabled?(:javascript_csp) %>
+                <hr />
+                <div id="csp_options"></div>
+              <% end %>
             </div>
-            <%= f.select :default_wiki_editing_roles, [
-              [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
-              [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
-              [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]], {}, :disabled => !can_manage %>
-            <label for="course_default_wiki_editing_roles">
-              <%= t(%{can create, rename, and edit course pages by default}) %>
-            </label><br/>
-            <div class="changed_default_wiki_editing_roles" style="display: none; padding-<%= direction('left') %>: 20px; font-size: 0.8em;">
-              <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
-              <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
-            </div>
-            <% if @context.root_account.feature_enabled?(:javascript_csp) %>
-              <hr />
-              <div id="csp_options"></div>
-            <% end %>
-          </div>
+          <% end %>
         </div>
       </div>
       <% if can_manage %>
@@ -680,7 +682,7 @@
       <%= f.text_field :name, :id => "course_section_name_edit", :'aria-label' => t('buttons.edit_section_name', "Edit section name") %>
     <% end %>
   </div>
-  <% if can_do @context, @current_user, :update %>
+  <% if can_do(@context, @current_user, :update) && !@context.elementary_homeroom_course? %>
 
   <div id="tab-navigation">
     <h2 class="screenreader-only"><%= t('headings.navigation', %{Course Navigation}) %></h2>
@@ -773,13 +775,13 @@
 
   <% end %>
 
-  <% if can_do @context, @current_user, :read_as_admin %>
+  <% if can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
     <div id="tab-tools">
       <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
     </div>
   <% end %>
 
-  <% if @publishing_enabled %>
+  <% if @publishing_enabled && !@context.elementary_homeroom_course? %>
     <div id="tab-grade-publishing">
       <h2><%= t('Grade Syncing') %></h2>
       <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
@@ -788,14 +790,14 @@
     </div>
   <% end %>
 
-  <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+  <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) && !@context.elementary_homeroom_course? %>
     <div id="tab-alerts">
       <h2><%= t(:alerts_title, "Alerts") %></h2>
       <%= render :partial => 'alerts/alerts' %>
     </div>
   <% end %>
 
-  <% if can_do @context, @current_user, :view_feature_flags %>
+  <% if can_do(@context, @current_user, :view_feature_flags) && !@context.elementary_homeroom_course? %>
     <div id="tab-features"></div>
   <% end %>
 </div><!-- end course details tab -->

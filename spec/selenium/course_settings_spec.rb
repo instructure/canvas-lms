@@ -33,6 +33,28 @@ describe "course settings" do
     expect(ff("#section-tabs .section.section-hidden").count).to be > 0
   end
 
+  context "considering homeroom courses" do
+    let(:canvas_for_elem_flag){false}
+    before(:each) do
+      canvas_for_elem_flag = @account.feature_enabled?(:canvas_for_elementary)
+    end
+    after(:each) do
+      @account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
+    end
+
+    it 'hides most tabs if set' do
+      @account.enable_feature!(:canvas_for_elementary)
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/courses/#{@course.id}/settings"
+      expect(ff('#course_details_tabs > ul li').length).to eq 2
+      expect(f('#course_details_tab')).to be_displayed
+      expect(f('#sections_tab')).to be_displayed
+    end
+
+  end
+
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
