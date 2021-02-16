@@ -3103,6 +3103,10 @@ class Course < ActiveRecord::Base
     homeroom_course? && account&.feature_enabled?(:canvas_for_elementary)
   end
 
+  def lock_all_announcements?
+    !!lock_all_announcements || elementary_homeroom_course?
+  end
+
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
     return true if user_is_instructor?(user)

@@ -241,5 +241,30 @@ describe "announcements" do
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
     end
+
+    context "in a homeroom course" do
+      let(:canvas_for_elem_flag) {@course.account.feature_enabled?(:canvas_for_elementary)}
+      let(:is_homeroom) {@course.homeroom_course}
+
+      before :each do
+        @course.account.enable_feature!(:canvas_for_elementary)
+        @course.homeroom_course = true
+        @course.save!
+      end
+
+      after :each do
+        @course.account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
+        @course.homeroom_course = is_homeroom
+        @course.save!
+      end
+
+      it "removes the Reply section" do
+        create_announcement
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+
+        expect(f('#discussion_topic')).to contain_css('.entry-content.no-reply')
+        expect(f('body')).not_to contain_css('.discussion-entry-reply-area')
+      end
+    end
   end
 end
