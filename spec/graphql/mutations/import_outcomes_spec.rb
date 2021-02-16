@@ -45,6 +45,9 @@ describe Mutations::ImportOutcomes do
             attribute
             message
           }
+          progress {
+            id
+          }
         }
       }
     GQL
@@ -75,33 +78,11 @@ describe Mutations::ImportOutcomes do
       source_context_id: source_context_id,
       source_context_type: source_context_type
     )
-    described_class.execute(progress, attrs)
-  end
-
-  def make_group(group_attrs, context, parent_group = nil)
-    outcomes = group_attrs.delete(:outcomes) || 0
-    groups = group_attrs.delete(:groups)
-
-    create_group_attrs = {
-      context: context,
-      **group_attrs
-    }
-
-    create_group_attrs[:outcome_group_id] = parent_group&.id if parent_group&.id
-
-    group = outcome_group_model(create_group_attrs)
-
-    outcomes.times.each do |c|
-      outcome_model(
-        title: "#{c} #{group_attrs[:title]} outcome",
-        outcome_group: group,
-        context: context
-      )
-    end
-
-    groups&.each do |child|
-      make_group(child, context, group)
-    end
+    source_context = attrs[:source_context_type].constantize.find_by(id: attrs[:source_context_id]) if attrs[:source_context_type]
+    group = LearningOutcomeGroup.find_by(id: attrs[:group_id]) if attrs[:group_id]
+    outcome_id = attrs[:outcome_id]
+    target_context = attrs[:target_context_type].constantize.find_by(id: attrs[:target_context_id])
+    described_class.execute(progress, source_context, group, outcome_id, target_context)
   end
 
   def find_group(title)
@@ -118,11 +99,12 @@ describe Mutations::ImportOutcomes do
   let(:source_context_type) { "Account" }
   let(:ctx) { { domain_root_account: Account.default, current_user: current_user } }
   let(:current_user) { @teacher }
+  let(:progress) { @course.progresses.create!(tag: "import_outcomes") }
 
-  before do
+  before(:once) do
     Account.default.enable_feature!(:improved_outcomes_management)
     course_with_teacher
-    make_group({
+    make_group_structure({
       title: "Group A",
       outcomes: 5,
       groups: [{
@@ -138,10 +120,29 @@ describe Mutations::ImportOutcomes do
       }]
     }, Account.default)
 
-    make_group({
+    make_group_structure({
       title: "Group B",
       outcomes: 5
     }, Account.default)
+  end
+
+  def assert_tree_exists(groups, db_parent_group)
+    group_titles = db_parent_group.child_outcome_groups.active.pluck(:title)
+    expect(group_titles.sort).to eql(groups.map {|g| g[:title]}.sort)
+
+    groups.each do |group|
+      outcome_titles = group[:outcomes] || []
+      title = group[:title]
+      childs = group[:groups]
+
+      db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+
+      db_outcomes = db_group.child_outcome_links.map(&:content)
+
+      expect(outcome_titles.sort).to eql(db_outcomes.map(&:title).sort)
+
+      assert_tree_exists(childs, db_group) if childs
+    end
   end
 
   context "imports outcomes" do
@@ -159,6 +160,7 @@ describe Mutations::ImportOutcomes do
       @course2 = Course.create!(name: "Second", account: Account.default)
       @course2_group = outcome_group_model(context: @course2)
       @course2_outcome = outcome_model(context: @course2, outcome_group: @course2_group)
+      @outcome_without_group = LearningOutcome.create!(title: "Outcome without group")
     end
 
     def expect_validation_error(result, attribute, message)
@@ -293,6 +295,18 @@ describe Mutations::ImportOutcomes do
         result = exec_graphql(outcome_id: @course2_outcome.id)
         expect_error(result, "Outcome #{@course2_outcome.id} is not available in context Course##{target_context_id}")
       end
+
+      it "errors when importing outcome without group" do
+        expect {
+          exec(outcome_id: @outcome_without_group.id)
+        }.not_to change(LearningOutcomeGroup, :count)
+
+        progress.reload
+        expect(progress.message).to eql(
+          "Could not import Learning Outcome #{@outcome_without_group.id} because it doesn't belong to any group"
+        )
+        expect(progress).to be_failed
+      end
     end
 
     context "without permissions" do
@@ -306,4 +320,417 @@ describe Mutations::ImportOutcomes do
       end
     end
   end
+
+  it "returns a progress" do
+    result = exec_graphql(outcome_id: get_outcome_id(
+      "0 Group E outcome"
+    ))
+    expect(result.dig("data", "importOutcomes", "progress", "id")).to be_present
+  end
+
+  context "passing outcomeId" do
+    it "works when importing outcomes from same group" do
+      [
+        "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
+        "3 Group E outcome", "4 Group E outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group E",
+        outcomes: [
+          "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
+          "3 Group E outcome", "4 Group E outcome"
+        ]
+      }], @course.root_outcome_group)
+    end
+
+    it "works when importing outcomes from different group" do
+      [
+        "0 Group E outcome", "0 Group C outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group C",
+        outcomes: ["0 Group C outcome"],
+        groups: [{
+          title: "Group E",
+          outcomes: ["0 Group E outcome"]
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "rebuilds structure when importing a parent group and a group that was imported before" do
+      [
+        "0 Group D outcome", "0 Group C outcome", "1 Group D outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group C",
+        outcomes: ["0 Group C outcome"],
+        groups: [{
+          title: "Group D",
+          outcomes: ["0 Group D outcome", "1 Group D outcome"]
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "rebuilds structure when importing a parent group from a group that was imported before" do
+      [
+        "0 Group D outcome", "0 Group C outcome", "0 Group A outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: ["0 Group A outcome"],
+        groups: [{
+          title: "Group C",
+          outcomes: ["0 Group C outcome"],
+          groups: [{
+            title: "Group D",
+            outcomes: ["0 Group D outcome"]
+          }]
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "rebuilds structure when importing a child group from a group that was imported before" do
+      [
+        "0 Group A outcome", "0 Group D outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: ["0 Group A outcome"],
+        groups: [{
+          title: "Group C",
+          groups: [{
+            title: "Group D",
+            outcomes: ["0 Group D outcome"]
+          }]
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "rebuilds structure (reverse order)" do
+      [
+        "0 Group D outcome", "0 Group A outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: ["0 Group A outcome"],
+        groups: [{
+          title: "Group C",
+          groups: [{
+            title: "Group D",
+            outcomes: ["0 Group D outcome"]
+          }]
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "build structure correctly if import outcomes groups from different root parents" do
+      [
+        "0 Group D outcome", "0 Group B outcome"
+      ].each do |title|
+        exec(outcome_id: get_outcome_id(title))
+      end
+
+      assert_tree_exists([{
+        title: "Group D",
+        outcomes: ["0 Group D outcome"]
+      }, {
+        title: "Group B",
+        outcomes: ["0 Group B outcome"]
+      }], @course.root_outcome_group)
+    end
+
+    it "Don't mess with outcomes that belongs already to the course" do
+      make_group_structure({
+        title: "Group in Course",
+        outcomes: 1
+      }, @course)
+
+      exec(outcome_id: get_outcome_id("0 Group D outcome"))
+
+      assert_tree_exists([{
+        title: "Group D",
+        outcomes: ["0 Group D outcome"]
+      }, {
+        title: "Group in Course",
+        outcomes: ["0 Group in Course outcome"]
+      }], @course.root_outcome_group)
+    end
+
+    it "doesn't reactivate previous destroyed imported groups" do
+      exec(outcome_id: get_outcome_id("0 Group E outcome"))
+      group = @course.root_outcome_group.child_outcome_groups.find_by(title: "Group E")
+      group.destroy
+      exec(outcome_id: get_outcome_id("0 Group D outcome"))
+
+      assert_tree_exists([{
+        title: "Group D",
+        outcomes: ["0 Group D outcome"]
+      }], @course.root_outcome_group)
+    end
+  end
+
+  context "passing groupId" do
+    it "import all nested outcomes from a group" do
+      exec(group_id: find_group("Group C").id)
+
+      assert_tree_exists([{
+        title: "Group C",
+        outcomes: 3.times.map {|i| "#{i} Group C outcome"},
+        groups: [{
+          title: "Group D",
+          outcomes: 5.times.map {|i| "#{i} Group D outcome"}
+        }, {
+          title: "Group E",
+          outcomes: 5.times.map {|i| "#{i} Group E outcome"}
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "resync new added outcomes and groups" do
+      group_e = LearningOutcomeGroup.find_by(title: "Group E")
+      groupc_id = find_group("Group C").id
+
+      exec(group_id: groupc_id)
+
+      # add new outcome
+      outcome_model(
+        title: "5 Group E outcome",
+        outcome_group: group_e,
+        context: Account.default
+      )
+
+      # add new group with outcomes
+      make_group_structure({
+        title: "Group F",
+        outcomes: 1
+      }, Account.default, group_e)
+
+      exec(group_id: groupc_id)
+
+      assert_tree_exists([{
+        title: "Group C",
+        outcomes: 3.times.map {|i| "#{i} Group C outcome"},
+        groups: [{
+          title: "Group D",
+          outcomes: 5.times.map {|i| "#{i} Group D outcome"}
+        }, {
+          title: "Group E",
+          outcomes: 6.times.map {|i| "#{i} Group E outcome"},
+          groups: [{
+            title: "Group F",
+            outcomes: 1.times.map {|i| "#{i} Group F outcome"},
+          }]
+        }]
+      }], @course.root_outcome_group)
+    end
+
+    it "build structure correctly if import groups from different parents" do
+      exec(group_id: find_group("Group B").id)
+      exec(group_id: find_group("Group C").id)
+
+      assert_tree_exists([{
+        title: "Group C",
+        outcomes: 3.times.map {|i| "#{i} Group C outcome"},
+        groups: [{
+          title: "Group D",
+          outcomes: 5.times.map {|i| "#{i} Group D outcome"}
+        }, {
+          title: "Group E",
+          outcomes: 5.times.map {|i| "#{i} Group E outcome"}
+        }]
+      }, {
+        title: "Group B",
+        outcomes: 5.times.map {|i| "#{i} Group B outcome"}
+      }], @course.root_outcome_group)
+    end
+
+    it "reactivate previous imported deleted group" do
+      exec(group_id: find_group("Group C").id)
+
+      groupc = LearningOutcomeGroup.find_by(title: "Group D", context: @course)
+      groupd = LearningOutcomeGroup.find_by(title: "Group C", context: @course)
+      groupc.destroy
+      groupd.destroy
+
+      exec(group_id: find_group("Group C").id)
+      groupc.reload
+      groupd.reload
+
+      expect(groupc.workflow_state).to eql("active")
+      expect(groupd.workflow_state).to eql("active")
+    end
+  end
+
+  context "global to account to course" do
+    context "single import" do
+      before do
+        root_group = LearningOutcomeGroup.find_or_create_root(nil, true)
+        @root_group = outcome_group_model(
+          title: "Root Group A",
+          outcome_group_id: root_group.id
+        )
+        outcome_model(
+          title: "0 Root Group A outcome",
+          outcome_group: @root_group,
+          global: true
+        )
+        outcome_model(
+          title: "1 Root Group A outcome",
+          outcome_group: @root_group,
+          global: true
+        )
+
+        exec(
+          outcome_id: get_outcome_id("0 Root Group A outcome", nil),
+          source_context_id: nil, source_context_type: nil,
+          target_context_id: Account.default.id, target_context_type: "Account"
+        )
+
+        exec(group_id: Account.default.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A").id)
+      end
+
+      it "import Root Group A with 1 outcome to Account" do
+        assert_tree_exists([{
+          title: "Group A",
+          outcomes: 5.times.map {|i| "#{i} Group A outcome"},
+          groups: [{
+            title: "Group C",
+            outcomes: 3.times.map {|i| "#{i} Group C outcome"},
+            groups: [{
+              title: "Group D",
+              outcomes: 5.times.map {|i| "#{i} Group D outcome"}
+            }, {
+              title: "Group E",
+              outcomes: 5.times.map {|i| "#{i} Group E outcome"}
+            }]
+          }]
+        }, {
+          title: "Group B",
+          outcomes: 5.times.map {|i| "#{i} Group B outcome"}
+        }, {
+          title: "Root Group A",
+          outcomes: 1.times.map {|i| "#{i} Root Group A outcome"}
+        }], Account.default.root_outcome_group)
+      end
+
+      it "import Root Group A with 1 outcome to Course" do
+        assert_tree_exists([{
+          title: "Root Group A",
+          outcomes: 1.times.map {|i| "#{i} Root Group A outcome"}
+        }], @course.root_outcome_group)
+      end
+
+      it "handles source_outcome_group_id" do
+        @root_group.reload
+        account_imported_group = Account.default.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A")
+        course_imported_group = @course.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A")
+
+        expect(account_imported_group.source_outcome_group_id).to eql(@root_group.id)
+        expect(course_imported_group.source_outcome_group_id).to eql(account_imported_group.id)
+      end
+    end
+
+    context "multiple imports" do
+      before do
+        root_group = LearningOutcomeGroup.find_or_create_root(nil, true)
+        group_a = outcome_group_model(
+          title: "Root Group A",
+          outcome_group_id: root_group.id
+        )
+        group_b = outcome_group_model(
+          title: "Root Group B",
+          outcome_group_id: group_a.id
+        )
+        group_c = outcome_group_model(
+          title: "Root Group C",
+          outcome_group_id: group_a.id
+        )
+        outcome_model(
+          title: "0 Root Group B outcome",
+          outcome_group: group_b,
+          global: true
+        )
+        outcome_model(
+          title: "0 Root Group C outcome",
+          outcome_group: group_c,
+          global: true
+        )
+
+        exec(
+          group_id: find_group("Root Group B").id,
+          source_context_id: nil, source_context_type: nil,
+          target_context_id: Account.default.id, target_context_type: "Account"
+        )
+
+        exec(
+          group_id: find_group("Root Group C").id,
+          source_context_id: nil, source_context_type: nil,
+          target_context_id: Account.default.id, target_context_type: "Account"
+        )
+      end
+
+      it "imports correctly" do
+        assert_tree_exists([{
+          title: "Group A",
+          outcomes: 5.times.map {|i| "#{i} Group A outcome"},
+          groups: [{
+            title: "Group C",
+            outcomes: 3.times.map {|i| "#{i} Group C outcome"},
+            groups: [{
+              title: "Group D",
+              outcomes: 5.times.map {|i| "#{i} Group D outcome"}
+            }, {
+              title: "Group E",
+              outcomes: 5.times.map {|i| "#{i} Group E outcome"}
+            }]
+          }]
+        }, {
+          title: "Group B",
+          outcomes: 5.times.map {|i| "#{i} Group B outcome"}
+        }, {
+          title: "Root Group A",
+          groups: [{
+            title: "Root Group B",
+            outcomes: 1.times.map {|i| "#{i} Root Group B outcome"},
+          }, {
+            title: "Root Group C",
+            outcomes: 1.times.map {|i| "#{i} Root Group C outcome"},
+          }]
+        }], Account.default.root_outcome_group)
+
+        exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: 'Root Group B').id)
+        exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: 'Root Group C').id)
+
+        assert_tree_exists([{
+          title: "Root Group A",
+          groups: [{
+            title: "Root Group B",
+            outcomes: 1.times.map {|i| "#{i} Root Group B outcome"},
+          }, {
+            title: "Root Group C",
+            outcomes: 1.times.map {|i| "#{i} Root Group C outcome"},
+          }]
+        }], @course.root_outcome_group)
+      end
+    end
+  end
+
 end
