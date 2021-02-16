@@ -161,7 +161,14 @@ class CourseSection < ActiveRecord::Base
     end
     can :read and can :delete
 
-    given { |user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
+    given do |user, session|
+      manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
+        :allow_course_admin_actions
+      else
+        :manage_admin_users
+      end
+      self.course.grants_any_right?(user, session, :manage_students, manage_perm)
+    end
     can :read
 
     given { |user| self.course.account_membership_allows(user, :read_roster) }

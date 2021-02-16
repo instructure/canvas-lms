@@ -2365,7 +2365,12 @@ class UsersController < ApplicationController
 
     # returns the original list in :invited_users (with ids) if successfully added, or in :errored_users if not
     get_context
-    return unless authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
+    manage_perm = if @context.root_account.feature_enabled? :granular_permissions_manage_users
+      :allow_course_admin_actions
+    else
+      :manage_admin_users
+    end
+    return unless authorized_action(@context, @current_user, [:manage_students, manage_perm])
 
     root_account = context.root_account
     unless root_account.open_registration? || root_account.grants_right?(@current_user, session, :manage_user_logins)
