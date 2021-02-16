@@ -1439,6 +1439,6 @@ class GradebooksController < ApplicationController
   end
 
   def allow_view_ungraded_as_zero?
-    Account.site_admin.feature_enabled?(:view_ungraded_as_zero)
+    @context.account.feature_enabled?(:view_ungraded_as_zero)
   end
 end

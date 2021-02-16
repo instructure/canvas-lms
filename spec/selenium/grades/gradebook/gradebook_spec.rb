@@ -85,7 +85,7 @@ describe "Gradebook" do
   context 'view ungraded as 0' do
 
     before(:each) do
-      Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+      @course.account.enable_feature!(:view_ungraded_as_zero)
       Gradebook.visit(@course)
     end
 
