@@ -23,7 +23,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/settings.html.erb" do
   before :once do
-    @subaccount = Account.default.sub_accounts.create!(:name => 'subaccount')
+    @subaccount = account_model(:parent_account => Account.default, name: 'subaccount')
+    @other_subaccount = account_model(:parent_account => Account.default)
+    @sub_subaccount1 = account_model(:parent_account => @subaccount)
+    @sub_subaccount2 = account_model(:parent_account => @subaccount)
+
     course_with_teacher(:active_all => true, :account => @subaccount)
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
@@ -181,17 +185,8 @@ describe "courses/settings.html.erb" do
 
   context "account_id selection" do
     it "should let sub-account admins see other accounts within their sub-account as options" do
-      root_account = Account.create!(:name => 'root')
-      subaccount = account_model(:parent_account => root_account)
-      other_subaccount = account_model(:parent_account => root_account) # should not include
-      sub_subaccount1 = account_model(:parent_account => subaccount)
-      sub_subaccount2 = account_model(:parent_account => subaccount)
-
-      @course.account = sub_subaccount1
-      @course.save!
-
-      @user = account_admin_user(:account => subaccount, :active_user => true)
-      expect(root_account.grants_right?(@user, :manage_courses)).to be_falsey
+      @user = account_admin_user(:account => @subaccount, :active_user => true)
+      expect(Account.default.grants_right?(@user, :manage_courses)).to be_falsey
       view_context(@course, @user)
 
       render
@@ -201,19 +196,10 @@ describe "courses/settings.html.erb" do
       #select.children.count.should == 3
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i rescue c.to_s}
-      expect(option_ids.sort).to eq [subaccount.id, sub_subaccount1.id, sub_subaccount2.id].sort
+      expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 
     it "should let site admins see all accounts within their root account as options" do
-      root_account = Account.create!(:name => 'root')
-      subaccount = account_model(:parent_account => root_account)
-      other_subaccount = account_model(:parent_account => root_account)
-      sub_subaccount1 = account_model(:parent_account => subaccount)
-      sub_subaccount2 = account_model(:parent_account => subaccount)
-
-      @course.account = sub_subaccount1
-      @course.save!
-
       @user = site_admin_user
       view_context(@course, @user)
 
@@ -221,7 +207,7 @@ describe "courses/settings.html.erb" do
       doc = Nokogiri::HTML(response.body)
       select = doc.at_css("select#course_account_id")
       expect(select).not_to be_nil
-      all_accounts = [root_account] + root_account.all_accounts
+      all_accounts = [Account.default] + Account.default.all_accounts
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i}
       expect(option_ids.sort).to eq all_accounts.map(&:id).sort

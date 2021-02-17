@@ -116,7 +116,8 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section).to eq @section
       end
 
-      it "should be unauthorized for users without manage_students permission" do
+      it "should be unauthorized for users without manage_students permission (non-granular)" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         json = api_call :post, @path, @path_options,
                         {
@@ -131,6 +132,24 @@ describe EnrollmentsApiController, type: :request do
                             }
                         }, {}, {:expected_status => 401}
       end
+
+      it "should be unauthorized for users without add_student_to_course permission (granular)" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
+        json = api_call :post, @path, @path_options,
+                        {
+                            :enrollment => {
+                                :user_id                            => @unenrolled_user.id,
+                                :type                               => 'StudentEnrollment',
+                                :enrollment_state                   => 'active',
+                                :course_section_id                  => @section.id,
+                                :limit_privileges_to_course_section => true,
+                                :start_at                           => nil,
+                                :end_at                             => nil
+                            }
+                        }, {}, {:expected_status => 401}
+      end
+
 
       it "should create a new teacher enrollment" do
         json = api_call :post, @path, @path_options,
