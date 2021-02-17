@@ -2838,6 +2838,7 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     default_tabs = elementary_homeroom_course? ? Course.default_homeroom_tabs : Course.default_tabs
+    opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
@@ -2866,7 +2867,7 @@ class Course < ActiveRecord::Base
       end
       tabs.compact!
       tabs += default_tabs
-      tabs += external_tabs unless elementary_homeroom_course?
+      tabs += external_tabs
 
       # Ensure that Settings is always at the bottom
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
