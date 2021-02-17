@@ -51,9 +51,8 @@ const compileHandlebars = data => {
     const template = precompiler.precompile(ast).toString()
     return {template, scope, translationCount}
   } catch (e) {
-    e = e.message || e
-    console.log(e)
-    throw {error: e}
+    console.error(e.message || e)
+    throw e
   }
 }
 

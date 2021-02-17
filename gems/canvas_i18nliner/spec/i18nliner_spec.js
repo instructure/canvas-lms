@@ -50,6 +50,23 @@ describe("I18nliner", function() {
         }
       });
     });
+
+    it('throws if no scope was specified', () => {
+      const command = new I18nliner.Commands.Check({});
+      const origDir = process.cwd();
+
+      try {
+        process.chdir('spec/fixtures/hbs-missing-i18n-scope');
+        command.checkFiles();
+      }
+      finally {
+        process.chdir(origDir);
+      }
+
+      expect(command.isSuccess()).toBeFalsy()
+      expect(command.errors.length).toEqual(1)
+      expect(command.errors[0]).toMatch(/expected i18nScope for Handlebars template to be specified/)
+    })
   });
 
   describe("javascript", function() {
