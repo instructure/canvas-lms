@@ -764,7 +764,16 @@ pipeline {
                 if(configuration.isChangeMerged()) {
                   timedStage('Dependency Check', stages, {
                     catchError (buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                      snyk("canvas-lms:ruby", "Gemfile.lock.next", "$PATCHSET_TAG")
+                      try {
+                        snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
+                      }
+                      catch (err) {
+                        if (err.toString().contains('Gemfile.lock does not exist')) {
+                          snyk("canvas-lms:ruby", "Gemfile.lock.next", "$PATCHSET_TAG")
+                        } else {
+                          throw err
+                        }
+                      }
                     }
                   })
                 }
