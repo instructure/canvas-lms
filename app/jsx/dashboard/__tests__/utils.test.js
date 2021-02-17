@@ -18,10 +18,17 @@
 
 import fetchMock from 'fetch-mock'
 
-import {fetchLatestAnnouncement} from 'jsx/dashboard/utils'
+import {
+  fetchLatestAnnouncement,
+  fetchCourseInstructors,
+  readableRoleName
+} from 'jsx/dashboard/utils'
 
 const ANNOUNCEMENT_URL =
   '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
+
+const USERS_URL =
+  '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
 
 afterEach(() => {
   fetchMock.restore()
@@ -54,5 +61,41 @@ describe('fetchLatestAnnouncement', () => {
     fetchMock.get(ANNOUNCEMENT_URL, 'null')
     const announcement = await fetchLatestAnnouncement('test')
     expect(announcement).toBeNull()
+  })
+})
+
+describe('fetchCourseInstructors', () => {
+  it('returns multiple instructors if applicable', async () => {
+    fetchMock.get(
+      USERS_URL,
+      JSON.stringify([
+        {
+          id: 14
+        },
+        {
+          id: 15
+        }
+      ])
+    )
+    const instructors = await fetchCourseInstructors('test')
+    expect(instructors.length).toBe(2)
+    expect(instructors[0].id).toBe(14)
+    expect(instructors[1].id).toBe(15)
+  })
+})
+
+describe('readableRoleName', () => {
+  it('returns correct role names for standard enrollment types', () => {
+    expect(readableRoleName('TeacherEnrollment')).toBe('Teacher')
+    expect(readableRoleName('TaEnrollment')).toBe('Teaching Assistant')
+    expect(readableRoleName('DesignerEnrollment')).toBe('Designer')
+    expect(readableRoleName('StudentEnrollment')).toBe('Student')
+    expect(readableRoleName('StudentViewEnrollment')).toBe('Student')
+    expect(readableRoleName('ObserverEnrollment')).toBe('Observer')
+  })
+
+  it('returns correct role name for custom role', () => {
+    const customName = 'Super Cool Teacher'
+    expect(readableRoleName(customName)).toBe(customName)
   })
 })

@@ -33,6 +33,7 @@ const {typography} = variables
 const base = {
   typography: {
     fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`,
+    fontSizeSmall: '1rem',
     fontSizeMedium: '1.125rem',
     fontSizeLarge: '1.5rem',
     fontSizeXLarge: '2rem'

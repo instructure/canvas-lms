@@ -98,6 +98,32 @@ const gradeCourses = [
     homeroom_course: true
   }
 ]
+const staff = [
+  {
+    id: '1',
+    short_name: 'Mrs. Thompson',
+    bio: 'Office Hours: 1-3pm W',
+    email: 't@abc.edu',
+    avatar_url: '/images/avatar1.png',
+    enrollments: [
+      {
+        role: 'TeacherEnrollment'
+      }
+    ]
+  },
+  {
+    id: '2',
+    short_name: 'Tommy the TA',
+    bio: 'Office Hours: 1-3pm F',
+    email: 'tommy@abc.edu',
+    avatar_url: '/images/avatar2.png',
+    enrollments: [
+      {
+        role: 'TaEnrollment'
+      }
+    ]
+  }
+]
 const defaultEnv = {
   current_user: currentUser,
   FEATURES: {
@@ -139,6 +165,10 @@ beforeAll(() => {
   fetchMock.get(
     '/api/v1/users/self/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image&enrollment_type=student&enrollment_state=active',
     JSON.stringify(gradeCourses)
+  )
+  fetchMock.get(
+    '/api/v1/courses/homeroom/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments',
+    JSON.stringify(staff)
   )
 })
 
@@ -247,6 +277,17 @@ describe('K-5 Dashboard', () => {
       expect(await findByText('Economics 101')).toBeInTheDocument()
       expect(getByText('B-')).toBeInTheDocument()
       expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Resources Section', () => {
+    it('shows the staff contact info for each staff member in all homeroom courses', async () => {
+      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
+      expect(await wrapper.findByText('Mrs. Thompson')).toBeInTheDocument()
+      expect(wrapper.getByText('Office Hours: 1-3pm W')).toBeInTheDocument()
+      expect(wrapper.getByText('Teacher')).toBeInTheDocument()
+      expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
+      expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
     })
   })
 })
