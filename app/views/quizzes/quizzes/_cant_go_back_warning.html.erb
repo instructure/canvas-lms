@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% preview ||= false %>
 <div
   id="js-sequential-warning-dialogue"
   data-turn-into-dialog='{"width": 400, "modal":true}'
@@ -29,7 +30,7 @@
     <% end %>
   </p>
   <div class="button-container">
-    <a href="<%= take_quiz_url %>" data-method="POST">
+    <a href="<%= preview ? preview_quiz_url : take_quiz_url %>" data-method="POST">
       <button type="button" class="btn btn-primary">Begin</button>
     </a>
   </div>

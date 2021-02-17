@@ -25,15 +25,24 @@ require 'academic_benchmark/engine'
 
 require 'academic_benchmark/ab_gem_extensions/standard'
 require 'academic_benchmark/ab_gem_extensions/authority'
+require 'academic_benchmark/ab_gem_extensions/publication'
 require 'academic_benchmark/ab_gem_extensions/document'
+require 'academic_benchmark/ab_gem_extensions/section'
 
 module AcademicBenchmark
-  NATIONAL_STANDARDS_TITLE = "National Standards".freeze
-  NATIONAL_STD_CODES = %w[CC NT NRC].freeze
-  COUNTRY_STD_CODES = %w[AU UK].freeze
-  UNITED_KINGDOM_TITLE = "United Kingdom".freeze
-  COMMON_CORE_AUTHORITY = 'CC'.freeze
-  NGSS_AUTHORITY = 'NRC'.freeze
+  # The authorities have changed from v3 to v4.1, namely:
+  # National Standards (NT) -> ISTE
+  # NRC/NGSS -> Achieve
+  # NGA Center/CCSSO -> CC
+
+  COMMON_CORE_AUTHORITY = 'CC'
+  ISTE_AUTHORITY_CODE = 'ISTE'
+  ACHIEVE_AUTHORITY = 'Achieve' # code: -none-
+  NATIONAL_STDS = [COMMON_CORE_AUTHORITY, ISTE_AUTHORITY_CODE, ACHIEVE_AUTHORITY].freeze
+  COUNTRY_STDS = [
+    'Australian Curriculum, Assessment and Reporting Authority', # code: acara
+    'UK Department for Education' # code: -none-
+  ].freeze
 
   def self.config
     empty_settings = {}.freeze
@@ -54,7 +63,7 @@ module AcademicBenchmark
 
   def self.extract_nat_stds(api, nat_stds_guid)
     return [] if nat_stds_guid.nil?
-    api.standards.authority_documents(nat_stds_guid)
+    api.standards.authority_publications(nat_stds_guid)
   end
 
   ##
@@ -62,7 +71,7 @@ module AcademicBenchmark
   # National Standards are also known as Common Core and NGSS
   ##
   def self.nat_stds_guid_from_auths(authorities)
-    stds = authorities.find{|a| a.description == NATIONAL_STANDARDS_TITLE}
+    stds = authorities.find{|a| a.code == ISTE_AUTHORITY_CODE}
     stds.try(:guid)
   end
 
@@ -81,8 +90,8 @@ module AcademicBenchmark
   # sort national standards at the top, followed by country standards,
   # followed by the rest at the bottom in alphabetical order
   def self.sort_authorities(authorities)
-    national_stds, rest = authorities.partition{ |a| NATIONAL_STD_CODES.include?(a.code) }
-    country_stds, rest = rest.partition{ |a| COUNTRY_STD_CODES.include?(a.code) }
+    national_stds, rest = authorities.partition{ |a| NATIONAL_STDS.include?(a.code) || NATIONAL_STDS.include?(a.description) }
+    country_stds, rest = rest.partition{ |a| COUNTRY_STDS.include?(a.description) }
     [
       self.sort_authorities_by_description(national_stds),
       self.sort_authorities_by_description(country_stds),
@@ -102,20 +111,21 @@ module AcademicBenchmark
     api = self.api_handle
     auth_list = self.retrieve_authorities(api)
 
-    # prepend the common core, next gen science standards,
+    # prepend the common core, next gen science standards (Achieve),
     # and the ISTE (NETS) standards to the list
     auth_list.unshift(self.extract_nat_stds(api, self.nat_stds_guid_from_auths(auth_list)))
-    auth_list.unshift(api.standards.authority_documents(NGSS_AUTHORITY))
-    auth_list.unshift(api.standards.authority_documents(COMMON_CORE_AUTHORITY))
+    auth_list.unshift(api.standards.authority_publications(ACHIEVE_AUTHORITY))
+    auth_list.unshift(api.standards.authority_publications(COMMON_CORE_AUTHORITY))
 
     # flatten down the list of authorities and hashify it
     auth_list.flatten!
-    auth_list.map(&:to_h)
-  end
-
-  # The UK standards are now available to us as well,
-  def self.uk_guid(api)
-    api.browse.find{ |a| a["title"] == UNITED_KINGDOM_TITLE }
+    # exclude acronym (code) values since they're not unique across authorities/publications
+    auth_list.map(&:to_h).map do |item|
+      {
+        title: item[:descr],
+        guid: item[:guid]
+      }
+    end
   end
 
   class APIError < StandardError; end
@@ -123,25 +133,25 @@ module AcademicBenchmark
   def self.import(guid, options = {})
     is_auth = self.auth?(guid)
     authority = is_auth ? guid : nil
-    document = is_auth ? nil : guid
-    check_args(authority, document)
+    publication = is_auth ? nil : guid
+    check_args(authority, publication)
     self.ensure_ab_credentials
 
     AcademicBenchmark.queue_migration_for(
       authority: authority,
-      document: document,
+      publication: publication,
       user: self.authorized?,
       options: options
     ).first
   end
 
-  def self.queue_migration_for(authority:, document:, user:, options: {})
+  def self.queue_migration_for(authority:, publication:, user:, options: {})
     cm = ContentMigration.new(context: Account.site_admin)
     cm.converter_class = self.config['converter_class']
     cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
     cm.migration_settings[:import_immediately] = true
     cm.migration_settings[:authority] = authority
-    cm.migration_settings[:document] = document
+    cm.migration_settings[:publication] = publication
     cm.migration_settings[:no_archive_file] = true
     cm.migration_settings[:skip_import_notification] = true
     cm.migration_settings[:skip_job_progress] = true
@@ -173,10 +183,10 @@ module AcademicBenchmark
     self.api_handle.standards.authorities.map(&:guid).include?(guid)
   end
 
-  def self.check_args(authority, document)
-    if authority.nil? && document.nil?
+  def self.check_args(authority, publication)
+    if authority.nil? && publication.nil?
       raise Canvas::Migration::Error,
-        "You must specify either an Authority or a Document to import (both were nil)"
+            "You must specify either an Authority or a Publication to import (both were nil)"
     end
   end
 

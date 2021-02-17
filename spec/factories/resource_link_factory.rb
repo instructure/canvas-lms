@@ -20,7 +20,6 @@
 
 module Factories
   def resource_link_model(overrides: {})
-    overrides[:resource_link_id] = overrides[:resource_link_uuid] if overrides.key?(:resource_link_uuid) # we'll remove this on part 4 commit
     return Lti::ResourceLink.find_by!(resource_link_uuid: overrides[:resource_link_uuid]) if overrides.key?(:resource_link_uuid)
 
     context ||= Course.create!(name: 'Course')

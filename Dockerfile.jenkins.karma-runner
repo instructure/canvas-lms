@@ -1,0 +1,9 @@
+# syntax=docker/dockerfile:experimental
+
+ARG PATCHSET_TAG
+FROM $PATCHSET_TAG AS patchset
+
+FROM local/karma-builder
+USER docker
+RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
+  cp -rf /tmp/src/. /usr/src/app

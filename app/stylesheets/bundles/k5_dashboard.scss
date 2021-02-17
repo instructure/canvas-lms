@@ -1,0 +1,90 @@
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+.ic-dashboard-app {
+  margin-top: -($ic-sp * 2);
+}
+
+.ic-notification + .ic-dashboard-app {
+  margin-top: 0;
+}
+
+.ic-Dashboard-header__layout {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  height: $ic-breadcrumbs-height;
+  &.small {
+    padding-bottom: .5rem;
+
+    .ic-Dashboard-header__actions {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+h1.ic-Dashboard-header__title {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.ic-Dashboard-header__actions {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// These overrides are only here because the Dashboard cards don't fully use InstUI.
+// Once they are on InstUI they can be removed
+.ic-DashboardCard {
+  font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  & h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+  }
+
+  & h3.ic-DashboardCard__header-title {
+    font-size: 1rem;
+  }
+}
+
+// These overrides are required because InstUI Tabs don't natively support icons or
+// themeable "selected" colors.
+.ic-Dashboard-tabs {
+  & [role="tab"] {
+    padding: 0.75rem 1.25rem;
+  }
+
+  & .ic-Dashboard-tabs__tab {
+    display: flex;
+    align-items: flex-end;
+
+    &.selected {
+      color: var(--ic-brand-primary);
+    }
+
+    & svg {
+      margin-right: 0.5em;
+    }
+  }
+}

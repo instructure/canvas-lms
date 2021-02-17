@@ -57,12 +57,12 @@ enable_fullstory:
   applies_to: SiteAdmin
 new_math_equation_handling:
   state: hidden
-  display_name: Updated math equation handling
+  display_name: "Math: Updated equation handling"
   description: |-
     Replaces the existing image of the math equation plus its hidden mathml
     with a MathJax processed version. This change provides better accessibility
     and many options for the reader to interact with the equation on the page.
-  applies_to: SiteAdmin
+  applies_to: RootAccount
 autocreate_attachment_from_media_object:
   state: hidden
   display_name: Create Files After RCE Media Upload/Recording
@@ -91,15 +91,15 @@ new_file_url_rewriting:
       state: on
 inline_math_everywhere:
   state: hidden
-  display_name: Support LaTex math equations almost everywhere
+  display_name: "Math: Support LaTex math equations almost everywhere"
   description: |-
     With this feature, LaTex math equations entered into most
     text entry fields in Canvas will be processed by MathJax.
     LaTex delimited by \(...\) become inline equations, while
-    $$...$$ will be rendered as as a block.  For example,
+    $$...$$ will be rendered as a block.  For example,
     you could choose to title an Assignment \(\sqrt{x}\), or
     enter $$ax^2 + by + c = 0$$ in a submission comment.
-    This feature reequires that the "Updated math equation handling"
+    This feature requires that the "Math: Updated equation handling"
     flag is also on.
   applies_to: RootAccount
 bounced_emails_admin_tool:

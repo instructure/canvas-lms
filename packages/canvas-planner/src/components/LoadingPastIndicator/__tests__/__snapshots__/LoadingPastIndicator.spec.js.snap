@@ -4,31 +4,29 @@ exports[`prioritizes loading complete over currently loading 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="small"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <View
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="block"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       margin="small"
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <TV
         aria-hidden="true"
@@ -64,31 +62,29 @@ exports[`renders TV when all past items loaded 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="small"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <View
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="block"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       margin="small"
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <TV
         aria-hidden="true"
@@ -124,18 +120,17 @@ exports[`renders spinner while loading 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="medium small small small"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Spinner
       as="div"

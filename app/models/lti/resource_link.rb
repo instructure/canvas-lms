@@ -21,9 +21,11 @@
 class Lti::ResourceLink < ApplicationRecord
   include Canvas::SoftDeletable
 
-  validates :context_external_tool_id, :context_id, :context_type, :lookup_id,
-            :resource_link_id, :lookup_uuid, :resource_link_uuid, presence: true
-  validates :lookup_id, uniqueness: true
+  self.ignored_columns = %i[lookup_id resource_link_id]
+
+  validates :context_external_tool_id, :context_id, :context_type, :lookup_uuid,
+            :resource_link_uuid, presence: true
+  validates :lookup_uuid, uniqueness: true
 
   belongs_to :context_external_tool
   belongs_to :context, polymorphic: [:account, :assignment, :course]
@@ -37,8 +39,8 @@ class Lti::ResourceLink < ApplicationRecord
             dependent: :destroy,
             foreign_key: :lti_resource_link_id
 
-  before_validation :generate_resource_link_id, on: :create
-  before_validation :generate_lookup_id, on: :create
+  before_validation :generate_resource_link_uuid, on: :create
+  before_validation :generate_lookup_uuid, on: :create
   before_save :set_root_account
 
   def self.create_with(context, tool, custom_params = nil)
@@ -66,14 +68,12 @@ class Lti::ResourceLink < ApplicationRecord
 
   private
 
-  def generate_lookup_id
-    self.lookup_id ||= SecureRandom.uuid
-    self.lookup_uuid ||= self.lookup_id
+  def generate_lookup_uuid
+    self.lookup_uuid ||= SecureRandom.uuid
   end
 
-  def generate_resource_link_id
-    self.resource_link_id ||= SecureRandom.uuid
-    self.resource_link_uuid  ||= self.resource_link_id
+  def generate_resource_link_uuid
+    self.resource_link_uuid ||= SecureRandom.uuid
   end
 
   def set_root_account

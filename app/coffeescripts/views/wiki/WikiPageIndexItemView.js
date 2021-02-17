@@ -78,7 +78,6 @@ export default class WikiPageIndexItemView extends Backbone.View {
       DELETE: !!this.WIKI_RIGHTS.delete_page
     }
 
-    json.BULK_DELETE_ENABLED = ENV.FEATURES?.bulk_delete_pages
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED
     // NOTE: if permissions need to change for OPEN_MANAGE_OPTIONS, please update WikiPageIndexView.js to match
     json.CAN.OPEN_MANAGE_OPTIONS = json.CAN.MANAGE || json.DIRECT_SHARE_ENABLED
@@ -162,7 +161,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     const {indexView} = this
     const {collection} = this
     return editDialog.on('success', function() {
-      indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}.al-trigger`
+      indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}-menu.al-trigger`
       indexView.currentSortField = null
       indexView.renderSortHeaders()
 

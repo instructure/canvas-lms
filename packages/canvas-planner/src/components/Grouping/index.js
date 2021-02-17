@@ -23,7 +23,7 @@ import {arrayOf, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 import PlannerItem from '../PlannerItem'
 import CompletedItemsFacade from '../CompletedItemsFacade'
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
@@ -72,7 +72,7 @@ export class Grouping extends Component {
     this.props.registerAnimatable('group', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.props.deregisterAnimatable('group', this, this.itemUniqueIds())
     this.props.registerAnimatable(
       'group',

@@ -270,6 +270,45 @@ describe GradeSummaryPresenter do
     end
   end
 
+  describe '#observed_students' do
+    before(:once) do
+      @course = course_factory(active_all: true)
+      @course.restrict_student_future_view = true
+      @course.save!
+      @student = user_factory
+      @student2 = user_factory
+      observer = user_with_pseudonym(active_all: true)
+      section = @course.course_sections.create!
+      section.start_at = 1.day.from_now
+      section.restrict_enrollments_to_section_dates = true
+      section.save!
+
+      add_linked_observer(@student, observer)
+      add_linked_observer(@student2, observer)
+      @student_enrollment = section.enroll_user(@student, 'StudentEnrollment')
+      @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment')
+
+      @presenter = GradeSummaryPresenter.new(@course, observer, nil)
+    end
+
+    it 'does not include students from future sections in a date restricted course' do
+      expect(@presenter.observed_students).not_to have_key(@student)
+    end
+
+    it 'includes students from current sections in a date restricted course' do
+      expect(@presenter.observed_students).to include(@student2 => [@student_enrollment2])
+    end
+
+    it 'includes all students if course is not restricted by date' do
+      @course.restrict_student_future_view = false
+      @course.save!
+      expect(@presenter.observed_students).to include(@student => [@student_enrollment])
+      expect(@presenter.observed_students).to include(@student2 => [@student_enrollment2])
+    end
+
+  end
+
+
   describe '#submissions' do
     before(:once) do
       teacher_in_course

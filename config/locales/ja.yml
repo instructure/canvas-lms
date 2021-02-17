@@ -1794,11 +1794,13 @@ ja:
   add_course_406cb773: コースの追加
   add_course_assignments_628ed6d0: コースの課題の追加
   add_course_calendar_events_146154a5: "コースのカレンダー イベントの追加"
+  add_course_files_4e0f1abc: コースファイルを追加
   add_criterion_eb9587ef: 基準を追加する
   add_custom_link_22059c0: カスタムリンクを追加する
   add_designers_to_courses_9588820b: デザイナーをコースに追加
   add_discussion_653dab4c: ディスカッションを追加する
   add_domain_f15bc6c1: ドメインを追加
+  add_edit_delete_files_573a4d62: "ファイルの追加 / 編集 / 削除"
   add_edit_delete_sections_d32c5b4d: セクションの追加/編集/削除
   add_email_address_aef3b61: "電子メール アドレスを追加する"
   add_existing_content_7e36da66: 現存のコンテンツを追加する
@@ -1809,6 +1811,7 @@ ja:
   add_grading_period_6f774dc3: 採点期間を追加
   add_grading_scheme_81e23c05: 採点スキームを追加
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: 管理者成績レポートに採点スキームを追加
+  add_granularity_to_permissions_around_managing_cou_2244c94a: コースファイルの管理に関する権限をさらに詳細にする
   add_granularity_to_permissions_around_managing_cou_4a5bc486: コースセクションの管理に関する権限に粒度を追加する
   add_group_c84f9e9d: グループの追加
   add_group_set_f9809e11: "グループ セットの追加"
@@ -2104,6 +2107,8 @@ ja:
   allow_users_to_comment_45b8f753: ユーザーにコメントを許可する
   allowed_attempts_4e229caa: 許可されている試行回数
   allowed_domains_ee7868c8: 許可されているドメイン
+  allowed_for_subaccounts_courses_default_off_da598c11: "サブアカウント / コース対して許可、デフォルトはオフ"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "サブアカウント / コース対して許可、デフォルトはオン"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: 受講生がコンテクストカード上の「ユーザとして操作」のリンクにアクセスできるようにします
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "ユーザーがユーザーのログイン情報内で SIS ID を表示できるようにします。"
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "ユーザーがコースの人物のページのユーザー SIS ID を表示できるようにします。"
@@ -3157,6 +3162,7 @@ ja:
     assignment_group_selector: 
       assignment_group: 課題グループ
       assignment_group_options: 
+        create_group: グループを作成
         new_group: 新しいグループ
     assignment_groups_count: 
       one: "%{count} 個のグループ"
@@ -5098,6 +5104,7 @@ ja:
   classic_quizzes_dee3c7b7: クラシッククイズ
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: 提出なしの時間指定クイズのクラシッククイズオプション
   clear_2084585f: クリア
+  clear_search_field_75f595c7: 検索フィールドをクリア
   clear_selected_file_82388e50: 選択したファイルを消去する
   clear_user_cache_ef079f7f: ユーザーキャッシュを消去する
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "コードが表示されない場合は、[キャンセル]をクリックします。"
@@ -5343,6 +5350,7 @@ ja:
   collapse_all_50275533: すべて折りたたみ
   collapse_group_c2af7cad: グループの折りたたみ
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} のグループ メンバーのリストを折りたたむ"
+  collapse_outcome_description_de471564: 結果の説明を折りたたむ
   collapse_subdiscussion_89af1f5c: サブディスカッションを折りたたむ
   collapse_tutorial_tray_66ee7dc1: チュートリアルトレイを折りたたむ
   collapsed_510aa02a: 折りたたまれました
@@ -6549,6 +6557,9 @@ ja:
   count_files_were_ignored_2f9c054a: 
     one: "(%{count}) のファイルが無視されました"
     other: "(%{count}) のファイルが無視されました"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "%{count} 件の「%{groupTitle}」結果"
+    other: "%{count} 件の「%{groupTitle}」結果"
   count_hidden_e8d2c57c: "%{count} は非表示です"
   count_images_found_for_term_a93635ed: "%{count} 画像が %{term}について見つかりました"
   count_items_deleted_successfully_a287aa53: 
@@ -6577,6 +6588,9 @@ ja:
     one: "%{count} オプション"
     other: "%{count} オプション"
   count_options_loaded_cd59cc3b: "%{count}オプションがロードされました。"
+  count_outcomes_selected_55902958: 
+    one: "%{count} 件の結果が選択されています"
+    other: "%{count} 件の結果が選択されています"
   count_page_views_b40102b3: 
     one: "%{count} ページ ビュー"
     other: "%{count} ページビュー"
@@ -6815,7 +6829,10 @@ ja:
   course_favorites_from_dashboard_27a3515a: ダッシュボードからのコースのお気に入り
   course_files_62deb8f8: "コース ファイル"
   course_files_a31f97fc: "コース ファイル"
+  course_files_add_2eede390: "コースファイル - 追加"
   course_files_add_edit_delete_24678a2f: "コースファイル - 追加/編集/削除"
+  course_files_delete_fae0effe: "コースファイル - 削除"
+  course_files_edit_d05d4e8b: "コースファイル - 編集"
   course_found_f5a40cd3: コースが見つかりました
   course_found_not_deleted_a20f72f0: コースが見つかりました（削除されていない）
   course_grade_grade_in_course_code_9fa854db: "コースの成績：%{grade}%（内）%{course_code}"
@@ -7605,6 +7622,8 @@ ja:
   create_edit_line_item_scores_116482c7: ライン項目スコアの作成/編集
   create_educational_resources_8219326e: 教育リソースを作成する
   create_failed_15d07ad4: 作成に失敗しました
+  create_file_71aa1922: "[ ファイルを作成 ]"
+  create_file_s_188549e6: "[ ファイルを作成 ]"
   create_files_after_rce_media_upload_recording_77d75a96: RCEメディアのアップロード/記録後にファイルを作成する
   create_interactive_course_content_76665336: インタラクティブなコースコンテンツを作成する
   create_item_base: 
@@ -8049,6 +8068,7 @@ ja:
   delete_comment_a71040c3: コメントの削除
   delete_comment_comment_d32ffc85: "コメントを削除する：%{comment}"
   delete_comment_commenttext_c8afe129: "コメントを削除：%{commentText}"
+  delete_course_files_ee9e769: コースファイルを削除
   delete_criterion_row_80c3b3b: 基準の列を削除する
   delete_current_message_5da0221a: 現在のメッセージの削除
   delete_current_module_item_21fefc54: 現在のモジュール/アイテムを削除
@@ -8345,6 +8365,7 @@ ja:
   disabled_3b1b332a: 無効
   disabled_and_locked_d14dc6c2: 無効にしてロックしました
   disabled_by_default_7d822dcb: デフォルトで無効
+  disabled_for_all_subaccounts_courses_6c8938e0: "サブアカウント / コース対して無効"
   disabled_in_course_settings_d15ee35d: "* コース設定で無効"
   disabled_links_b3bdea99: 無効のリンク
   disabled_locked_dab351d6: 無効（ロック済み）
@@ -8836,6 +8857,7 @@ ja:
   download_submission_comments_2a6c0395: 投稿コメントをダウンロード
   download_submissions_7454665f: 提出物のダウンロード
   download_the_complete_list_of_errors_and_warnings__7d993f7b: エラーと警告の完全なリストをここからダウンロードしてください。
+  download_these_results_as_csv_9a890883: "これらの結果を CSV としてダウンロード"
   download_this_file_669f9174: このファイルをダウンロード
   downloading_course_content_allows_access_to_conten_164d9336: コースのコンテンツをダウンロードすることは、コンテンツがオフラインの間にコンテンツにアクセスすることを可能にします。コンテンツは、ファイル、ページ、課題、議論「のトピック、クイズを含む場合があります。各コースの「ePubを生成」をクリックし、いずれかのeリーダーソフトウェアを開き、閲覧してください。
   draft_92507c72: (ドラフト)
@@ -8972,6 +8994,7 @@ ja:
   edit_collaboration_b014c18b: コラボレーションを編集する
   edit_comment_comment_e74afa04: "コメントを編集：%{comment}"
   edit_conference_title_6e234815: "\"%{conference_title}\"を編集"
+  edit_course_files_d046ef82: コースファイルを編集
   edit_course_role_3b992fc2: コースの役割を編集
   edit_criterion_5e4dadca: 基準を編集
   edit_criterion_description_5828919: 基準の説明を編集
@@ -9179,6 +9202,7 @@ ja:
   enabled_and_locked_49ff3de4: 有効にしてロックしました
   enabled_ba7cab66: 有効
   enabled_by_default_e530d6ed: デフォルトで有効
+  enabled_for_all_subaccounts_courses_e2ee4b2: "サブアカウント / コース対して有効"
   enabled_links_be110215: 有効なリンク
   enabled_locked_3cf7c256: 有効（ロック済み）
   enabled_unlocked_8d3a5df7: 有効（ロック解除）
@@ -9746,6 +9770,7 @@ ja:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "%{groupName} のグループ メンバーのリストを展開"
   expand_or_collapse_calendars_9854b0d0: カレンダーの展開と折りたたみ
   expand_or_collapse_undated_items_b901de09: 日付のないアイテムの展開と折りたたみ
+  expand_outcome_description_c5bdd70b: 結果の説明を展開する
   expand_permission_b45bf097: "展開する%{permission}"
   expand_permission_c61d5958: 許可を拡大する
   expand_subdiscussion_cd226ed4: サブディスカッションを展開する
@@ -11346,6 +11371,7 @@ ja:
   granular_contexttype_notification_settings_will_be_c5dfc901: "将来、ここから詳細な%{contextType}の通知設定を行うことができるようになる予定です。"
   granular_course_notification_settings_will_be_conf_68f122db: 将来、ここから詳細なコースの通知設定を行うことができるようになる予定です。
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: コースから管理者の役割を追加/削除するためのきめ細かい権限
+  granular_permissions_for_managing_course_files_1ed7f019: コースファイルを管理するための詳細な権限
   granular_permissions_for_managing_course_sections_da4b04b: コースセクションを管理するための詳細な権限
   granular_permissions_for_managing_wiki_pages_3ed89a84: Wikiページを管理するための詳細な権限
   graph_bar_b5daa23d: グラフバー
@@ -12387,6 +12413,7 @@ ja:
   importing_outcomes_e62a0375: 成果をインポートする
   improve_accessibility_of_left_hand_menu_through_be_908fb002: 無効になっているメニュー項目の色と視覚およびスクリーンリーダーインジケータを適切に利用することで、左メニューのアクセシビリティを改善します。
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "ファイル内におけるドラッグ & ドロップの見つけやすさを改善"
+  improved_interface_with_ongoing_updates_7316bdef: 継続的な更新によって改善されたインターフェイス
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: モジュールからの新しいクイズの作成を含む、モジュールによる新しいクイズサポートを改善
   improved_outcomes_management_4692f886: 成果管理の改善
   improved_visual_reminders_to_encourage_instructors_f203c7f: コースを公開するように講師を促すために改善された視覚的リマインダ
@@ -13190,6 +13217,7 @@ ja:
   loading_last_attended_date_5a42463: 最終出席日を読み込み中
   loading_mastery_paths_c558a766: 熟達の過程の読み込み中...
   loading_media_32847745: メディアの読込み
+  loading_message_list_226a131e: メッセージリストをロード中
   loading_more_grade_history_results_b235de5: 成績履歴結果をさらに読み込み中。
   loading_more_gradebook_history_results_810f6d2e: 成績表履歴結果をさらに読み込み中。
   loading_more_results_1d437202: より多くの結果を読み込んでいます
@@ -13432,6 +13460,7 @@ ja:
   malformed_csv_aaa4b7f2: "不正な形式の CSV"
   maltese_916925e8: マルタ語
   manage_access_bd923d8d: アクセスの管理
+  manage_add_edit_delete_course_files_162c1a65: "コース ファイルの管理 (追加 / 編集 / 削除)"
   manage_add_edit_delete_pages_5c73f2fb: "ページ管理 (追加 / 編集 / 削除)"
   manage_announcement_with_title_title_f2ce92de: "この件名の通知の管理%{title}"
   manage_app_list_994cc26c: アプリリストを管理する
@@ -13445,6 +13474,7 @@ ja:
       delete_avatar: このユーザのプロフィール画像を削除してもよろしいですか?
       lock_avatar: この画像をロックすると画像が承認され、このユーザは画像を更新できなくなります。続行しますか?
   manage_b88f7150: 管理
+  manage_course_files_57e07038: コースファイルを管理
   manage_course_sections_f482d1b3: コースセクションを管理
   manage_discussion_title_a2ecb3fb: "討議を管理する%{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: 登録状況を管理し、グループを作成し、このページからユーザーを追加する。
@@ -15968,6 +15998,7 @@ ja:
   nav_text_active_a924ae88: ナビテキストアクティブ
   navigation_allows_user_to_view_the_people_link_in__dd533d29: ユーザーがコースナビゲーションの人物のリンクを表示できるようにします。
   navigation_icon_45db938e: ナビゲーションのアイコン
+  navigation_menu_fd782ff8: ナビゲーションメニュー
   near_mastery_f25174a4: 熟達に近い
   need_a_canvas_account_221d18ed: "Canvas アカウントが必要ですか？"
   need_help_setting_up_your_course_2b763141: コースの設定でヘルプが必要ですか？
@@ -16036,7 +16067,7 @@ ja:
   new_question_group_d9306280: 新しい問題グループ
   new_quiz_34aacba6: 新しいクイズ
   new_quiz_statistics_desc: コースの新しいクイズ統計ページを有効にします。
-  new_quizzes_dbda7e0a: 新クイズ
+  new_quizzes_dbda7e0a: 新しいクイズ
   new_quizzes_importing_c167dce0: 新クイズのインポート
   new_quizzes_migration_during_course_import_copy_e9dd124e: コースのインポート/コピー中の、新しいクイズの移行
   new_quizzes_migration_enabled_by_default_5f9bcc81: デフォルトで有効になっている新しいクイズの移行
@@ -16834,6 +16865,7 @@ ja:
   outcome_imports_c496a81f: 成果のインポート
   outcome_mastery_scales_8c3a814d: 成果達成度スケール
   outcome_mastery_scales_add_edit_171551c: "成果達成度スケール - 追加 / 編集"
+  outcome_menu_4fe5813: 結果メニュー
   outcome_path_mastery_points: "%{path} 熟達度"
   outcome_path_result: "%{path} 結果"
   outcome_proficiency_calculations_5959b681: 成果の習熟度の計算
@@ -19052,6 +19084,7 @@ ja:
           select_all_banks: すべて選択
           view_question_banks: コースの質問バンクを表示
         options: 
+          create_group: "[ グループを作成 ]"
           new_group: "[ 新しいグループ ]"
           no_group: "[ グループなし ]"
         select_a_question_bank: このクイズに問題グループとしてリンクする問題バンクを下のリストから選択します。
@@ -20042,6 +20075,7 @@ ja:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: この権限が有効か無効かにかかわらず、ユーザーは引き続き個人の予定表でイベントを管理できます。
   regenerate_3e4679f8: 再発生
   regenerate_epub_395c8e56: ePubを再生成
+  regenerating_themes_462e6cd9: テーマを再生成しています...
   region_47e29025: "リージョン:"
   region_939f2a6c: リージョン
   register_email_efc06d59: 電子メールの登録
@@ -20777,6 +20811,7 @@ ja:
   search_discussion_by_title_30466604: ディスカッションを件名ごとに検索
   search_endpoints_d5abf37f: エンドポイントを検索
   search_entries_or_author_63fb0a86: エントリまたは作成者を検索
+  search_field_234156fc: 検索フィールド
   search_flickr_6f28b02e: "flickr を検索"
   search_for_a_deleted_course_by_id_f553398d: "削除されたコースを ID で検索"
   search_for_files_7541fb28: ファイルの検索
@@ -20791,6 +20826,7 @@ ja:
   search_term_must_be_at_least_num_characters_669098ed: "検索項目は%{num}文字以下である必要があります"
   search_title_body_or_author_1d26711f: タイトル、本文、または作成者を検索
   search_users_48b1789e: ユーザーを検索中...
+  search_within_grouptitle_4d38272f: "%{groupTitle} 内で検索"
   searching_b0207e7f: 検索中
   searching_for_announcements_in_sections_must_span__80e4dfe4: セクション内の広告ウンスを検索は、正確に1コースでなされなければなりません
   second_reviewer_90046c68: 2番目の評価者
@@ -20981,6 +21017,7 @@ ja:
   select_one_8e0af564: "1 つを選択"
   select_one_b647b384: ひとつ選んでください
   select_one_of_the_options_c8b0c6e4: オプションを1つ選択
+  select_outcome_7e6e2562: 結果を選択
   select_page_e93fc123: ページを選択する
   select_prerequisite_module_57894963: 前提条件モジュールの選択
   select_prerequite_module_e9042bb0: 前提条件モジュールの選択
@@ -20991,11 +21028,17 @@ ja:
   select_students_for_review_6e004a12: レビューのために受講生を選択
   select_sub_account_6704196a: サブアカウントを選択する
   select_term_f8083fb0: 期間を選択する
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "関連付けるファイルを選択、または [ファイルを作成] を選択してファイルを追加します。"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "関連付けるファイルを選択するか、または [新しいファイル] を選択してファイルを追加します。"
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: この*モジュール*に関連付けたいファイルを選択、または「新規ファイル」を選択してファイルを追加します。
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "この*モジュール*に関連付けるファイルを選択、または [ファイルを作成] を選択してファイルを追加します。"
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "関連付けるファイルを選択、または [ファイルを作成] を選択してファイルを追加します。"
   select_the_files_you_want_to_associate_or_add_file_9acd7878: 関連付けたいファイルを選択、または「新規ファイル」を選択してファイルを追加します。
   select_the_files_you_want_to_associate_with_this_m_82677c50: この*モジュール*に関連付けたいファイルを選択、または「新規ファイル」を選択してファイルを追加します。
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "この*モジュール*に関連付けるファイルを選択、または [ファイルを作成] を選択してファイルを追加します。"
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。"
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "関連付けるページを選択、または [ページを作成] を選択して新しいページを追加します。"
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "この*モジュール*に関連付けるページを選択、または [ページを作成] を選択して新しいページを追加します。"
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "この*モジュール*に関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。"
   select_title_for_deletion_45b08247: "%{title}を削除すると選択する"
   select_type_of_prerequisite_8d6fa902: 前提条件のタイプを選択する
@@ -21713,10 +21756,21 @@ ja:
       add_to_module: "*モジュール*に %{item} を追加"
       assignment_item: 課題
       assignment_item_select_label: "関連付ける課題を選択するか、または [新しい課題] を選択して課題を追加します。"
+      assignment_item_select_label_create: "関連付ける課題を選択、または [課題を作成] を選択して課題を追加します。"
+      assignment_item_select_label_new: "関連付ける課題を選択、または [新しい課題] を選択して課題を追加します。"
       assignment_notice: "この *モジュール* に関連付ける課題を選択するか、\"新しい課題\" を選択して課題を追加します。"
       content_page_item: ページ
+      create_assignment_notice: "この*モジュール*に関連付ける課題を選択、または [課題を作成] を選択して課題を追加します。"
+      create_assignment_option: "[ 課題を作成 ]"
+      create_page_option: "[ ページを作成 ]"
+      create_quiz_notice: "この*モジュール*に関連付けるクイズを選択、または [クイズを作成] を選択して新しいクイズを追加します。"
+      create_quiz_option: "[ クイズを作成 ]"
+      create_topic_notice: "この*モジュール*に関連付けるトピックを選択、または [トピックを作成] を選択してトピックを追加します。"
+      create_topic_option: "[ トピックを作成 ]"
       discussion_item: ディスカッション
       discussion_topic_select_label: "関連付けるトピックを選択するか、または [新しいトピック] を選択してトピックを追加します。"
+      discussion_topic_select_label_create: "関連付けるトピックを選択、または [トピックを作成] を選択してトピックを追加します。"
+      discussion_topic_select_label_new: "関連付けるトピックを選択、または [新しいトピック] を選択してトピックを追加します。"
       domain_match_notice: "このツールを使用するには、ドメインが %{domain} と一致している必要があります"
       external_tool_item: 外部ツール
       external_tool_notice: "下のリストからツールを選択するか、または、Basic LTI で構成されている外部ツールの場合は、外部ツールの URL を入力して、その外部ツールへのリンクをこの *モジュール* に追加します。"
@@ -21736,6 +21790,7 @@ ja:
         header: ヘッダ
         indentation: インデント
         page_name: ページ名
+        quiz_engine: クイズエンジン
         quiz_group: グループ
         quiz_name: クイズ名
         topic_name: トピック名
@@ -21743,16 +21798,21 @@ ja:
         wiki_page_name: ページ名
         wiki_page_namem: 課題名
       loading: 読み込んでいます...
+      new_assignment_notice: "この*モジュール*に関連付ける課題を選択、または [新しい課題] を選択して課題を追加します。"
       new_assignment_option: "[ 新しい課題 ]"
       new_page_option: "[ 新しいページ ]"
+      new_quiz_notice: "この*モジュール*に関連付けるクイズを選択、または [新しいクイズ] を選択して新しいクイズを追加します。"
       new_quiz_option: "[ 新しいクイズ ]"
       new_tab: 新しいタブに読み込み
+      new_topic_notice: "この*モジュール*に関連付けるトピックを選択、または [新しいトピック] を選択してトピックを追加します。"
       new_topic_option: "[ 新しいトピック ]"
       options: 
         assignments: 課題
       quiz_item: クイズ
       quiz_notice: "この *モジュール* に関連付けるクイズを選択するか、\"新しいクイズ\" を選択してクイズを追加します。"
       quiz_select_label: "関連付けるクイズを選択するか、または [新しいクイズ] を選択して新しいクイズを追加します。"
+      quiz_select_label_create: "関連付けるクイズを選択、または [クイズを作成] を選択して新しいクイズを追加します。"
+      quiz_select_label_new: "関連付けるクイズを選択、または [新しいクイズ] を選択して新しいクイズを追加します。"
       select_item_type_label: 追加するコンテンツの種類を選択します。
       sub_header_notice: "*モジュール* のサブヘッダとして追加するテキストを入力します"
       text_header_item: "テキスト ヘッダ"
@@ -23136,6 +23196,7 @@ ja:
   the_module_item_is_locked_27fe420b: "モジュール アイテムはロックされています。"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "ユーザ %{current_user_name} の最近のスコアと結果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "このコースの次に利用可能な予約は～です*%{date}*"
+  the_original_quizzes_interface_fcda53bc: オリジナルのクイズインターフェイス
   the_preceding_content_is_partner_provided_d753928c: 上記のコンテンツはパートナーが提供しています
   the_previous_sis_batch_was_aborted_d7d89955: 以前のSISバッチは中止されました
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 熟達スコアの計算は管理者によって設定され、このアカウントのすべてのコースに適用されます。
@@ -24258,7 +24319,9 @@ ja:
   unable_to_find_extension_3fe61b3c: 拡張子が見つかりません
   unable_to_find_filetype_7b620f02: ファイルタイプが見つかりません
   unable_to_find_matches_for_these_email_addresses_i_c2305106: あなたの機関内でこれらのメールアドレスとマッチするものが見つかりません。新規ユーザーとして作成したいものを選択してください。選択されていないものはスキップされます。
+  unable_to_load_courses_menu_7074ea04: コースメニューをロードできません。
   unable_to_load_lti_1_3_tools_cf169f9: "Lti 1.3 ツールを読み込めません"
+  unable_to_load_messages_2b158fd0: "メッセージをロードできません。 "
   unable_to_read_file_2d04b0c: ファイルが読めません
   unable_to_remove_app_4293cb53: アプリを削除できません
   unable_to_save_new_discussion_topic_99239f3f: 新しいディスカッショントピックを保存できません

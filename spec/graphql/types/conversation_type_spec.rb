@@ -68,6 +68,15 @@ describe Types::ConversationType do
       result = conversation_type.resolve('conversationMessagesConnection { nodes { mediaComment { title } } }')
       expect(result[0]).to eq(@media_object.title)
     end
+
+    it 'returns conversations for the given participants' do
+      result = conversation_type.resolve("conversationMessagesConnection(participants: [#{@student.id}, #{@teacher.id}]) { nodes { body } }")
+      expect(result).to include(@conversation.conversation.conversation_messages[0].body)
+      expect(result).to include(@conversation.conversation.conversation_messages[1].body)
+
+      result = conversation_type.resolve("conversationMessagesConnection(participants: [#{@student.id + 1337}]) { nodes { body } }")
+      expect(result).to be_empty
+    end
   end
 
   context 'conversationPaticipants' do

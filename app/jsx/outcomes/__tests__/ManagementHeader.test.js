@@ -17,11 +17,17 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import ManagementHeader from '../ManagementHeader'
 import {showImportOutcomesModal} from '../ImportOutcomesModal'
+import {MockedProvider} from '@apollo/react-testing'
 
 jest.mock('../ImportOutcomesModal')
+jest.useFakeTimers()
+
+const render = children => {
+  return rtlRender(<MockedProvider mocks={[]}>{children}</MockedProvider>)
+}
 
 describe('ManagementHeader', () => {
   it('renders Outcomes title', () => {
@@ -43,10 +49,11 @@ describe('ManagementHeader', () => {
     expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
   })
 
-  it('opens FindOutcomesModal when Find button is clicked', () => {
+  it('opens FindOutcomesModal when Find button is clicked', async () => {
     const {getByText} = render(<ManagementHeader />)
     const findButton = getByText('Find')
     fireEvent.click(findButton)
+    await act(async () => jest.runAllTimers())
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
   })
 })

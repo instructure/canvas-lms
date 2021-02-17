@@ -83,7 +83,10 @@ export default class EntryEditor extends EditorToggle {
       .css({marginLeft: '5px'})
       .attr('href', 'javascript:')
       .addClass('cancel_button')
-      .click(() => this.display({cancel: true}))
+      .click(() => {
+        this.cancel()
+        this.display({cancel: true})
+      })
   }
 
   createDeleteAttachmentButton() {

@@ -1709,11 +1709,13 @@ is:
   add_course_406cb773: "Bæta við námskeiði"
   add_course_assignments_628ed6d0: "Bæta við námskeiðsverkefnum"
   add_course_calendar_events_146154a5: "Bæta dagatalsviðburðum við námskeið"
+  add_course_files_4e0f1abc: "Bæta við námskeiðsskrám"
   add_criterion_eb9587ef: "Bæta við viðmiðun"
   add_custom_link_22059c0: "Bæta við sérsniðnum tengli"
   add_designers_to_courses_9588820b: "Bæta hönnuðum við námskeið"
   add_discussion_653dab4c: "Bæta við umræðum"
   add_domain_f15bc6c1: "Bæta við léni"
+  add_edit_delete_files_573a4d62: "stofna / breyta / eyða skrám"
   add_edit_delete_sections_d32c5b4d: "Bæta við / breyta / eyða hlutum"
   add_email_address_aef3b61: "Bæta við netfangi"
   add_existing_content_7e36da66: "Bæta við efnið"
@@ -1724,6 +1726,7 @@ is:
   add_grading_period_6f774dc3: "Bæta við einkunnatímabili"
   add_grading_scheme_81e23c05: "Bæta við einkunnakvarða"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Bæta einkunnakvarða við einkunnaskýrslu kerfisstjóra"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Bættu stigskiptingu við heimildir fyrir umsjón með námskeiðsskrám"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Gerðu heimildir sértækar í kringum stjórnun á námskeiðshlutum"
   add_group_c84f9e9d: "Bæta við hópi"
   add_group_set_f9809e11: "Bæta við hópasetti"
@@ -2008,6 +2011,8 @@ is:
   allow_users_to_comment_45b8f753: "Leyfa notendum að gera athugasemdir"
   allowed_attempts_4e229caa: "Heimilaðar tilraunir"
   allowed_domains_ee7868c8: "Leyfð lén"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Leyft fyrir undirreikninga/námskeið, slökkt á sjálfgefnu"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Leyft fyrir undirreikninga/námskeið, kveikt á sjálfgefnu"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gerir notanda kleift að fá aðgang að Nota sem notandi hlekkinn á samhengisspjaldi nemenda"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Gerir notanda kleift að skoða SIS-auðkenni í innskráningarupplýsingum notanda."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gerir notanda kleift að skoða SIS-auðkenni í fólk-síðu námskeiðs."
@@ -3023,6 +3028,7 @@ is:
     assignment_group_selector: 
       assignment_group: Verkefnahópur
       assignment_group_options: 
+        create_group: "Stofna hóp"
         new_group: "Nýr hópur"
     assignment_list_item: 
       delete: Eyða
@@ -4788,6 +4794,7 @@ is:
   classic_quizzes_dee3c7b7: "Sígild próf"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Sígild próf valkostur fyrir tímasett próf án skila"
   clear_2084585f: Hreinsa
+  clear_search_field_75f595c7: "Hreinsa leitarreit"
   clear_selected_file_82388e50: "Hreinsa valda skrá"
   clear_user_cache_ef079f7f: "Hreinsa flýtiminni notanda"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Smelltu á „Hætta við“ ef þú vilt ekki að kóðinn sé sýndur."
@@ -5012,6 +5019,7 @@ is:
   collaborations_tutorial_tray_9219d9d: "Leiðbeiningar með samvinnu"
   collapse_all_50275533: "Draga allt saman"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Fella lista yfir meðlimi í hópnum %{groupName}"
+  collapse_outcome_description_de471564: "Fella saman lýsingu á niðurstöðu"
   collapse_subdiscussion_89af1f5c: "Fella undirumræðu"
   collapse_tutorial_tray_66ee7dc1: "Fella leiðbeiningar"
   collapsed_510aa02a: Fellt
@@ -6109,6 +6117,9 @@ is:
   count_files_were_ignored_2f9c054a: 
     one: "(1) skrá var hunsuð"
     other: "(%{count}) skrár voru hunsaðar"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 „%{groupTitle}“ niðurstaða"
+    other: "%{count} „%{groupTitle}“ niðurstöður"
   count_hidden_e8d2c57c: "%{count} falið"
   count_images_found_for_term_a93635ed: "%{count} myndir fundust fyrir %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -6137,6 +6148,9 @@ is:
     one: "1 valkostur"
     other: "%{count} valkostir"
   count_options_loaded_cd59cc3b: "%{count} Valkostum hlaðið inn."
+  count_outcomes_selected_55902958: 
+    one: "1 niðurstaða valin"
+    other: "%{count} niðurstöður valdar"
   count_page_views_b40102b3: 
     one: "1 síðuskoðun"
     other: "%{count}  síðuskoðanir"
@@ -6338,7 +6352,10 @@ is:
   course_favorites_from_dashboard_27a3515a: "Eftirlætis námskeið frá stjórnborði"
   course_files_62deb8f8: Námskeiðsskrár
   course_files_a31f97fc: Námskeiðsskrár
+  course_files_add_2eede390: "Námskeiðsskrár - bæta við"
   course_files_add_edit_delete_24678a2f: "Skrár námskeiðs - bæta við / breyta / eyða"
+  course_files_delete_fae0effe: "Námskeiðsskrár - eyða"
+  course_files_edit_d05d4e8b: "Námskeiðsskrár - breyta"
   course_found_f5a40cd3: "Námskeið fannst"
   course_found_not_deleted_a20f72f0: "Námskeið fannst (ekki eytt)"
   course_grade_grade_in_course_code_9fa854db: "Einkunn námskeiðs: %{grade}% í %{course_code}"
@@ -6994,6 +7011,8 @@ is:
   create_edit_line_item_scores_116482c7: "Búa til / breyta einkunnum línuatriða"
   create_educational_resources_8219326e: "Stofna menntunartilföng"
   create_failed_15d07ad4: "Ekki tókst að stofna"
+  create_file_71aa1922: "[ Búa til skrá ]"
+  create_file_s_188549e6: "[ Búa til skrá(r) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Býr til skrár eftir upphleðslu/upptöku á RCE-miðli"
   create_interactive_course_content_76665336: "Búðu til gagnvirkt námskeiðsefni"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Búa til áskrift að viðburðum í beinni á ToolProxy"
@@ -7405,6 +7424,7 @@ is:
   delete_comment_a71040c3: "Eyða athugasemd"
   delete_comment_comment_d32ffc85: "Eyða athugasemd: %{comment}"
   delete_comment_commenttext_c8afe129: "Eyða athugasemd: %{commentText}"
+  delete_course_files_ee9e769: "Eyða námskeiðsskrám"
   delete_criterion_row_80c3b3b: "Eyða viðmiðunarlínu"
   delete_current_message_5da0221a: "Eyða núverandi skilaboðum"
   delete_current_module_item_21fefc54: "Eyða núverandi einingu/atriði"
@@ -7683,6 +7703,7 @@ is:
   disabled_3b1b332a: Aftengt
   disabled_and_locked_d14dc6c2: "Aftengt og læst"
   disabled_by_default_7d822dcb: "Sjálfvalið aftengt"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Óvirkt fyrir alla undirreikninga/námskeið"
   disabled_in_course_settings_d15ee35d: "* Óvirkt í stillingum námskeiðs"
   disabled_links_b3bdea99: "Aftengdir tenglar"
   disabled_locked_dab351d6: "Óvirkjað (læst)"
@@ -8118,6 +8139,7 @@ is:
   download_submission_comments_2a6c0395: "Ná í athugasemdir við skil"
   download_submissions_7454665f: "Hlaða niður skilum"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Hlaða niður heildstæðum lista af villum og viðvörunum hér."
+  download_these_results_as_csv_9a890883: "Sæktu þessar niðurstöður sem CSV"
   download_this_file_669f9174: "Hlaða niður þessari skrá"
   downloading_course_content_allows_access_to_conten_164d9336: "Niðurhal á námskeiðsefni heimilar aðgang að efni án nettengingar. Efni getur verið skrár, síður, verkefni, umræðuefni eða próf. Smelltu á \"Búa til ePub\" fyrir hvert námskeið og opnaðu með eReader hugbúnaði til að skoða."
   draft_92507c72: (drög)
@@ -8237,6 +8259,7 @@ is:
   edit_collaboration_b014c18b: "Breyta samvinnu"
   edit_comment_comment_e74afa04: "Breyta athugasemd: %{comment}"
   edit_conference_title_6e234815: "Breyta \"%{conference_title}\""
+  edit_course_files_d046ef82: "Breyta námskeiðsskrám"
   edit_course_role_3b992fc2: "Breyta hlutverki námskeiðs"
   edit_criterion_5e4dadca: "Breyta viðmiði"
   edit_criterion_description_5828919: "Breyta forsendulýsingu"
@@ -8426,6 +8449,7 @@ is:
   enabled_and_locked_49ff3de4: "Heimilað og læst"
   enabled_ba7cab66: Heimilað
   enabled_by_default_e530d6ed: "Sjálfvalið heimilað"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Virkt fyrir alla undirreikninga/námskeið"
   enabled_links_be110215: "Heimilaðir tenglar"
   enabled_locked_3cf7c256: "Virkjað (læst)"
   enabled_unlocked_8d3a5df7: "Virkjað (ólæst)"
@@ -8964,6 +8988,7 @@ is:
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Stækka/fella %{title} níðurstöðuhóp, nemandi nær tileinkuninni %{mastery_count} af %{count} niðurstöðum"
   expand_global_navigation_2c28d5d4: "Stækka aðalvalmynd"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Stækka lista hópmeðlima í %{groupName}"
+  expand_outcome_description_c5bdd70b: "Stækka lýsingu á niðurstöðu"
   expand_permission_b45bf097: "Víkka %{permission}"
   expand_permission_c61d5958: "Útvíkka leyfi"
   expand_subdiscussion_cd226ed4: "Stækka undirumræður"
@@ -10099,6 +10124,7 @@ is:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Hægt verður að breyta sértilkynningastillingum %{contextType} hér í framtíðinni."
   granular_course_notification_settings_will_be_conf_68f122db: "Hægt verður að breyta sértilkynningastillingum námskeiðs hér í framtíðinni."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Sértækar heimildir til að bæta við/fjarlægja stjórnendahlutverk úr námskeiði"
+  granular_permissions_for_managing_course_files_1ed7f019: "Stigskiptar heimildir fyrir umsjón með námskeiðsskrám"
   granular_permissions_for_managing_course_sections_da4b04b: "Sértækar heimildir til að stjórna námskeiðahlutum"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Grófara leyfi fyrir stjórnun wiki-síða"
   graph_bar_b5daa23d: Myndritaslá
@@ -10963,6 +10989,7 @@ is:
   importing_outcomes_e62a0375: "Flytur inn niðurstöður"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Bæta aðgengi valmyndar á vinstri hönd með betri notkun á litum plús sjónrænum og skjálesara vísum vegna óvirkra valmyndaatriða."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Bæta sýnileika draga og sleppa í skrám"
+  improved_interface_with_ongoing_updates_7316bdef: "Bætt viðmót með opnum uppfærslum"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Bættur stuðningur fyrir ný próf með „Námsefni“, þar á meðal sköpun nýrra prófa úr „Námsefni“"
   improved_outcomes_management_4692f886: "Bætt umsjón á niðurstöðum"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Bættar sjónrænar áminningar til að hvetja kennara til að birta námskeið"
@@ -11740,6 +11767,7 @@ is:
   loading_graders_f6a76142: "Sækir matsaðila"
   loading_last_attended_date_5a42463: "Hleð inn upplýsingum um dagsetningu síðustu mætingar"
   loading_media_32847745: "Hleð inn margmiðlunarefni"
+  loading_message_list_226a131e: "Hleður skilaboðalista"
   loading_more_grade_history_results_b235de5: "Hleð fleiri niðurstöðum um einkunnaferil."
   loading_more_gradebook_history_results_810f6d2e: "Hleð inn fleiri niðurstöðum úr einkannasögu"
   loading_more_results_1d437202: "Sæki fleiri niðurstöður"
@@ -11946,6 +11974,7 @@ is:
   malformed_csv_aaa4b7f2: "Vansniðin CSV"
   maltese_916925e8: Maltneska
   manage_access_bd923d8d: "Umsjón með aðgengi"
+  manage_add_edit_delete_course_files_162c1a65: "Umsjón með (stofna / breyta / eyða) námskeiðsskrám"
   manage_add_edit_delete_pages_5c73f2fb: "Stjórna (stofna / breyta / eyða) síðum"
   manage_announcement_with_title_title_f2ce92de: "Umsjón með tilkynningum með titilinn %{title}"
   manage_app_list_994cc26c: "Umsjón með smáforritalista"
@@ -11959,6 +11988,7 @@ is:
       delete_avatar: "Viltu örugglega eyða mynd þessa notanda?"
       lock_avatar: "Læsing á þessari mynd samþykkir hana og hindrar notanda í að uppfæra hana. Halda áfram?"
   manage_b88f7150: Stjórna
+  manage_course_files_57e07038: "Umsjón með námskeiðsskrám"
   manage_course_sections_f482d1b3: "Stjórna námskeiðshlutum"
   manage_discussion_title_a2ecb3fb: "Umsjón með umræðu %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Stjórnið innritunarstöðu, stofnið hópa og bætið við notendum frá þessari síðu."
@@ -14148,6 +14178,7 @@ is:
   nav_text_94206145: Leiðarvísistexti
   nav_text_active_a924ae88: "Virkur leiðarvísistexti"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Yfirlit gerir notanda kleift að skoða fólk-hlekkinn í yfirliti námskeiðs."
+  navigation_menu_fd782ff8: Leiðarstýringarvalmynd
   near_mastery_f25174a4: "Nálægt tileinkun"
   need_a_canvas_account_221d18ed: "Þarftu Canvas-reikning?"
   needs_grading_9143d47c: "Þarfnast einkunnargjafar"
@@ -14962,6 +14993,7 @@ is:
   outcome_imports_c496a81f: Niðurstöðuinnflutningar
   outcome_mastery_scales_8c3a814d: "Tileinkunarkvarðar fyrir niðurstöður"
   outcome_mastery_scales_add_edit_171551c: "Tileinkunarkvarðar niðurstaðna - bæta við / breyta"
+  outcome_menu_4fe5813: Niðurstöðuvalmynd
   outcome_path_mastery_points: "%{path} tileinkunarpunktar"
   outcome_path_result: "%{path} niðurstaða"
   outcome_proficiency_calculations_5959b681: "Niðurstöðuútreikningar á hæfni"
@@ -17003,6 +17035,7 @@ is:
           select_all_banks: "Velja allt"
           view_question_banks: "Skoða spurningabanka námskeiðs"
         options: 
+          create_group: "[ Stofna hóp ]"
           new_group: "[ Nýr hópur ]"
           no_group: "[ Enginn hópur ]"
         select_a_question_bank: "Velja spurningabanka af neðangreindum lista til að tengja hann við þetta próf sem spurningahóp."
@@ -17831,6 +17864,7 @@ is:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Hvort sem þetta leyfi er virkt eða óvirkt getur notandi ennþá stjórnað atburðum á sínu persónulega dagatali."
   regenerate_3e4679f8: "Búa aftur til"
   regenerate_epub_395c8e56: "Búa aftur til ePub"
+  regenerating_themes_462e6cd9: "Endurgerir þemu..."
   region_47e29025: "Svæði:"
   region_939f2a6c: Svæði
   register_email_efc06d59: "Skrá netfang"
@@ -18517,6 +18551,7 @@ is:
   search_discussion_by_title_30466604: "Leita að umræðum eftir titli"
   search_endpoints_d5abf37f: "Leita í endapunktum"
   search_entries_or_author_63fb0a86: "Leita að færslum eða höfundi"
+  search_field_234156fc: Leitarreitur
   search_flickr_6f28b02e: "Leita á Flickr"
   search_for_a_deleted_course_by_id_f553398d: "Leita að eyddu námskeiði eftir auðkenni"
   search_for_files_7541fb28: "Leita að skrám"
@@ -18529,6 +18564,7 @@ is:
   search_permissions_915bbd09: "Leita í leyfum"
   search_term_must_be_at_least_num_characters_669098ed: "Leitarorð verður að vera minnst %{num} stafir"
   search_title_body_or_author_1d26711f: "Leita eftir titli, stofni eða höfundi"
+  search_within_grouptitle_4d38272f: "Leita innan %{groupTitle}"
   searching_b0207e7f: Leita
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Leit að tilkynningum í hlutum verða að spanna nákvæmlega einn kúrs"
   searching_for_courses_8cc5f904: "Leita að námskeiðum…"
@@ -18715,6 +18751,7 @@ is:
   select_one_8e0af564: "Velja einn"
   select_one_b647b384: "Veldu eitt"
   select_one_of_the_options_c8b0c6e4: "Velja einn af þessum kostum:"
+  select_outcome_7e6e2562: "Velja niðurstöðu"
   select_page_e93fc123: "Velja síðu"
   select_prerequisite_module_57894963: "Velja forkröfueiningu"
   select_prerequite_module_e9042bb0: "Velja forkröfueiningu"
@@ -18725,11 +18762,17 @@ is:
   select_students_for_review_6e004a12: "Velja nemendur til að meta"
   select_sub_account_6704196a: "Velja undirreikning"
   select_term_f8083fb0: "Velja önn"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Veldu skrána sem þú vilt tengja eða bættu við skrá með því að velja „Búa til skrá“."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Veldu skrána sem þú vilt tengja eða bættu við skrá með því að velja \"Ný skrá\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Veldu skrána sem þú vilt tengja við þessa *einingu* eða bættu við nýrri með því að velja \"Ný skrá\"."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Veldu skrána sem þú vilt tengja við þessa *einingu* eða bættu við skrá með því að velja „Búa til skrá“."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Veldu skrárnar sem þú vilt tengja eða bættu við skrám með því að velja „Búa til skrá(r)“."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Veldu skrárnar sem þú vilt tengja, eða bættu við nýjum með því að velja \"Ný skrá\"."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Veldu skrárnar sem þú vilt tengja við þessa *einingu* eða bættu við nýjum með því að velja \"Ný skrá\"."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Veldu skrárnar sem þú vilt tengja við þessa *einingu* eða bættu við skrám með því að velja „Búa til skrá(r)“."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Veldu síðuna sem þú vilt tengja eða bættu við nýrri síðu með því að velja \"Ný síða\"."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Veldu síðuna sem þú vilt tengja eða bættu við nýrri síðu með því að velja „Búa til síðu“."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Veldu síðuna sem þú vilt tengja við þessa *einingu* eða bættu við nýrri síðu með því að velja „Búa til síðu“."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Veldu síðuna sem þú vilt tengja við þessa *einingu* eða bættu við nýrri síðu með því að velja „Ný síða“."
   select_title_for_deletion_45b08247: "Velja %{title} til að eyða"
   select_type_of_prerequisite_8d6fa902: "Velja tegund forkröfu"
@@ -19327,10 +19370,21 @@ is:
       add_to_module: "Bæta %{item} við *einingu*"
       assignment_item: Verkefni
       assignment_item_select_label: "Veldu verkefnið sem þú vilt tengja eða bættu við verkefni með því að velja \"Nýtt verkefni\"."
+      assignment_item_select_label_create: "Veldu verkefnið sem þú vilt tengja eða bættu við verkefni með því að velja „Búa til verkefni“."
+      assignment_item_select_label_new: "Veldu verkefnið sem þú vilt tengja eða bættu við verkefni með því að velja „Nýtt verkefni“."
       assignment_notice: "Veldu verkefnið sem þú vilt tengja við þessa *einingu* eða bættu við verkefni með því að velja \"Nýtt verkefni\"."
       content_page_item: Síða
+      create_assignment_notice: "Veldu verkefnið sem þú vilt tengja við þessa *einingu* eða bættu við verkefni með því að velja „Búa til verkefni“."
+      create_assignment_option: "[ Búa til verkefni ]"
+      create_page_option: "[ Búa til síðu ]"
+      create_quiz_notice: "Veldu prófið sem þú vilt tengja við þessa *einingu* eða bættu við nýju prófi með því að velja „Búa til próf“."
+      create_quiz_option: "[ Búa til próf ]"
+      create_topic_notice: "Veldu umræðuefnið sem þú vilt tengja við þessa *einingu* eða bættu við umræðuefni með því að velja „Búa til umræðuefni“."
+      create_topic_option: "[ Búa til umræðuefni ]"
       discussion_item: Umræða
       discussion_topic_select_label: "Veldu umræðuefnið sem þú vilt tengja eða bættu við nýju með því að velja \"Nýtt umræðuefni\"."
+      discussion_topic_select_label_create: "Veldu umræðuefnið sem þú vilt tengja eða bættu við umræðuefni með því að velja „Nýtt umræðuefni“."
+      discussion_topic_select_label_new: "Veldu umræðuefnið sem þú vilt tengja eða bættu við umræðuefni með því að velja „Nýtt umræðuefni“."
       domain_match_notice: "til að nota þetta tól verður lén að passa við %{domain}"
       external_tool_item: "Ytra tæki"
       external_tool_notice: "Veldu tæki af listanum eða skráðu vefslóð á ytra tæki sem þú veist að er stillt með grunn LTI til að bæta við tengli á það í þessa *einingu*."
@@ -19350,6 +19404,7 @@ is:
         header: Haus
         indentation: Inndrag
         page_name: Síðuheiti
+        quiz_engine: Prófvél
         quiz_group: Hópur
         quiz_name: "Heiti prófs"
         topic_name: "Heiti umræðuefnis"
@@ -19357,16 +19412,21 @@ is:
         wiki_page_name: Síðuheiti
         wiki_page_namem: "Heiti verkefnis"
       loading: "Hleð inn..."
+      new_assignment_notice: "Veldu verkefnið sem þú vilt tengja við þessa *einingu* eða bættu við verkefni með því að velja „Nýtt verkefni“."
       new_assignment_option: "[ Nýtt verkefni ]"
       new_page_option: "[ Ný síða ]"
+      new_quiz_notice: "Veldu prófið sem þú vilt tengja við þessa *einingu* eða bættu við nýju prófi með því að velja „Nýtt próf“."
       new_quiz_option: "[ Nýtt próf]"
       new_tab: "Hlaða í nýjum flipa"
+      new_topic_notice: "Veldu umræðuefnið sem þú vilt tengja við þessa *einingu* eða bættu við umræðuefni með því að velja „Nýtt umræðuefni“."
       new_topic_option: "[ Nýtt umræðuefni ]"
       options: 
         assignments: Verkefni
       quiz_item: Próf
       quiz_notice: "Veldu prófið sem þú vilt tengja við þessa *einingu* eða bættu við nýju með því að velja \"Nýtt próf\"."
       quiz_select_label: "Veldu prófið sem þú vilt tengja eða bættu við nýju með því að velja \"Nýtt próf\"."
+      quiz_select_label_create: "Veldu prófið sem þú vilt tengja eða bættu við nýju prófi með því að velja „Búa til próf“."
+      quiz_select_label_new: "Veldu prófið sem þú vilt tengja eða bættu við nýju prófi með því að velja „Nýtt próf“."
       select_item_type_label: "Veldu tegund efnis til að bæta við."
       sub_header_notice: "Skrifaðu textann sem þú vilt hafa sem undirhaus í *einingu*"
       text_header_item: "Texti í haus"
@@ -20639,6 +20699,7 @@ is:
   the_module_item_is_locked_27fe420b: "Námsefni atriði er læst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Nýjustu einkunnir fyrir %{current_user_name} og niðurstaða %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Næsti tiltæki fundur námskeiðsins er þann *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "Upprunalega viðmótið fyrir próf"
   the_preceding_content_is_partner_provided_d753928c: "Framangreint efni er gefið upp af samstarfsaðila"
   the_previous_sis_batch_was_aborted_d7d89955: "Hætt var við fyrri SIS-lotu"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Hæfniútreikningurinn var settur af kerfisstjóranum þínum og á við um öll námskeið á þessum reikningi."
@@ -21737,7 +21798,9 @@ is:
   unable_to_find_clever_district_district_id_61deb1cb: "Fann ekki Clever-hverfi %{district_id}"
   unable_to_find_extension_3fe61b3c: "ekki tókst að finna skráarendingu"
   unable_to_find_filetype_7b620f02: "ekki tókst að finna skráargerð"
+  unable_to_load_courses_menu_7074ea04: "Ekki er hægt að hlaða námskeiðsvalmynd."
   unable_to_load_lti_1_3_tools_cf169f9: "Ekki tókst að hlaða inn Lti 1.3 verkfærum"
+  unable_to_load_messages_2b158fd0: "Ekki hægt að hlaða skilaboðum. "
   unable_to_read_file_2d04b0c: "Ekki hægt að lesa skrá"
   unable_to_remove_app_4293cb53: "Ekki hægt að fjarlægja smáforrit"
   unable_to_save_new_discussion_topic_99239f3f: "Ekki tókst að vista nýja umræðuefnið"

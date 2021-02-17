@@ -39,7 +39,7 @@ export class NewActivityIndicator extends Component {
     deregisterAnimatable: () => {}
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.registerAnimatable(
       'new-activity-indicator',
       this,
@@ -48,7 +48,7 @@ export class NewActivityIndicator extends Component {
     )
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.props.deregisterAnimatable('new-activity-indicator', this, this.props.itemIds)
     this.props.registerAnimatable(
       'new-activity-indicator',

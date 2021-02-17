@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 
-describe "settings tabs" do
+describe "settings tabs", ignore_js_errors: true do
   context "announcements tab" do
     include_context "in-process server selenium tests"
 
@@ -37,7 +37,6 @@ describe "settings tabs" do
       ff("#add_notification_form .ui-datepicker-trigger")[1].click
       f(".ui-datepicker-next").click
       fln("15").click
-
       type_in_tiny "textarea", "this is a message"
       yield if block_given?
       submit_form("#add_notification_form")
@@ -77,6 +76,7 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
     end
 

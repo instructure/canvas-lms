@@ -119,6 +119,7 @@ module BasicLTI
     def submit_submission
       submission.submission_type = params[:submission_type] || 'basic_lti_launch'
       submission.submitted_at = params[:submitted_at] || Time.zone.now
+      submission.graded_at = params[:graded_at] || Time.zone.now
       submission.grade_matches_current_submission = false
       # this step is important, to send user notifications
       # see SubmissionPolicy
@@ -129,7 +130,7 @@ module BasicLTI
     def grade_submission(launch_url, grade, score, grader_id)
       submission.grade = grade
       submission.score = score
-      submission.graded_at = submission.submitted_at
+      submission.graded_at = params[:graded_at] || Time.zone.now
       submission.grade_matches_current_submission = true
       submission.grader_id = grader_id
       submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?

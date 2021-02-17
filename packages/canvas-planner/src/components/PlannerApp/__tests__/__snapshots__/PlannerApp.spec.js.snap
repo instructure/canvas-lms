@@ -3,20 +3,20 @@
 exports[`PlannerApp always renders today and tomorrow when only items are in the future 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -83,20 +83,20 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
 exports[`PlannerApp empty day calculation always renders yesterday, today and tomorrow 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -183,20 +183,20 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
 exports[`PlannerApp empty day calculation does not render an empty tomorrow when tomorrow may only be partially loaded 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -241,20 +241,20 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
 exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the future 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -333,20 +333,20 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
 exports[`PlannerApp empty day calculation only renders days with items in the past 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -418,20 +418,20 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
 exports[`PlannerApp empty day calculation renders 2 consecutive empty days in the future as empty days 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -516,20 +516,20 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
 exports[`PlannerApp only renders today when the only item is today 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -574,20 +574,20 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
 exports[`PlannerApp renders base component 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -658,20 +658,20 @@ exports[`PlannerApp renders base component 1`] = `
 exports[`PlannerApp renders empty component with no assignments 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -696,20 +696,20 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
 exports[`PlannerApp renders loading past spinner when loading past and there are no future items 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -735,20 +735,20 @@ exports[`PlannerApp renders loading past spinner when loading past and there are
 exports[`PlannerApp shows only the loading component when the isLoading prop is true 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={
@@ -762,18 +762,17 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
     </ShowOnFocusButton>
   </View>
   <View
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="block"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="xx-large medium"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Spinner
       as="div"
@@ -791,20 +790,20 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
 exports[`PlannerApp shows the loading past indicator when loadingPast prop is true 1`] = `
 <div
   className="PlannerApp large"
+  data-testid="PlannerApp"
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <ShowOnFocusButton
       buttonProps={

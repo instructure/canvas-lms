@@ -102,11 +102,7 @@ export const OutcomeManagementWithoutGraphql = () => {
       {improvedManagement && <ManagementHeader />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
-          {improvedManagement ? (
-            <OutcomeManagementPanel contextType={contextType} contextId={contextId} />
-          ) : (
-            <OutcomePanel />
-          )}
+          {improvedManagement ? <OutcomeManagementPanel /> : <OutcomePanel />}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
           <MasteryScale

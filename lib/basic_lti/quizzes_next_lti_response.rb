@@ -31,7 +31,8 @@ module BasicLTI
       quiz_lti_submission = quiz_lti_submission.
         with_params(
           submission_type: 'basic_lti_launch',
-          submitted_at: submitted_at_date
+          submitted_at: submitted_at_date,
+          graded_at: graded_at_date
         )
       return quiz_lti_submission.revert_history(result_url, -tool.id) if submission_reopened?
       quiz_lti_submission.commit_history(result_url, grade, -tool.id)
@@ -51,6 +52,11 @@ module BasicLTI
     def submitted_at_date
       submitted_at = submission_submitted_at
       submitted_at.present? ? Time.zone.parse(submitted_at) : nil
+    end
+
+    def graded_at_date
+      graded_at = result_data_text_json&.dig(:graded_at)
+      graded_at.present? ? Time.zone.parse(graded_at) : nil
     end
 
     def result_data_text_json

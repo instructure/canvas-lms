@@ -29,7 +29,7 @@ import {animatable} from '../../dynamic-ui'
 import formatMessage from '../../format-message'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity')
 
@@ -75,7 +75,7 @@ export class Opportunities extends Component {
     this.closeButtonRef.focus()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setMaxHeight(nextProps)
   }
 

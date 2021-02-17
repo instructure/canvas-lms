@@ -87,7 +87,7 @@ export default class ScoreInput extends React.Component {
       if (this.props.score === '') {
         return ''
       }
-      return transformScore(this.props.score, this.props.triggerAssignment, true)
+      return transformScore(this.props.score, this.props.triggerAssignment, false)
     } else if (this.state.editingValue) {
       return this.state.editingValue
     } else {

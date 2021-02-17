@@ -33,6 +33,8 @@ OS="$(uname)"
 DINGHY_MEMORY='8192'
 DINGHY_CPUS='4'
 DINGHY_DISK='150'
+# docker-compose version 1.20.0 introduced build-arg that we use for linux
+DOCKER_COMPOSE_MIN_VERSION='1.20.0'
 
 function installed {
   type "$@" &> /dev/null
@@ -40,36 +42,70 @@ function installed {
 
 if [[ $OS == 'Darwin' ]]; then
   install='brew install'
-  dependencies='docker docker-machine docker-compose dinghy'
+  #docker-compose is checked separately
+  dependencies='docker docker-machine dinghy'
+elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
+  echo 'This script only supports Debian-based Linux'
+  exit 1
 elif [[ $OS == 'Linux' ]]; then
-  install='sudo apt-get update && sudo apt-get install -y'
-  dependencies='docker-compose'
+  #when more dependencies get added, modify Linux install output below
+  #docker-compose is checked separately
+  dependencies='dory'
 else
   echo 'This script only supports MacOS and Linux :('
   exit 1
 fi
 
-function install_dependencies {
+function check_dependencies {
   local packages=()
+  #check for proper docker-compose version
+  if ! check_docker_compose_version; then
+    message "docker-compose $DOCKER_COMPOSE_MIN_VERSION or higher is required."
+    printf "\tPlease see %s for installation instructions.\n" "https://docs.docker.com/compose/install/"
+    packages+=("docker-compose")
+    docker_missing=1
+  fi
+  #check for required packages installed
   for package in $dependencies; do
-    installed "$package" || packages+=("$package")
-  done
-  [[ ${#packages[@]} -gt 0 ]] || return 0
-
-  message "First, we need to install some dependencies."
-  if [[ $OS == 'Darwin' ]]; then
-    if ! installed brew; then
-      echo 'We need homebrew to install dependencies, please install that first!'
-      echo 'See https://brew.sh/'
-      exit 1
-    elif ! brew ls --versions dinghy > /dev/null; then
-      brew tap codekitchen/dinghy
+    if ! installed "$package"; then
+      packages+=("$package")
     fi
-  elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
-    echo 'This script only supports Debian-based Linux (for now - contributions welcome!)'
+  done
+  #if missing packages, print missing packages with install assistance.
+  if [[ ${#packages[@]} -gt 0 ]]; then
+    #when more dependencies get added, modify this output to include them.
+    if [[ $OS == 'Linux' ]];then
+      if [[ "${packages[*]}" =~ "dory" ]];then
+        message "Some additional dependencies need to be installed for your OS."
+        printf "\tCanvas recommends using dory for a reverse proxy allowing you to
+\taccess canvas at http://canvas.docker. Detailed instructions
+\tare available at https://github.com/FreedomBen/dory.
+\tIf you want to install it, run 'gem install dory' then rerun this script.\n"
+        [[ ${docker_missing:-0} == 1 ]] || prompt 'Would you like to skip dory? [y/n]' skip_dory
+        [[ ${skip_dory:-n} != 'y' ]] || return 0
+      fi
+    elif [[ $OS == 'Darwin' ]];then
+      message "Some additional dependencies need to be installed for your OS."
+      printf -v joined '%s,' "${packages[@]}"
+      echo "Please install ${joined%,}."
+      printf "\tTry: %s %s\n" "$install" "${packages[*]}"
+    else
+      echo 'This script only supports MacOS and Linux :('
+      exit 1
+    fi
+    printf "\nOnce all dependencies are installed, rerun this script.\n"
     exit 1
   fi
-  confirm_command "$install ${packages[*]}"
+}
+
+function check_docker_compose_version {
+  if ! installed "docker-compose"; then
+    return 1
+  fi
+  compose_version=$(eval docker-compose --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+  if (( $(echo "$compose_version $DOCKER_COMPOSE_MIN_VERSION" | awk '{print ($1 < $2)}') )); then
+    return 1
+  fi
 }
 
 function create_dinghy_vm {
@@ -118,10 +154,18 @@ function start_dinghy_vm {
 }
 
 function start_docker_daemon {
-  service docker status &> /dev/null && return 0
+  if installed "service"; then
+    service docker status &> /dev/null && return 0
+  else
+    systemctl status docker &> /dev/null && return 0
+  fi
   prompt 'The docker daemon is not running. Start it? [y/n]' confirm
   [[ ${confirm:-n} == 'y' ]] || return 1
-  sudo service docker start
+  if installed "service"; then
+    sudo service docker start
+  else
+    sudo systemctl start docker
+  fi
   sleep 1 # wait for docker daemon to start
 }
 
@@ -138,23 +182,6 @@ function setup_docker_as_nonroot {
   confirm_command "exec sg docker -c $0"
 }
 
-function install_dory {
-  installed dory && return 0
-  message 'Installing dory...'
-
-  if ! installed gem; then
-    message "You need ruby to run dory (it's a gem). Install ruby and try again."
-    return 1
-  fi
-
-  prompt "Use sudo to install dory gem? You may need this if using system ruby [y/n]" use_sudo
-  if [[ ${use_sudo:-n} == 'y' ]]; then
-    confirm_command 'sudo gem install dory'
-  else
-    confirm_command 'gem install dory'
-  fi
-}
-
 function start_dory {
   message 'Starting dory...'
   if dory status | grep -q 'not running'; then
@@ -165,17 +192,15 @@ function start_dory {
 }
 
 function setup_docker_environment {
-  install_dependencies
+  check_dependencies
   if [[ $OS == 'Darwin' ]]; then
     message "It looks like you're using a Mac. You'll need a dinghy VM. Let's set that up."
     create_dinghy_vm
     start_dinghy_vm
   elif [[ $OS == 'Linux' ]]; then
-    message "It looks like you're using Linux. You'll need dory. Let's set that up."
     start_docker_daemon
     setup_docker_as_nonroot
-    install_dory
-    start_dory
+    [[ ${skip_dory:-n} != 'y' ]] && start_dory
   fi
   if [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml exists, skipping copy of default configuration"
@@ -183,7 +208,6 @@ function setup_docker_environment {
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
     cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
-
   echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env
 }
 

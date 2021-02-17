@@ -33,6 +33,15 @@ module Types
       load_association(:author)
     end
 
+    field :recipients, [UserType], null: false
+    def recipients
+      load_association(:conversation_message_participants).then do |cmps|
+        # handle case where user sent a message to themself
+        cmps = cmps.reject { |cmp| cmp.user_id == current_user.id } unless cmps.size == 1
+        Loaders::AssociationLoader.for(ConversationMessageParticipant, :user).load_many(cmps)
+      end
+    end
+
     field :media_comment, MediaObjectType, null: true
     def media_comment
       Loaders::MediaObjectLoader.load(object.media_comment_id)
@@ -40,13 +49,9 @@ module Types
 
     field :attachments_connection, Types::FileType.connection_type, null: true
     def attachments_connection
-      Promise.all([
-        load_association(:attachment_associations).then do |attachment_associations|
-          attachment_associations.each do |attachment_association|
-            Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load(attachment_association)
-          end
-        end
-      ]).then { object.attachments }
+      load_association(:attachment_associations).then do |attachment_associations|
+        Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
+      end
     end
   end
 end

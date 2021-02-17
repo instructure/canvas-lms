@@ -526,7 +526,11 @@ module RCENextPage
   end
 
   def math_square_root_button
-    f('.sqrt-stem')
+    f('.sqrt-prefix')
+  end
+
+  def editor_sqrt_textarea
+    f('#mathquill-container textarea')
   end
 
   def math_builder_insert_equation_button
@@ -547,6 +551,10 @@ module RCENextPage
 
   def math_rendering_exists?
     element_exists?('.equation_image')
+  end
+
+  def mathjax_element_exists_in_title?
+    element_exists?('.assignment-title .MathJax_Preview')
   end
 
   def save_button
@@ -1023,6 +1031,10 @@ module RCENextPage
   # Math toolbar and modal
   def select_squareroot_symbol
     math_square_root_button.click
+  end
+
+  def add_squareroot_value
+    editor_sqrt_textarea.send_keys("81")
   end
 
   def select_math_equation_from_toolbar

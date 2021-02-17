@@ -91,10 +91,17 @@ class ContextModulesController < ApplicationController
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.usage_rights_required?,
-           manage_files: @context.grants_right?(@current_user, session, :manage_files)
+           manage_files_edit:
+            @context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_edit
+            )
         },
         :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools},
-        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account)
+        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
+        :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
@@ -124,6 +131,7 @@ class ContextModulesController < ApplicationController
         limit(400).
         pluck(:id, :title, Arel.sql("'assignment' AS type"))
 
+      @combined_active_quizzes_includes_both_types = !classic_quizzes.empty? && !lti_quizzes.empty?
       (classic_quizzes + lti_quizzes).sort_by{ |quiz_attrs| Canvas::ICU.collation_key(quiz_attrs[1] || CanvasSort::First) }.take(400)
     end
   end

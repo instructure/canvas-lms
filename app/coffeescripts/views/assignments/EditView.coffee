@@ -188,6 +188,7 @@ export default class EditView extends ValidatedFormView
 
   handleCancel: (ev) =>
     ev.preventDefault()
+    @cancel()
     @redirectAfterCancel()
 
   settingsToCache:() =>

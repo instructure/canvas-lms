@@ -321,6 +321,8 @@ describe Types::UserType do
     end
 
     it 'has updatedAt field for conversations and conversationParticipants' do
+      skip 'VICE-1115 (01/27/2021)'
+
       convo = conversation(@student, @teacher)
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]

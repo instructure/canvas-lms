@@ -126,6 +126,38 @@ describe "submissions" do
       expect(@submission.workflow_state).to eq 'submitted'
     end
 
+    it "renders the webcam wraper when enable_webcam_submission is enabled", priority: "1" do
+      @course.root_account.enable_feature!(:enable_webcam_submission)
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "renders the webcam wraper when enable_webcam_submission is enabled and allowed_extensions has png", priority: "1" do
+      @course.root_account.enable_feature!(:enable_webcam_submission)
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["png"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "doesn't render the webcam wraper when enable_webcam_submission is enabled and allowed_extensions doens't have png", priority: "1" do
+      @course.root_account.enable_feature!(:enable_webcam_submission)
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["pdf"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(element_exists?('.attachment_wrapper')).to be_falsy
+    end
+
     it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
       skip('investigate in LA-843')
       skip_if_safari(:alert)

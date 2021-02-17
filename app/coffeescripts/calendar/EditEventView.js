@@ -304,6 +304,8 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   saveEvent(eventData) {
+    RichContentEditor.closeRCE(this.$('textarea'))
+
     return this.$el.disableWhileLoading(
       this.model.save(eventData, {
         success: () => this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
@@ -380,6 +382,10 @@ export default class EditCalendarEventView extends Backbone.View {
   duplicateCheckboxChanged(jsEvent, _propagate) {
     return this.enableDuplicateFields(jsEvent.target.checked)
   }
+
+  cancel() {
+    RichContentEditor.closeRCE(this.$('textarea'))
+  }
 }
 
 EditCalendarEventView.prototype.el = $('#content')
@@ -389,6 +395,7 @@ EditCalendarEventView.prototype.events = {
   'change #use_section_dates': 'toggleUseSectionDates',
   'click .delete_link': 'destroyModel',
   'click .switch_event_description_view': 'toggleHtmlView',
-  'change "#duplicate_event': 'duplicateCheckboxChanged'
+  'change "#duplicate_event': 'duplicateCheckboxChanged',
+  'click .btn[role="button"]': 'cancel'
 }
 EditCalendarEventView.type = 'event'

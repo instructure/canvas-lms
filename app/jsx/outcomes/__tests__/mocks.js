@@ -27,6 +27,7 @@ import {
 } from '../MasteryCalculation/api'
 
 import {courseMocks, accountMocks} from '../Management/__tests__/mocks'
+import {FIND_GROUPS_QUERY} from '../api'
 
 const outcomeCalculationMethod = {
   __typename: 'OutcomeCalculationMethod',
@@ -140,3 +141,86 @@ export const outcomeGroupsMocks = [
   ...accountMocks({accountId: '11'}),
   ...courseMocks({courseId: '12'})
 ]
+
+export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
+  const globalGroup = includeGlobalRootGroup ? globalGroupMock() : {}
+
+  return [
+    {
+      request: {
+        query: FIND_GROUPS_QUERY,
+        variables: {
+          id: '1',
+          type: 'Account',
+          rootGroupId: includeGlobalRootGroup ? 1 : 0,
+          includeGlobalRootGroup
+        }
+      },
+      result: {
+        data: {
+          context: {
+            _id: '1',
+            __typename: 'Account',
+            parentAccountsConnection: parentAccountMock()
+          },
+          ...globalGroup
+        }
+      }
+    },
+    {
+      request: {
+        query: FIND_GROUPS_QUERY,
+        variables: {
+          id: '1',
+          type: 'Course',
+          rootGroupId: 0,
+          includeGlobalRootGroup: false
+        }
+      },
+      result: {
+        data: {
+          context: {
+            __typename: 'Course',
+            _id: '1',
+            account: {
+              _id: '1',
+              __typename: 'Account',
+              rootOutcomeGroup: {
+                title: `Course Account Outcome Group`,
+                childGroupsCount: 1,
+                outcomesCount: 0,
+                __typename: 'LearningOutcomeGroup',
+                _id: '1'
+              },
+              parentAccountsConnection: parentAccountMock()
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+
+const parentAccountMock = () => ({
+  __typename: 'ParentAccountsConnection',
+  nodes: new Array(10).fill(0).map((_v, i) => ({
+    __typename: 'Account',
+    rootOutcomeGroup: {
+      title: `Root Account Outcome Group ${i}`,
+      childGroupsCount: 10,
+      outcomesCount: 0,
+      __typename: 'LearningOutcomeGroup',
+      _id: 100 + i
+    }
+  }))
+})
+
+const globalGroupMock = () => ({
+  globalRootGroup: {
+    __typename: 'LearningOutcomeGroup',
+    title: 'Global Root Outcome Group',
+    childGroupsCount: 20,
+    outcomesCount: 5,
+    _id: '1'
+  }
+})

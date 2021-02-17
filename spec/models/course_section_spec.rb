@@ -474,8 +474,8 @@ describe CourseSection, "moving to new course" do
   end
 
   context 'permissions' do
-    context ':read and section_visibilities' do
-      before :once do
+    context ":read and section_visibilities" do
+      before do
         RoleOverride.create!({
           :context => Account.default,
           :permission => 'manage_students',
@@ -484,8 +484,6 @@ describe CourseSection, "moving to new course" do
         })
         course_with_ta(:active_all => true)
         @other_section = @course.course_sections.create!(:name => "Other Section")
-        # granular permissions disabled by default
-        @course.root_account.disable_feature!(:granular_permissions_course_sections)
       end
 
       it "should work with section_limited true" do
@@ -493,7 +491,9 @@ describe CourseSection, "moving to new course" do
         @ta.reload
 
         # make sure other ways to get :read are false
-        expect(@other_section.course.grants_right?(@ta, :manage_sections)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
 
         expect(@other_section.grants_right?(@ta, :read)).to be_falsey
@@ -501,49 +501,12 @@ describe CourseSection, "moving to new course" do
 
       it "should work with section_limited false" do
         # make sure other ways to get :read are false
-        expect(@other_section.course.grants_right?(@ta, :manage_sections)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
 
         expect(@other_section.grants_right?(@ta, :read)).to be_truthy
-      end
-    end
-
-    context 'with granular permissions enabled' do
-      context ":read and section_visibilities" do
-        before do
-          RoleOverride.create!({
-            :context => Account.default,
-            :permission => 'manage_students',
-            :role => ta_role,
-            :enabled => false
-          })
-          course_with_ta(:active_all => true)
-          @other_section = @course.course_sections.create!(:name => "Other Section")
-          @course.root_account.enable_feature!(:granular_permissions_course_sections)
-        end
-
-        it "should work with section_limited true" do
-          @ta.enrollments.update_all(:limit_privileges_to_course_section => true)
-          @ta.reload
-
-          # make sure other ways to get :read are false
-          expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
-          expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
-          expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
-          expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
-
-          expect(@other_section.grants_right?(@ta, :read)).to be_falsey
-        end
-
-        it "should work with section_limited false" do
-          # make sure other ways to get :read are false
-          expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
-          expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
-          expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
-          expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
-
-          expect(@other_section.grants_right?(@ta, :read)).to be_truthy
-        end
       end
     end
   end

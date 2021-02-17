@@ -245,7 +245,7 @@ module Types
       if object == current_user
         # FIXME: this only returns groups on the current shard.  it should
         # behave like the REST API (see GroupsController#index)
-        load_association(:current_groups)
+        current_user.visible_groups
       end
     end
 

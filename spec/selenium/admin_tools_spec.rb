@@ -626,6 +626,8 @@ describe "admin_tools" do
       expect(data).not_to include 'one@example.com'
       expect(data).to include 'two@example.com'
       expect(data).not_to include 'three@example.com'
+      csvLink = fj("#bouncedEmailsPane a:contains('Download these results as CSV')")['href']
+      expect(csvLink).to include "/api/v1/accounts/#{@account.id}/bounced_communication_channels.csv?order=desc&pattern=*%40example.com"
     end
   end
 end

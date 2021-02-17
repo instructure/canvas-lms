@@ -206,6 +206,25 @@ describe EnrollmentsApiController, type: :request do
         expect(enrollment.workflow_state).to eq 'invited'
       end
 
+      it "creates a new observer student link" do
+        student = User.create!
+        @course.enroll_student(student, enrollment_state: "active")
+        @path = "/api/v1/sections/#{@section.id}/enrollments"
+        @path_options[:section_id] = @section.id
+        api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: @unenrolled_user.id,
+              associated_user_id: student.id,
+              type: 'ObserverEnrollment',
+              enrollment_state: 'invited',
+              limit_privileges_to_course_section: true
+            }
+          }
+        link = UserObservationLink.find_by(user_id: student.id, observer_id: @unenrolled_user.id, workflow_state: "active")
+        expect(link).to be_present
+      end
+
       it "should not default observer enrollments to 'active' state if the user is not registered" do
         json = api_call :post, @path, @path_options,
           {

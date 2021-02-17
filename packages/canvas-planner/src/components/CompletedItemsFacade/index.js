@@ -20,7 +20,7 @@ import classnames from 'classnames'
 import {momentObj} from 'react-moment-proptypes'
 import {themeable} from '@instructure/ui-themeable'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import {func, number, string, arrayOf, shape, oneOf} from 'prop-types'
 import BadgeList from '../BadgeList'
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
@@ -28,7 +28,7 @@ import {badgeShape, sizeShape} from '../plannerPropTypes'
 import {animatable} from '../../dynamic-ui'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 import formatMessage from '../../format-message'
 
@@ -63,7 +63,7 @@ export class CompletedItemsFacade extends Component {
     )
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.props.deregisterAnimatable('item', this, this.props.animatableItemIds)
     this.props.registerAnimatable(
       'item',

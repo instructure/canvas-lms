@@ -19,8 +19,9 @@
 import React from 'react'
 import {themeable} from '@instructure/ui-themeable'
 import {bool, string, arrayOf, shape} from 'prop-types'
-import {View} from '@instructure/ui-layout'
-import {Heading, Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {courseShape} from '../plannerPropTypes'
@@ -28,7 +29,7 @@ import formatMessage from '../../format-message'
 import ErrorAlert from '../ErrorAlert'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 export class GradesDisplay extends React.Component {
   static propTypes = {

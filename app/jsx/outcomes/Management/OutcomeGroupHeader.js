@@ -27,22 +27,26 @@ import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '../../shared/helpers/addZeroWidthSpace'
 
 const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
-  <View as="div" padding="small 0 0">
+  <View as="div" padding="x-small 0 0">
     <Flex as="div" alignItems="start">
-      <Flex.Item padding="xxx-small 0 0" size={minWidth} shouldGrow>
-        <Heading level="h2">
-          <div style={{overflowWrap: 'break-word'}}>
-            {title
-              ? I18n.t('%{title} Outcomes', {title: addZeroWidthSpace(title)})
-              : I18n.t('Outcomes')}
-          </div>
-        </Heading>
+      <Flex.Item size={minWidth} shouldGrow>
+        <div style={{padding: '0.21875rem 0'}}>
+          <Heading level="h2">
+            <div style={{overflowWrap: 'break-word'}}>
+              {title
+                ? I18n.t('%{title} Outcomes', {title: addZeroWidthSpace(title)})
+                : I18n.t('Outcomes')}
+            </div>
+          </Heading>
+        </div>
       </Flex.Item>
       <Flex.Item>
         <OutcomeKebabMenu menuTitle={I18n.t('Outcome Group Menu')} onMenuHandler={onMenuHandler} />
       </Flex.Item>
     </Flex>
-    <OutcomeDescription description={description} />
+    <View as="div" padding="small 0 0">
+      <OutcomeDescription description={description} />
+    </View>
   </View>
 )
 

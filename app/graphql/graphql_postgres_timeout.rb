@@ -37,8 +37,9 @@ module GraphQLPostgresTimeout
             Rails.logger.warn {
               "GraphQL Operation failed due to postgres statement_timeout:\n#{query.query_string}"
             }
+            raise GraphQLPostgresTimeout::Error, "operation timed out"
           end
-          raise GraphQLPostgresTimeout::Error, "operation timed out"
+          raise GraphQL::ExecutionError, "Invalid SQL: #{e.message}"
         end
       end
     end

@@ -104,6 +104,21 @@ describe OutcomesController do
         end
       end
     end
+
+    context "global_root_outcome_id" do
+      it "should return the global root group id for an account" do
+        global_id = LearningOutcomeGroup.global_root_outcome_group.id
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq global_id
+      end
+
+      it "should not return the global root id for a course" do
+        user_session(@admin)
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
+      end
+    end
   end
 
   describe "GET 'show'" do

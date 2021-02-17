@@ -118,7 +118,6 @@ SearchResults.render = function() {
               model={child}
               isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
               toggleSelected={this.props.toggleItemSelected.bind(null, child)}
-              userCanManageFilesForContext={this.props.userCanManageFilesForContext}
               userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
               usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
               externalToolsForContext={this.props.externalToolsForContext}

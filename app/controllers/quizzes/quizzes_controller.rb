@@ -121,6 +121,7 @@ class Quizzes::QuizzesController < ApplicationController
           question_banks: feature_enabled?(:question_banks),
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           quiz_lti_enabled: quiz_lti_enabled?,
+          new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
               @context.quiz_lti_tool.present?,

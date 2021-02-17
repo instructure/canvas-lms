@@ -50,7 +50,7 @@ export const MessageListHolder = ({...props}) => {
 }
 
 const conversationParticipantsProp = PropTypes.shape({
-  id: PropTypes.number,
+  id: PropTypes.string,
   workflowState: PropTypes.string,
   conversation: conversationProp
 })

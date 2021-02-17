@@ -469,7 +469,7 @@ describe "grades" do
   end
 
   context "as an observer" do
-    it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
+    it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883, ignore_js_errors: true do
       @obs = user_model(name: "Observer")
       e1 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
       e1.associated_user = @student_1
@@ -482,21 +482,21 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
       click_option("#student_select_menu", "Student 2")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 2"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 2"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
       click_option("#student_select_menu", "Student 1")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end

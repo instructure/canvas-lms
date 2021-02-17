@@ -1794,11 +1794,13 @@ zh-Hans:
   add_course_406cb773: 添加课程
   add_course_assignments_628ed6d0: 添加课程作业
   add_course_calendar_events_146154a5: 添加课程日历事件
+  add_course_files_4e0f1abc: 添加课程文件
   add_criterion_eb9587ef: 添加标准
   add_custom_link_22059c0: 添加自定义链接
   add_designers_to_courses_9588820b: 向课程添加设计员
   add_discussion_653dab4c: 添加讨论
   add_domain_f15bc6c1: 添加域
+  add_edit_delete_files_573a4d62: 添加/编辑/删除文件
   add_edit_delete_sections_d32c5b4d: 添加/编辑/删除班次
   add_email_address_aef3b61: 添加电子邮件地址
   add_existing_content_7e36da66: 添加现有内容
@@ -1809,6 +1811,7 @@ zh-Hans:
   add_grading_period_6f774dc3: 添加评分周期
   add_grading_scheme_81e23c05: 添加评分方案
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: 给管理员评分报告添加评分方案
+  add_granularity_to_permissions_around_managing_cou_2244c94a: 添加关于管理课程文件的权限细化
   add_granularity_to_permissions_around_managing_cou_4a5bc486: 添加关于管理课程班次的权限粒度
   add_group_c84f9e9d: 添加小组
   add_group_set_f9809e11: 添加小组集
@@ -2104,6 +2107,8 @@ zh-Hans:
   allow_users_to_comment_45b8f753: 允许用户评论
   allowed_attempts_4e229caa: 允许尝试
   allowed_domains_ee7868c8: 允许的域
+  allowed_for_subaccounts_courses_default_off_da598c11: 已对子帐户/课程允许，默认关闭
+  allowed_for_subaccounts_courses_default_on_e485ec7f: 已对子帐户/课程允许，默认开启
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: 允许用户访问学生背景卡上的“作为用户”链接
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "允许用户在用户的登录详细信息中查看SIS ID。"
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "允许用户在课程的“人员”页面中查看用户SIS ID。"
@@ -3158,6 +3163,7 @@ zh-Hans:
     assignment_group_selector: 
       assignment_group: 作业小组
       assignment_group_options: 
+        create_group: 创建小组
         new_group: 创建新小组
     assignment_groups_count: 
       one: "%{count} 个小组"
@@ -5091,6 +5097,7 @@ zh-Hans:
   classic_quizzes_dee3c7b7: 旧测验
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: 无提交项的计时测验的典型测验选项
   clear_2084585f: 清除
+  clear_search_field_75f595c7: 清除搜索字段
   clear_selected_file_82388e50: 清除所选文件
   clear_user_cache_ef079f7f: 清除用户缓存
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: 如果您不想显示二维码，可以单击“取消”。
@@ -5336,6 +5343,7 @@ zh-Hans:
   collapse_all_50275533: 全部折叠
   collapse_group_c2af7cad: 折叠小组
   collapse_list_of_group_members_for_groupname_d6c66fa0: "折叠 %{groupName} 的组成员列表"
+  collapse_outcome_description_de471564: 折叠结果描述
   collapse_subdiscussion_89af1f5c: 折叠班次讨论
   collapse_tutorial_tray_66ee7dc1: 折叠教程托盘
   collapsed_510aa02a: 折叠
@@ -6542,6 +6550,9 @@ zh-Hans:
   count_files_were_ignored_2f9c054a: 
     one: "(%{count}) 个文件已忽略"
     other: "(%{count}) 个文件已忽略"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "%{count} 个“%{groupTitle}”结果"
+    other: "%{count} 个“%{groupTitle}”结果"
   count_hidden_e8d2c57c: "%{count} 已隐藏"
   count_images_found_for_term_a93635ed: "找到%{term}的%{count}个图像"
   count_items_deleted_successfully_a287aa53: 
@@ -6570,6 +6581,9 @@ zh-Hans:
     one: "%{count} 选项"
     other: "%{count} 选项"
   count_options_loaded_cd59cc3b: "%{count}选项已加载。"
+  count_outcomes_selected_55902958: 
+    one: "已选择 %{count} 个结果"
+    other: "已选择 %{count} 个结果"
   count_page_views_b40102b3: 
     one: "%{count} 个页面查看"
     other: "%{count} 页面视图"
@@ -6808,7 +6822,10 @@ zh-Hans:
   course_favorites_from_dashboard_27a3515a: 控制面板的课程收藏项
   course_files_62deb8f8: 课程文件
   course_files_a31f97fc: 课程文件
+  course_files_add_2eede390: "课程文件 - 添加"
   course_files_add_edit_delete_24678a2f: "课程文件 - 添加/编辑/删除"
+  course_files_delete_fae0effe: "课程文件 - 删除"
+  course_files_edit_d05d4e8b: "课程文件 - 编辑"
   course_found_f5a40cd3: 已找到课程
   course_found_not_deleted_a20f72f0: 已找到课程（未删除）
   course_grade_grade_in_course_code_9fa854db: "课程评分：%{grade}%分%{course_code}"
@@ -7596,6 +7613,8 @@ zh-Hans:
   create_edit_line_item_scores_116482c7: 创建/编辑行项目评分
   create_educational_resources_8219326e: 创建教学资源
   create_failed_15d07ad4: 创建失败
+  create_file_71aa1922: "[创建文件]"
+  create_file_s_188549e6: "[创建文件]"
   create_files_after_rce_media_upload_recording_77d75a96: "在上传/录制 RCE 媒体后创建文件"
   create_interactive_course_content_76665336: 创建互动式课程内容
   create_item_base: 
@@ -8040,6 +8059,7 @@ zh-Hans:
   delete_comment_a71040c3: 删除评论
   delete_comment_comment_d32ffc85: "删除评论：%{comment}"
   delete_comment_commenttext_c8afe129: "删除评论：%{commentText}"
+  delete_course_files_ee9e769: 删除课程文件
   delete_criterion_row_80c3b3b: 删除条件列
   delete_current_message_5da0221a: 删除目前信息
   delete_current_module_item_21fefc54: 删除目前单元/项目
@@ -8336,6 +8356,7 @@ zh-Hans:
   disabled_3b1b332a: 禁用
   disabled_and_locked_d14dc6c2: 已禁用并锁定
   disabled_by_default_7d822dcb: 默认禁用
+  disabled_for_all_subaccounts_courses_6c8938e0: 已对所有子帐户/课程禁用
   disabled_in_course_settings_d15ee35d: "* 在课程设置中禁用"
   disabled_links_b3bdea99: 已禁用的链接
   disabled_locked_dab351d6: 已禁用（已锁定）
@@ -8827,6 +8848,7 @@ zh-Hans:
   download_submission_comments_2a6c0395: 下载提交项评论
   download_submissions_7454665f: 下载提交
   download_the_complete_list_of_errors_and_warnings__7d993f7b: 此处可下载错误和警告的完整列表。
+  download_these_results_as_csv_9a890883: "将这些结果下载为 CSV"
   download_this_file_669f9174: 下载此文件
   downloading_course_content_allows_access_to_conten_164d9336: 下载课程内容允许脱机访问内容。内容可能包括文件、网页、作业、讨论主题或测验。点击为每门课程“生成ePub”，并通过打开任何电子阅读器软件来查看。
   draft_92507c72: （草稿）
@@ -8963,6 +8985,7 @@ zh-Hans:
   edit_collaboration_b014c18b: 编辑协作
   edit_comment_comment_e74afa04: "编辑评论：%{comment}"
   edit_conference_title_6e234815: "编辑 \"%{conference_title}\""
+  edit_course_files_d046ef82: 编辑课程文件
   edit_course_role_3b992fc2: 编辑课程角色
   edit_criterion_5e4dadca: 编辑标准
   edit_criterion_description_5828919: 编辑标准描述
@@ -9170,6 +9193,7 @@ zh-Hans:
   enabled_and_locked_49ff3de4: 已启用并锁定
   enabled_ba7cab66: 已启用
   enabled_by_default_e530d6ed: 默认启用
+  enabled_for_all_subaccounts_courses_e2ee4b2: 已对所有子帐户/课程启用
   enabled_links_be110215: 已启用的链接
   enabled_locked_3cf7c256: 已启用（已锁定）
   enabled_unlocked_8d3a5df7: 已启用（未锁定）
@@ -9735,6 +9759,7 @@ zh-Hans:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "展开 %{groupName} 的小组成员列表"
   expand_or_collapse_calendars_9854b0d0: 展开或折叠日历
   expand_or_collapse_undated_items_b901de09: 展开或折叠未注明日期的项
+  expand_outcome_description_c5bdd70b: 展开结果描述
   expand_permission_b45bf097: "展开 %{permission}"
   expand_permission_c61d5958: 扩展权限
   expand_subdiscussion_cd226ed4: 扩展班次讨论
@@ -11338,6 +11363,7 @@ zh-Hans:
   granular_contexttype_notification_settings_will_be_c5dfc901: "今后可在此处配置细化%{contextType}通知设置。"
   granular_course_notification_settings_will_be_conf_68f122db: 以后可在此处配置精细课程通知设置。
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: 用于添加/移除课程管理员角色的粒度权限
+  granular_permissions_for_managing_course_files_1ed7f019: 用于管理课程文件的细化权限
   granular_permissions_for_managing_course_sections_da4b04b: 用于管理课程班次的粒度权限
   granular_permissions_for_managing_wiki_pages_3ed89a84: 管理维基页面的粒度权限
   graph_bar_b5daa23d: 图形栏
@@ -12376,6 +12402,7 @@ zh-Hans:
   importing_outcomes_e62a0375: 正在导入结果
   improve_accessibility_of_left_hand_menu_through_be_908fb002: 通过优化使用颜色及不活跃菜单项的视觉和屏幕朗读器指示器，改善左侧菜单的辅助功能。
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: 改进文件拖放的可发现性
+  improved_interface_with_ongoing_updates_7316bdef: 持续更新的改进界面
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: 改进的单元新测验支持，包括从单元创建新测验
   improved_outcomes_management_4692f886: 改进的结果管理
   improved_visual_reminders_to_encourage_instructors_f203c7f: 改进视觉提醒以鼓励教师发布课程
@@ -13176,6 +13203,7 @@ zh-Hans:
   loading_last_attended_date_5a42463: 正在加载上次出勤日期
   loading_mastery_paths_c558a766: 加载通达的路径......
   loading_media_32847745: 正在加载媒体
+  loading_message_list_226a131e: 正在加载消息列表
   loading_more_grade_history_results_b235de5: 正在加载多个评分历史记录结果。
   loading_more_gradebook_history_results_810f6d2e: 加载更多成绩册历史记录结果。
   loading_more_results_1d437202: 正在加载其它结果
@@ -13418,6 +13446,7 @@ zh-Hans:
   malformed_csv_aaa4b7f2: "格式不正确的 CSV"
   maltese_916925e8: 马耳他语
   manage_access_bd923d8d: 管理访问
+  manage_add_edit_delete_course_files_162c1a65: 管理（添加/编辑/删除）课程文件
   manage_add_edit_delete_pages_5c73f2fb: 管理（添加/编辑/删除）页面
   manage_announcement_with_title_title_f2ce92de: "管理公告和标题%{title}"
   manage_app_list_994cc26c: 管理应用程序列表
@@ -13431,6 +13460,7 @@ zh-Hans:
       delete_avatar: 是否确定要删除此用户的档案头像?
       lock_avatar: 锁定此头像将会批准它，并阻止用户进行更新。是否继续?
   manage_b88f7150: 管理
+  manage_course_files_57e07038: 管理课程文件
   manage_course_sections_f482d1b3: 管理课程班次
   manage_discussion_title_a2ecb3fb: "管理讨论%{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: 从此页面管理注册状态、创建小组和添加用户。
@@ -15954,6 +15984,7 @@ zh-Hans:
   nav_text_active_a924ae88: 导航文本活动
   navigation_allows_user_to_view_the_people_link_in__dd533d29: 导航允许用户在“课程导航”中查看“人员”链接。
   navigation_icon_45db938e: 导航图标
+  navigation_menu_fd782ff8: 导航菜单
   near_mastery_f25174a4: 最接近的掌握
   need_a_canvas_account_221d18ed: 需要一个Canvas帐户吗？
   need_help_setting_up_your_course_2b763141: 需要帮助设置您的课程吗？
@@ -16818,6 +16849,7 @@ zh-Hans:
   outcome_imports_c496a81f: 结果导入
   outcome_mastery_scales_8c3a814d: 结果掌握程度量表
   outcome_mastery_scales_add_edit_171551c: "结果掌握程度量表 - 添加/编辑"
+  outcome_menu_4fe5813: 结果菜单
   outcome_path_mastery_points: "%{path} 掌握程度"
   outcome_path_result: "%{path} 结果"
   outcome_proficiency_calculations_5959b681: 结果熟练程度计算
@@ -19044,6 +19076,7 @@ zh-Hans:
           select_all_banks: 全选
           view_question_banks: 查看课程题库
         options: 
+          create_group: "[创建小组]"
           new_group: "[创建新小组]"
           no_group: "[无小组]"
         select_a_question_bank: 从下面的列表中选择一个题库以将其链接到此测验作为问题组。
@@ -20034,6 +20067,7 @@ zh-Hans:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: 无论是启用还是禁用此权限，用户仍可以管理其个人日历中的事件。
   regenerate_3e4679f8: 重新生成
   regenerate_epub_395c8e56: 重生ePub
+  regenerating_themes_462e6cd9: 重新生成主题...
   region_47e29025: 地区：
   region_939f2a6c: 地区
   register_email_efc06d59: 注册电子邮件
@@ -20768,6 +20802,7 @@ zh-Hans:
   search_discussion_by_title_30466604: 按标题搜索讨论
   search_endpoints_d5abf37f: 搜索端点
   search_entries_or_author_63fb0a86: 搜索条目或作者
+  search_field_234156fc: 搜索字段
   search_flickr_6f28b02e: "搜索 Flickr"
   search_for_a_deleted_course_by_id_f553398d: 通过ID搜索已删除的课程
   search_for_files_7541fb28: 搜索文件
@@ -20782,6 +20817,7 @@ zh-Hans:
   search_term_must_be_at_least_num_characters_669098ed: "检索词都必须至少为%{num}个字符"
   search_title_body_or_author_1d26711f: 搜索标题、正文或作者
   search_users_48b1789e: 搜索用户...
+  search_within_grouptitle_4d38272f: "在 %{groupTitle} 内搜索"
   searching_b0207e7f: 正在搜索
   searching_for_announcements_in_sections_must_span__80e4dfe4: 在会话中搜索公告必须恰好以一门课程为限
   second_reviewer_90046c68: 第二个评审员
@@ -20972,6 +21008,7 @@ zh-Hans:
   select_one_8e0af564: 选择一个
   select_one_b647b384: 选择一个
   select_one_of_the_options_c8b0c6e4: 选择一个选项：
+  select_outcome_7e6e2562: 选择结果
   select_page_e93fc123: 选择页面
   select_prerequisite_module_57894963: 选择先修课程单元
   select_prerequite_module_e9042bb0: 选择先修课程单元
@@ -20982,11 +21019,17 @@ zh-Hans:
   select_students_for_review_6e004a12: 选择学生进行审阅
   select_sub_account_6704196a: 选择子帐户
   select_term_f8083fb0: 选择期限
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: 选择需要关联的文件，或通过选择“创建文件”添加文件。
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: 选择您要关联的文件，或者通过选择“新文件”来添加文件。
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: 选择您要与此*模块*关联的文件，或通过选择“新文件”添加文件。
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: 选择需要与该*模块*关联的文件，或通过选择“创建文件”添加文件。
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: 选择需要关联的文件，或通过选择“创建文件”添加文件。
   select_the_files_you_want_to_associate_or_add_file_9acd7878: 选择您要关联的文件，或通过选择“新文件”添加文件。
   select_the_files_you_want_to_associate_with_this_m_82677c50: 选择您要与此*模块*关联的文件，或通过选择“新文件”添加文件。
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: 选择需要与该*模块*关联的文件，或通过选择“创建文件”添加文件。
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: 选择想要关联的页面，或选择“新页面”来添加新页面。
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: 选择需要关联的页面，或通过选择“创建页面”添加新页面。
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: 选择需要与该*模块*关联的页面，或通过选择“创建页面”添加新页面。
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: 选择想要与此*单元*关联的页面，或选择“新页面”来添加新页面。
   select_title_for_deletion_45b08247: "选择要删除的 %{title}"
   select_type_of_prerequisite_8d6fa902: 选择先修课程类型
@@ -21699,10 +21742,21 @@ zh-Hans:
       add_to_module: "添加 %{item} 到*单元*"
       assignment_item: 作业
       assignment_item_select_label: 选择您要关联的作业，或者通过选择“新作业”来添加作业。
+      assignment_item_select_label_create: 选择需要关联的作业，或通过选择“创建作业”添加作业。
+      assignment_item_select_label_new: 选择需要关联的作业，或者通过选择“新作业”添加作业。
       assignment_notice: 选择您要与此*单元*关联的作业，或通过选择"新作业"添加一个作业。
       content_page_item: 页面
+      create_assignment_notice: 选择需要与该*模块*关联的作业，或通过选择“创建作业”添加作业。
+      create_assignment_option: "[创建作业]"
+      create_page_option: "[创建页面]"
+      create_quiz_notice: 选择需要与该*模块*关联的测验，或通过选择“创建测验”添加新测验。
+      create_quiz_option: "[创建测验]"
+      create_topic_notice: 选择需要与该*模块*关联的主题，或通过选择“创建主题”添加主题。
+      create_topic_option: "[创建主题]"
       discussion_item: 讨论
       discussion_topic_select_label: 选择您要关联的主题，或者通过选择“新主题”来添加主题。
+      discussion_topic_select_label_create: 选择需要关联的主题，或通过选择“创建主题”添加主题。
+      discussion_topic_select_label_new: 选择需要关联的主题，或者通过选择“新主题”添加主题。
       domain_match_notice: "要使用此工具，域必须匹配 %{domain}"
       external_tool_item: 外部工具
       external_tool_notice: "从下面的列表中选择一个工具，或输入已知通过 Basic LTI 配置的外部工具的 URL，从而将指向它的链接添加到此*单元*。"
@@ -21722,6 +21776,7 @@ zh-Hans:
         header: 标题
         indentation: 缩进
         page_name: 页面名称
+        quiz_engine: 测验引擎
         quiz_group: 小组
         quiz_name: 测验名称
         topic_name: 主题名称
@@ -21729,16 +21784,21 @@ zh-Hans:
         wiki_page_name: 页面名称
         wiki_page_namem: 作业名称
       loading: 正在加载...
+      new_assignment_notice: 选择需要与该*模块*关联的作业，或通过选择“新作业”添加作业。
       new_assignment_option: "[新作业]"
       new_page_option: "[新页面]"
+      new_quiz_notice: 选择需要与该*模块*关联的测验，或通过选择“新测验”添加新测验。
       new_quiz_option: "[新测验]"
       new_tab: 在新选项卡中加载
+      new_topic_notice: 选择需要与该*模块*关联的主题，或通过选择“新主题”添加主题。
       new_topic_option: "[新主题]"
       options: 
         assignments: 作业
       quiz_item: 测验
       quiz_notice: 选择您要与此*单元*关联的测验，或通过选择"新测验"添加一个新测验。
       quiz_select_label: 选择您要关联的测验，或者通过选择“新测验”来添加新测验。
+      quiz_select_label_create: 选择需要关联的测验，或通过选择“创建测验”添加新测验。
+      quiz_select_label_new: 选择需要关联的测验，或者通过选择“新测验”添加新测验。
       select_item_type_label: 选择要添加的内容类型。
       sub_header_notice: 键入您想要作为*单元*副标题添加的文本。
       text_header_item: 文本标题
@@ -23119,6 +23179,7 @@ zh-Hans:
   the_module_item_is_locked_27fe420b: 单元项已锁定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "为用户的最新得分 %{current_user_name} 和结果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "该课程的下一可用预约已启动*%{date}*"
+  the_original_quizzes_interface_fcda53bc: 原测验界面
   the_preceding_content_is_partner_provided_d753928c: 以上内容由合作伙伴提供
   the_previous_sis_batch_was_aborted_d7d89955: "上一个 SIS 批次已中止"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 该熟练程度计算方法由您的管理员设置，适用于该帐户的所有课程。
@@ -24241,7 +24302,9 @@ zh-Hans:
   unable_to_find_extension_3fe61b3c: 找不到扩展
   unable_to_find_filetype_7b620f02: "找不到 filetype"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: 在您的机构中无法找到与这些电子邮件地址相匹配的内容。选择要创建为新用户的人。将跳过取消选择。
+  unable_to_load_courses_menu_7074ea04: 无法下载课程菜单。
   unable_to_load_lti_1_3_tools_cf169f9: "无法加载 Lti 1.3 工具"
+  unable_to_load_messages_2b158fd0: "无法加载消息。 "
   unable_to_read_file_2d04b0c: 无法读取文件
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unable_to_save_new_discussion_topic_99239f3f: 无法保存新的讨论主题

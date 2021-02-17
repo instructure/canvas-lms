@@ -99,6 +99,52 @@
       "hidden": false,
       "parent_state": "allowed"
     }
+  },
+  "allowedOnRootAccountFeature": {
+    "feature": "feature5",
+    "applies_to": "RootAccount",
+    "root_opt_in": true,
+    "display_name": "Feature 5",
+    "description": "This does great feature5y things",
+    "feature_flag": {
+      "feature": "feature5",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": true
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed_on"
+    }
+  },
+  "allowedOnCourseFeature": {
+    "feature": "feature6",
+    "applies_to": "Course",
+    "root_opt_in": true,
+    "display_name": "Feature 6",
+    "description": "This does great feature6y things",
+    "feature_flag": {
+      "feature": "feature6",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed_on"
+    }
   }
 }
-  

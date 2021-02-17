@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+//
+// NOTE!: Be sure to call RichContentEditor.closeRCE(target) in your source page
+//        whenever the user purposfully leaves the page (by clicking Cancel or Submit)
+//        This gets any autosaved content cleared so they won't be prompted next
+//        time around.
+
 import serviceRCELoader from './serviceRCELoader'
 import {RCELOADED_EVENT_NAME, send, destroy, focus} from './RceCommandShim'
 import deprecated from '../helpers/deprecated'
@@ -165,6 +171,8 @@ const RichContentEditor = {
    *     the element's siblings, so when the RCE is rendered into the
    *     container it doesn't wipe out other parts of the DOM
    *
+   * Be sure to call RichContentEditor.closeRCE(target) if the user cleanly exits the page
+   *
    * @public
    */
   loadNewEditor(target, tinyMCEInitOptions = {}, cb) {
@@ -222,6 +230,17 @@ const RichContentEditor = {
     $target = this.freshNode($target)
     destroy($target)
     if (!ENV.use_rce_enhancements) Sidebar.hide()
+  },
+
+  /**
+   * Tell the RCE we're closing
+   *
+   * @public
+   */
+  closeRCE(target) {
+    if (window.ENV.use_rce_enhancements) {
+      this.callOnRCE(target, 'RCEClosed')
+    }
   },
 
   /**

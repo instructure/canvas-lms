@@ -205,19 +205,19 @@ describe "interaction with grading periods" do
       get "/courses/#{test_course.id}/grades"
     end
 
-    it 'should display the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
-      expect(fj("#grading_period_select_menu option:selected")).to include_text('Course Grading Period 1')
+    it 'should display the current grading period and assignments in grades page', priority: "1", test_id: 202326, ignore_js_errors: true do
+      expect(f("#grading_period_select_menu").attribute('value')).to eq "Course Grading Period 1"
       expect(f("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
     end
 
-    it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
-      fj("#grading_period_select_menu option:nth-child(3)").click
+    it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 562596, ignore_js_errors: true do
+      click_option('#grading_period_select_menu', 'Course Grading Period 2')
       expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end
 
-    it 'should update assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
-      fj("#grading_period_select_menu option:nth-child(1)").click
+    it 'should update assignments when a all periods are selected in grades page', priority: "1", test_id: 571756, ignore_js_errors: true do
+      click_option("#grading_period_select_menu", 'All Grading Periods')
       expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')

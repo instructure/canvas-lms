@@ -132,7 +132,7 @@ module UserContent
           uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
         elsif attachment.locked_for?(user) && attachment.content_type =~ /^image/
           # hidden=1 tells the browser to strip the alt attribute for locked files
-          uri.query = (uri.query.to_s.split("&") + ["hidden=1"]).join("&") 
+          uri.query = (uri.query.to_s.split("&") + ["hidden=1"]).join("&")
         end
         uri.to_s
       end
@@ -143,6 +143,7 @@ module UserContent
 
     def attachment
       return nil unless match.obj_id
+
       unless @_attachment
         @_attachment = preloaded_attachments[match.obj_id]
         @_attachment ||= Attachment.find_by_id(match.obj_id) if context.is_a?(User) || context.nil?
@@ -157,8 +158,12 @@ module UserContent
 
     def user_can_download_attachment?
       # checking on the context first can improve performance when checking many attachments for admins
-      (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) ||
-        attachment.grants_right?(user, nil, :download)
+      context&.grants_any_right?(
+        user,
+        :manage_files,
+        :read_as_admin,
+        *RoleOverride::GRANULAR_FILE_PERMISSIONS
+      ) || attachment&.grants_right?(user, nil, :download)
     end
 
     def user_can_view_attachment?

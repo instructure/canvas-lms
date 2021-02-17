@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
 import sinon from 'sinon'
 import {wait} from '@testing-library/react'
@@ -65,7 +65,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     const bindRef = ref => {
       component = ref
     }
-    const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
+    const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
     const CardBox = <Box connectDropTarget={el => el} ref={bindRef} {...props} />
     ReactDOM.render(CardBox, $container)
   }

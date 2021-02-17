@@ -47,11 +47,29 @@ describe UsageRightsController, type: :request do
     end
 
     describe "set_usage_rights" do
+      before :each do
+        # granular permissions disabled by default
+        @course.root_account.disable_feature!(:granular_permissions_course_files)
+      end
+
       it "should require :manage_files on the context" do
         student_in_course active_all: true
         api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/usage_rights",
                          { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json'},
                          {}, {}, {expected_status: 401})
+      end
+
+      context 'with granular permissions enabled' do
+        before :each do
+          @course.root_account.enable_feature!(:granular_permissions_course_files)
+        end
+
+        it "should require manage_files_add or manage_files_edit on the context" do
+          student_in_course active_all: true
+          api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/usage_rights",
+                           { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json'},
+                           {}, {}, {expected_status: 401})
+        end
       end
 
       it "should publish on save when usage_rights & publish have been set" do
@@ -174,6 +192,11 @@ describe UsageRightsController, type: :request do
     end
 
     describe "remove_usage_rights" do
+      before :each do
+        # granular permissions disabled by default
+        @course.root_account.disable_feature!(:granular_permissions_course_files)
+      end
+
       it "should require :manage_files on the context" do
         student_in_course active_all: true
         api_call_as_user(@student, :delete, "/api/v1/courses/#{@course.id}/usage_rights",
@@ -185,12 +208,37 @@ describe UsageRightsController, type: :request do
         usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
         @course.attachments.update_all(usage_rights_id: usage_rights.id)
         json = api_call(:delete, "/api/v1/courses/#{@course.id}/usage_rights",
-                 { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
-                 { folder_ids: [@folderA.id] })
+                        {controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
+                        {folder_ids: [@folderA.id] })
         expect(json['message']).to eq("3 files updated")
         expect(json['file_ids']).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
         expect(@fileR.reload.usage_rights_id).to eq(usage_rights.id)
         expect(@course.attachments.where(usage_rights_id: nil).pluck(:id)).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
+      end
+
+      context 'with granular permissions enabled' do
+        before :each do
+          @course.root_account.enable_feature!(:granular_permissions_course_files)
+        end
+
+        it "should require manage_files_delete on the context" do
+          student_in_course active_all: true
+          api_call_as_user(@student, :delete, "/api/v1/courses/#{@course.id}/usage_rights",
+                           { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
+                           {}, {}, {expected_status: 401})
+        end
+
+        it "should remove usage rights" do
+          usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
+          @course.attachments.update_all(usage_rights_id: usage_rights.id)
+          json = api_call(:delete, "/api/v1/courses/#{@course.id}/usage_rights",
+                          {controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
+                          {folder_ids: [@folderA.id] })
+          expect(json['message']).to eq("3 files updated")
+          expect(json['file_ids']).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
+          expect(@fileR.reload.usage_rights_id).to eq(usage_rights.id)
+          expect(@course.attachments.where(usage_rights_id: nil).pluck(:id)).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
+        end
       end
     end
   end

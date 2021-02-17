@@ -731,7 +731,7 @@ en:
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
     Allows admins to view a log containing information about all recently run
     GraphQL mutations
-  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: Microsoft Immersive Reader - Free Trial (Wiki Pages)
+  microsoft_immersive_reader_30edaaee: Microsoft Immersive Reader
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: Makes a Microsoft Immersive Reader link option show up on wiki pages.
   canvas_elementary_theming_a42fa76f: Canvas Elementary Theming
   elementary_friendly_theme_font_and_limited_course__f6746b89: |-
@@ -769,8 +769,8 @@ en:
   requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: Granular permissions for Add/Remove admin roles from Course
   adds_granular_permissions_for_adding_and_removing__e1e484a3: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
-  granular_permissions_for_managing_course_sections_da4b04b: Granular permissions for managing course sections
-  add_granularity_to_permissions_around_managing_cou_4a5bc486: Add granularity to permissions around managing course sections
+  granular_permissions_for_managing_course_files_1ed7f019: Granular permissions for managing course files
+  add_granularity_to_permissions_around_managing_cou_2244c94a: Add granularity to permissions around managing course files
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
@@ -820,7 +820,7 @@ en:
     automatically after associating and syncing with a blueprint course
   enable_fullstory_5c673a06: Enable fullstory
   include_fullstory_recording_of_the_user_s_session_656d131e: Include FullStory recording of the user's session
-  updated_math_equation_handling_b84509d1: Updated math equation handling
+  math_updated_equation_handling_b08edab3: 'Math: Updated equation handling'
   replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
     Replaces the existing image of the math equation plus its hidden mathml
     with a MathJax processed version. This change provides better accessibility
@@ -837,15 +837,15 @@ en:
     often added "/download" where it was not wanted and inappropriate. This
     setting updates how URL rewriting takes place to facilitate previewing
     files within Canvas and not downloading.
-  support_latex_math_equations_almost_everywhere_6ce8ca24: Support LaTex math equations almost everywhere
-  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+  math_support_latex_math_equations_almost_everywher_75545098: 'Math: Support LaTex math equations almost everywhere'
+  with_this_feature_latex_math_equations_entered_int_c2cabd84: |-
     With this feature, LaTex math equations entered into most
     text entry fields in Canvas will be processed by MathJax.
     LaTex delimited by \(...\) become inline equations, while
-    $$...$$ will be rendered as as a block.  For example,
+    $$...$$ will be rendered as a block.  For example,
     you could choose to title an Assignment \(\sqrt{x}\), or
     enter $$ax^2 + by + c = 0$$ in a submission comment.
-    This feature reequires that the "Updated math equation handling"
+    This feature requires that the "Math: Updated equation handling"
     flag is also on.
   bounced_emails_admin_tool_9730a5e4: Bounced Emails Admin Tool
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
@@ -856,16 +856,12 @@ en:
   a_simplified_canvas_interface_for_k_5_80b33391: A simplified Canvas interface for K-5
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
-  reduce_outcome_duplication_on_course_import_26431b40: Reduce outcome duplication on course import
-  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: Ensures that outcomes that have already been imported into a course are not duplicated if they are imported again
   selectable_outcomes_during_course_content_migratio_3f108a1a: Selectable outcomes during course content migration
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: Allows learning outcomes to be selectable when migrating course content
   restricted_view_for_teachers_in_lmgb_52c78a62: Restricted view for teachers in LMGB
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: Hides certain students and sections in the LMGB if the teacher only has access to a particular section
   outcomes_service_alignment_migration_5b4391ad: Outcomes Service Alignment Migration
   includes_outcomes_service_alignments_when_exportin_6c578a35: Includes Outcomes Service alignments when exporting and importing course content
-  page_bulk_deleting_74860a80: Page Bulk Deleting
-  allow_pages_to_be_deleted_in_bulk_199d3d3b: Allow pages to be deleted in bulk
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: Account and Course Level Outcome Mastery Scales
   allows_setting_account_course_level_mastery_scales_1939e0fd: Allows setting Account & Course Level mastery scales and calculation methods, replacing per-outcome criterion ratings & calculation methods
   usage_rights_on_discussion_topics_7bb66ac2: Usage Rights on Discussion Topics
@@ -874,6 +870,8 @@ en:
   helps_administrators_and_teachers_make_more_meanin_c458bcf7: Helps administrators and teachers make more meaningful decisions as they import, organize, and edit outcomes in their account and courses.
   student_filters_in_lmgb_13964502: Student filters in LMGB
   allow_inactive_and_or_concluded_enrollments_to_be__3c9a65ab: Allow inactive and/or concluded enrollments to be displayed in LMGB
+  enable_webcam_on_submissions_2e6bfcd4: Enable Webcam on Submissions
+  allow_students_to_submit_photo_using_their_webcam_5c18bf01: Allow students to submit photo using their webcam.
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
     Differentiate between system- and user-generated live events
@@ -2196,6 +2194,7 @@ en:
       headers:
         date: Date
         details: Details
+        due: Due
     edit:
       links:
         add_rubric: Rubric
@@ -2268,6 +2267,7 @@ en:
     assignment_group_selector:
       assignment_group: Assignment Group
       assignment_group_options:
+        create_group: Create Group
         new_group: New Group
     assignment_list_item:
       delete: Delete
@@ -3599,10 +3599,6 @@ en:
         one: 1 file
         other: "%{count} files"
     confirm_reject_invitation: Are you sure you want to reject the invitation to participate in this course?
-    syllabus:
-      headers:
-        date: Date
-        details: Details
     roster:
       edit_sections_view:
         edit_sections_desc: Sections are an additional way to organize users. This can allow you to teach multiple classes from the same course, so that you can have the course content all in one place. Below you can move a user to a different section, or add/remove section enrollments. Users must be in at least one section at all times.
@@ -5540,6 +5536,7 @@ en:
           group_points: Points
         options:
           no_group: "[ No Group ]"
+          create_group: "[ Create Group ]"
           new_group: "[ New Group ]"
         buttons:
           add_questions: Add Questions
@@ -8029,14 +8026,12 @@ en:
       manage_assignments: Manage (add / edit / delete) assignments and quizzes
       manage_calendar: Add, edit and delete events on the course calendar
       manage_content: Manage all other course content
-      manage_files: Manage (add / edit / delete) course files
       manage_grades: Edit grades
       manage_groups: Manage (create / edit / delete) groups
       manage_interaction_alerts: Manage alerts
       manage_outcomes: Manage learning outcomes
       manage_proficiency_calculations: Manage outcome proficiency calculations
       manage_proficiency_scales: Manage outcome mastery scales
-      manage_sections: Manage (create / edit / delete) course sections
       manage_sections_add: Add course sections
       manage_sections_edit: Edit course sections
       manage_sections_delete: Delete course sections
@@ -8125,14 +8120,21 @@ en:
   assignments_and_quizzes_add_edit_delete_5bac17ed: Assignments and Quizzes - add / edit / delete
   course_calendar_add_edit_delete_events_76b97c04: Course Calendar - add / edit / delete events
   course_content_add_edit_delete_ea877eca: Course Content - add / edit / delete
+  manage_add_edit_delete_course_files_162c1a65: Manage (add / edit / delete) course files
   course_files_add_edit_delete_24678a2f: Course Files - add / edit / delete
+  add_course_files_4e0f1abc: Add course files
+  course_files_add_2eede390: Course Files - add
+  manage_course_files_57e07038: Manage Course Files
+  edit_course_files_d046ef82: Edit course files
+  course_files_edit_d05d4e8b: Course Files - edit
+  delete_course_files_ee9e769: Delete course files
+  course_files_delete_fae0effe: Course Files - delete
   grades_edit_773dfc24: Grades - edit
   groups_add_edit_delete_1536bbb4: Groups - add / edit / delete
   alerts_add_edit_delete_d71091c6: Alerts - add / edit / delete
   learning_outcomes_add_edit_delete_b686457a: Learning Outcomes - add / edit / delete
   outcome_proficiency_calculations_add_edit_5a2217b7: Outcome Proficiency Calculations - add / edit
   outcome_mastery_scales_add_edit_171551c: Outcome Mastery Scales - add / edit
-  course_sections_add_edit_delete_c4f4ac19: Course Sections - add / edit / delete
   course_sections_add_c6b5dc1: Course Sections - add
   manage_course_sections_f482d1b3: Manage Course Sections
   course_sections_edit_bd783e1: Course Sections - edit
@@ -8670,6 +8672,7 @@ en:
         files: Files
         file: File
         folder: Folder
+        quiz_engine: Quiz Engine
         quiz_name: Quiz Name
         quiz_group: Group
         wiki_page_namem: Assignment Name
@@ -8681,17 +8684,28 @@ en:
       external_tool_notice: Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.
       loading: Loading...
       domain_match_notice: to use this tool the domain must match %{domain}
+      create_page_option: "[ Create Page ]"
       new_page_option: "[ New Page ]"
-      quiz_notice: Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".
-      quiz_select_label: Select the quiz you want to associate, or add a new one by selecting "New Quiz".
+      create_quiz_notice: Select the quiz you want to associate with this *module*, or add a new one by selecting "Create Quiz".
+      quiz_select_label_create: Select the quiz you want to associate, or add a new one by selecting "Create Quiz".
+      new_quiz_notice: Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".
+      quiz_select_label_new: Select the quiz you want to associate, or add a new one by selecting "New Quiz".
+      create_quiz_option: "[ Create Quiz ]"
       new_quiz_option: "[ New Quiz ]"
+      classic_quiz_identifier: "(classic)"
       options:
         assignments: Assignments
-      assignment_notice: Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".
-      assignment_item_select_label: Select the assignment you want to associate, or add an assignment by selecting "New Assignment".
+      create_assignment_notice: Select the assignment you want to associate with this *module*, or add an assignment by selecting "Create Assignment".
+      assignment_item_select_label_create: Select the assignment you want to associate, or add an assignment by selecting "Create Assignment".
+      new_assignment_notice: Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".
+      assignment_item_select_label_new: Select the assignment you want to associate, or add an assignment by selecting "New Assignment".
+      create_assignment_option: "[ Create Assignment ]"
       new_assignment_option: "[ New Assignment ]"
-      topic_notice: Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".
-      discussion_topic_select_label: Select the topic you want to associate, or add a topic by selecting "New Topic".
+      create_topic_notice: Select the topic you want to associate with this *module*, or add a topic by selecting "Create Topic".
+      discussion_topic_select_label_create: Select the topic you want to associate, or add a topic by selecting "Create Topic".
+      new_topic_notice: Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".
+      discussion_topic_select_label_new: Select the topic you want to associate, or add a topic by selecting "New Topic".
+      create_topic_option: "[ Create Topic ]"
       new_topic_option: "[ New Topic ]"
       indent_level:
         zero: "*Don't Indent*"
@@ -9371,6 +9385,7 @@ en:
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   student_current_grades_report_base_86b5962a: Student Current Grades Report - Base
+  uc_merced_student_activity_report_4a9a1eb8: UC Merced Student Activity Report
   template_account_21ac8f4f: Template Account
   rce_contents_replace_display_name: RCE Contents Replace
   rce_contents_replace_description: Enable RCE full text replace from LTI's
@@ -9638,6 +9653,7 @@ en:
   epub_exports_3822c3f8: ePub Exports
   invalid_timestamp_timestamp_not_parseable_dae79e92: Invalid timestamp - timestamp not parseable
   invalid_timestamp_timestamp_in_future_5bc855d7: Invalid timestamp - timestamp in future
+  regenerating_themes_462e6cd9: Regenerating themes...
   primary_brand_color_db79b428: Primary Brand Color
   main_text_color_7d65ab1b: Main Text Color
   link_color_55f8b835: Link Color
@@ -12582,9 +12598,9 @@ en:
   matching_left_side_900f860b: Matching left side
   matching_right_side_920e71b2: Matching right side
   number_between_1_and_16_inclusive_31f5468d: number between 1 and 16 inclusive
-  click_to_enter_comments_if_the_student_chooses_thi_507c20f6: Click to enter comments, if the student chooses this answer
   toggle_editing_answer_text_as_html_9a93fe6: Toggle editing answer text as HTML
   delete_this_answer_f1802eaa: Delete this Answer
+  click_to_enter_comments_if_the_student_chooses_thi_507c20f6: Click to enter comments, if the student chooses this answer
   enter_your_question_and_multiple_answers_31370054: Enter your question and multiple answers.
   enter_your_question_text_4729b886: Enter your question text.
   enter_your_question_text_students_will_see_the_que_f19af9e9: Enter your question text. Students will see the question followed by a small text box to type their answer.
@@ -12784,6 +12800,7 @@ en:
   message_type_480e7b89: Message Type
   cutoff_score_74254c89: cutoff score
   send_message_6ccc90e8: Send Message
+  navigation_menu_fd782ff8: Navigation Menu
   account_97b34646: Account
   admin_4d3ba42f: Admin
   dashboard_7f1dbf71: Dashboard
@@ -12823,10 +12840,18 @@ en:
   rating_description_db6adf39: Rating Description
   update_rating_6d29c2ef: Update Rating
   points_out_of_total_24f61148: "*%{points}* out of **%{total}**"
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: Select the page you want to associate with this *module*, or add a new page by selecting "Create Page".
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: Select the page you want to associate, or add a new page by selecting "Create Page".
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: Select the page you want to associate with this *module*, or add a new page by selecting "New Page".
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: Select the page you want to associate, or add a new page by selecting "New Page".
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: Select the files you want to associate with this *module*, or add files by selecting "Create File(s)".
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: Select the file you want to associate with this *module*, or add a file by selecting "Create File".
   select_the_files_you_want_to_associate_with_this_m_82677c50: Select the files you want to associate with this *module*, or add files by selecting "New File(s)".
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: Select the file you want to associate with this *module*, or add a file by selecting "New File".
+  new_quizzes_dbda7e0a: New Quizzes
+  improved_interface_with_ongoing_updates_7316bdef: Improved interface with ongoing updates
+  classic_quizzes_dee3c7b7: Classic Quizzes
+  the_original_quizzes_interface_fcda53bc: The original quizzes interface
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: You're editing your Canvas Theme! The changes have not been applied yet.
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: You're editing your Canvas Theme! Apply or cancel changes from within the *Theme Editor*.
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 'Note: sub-account themes are not active during this preview.'
@@ -13074,6 +13099,9 @@ en:
   this_report_gets_the_submissions_for_courses_d83bb449: This report gets the submissions for courses.
   course_submission_report_data_example_95971ae4: Course Submission Report Data Example
   include_course_scores_e38e71da: Include course scores
+  report_start_date_160e7416: Report Start Date
+  report_end_date_e5ad8c08: Report End Date
+  student_integration_id_e08f80af: Student Integration ID
   canvas_cloud_information_fdd404f2: Canvas Cloud Information
   created_by_b39b9c8b: Created By
   delete_domain_domain_c5b68f5: Delete domain %{domain}
@@ -13111,7 +13139,8 @@ en:
   service_c3d74594: 'Service:'
   lti_launch_af082dc3: 'LTI Launch:'
   the_lti_tool_was_deleted_on_3727da23: The LTI Tool was deleted on
-  click_here_to_restore_the_tool_4ff358ae: "*Click here* to restore the tool"
+  the_lti_user_was_deleted_2a3b796f: The LTI User was deleted
+  click_here_to_fix_the_issue_fc75f5bf: "*Click here* to fix the issue"
   beta_lti_launch_c200ffdf: 'Beta LTI Launch:'
   there_are_no_announcements_for_this_course_5ee649c3: There are no announcements for this course.
   back_to_table_of_contents_d878b315: Back to Table of Contents
@@ -15439,6 +15468,11 @@ en:
   plagiarism_review_7bccc7df: Plagiarism Review
   error_retrieving_assignment_external_tools_9102d343: Error retrieving assignment external tools
   external_tool_tool_id_6028b3b1: External Tool %{tool_id}
+  upload_a_file_228b8cf9: Upload a file
+  upload_file_fd2361b8: Upload File
+  use_webcam_1ed0bf6b: Use Webcam
+  captured_image_91838f78: Captured Image
+  remove_webcam_image_count_efee4a11: Remove webcam image %{count}
   tool_not_found_f6366382: Tool Not Found
   the_tool_is_not_installed_in_the_course_or_account_1be7230b: The tool is not installed in the course or account
   content_successfully_added_395c906f: "%{content} successfully added"
@@ -15610,7 +15644,6 @@ en:
   error_updating_submission_draft_1d40ade7: Error updating submission draft
   error_adding_files_to_submission_draft_6acac337: Error adding files to submission draft
   uploading_files_5ff8f4fd: Uploading files
-  upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
   add_media_cfa37b54: Add Media
@@ -15996,6 +16029,7 @@ en:
   deleted_content_exceptions_237e809d: 'Deleted content exceptions:'
   content_1440204b: Content
   failed_to_perform_search_c918100f: Failed to perform search
+  download_these_results_as_csv_9a890883: Download these results as CSV
   bounced_emails_83f293b5: Bounced Emails
   address_use_as_wildcard_48f2cf60: Address (use * as wildcard)
   mfoster_708c21fb: mfoster@*
@@ -16118,6 +16152,21 @@ en:
   not_starred_98931190: not starred
   open_message_d7b12975: Open Message
   subject_114b2e98: Subject
+  error_occurred_while_creating_conversation_message_43751479: Error occurred while creating conversation message
+  message_sent_successfully_7cc86ad3: Message sent successfully
+  error_creating_conversation_1d814618: Error creating conversation
+  error_adding_files_to_conversation_message_58e83876: Error adding files to conversation message
+  error_uploading_files_f709361f: Error uploading files
+  message_body_is_required_105d5986: Message body is required
+  unable_to_query_for_courses_at_this_time_please_tr_eafb8e73: Unable to query for courses at this time, please try again later
+  uploading_files_9e39dbf9: Uploading Files
+  please_wait_while_we_upload_attachments_fc34efd1: Please wait while we upload attachments
+  sending_message_ba2f0f0e: Sending Message
+  sending_message_75923692: Sending message
+  delete_operation_failed_3db8cd19: Delete operation failed
+  unable_to_load_courses_menu_7074ea04: Unable to load courses menu.
+  loading_message_list_226a131e: Loading Message List
+  unable_to_load_messages_2b158fd0: 'Unable to load messages. '
   answer_sequence_cfeda025: Answer Sequence
   quiz_log_auditing:
     table_view:
@@ -16405,8 +16454,12 @@ en:
   excused_3aab77: excused
   grade_10d1e5a1: "%{grade}"
   last_length_graded_items_6db7374e: Last %{length} Graded Items
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: Select the files you want to associate, or add files by selecting "Create File(s)".
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: Select the file you want to associate, or add a file by selecting "Create File".
   select_the_files_you_want_to_associate_or_add_file_9acd7878: Select the files you want to associate, or add files by selecting "New File(s)".
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: Select the file you want to associate, or add a file by selecting "New File".
+  create_file_s_188549e6: "[ Create File(s) ]"
+  create_file_71aa1922: "[ Create File ]"
   new_file_s_8876bba1: "[ New File(s) ]"
   new_file_135ae520: "[ New File ]"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: Unable to set up drag and drop for modules
@@ -16553,6 +16606,12 @@ en:
   help_menu_links_51184b65: Help menu links
   failed_to_load_recent_activity_d3e5adeb: Failed to load recent activity
   failed_to_save_dashboard_selection_32e71c72: Failed to save dashboard selection
+  homeroom_12546f9c: Homeroom
+  schedule_e5dd4c32: Schedule
+  resources_ccefab27: Resources
+  failed_to_load_the_schedule_tab_fd7b0911: Failed to load the schedule tab
+  welcome_name_a16afa7f: Welcome, %{name}!
+  my_subjects_61936afb: My Subjects
   no_courses_favorited_4e69fd63: No courses favorited
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "You have no courses favorited. Reloading this page will show all\n      your active courses. To add favorites, go to "
   all_courses_80701c6f: All Courses.
@@ -16708,6 +16767,13 @@ en:
   paste_json_26ad8050: Paste JSON
   enter_url_e8bb8a33: Enter URL
   configure_ecb97e30: Configure
+  manage_discussion_c1dd8f4e: Manage Discussion
+  mark_all_as_read_8f3bdf57: Mark All as Read
+  close_for_comments_37783f56: Close for Comments
+  open_for_comments_f8f7641e: Open for Comments
+  publishing_41bc5431: Publishing...
+  unpublishing_2c317034: Unpublishing...
+  unpublish_9f2d730b: Unpublish
   next_message_780bcf24: Next Message
   previous_message_8804f87e: Previous Message
   edit_current_message_da650d4c: Edit Current Message
@@ -16969,10 +17035,10 @@ en:
   beta_cb5f307e: Beta
   site_admin_d0417171: Site Admin
   loading_features_d26820f6: Loading features
-  enabled_locked_3cf7c256: Enabled (locked)
-  disabled_locked_dab351d6: Disabled (locked)
-  disabled_unlocked_1588a6d1: Disabled (unlocked)
-  enabled_unlocked_8d3a5df7: Enabled (unlocked)
+  enabled_for_all_subaccounts_courses_e2ee4b2: Enabled for all subaccounts/courses
+  disabled_for_all_subaccounts_courses_6c8938e0: Disabled for all subaccounts/courses
+  allowed_for_subaccounts_courses_default_off_da598c11: Allowed for subaccounts/courses, default off
+  allowed_for_subaccounts_courses_default_on_e485ec7f: Allowed for subaccounts/courses, default on
   sorted_direction_by_columnname_d049ac44: Sorted %{direction} by %{columnName}
   info_panel_displayed_51d481cc: Info panel displayed
   info_panel_hidden_bf7c3b7b: Info panel hidden
@@ -17005,7 +17071,6 @@ en:
   copy_to_folder_32ecc3c3: Copy to Folder
   moving_a4d552df: Moving...
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: Before publishing, you must set usage rights on your files.
-  unpublish_9f2d730b: Unpublish
   only_available_to_students_with_link_107e2468: Only available to students with link
   schedule_student_availability_332154a: Schedule student availability
   available_from_date_43b5e11d: Available From Date
@@ -17948,6 +18013,7 @@ en:
   add_outcomes_to_account_4647776f: Add Outcomes to Account
   pro_tip_30e41fa3: PRO TIP!
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: Save yourself a lot of time by only adding the outcomes that are specific to your course content.
+  select_a_group_to_reveal_outcomes_here_91883028: Select a group to reveal outcomes here.
   import_outcomes_7dda186b: Import Outcomes
   upload_your_outcomes_bceeadbe: Upload your Outcomes!
   csv_or_json_formats_only_d8ba36d: CSV or JSON formats only
@@ -17977,16 +18043,26 @@ en:
   loading_outcome_results_96e21ce4: Loading outcome results
   an_error_occurred_loading_outcomes_data_cfd18b61: An error occurred loading outcomes data.
   there_are_no_outcomes_in_the_course_1d36d9c6: There are no outcomes in the course.
+  select_outcome_7e6e2562: Select outcome
+  expand_outcome_description_c5bdd70b: Expand outcome description
+  collapse_outcome_description_de471564: Collapse outcome description
+  outcome_menu_4fe5813: Outcome Menu
+  count_outcomes_selected_55902958:
+    one: 1 Outcome Selected
+    other: "%{count} Outcomes Selected"
+  search_within_grouptitle_4d38272f: Search within %{groupTitle}
+  count_grouptitle_outcomes_4ddea09:
+    one: 1 "%{groupTitle}" Outcome
+    other: '%{count} "%{groupTitle}" Outcomes'
   title_outcomes_7adbd9cc: "%{title} Outcomes"
   outcome_group_menu_2fffeb71: Outcome Group Menu
   menu_39cb0e8e: Menu
-  groups_groups_outcomes_outcomes_72fb5317: "%{groups} Groups | %{outcomes} Outcomes"
+  search_field_234156fc: Search field
+  clear_search_field_75f595c7: Clear search field
   outcomes_have_not_been_added_to_this_course_yet_7b761b8c: Outcomes have not been added to this course yet.
   outcomes_have_not_been_added_to_this_account_yet_908ade88: Outcomes have not been added to this account yet.
   get_started_by_finding_importing_or_creating_your__6b62c1d9: Get started by finding, importing or creating your course outcomes.
   get_started_by_finding_importing_or_creating_your__380b6cfb: Get started by finding, importing or creating your account outcomes.
-  an_error_occurred_while_loading_course_outcomes_320ccc44: An error occurred while loading course outcomes.
-  an_error_occurred_while_loading_account_outcomes_8f337857: An error occurred while loading account outcomes.
   an_error_occurred_while_loading_course_outcomes_er_accefe77: 'An error occurred while loading course outcomes: %{error}'
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: 'An error occurred while loading account outcomes: %{error}'
   must_be_between_lower_and_upper_1f501b2a: Must be between %{lower} and %{upper}
@@ -18048,6 +18124,11 @@ en:
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: Please wait as we upload and process your file.
   an_outcome_import_is_currently_in_progress_11e6cb38: An outcome import is currently in progress.
   it_s_ok_to_leave_this_page_we_ll_email_you_when_th_2dbed7fa: It's ok to leave this page, we'll email you when the import is done.
+  groups_groups_outcomes_outcomes_72fb5317: "%{groups} Groups | %{outcomes} Outcomes"
+  an_error_occurred_while_loading_course_outcomes_320ccc44: An error occurred while loading course outcomes.
+  an_error_occurred_while_loading_account_outcomes_8f337857: An error occurred while loading account outcomes.
+  account_standards_a657d5e2: Account Standards
+  state_standards_c9b1affd: State Standards
   no_announcements_to_display_fbf9ed1e: No announcements to display
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
     You can view dismissed announcements by going to Account and selecting Global
@@ -18105,6 +18186,7 @@ en:
   create_delete_update_pages_be209769: Create / Delete / Update Pages
   add_remove_in_courses_fa1c9081: Add / Remove in courses
   add_edit_delete_sections_d32c5b4d: add / edit / delete Sections
+  add_edit_delete_files_573a4d62: add / edit / delete Files
   account_settings_fe083453: Account Settings
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: Allows user to view and manage the Settings and Notifications tabs in Account Settings.
   authentication_1b518c38: Authentication
@@ -18612,8 +18694,6 @@ en:
   click_proceed_to_continue_b6eeffc6: Click "Proceed" to continue.
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: Click "Cancel" if you donʼt want the code displayed.
   learn_more_about_the_differences_a1217479: Learn more about the differences.
-  new_quizzes_dbda7e0a: New Quizzes
-  classic_quizzes_dee3c7b7: Classic Quizzes
   this_has_more_question_types_like_hotspot_categori_620e9df6: |-
     This has more question types like hotspot,
             categorization, matching, and ordering. It also has
@@ -18878,6 +18958,11 @@ en:
   all_timezones_5e8afa7b: All Timezones
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
   totalcount_total_replies_b6988c0a: "%{totalCount} total replies"
+  canvas_needs_acccess_to_your_camera_16db6502: Canvas needs acccess to your camera.
+  you_can_provide_this_access_in_your_browser_settin_2b81a586: You can provide this access in your browser settings.
+  take_photo_b06762f9: Take Photo
+  try_again_6ca44338: Try Again
+  use_this_photo_3a594830: Use This Photo
   error_in_mastery_paths_range_index_7d17ddac: "%{error} in mastery paths range %{index}"
   multiple_ba5220cd: Multiple
   upper_lower_56cad16c: "%{upper} - %{lower}"
@@ -19061,8 +19146,6 @@ en:
   reset_95a81614: Reset
   view_file_8a1c62e5: View File
   select_image_e1696a4d: Select Image
-  unknown_account_74d30b82: Unknown Account
-  account_name_13ed649: "%{account_name}"
   progress_for_account_name_ef203250: Progress for %{account_name}
   generating_preview_45b53be0: Generating preview...
   applying_new_styles_to_subaccounts_e8aeeef2: Applying new styles to subaccounts

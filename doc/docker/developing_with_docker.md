@@ -232,6 +232,35 @@ Now just run your choice of selenium specs:
 docker-compose run --rm web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
+### Capturing Rails Logs and Screenshots
+
+When selenium specs fail, the root cause isn't always obvious from the
+stdout/stderr of `rspec`. E.g. you might just see an `Uncaught Error: Internal
+Server Error`. To see the actual stack trace that led to the 500 response, you
+have to look at the rails logs. One way to do that is to just view
+`/usr/src/app/log/test.log` after the fact, or `tail -f` it during the run.
+Note that the log directory is a non-synchronized volume mount, so you need to
+actually view it from inside the `web` container rather than just on your
+native host.
+
+But here's a hot tip -- you can capture the portion of the rails log that
+corresponds to each failed spec, plus a screenshot of the page at the time of
+the failure, by running your specs with the `spec/spec.opts` options like:
+
+```sh
+docker-compose run --rm web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard_spec.rb
+```
+
+This will produce a `log/spec_failures` directory in the container, which you
+can then `docker cp` to your host to view in a browser:
+
+```sh
+docker cp "$(docker-compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
+open -a "Google Chrome" file:///"$(pwd)"/spec_failures
+```
+
+That directory tree contains a web page per spec failure, each featuring a
+colorized rails log and a browser screenshot taken at the time of the failure.
 
 ## Extra Services
 

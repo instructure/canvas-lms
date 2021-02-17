@@ -288,6 +288,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
 
   $edit_course_syllabus_form.on('click', '.cancel_button', ev => {
     ev.preventDefault()
+    RichContentEditor.closeRCE($course_syllabus_body)
     $edit_course_syllabus_form.triggerHandler('hide_edit')
   })
 
@@ -295,6 +296,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     object_name: 'course',
 
     processData(data) {
+      RichContentEditor.closeRCE($course_syllabus_body) // I'd like to wait until success, but by then the RCE is gone
       const syllabus_body = RichContentEditor.callOnRCE($course_syllabus_body, 'get_code')
       data['course[syllabus_body]'] = syllabus_body
       return data

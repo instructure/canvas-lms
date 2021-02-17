@@ -17,11 +17,19 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import $ from 'jquery'
+import {MockedProvider} from '@apollo/react-testing'
+import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
 import OutcomesContext from '../contexts/OutcomesContext'
+import {createCache} from 'jsx/canvas-apollo'
+import 'compiled/jquery.rails_flash_notifications'
+import {findModalMocks} from './mocks'
+
+jest.useFakeTimers()
 
 describe('FindOutcomesModal', () => {
+  let cache
   let onCloseHandlerMock
   const defaultProps = (props = {}) => ({
     open: true,
@@ -31,51 +39,140 @@ describe('FindOutcomesModal', () => {
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
+    cache = createCache()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it('renders component with "Add Outcomes to Account" title when contextType is Account', () => {
-    const {getByText} = render(
-      <OutcomesContext.Provider value={{env: {contextType: 'Account'}}}>
-        <FindOutcomesModal {...defaultProps()} />
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '1', mocks = findModalMocks()} = {}
+  ) => {
+    return rtlRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        <MockedProvider cache={cache} mocks={mocks}>
+          {children}
+        </MockedProvider>
       </OutcomesContext.Provider>
     )
+  }
+
+  it('renders component with "Add Outcomes to Account" title when contextType is Account', async () => {
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
+
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
   })
 
-  it('renders component with "Add Outcomes to Course" title when contextType is Course', () => {
-    const {getByText} = render(
-      <OutcomesContext.Provider value={{env: {contextType: 'Course'}}}>
-        <FindOutcomesModal {...defaultProps()} />
-      </OutcomesContext.Provider>
-    )
+  it('renders component with "Add Outcomes to Course" title when contextType is Course', async () => {
+    const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      contextType: 'Course'
+    })
+    await act(async () => jest.runAllTimers())
+
     expect(getByText('Add Outcomes to Course')).toBeInTheDocument()
   })
 
-  it('shows modal if open prop true', () => {
+  it('shows modal if open prop true', async () => {
     const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
+
     expect(getByText('Close')).toBeInTheDocument()
   })
 
-  it('does not show modal if open prop false', () => {
+  it('does not show modal if open prop false', async () => {
     const {queryByText} = render(<FindOutcomesModal {...defaultProps({open: false})} />)
+    await act(async () => jest.runAllTimers())
     expect(queryByText('Close')).not.toBeInTheDocument()
   })
 
-  it('calls onCloseHandlerMock on Close button click', () => {
+  it('calls onCloseHandlerMock on Close button click', async () => {
     const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
     const closeBtn = getByText('Close')
     fireEvent.click(closeBtn)
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onCloseHandlerMock on Done button click', () => {
+  it('calls onCloseHandlerMock on Done button click', async () => {
     const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
     const doneBtn = getByText('Done')
     fireEvent.click(doneBtn)
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+  })
+
+  describe('within an account context', () => {
+    it('renders the parent account groups', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      expect(getByText('100 Groups | 0 Outcomes')).toBeInTheDocument()
+      fireEvent.click(getByText('Account Standards'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
+    })
+
+    it('displays an error on failed request', async () => {
+      const flashMock = jest.spyOn($, 'flashError').mockImplementation()
+      render(<FindOutcomesModal {...defaultProps()} />, {mocks: []})
+      await act(async () => jest.runAllTimers())
+      expect(flashMock).toHaveBeenCalledWith('An error occurred while loading account outcomes.')
+    })
+  })
+
+  describe('within a course context', () => {
+    it('renders the course.account group and parent account groups', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+        contextType: 'Course'
+      })
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Account Standards'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText(`Course Account Outcome Group`)).toBeInTheDocument()
+      expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
+    })
+
+    it('displays an error on failed request', async () => {
+      const flashMock = jest.spyOn($, 'flashError').mockImplementation()
+      render(<FindOutcomesModal {...defaultProps()} />, {
+        contextType: 'Course',
+        mocks: []
+      })
+      await act(async () => jest.runAllTimers())
+      expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
+    })
+  })
+
+  describe('global standards', () => {
+    beforeEach(() => {
+      window.ENV = {
+        GLOBAL_ROOT_OUTCOME_GROUP_ID: 1
+      }
+    })
+
+    afterEach(() => {
+      window.ENV = null
+    })
+
+    it('renders the State Standards group and subgroups', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+        mocks: findModalMocks({includeGlobalRootGroup: true})
+      })
+      await act(async () => jest.runAllTimers())
+      expect(getByText('20 Groups | 5 Outcomes')).toBeInTheDocument()
+      fireEvent.click(getByText('State Standards'))
+      await act(async () => jest.runAllTimers())
+    })
+
+    it('does not render the State Standard group if no GLOBAL_ROOT_OUTCOME_GROUP_ID is set', async () => {
+      window.ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID = ''
+      const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+        mocks: findModalMocks({includeGlobalRootGroup: true})
+      })
+      await act(async () => jest.runAllTimers())
+      expect(queryByText('State Standards')).not.toBeInTheDocument()
+    })
   })
 })

@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {string} from 'prop-types'
 import I18n from 'i18n!bounced_emails'
@@ -30,6 +31,7 @@ import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import tz from 'timezone'
+import $ from 'jquery'
 
 BouncedEmailsView.propTypes = {
   accountId: string.isRequired
@@ -42,6 +44,7 @@ export default function BouncedEmailsView({accountId}) {
   const [after, setAfter] = useState()
   const [before, setBefore] = useState()
   const [fetchError, setFetchError] = useState('')
+  const [csvReportPath, setCsvReportPath] = useState()
 
   const formatDate = date => {
     return tz.format(date, 'date.formats.medium')
@@ -119,6 +122,9 @@ export default function BouncedEmailsView({accountId}) {
       params.after = after.toISOString()
     }
     setLoading(true)
+    setCsvReportPath(
+      `/api/v1/accounts/${accountId}/bounced_communication_channels.csv?${$.param(params)}`
+    )
     doFetchApi({path, params})
       .then(onFetch)
       .catch(onError)
@@ -137,20 +143,25 @@ export default function BouncedEmailsView({accountId}) {
         return <Text color="secondary">{I18n.t('No results')}</Text>
       }
       return (
-        <Responsive
-          query={{small: {maxWidth: '1000px'}, large: {minWidth: '1000px'}}}
-          props={{small: {layout: 'stacked'}, large: {layout: 'fixed'}}}
-        >
-          {props => (
-            <Table caption={I18n.t('Bounced Emails')} {...props}>
-              {renderTableHeader(table_data[0])}
-              {renderTableBody(table_data.slice(1))}
-            </Table>
+        <>
+          {csvReportPath && (
+            <Link href={csvReportPath}>{I18n.t('Download these results as CSV')}</Link>
           )}
-        </Responsive>
+          <Responsive
+            query={{small: {maxWidth: '1000px'}, large: {minWidth: '1000px'}}}
+            props={{small: {layout: 'stacked'}, large: {layout: 'fixed'}}}
+          >
+            {props => (
+              <Table caption={I18n.t('Bounced Emails')} {...props}>
+                {renderTableHeader(table_data[0])}
+                {renderTableBody(table_data.slice(1))}
+              </Table>
+            )}
+          </Responsive>
+        </>
       )
     },
-    [loading, renderTableHeader, renderTableBody]
+    [loading, renderTableHeader, renderTableBody, csvReportPath]
   )
 
   return (

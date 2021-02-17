@@ -18,32 +18,20 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {merge} from 'lodash'
 import OutcomeDescription from '../OutcomeDescription'
-
-import {stripHtmlTags} from '../../../shared/helpers/stripHtmlTags'
-
-jest.mock('../../../shared/helpers/stripHtmlTags', () => ({
-  stripHtmlTags: jest.fn().mockImplementation(() => 'Description')
-}))
 
 describe('OutcomeDescription', () => {
   let onClickHandlerMock
   const empty = ''
   const truncatedTestId = 'description-truncated'
   const expandedTestId = 'description-expanded'
-  const enterKey = {key: 'Enter', code: 'Enter', keyCode: 13, charCode: 13}
-  const spaceKey = {key: 'Space', code: 'Space', keyCode: 32, charCode: 32}
-  const defaultProps = (props = {}) =>
-    merge(
-      {
-        withExternalControl: true,
-        truncate: true,
-        description: 'Description',
-        onClickHandler: onClickHandlerMock
-      },
-      props
-    )
+  const defaultProps = (props = {}) => ({
+    withExternalControl: true,
+    truncate: true,
+    description: 'Description',
+    onClickHandler: onClickHandlerMock,
+    ...props
+  })
 
   beforeEach(() => {
     onClickHandlerMock = jest.fn()
@@ -74,51 +62,18 @@ describe('OutcomeDescription', () => {
       expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
     })
 
-    it('calls click handler fn when user clicks on truncated description', () => {
+    it('calls click handler when user clicks on truncated description', () => {
       const {getByTestId} = render(<OutcomeDescription {...defaultProps()} />)
       const descTruncated = getByTestId(truncatedTestId)
       fireEvent.click(descTruncated)
       expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
     })
 
-    it('calls click handler fn when user presses Enter key on truncated description', () => {
-      const {getByTestId} = render(<OutcomeDescription {...defaultProps()} />)
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.keyDown(descTruncated, enterKey)
-      expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls click handler fn when user presses Space key on truncated description', () => {
-      const {getByTestId} = render(<OutcomeDescription {...defaultProps()} />)
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.keyDown(descTruncated, spaceKey)
-      expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls click handler fn when user clicks on expanded description', () => {
+    it('calls click handler when user clicks on expanded description', () => {
       const {getByTestId} = render(<OutcomeDescription {...defaultProps({truncate: false})} />)
       const descExpanded = getByTestId(expandedTestId)
       fireEvent.click(descExpanded)
       expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls click handler fn when user presses Enter key on expanded description', () => {
-      const {getByTestId} = render(<OutcomeDescription {...defaultProps({truncate: false})} />)
-      const descExpanded = getByTestId(expandedTestId)
-      fireEvent.keyDown(descExpanded, enterKey)
-      expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls click handler fn when user presses Space key on expanded description', () => {
-      const {getByTestId} = render(<OutcomeDescription {...defaultProps({truncate: false})} />)
-      const descExpanded = getByTestId(expandedTestId)
-      fireEvent.keyDown(descExpanded, spaceKey)
-      expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls stripHtmlTags fn when description prop provided', () => {
-      render(<OutcomeDescription {...defaultProps()} />)
-      expect(stripHtmlTags).toHaveBeenCalled()
     })
   })
 
@@ -153,24 +108,6 @@ describe('OutcomeDescription', () => {
       expect(queryByTestId(expandedTestId)).toBeInTheDocument()
     })
 
-    it('expands description when when user presses Enter key on truncated description', () => {
-      const {getByTestId, queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.keyDown(descTruncated, enterKey)
-      expect(queryByTestId(expandedTestId)).toBeInTheDocument()
-    })
-
-    it('expands description when when user presses Space key on truncated description', () => {
-      const {getByTestId, queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.keyDown(descTruncated, spaceKey)
-      expect(queryByTestId(expandedTestId)).toBeInTheDocument()
-    })
-
     it('truncates description when when user clicks on expanded description', () => {
       const {getByTestId, queryByTestId} = render(
         <OutcomeDescription {...defaultProps({withExternalControl: false})} />
@@ -180,33 +117,6 @@ describe('OutcomeDescription', () => {
       const descExpanded = getByTestId(expandedTestId)
       fireEvent.click(descExpanded)
       expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-    })
-
-    it('truncates description when when user presses Enter key on expanded description', () => {
-      const {getByTestId, queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.click(descTruncated)
-      const descExpanded = getByTestId(expandedTestId)
-      fireEvent.keyDown(descExpanded, enterKey)
-      expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-    })
-
-    it('truncates description when when user presses Space key on expanded description', () => {
-      const {getByTestId, queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.click(descTruncated)
-      const descExpanded = getByTestId(expandedTestId)
-      fireEvent.keyDown(descExpanded, spaceKey)
-      expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-    })
-
-    it('calls stripHtmlTags fn when description prop provided', () => {
-      render(<OutcomeDescription {...defaultProps({withExternalControl: false})} />)
-      expect(stripHtmlTags).toHaveBeenCalled()
     })
   })
 })

@@ -7,7 +7,6 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
   <Heading
     border="none"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -104,7 +103,6 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
   <Heading
     border="none"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -235,7 +233,6 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
   <Heading
     border="none"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -366,7 +363,6 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
   <Heading
     border="none"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -507,7 +503,6 @@ exports[`renders the base component with required props 1`] = `
   <Heading
     border="bottom"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -532,18 +527,17 @@ exports[`renders the base component with required props 1`] = `
   </Heading>
   <div>
     <View
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="block"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       margin="small 0 0 0"
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
       textAlign="center"
+      withVisualDebug={false}
     >
       Nothing Planned Yet
     </View>

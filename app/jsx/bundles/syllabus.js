@@ -73,7 +73,7 @@ const deferreds = _.map(collections, collection => {
 // Create the aggregation collection and view
 const acollection = new SyllabusCollection(collections)
 const view = new SyllabusView({
-  el: '#syllabusContainer',
+  el: '#syllabusTableBody',
   collection: acollection,
   can_read: ENV.CAN_READ,
   is_valid_user: !!ENV.current_user_id

@@ -231,7 +231,7 @@ pipeline {
             stage("Run Flakey Spec Catcher") {
               if(partitions.size() == 0) {
                 return
-              } else if(partitions.size() >= env.MAX_NODES.toInteger()) {
+              } else if(partitions.size() > env.MAX_NODES.toInteger()) {
                 error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
 
                 return

@@ -165,7 +165,7 @@ class WikiPagesApiController < ApplicationController
   # Duplicate a wiki page
   #
   # @example_request
-  #     curl -X DELETE -H 'Authorization: Bearer <token>' \
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages/14/duplicate
   #
   # @returns Page

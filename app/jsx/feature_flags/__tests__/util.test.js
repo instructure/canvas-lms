@@ -54,16 +54,16 @@ describe('feature_flags:util', () => {
   describe('buildDescription', () => {
     it('generates the right things with allowsDefaults', () => {
       expect(util.buildDescription(sampleData.offFeature.feature_flag, true)).toEqual(
-        'Disabled (locked)'
+        'Disabled for all subaccounts/courses'
       )
       expect(util.buildDescription(sampleData.allowedFeature.feature_flag, true)).toEqual(
-        'Disabled (unlocked)'
+        'Allowed for subaccounts/courses, default off'
       )
       expect(util.buildDescription(sampleData.allowedOnFeature.feature_flag, true)).toEqual(
-        'Enabled (unlocked)'
+        'Allowed for subaccounts/courses, default on'
       )
       expect(util.buildDescription(sampleData.onFeature.feature_flag, true)).toEqual(
-        'Enabled (locked)'
+        'Enabled for all subaccounts/courses'
       )
     })
 
@@ -76,6 +76,19 @@ describe('feature_flags:util', () => {
         'Enabled'
       )
       expect(util.buildDescription(sampleData.onFeature.feature_flag, false)).toEqual('Enabled')
+    })
+  })
+
+  describe('doesAllowDefaults', () => {
+    it('correctly determines whether allowed states are available', () => {
+      expect(util.doesAllowDefaults(sampleData.offFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.onFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.allowedFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.allowedOnFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.allowedOnRootAccountFeature.feature_flag)).toBe(
+        false
+      )
+      expect(util.doesAllowDefaults(sampleData.allowedOnCourseFeature.feature_flag)).toBe(false)
     })
   })
 })

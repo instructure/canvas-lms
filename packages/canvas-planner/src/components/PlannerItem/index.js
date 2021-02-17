@@ -18,9 +18,11 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 import {themeable, ApplyTheme} from '@instructure/ui-themeable'
-import {Text, Pill, Avatar} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Pill} from '@instructure/ui-pill'
+import {Avatar} from '@instructure/ui-avatar'
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {
   IconAssignmentLine,
@@ -40,7 +42,7 @@ import BadgeList from '../BadgeList'
 import CalendarEventModal from '../CalendarEventModal'
 import responsiviser from '../responsiviser'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../plannerPropTypes'
 import {showPillForOverdueStatus} from '../../utilities/statusUtils'
 import formatMessage from '../../format-message'
@@ -55,6 +57,7 @@ export class PlannerItem extends Component {
     title: string.isRequired,
     points: number,
     date: momentObj,
+    address: string,
     dateStyle: string,
     details: string,
     courseName: string,
@@ -99,7 +102,7 @@ export class PlannerItem extends Component {
     this.props.registerAnimatable('item', this, this.props.animatableIndex, [this.props.uniqueId])
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.props.deregisterAnimatable('item', this, [this.props.uniqueId])
     this.props.registerAnimatable('item', this, nextProps.animatableIndex, [nextProps.uniqueId])
     this.setState({

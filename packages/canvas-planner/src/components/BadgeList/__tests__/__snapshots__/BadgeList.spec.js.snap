@@ -9,8 +9,8 @@ exports[`renders Pill components as list items 1`] = `
     key="null/.0"
   >
     <Pill
+      color="primary"
       text="Pill 1"
-      variant="default"
     />
   </li>
   <li
@@ -18,8 +18,8 @@ exports[`renders Pill components as list items 1`] = `
     key="null/.1"
   >
     <Pill
+      color="primary"
       text="Pill 2"
-      variant="default"
     />
   </li>
   <li
@@ -27,8 +27,8 @@ exports[`renders Pill components as list items 1`] = `
     key="null/.2"
   >
     <Pill
+      color="primary"
       text="Pill 3"
-      variant="default"
     />
   </li>
 </ul>

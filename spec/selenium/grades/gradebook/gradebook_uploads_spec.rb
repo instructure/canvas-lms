@@ -334,4 +334,55 @@ describe "Gradebook - uploads" do
 
     assert_assignment_is_not_highlighted
   end
+
+  describe "override grades" do
+    before(:each) do
+      @course1 = Course.create!
+      @course1.enable_feature!(:final_grades_override)
+      @course1.update!(allow_final_grade_override: true)
+      @student_enrollment = student_in_course(active_all: true, course: @course1)
+      @student = @student_enrollment.user
+      @teacher = teacher_in_course(course: @course1, active_all: true).user
+      assignment1 = @course1.assignments.create!(title: "Assignment 1")
+      assignment1.grade_student(@student, grade: 10, grader: @teacher)
+      @student_enrollment.scores.find_by!(course_score: true).update!(override_score: 89.1)
+
+      user_session(@teacher)
+      Gradebook.visit_upload(@course1)
+    end
+
+    it 'finds changes to override scores when flag enabled' do
+      Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
+
+      _filename, fullpath, _data = gradebook_file("gradebook.csv",
+            "Student Name,ID,Section,Assignment 1,Override Score",
+            "User,#{@student.id},,10,100")
+
+      Gradebook.grades_uploaded_data.send_keys(fullpath)
+      wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+      run_jobs
+      Gradebook.wait_for_spinner
+
+      expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
+      expect(f('#no_changes_detected')).not_to be_displayed
+
+      expect(ff('.slick-header-column.assignment').length).to eq 1
+      expect(f('#assignments_without_changes_alert')).to be_displayed
+    end
+
+    it 'does not find changes to override scores when flag disabled' do
+      Account.site_admin.disable_feature!(:import_override_scores_in_gradebook)
+
+      _filename, fullpath, _data = gradebook_file("gradebook.csv",
+            "Student Name,ID,Section,Assignment 1,Override Score",
+            "User,#{@student.id},,10,100")
+
+      Gradebook.grades_uploaded_data.send_keys(fullpath)
+      wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+      run_jobs
+      Gradebook.wait_for_spinner
+
+      expect(f('#no_changes_detected')).to be_displayed
+    end
+  end
 end

@@ -340,7 +340,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.CAN.OPEN_MANAGE_OPTIONS =
       json.CAN.MANAGE || json.CAN.CREATE || json.CAN.PUBLISH || ENV.DIRECT_SHARE_ENABLED
 
-    json.BULK_DELETE_ENABLED = ENV.FEATURES?.bulk_delete_pages
     json.fetched = !!this.fetched
     json.fetchedLast = !!this.fetchedLast
     json.collectionHasTodoDate = this.collectionHasTodoDate()

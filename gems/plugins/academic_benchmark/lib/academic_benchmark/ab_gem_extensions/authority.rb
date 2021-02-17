@@ -23,12 +23,12 @@ module AcademicBenchmarks
   module Standards
     class Authority
       include Common
-      def document_cache
-        @document_cache ||= {}
+      def publication_cache
+        @publication_cache ||= {}
       end
 
       def build_outcomes(ratings={}, _parent=nil)
-        document_cache.clear
+        publication_cache.clear
         build_common_outcomes(ratings).merge!({
           title: description,
           description: "#{code} - #{description}",

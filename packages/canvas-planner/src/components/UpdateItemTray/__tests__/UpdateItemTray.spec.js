@@ -51,6 +51,7 @@ afterAll(() => {
 
 afterEach(() => {
   jest.restoreAllMocks()
+  document.body.innerHTML = ''
 })
 
 it('renders the item to update if provided', () => {
@@ -112,7 +113,7 @@ it('disables the save button when title is empty', () => {
 it('handles courseid being none', () => {
   const item = simpleItem()
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />)
-  wrapper.instance().handleCourseIdChange({target: {value: 'none'}})
+  wrapper.instance().handleCourseIdChange({}, {value: 'none'})
   expect(wrapper.instance().state.updates.courseId).toBe(undefined)
 })
 
@@ -122,7 +123,7 @@ it('correctly updates id to null when courseid is none', () => {
   const wrapper = shallow(
     <UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={item} />
   )
-  wrapper.instance().handleCourseIdChange({target: {value: 'none'}})
+  wrapper.instance().handleCourseIdChange({}, {value: 'none'})
   wrapper.instance().handleSave()
   expect(mockCallback).toHaveBeenCalledWith({
     uniqueId: '1',
@@ -287,12 +288,21 @@ it('does render the delete button if an item is specified', () => {
 })
 
 it('renders just an optional option when no courses', () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} />)
-  expect(wrapper.find('CanvasSelectOption')).toHaveLength(1)
+  const wrapper = mount(<UpdateItemTray {...defaultProps} />)
+  // SimpleSelect doesn't make it easy to test what
+  // options are rendered into the DOM
+  const courseSelect = wrapper.find('SimpleSelect')
+  courseSelect.simulate('click')
+  const optListId = courseSelect
+    .getDOMNode()
+    .querySelector('input')
+    .getAttribute('aria-owns')
+  const optList = document.getElementById(optListId)
+  expect(optList.querySelectorAll('li')).toHaveLength(1)
 })
 
 it('renders course options plus an optional option when provided with courses', () => {
-  const wrapper = shallow(
+  const wrapper = mount(
     <UpdateItemTray
       {...defaultProps}
       courses={[
@@ -301,7 +311,14 @@ it('renders course options plus an optional option when provided with courses', 
       ]}
     />
   )
-  expect(wrapper.find('CanvasSelectOption')).toHaveLength(3)
+  const courseSelect = wrapper.find('SimpleSelect')
+  courseSelect.simulate('click')
+  const optListId = courseSelect
+    .getDOMNode()
+    .querySelector('input')
+    .getAttribute('aria-owns')
+  const optList = document.getElementById(optListId)
+  expect(optList.querySelectorAll('li')).toHaveLength(3)
 })
 
 it('invokes save callback with updated data', () => {
@@ -325,7 +342,7 @@ it('invokes save callback with updated data', () => {
   )
   wrapper.instance().handleTitleChange({target: {value: 'new title'}})
   wrapper.instance().handleDateChange({}, '2017-05-01T14:00:00Z')
-  wrapper.instance().handleCourseIdChange(null, '43')
+  wrapper.instance().handleCourseIdChange(null, {value: '43'})
   wrapper.instance().handleChange('details', 'new details')
   wrapper.instance().handleSave()
   expect(saveMock).toHaveBeenCalledWith({

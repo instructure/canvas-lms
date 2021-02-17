@@ -20,7 +20,8 @@ import classnames from 'classnames'
 import {themeable} from '@instructure/ui-themeable'
 import {func, bool, string} from 'prop-types'
 
-import {Heading, Link} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
+import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 
 import formatMessage from '../../format-message'
@@ -28,11 +29,11 @@ import DesertSvg from './empty-desert.svg' // Currently uses react-svg-loader
 import BalloonsSvg from './balloons.svg'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 class PlannerEmptyState extends Component {
   static propTypes = {
-    changeDashboardView: func.isRequired,
+    changeDashboardView: func,
     onAddToDo: func.isRequired,
     isCompletelyEmpty: bool,
     responsiveSize: string
@@ -73,10 +74,15 @@ class PlannerEmptyState extends Component {
           <div className={styles.subtitle}>
             {formatMessage("Looks like there isn't anything here")}
           </div>
-          <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
-            {formatMessage('Go to Card View Dashboard')}
-          </Link>
-          |{this.renderAddToDoButton()}
+          {this.props.changeDashboardView && (
+            <>
+              <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
+                {formatMessage('Go to Card View Dashboard')}
+              </Link>
+              |
+            </>
+          )}
+          {this.renderAddToDoButton()}
         </div>
       </div>
     )

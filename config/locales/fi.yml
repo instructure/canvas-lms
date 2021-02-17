@@ -1192,11 +1192,13 @@ fi:
   add_course_406cb773: "Lisää kurssi"
   add_course_assignments_628ed6d0: "Lisää kurssin tehtäviä"
   add_course_calendar_events_146154a5: "Lisää kurssin kalenteritapahtumat"
+  add_course_files_4e0f1abc: "Lisää kurssitiedostoja"
   add_criterion_eb9587ef: "Lisää kriteeri"
   add_custom_link_22059c0: "Lisää mukautettu linkki"
   add_designers_to_courses_9588820b: "Lisää suunnittelijoita kursseille"
   add_discussion_653dab4c: "Lisää keskustelu"
   add_domain_f15bc6c1: "Lisää verkkotunnus (domain)"
+  add_edit_delete_files_573a4d62: "lisää/muokkaa/poista tiedostoja"
   add_edit_delete_sections_d32c5b4d: "lisää/muokkaa/poista osioita"
   add_email_address_aef3b61: "Lisää sähköpostiosoite"
   add_existing_content_7e36da66: "Lisää olemassa oleva sisältö"
@@ -1207,6 +1209,7 @@ fi:
   add_grading_period_6f774dc3: "Lisää arvosanojen antojakso"
   add_grading_scheme_81e23c05: " Lisää arviointiasteikko"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Lisää arviointiasteikko pääkäyttäjän arvosanaraportteihin."
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Lisää karkeus käyttöoikeuksiin kurssitiedostojen hallintaan liittyen"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Lisää karkeus käyttöoikeuksiin kurssin osien hallintaan liittyen"
   add_group_c84f9e9d: "Lisää ryhmä"
   add_group_set_f9809e11: "Lisää ryhmäjoukko"
@@ -1470,6 +1473,8 @@ fi:
   allow_users_to_comment_45b8f753: "Salli käyttäjien kommentoida"
   allowed_attempts_4e229caa: "Sallitut yritykset"
   allowed_domains_ee7868c8: "Sallitut verkkotunnukset"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Sallittu alitileille/kursseille, oletuksena pois päältä"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Sallittu alitileille/kursseille, oletuksena päällä"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Sallii Toimi käyttäjänä -linkin näkymisen opiskelijan kontekstikortilla"
   allows_account_course_level_mastery_scales_and_cal_da88d5a0: "Mahdollistaa tili- ja kurssitason hallinnan asteikot ja laskelman, ja korvaa tulokohtaisen ehdon luokitukset ja laskentamenetelmät"
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Sallii tilitason hallinnan suuruusluokat ja tehokkuuslaskelmat, korvaa tuloskohtaiset suuruusluokat"
@@ -2379,6 +2384,7 @@ fi:
     assignment_group_selector: 
       assignment_group: Tehtäväryhmä
       assignment_group_options: 
+        create_group: "Luo ryhmä"
         new_group: "Uusi ryhmä"
     assignment_list_item: 
       delete: Poista
@@ -3911,6 +3917,7 @@ fi:
   classic_quizzes_dee3c7b7: "Klassiset testit"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassisten kyselyiden asetus ajoitetuille kyselyille ilman lähetystä"
   clear_2084585f: Tyhjennä
+  clear_search_field_75f595c7: "Tyhjennä hakukenttä"
   clear_selected_file_82388e50: "Tyhjennä valittu tiedosto"
   clear_user_cache_ef079f7f: "Tyhjennä käyttäjän välimuisti"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Napsauta ”Peruuta”, jos et haluan koodin näkyvän."
@@ -4116,6 +4123,7 @@ fi:
   collaborations_tutorial_tray_9219d9d: "Yhteistöiden ohjetietopaneeli"
   collapse_all_50275533: "Kutista kaikki"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kutista ryhmän jäsenten lista kohteelle %{groupName}"
+  collapse_outcome_description_de471564: "Kutista tuloksen kuvaus"
   collapse_subdiscussion_89af1f5c: "Kutista alakeskustelu"
   collapse_tutorial_tray_66ee7dc1: "Kutista ohjetietopaneelia"
   collapsed_510aa02a: Kutistettu
@@ -5095,6 +5103,9 @@ fi:
   count_files_were_ignored_2f9c054a: 
     one: "(1) tiedosto ohitettiin"
     other: "(%{count}) tiedostoa ohitettiin"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 \"%{groupTitle}\" tulos"
+    other: "%{count} \"%{groupTitle}\" tulosta"
   count_hidden_e8d2c57c: "%{count} piilotettu"
   count_images_found_for_term_a93635ed: "%{count} kuvaa löytyi haulla %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -5118,6 +5129,9 @@ fi:
     one: "1 Asetus"
     other: "%{count} Asetusta"
   count_options_loaded_cd59cc3b: "%{count} asetusta ladattu."
+  count_outcomes_selected_55902958: 
+    one: "1 tulos valittuna"
+    other: "%{count} tulosta valittuna"
   count_pages_selected_for_deletion_1ab0f684: 
     one: "%{count} sivu valittu poistettavaksi"
     other: "%{count} sivua valittu poistettavaksi"
@@ -5300,7 +5314,10 @@ fi:
   course_favorites_from_dashboard_27a3515a: "Suosikkikurssien valinnat koontinäytöltä"
   course_files_62deb8f8: "Kurssin tiedostot"
   course_files_a31f97fc: "Kurssin tiedostot"
+  course_files_add_2eede390: "Kurssitiedostot - lisää"
   course_files_add_edit_delete_24678a2f: "Kurssitiedostot - lisää/muokkaa/poista"
+  course_files_delete_fae0effe: "Kurssitiedostot - poista"
+  course_files_edit_d05d4e8b: "Kurssitiedostot - muokkaa"
   course_found_f5a40cd3: "Kurssi löytyi"
   course_found_not_deleted_a20f72f0: "Kurssi löytyi (ei poistettu)"
   course_grade_grade_in_course_code_9fa854db: "Kurssin arvosana: %{grade}% kohteessa %{course_code}"
@@ -5915,6 +5932,8 @@ fi:
   create_edit_line_item_scores_116482c7: "Luo/muokkaa rivikohteiden pistemääriä"
   create_educational_resources_8219326e: "Luo koulutusresurssit"
   create_failed_15d07ad4: "Luonti epäonnistui"
+  create_file_71aa1922: "[ Luo tiedosto ]"
+  create_file_s_188549e6: "[ Luo tiedosto(t) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Luo tiedostot RCE Media -latauksen/nauhoituksen jälkeen"
   create_interactive_course_content_76665336: "Luo interaktiivista kurssisisältöä"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Luo live-tapahtuman tilaukset on ToolProxyssa"
@@ -6320,6 +6339,7 @@ fi:
   delete_comment_a71040c3: "Poista kommentti"
   delete_comment_comment_d32ffc85: "Poista kommentti: %{comment}"
   delete_comment_commenttext_c8afe129: "Poista kommentti: %{commentText}"
+  delete_course_files_ee9e769: "Poista kurssitiedostoja"
   delete_criterion_row_80c3b3b: "Poista kriteeririvi"
   delete_current_message_5da0221a: "Poista nykyinen viesti"
   delete_current_module_item_21fefc54: "Poista nykyinen moduuli/kohde"
@@ -6504,6 +6524,7 @@ fi:
   disabled_18c33a73: "(poistettu käytöstä)"
   disabled_3b1b332a: "Poistettu käytöstä"
   disabled_and_locked_d14dc6c2: "Pois käytöstä ja lukittu"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Pois käytöstä kaikille alitileille/kursseille"
   disabled_in_course_settings_d15ee35d: "* Poistettu käytöstä kurssiasetuksissa"
   disabled_links_b3bdea99: "Käytöstä poistetut linkit"
   disabled_locked_dab351d6: "Pois käytöstä (lukittu)"
@@ -6866,6 +6887,7 @@ fi:
   download_submission_comments_2a6c0395: "Lataa tehtäväpalautuksen kommentit"
   download_submissions_7454665f: "Lataa tehtäväpalautukset"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Lataa täydellinen luettelo virheistä ja varoituksista tästä."
+  download_these_results_as_csv_9a890883: "Lataa nämä tulokset CSV:nä"
   download_this_file_669f9174: "Lataa tämä tiedosto"
   downloading_course_content_allows_access_to_conten_164d9336: "Kurssin sisällön lataaminen mahdollistaa pääsyn sisältöön offline-tilassa. Sisältö voi koostua tiedostosta, sivuista, tehtävistä, keskusteluaiheista tai testeistä. Napsauta jokaiselle kurssille \"Luo ePub\" ja avaa millä tahansa eReader-ohjelmalla."
   draft_92507c72: (luonnos)
@@ -6972,6 +6994,7 @@ fi:
   edit_collaboration_b014c18b: "Muokkaa yhteistyötä"
   edit_comment_comment_e74afa04: "Muokkaa kommenttia: %{comment}"
   edit_conference_title_6e234815: "Muokkaa ”%{conference_title}\""
+  edit_course_files_d046ef82: "Muokkaa kurssitiedostoja"
   edit_course_role_3b992fc2: "Muokkaa kurssiroolia"
   edit_criterion_5e4dadca: "Muokkaa kriteeriä"
   edit_criterion_description_5828919: "Muokkaa kriteerien kuvausta"
@@ -7146,6 +7169,7 @@ fi:
   enable_toolname_dc64c25a: "Ota %{toolName} käyttöön"
   enabled_and_locked_49ff3de4: "Käytössä ja lukittu"
   enabled_ba7cab66: Käytössä
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Käytössä kaikille alitileille/kursseille"
   enabled_links_be110215: "Ota linkit käyttöön"
   enabled_locked_3cf7c256: "Käytössä (lukittu)"
   enabled_unlocked_8d3a5df7: "Käytössä (lukitus avattu)"
@@ -7665,6 +7689,7 @@ fi:
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Laajenna/kutista %{title} Osaamisen hallinnan tulosryhmä, opiskelijalla on hyvä osaaminen %{mastery_count} / %{count} tuloksesta"
   expand_global_navigation_2c28d5d4: "Laajenna päävalikkoa"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Laajenna ryhmän jäsenten lista kohteelle %{groupName}"
+  expand_outcome_description_c5bdd70b: "Laajenna tuloksen kuvaus"
   expand_permission_b45bf097: "Laajenna %{permission}"
   expand_permission_c61d5958: "Laajenna käyttöoikeutta"
   expand_subdiscussion_cd226ed4: "Laajenna alakeskustelua"
@@ -8659,6 +8684,7 @@ fi:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Hajautetut %{contextType} ilmoitusasetukset voidaan tulevaisuudessa määrittää tässä."
   granular_course_notification_settings_will_be_conf_68f122db: "Karkeat kurssin ilmoitusasetukset konfiguroidaan täällä tulevaisuudessa."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Karkeat käyttöoikeudet Lisää-/poista-järjestelmäkäyttäjän rooleille kurssilta"
+  granular_permissions_for_managing_course_files_1ed7f019: "Karkeat käyttöoikeudet kurssitiedostojen hallintaan"
   granular_permissions_for_managing_course_sections_da4b04b: "Karkeat käyttöoikeudet kurssin osien hallintaan"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Karkeat käyttöoikeudet wiki-sivujen hallintaan"
   graph_bar_b5daa23d: Kaaviopalkki
@@ -9476,6 +9502,7 @@ fi:
   importing_outcomes_e62a0375: "tuloksia tuodaan"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Paranna vasemmanpuoleisen valikon käytettävyyttä värin paremman visuaalisenkäytön ja ei-aktiivisten valikkokohteiden näytönlukijan ilmaisimien avulla"
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Paranna vedon ja pudotuksen löydettävyyttä tiedostoissa"
+  improved_interface_with_ongoing_updates_7316bdef: "Kehitetty rajapinta jatkuvilla päivityksillä"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Parempi uusien kyselyiden tuki moduuleiden kanssa, mukaan lukien uudet kyselyt moduuleista"
   improved_outcomes_management_4692f886: "Parempi tulosten hallinta"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Parannetut visuaaliset muistutukset rohkaisemaan ohjaajia julkaisemaan kursseja"
@@ -10191,6 +10218,7 @@ fi:
   loading_graders_f6a76142: "Arvioijia ladataan"
   loading_last_attended_date_5a42463: "Ladataan viimeistä osallistumispäivää"
   loading_media_32847745: "Ladataan mediaa"
+  loading_message_list_226a131e: "Viestiluetteloa ladataan"
   loading_more_gradebook_history_results_810f6d2e: "Ladataan lisää tuloksia arvosanakirjan historiaan."
   loading_more_results_1d437202: "Ladataan lisää tuloksia"
   loading_more_results_def6df65: "Ladataan lisää tuloksia..."
@@ -10391,6 +10419,7 @@ fi:
   malformed_csv_aaa4b7f2: "Virheellisesti muotoiltu CSV"
   maltese_916925e8: malta
   manage_access_bd923d8d: "Hallitse käyttöoikeutta"
+  manage_add_edit_delete_course_files_162c1a65: "Hallitse (lisää/muokkaa/poista) kurssitiedostoja"
   manage_add_edit_delete_pages_5c73f2fb: "Hallitse sivuja - lisää/muokkaa/poista"
   manage_app_list_994cc26c: "Hallitse sovellusluetteloa"
   manage_assignment_31a132fb: "Hallitse tehtävää"
@@ -10403,6 +10432,7 @@ fi:
       delete_avatar: "Haluatko varmasti poistaa tämän käyttäjän profiilikuvan?"
       lock_avatar: "Tämän kuvan lukitseminen hyväksyy toiminnon ja estää käyttäjää päivittämästä kuvaa.  Jatketaanko?"
   manage_b88f7150: Hallitse
+  manage_course_files_57e07038: "Hallitse kurssitiedostoja"
   manage_course_sections_f482d1b3: "Hallitse kurssin osioita"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Hallitse ilmoittumisen tila, luo ryhmiä ja lisää käyttäjiä tältä sivulta."
   manage_grading_schemes_in_context_name_e3678273: "Hallitse arviointiasteikkoja kohteessa %{context_name}"
@@ -12413,6 +12443,7 @@ fi:
   nav_text_94206145: Navigointiteksti
   nav_text_active_a924ae88: "Navigointiteksti aktiivinen"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigointi sallii käyttäjän nähdä Henkilöt-linkin kurssin navigoinnissa."
+  navigation_menu_fd782ff8: Navigointivalikko
   near_mastery_f25174a4: "Tyydyttävä osaaminen"
   need_a_canvas_account_221d18ed: "Tarvitsetko Canvas-tilin?"
   needs_grading_9143d47c: "Täytyy arvioida"
@@ -13170,6 +13201,7 @@ fi:
   outcome_imports_c496a81f: "Osaamisen tuonnit"
   outcome_mastery_scales_8c3a814d: "Tuloksen hallinnan suuruusluokat"
   outcome_mastery_scales_add_edit_171551c: "Tulosten hallinnan asteikot - lisää/muokkaa"
+  outcome_menu_4fe5813: Tulosvalikko
   outcome_path_mastery_points: "%{path} hallinnan pisteet"
   outcome_path_result: "%{path} Tulos"
   outcome_proficiency_calculations_5959b681: "Tuottojen pätevyyslaskennat"
@@ -15037,6 +15069,7 @@ fi:
           select_all_banks: "Valitse kaikki"
           view_question_banks: "Näytä kurssin kysymyspankit"
         options: 
+          create_group: "[ Luo ryhmä ]"
           new_group: "[ Uusi ryhmä ]"
           no_group: "[ Ei ryhmää ]"
         select_a_question_bank: "Valitse kysymyspankki alla olevalta listalta linkittääksesi sen testiin kysymysryhmänä."
@@ -15851,6 +15884,7 @@ fi:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Huolimatta siitä, onko tämä käyttöoikeus käytössä tai pois käytöstä, käyttäjä voi yhä hallita tehtäviä henkilökohtaisessa kalenterissaan."
   regenerate_3e4679f8: "Luo uudelleen"
   regenerate_epub_395c8e56: "Luo ePub uudelleen"
+  regenerating_themes_462e6cd9: "Teemoja luodaan uudelleen..."
   register_email_efc06d59: "Rekisteröi sähköpostiosoite"
   register_slack_email_1f6d7e6d: "Rekisteröi Slack-sähköposti"
   registration: 
@@ -16473,6 +16507,7 @@ fi:
   search_discussion_by_title_30466604: "Hae keskustelua otsikon perusteella"
   search_endpoints_d5abf37f: "Hae päätepisteitä"
   search_entries_or_author_63fb0a86: "Hae merkintöjä tai tekijää"
+  search_field_234156fc: Hakukenttä
   search_flickr_6f28b02e: "Hae Flickristä"
   search_for_a_deleted_course_by_id_f553398d: "Hae poistettua kurssia tunnuksella"
   search_for_files_7541fb28: "Hae tiedostoja"
@@ -16484,6 +16519,7 @@ fi:
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Hae henkilöitä. Kun kirjoitat tähän kenttään, henkilölistaa suodatetaan automaattisesti, niin että siinä näkyvät vain ne nimet, jotka täsmäävät kirjoittamasi tekstin kanssa."
   search_permissions_915bbd09: "Hae käyttöoikeuksia"
   search_term_must_be_at_least_num_characters_669098ed: "Hakutermissä on oltava vähintään %{num} merkkiä"
+  search_within_grouptitle_4d38272f: "Etsi kohdassa %{groupTitle}"
   searching_b0207e7f: Haetaan
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Ilmoitusten hakemisen osioista täytyy ulottua täsmälleen yhdelle kurssille"
   secondary_button_36a86f03: "Toissijainen painike"
@@ -16651,6 +16687,7 @@ fi:
   select_one_8e0af564: "Valitse yksi"
   select_one_b647b384: "Valitse yksi"
   select_one_of_the_options_c8b0c6e4: "Valitse jokin seuraavista vaihtoehdoista:"
+  select_outcome_7e6e2562: "Valittu tulos"
   select_page_e93fc123: "Valitse sivu"
   select_prerequisite_module_57894963: "Valitse ennakkoedellytyksen moduuli"
   select_prerequite_module_e9042bb0: "Valitse ennakkoedellytyksen moduuli"
@@ -16659,11 +16696,17 @@ fi:
   select_student_name_caaff244: "Valitse opiskelija %{name}"
   select_sub_account_6704196a: "Valitse alakategoria"
   select_term_f8083fb0: "Valitse lukukausi"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Valitse tiedosto, jonka haluat liittää tai lisää tiedosto valitsemalla \"Luo tiedosto\"."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Valitse tiedosto, jonka haluat liittää tai lisää tiedosto valitsemalla \"Uusi tiedosto\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Valitse tiedosto, jonka haluat liittää tähän *moduuliin* tai lisää tiedosto valitsemalla \"Uusi tiedosto\"."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Valitse tiedosto, jonka haluat liittää tähän *moduuliin* tai lisää tiedosto valitsemalla \"Luo tiedosto\"."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Valitse tiedostot, jotka haluat liittää tai lisää tiedostot valitsemalla \"Luo tiedostot\"."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Valitse tiedostot, jotka haluat liittää tai lisää tiedostot valitsemalla \"Uudet tiedostot\"."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Valitse tiedostot, jotka haluat liittää tähän *moduuliin* tai lisää tiedostot valitsemalla \"Uudet tiedostot\"."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Valitse tiedostot, jotka haluat liittää tähän *moduuliin* tai lisää tiedostot valitsemalla \"Luo tiedostot\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Valitse sivu, jonka haluat liittää tai lisää uusi valitsemalla \"Uusi sivu\"."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Valitse sivu, jonka haluat liittää tai lisää uusi valitsemalla \"Luo sivu\"."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Valitse sivu, jonka haluat liittää tähän *moduuliin* tai lisää uusi sivu valitsemalla \"Luo sivu\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Valitse sivu, jonka haluat liittää tähän *moduuliin* tai lisää uusi sivu valitsemalla \"Uusi sivu\"."
   select_title_for_deletion_45b08247: "Valitse %{title} poistettavaksi"
   select_type_of_prerequisite_8d6fa902: "Valitse ennakkoedellytyksen tyyppi"
@@ -17179,10 +17222,21 @@ fi:
       add_to_module: "Lisää %{item} *moduuliin*"
       assignment_item: Tehtävä
       assignment_item_select_label: "Valitse tehtävä, jonka haluat liittää tai lisää tehtävä valitsemalla \"Uusi tehtävä\"."
+      assignment_item_select_label_create: "Valitse tehtävä, jonka haluat liittää tai lisää tehtävä valitsemalla \"Luo tehtävä\"."
+      assignment_item_select_label_new: "Valitse tehtävä, jonka haluat liittää tai lisää tehtävä valitsemalla \"Uusi tehtävä\"."
       assignment_notice: "Valitse tehtävä, jonka haluat liittää tähän *moduuliin* tai lisää tehtävä valitsemalla \"Uusi tehtävä\"."
       content_page_item: Sivu
+      create_assignment_notice: "Valitse tehtävä, jonka haluat liittää tähän *moduuliin* tai lisää tehtävä valitsemalla \"Luo tehtävä\"."
+      create_assignment_option: "[ Luo tehtävä ]"
+      create_page_option: "[ Luo sivu ]"
+      create_quiz_notice: "Valitse testi, jonka haluat liittää tähän *moduuliin* tai lisää uusi valitsemalla \"Luo testi\"."
+      create_quiz_option: "[ Luo testi ]"
+      create_topic_notice: "Valitse aihe, jonka haluat liittää tähän *moduuliin* tai lisää aihe valitsemalla \"Luo aihe\"."
+      create_topic_option: "[ Luo aihe ]"
       discussion_item: Keskustelu
       discussion_topic_select_label: "Valitse aihe, jonka haluat liittää tai lisää aihe valitsemalla \"Uusi aihe\"."
+      discussion_topic_select_label_create: "Valitse aihe, jonka haluat liittää tai lisää aihe valitsemalla \"Luo aihe\"."
+      discussion_topic_select_label_new: "Valitse aihe, jonka haluat liittää tai lisää aihe valitsemalla \"Uusi aihe\"."
       domain_match_notice: "jos haluat käyttää tätä työkalua, verkkotunnuksen täytyy täsmätä %{domain}"
       external_tool_item: "Ulkoinen työkalu"
       external_tool_notice: "Valitse työkalu alla olevasta listasta tai syötä ulkoisen työkalun URL, jonka jo tiedät olevan konfiguroitu Basic LTI:n kanssa lisätäksesi linkin siitä tähän *moduuliin*."
@@ -17202,6 +17256,7 @@ fi:
         header: Otsikko
         indentation: Sisennys
         page_name: "Sivun nimi"
+        quiz_engine: Kyselykone
         quiz_group: Ryhmä
         quiz_name: "Testin nimi"
         topic_name: "Aiheen nimi"
@@ -17209,16 +17264,21 @@ fi:
         wiki_page_name: "Sivun nimi"
         wiki_page_namem: "Tehtävän nimi"
       loading: Ladataan...
+      new_assignment_notice: "Valitse tehtävä, jonka haluat liittää tähän *moduuliin* tai lisää tehtävä valitsemalla \"Uusi tehtävä\"."
       new_assignment_option: "[ Uusi tehtävä ]"
       new_page_option: "[ Uusi sivu ]"
+      new_quiz_notice: "Valitse testi, jonka haluat liittää tähän *moduuliin* tai lisää uusi valitsemalla \"Uusi testi\"."
       new_quiz_option: "[ Uusi testi ]"
       new_tab: "Avaa uudessa välilehdessä"
+      new_topic_notice: "Valitse aihe, jonka haluat liittää tähän *moduuliin* tai lisää aihe valitsemalla \"Uusi aihe\"."
       new_topic_option: "[ Uusi aihe ]"
       options: 
         assignments: Tehtävät
       quiz_item: Testi
       quiz_notice: "Valitse testi, jonka haluat liittää tähän *moduuliin* tai lisää uusi valitsemalla \"Uusi testi\"."
       quiz_select_label: "Valitse testi, jonka haluat liittää tai lisää uusi valitsemalla \"Uusi testi\"."
+      quiz_select_label_create: "Valitse testi, jonka haluat liittää tai lisää uusi valitsemalla \"Luo testi\"."
+      quiz_select_label_new: "Valitse testi, jonka haluat liittää tai lisää uusi valitsemalla \"Uusi testi\"."
       select_item_type_label: "Valitse lisättävän sisällön tyyppi."
       sub_header_notice: "Kirjoita teksti, jonka haluaisit lisätä *moduulin* alaotsikkoon"
       text_header_item: "Tekstin otsikko"
@@ -18384,6 +18444,7 @@ fi:
   the_module_item_is_locked_27fe420b: "Moduulin osa on lukittu."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Viimeisimmät pistemäärät käyttäjälle %{current_user_name} ja tulokselle %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Seuraava saatavissa oleva tapaaminen tällä kurssilla on *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "Alkuperäinen testirajapinta"
   the_preceding_content_is_partner_provided_d753928c: "Edeltävä sisältö on kumppanin toimittamaa"
   the_previous_sis_batch_was_aborted_d7d89955: "Edellinen SIS-erä keskeytettiin"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Järjestelmäkäyttäjäsi määritti pätevyyslaskelman. Se koskee kaikkia kurssejasi tällä tilillä."
@@ -19399,7 +19460,9 @@ fi:
   unable_to_dismiss_update_df1e32eb: "Päivitystä ei voida ohittaa"
   unable_to_find_extension_3fe61b3c: "tiedostotunnusta ei löytynyt"
   unable_to_find_filetype_7b620f02: "tiedostotyyppiä ei löytynyt"
+  unable_to_load_courses_menu_7074ea04: "Kussivalikon lataus ei onnistu."
   unable_to_load_lti_1_3_tools_cf169f9: "Lti 1.3 -työkalujen lataus ei onnistunut"
+  unable_to_load_messages_2b158fd0: "Viestien lataus ei onnistu. "
   unable_to_read_file_2d04b0c: "Faili lugemine ei ole võimalik."
   unable_to_remove_app_4293cb53: "Sovellusta ei voida poistaa"
   unable_to_save_new_discussion_topic_99239f3f: "uuden keskustelun aiheen tallentaminen ei onnistunut"

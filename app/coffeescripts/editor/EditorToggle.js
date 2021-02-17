@@ -199,6 +199,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
           .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
           .click(
             preventDefault(() => {
+              RichContentEditor.closeRCE(this.textArea)
               this.display()
               this.editButton && this.editButton.focus()
             })
@@ -214,5 +215,9 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
     const $container = $("<div class='switch-views'></div>")
     ReactDOM.render(component, $container[0])
     return $container
+  },
+
+  cancel() {
+    RichContentEditor.closeRCE(this.textArea)
   }
 })
