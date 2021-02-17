@@ -15,7 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render, waitForElement} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import MobileContextMenu from '../MobileContextMenu'
 
 const tabsFromApi = [
@@ -78,19 +78,19 @@ describe('MobileContextMenu', () => {
 
   it('displays tabs that are not marked hidden or unused', async () => {
     const {getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
-    await waitForElement(() => getAllByRole('link'))
+    await waitFor(() => getAllByRole('link'))
     expect(getByText('Home')).toBeVisible()
   })
 
   it('does not display external tabs that are set to hidden', async () => {
     const {getAllByRole, queryByText} = render(<MobileContextMenu {...props} />)
-    await waitForElement(() => getAllByRole('link'))
+    await waitFor(() => getAllByRole('link'))
     expect(queryByText('Course Navigation')).not.toBeInTheDocument()
   })
 
   it('displays internal hidden tabs with offline icon', async () => {
     const {container, getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
-    await waitForElement(() => getAllByRole('link'))
+    await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('Discussions')).toBeVisible()
     expect(getByText('- Disabled. Not visible to students.')).toBeVisible()
@@ -100,7 +100,7 @@ describe('MobileContextMenu', () => {
 
   it('displays internal unused tabs with offline icon', async () => {
     const {container, getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
-    await waitForElement(() => getAllByRole('link'))
+    await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('Grades')).toBeVisible()
     expect(iconOff.length).toEqual(3)
@@ -109,7 +109,7 @@ describe('MobileContextMenu', () => {
 
   it('displays external unused tabs with offline icon', async () => {
     const {container, getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
-    await waitForElement(() => getAllByRole('link'))
+    await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('DIG')).toBeVisible()
     expect(iconOff.length).toEqual(3)

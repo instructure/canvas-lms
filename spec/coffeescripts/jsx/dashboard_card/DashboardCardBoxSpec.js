@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
 import sinon from 'sinon'
-import {wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 import DashboardCard from 'jsx/dashboard_card/DashboardCard'
 import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
@@ -178,7 +178,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       server.respond()
 
       removeCardFromFavorites(card)
-      await wait(() => waitForRerender(card))
+      await waitFor(() => waitForRerender(card))
 
       const rerendered = getDashboardCardElements()
       strictEqual(rerendered.length, 1)

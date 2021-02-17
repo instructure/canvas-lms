@@ -26,7 +26,7 @@ import $ from 'jquery'
 import React from 'react'
 import axios from 'axios'
 import {shallow} from 'enzyme'
-import waitForExpect from 'wait-for-expect'
+import {waitFor} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = {
@@ -63,7 +63,7 @@ describe('default proficiency', () => {
 
   it('render billboard after loading', async () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(wrapper.find('Billboard')).toHaveLength(1)
     })
   })
@@ -131,15 +131,10 @@ describe('default proficiency', () => {
     setTimeout(() => {
       wrapper.instance().removeBillboard()
       wrapper.instance().handleDescriptionChange(0)('')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        findProficiencyRatings(wrapper)
-          .first()
-          .prop('descriptionError')
-      ).toBe('Missing required description')
+      wrapper.find('Button').last().simulate('click')
+      expect(findProficiencyRatings(wrapper).first().prop('descriptionError')).toBe(
+        'Missing required description'
+      )
       done()
     }, 1)
   })
@@ -149,15 +144,8 @@ describe('default proficiency', () => {
     setTimeout(() => {
       wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)('')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        findProficiencyRatings(wrapper)
-          .first()
-          .prop('pointsError')
-      ).toBe('Invalid points')
+      wrapper.find('Button').last().simulate('click')
+      expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
       done()
     }, 1)
   })
@@ -167,15 +155,8 @@ describe('default proficiency', () => {
     setTimeout(() => {
       wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)('1.1.1')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        findProficiencyRatings(wrapper)
-          .first()
-          .prop('pointsError')
-      ).toBe('Invalid points')
+      wrapper.find('Button').last().simulate('click')
+      expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
       done()
     }, 1)
   })
@@ -185,15 +166,8 @@ describe('default proficiency', () => {
     setTimeout(() => {
       wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)('-1')
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
-      expect(
-        findProficiencyRatings(wrapper)
-          .first()
-          .prop('pointsError')
-      ).toBe('Negative points')
+      wrapper.find('Button').last().simulate('click')
+      expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Negative points')
       done()
     }, 1)
   })
@@ -205,10 +179,7 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper
-        .find('Button')
-        .last()
-        .simulate('click')
+      wrapper.find('Button').last().simulate('click')
       expect(axios.post).toHaveBeenCalledTimes(1)
       postSpy.mockRestore()
       done()

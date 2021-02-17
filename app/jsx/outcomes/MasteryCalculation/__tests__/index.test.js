@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, wait, fireEvent, waitForElementToBeRemoved} from '@testing-library/react'
+import {render, waitFor, fireEvent, waitForElementToBeRemoved} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {ACCOUNT_OUTCOME_CALCULATION_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
 import MasteryCalculation from '../index'
@@ -70,8 +70,7 @@ describe('MasteryCalculation', () => {
       </MockedProvider>
     )
     expect(getByText('Loading')).not.toEqual(null)
-    await wait()
-    expect(getByDisplayValue(/65/)).not.toEqual(null)
+    await waitFor(() => expect(getByDisplayValue(/65/)).not.toEqual(null))
   })
 
   it('loads role list', async () => {
@@ -169,7 +168,7 @@ describe('MasteryCalculation', () => {
       fireEvent.input(parameter, {target: {value: '88'}})
       fireEvent.click(getByText('Save Mastery Calculation'))
       fireEvent.click(getByText('Save'))
-      await wait(() => {
+      await waitFor(() => {
         expect(updateCall).toHaveBeenCalled()
       })
     })

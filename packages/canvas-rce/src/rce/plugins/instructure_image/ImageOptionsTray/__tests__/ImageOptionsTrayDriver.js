@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, getByLabelText, getAllByText, queryByLabelText, wait} from '@testing-library/dom'
+import {
+  fireEvent,
+  getByLabelText,
+  getAllByText,
+  queryByLabelText,
+  waitFor
+} from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {
   const controlledId = $sizeSelect.getAttribute('aria-controls')
@@ -115,7 +121,7 @@ export default class ImageOptionsTrayDriver {
 
   async setSize(sizeText) {
     this.$sizeSelect.click()
-    await wait(() => getSizeOptions(this.$sizeSelect))
+    await waitFor(() => getSizeOptions(this.$sizeSelect))
     const $options = getSizeOptions(this.$sizeSelect)
     $options.find($option => $option.textContent.trim().includes(sizeText)).click()
   }

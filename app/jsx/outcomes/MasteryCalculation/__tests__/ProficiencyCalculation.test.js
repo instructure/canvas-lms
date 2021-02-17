@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, wait} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import ProficiencyCalculation from '../ProficiencyCalculation'
 
 describe('ProficiencyCalculation', () => {
@@ -256,7 +256,7 @@ describe('ProficiencyCalculation', () => {
         fireEvent.input(parameter, {target: {value: '40'}})
         fireEvent.click(getByText('Save Mastery Calculation'))
         fireEvent.click(getByText('Save'))
-        await wait(() => {
+        await waitFor(() => {
           expect(update).toHaveBeenCalledTimes(1)
           expect(update).toHaveBeenCalledWith('decaying_average', 40)
         })
@@ -312,7 +312,7 @@ describe('ProficiencyCalculation', () => {
         fireEvent.input(parameter, {target: {value: '3'}})
         fireEvent.click(getByText('Save Mastery Calculation'))
         fireEvent.click(getByText('Save'))
-        await wait(() => {
+        await waitFor(() => {
           expect(update).toHaveBeenCalledTimes(1)
           expect(update).toHaveBeenCalledWith('n_mastery', 3)
         })

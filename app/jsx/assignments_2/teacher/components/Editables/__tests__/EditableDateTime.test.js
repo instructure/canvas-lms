@@ -116,11 +116,11 @@ describe('EditableDateTime', () => {
   //   fireEvent.change(input, {target: {value: newdt}})
 
   //   fireEvent.keyDown(input, {key: 'Enter', code: 13, target: {value: input.value}})
-  //   await wait(() => {
+  //   await waitFor(() => {
   //     expect(onChangeMode).toHaveBeenCalledWith('view')
   //   })
 
-  //   await wait(() => {
+  //   await waitFor(() => {
   //     expect(onChange).toHaveBeenCalled()
   //     expect(onChange).toHaveBeenCalledWith('2019-04-11T13:00:00-05:00')
   //   })

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, wait} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {DateTime} from '@instructure/ui-i18n'
 import {mockOverride, closest} from '../../../test-utils'
 import OverrideDates from '../OverrideDates'
@@ -119,7 +119,7 @@ function failADate(whichDate) {
     const dateDisplay = DateTime.toLocaleString(override[whichDate], locale, timeZone, 'LL')
     let dinput
     // wait for the popup
-    await wait(() => {
+    await waitFor(() => {
       dinput = getByDisplayValue(dateDisplay)
     })
     // focus the date input and change it's value to a date that fails validation
@@ -133,7 +133,7 @@ function failADate(whichDate) {
     // "Warning: Can't perform a React state update on an unmounted component."
     // though I cannot see the difference in the underlying logic between this
     // and waitForNoElement)
-    await wait(() => {
+    await waitFor(() => {
       expect(queryByTestId('EditableDateTime-editor')).toBeNull()
     })
 

@@ -17,7 +17,7 @@
  */
 
 import setupCSP from '../alert_enforcement'
-import {wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 const oldEnv = window.ENV
 
@@ -42,7 +42,7 @@ describe('setupCSP', () => {
     iframe.className = 'attachment-html-iframe'
     document.body.appendChild(iframe)
     setupCSP(document)
-    return wait(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
+    return waitFor(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
   })
 
   it('adds the csp policy to iframes that get added to the page after initial load', () => {
@@ -53,7 +53,7 @@ describe('setupCSP', () => {
     const iframe = document.createElement('iframe')
     iframe.className = 'attachment-html-iframe'
     document.body.appendChild(iframe)
-    return wait(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
+    return waitFor(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
   })
 
   it("doesn't add the csp policy to untagged iframes", () => {
@@ -63,6 +63,6 @@ describe('setupCSP', () => {
     const iframe = document.createElement('iframe')
     document.body.appendChild(iframe)
     setupCSP(document)
-    return wait(() => expect(iframe.getAttribute('csp')).toBe(null))
+    return waitFor(() => expect(iframe.getAttribute('csp')).toBe(null))
   })
 })

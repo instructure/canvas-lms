@@ -18,7 +18,7 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {act, render, waitForElement, within} from '@testing-library/react'
+import {act, render, waitFor} from '@testing-library/react'
 import {K5Dashboard} from '../K5Dashboard'
 import fetchMock from 'fetch-mock'
 
@@ -116,31 +116,6 @@ const defaultProps = {
   plannerEnabled: false
 }
 
-const getSelectedTab = wrapper => {
-  const selectedTabs = wrapper.getAllByRole('tab').filter(tab => tab.getAttribute('aria-selected'))
-  expect(selectedTabs.length).toBe(1)
-  return selectedTabs[0]
-}
-
-const expectSelectedTabText = (wrapper, text) => {
-  const tab = getSelectedTab(wrapper)
-  expect(within(tab).getByText(text)).toBeInTheDocument()
-}
-
-// We often have to wait for the Dashboard cards to be rendered on the Homeroom
-// tab, otherwise the test finishes too early and Jest cleans up the context
-// passed to the card components (e.g. window.ENV). This causes the test to fail
-// with undefined errors even if the actual test really succeeds.
-const waitForCardsToLoad = async wrapper => {
-  await waitForElement(() => wrapper.getByTestId('k5-dashboard-card'))
-}
-
-const renderDashboardHomeroomPage = async (props = defaultProps) => {
-  const wrapper = render(<K5Dashboard {...props} />)
-  await waitForCardsToLoad(wrapper)
-  return wrapper
-}
-
 beforeAll(() => {
   moxios.install()
   moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
@@ -183,23 +158,23 @@ afterEach(() => {
 
 describe('K-5 Dashboard', () => {
   it('displays a welcome message to the logged-in user', async () => {
-    const wrapper = await renderDashboardHomeroomPage()
-
-    expect(wrapper.getByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
+    const {findByText} = render(<K5Dashboard {...defaultProps} />)
+    expect(await findByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
   })
 
   describe('Tabs', () => {
     it('show Homeroom, Schedule, Grades, and Resources options', async () => {
-      const wrapper = await renderDashboardHomeroomPage()
-      ;['Homeroom', 'Schedule', 'Grades', 'Resources'].forEach(label => {
-        expect(wrapper.getByText(label)).toBeInTheDocument()
+      const {getByText} = render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => {
+        ;['Homeroom', 'Schedule', 'Grades', 'Resources'].forEach(label =>
+          expect(getByText(label)).toBeInTheDocument()
+        )
       })
     })
 
     it('default to the Homeroom tab', async () => {
-      const wrapper = await renderDashboardHomeroomPage()
-
-      expectSelectedTabText(wrapper, 'Homeroom')
+      const {findByRole} = render(<K5Dashboard {...defaultProps} />)
+      expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
     })
 
     describe('store current tab ID to URL', () => {
@@ -209,52 +184,47 @@ describe('K-5 Dashboard', () => {
 
       it('and start at that tab if it is valid', async () => {
         window.location.hash = '#grades'
-        let wrapper = null
-        await act(async () => {
-          wrapper = await render(<K5Dashboard {...defaultProps} />)
-        })
-
-        expectSelectedTabText(wrapper, 'Grades')
+        const {findByRole} = render(<K5Dashboard {...defaultProps} />)
+        expect(await findByRole('tab', {name: 'Grades', selected: true})).toBeInTheDocument()
       })
 
       it('and start at the default tab if it is invalid', async () => {
         window.location.hash = 'tab-not-a-real-tab'
-        const wrapper = await renderDashboardHomeroomPage()
-
-        expectSelectedTabText(wrapper, 'Homeroom')
+        const {findByRole} = render(<K5Dashboard {...defaultProps} />)
+        expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
       })
 
       it('and update the current tab as tabs are changed', async () => {
-        const wrapper = await renderDashboardHomeroomPage()
+        const {findByRole, getByRole, queryByRole} = render(<K5Dashboard {...defaultProps} />)
 
-        await act(async () => within(wrapper.getByRole('tablist')).getByText('Grades').click())
-        expect(window.location.hash).toBe('#grades')
-        expectSelectedTabText(wrapper, 'Grades')
+        const gradesTab = await findByRole('tab', {name: 'Grades'})
+        act(() => gradesTab.click())
+        expect(await findByRole('tab', {name: 'Grades', selected: true})).toBeInTheDocument()
 
-        await act(async () => within(wrapper.getByRole('tablist')).getByText('Resources').click())
-        expect(window.location.hash).toBe('#resources')
-        expectSelectedTabText(wrapper, 'Resources')
+        act(() => getByRole('tab', {name: 'Resources'}).click())
+        expect(await findByRole('tab', {name: 'Resources', selected: true})).toBeInTheDocument()
+        expect(queryByRole('tab', {name: 'Grades', selected: true})).not.toBeInTheDocument()
       })
     })
   })
 
   describe('Homeroom Section', () => {
     it('displays "My Subjects" heading', async () => {
-      const wrapper = await renderDashboardHomeroomPage()
-      expect(wrapper.getByText('My Subjects')).toBeInTheDocument()
+      const {findByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(await findByText('My Subjects')).toBeInTheDocument()
     })
 
     it('shows course cards, excluding homerooms', async () => {
-      const wrapper = await renderDashboardHomeroomPage()
-      expect(wrapper.getByText('Economics 101')).toBeInTheDocument()
-      expect(wrapper.queryByText('Home Room')).toBeNull()
+      const {findByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(await findByText('Economics 101')).toBeInTheDocument()
+      expect(queryByText('Home Room')).not.toBeInTheDocument()
     })
 
     it('shows latest announcement from each homeroom', async () => {
-      const wrapper = await renderDashboardHomeroomPage()
-      expect(wrapper.getByText('Announcement here')).toBeInTheDocument()
-      expect(wrapper.getByText('This is the announcement')).toBeInTheDocument()
-      const attachment = wrapper.getByText('exam1.pdf')
+      const {findByText, getByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(await findByText('Announcement here')).toBeInTheDocument()
+      expect(getByText('This is the announcement')).toBeInTheDocument()
+      const attachment = getByText('exam1.pdf')
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://google.com/download')
     })
@@ -262,19 +232,19 @@ describe('K-5 Dashboard', () => {
 
   describe('Schedule Section', () => {
     it('displays an empty state when no items are fetched', async () => {
-      const {getByText} = render(
+      const {findByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      await waitForElement(() => getByText("Looks like there isn't anything here"))
+      expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
     })
   })
 
   describe('Grades Section', () => {
     it('displays a score summary for each non-homeroom course', async () => {
-      const {getByText, queryByText} = render(
+      const {findByText, getByText, queryByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-grades" />
       )
-      await waitForElement(() => getByText('Economics 101'))
+      expect(await findByText('Economics 101')).toBeInTheDocument()
       expect(getByText('B-')).toBeInTheDocument()
       expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
     })

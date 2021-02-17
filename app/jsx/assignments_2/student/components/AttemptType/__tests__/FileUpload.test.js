@@ -22,7 +22,7 @@ import {AlertManagerContext} from '../../../../../shared/components/AlertManager
 import {DEFAULT_ICON} from '../../../../../shared/helpers/mimeClassIconHelper'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
 import FileUpload from '../FileUpload'
-import {fireEvent, render, wait} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -177,7 +177,7 @@ describe('FileUpload', () => {
 
     uploadFiles(fileInput, [file, file2])
 
-    await wait(() => {
+    await waitFor(() => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
@@ -244,7 +244,7 @@ describe('FileUpload', () => {
       })
     )
 
-    await wait(() => {
+    await waitFor(() => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
@@ -288,7 +288,7 @@ describe('FileUpload', () => {
       })
     )
 
-    await wait(() => {
+    await waitFor(() => {
       expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith(
         [{url: 'http://lemon.com', title: 'LemonRules.txt', mediaType: ''}],
         expect.anything()
@@ -401,7 +401,7 @@ describe('FileUpload', () => {
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     uploadFiles(fileInput, [file])
 
-    await wait(() => {
+    await waitFor(() => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
@@ -432,7 +432,7 @@ describe('FileUpload', () => {
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     uploadFiles(fileInput, [file])
 
-    await wait(() => {
+    await waitFor(() => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, fireEvent, wait} from '@testing-library/react'
+import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import $ from 'jquery'
 import store from '../../lib/ExternalAppsStore'
 import ExternalToolsTableRow from '../ExternalToolsTableRow'
@@ -156,7 +156,7 @@ describe('ExternalToolsTableRow', () => {
         const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
         fireEvent.click(checkbox)
       })
-      await wait(() => expect(store.getState().externalTools[0].is_rce_favorite).toBe(true))
+      await waitFor(() => expect(store.getState().externalTools[0].is_rce_favorite).toBe(true))
     })
   })
 })

@@ -19,7 +19,7 @@
 import React from 'react'
 import useGroupDetail from '../useGroupDetail'
 import {createCache} from '../../../canvas-apollo'
-import {renderHook, act} from '@testing-library/react-hooks'
+import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {groupDetailMocks} from './mocks'
 import $ from 'jquery'
 import {MockedProvider} from '@apollo/react-testing'
@@ -46,17 +46,17 @@ describe('groupDetailHook', () => {
     await act(async () => jest.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(result.current.group.title).toBe('Group 1')
-    expect(result.current.group.outcomes.nodes.map((o) => o.title)).toEqual([
+    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
       'Outcome 1 - Group 1',
-      'Outcome 2 - Group 1',
+      'Outcome 2 - Group 1'
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.nodes.map((o) => o.title)).toEqual([
+    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1',
-      'Outcome 3 - Group 1',
+      'Outcome 3 - Group 1'
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(false)
   })
@@ -71,22 +71,22 @@ describe('groupDetailHook', () => {
 
   it('resets and loads correctly when change the id', async () => {
     mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '2'})]
-    const {result, rerender} = renderHook((id) => useGroupDetail(id), {wrapper, initialProps: '1'})
+    const {result, rerender} = renderHook(id => useGroupDetail(id), {wrapper, initialProps: '1'})
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 1')
     act(() => rerender('2'))
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 2')
-    expect(result.current.group.outcomes.nodes.map((o) => o.title)).toEqual([
+    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
       'Outcome 1 - Group 2',
-      'Outcome 2 - Group 2',
+      'Outcome 2 - Group 2'
     ])
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.nodes.map((o) => o.title)).toEqual([
+    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
       'Outcome 1 - Group 2',
       'Outcome 2 - Group 2',
-      'Outcome 3 - Group 2',
+      'Outcome 3 - Group 2'
     ])
   })
 })

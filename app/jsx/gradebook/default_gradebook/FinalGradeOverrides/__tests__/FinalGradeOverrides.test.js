@@ -17,7 +17,7 @@
  */
 
 import sinon from 'sinon'
-import {wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 import GradeOverride from '../../../../grading/entities/GradeOverride'
 import GradeOverrideInfo from '../../../../grading/GradeEntry/GradeOverrideInfo'
@@ -173,7 +173,7 @@ describe('Gradebook FinalGradeOverrides', () => {
     })
 
     async function finished() {
-      await wait(() => FlashAlert.showFlashAlert.callCount > 0)
+      await waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
     }
 
     it('updates the grade info via the api when the grade info is valid', async () => {

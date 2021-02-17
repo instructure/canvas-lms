@@ -18,7 +18,7 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import {render, waitForElement} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import K5DashboardCard, {DashboardCardHeaderHero} from '../cards/K5DashboardCard'
 import K5DashboardContext from '../K5DashboardContext'
 
@@ -98,7 +98,7 @@ describe('K-5 Dashboard Card', () => {
       {overwriteRoutes: true}
     )
     const {getByText} = render(<K5DashboardCard {...defaultProps} />)
-    const linkText = await waitForElement(() => getByText('How do you do, fellow kids?'))
+    const linkText = await waitFor(() => getByText('How do you do, fellow kids?'))
     const link = linkText.closest('a')
     expect(link.href).toBe('http://localhost/courses/test/discussion_topics/55')
   })
@@ -109,7 +109,7 @@ describe('K-5 Dashboard Card', () => {
         <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
-    const message = await waitForElement(() => getByText('Nothing due today'))
+    const message = await waitFor(() => getByText('Nothing due today'))
     expect(message).toBeInTheDocument()
   })
 
@@ -120,7 +120,7 @@ describe('K-5 Dashboard Card', () => {
         <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
       </K5DashboardContext.Provider>
     )
-    const link = await waitForElement(() => getByText('3 due today'))
+    const link = await waitFor(() => getByText('3 due today'))
     link.click()
     expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
   })
@@ -132,7 +132,7 @@ describe('K-5 Dashboard Card', () => {
         <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
       </K5DashboardContext.Provider>
     )
-    const link = await waitForElement(() => getByText('2 missing'))
+    const link = await waitFor(() => getByText('2 missing'))
     link.click()
     expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
   })

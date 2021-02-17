@@ -19,7 +19,7 @@
 import {AuditLogForm, AuditLogResults, MUTATION_LOG_QUERY} from '../MutationAuditLog'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 
 describe('AuditLogForm', () => {
   it('renders', () => {
@@ -187,7 +187,7 @@ describe('AuditLogResults', () => {
     expect(getByText(/Loading/)).toBeInTheDocument()
 
     // results
-    expect(await waitForElement(() => getByText('Professor'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Professor'))).toBeInTheDocument()
   })
 
   it('paginates', async () => {
@@ -196,11 +196,11 @@ describe('AuditLogResults', () => {
         <AuditLogResults assetString="user_123" pageSize={1} />
       </MockedProvider>
     )
-    const loadMoreButton = await waitForElement(() => getByText(/load more/i))
+    const loadMoreButton = await waitFor(() => getByText(/load more/i))
     expect(loadMoreButton).toBeInTheDocument()
 
     fireEvent.click(loadMoreButton)
-    expect(await waitForElement(() => getByText('Doctor'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Doctor'))).toBeInTheDocument()
     expect(getByText(/No more/)).toBeInTheDocument()
   })
 
@@ -211,7 +211,7 @@ describe('AuditLogResults', () => {
       </MockedProvider>
     )
 
-    expect(await waitForElement(() => getByText(/no results/i))).toBeInTheDocument()
+    expect(await waitFor(() => getByText(/no results/i))).toBeInTheDocument()
   })
 
   it('handles errors', async () => {
@@ -221,7 +221,7 @@ describe('AuditLogResults', () => {
       </MockedProvider>
     )
 
-    expect(await waitForElement(() => getByText(/went wrong/))).toBeInTheDocument()
+    expect(await waitFor(() => getByText(/went wrong/))).toBeInTheDocument()
   })
 
   it('expands parameters', async () => {
@@ -231,7 +231,7 @@ describe('AuditLogResults', () => {
       </MockedProvider>
     )
 
-    const showParamsBtn = await waitForElement(() => getByText('Show params'))
+    const showParamsBtn = await waitFor(() => getByText('Show params'))
     expect(showParamsBtn).toBeInTheDocument()
 
     fireEvent.click(showParamsBtn)

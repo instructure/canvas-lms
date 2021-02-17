@@ -18,7 +18,7 @@
 
 import React from 'react'
 import axios from 'axios'
-import {cleanup, render, fireEvent, waitForElement} from '@testing-library/react'
+import {cleanup, render, fireEvent, waitFor} from '@testing-library/react'
 import MessageStudentsWhoDialog from '../MessageStudentsWhoDialog'
 import {mockAssignment, mockUser, mockSubmission} from '../../test-utils'
 import {
@@ -637,7 +637,7 @@ describe('MessageStudentsWhoDialog', () => {
       axios.post.mockResolvedValue(() => Promise.resolve({status: 202, data: []}))
       fireEvent.click(sendButton)
 
-      expect(await waitForElement(() => getByText('Sending messages'))).toBeInTheDocument()
+      expect(await waitFor(() => getByText('Sending messages'))).toBeInTheDocument()
     })
 
     it('handles success', async () => {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fireEvent, render, wait} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
 import range from 'lodash/range'
@@ -174,7 +174,7 @@ describe('ViewManager', () => {
         const newButton = getByText('New Attempt')
         fireEvent.click(newButton)
 
-        await wait(() => {
+        await waitFor(() => {
           expect(document.querySelector).toHaveBeenCalledWith(
             'button[data-test-id=assignments-2-assignment-toggle-details]'
           )

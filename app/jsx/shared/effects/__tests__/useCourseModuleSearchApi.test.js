@@ -17,7 +17,7 @@
  */
 
 import fetchMock from 'fetch-mock'
-import {renderHook} from '@testing-library/react-hooks'
+import {renderHook} from '@testing-library/react-hooks/dom'
 import useModuleCourseSearchApi from '../useModuleCourseSearchApi'
 
 function setupCourseModulesResponse() {

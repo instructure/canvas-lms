@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {wait} from '@testing-library/dom'
+import {waitFor} from '@testing-library/dom'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import RCELoader from 'jsx/shared/rce/serviceRCELoader'
 import $ from 'jquery'
@@ -72,7 +72,7 @@ test('instatiating a remote editor', async () => {
   RichContentEditor.preloadRemoteModule()
   const target = $('#big_rce_text')
   loadNewEditor()
-  await wait(() => RCELoader.loadRCE.callCount > 0)
+  await waitFor(() => RCELoader.loadRCE.callCount > 0)
   equal(target.parent().attr('id'), 'tinymce-parent-of-big_rce_text')
   equal(target.parent().find('#fake-editor').length, 1)
 })

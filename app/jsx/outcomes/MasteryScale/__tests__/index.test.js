@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, wait, fireEvent} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import moxios from 'moxios'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '../api'
@@ -59,9 +59,8 @@ describe('MasteryScale', () => {
         <MasteryScale contextType="Account" contextId="11" />
       </MockedProvider>
     )
-    expect(getByText('Loading')).not.toEqual(null)
-    await wait()
-    expect(getByDisplayValue(/Rating A/)).not.toEqual(null)
+    expect(getByText('Loading')).toBeInTheDocument()
+    await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads proficiency data to Course', async () => {
@@ -70,9 +69,8 @@ describe('MasteryScale', () => {
         <MasteryScale contextType="Course" contextId="12" />
       </MockedProvider>
     )
-    expect(getByText('Loading')).not.toEqual(null)
-    await wait()
-    expect(getByDisplayValue(/Rating A/)).not.toEqual(null)
+    expect(getByText('Loading')).toBeInTheDocument()
+    await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads role list', async () => {
@@ -81,16 +79,17 @@ describe('MasteryScale', () => {
         <MasteryScale contextType="Account" contextId="11" />
       </MockedProvider>
     )
-    expect(getByText('Loading')).not.toEqual(null)
-    await wait()
-    expect(
-      getByText(/Permission to change this mastery scale at the account level is enabled for/)
-    ).not.toEqual(null)
-    expect(
-      getByText(/Permission to change this mastery scale at the course level is enabled for/)
-    ).not.toEqual(null)
-    expect(getAllByText(/Account Admin/).length).not.toBe(0)
-    expect(getByText(/Teacher/)).not.toEqual(null)
+    expect(getByText('Loading')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        getByText(/Permission to change this mastery scale at the account level is enabled for/)
+      ).toBeInTheDocument()
+      expect(
+        getByText(/Permission to change this mastery scale at the course level is enabled for/)
+      ).toBeInTheDocument()
+      expect(getAllByText(/Account Admin/).length).not.toBe(0)
+      expect(getByText(/Teacher/)).toBeInTheDocument()
+    })
   })
 
   it('displays an error on failed request', async () => {
@@ -99,8 +98,7 @@ describe('MasteryScale', () => {
         <MasteryScale contextType="Account" contextId="11" />
       </MockedProvider>
     )
-    await wait()
-    expect(getByText(/An error occurred/)).not.toEqual(null)
+    await waitFor(() => expect(getByText(/An error occurred/)).toBeInTheDocument())
   })
 
   it('loads default data when request returns no ratings/method', async () => {
@@ -127,8 +125,7 @@ describe('MasteryScale', () => {
         <MasteryScale contextType="Account" contextId="11" />
       </MockedProvider>
     )
-    await wait()
-    expect(getByText('Mastery')).not.toBeNull()
+    await waitFor(() => expect(getByText('Mastery')).not.toBeNull())
   })
 
   describe('update outcomeProficiency', () => {
@@ -150,7 +147,7 @@ describe('MasteryScale', () => {
       fireEvent.click(getByText('Save Mastery Scale'))
       fireEvent.click(getByText('Save'))
 
-      await wait(() => {
+      await waitFor(() => {
         const request = moxios.requests.mostRecent()
         expect(request).not.toBeUndefined()
         expect(request.config.url).toEqual('/api/v1/accounts/11/outcome_proficiency')
@@ -175,13 +172,14 @@ describe('MasteryScale', () => {
           <MasteryScale contextType="Account" contextId="11" />
         </MockedProvider>
       )
-      expect(getByText('Loading')).not.toEqual(null)
-      await wait()
-      expect(
-        queryByText(
-          /This mastery scale will be used as the default for all courses within your account/
-        )
-      ).not.toBeInTheDocument()
+      expect(getByText('Loading')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(
+          queryByText(
+            /This mastery scale will be used as the default for all courses within your account/
+          )
+        ).not.toBeInTheDocument()
+      )
     })
   })
 })

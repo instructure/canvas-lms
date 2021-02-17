@@ -17,7 +17,7 @@
 //  */
 
 import React from 'react'
-import {render, wait} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import FeatureFlags from '../FeatureFlags'
@@ -43,7 +43,7 @@ describe('feature_flags::FeatureFlags', () => {
 
   it('Renders all the appropriate sections', async () => {
     const {getAllByText, queryByText} = render(<FeatureFlags />)
-    await wait(() => expect(getAllByText('Account')[0]).toBeInTheDocument())
+    await waitFor(() => expect(getAllByText('Account')[0]).toBeInTheDocument())
     expect(getAllByText('Course')[0]).toBeInTheDocument()
     expect(getAllByText('User')[0]).toBeInTheDocument()
     expect(queryByText('Site Admin')).not.toBeInTheDocument()
