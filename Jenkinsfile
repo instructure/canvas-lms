@@ -59,6 +59,10 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
+def getRailsLoadAllLocales() {
+  return configuration.isChangeMerged() ? 1 : (configuration.getBoolean('rails-load-all-locales', 'false') ? 1 : 0)
+}
+
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
 def ignoreBuildNeverStartedError(block) {
@@ -478,7 +482,7 @@ pipeline {
                       "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
-                      "RAILS_LOAD_ALL_LOCALES=${configuration.isChangeMerged() ? 1 : 0}",
+                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
@@ -634,7 +638,7 @@ pipeline {
                       "CACHE_SAVE_SCOPE=${cacheScope}",
                       "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
                       "PATCHSET_TAG=${env.PATCHSET_TAG}",
-                      "RAILS_LOAD_ALL_LOCALES=${configuration.isChangeMerged() ? 1 : 0}",
+                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
                       "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
                     ]) {
                       sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
