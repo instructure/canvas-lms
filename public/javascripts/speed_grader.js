@@ -2338,6 +2338,22 @@ EG = {
       } else {
         $reassign_assignment.hide()
       }
+    } else if (
+      currentSubmission &&
+      currentSubmission?.submission_history &&
+      currentSubmission.workflow_state === 'unsubmitted'
+    ) {
+      const index = currentSubmission.submission_history.length - 1
+      const missing =
+        currentSubmission.submission_history[index].submission?.missing ||
+        currentSubmission.submission_history[index]?.missing
+      if (missing) {
+        this.refreshSubmissionsToView()
+        $submission_details.show()
+      } else {
+        $submission_details.hide()
+      }
+      $reassign_assignment.hide()
     } else {
       // there's no submission
       $submission_details.hide()

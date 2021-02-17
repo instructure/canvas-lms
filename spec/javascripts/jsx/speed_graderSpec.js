@@ -382,6 +382,24 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.showSubmissionDetails()
       strictEqual($('#submission_details').is(':visible'), false)
     })
+
+    test('shows submission details if submission in submission history and missing', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{submission: {missing: true}}]
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#submission_details').is(':visible'), true)
+    })
+
+    test('shows submission details if submission is missing', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{missing: true}]
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#submission_details').is(':visible'), true)
+    })
   })
 
   QUnit.module('#refreshGrades()', hooks => {
