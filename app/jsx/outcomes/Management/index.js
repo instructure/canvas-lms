@@ -32,8 +32,8 @@ import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
 import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
 import useModal from '../../shared/hooks/useModal'
-import OutcomeMoveModal from './OutcomeMoveModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
+import MoveModal from './MoveModal'
 import GroupRemoveModal from './GroupRemoveModal'
 
 const NoOutcomesBillboard = ({contextType}) => {
@@ -87,7 +87,6 @@ const OutcomeManagementPanel = () => {
     selectedGroupId
   } = useManageOutcomes()
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
-  
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const groupMenuHandler = (_, action) => {
@@ -188,7 +187,7 @@ const OutcomeManagementPanel = () => {
           {selectedGroupId && (
             <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
           )}
-          <OutcomeMoveModal
+          <MoveModal
             title={group ? group.title : ''}
             type="group"
             isOpen={isMoveGroupModalOpen}

@@ -17,21 +17,37 @@
  */
 
 import React from 'react'
-import OutcomeMoveModal from './OutcomeMoveModal'
+import MoveModal from './MoveModal'
+import {MockedProvider} from '@apollo/react-testing'
+import OutcomesContext from '../contexts/OutcomesContext'
+import {accountMocks, groupMocks} from './__tests__/mocks'
+import {createCache} from 'jsx/canvas-apollo'
 
 export default {
-  title: 'Examples/Outcomes/OutcomeMoveModal',
-  component: OutcomeMoveModal,
+  title: 'Examples/Outcomes/MoveModal',
+  component: MoveModal,
   args: {
     isOpen: true,
     onCloseHandler: () => {},
-    title: 'Storybook Group Title',
-    type: 'outcome'
+    title: 'Group Title',
+    type: 'group',
+    contextType: 'Account',
+    contextId: 1
   }
 }
 
-const Template = args => <OutcomeMoveModal {...args} />
-
+const Template = args => {
+  return (
+    <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+      <MockedProvider
+        mocks={[...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]}
+        cache={createCache()}
+      >
+        <MoveModal {...args} />
+      </MockedProvider>
+    </OutcomesContext.Provider>
+  )
+}
 export const Default = Template.bind({})
 
 export const veryLongOutcomeTitle = Template.bind({})

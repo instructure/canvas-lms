@@ -309,3 +309,57 @@ export const useFindOutcomeModal = open => {
     clearSearch
   }
 }
+
+export const useGroupMoveModal = () => {
+  const {contextId, contextType} = useCanvasContext()
+
+  const client = useApolloClient()
+  const {
+    collections,
+    setCollections,
+    queryCollections: treeBrowserQueryCollection,
+    error,
+    setError,
+    isLoading,
+    setIsLoading
+  } = useTreeBrowser()
+
+  const queryCollections = ({id}) => {
+    treeBrowserQueryCollection({id})
+  }
+
+  useEffect(() => {
+    client
+      .query({
+        query: CHILD_GROUPS_QUERY,
+        variables: {
+          id: contextId,
+          type: contextType
+        }
+      })
+      .then(({data}) => {
+        setCollections(
+          mergeCollections(
+            data?.context?.rootOutcomeGroup?.childGroups?.nodes,
+            collections,
+            ROOT_ID
+          )
+        )
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+      .catch(err => {
+        setError(err)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return {
+    error,
+    isLoading,
+    collections,
+    queryCollections,
+    rootId: ROOT_ID
+  }
+}
