@@ -254,7 +254,7 @@ describe 'Student Gradebook' do
     end
   end
 
-  describe "Arrange By dropdown", ignore_js_errors: true do
+  describe "Arrange By dropdown" do
     before :once do
       course_with_student(name: "Student", active_all: true)
 

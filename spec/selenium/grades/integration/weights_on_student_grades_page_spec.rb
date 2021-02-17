@@ -21,7 +21,7 @@ require_relative '../pages/student_grades_page'
 require_relative './weighting_setup'
 require_relative './a_gradebook_shared_example'
 
-describe 'gradebook', ignore_js_errors: true do
+describe 'gradebook' do
   include_context "in-process server selenium tests"
   include WeightingSetup
 

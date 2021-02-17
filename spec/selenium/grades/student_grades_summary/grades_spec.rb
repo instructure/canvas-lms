@@ -469,7 +469,7 @@ describe "grades" do
   end
 
   context "as an observer" do
-    it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883, ignore_js_errors: true do
+    it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
       @obs = user_model(name: "Observer")
       e1 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
       e1.associated_user = @student_1

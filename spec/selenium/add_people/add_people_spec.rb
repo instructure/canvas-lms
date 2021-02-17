@@ -160,7 +160,7 @@ describe "add_people" do
 
     # tests that INSTUI fixed a bug in Select that would close the Modal
     # when the user uses 'esc' to close the options dropdown
-    it "should not close the modal on 'escape'ing from role Select options", ignore_js_errors: true do
+    it "should not close the modal on 'escape'ing from role Select options" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog
