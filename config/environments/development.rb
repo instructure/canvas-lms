@@ -61,6 +61,8 @@ environment_configuration(defined?(config) && config) do |config|
 
   config.eager_load = false
 
+  config.hosts << HostUrl
+
   # allow docker dev setup to use http proxy
   config.hosts << ENV['VIRTUAL_HOST'] if ENV['VIRTUAL_HOST']
 
