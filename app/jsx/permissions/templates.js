@@ -3041,6 +3041,50 @@ const courseAddRemoveDesignerPermissions = generateActionTemplates(
   ]
 )
 
+const allowCourseAdminActions = generateActionTemplates(
+  'allow_course_admin_actions',
+  [
+    {
+      title: I18n.t('People (Course)'),
+      description: I18n.t(
+        `Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Courses (Account)'),
+      description: I18n.t(
+        'To access the account Courses page, Courses - view list must be enabled.'
+      )
+    },
+    {
+      title: I18n.t('People (Course)'),
+      description: I18n.t(
+        `Enrollments may be added by your institution student information system (SIS).
+        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        `Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        `Enrollments may be added by your institution student information system (SIS).
+        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
+      )
+    }
+  ]
+)
+
 const usersViewListPermissions = generateActionTemplates(
   'read_roster',
   [
@@ -3560,6 +3604,7 @@ const permissionsTeacher = generateActionTemplates(
 export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
   ...deepMergeAll([
     accountLevelPermissions.ACCOUNT,
+    allowCourseAdminActions.ACCOUNT,
     courseCalenderPermissions.ACCOUNT,
     adminsLevelPermissions.ACCOUNT,
     alertPermissions.ACCOUNT,
@@ -3635,6 +3680,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
 export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
   ...deepMergeAll([
     accountLevelPermissions.COURSE,
+    allowCourseAdminActions.COURSE,
     courseCalenderPermissions.COURSE,
     adminsLevelPermissions.COURSE,
     alertPermissions.COURSE,
