@@ -1494,62 +1494,25 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
-  if CANVAS_RAILS5_2
-    def foreign_key_for(from_table, options_or_to_table = {})
-      return unless supports_foreign_keys?
-      fks = foreign_keys(from_table).select { |fk| fk.defined_for? options_or_to_table }
-      # prefer a FK on a column named after the table
-      unless options_or_to_table.is_a?(Hash)
-        column = foreign_key_column_for(options_or_to_table) if options_or_to_table
-        return fks.find { |fk| fk.column == column} || fks.first
-      end
-      fks.first
+  def foreign_key_for(from_table, **options)
+    return unless supports_foreign_keys?
+    fks = foreign_keys(from_table).select { |fk| fk.defined_for?(options) }
+    # prefer a FK on a column named after the table
+    if options[:to_table]
+      column = foreign_key_column_for(options[:to_table])
+      return fks.find { |fk| fk.column == column } || fks.first
     end
-  else
-    def foreign_key_for(from_table, **options)
-      return unless supports_foreign_keys?
-      fks = foreign_keys(from_table).select { |fk| fk.defined_for?(options) }
-      # prefer a FK on a column named after the table
-      if options[:to_table]
-        column = foreign_key_column_for(options[:to_table])
-        return fks.find { |fk| fk.column == column } || fks.first
-      end
-      fks.first
-    end
+    fks.first
   end
 
-  def remove_foreign_key(from_table, *args)
+  def remove_foreign_key(from_table, to_table = nil, **options)
     return unless supports_foreign_keys?
 
-    raise ArgumentError if args.length > 2
-
-    # support remove_foreign_key :table, :table, if_exists: stuff
-    # OR
-    # remove_foreign_key :table, column: :stuff
-    # OR
-    # remove_foreign_key :table, column: :stuff, if_exists: stuff
-    options = args.last
-    options = {} unless options.is_a?(Hash)
-
-    if CANVAS_RAILS5_2
-      # when removing this, simplify the whole method signature to `to_table = nil, **options`
-      options_or_to_table = args.first || {}
-
-      if options.delete(:if_exists)
-        fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
-        return if fk_name_to_delete.nil?
-      else
-        fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
-      end
+    if options.delete(:if_exists)
+      fk_name_to_delete = foreign_key_for(from_table, to_table: to_table, **options)&.name
+      return if fk_name_to_delete.nil?
     else
-      options[:to_table] = args.first unless args.first.is_a?(Hash)
-
-      if options.delete(:if_exists)
-        fk_name_to_delete = foreign_key_for(from_table, **options)&.name
-        return if fk_name_to_delete.nil?
-      else
-        fk_name_to_delete = foreign_key_for!(from_table, **options).name
-      end
+      fk_name_to_delete = foreign_key_for!(from_table, to_table: to_table, **options).name
     end
 
     at = create_alter_table from_table
@@ -1583,19 +1546,17 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   end
 end
 
-module UnscopeCallbacks
-  def run_callbacks(*args)
-    unless CANVAS_RAILS5_2
+if CANVAS_RAILS6_0
+  module UnscopeCallbacks
+    def run_callbacks(*args)
       # in rails 6.1, we can get rid of this entire monkeypatch
       scope = self.class.current_scope&.clone || self.class.default_scoped
       scope = scope.klass.unscoped
-    else
-      scope = self.class.all.klass.unscoped
+      scope.scoping { super }
     end
-    scope.scoping { super }
   end
+  ActiveRecord::Base.send(:include, UnscopeCallbacks)
 end
-ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
 module MatchWithDiscard
   def match(model, name)

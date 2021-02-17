@@ -25,8 +25,8 @@ end
 module ActiveSupport::Cache
   module RailsCacheShim
     def delete(key, options = nil)
-      r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS5_2)) # prefer rails 3 if on rails 3 and vis versa
-      r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS5_2))
+      r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS6_0)) # prefer rails new if on old rails and vice versa
+      r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS6_0))
       r1 || r2
     end
 
@@ -34,8 +34,8 @@ module ActiveSupport::Cache
 
     def normalize_key(key, options)
       result = super
-      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS5_2
-        result = "rails60:#{result}"
+      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+        result = "rails61:#{result}"
       end
       result
     end

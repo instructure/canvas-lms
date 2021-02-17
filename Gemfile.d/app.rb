@@ -17,12 +17,10 @@
 
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
-if CANVAS_RAILS5_2
-  gem 'rails', '5.2.4.5'
-    gem 'loofah', '2.3.0'
-    gem 'sprockets', '4.0.2'
-else
+if CANVAS_RAILS6_0
   gem 'rails', '6.0.3.5'
+else
+  gem 'rails', '6.1.3'
 end
 
 gem 'academic_benchmarks', '1.1.0', require: false
