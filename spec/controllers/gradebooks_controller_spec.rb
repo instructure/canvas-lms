@@ -833,7 +833,7 @@ describe GradebooksController do
           before(:each) { @teacher.preferences[:gradebook_version] = "srgb" }
 
           it "save_view_ungraded_as_zero_to_server is true when the feature is enabled" do
-            Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+            @course.account.enable_feature!(:view_ungraded_as_zero)
             get :show, params: { course_id: @course.id }
             expect(gradebook_options[:save_view_ungraded_as_zero_to_server]).to be true
           end
@@ -846,7 +846,7 @@ describe GradebooksController do
 
         context "when default gradebook is enabled" do
           it "sets allow_view_ungraded_as_zero in the ENV to true if the feature is enabled" do
-            Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+            @course.account.enable_feature!(:view_ungraded_as_zero)
             get :show, params: { course_id: @course.id }
             expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be true
           end
