@@ -132,7 +132,7 @@ module Lti::Ims
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data.
     #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
-    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, or online_url. Defaults to external_tool. Ignored if content_items are provided.
+    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, online_upload, or online_url. Defaults to external_tool. Ignored if content_items are provided.
     #   submission_data [String] submission data (URL or body text)
     #   submitted_at [String] Date and time that the submission was originally created. Should use subsecond precision. This should match the data and time that the original submission happened in Canvas.
     #   content_items [Array] Files that should be included with the submission. Each item should contain `type: file`, a url pointing to the file, a title, and a progress url that Canvas can report to. If present, submission_type will be online_upload.
@@ -182,23 +182,24 @@ module Lti::Ims
     #   }
     def create
       update_or_create_result
+      json = { resultUrl: result_url }
 
-      begin
-        content_items = upload_submission_files
-        render json: {
-               resultUrl: result_url,
-               Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items }
-             },
-             content_type: MIME_TYPE
-      rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
-        render_error('failed to communicate with file service', :gateway_timeout)
-      rescue CanvasHttp::InvalidResponseCodeError => err
-        err_message = "uploading to file service failed with #{err.code}: #{err.body}"
-        return render_error(err_message, :bad_request) if err.code == 400
-
-        # 5xx and other unexpected errors
-        render_error(err_message, :internal_server_error)
+      if has_content_items?
+        begin
+          content_items = upload_submission_files
+          json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items } unless content_items.empty?
+        rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
+          return render_error('failed to communicate with file service', :gateway_timeout)
+        rescue CanvasHttp::InvalidResponseCodeError => err
+          err_message = "uploading to file service failed with #{err.code}: #{err.body}"
+          return render_error(err_message, :bad_request) if err.code == 400
+  
+          # 5xx and other unexpected errors
+          return render_error(err_message, :internal_server_error)
+        end
       end
+
+      render json: json, content_type: MIME_TYPE
     end
 
     private
@@ -402,7 +403,7 @@ module Lti::Ims
 
     def submission_type
       # content_items override the provided submission type in favor of uploading a file
-      return 'online_upload' if file_content_items.any?
+      return 'online_upload' if has_content_items?
 
       scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_type) || DEFAULT_SUBMISSION_TYPE
     end
@@ -424,11 +425,11 @@ module Lti::Ims
     end
 
     def file_content_items
-      # disable file submission through AGS until all work is completed: INTEROP-6469
-      # see also note in docs on line 94
-      return [] unless Rails.env.test?
-
       scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :content_items)&.select { |item| item[:type] == "file"} || []
+    end
+
+    def has_content_items?
+      file_content_items.any?
     end
   end
 end
