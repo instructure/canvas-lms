@@ -1262,7 +1262,7 @@ class Attachment < ActiveRecord::Base
     can :delete and can :update
 
     given do |user, session|
-      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files)
     end
     can :read and can :create and can :download and can :read_as_admin
