@@ -215,7 +215,7 @@ export function enhanceUserContent() {
         const qs = href.searchParams
         qs.delete('wrap')
         qs.append('download_frd', '1')
-        const download_url = `${href.origin}${href.pathname}/download?${qs}`
+        const download_url = `${href.origin}${href.pathname}?${qs}`
         $download_btn = $(
           `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px;" href="${htmlEscape(
             download_url

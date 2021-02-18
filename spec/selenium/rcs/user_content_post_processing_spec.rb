@@ -63,7 +63,8 @@ describe 'user_content post processing' do
       expect(download_btn).to be_displayed
       expect(
         download_btn.attribute('href')
-      ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
+      ).to end_with "#{@file_url}?verifier=#{@file.uuid}&download_frd=1"
+      expect(download_btn).to have_attribute('download')
     end
 
     it 'omits preview button is requested' do
@@ -87,7 +88,8 @@ describe 'user_content post processing' do
       expect(download_btn).to be_displayed
       expect(
         download_btn.attribute('href')
-      ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
+      ).to end_with "#{@file_url}?verifier=#{@file.uuid}&download_frd=1"
+      expect(download_btn).to have_attribute('download')
     end
   end
 
