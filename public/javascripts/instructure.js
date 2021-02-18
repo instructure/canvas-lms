@@ -202,7 +202,7 @@ export function enhanceUserContent() {
     })
     .end()
 
-  $('a.instructure_scribd_file').each(function () {
+  $('a.instructure_file_link').each(function () {
     const $link = $(this)
     let $download_btn, $preview_link, $preview_container
     if ($.trim($link.text())) {
@@ -227,7 +227,7 @@ export function enhanceUserContent() {
             </a>`
         )
       }
-      if ($.filePreviewsEnabled()) {
+      if ($.filePreviewsEnabled() && $link.hasClass('instructure_scribd_file')) {
         if (ENV.FEATURES?.rce_better_file_previewing) {
           if ($link.hasClass('inline_disabled')) {
             // link opens in overlay
@@ -250,6 +250,7 @@ export function enhanceUserContent() {
           )
         }
       }
+      $link.removeClass('instructure_file_link')
       $link.removeClass('instructure_scribd_file').before($span).appendTo($span)
       $span.append($preview_link)
       $span.append($download_btn)
