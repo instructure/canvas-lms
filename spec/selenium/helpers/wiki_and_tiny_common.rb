@@ -211,6 +211,11 @@ module WikiAndTinyCommon
     el = f(selector)
     driver.action.key_down(:shift).click(el).key_up(:shift).perform
   end
+  def shift_O_combination(selector)
+    el = f(selector)
+    el.send_keys('') # focus
+    driver.action.key_down(:shift).key_down('o').key_up('o').key_up(:shift).perform
+  end
   def visit_front_page_edit(course)
     get "/courses/#{course.id}/pages/front-page/edit"
   end

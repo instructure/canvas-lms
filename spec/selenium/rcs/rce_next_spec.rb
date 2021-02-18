@@ -1423,8 +1423,8 @@ describe 'RCE next tests', ignore_js_errors: true do
           click_editor_view_button
           expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
 
-          # shift-click edit button -> raw editor
-          shift_click_button('[data-btn-id="rce-edit-btn"]')
+          # shift-o edit button -> raw editor
+          shift_O_combination('[data-btn-id="rce-edit-btn"]')
           expect(f('textarea#wiki_page_body')).to be_displayed
 
           # click "Pretty HTML Editor" status bar button -> fancy editor
