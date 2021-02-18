@@ -5,12 +5,12 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 # Append thread count used to build images.
 TAG_THREADS_SUFFIX=${RSPEC_PROCESSES:-"1"}
 
-export CACHE_VERSION="2021-02-17.1"
+export CACHE_VERSION="2021-02-18.1"
 export CACHE_SUFFIX="-$TAG_THREADS_SUFFIX"
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
-MIGRATIONS_CACHE_MD5=$(find . -path "./db/migrate/*.rb" -o -path "./gems/plugins/*/db/migrate/*.rb" -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1)
+MIGRATIONS_CACHE_MD5=$(find . \( -path  "./db/migrate/*.rb" -o -path "./gems/plugins/*/db/migrate/*.rb" \) -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1)
 
 declare -A CASSANDRA_TAGS; compute_tags_from_hash "CASSANDRA_TAGS" $CASSANDRA_PREFIX $MIGRATIONS_CACHE_MD5
 declare -A DYNAMODB_TAGS; compute_tags_from_hash "DYNAMODB_TAGS" $DYNAMODB_PREFIX $MIGRATIONS_CACHE_MD5
