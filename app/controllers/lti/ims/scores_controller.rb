@@ -369,7 +369,7 @@ module Lti::Ims
           type: item[:type],
           url: item[:url],
           title: item[:title],
-          progress: preflight_json[:progress][:url]
+          progress: lti_progress_show_url(id: preflight_json[:progress][:id])
         }
       end
     end

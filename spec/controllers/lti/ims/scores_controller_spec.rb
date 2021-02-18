@@ -368,6 +368,9 @@ module Lti::Ims
             let(:params_overrides) do
               super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items })
             end
+            let(:expected_progress_url) do
+              "http://test.host/api/lti/courses/#{context_id}/progress/"
+            end
 
             it 'ignores content items that are not type file' do
               send_request
@@ -391,7 +394,7 @@ module Lti::Ims
                 send_request
                 progress_url =
                   json[Lti::Result::AGS_EXT_SUBMISSION]['content_items'].first['progress']
-                expect(progress_url).to include 'http://test.host/api/v1/progress/'
+                expect(progress_url).to include expected_progress_url
               end
             end
 
@@ -429,7 +432,7 @@ module Lti::Ims
                 send_request
                 progress_url =
                   json[Lti::Result::AGS_EXT_SUBMISSION]['content_items'].first['progress']
-                expect(progress_url).to include 'http://test.host/api/v1/progress/'
+                expect(progress_url).to include expected_progress_url
               end
 
               shared_examples_for 'a 400' do
