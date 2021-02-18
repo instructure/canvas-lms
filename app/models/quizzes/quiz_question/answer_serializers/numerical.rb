@@ -38,16 +38,18 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #  { question_5: 8.4 }
     def serialize(answer)
       rc = SerializedAnswer.new
-      rc.answer[question_key] = Util.to_decimal(answer).to_s
+      # If the answer is a String we assume it is localized
+      decimal_answer = answer.is_a?(String) ? Util.i18n_to_decimal(answer) : Util.to_decimal(answer)
+      rc.answer[question_key] = decimal_answer
       rc
     end
 
+    # @param String
     # @return [BigDecimal|NilClass]
     def deserialize(submission_data, full=false)
       answer = submission_data[question_key]
-
       if answer.present?
-        Util.to_decimal(answer.to_s)
+        answer.is_a?(String) ? Util.i18n_to_decimal(answer) : answer
       end
     end
   end
