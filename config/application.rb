@@ -128,6 +128,23 @@ module CanvasRails
     end
 
     module PostgreSQLEarlyExtensions
+      module ConnectionHandling
+        def postgresql_connection(config)
+          conn_params = config.symbolize_keys
+
+          hosts = Array(conn_params[:host]).presence || [nil]
+          hosts.each_with_index do |host, index|
+            begin
+              conn_params[:host] = host
+              return super(conn_params)
+            rescue ::PG::Error
+              raise if index == hosts.length - 1
+              # else try next host
+            end
+          end
+        end
+      end
+
       def initialize(connection, logger, connection_parameters, config)
         unless config.key?(:prepared_statements)
           config = config.dup
@@ -171,6 +188,9 @@ module CanvasRails
       end
     end
 
+    Autoextend.hook(:"ActiveRecord::Base",
+      PostgreSQLEarlyExtensions::ConnectionHandling,
+        singleton: true)
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
