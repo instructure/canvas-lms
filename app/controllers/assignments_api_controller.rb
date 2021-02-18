@@ -1169,6 +1169,9 @@ class AssignmentsApiController < ApplicationController
   #     "online_url"
   #     "media_recording" (Only valid when the Kaltura plugin is enabled)
   #
+  # @deprecated_argument assignment[submission_types][] [String] NOTICE 2021-02-18 EFFECTIVE 2021-05-26
+  #   Only applies if the assignment doesn't have student submissions.
+  #
   # @argument assignment[allowed_extensions][] [String]
   #   Allowed extensions if submission_types includes "online_upload"
   #
