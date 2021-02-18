@@ -27,7 +27,7 @@ require 'action_view/helpers'
 module RevAssetPaths
   def path_to_asset(source, options = {})
     original_path = super
-    revved_url = Canvas::Cdn::RevManifest.url_for(original_path)
+    revved_url = ::Canvas::Cdn::RevManifest.url_for(original_path)
     if revved_url
       File.join(compute_asset_host(revved_url, options).to_s, revved_url)
     else

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,14 +16,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-def environment_configuration(_config)
-  CanvasRails::Application.configure do
-    yield(config)
+#
+require "audits/engine"
+require "switchman"
+
+module Audits
+  class << self
+    def config(_shard=::Switchman::Shard.current)
+      # settings = Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
+      # YAML.safe_load(settings['auditors.yml'] || '{}')
+      {}
+    end
   end
 end
-
-# Load the rails application
-require File.expand_path('../application', __FILE__)
-
-# Initialize the rails application
-CanvasRails::Application.initialize!

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,14 +16,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-def environment_configuration(_config)
-  CanvasRails::Application.configure do
-    yield(config)
-  end
-end
+#
+# Set up gems listed in the Gemfile.
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../../../Gemfile', __FILE__)
 
-# Load the rails application
-require File.expand_path('../application', __FILE__)
-
-# Initialize the rails application
-CanvasRails::Application.initialize!
+require 'bundler/setup' if File.exist?(ENV['BUNDLE_GEMFILE'])
+$LOAD_PATH.unshift File.expand_path('../../../../lib', __FILE__)

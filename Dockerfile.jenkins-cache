@@ -18,6 +18,15 @@ RUN --mount=target=/tmp/src \
     -name "*.gemspec" -o \
     -name "gem_version.rb" -o \
     -name "version.rb" \
+  \) -exec cp --parents -rf {} /tmp/dst \; && \
+  find engines \( \
+    -name "Gemfile" -o \
+    -name "Gemfile.d" -o \
+    -name "Gemfile.lock" -o \
+    -name "Gemfile.lock.next" -o \
+    -name "*.gemspec" -o \
+    -name "gem_version.rb" -o \
+    -name "version.rb" \
   \) -exec cp --parents -rf {} /tmp/dst \;
 
 FROM busybox AS cache-helper-collect-yarn

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,14 +16,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-def environment_configuration(_config)
-  CanvasRails::Application.configure do
-    yield(config)
+
+require 'rails_helper'
+require 'audits'
+
+RSpec.describe Audits do
+  describe ".config" do
+    it "is an empty hash right now" do
+      expect(Audits.config).to eq({})
+    end
   end
 end
-
-# Load the rails application
-require File.expand_path('../application', __FILE__)
-
-# Initialize the rails application
-CanvasRails::Application.initialize!

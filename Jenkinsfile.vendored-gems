@@ -82,6 +82,12 @@ pipeline {
                 sh 'build/new-jenkins/test-gems.sh'
               }
             }
+
+            stage ('Run Engine specs') {
+              timeout(time: 10) {
+                sh 'build/new-jenkins/test-engines.sh'
+              }
+            }
           }
         }
       }

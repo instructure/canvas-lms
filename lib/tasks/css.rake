@@ -28,7 +28,11 @@ namespace :css do
 
   task :compile do
     # try to get a conection to the database so we can do the brand_configs:write below
-    require 'config/environment' rescue nil
+    begin
+      require 'config/environment'
+    rescue => e
+      puts "WARN: failed to load rails environment before compiling: #{e}"
+    end
     require 'config/initializers/plugin_symlinks'
     require 'config/initializers/revved_asset_urls'
     require 'lib/brandable_css'
