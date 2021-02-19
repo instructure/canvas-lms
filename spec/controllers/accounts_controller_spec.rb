@@ -500,6 +500,49 @@ describe AccountsController do
               @student.reload.dashboard_view(@subaccount)]).to match_array(Array.new(3, "planner"))
     end
 
+    describe "enable_as_k5_account" do
+      before :once do
+        @account = Account.create!
+        @user = account_admin_user(account: @account)
+      end
+
+      before :each do
+        user_session(@user)
+      end
+
+      it "should be locked once the setting is enabled" do
+        post 'update', params: {:id => @account.id,
+                                :account => {
+                                  :settings => {
+                                    :enable_as_k5_account => {
+                                      :value => true
+                                    }
+                                  }
+                                }}
+        @account.reload
+        expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
+        expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
+      end
+
+      it "should be unlocked if the setting is disabled" do
+        @account.settings[:enable_as_k5_account] = {
+          value: true,
+          locked: true
+        }
+        post 'update', params: {:id => @account.id,
+                                :account => {
+                                  :settings => {
+                                    :enable_as_k5_account => {
+                                      :value => false
+                                    }
+                                  }
+                                }}
+        @account.reload
+        expect(@account.settings[:enable_as_k5_account][:value]).to be_falsey
+        expect(@account.settings[:enable_as_k5_account][:locked]).to be_falsey
+      end
+    end
+
     describe "quotas" do
       before :once do
         @account = Account.create!

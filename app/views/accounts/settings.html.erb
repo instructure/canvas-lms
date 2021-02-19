@@ -448,6 +448,17 @@
           <h2 class="screenreader-only"><%= t('Features') %></h2>
           <legend><%= t(:features_title, "Features") %></legend>
           <%= f.fields_for :settings do |settings| %>
+            <% if @account.root_account.feature_enabled?(:canvas_for_elementary) %>
+              <%= settings.fields_for :enable_as_k5_account do |k5| %>
+                <div>
+                  <% k5_settings = @account.enable_as_k5_account %>
+                  <% disabled = k5_settings[:locked] && k5_settings[:inherited] %>
+                  <%= k5.check_box :value, :checked => k5_settings[:value], :disabled => disabled %>
+                  <%= k5.label :value, t("Canvas for Elementary (beta)") %>
+                </div>
+              <% end %>
+            <% end %>
+
             <% if @account.root_account? %>
               <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>

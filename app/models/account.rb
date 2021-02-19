@@ -329,6 +329,8 @@ class Account < ActiveRecord::Base
 
   add_setting :rce_favorite_tool_ids, :inheritable => true
 
+  add_setting :enable_as_k5_account, boolean: true, default: false, inheritable: true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -419,6 +421,10 @@ class Account < ActiveRecord::Base
 
   def disable_rce_media_uploads?
     disable_rce_media_uploads[:value]
+  end
+
+  def enable_as_k5_account?
+    enable_as_k5_account[:value]
   end
 
   def open_registration?
