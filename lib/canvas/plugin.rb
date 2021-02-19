@@ -121,6 +121,10 @@ module Canvas
       !meta[:settings_partial].blank?
     end
 
+    def test_cluster_inherit?
+      meta.fetch(:test_cluster_inherit, true)
+    end
+
     # base class/module for this plugin
     def base
       @meta[:base].is_a?(Symbol) ? @meta[:base].to_s.constantize : @meta[:base]

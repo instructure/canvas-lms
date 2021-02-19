@@ -626,7 +626,7 @@ describe "Canvas Cartridge importing" do
     @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
-    links = Nokogiri::HTML::DocumentFragment.parse(page_2.body).css("a")
+    links = Nokogiri::HTML5.fragment(page_2.body).css("a")
     expect(links.count).to eq 2
     expect(links.first['href']).to eq "/media_objects/#{media_id}"
     expect(links.last['href']).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
@@ -657,7 +657,7 @@ describe "Canvas Cartridge importing" do
     @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
-    frame = Nokogiri::HTML::DocumentFragment.parse(page_2.body).at_css("iframe")
+    frame = Nokogiri::HTML5.fragment(page_2.body).at_css("iframe")
     expect(frame['src']).to eq "/media_objects_iframe/#{media_id}?type=video"
   end
 
@@ -705,7 +705,7 @@ describe "Canvas Cartridge importing" do
     meta_fields[:workflow_state] = page.workflow_state
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
     #convert to json
-    doc = Nokogiri::HTML(exported_html)
+    doc = Nokogiri::HTML5(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
@@ -732,7 +732,7 @@ describe "Canvas Cartridge importing" do
     migration_id = CC::CCHelper.create_key(page)
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, :identifier => migration_id)
     #convert to json
-    doc = Nokogiri::HTML(exported_html)
+    doc = Nokogiri::HTML5(exported_html)
     hash = @converter.convert_wiki(doc, 'blti-link')
     hash = hash.with_indifferent_access
     #import into new course
@@ -786,7 +786,7 @@ describe "Canvas Cartridge importing" do
     html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(asmnt.description, "Assignment: " + asmnt.title)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
-    html_doc = Nokogiri::HTML(html)
+    html_doc = Nokogiri::HTML5(html)
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -828,7 +828,7 @@ describe "Canvas Cartridge importing" do
     html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@assignment.description, "Assignment: " + @assignment.title)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
-    html_doc = Nokogiri::HTML(html)
+    html_doc = Nokogiri::HTML5(html)
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -857,7 +857,7 @@ describe "Canvas Cartridge importing" do
 XML
     #convert to json
     meta_doc = Nokogiri::XML(xml)
-    html_doc = Nokogiri::HTML("<html><head><title>value for title</title></head><body>haha</body></html>")
+    html_doc = Nokogiri::HTML5("<html><head><title>value for title</title></head><body>haha</body></html>")
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -1532,11 +1532,11 @@ describe "matching question reordering" do
 
     fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first
     fixed.question_data[:answers].each do |answer|
-      expect(Nokogiri::HTML(answer[:left_html]).at_css("img")).to be_present
-      expect(Nokogiri::HTML(answer[:right]).at_css("img")).to be_blank
+      expect(Nokogiri::HTML5(answer[:left_html]).at_css("img")).to be_present
+      expect(Nokogiri::HTML5(answer[:right]).at_css("img")).to be_blank
     end
     fixed.question_data[:matches].each do |match|
-      expect(Nokogiri::HTML(match[:text]).at_css("img")).to be_blank
+      expect(Nokogiri::HTML5(match[:text]).at_css("img")).to be_blank
     end
   end
 

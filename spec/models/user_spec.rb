@@ -3430,4 +3430,19 @@ describe User do
       expect(User.all.with_last_login.to_sql.scan(".*").count).to eq 1
     end
   end
+
+  describe "#can_create_enrollment_for?" do
+    before(:once) do
+      course_with_ta
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+    end
+
+    it "checks permissions" do
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'TeacherEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'TaEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'DesignerEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
+    end
+  end
 end

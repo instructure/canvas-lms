@@ -1004,6 +1004,13 @@ describe DeveloperKey do
       expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
       expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
     end
+
+    it "requires scheme to match on lenient matches" do
+      developer_key_not_saved.redirect_uri = "http://example.com/a/b"
+
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq true
+      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to eq false
+    end
   end
 
   context "Account scoped keys" do

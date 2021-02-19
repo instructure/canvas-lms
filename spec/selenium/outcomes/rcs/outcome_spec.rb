@@ -29,6 +29,7 @@ describe "outcomes" do
   describe "course outcomes" do
     before(:each) do
       course_with_teacher_logged_in
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
     end
 

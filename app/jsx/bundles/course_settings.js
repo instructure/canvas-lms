@@ -46,11 +46,13 @@ if (blueprint) {
 
 const navView = new NavigationView({el: $('#tab-navigation')})
 
-if (window.ENV.NEW_FEATURES_UI) {
-  ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
-} else {
-  const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
-  featureFlagView.collection.fetchAll()
+if (document.getElementById('tab-features')) {
+  if (window.ENV.NEW_FEATURES_UI) {
+    ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
+  } else {
+    const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
+    featureFlagView.collection.fetchAll()
+  }
 }
 
 $(() => navView.render())

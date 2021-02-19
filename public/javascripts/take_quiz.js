@@ -725,11 +725,16 @@ $(function() {
         $this.val(isNaN(val) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}))
       }
       if ($this.hasClass('precision_question_input')) {
-        var val = numberHelper.parse($this.val())
+        const precisionQuestionInputVal = numberHelper.parse($this.val())
+        const strVal = precisionQuestionInputVal.toString()
+        const precision = strVal.length - (strVal.includes('.') ? 1 : 0)
         $this.val(
-          isNaN(val)
+          Number.isNaN(precisionQuestionInputVal)
             ? ''
-            : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true, precision: 16})
+            : I18n.n(precisionQuestionInputVal.toPrecision(precision), {
+                strip_insignificant_zeros: true,
+                precision
+              })
         )
       }
       if (update !== false) {

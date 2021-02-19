@@ -38,10 +38,13 @@
 //                   the API for a new value. Defaults to 1/2 the poll interval.
 //       maxTries: how many API failures can occur in a row before we just give
 //                 up entirely and stop updating. Defaults to 5.
+//       useSessionStorage: whether to use local browser session storage for
+//       bool,default true  storing / retrieving unread counts before polling
+//                          the Canvas API.
 
 import React, {useRef, useState, useEffect} from 'react'
 import {createPortal} from 'react-dom'
-import {any, func, number, string} from 'prop-types'
+import {any, bool, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import I18n from 'i18n!UnreadCounts'
@@ -62,7 +65,8 @@ UnreadCounts.propTypes = {
   dataUrl: string.isRequired,
   pollIntervalMs: number,
   allowedAge: number,
-  maxTries: number
+  maxTries: number,
+  useSessionStorage: bool
 }
 
 UnreadCounts.defaultProps = {
@@ -74,11 +78,22 @@ UnreadCounts.defaultProps = {
   srText: count => I18n.t('%{count} unread.', {count}),
   pollIntervalMs: DEFAULT_POLL_INTERVAL,
   allowedAge: DEFAULT_POLL_INTERVAL / 2,
-  maxTries: 5
+  maxTries: 5,
+  useSessionStorage: true
 }
 
 export default function UnreadCounts(props) {
-  const {targetEl, onUpdate, onError, srText, dataUrl, pollIntervalMs, allowedAge, maxTries} = props
+  const {
+    targetEl,
+    onUpdate,
+    onError,
+    srText,
+    dataUrl,
+    pollIntervalMs,
+    allowedAge,
+    maxTries,
+    useSessionStorage
+  } = props
   const syncState = useRef({msUntilFirstPoll: 0, savedChecked: false})
   const [count, setCount] = useState(NaN) // want to be sure to update at least once
   let error = null
@@ -108,16 +123,17 @@ export default function UnreadCounts(props) {
         const result = await fetch(dataUrl, defaultFetchOptions)
         const resp = await result.json()
         const unreadCount = parseInt(resp.unread_count, 10)
-        try {
-          const savedState = JSON.stringify({
-            updatedAt: +new Date(),
-            unreadCount
-          })
-          sessionStorage.setItem(storageKeyFor(dataUrl), savedState)
-        } catch (_ex) {
-          // error in setting storage, no biggie, ignore
+        if (useSessionStorage) {
+          try {
+            const savedState = JSON.stringify({
+              updatedAt: +new Date(),
+              unreadCount
+            })
+            sessionStorage.setItem(storageKeyFor(dataUrl), savedState)
+          } catch (_ex) {
+            // error in setting storage, no biggie, ignore
+          }
         }
-
         if (count !== unreadCount) {
           setCount(unreadCount)
           updateParent(unreadCount)
@@ -177,7 +193,7 @@ export default function UnreadCounts(props) {
   useEffect(startPolling, [])
 
   // If we haven't started polling yet, see if we can use a saved value
-  if (!syncState.current.savedChecked) checkSavedValue()
+  if (useSessionStorage && !syncState.current.savedChecked) checkSavedValue()
 
   if (!count) return createPortal(null, targetEl)
 

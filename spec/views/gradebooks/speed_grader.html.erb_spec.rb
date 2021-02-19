@@ -124,6 +124,15 @@ describe "/gradebooks/speed_grader" do
     end
   end
 
+  describe 'reassignment wrapper' do
+    it 'is rendered when @can_comment_on_submission and @can_reassign_submissions are true' do
+      assign(:can_comment_on_submission, true)
+      assign(:can_reassign_submissions, true)
+      render template: 'gradebooks/speed_grader', locals: locals
+      expect(rendered).to include "<div id=\"reassign_assignment_wrapper\""
+    end
+  end
+
   context 'when group assignment' do
     before do
       assign(:can_comment_on_submission, true)
@@ -131,7 +140,7 @@ describe "/gradebooks/speed_grader" do
 
     it 'shows radio buttons if individually graded' do
       render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 2
       expect(html.css('#submission_group_comment').size).to be 1
     end
@@ -140,10 +149,10 @@ describe "/gradebooks/speed_grader" do
       @assignment.grade_group_students_individually = false
       @assignment.save!
       render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 0
       checkbox = html.css('#submission_group_comment')
-      expect(checkbox.attr('checked').value).to eq 'checked'
+      expect(checkbox.attr('checked')).not_to be_nil
       expect(checkbox.attr('style').value).to include('display:none')
     end
   end
@@ -151,7 +160,7 @@ describe "/gradebooks/speed_grader" do
   context 'grading box' do
     let(:html) do
       render template: 'gradebooks/speed_grader', locals: locals
-      Nokogiri::HTML.fragment(response.body)
+      Nokogiri::HTML5.fragment(response.body)
     end
 
     it 'renders the possible points for a points-based assignment' do
@@ -178,7 +187,7 @@ describe "/gradebooks/speed_grader" do
   context "hide student names checkbox" do
     let(:html) do
       render template: "gradebooks/speed_grader", locals: locals
-      Nokogiri::HTML.fragment(response.body)
+      Nokogiri::HTML5.fragment(response.body)
     end
 
     before(:once) do

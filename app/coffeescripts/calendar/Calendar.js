@@ -460,13 +460,9 @@ export default class Calendar {
       return
     }
 
-    if (
-      event.eventType === 'assignment' &&
-      event.assignment.unlock_at &&
-      event.assignment.lock_at
-    ) {
-      startDate = moment(event.assignment.unlock_at)
-      endDate = moment(event.assignment.lock_at)
+    if (event.eventType === 'assignment' && (event.assignment.unlock_at || event.assignment.lock_at)) {
+      startDate = event.assignment.unlock_at && moment(event.assignment.unlock_at)
+      endDate = event.assignment.lock_at && moment(event.assignment.lock_at)
       if (!withinMomentDates(event.start, startDate, endDate)) {
         revertFunc()
         showFlashAlert({

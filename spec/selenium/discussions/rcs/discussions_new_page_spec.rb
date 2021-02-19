@@ -46,6 +46,7 @@ describe "discussions" do
     let(:url) { "/courses/#{course.id}/discussion_topics/new" }
 
     before(:each) do
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
     end
 

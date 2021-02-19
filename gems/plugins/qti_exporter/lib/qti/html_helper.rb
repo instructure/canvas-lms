@@ -26,7 +26,7 @@ module Qti
 
     def sanitize_html_string(string, remove_extraneous_nodes=false)
       string = escape_unmatched_brackets(string)
-      sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(string), remove_extraneous_nodes)
+      sanitize_html!(Nokogiri::HTML5.fragment(string), remove_extraneous_nodes)
     end
 
     def sanitize_html!(node, remove_extraneous_nodes=false)
@@ -123,7 +123,7 @@ module Qti
 
       if string.include?("data-equation-content")
         # try to fix a weird issue with unescaped brackets inside html attribute values
-        string = Nokogiri::HTML::DocumentFragment.parse(string).to_xml rescue string
+        string = Nokogiri::HTML5.fragment(string).to_xml rescue string
       end
 
       string.split(/(\<[^\<\>]*\>)/m).map do |sub|
@@ -146,7 +146,7 @@ module Qti
       html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/) || @flavor == Qti::Flavors::ANGEL
       is_html = (html_node && @flavor == Qti::Flavors::CANVAS) ? true : false
       # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
-      sanitized = sanitize_html!(html_node ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
+      sanitized = sanitize_html!(html_node ? Nokogiri::HTML5.fragment(node.text) : node, true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
       if sanitized.present?
         if is_html
           html = sanitized

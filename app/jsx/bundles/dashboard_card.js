@@ -19,23 +19,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import getDroppableDashboardCardBox from '../dashboard_card/getDroppableDashboardCardBox'
+import DashboardCard from '../dashboard_card/DashboardCard'
 import axios from 'axios'
 import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 
 let promiseToGetDashboardCards
 
-export function createDashboardCards(dashboardCards) {
+export function createDashboardCards(dashboardCards, cardComponent = DashboardCard, extraProps) {
   const Box = getDroppableDashboardCardBox()
 
   // Decide which dashboard to show based on role
-  const current_roles = window.ENV.current_user_roles || []
+  const current_roles = window.ENV?.current_user_roles || []
   const isTeacher = current_roles.includes('teacher')
 
   return (
     <Box
       showSplitDashboardView={window.ENV?.FEATURES?.unpublished_courses && isTeacher}
       courseCards={dashboardCards}
-      hideColorOverlays={ENV && ENV.PREFERENCES && ENV.PREFERENCES.hide_dashcard_color_overlays}
+      hideColorOverlays={window.ENV?.PREFERENCES?.hide_dashcard_color_overlays}
+      cardComponent={cardComponent}
+      {...extraProps}
     />
   )
 }

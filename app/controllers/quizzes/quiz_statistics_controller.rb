@@ -136,7 +136,7 @@
 #           "type": "string"
 #         },
 #         "weight": {
-#           "description": "An integer to determine correctness of the answer. Incorrect answers should be 0, correct answers should be non-negative.",
+#           "description": "An integer to determine correctness of the answer. Incorrect answers should be 0, correct answers should 100",
 #           "example": 100,
 #           "type": "integer",
 #           "format": "int64"

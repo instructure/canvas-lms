@@ -3249,6 +3249,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz_lti!
+    setup_valid_quiz_lti_settings!
     tool = context.present? && context.quiz_lti_tool
     return unless tool
     self.submission_types = 'external_tool'
@@ -3627,6 +3628,10 @@ class Assignment < ActiveRecord::Base
     !!self.rubric_association&.active?
   end
 
+  def can_reassign?(grader)
+    (final_grader_id.nil? || final_grader_id == grader.id) && context.grants_right?(grader, :manage_grades)
+  end
+
   private
 
   def set_muted
@@ -3768,5 +3773,15 @@ class Assignment < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id = root_account&.id
+  end
+
+  def setup_valid_quiz_lti_settings!
+    self.peer_reviews = false
+    self.peer_review_count = 0
+    self.peer_reviews_due_at = nil
+    self.peer_reviews_assigned = false
+    self.automatic_peer_reviews = false
+    self.anonymous_peer_reviews = false
+    self.intra_group_peer_reviews = false
   end
 end

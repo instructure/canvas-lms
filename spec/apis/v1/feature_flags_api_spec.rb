@@ -420,6 +420,13 @@ describe "Feature Flags API", type: :request do
                            { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' })
           expect(t_root_account.feature_flags.where(feature: 'hidden_feature').count).to eql 1
         end
+
+        it "can unhide a hidden feature in a subaccount" do
+          api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_sub_account.id}/features/flags/hidden_feature?state=on",
+                   { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_sub_account.to_param, feature: 'hidden_feature', state: 'on' },
+                   {}, {}, { expected_status: 200 })
+          expect(t_sub_account.feature_flags.where(feature: 'hidden_feature').take).to be_enabled
+        end
       end
 
       it "should not create a root account feature flag with root admin privileges" do

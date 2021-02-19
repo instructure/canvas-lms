@@ -38,12 +38,14 @@ fi
 
 tag_many $KARMA_BUILDER_SELECTED_TAG local/karma-builder ${KARMA_BUILDER_TAGS[SAVE_TAG]}
 
-DOCKER_BUILDKIT=1 docker build \
+docker build \
   --build-arg PATCHSET_TAG="$PATCHSET_TAG" \
+  --build-arg RAILS_LOAD_ALL_LOCALES="$RAILS_LOAD_ALL_LOCALES" \
+  --file Dockerfile.jenkins.karma-runner \
   --label "KARMA_BUILDER_SELECTED_TAG=$KARMA_BUILDER_SELECTED_TAG" \
   --label "PATCHSET_TAG=$PATCHSET_TAG" \
   --label "WEBPACK_BUILDER_IMAGE=$WEBPACK_BUILDER_IMAGE" \
   --tag "$1" \
-  - < Dockerfile.jenkins.karma-runner
+  "$WORKSPACE"
 
 add_log "built $1"

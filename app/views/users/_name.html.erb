@@ -18,7 +18,12 @@
 
 <% unless @read_only
     account = @context && (@context.is_a?(Account) ? @context : @context.account)
-    managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
+    # Note: we'd like to pick :allow_course_admin_actions or :manage_admin_users depending on
+    # whether or not the :granular_permissions_manage_users FF is on for the root account, but
+    # we need the permission in order to even figure out what the appropriate root account is.
+    # So in this case, we'll take either; this appears to be safe because the permission check
+    # is not used anywhere else in this view.
+    managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :allow_course_admin_actions, :manage_admin_users) }
     account ||= managed_accounts.first
     root_account = account.root_account if account
   end

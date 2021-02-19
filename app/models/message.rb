@@ -666,21 +666,13 @@ class Message < ActiveRecord::Base
     check_acct = root_account || user&.account || Account.site_admin
     if path_type == 'sms'
       if Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
-        InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
-                                     short_stat: 'message.skip',
-                                     tags: {path_type: path_type, notification_name: notification_name})
-        self.destroy
-        return nil
+        return skip_and_cancel
       end
     end
 
     if path_type == 'push' && Account.site_admin.feature_enabled?(:reduce_push_notifications)
       if Notification.types_to_send_in_push.exclude?(notification_name)
-        InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
-                                     short_stat: 'message.skip',
-                                     tags: {path_type: path_type, notification_name: notification_name})
-        self.destroy
-        return nil
+        return skip_and_cancel
       end
     end
 
@@ -703,6 +695,13 @@ class Message < ActiveRecord::Base
       end
       send(delivery_method)
     end
+  end
+
+  def skip_and_cancel
+    InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
+                                 short_stat: 'message.skip',
+                                 tags: { path_type: path_type, notification_name: notification_name })
+    self.cancel
   end
 
   # Public: Enqueues a message to the notification_service's sqs queue

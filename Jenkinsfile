@@ -59,6 +59,10 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
+def getRailsLoadAllLocales() {
+  return configuration.isChangeMerged() ? 1 : (configuration.getBoolean('rails-load-all-locales', 'false') ? 1 : 0)
+}
+
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
 def ignoreBuildNeverStartedError(block) {
@@ -402,7 +406,8 @@ pipeline {
                     checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
                   }
 
-                  // Plugin builds using the checkout above will create this @tmp file, we need to remove it
+                  // Plugin builds using the dir step above will create this @tmp file, we need to remove it
+                  // https://issues.jenkins.io/browse/JENKINS-52750
                   sh 'rm -vr gems/plugins/*@tmp'
                 }
 
@@ -411,9 +416,10 @@ pipeline {
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
 
-                if (currentBuild.projectName.contains("rails-6")) {
-                  buildParameters += string(name: 'CANVAS_RAILS6_0', value: "${env.CANVAS_RAILS6_0}")
-                }
+                // if (currentBuild.projectName.contains("rails-6")) {
+                  // when updating this for future rails versions, change the value back to ${env.CANVAS_RAILSX_Y}
+                  buildParameters += string(name: 'CANVAS_RAILS6_0', value: "1")
+                // }
 
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master.
@@ -476,6 +482,7 @@ pipeline {
                       "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
+                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
@@ -564,6 +571,7 @@ pipeline {
                       "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1",
+                      "RAILS_LOAD_ALL_LOCALES=0",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
@@ -630,6 +638,7 @@ pipeline {
                       "CACHE_SAVE_SCOPE=${cacheScope}",
                       "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
                       "PATCHSET_TAG=${env.PATCHSET_TAG}",
+                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
                       "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
                     ]) {
                       sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
@@ -643,6 +652,17 @@ pipeline {
                     jsReady = true
                   } catch(e) {
                     jsReady = false
+
+                    if(configuration.isChangeMerged()) {
+                      // DEBUG: Sometimes a node can get polluted and produce an error like
+                      // The git source https://github.com/rails-api/active_model_serializers.git is not yet checked out
+                      // Take the last successful layer and upload it so it can be debugged.
+
+                      sh """
+                        docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $KARMA_RUNNER_IMAGE-failed
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE-failed
+                      """
+                    }
 
                     throw e
                   }
@@ -728,6 +748,12 @@ pipeline {
                   })
                 }
 
+                // Flakey spec catcher using the dir step above will create this @tmp file, we need to remove it
+                // https://issues.jenkins.io/browse/JENKINS-52750
+                if(!configuration.isChangeMerged() && env.GERRIT_PROJECT != "canvas-lms") {
+                  sh "rm -vrf $LOCAL_WORKDIR@tmp"
+                }
+
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
                   timedStage('Local Docker Dev Build', stages, {
@@ -737,7 +763,18 @@ pipeline {
 
                 if(configuration.isChangeMerged()) {
                   timedStage('Dependency Check', stages, {
-                    snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
+                    catchError (buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                      try {
+                        snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
+                      }
+                      catch (err) {
+                        if (err.toString().contains('Gemfile.lock does not exist')) {
+                          snyk("canvas-lms:ruby", "Gemfile.lock.next", "$PATCHSET_TAG")
+                        } else {
+                          throw err
+                        }
+                      }
+                    }
                   })
                 }
 

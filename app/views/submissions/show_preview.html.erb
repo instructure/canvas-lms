@@ -214,7 +214,7 @@
   <% end %>
 
   <% js_bundle 'legacy/submissions_show_preview_upload' %>
-<% elsif @submission.submission_type == "online_quiz" %>
+<% elsif @submission.submission_type == "online_quiz" and  @assignment&.quiz&.id %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <div style="text-align: center;">
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>

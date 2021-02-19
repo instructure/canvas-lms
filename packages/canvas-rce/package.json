@@ -56,6 +56,7 @@
   "dependencies": {
     "@instructure/canvas-media": ">=1.0.0",
     "@instructure/canvas-theme": "7",
+    "@instructure/js-utils": "1",
     "@instructure/k5uploader": ">=1",
     "@instructure/media-capture": "~7.1.0",
     "@instructure/ui-a11y-content": "7",

@@ -318,7 +318,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"%24IMS-CC-FILEBASE%24/unfiled/first.png\">\n</div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
       check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
@@ -380,7 +380,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"%24IMS-CC-FILEBASE%24/media_objects/some-kaltura-id\"></a></p></div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"$IMS-CC-FILEBASE$/media_objects/some-kaltura-id\"></a></p></div>"
 
       resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(@media_object)}]")
       expect(resource_node).to_not be_nil
@@ -423,7 +423,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"%24IMS-CC-FILEBASE%24/unfiled/not_actually_first.png\">\n</div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
 
@@ -433,13 +433,13 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1"})
+      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1">})
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
       description = doc.at_css('description').to_s
-      expect(description).not_to include 'https://example.com%24IMS-CC-FILEBASE%24'
-      expect(description).to include 'img src="%24IMS-CC-FILEBASE%24/unfiled/first.png'
+      expect(description).not_to include 'https://example.com$IMS-CC-FILEBASE$'
+      expect(description).to include 'img src="$IMS-CC-FILEBASE$/unfiled/first.png'
     end
 
     it "should not fail when answers are missing for FIMB" do
@@ -601,7 +601,7 @@ describe "Common Cartridge exporting" do
 
       # validate cc1.3 assignment xml document
       assignment_xml_doc = Nokogiri::XML(@zip_file.read(assignment_xml_file))
-      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="%24IMS-CC-FILEBASE%24/unfiled/test.txt">what?</a>'
+      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="$IMS-CC-FILEBASE$/unfiled/test.txt">what?</a>'
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
       expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11.0'

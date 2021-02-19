@@ -80,7 +80,7 @@ function selectedAnchorCount(ed) {
     .querySelectorAll('a').length
 }
 function getMenuItems(ed) {
-  const contextType = ed.settings.canvas_rce_user_context.type
+  const contextType = ed.settings.canvas_rce_containing_context.type
   const sel_anchors = ed.selection.isCollapsed() ? 0 : selectedAnchorCount(ed)
   let items
   if (getAnchorElement(ed, ed.selection.getNode())) {

@@ -21,8 +21,14 @@ import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import Confetti from '../../../confetti/components/Confetti'
-import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
+import {
+  CREATE_SUBMISSION,
+  CREATE_SUBMISSION_DRAFT,
+  SET_MODULE_ITEM_COMPLETION
+} from '../graphqlData/Mutations'
 import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
+import {Flex} from '@instructure/ui-flex'
+import {IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import {Modal} from '@instructure/ui-overlays'
@@ -32,7 +38,25 @@ import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
-import {direction} from '../../../shared/helpers/rtlHelper'
+
+function MarkAsDoneButton({done, onToggle}) {
+  return (
+    <Button
+      color={done ? 'success' : 'secondary'}
+      data-testid="set-module-item-completion-button"
+      id="set-module-item-completion-button"
+      onClick={onToggle}
+      renderIcon={done ? IconCompleteLine : IconEmptyLine}
+    >
+      {done ? I18n.t('Done') : I18n.t('Mark as done')}
+    </Button>
+  )
+}
+
+MarkAsDoneButton.propTypes = {
+  done: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired
+}
 
 export default class SubmissionManager extends Component {
   static propTypes = {
@@ -46,6 +70,7 @@ export default class SubmissionManager extends Component {
 
   state = {
     editingDraft: false,
+    moduleItemDone: false,
     openSubmitModal: false,
     showConfetti: false,
     submittingAssignment: false,
@@ -54,7 +79,8 @@ export default class SubmissionManager extends Component {
 
   componentDidMount() {
     this.setState({
-      activeSubmissionType: this.getActiveSubmissionTypeFromProps()
+      activeSubmissionType: this.getActiveSubmissionTypeFromProps(),
+      moduleItemDone: !!window.ENV.CONTEXT_MODULE_ITEM?.done
     })
   }
 
@@ -301,41 +327,84 @@ export default class SubmissionManager extends Component {
     )
   }
 
+  renderActions(context) {
+    const shouldRenderMarkAsDone = window.ENV.CONTEXT_MODULE_ITEM != null
+    const shouldRenderSubmit = this.shouldRenderSubmit(context)
+
+    if (shouldRenderMarkAsDone || shouldRenderSubmit) {
+      return (
+        <Flex as="div" direction="row-reverse" margin="small" padding="small">
+          {shouldRenderSubmit && (
+            <Flex.Item margin="0 0 0 small">{this.renderSubmitButton()}</Flex.Item>
+          )}
+          {shouldRenderMarkAsDone && <Flex.Item>{this.renderMarkAsDoneButton()}</Flex.Item>}
+        </Flex>
+      )
+    }
+  }
+
   renderSubmitButton() {
     return (
-      <div style={{textAlign: direction('right')}}>
-        <Mutation
-          mutation={CREATE_SUBMISSION}
-          onCompleted={data =>
-            data.createSubmission.errors
-              ? this.context.setOnFailure(I18n.t('Error sending submission'))
-              : this.handleSuccess()
-          }
-          onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
-          // refetch submission histories so we don't lose the currently
-          // displayed submission when a new submission is created and the current
-          // submission gets transitioned over to a submission history.
-          refetchQueries={() => [
-            {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: this.props.submission.id}}
-          ]}
-        >
-          {submitMutation => (
-            <>
-              <Button
-                id="submit-button"
-                data-testid="submit-button"
-                disabled={this.state.submittingAssignment}
-                variant="primary"
-                margin="xx-small 0"
-                onClick={() => this.handleSubmitButton(submitMutation)}
-              >
-                {I18n.t('Submit')}
-              </Button>
-              {this.state.openSubmitModal && this.renderSubmitConfirmation(submitMutation)}
-            </>
-          )}
-        </Mutation>
-      </div>
+      <Mutation
+        mutation={CREATE_SUBMISSION}
+        onCompleted={data =>
+          data.createSubmission.errors
+            ? this.context.setOnFailure(I18n.t('Error sending submission'))
+            : this.handleSuccess()
+        }
+        onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
+        // refetch submission histories so we don't lose the currently
+        // displayed submission when a new submission is created and the current
+        // submission gets transitioned over to a submission history.
+        refetchQueries={() => [
+          {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: this.props.submission.id}}
+        ]}
+      >
+        {submitMutation => (
+          <>
+            <Button
+              id="submit-button"
+              data-testid="submit-button"
+              disabled={this.state.submittingAssignment}
+              variant="primary"
+              margin="xx-small 0"
+              onClick={() => this.handleSubmitButton(submitMutation)}
+            >
+              {I18n.t('Submit')}
+            </Button>
+            {this.state.openSubmitModal && this.renderSubmitConfirmation(submitMutation)}
+          </>
+        )}
+      </Mutation>
+    )
+  }
+
+  renderMarkAsDoneButton() {
+    const errorMessage = I18n.t('Error updating status of module item')
+    const updateDoneStatus = () => {
+      this.setState(state => ({
+        moduleItemDone: !state.moduleItemDone
+      }))
+    }
+
+    const {id: itemId, module_id: moduleId} = window.ENV.CONTEXT_MODULE_ITEM
+    const {moduleItemDone} = this.state
+
+    return (
+      <Mutation
+        mutation={SET_MODULE_ITEM_COMPLETION}
+        onCompleted={data => {
+          data.setModuleItemCompletion.errors
+            ? this.context.setOnFailure(errorMessage)
+            : updateDoneStatus()
+        }}
+        onError={() => {
+          this.context.setOnFailure(errorMessage)
+        }}
+        variables={{itemId, moduleId, done: !moduleItemDone}}
+      >
+        {mutation => <MarkAsDoneButton done={moduleItemDone} onToggle={mutation} />}
+      </Mutation>
     )
   }
 
@@ -344,9 +413,7 @@ export default class SubmissionManager extends Component {
       <>
         {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
         <StudentViewContext.Consumer>
-          {context => {
-            return this.shouldRenderSubmit(context) ? this.renderSubmitButton() : null
-          }}
+          {context => this.renderActions(context)}
         </StudentViewContext.Consumer>
         {this.state.showConfetti ? <Confetti /> : null}
       </>

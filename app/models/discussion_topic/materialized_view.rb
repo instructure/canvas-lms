@@ -199,7 +199,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   def self.include_mobile_overrides(entries, overrides)
     entries.each do |entry|
       if entry["message"]
-        parsed_html = Nokogiri::HTML::DocumentFragment.parse(entry["message"])
+        parsed_html = Nokogiri::HTML5.fragment(entry["message"])
         Api::Html::Content.add_overrides_to_html(parsed_html, overrides)
         entry["message"] = parsed_html.to_s
       end

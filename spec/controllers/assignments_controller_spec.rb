@@ -792,6 +792,44 @@ describe AssignmentsController do
       expect(response).to be_successful
     end
 
+    describe 'assignments_2_student' do
+      before do
+        @course.enable_feature!(:assignments_2_student)
+        @course.save!
+        user_session(@student)
+      end
+
+      it "sets unlock date as a prerequisite for date locked assignment" do
+        @assignment.unlock_at = 1.week.from_now
+        @assignment.lock_at = 2.weeks.from_now
+        @assignment.due_at = 10.days.from_now
+        @assignment.submission_types = 'text_tool'
+        @assignment.save!
+
+        get 'show', params: {course_id: @course.id, id: @assignment.id}
+
+        expect(assigns[:js_env][:PREREQS][:unlock_at]).to eq(@assignment.unlock_at)
+      end
+
+      it "sets the previous assignment as a prerequisite for assignment in module with prerequisite requirement" do
+        @mod = @course.context_modules.create!(name: 'Module 1')
+        @mod2 = @course.context_modules.create!(name: 'Module 2')
+
+        @assignment2 = @course.assignments.create(title: "another assignment")
+
+        @tag = @mod.add_item(type: 'assignment', id: @assignment.id)
+        @mod2.add_item(type: 'assignment', id: @assignment2.id)
+        @mod.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+        @mod2.prerequisites = "module_#{@mod.id}"
+        @mod.save!
+        @mod2.save!
+
+        get 'show', params: {course_id: @course.id, id: @assignment2.id}
+
+        expect(assigns[:js_env][:PREREQS][:items].first[:prev][:title]).to eq(@assignment.title)
+      end
+    end
+
     it "should not show locked external tool assignments" do
       user_session(@student)
 
@@ -1074,6 +1112,73 @@ describe AssignmentsController do
           get :show, params: {course_id: @course.id, id: @assignment.id}
           expect(assigns[:js_env]).to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
           expect(assigns[:js_env]).to have_key :MASTERY_SCALE
+        end
+      end
+
+      context "with the assignments_2_student flag enabled" do
+        let(:course) { @course }
+        let(:assignment) { @assignment }
+        let(:student) { @student }
+
+        before(:each) do
+          course.enable_feature!(:assignments_2_student)
+          assignment.update!(submission_types: "online_upload")
+          user_session(student)
+        end
+
+        describe "CONTEXT_MODULE_ITEM" do
+          context "when viewing an assignment with a 'mark as done' requirement" do
+            let(:module1) { course.context_modules.create!(name: "a module") }
+            let(:module1_assignment_item) { module1.content_tags.find_by!(content_type: "Assignment", content_id: assignment.id) }
+
+            before(:each) do
+              module1.add_item(id: assignment.id, type: "assignment")
+              module1.completion_requirements = [{id: module1_assignment_item.id, type: "must_mark_done"}]
+              module1.save!
+
+              module1.context_module_progressions.create!(user: student)
+            end
+
+            it "sets 'id' to the module item ID" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:id]).to eq module1_assignment_item.id
+            end
+
+            it "sets 'module_id' to the module ID" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:module_id]).to eq module1.id
+            end
+
+            it "sets 'done' to true if the user has completed the item" do
+              module1_assignment_item.context_module_action(student, :done)
+
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:done]).to be true
+            end
+
+            it "sets 'done' to false if the user has not completed the item" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:done]).to be false
+            end
+
+            it "uses the module item ID specified by the 'module_item_id' param if one is passed in" do
+              module2 = course.context_modules.create!(name: "another module")
+              module2.add_item(id: assignment.id, type: "assignment")
+
+              module2_assignment_item = module2.content_tags.find_by!(content_type: "Assignment", content_id: assignment.id)
+              module2.completion_requirements = [{id: module2_assignment_item.id, type: "must_mark_done"}]
+              module2.save!
+
+              get :show, params: {course_id: @course.id, id: @assignment.id, module_item_id: module2_assignment_item.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:id]).to eq module2_assignment_item.id
+            end
+          end
+
+          it "is not included when the assignment does not have a 'mark as done' requirement" do
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+
+            expect(assigns[:js_env]).not_to have_key :CONTEXT_MODULE_ITEM
+          end
         end
       end
     end
@@ -1721,6 +1826,22 @@ describe AssignmentsController do
       it_behaves_like 'course feature flags for Anonymous Moderated Marking' do
         let(:js_env_attribute) { :MODERATED_GRADING_ENABLED }
         let(:feature_flag) { :moderated_grading }
+      end
+    end
+
+    describe 'js_env ANNOTATED_DOCUMENT_SUBMISSIONS' do
+      it "should set FLAGS/annotated_document_submissions in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:annotated_document_submissions)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(true)
+      end
+
+      it "should set FLAGS/annotated_document_submissions in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:annotated_document_submissions)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(false)
       end
     end
   end

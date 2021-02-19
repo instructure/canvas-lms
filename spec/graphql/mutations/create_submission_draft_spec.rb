@@ -332,4 +332,56 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :submissionAttempt)
     ).to eq 1
   end
+
+  context 'when dup records exist' do
+    before do
+      # simulate creating a dup record
+      submission_draft = SubmissionDraft.where(
+        submission: @submission,
+        submission_attempt: @submission.attempt
+      ).first_or_create!
+      submission_draft.update_attribute(:submission_attempt, @submission.attempt + 1)
+      SubmissionDraft.where(
+        submission: @submission,
+        submission_attempt: @submission.attempt
+      ).first_or_create!
+      submission_draft.update_attribute(:submission_attempt, @submission.attempt)
+    end
+
+    it 'updates an existing submission draft without error' do
+      result = run_mutation(
+        active_submission_type: 'online_text_entry',
+        attempt: @submission.attempt,
+        body: 'some text body 123',
+        submission_id: @submission.id
+      )
+
+      drafts = SubmissionDraft.where(
+        submission: @submission, submission_attempt: @submission.attempt
+      )
+      expect(drafts.first.body).to eq 'some text body 123'
+      expect(
+        result.dig(:data, :createSubmissionDraft, :submissionDraft, :activeSubmissionType)
+      ).to eq 'online_text_entry'
+    end
+
+    it 'removes dup records' do
+      drafts = SubmissionDraft.where(
+        submission: @submission, submission_attempt: @submission.attempt
+      )
+
+      expect(drafts.count).to be 2
+      run_mutation(
+        active_submission_type: 'online_text_entry',
+        attempt: @submission.attempt,
+        body: 'some text body 123',
+        submission_id: @submission.id
+      )
+
+      drafts = SubmissionDraft.where(
+        submission: @submission, submission_attempt: @submission.attempt
+      )
+      expect(drafts.count).to be 1
+    end
+  end
 end

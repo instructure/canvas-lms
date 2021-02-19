@@ -50,8 +50,12 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler}) => (
 )
 
 OutcomeKebabMenu.propTypes = {
-  menuTitle: PropTypes.string,
-  onMenuHandler: PropTypes.func.isRequired
+  onMenuHandler: PropTypes.func.isRequired,
+  menuTitle: PropTypes.string
+}
+
+OutcomeKebabMenu.defaultProps = {
+  menuTitle: ''
 }
 
 export default OutcomeKebabMenu

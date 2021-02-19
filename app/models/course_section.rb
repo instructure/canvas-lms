@@ -161,7 +161,14 @@ class CourseSection < ActiveRecord::Base
     end
     can :read and can :delete
 
-    given { |user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
+    given do |user, session|
+      manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
+        :allow_course_admin_actions
+      else
+        :manage_admin_users
+      end
+      self.course.grants_any_right?(user, session, :manage_students, manage_perm)
+    end
     can :read
 
     given { |user| self.course.account_membership_allows(user, :read_roster) }
@@ -249,7 +256,17 @@ class CourseSection < ActiveRecord::Base
     old_course = self.course
     self.course = course
     self.root_account_id = course.root_account_id
-    self.default_section = (course.course_sections.active.size == 0)
+
+    all_attrs = { course_id: course.id }
+    if self.root_account_id_changed?
+      all_attrs[:root_account_id] = self.root_account_id
+    end
+
+    CourseSection.unique_constraint_retry do
+      self.default_section = (course.course_sections.active.size == 0)
+      self.save!
+    end
+
     old_course.course_sections.reset
     course.course_sections.reset
     assignment_overrides.active.destroy_all
@@ -259,11 +276,6 @@ class CourseSection < ActiveRecord::Base
     enrollment_ids = enrollment_data.map(&:first)
     user_ids = enrollment_data.map(&:last).uniq
 
-    all_attrs = { course_id: course.id }
-    if self.root_account_id_changed?
-      all_attrs[:root_account_id] = self.root_account_id
-    end
-    self.save!
     if enrollment_ids.any?
       self.all_enrollments.update_all all_attrs
       Enrollment.delay_if_production.batch_add_to_favorites(enrollment_ids)

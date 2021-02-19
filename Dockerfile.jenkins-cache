@@ -14,6 +14,7 @@ RUN --mount=target=/tmp/src \
     -name "Gemfile" -o \
     -name "Gemfile.d" -o \
     -name "Gemfile.lock" -o \
+    -name "Gemfile.lock.next" -o \
     -name "*.gemspec" -o \
     -name "gem_version.rb" -o \
     -name "version.rb" \

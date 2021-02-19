@@ -12,8 +12,7 @@ function create_log_file {
 }
 
 function echo_console_and_log {
-  echo "$1"
-  echo "$1" >>"$LOG"
+  echo "$1" |tee -a "$LOG"
 }
 
 function print_results {
@@ -45,8 +44,7 @@ function is_canvas_root {
 }
 
 function is_git_dir {
-  git rev-parse --is-inside-git-dir >/dev/null 2>&1 && [ -d .git ]
-  return $?
+  [ "$(basename "$(git rev-parse --show-toplevel)")" == "$(basename "$(pwd)")" ]
 }
 
 # Parameter: the name of the script calling this function
@@ -66,8 +64,7 @@ function update_plugin {
     cd "$1"
     if is_git_dir; then
       echo_console_and_log "  Updating plugin $1 ..."
-      git checkout master >>"$LOG" 2>&1
-      git pull --rebase >>"$LOG" 2>&1
+      git pull --rebase origin master >>"$LOG" 2>&1
     fi
   )
 }

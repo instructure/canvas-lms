@@ -243,7 +243,8 @@ h3 .tally {
     </div>
   <% end %>
 </div>
-<% if can_do @context, @current_user, :read_roster, :manage_students, :manage_admin_users %>
+<% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
+<% if can_do @context, @current_user, :read_roster, :manage_students, manage_perm %>
   <div class="enrollments-lists">
     <h3><%= t('titles.current_enrollments', 'Current Enrollments') %></h3>
     <div class="user-list-wrapper" id="current-enrollment-list">

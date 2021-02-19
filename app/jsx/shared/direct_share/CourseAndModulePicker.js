@@ -22,6 +22,7 @@ import React from 'react'
 import {func, string, bool} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
@@ -34,7 +35,12 @@ CourseAndModulePicker.propTypes = {
   selectedModuleId: string,
   setSelectedModule: func,
   setModuleItemPosition: func,
-  disableModuleInsertion: bool
+  disableModuleInsertion: bool,
+  includeConcluded: bool
+}
+
+CourseAndModulePicker.defaultProps = {
+  includeConcluded: false
 }
 
 export default function CourseAndModulePicker({
@@ -43,7 +49,8 @@ export default function CourseAndModulePicker({
   selectedModuleId,
   setSelectedModule,
   setModuleItemPosition,
-  disableModuleInsertion
+  disableModuleInsertion,
+  includeConcluded
 }) {
   return (
     <>
@@ -52,12 +59,22 @@ export default function CourseAndModulePicker({
           onItemSelected={setSelectedCourse}
           renderLabel={I18n.t('Select a Course')}
           itemSearchFunction={useManagedCourseSearchApi}
+          additionalParams={{include: includeConcluded ? 'concluded' : ''}}
           renderOption={item => {
             return (
               <View>
-                {item.name}
+                <TruncateText maxLines={2} truncate="word">
+                  <Text weight="bold">{item.name}</Text>
+                </TruncateText>
+                <View as="p" margin="xx-small none none" padding="none">
+                  <TruncateText maxLines={2}>
+                    <Text>{item.course_code}</Text>
+                  </TruncateText>
+                </View>
                 <View as="p" margin="none" padding="none">
-                  <Text size="small">{item.course_code}</Text>
+                  <TruncateText maxLines={2}>
+                    <Text size="small">{item.term}</Text>
+                  </TruncateText>
                 </View>
               </View>
             )

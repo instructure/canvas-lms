@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require 'spec_helper'
 require_dependency "lti/variable_expander"
 module Lti
   describe VariableExpander do
@@ -130,16 +130,6 @@ module Lti
       expect(variable_expander.lti_helper).not_to be nil
       variable_expander.current_user = nil
       expect(variable_expander.instance_variable_get(:"@current_user")).to be nil
-    end
-
-    it 'registers expansions' do
-      before_count = VariableExpander.expansions.count
-      VariableExpander.register_expansion('abc123', ['a'], -> { @context })
-      expansions = VariableExpander.expansions
-      expect(expansions.count - before_count).to eq 1
-      test_expan = expansions[:"$abc123"]
-      expect(test_expan.name).to eq 'abc123'
-      expect(test_expan.permission_groups).to eq ['a']
     end
 
     it 'expands registered variables' do
@@ -1012,25 +1002,33 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq course.course_code
         end
-          context 'when the course has multiple sections' do
-            # User.new leads to empty/null columns, which causes yet more AR
-            # complaints. The user_factory takes care of this.
-            let(:user) { user_factory }
 
-            before(:each) do
-              # AR complains if you don't save the course to the database first.
-              course.save!
-              enrolled_section = add_section("section one", { course: course })
-              add_section("section two", { course: course })
-              create_enrollment(course, user, { section: enrolled_section })
-            end
+        context 'when the course has multiple sections' do
+          # User.new leads to empty/null columns, which causes yet more AR
+          # complaints. The user_factory takes care of this.
+          let(:user) { user_factory }
 
-            it 'has a substitution for com.instructure.User.sectionNames' do
-              exp_hash = { test: '$com.instructure.User.sectionNames' }
-              variable_expander.expand_variables!(exp_hash)
-              expect(exp_hash[:test]).to match_array ['section one']
-            end
+          before(:each) do
+            # AR complains if you don't save the course to the database first.
+            course.save!
+            enrolled_section = add_section("section one", { course: course })
+            add_section("section two", { course: course })
+            create_enrollment(course, user, { section: enrolled_section })
           end
+
+          it 'has a substitution for com.instructure.User.sectionNames' do
+            exp_hash = { test: '$com.instructure.User.sectionNames' }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'section one'
+          end
+
+          it 'works with a user enrolled in both sections' do
+            create_enrollment(course, user, { section: course.course_sections.find_by(name: 'section two') })
+            exp_hash = { test: '$com.instructure.User.sectionNames' }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test].split(',')).to match_array ['section one', 'section two']
+          end
+        end
 
         context 'when the course has groups' do
           let(:course_with_groups) do
@@ -1194,7 +1192,7 @@ module Lti
             create_enrollment(course, user, { section: second_section })
             exp_hash = { test: '$com.instructure.User.sectionNames' }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to match_array ['1', '2']
+            expect(exp_hash[:test].split(',')).to match_array ['1', '2']
         end
 
         it 'has substitution for $Canvas.xapi.url' do

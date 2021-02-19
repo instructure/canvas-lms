@@ -2749,7 +2749,7 @@ describe DiscussionTopicsController, type: :request do
       expect(v0_r1['id']).to eq @reply2.id
       expect(v0_r1['user_id']).to eq @teacher.id
 
-      message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
+      message = Nokogiri::HTML5.fragment(v0_r1["message"])
 
       a_tag = message.css("p a").first
       expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"

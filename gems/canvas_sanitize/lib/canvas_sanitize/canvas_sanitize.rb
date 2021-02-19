@@ -42,56 +42,6 @@ module CanvasSanitize #:nodoc:
     klass.extend(ClassMethods)
   end
 
-  # modified from sanitize.rb to support mid-value matching
-  REGEX_STYLE_PROTOCOL = /([A-Za-z0-9\+\-\.\&\;\#\s]*?)(?:\:|&#0*58|&#x0*3a)/i
-  REGEX_STYLE_METHOD = /([A-Za-z0-9\+\-\.\&\;\#\s]*?)(?:\(|&#0*40|&#x0*28)/i
-
-  # used as a sanitize.rb transformer, below
-  def self.sanitize_style(env)
-    node = env[:node]
-    styles = []
-    style = node['style'] || ""
-    # taken from https://github.com/flavorjones/loofah/blob/master/lib/loofah/html5/scrub.rb
-    # the gauntlet
-    style = '' unless style =~ /\A([-:,\;#%.\(\)\/\sa-zA-Z0-9!]|\'[\s\w]+\'|\"[\s\w]+\"|\([\d,\s]+\))*\z/
-    style = '' unless style =~ /\A\s*([-\w]+\s*:[^\;]*(\;\s*|$))*\z/
-
-    config = env[:config]
-
-    style.scan(/([-\w]+)\s*:\s*([^;]*)/) do |property, value|
-      property = property.downcase
-      valid = (config[:style_properties] || []).include?(property)
-      valid ||= (config[:style_expressions] || []).any? { |e| property.match(e) }
-      if valid
-        styles << [property, clean_style_value(config, value)]
-      end
-    end
-    node['style'] = styles.select { |k, v| v }.map { |k, v| "#{k}: #{v}" }.join('; ') + ";"
-  end
-
-  def self.clean_style_value(config, value)
-    # checks for any colons anywhere in the string
-    # to make sure they're preceded by a valid protocol
-    protocols = config[:protocols]['style']['any']
-
-    # no idea what these are called in css, but it's
-    # a name followed by open-paren
-    # (i.e. url(...) or expression(...))
-    methods = config[:style_methods]
-
-    if methods
-      value.to_s.downcase.scan(REGEX_STYLE_METHOD) do |match|
-        return nil if !methods.include?(match[0].downcase)
-      end
-    end
-    if protocols
-      value.to_s.downcase.scan(REGEX_STYLE_PROTOCOL) do |match|
-        return nil if !protocols.include?(match[0].downcase)
-      end
-    end
-    value
-  end
-
   DEFAULT_PROTOCOLS = ['http', 'https', :relative].freeze
   SANITIZE = {
       :elements => [
@@ -99,7 +49,7 @@ module CanvasSanitize #:nodoc:
           'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
           'del', 'ins', 'iframe', 'font',
           'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
-          'q', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'sup', 'abbr', 'table', 'tbody', 'td',
+          'q', 'small', 'source', 'span', 'strike', 'strong', 'style', 'sub', 'sup', 'abbr', 'table', 'tbody', 'td',
           'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'track', 'audio',
           # added to unify tinymce and canvas_sanitize whitelists
           'address', 'acronym', 'map', 'area','bdo', 'dfn', 'kbd', 'legend', 'samp', 'tt', 'var', 'big',
@@ -339,8 +289,8 @@ module CanvasSanitize #:nodoc:
           'none' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
           'semantics' => { 'href' => DEFAULT_PROTOCOLS }.freeze,
       }.freeze,
-      :style_methods => ['url'].freeze,
-      :style_properties => [
+      css: {
+        properties: ([
           'background', 'border', 'clear', 'color',
           'cursor', 'direction', 'display', 'float',
           'font', 'height', 'left', 'line-height',
@@ -353,20 +303,17 @@ module CanvasSanitize #:nodoc:
           'top', 'vertical-align',
           'visibility', 'white-space', 'width',
           'z-index', 'zoom'
-      ].freeze,
-      :style_expressions => [
-          /\Abackground-(?:attachment|color|image|position|repeat)\z/,
-          /\Abackground-position-(?:x|y)\z/,
-          /\Aborder-(?:bottom|collapse|color|left|right|spacing|style|top|width)\z/,
-          /\Aborder-(?:bottom|left|right|top)-(?:color|style|width)\z/,
-          /\Afont-(?:family|size|stretch|style|variant|weight)\z/,
-          /\Alist-style-(?:image|position|type)\z/,
-          /\Amargin-(?:bottom|left|right|top|offset)\z/,
-          /\Apadding-(?:bottom|left|right|top)\z/
-      ].freeze,
-      :transformers => lambda { |env|
-        CanvasSanitize.sanitize_style(env) if env[:node]['style']
-        Sanitize.clean_node!(env[:node], {:remove_contents => true}) if env[:node_name] == 'style'
+        ] +
+        %w{attachment color image position repeat}.map { |i| "background-#{i}"} +
+        %w{x y}.map { |i| "background-position-#{i}" } +
+        %w{bottom collapse color left right spacing style top width}.map { |i| "border-#{i}" } +
+        %w{bottom left right top}.map { |i| %w{color style width}.map { |j| "border-#{i}-#{j}" } }.flatten +
+        %w{family size stretch style variant width}.map { |i| "font-#{i}" } +
+        %w{image position type}.map { |i| "list-style-#{i}" } +
+        %w{bottom left right top offset}.map { |i| "margin-#{i}" } +
+        %w{bottom left right top}.map { |i| "padding-#{i}" }
+        ).to_set.freeze,
+        protocols: DEFAULT_PROTOCOLS
       }
   }.freeze
 

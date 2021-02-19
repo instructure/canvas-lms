@@ -24,8 +24,8 @@ environment_configuration(defined?(config) && config) do |config|
   # and recreated between test runs.  Don't rely on the data there!
   config.cache_classes = true
 
-  # Show full error reports and disable caching
-  config.consider_all_requests_local = true
+  # Show formatted error reports and disable caching
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true

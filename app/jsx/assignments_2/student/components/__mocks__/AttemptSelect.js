@@ -25,7 +25,7 @@ export const getCurrentAttempt = submission => {
 
 export default function AttemptSelect() {
   return (
-    <Text size="medium" weight="bold" data-test-id="attempt">
+    <Text size="medium" weight="bold" data-testid="attemptSelect">
       Attempt 1
     </Text>
   )

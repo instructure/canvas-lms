@@ -196,7 +196,7 @@ describe SectionTabHelper do
             tab_assignments, course
           ).a_tag
         end
-        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+        let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
         it 'should be an a tag' do
           expect(html.name).to eq 'a'
@@ -218,7 +218,7 @@ describe SectionTabHelper do
             tab_assignments.merge(hidden_unused: true), course
           ).a_tag
         end
-        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+        let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
         it 'should have a tooltip' do
           expect(html.attributes).to include('data-tooltip')
@@ -238,7 +238,7 @@ describe SectionTabHelper do
             tab_assignments.merge(hidden: true), course
           ).a_tag
         end
-        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+        let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
         it 'should have a tooltip' do
           expect(html.attributes).to include('data-tooltip')
@@ -258,7 +258,7 @@ describe SectionTabHelper do
             tab_assignments.merge(), course
           ).a_tag
         end
-        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+        let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
         it 'shouldn\'t have a title attribute' do
           expect(html.attributes).not_to include('title')
@@ -290,7 +290,7 @@ describe SectionTabHelper do
           tab_assignments, course
         ).to_html
       end
-      let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+      let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it 'should be an li tag' do
         expect(html.name).to eq 'li'

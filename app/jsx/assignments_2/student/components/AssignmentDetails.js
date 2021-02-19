@@ -29,7 +29,7 @@ export default function AssignmentDetails({assignment, isSticky}) {
   return (
     <>
       <Heading margin="0 small medium 0" level="h1" as="h2" data-test-id="title">
-        {/* We put 100 here because using auto maxes out at one line and the input for the assignment name never exeeds 100 */}
+        {/* We put 100 here because using auto maxes out at one line and the input for the assignment name never exceeds 100 */}
         <TruncateText maxLines={isSticky ? 1 : 100} truncate={isSticky ? 'character' : 'word'}>
           {assignment.name}
         </TruncateText>

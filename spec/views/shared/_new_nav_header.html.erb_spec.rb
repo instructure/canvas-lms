@@ -26,14 +26,14 @@ describe "shared/_new_nav_header" do
     assign(:domain_root_account, Account.default)
     assign(:current_user, user_factory)
     render "shared/_new_nav_header"
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
 
     expect(doc.at_css("#global_nav_courses_link")).not_to be_nil
   end
 
   it "should not render courses when not logged in" do
     render "shared/_new_nav_header"
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
 
     expect(doc.at_css("#global_nav_courses_link")).to be_nil
   end

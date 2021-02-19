@@ -31,6 +31,7 @@ describe "sub account outcomes" do
 
       before(:each) do
         course_with_admin_logged_in
+        Account.default.enable_feature!(:rce_enhancements)
         stub_rcs_config
       end
 

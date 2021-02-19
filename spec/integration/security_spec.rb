@@ -747,7 +747,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('.edit_course_link')).to be_empty
         expect(html.css('#tab-users')).to be_empty
         expect(html.css('#tab-navigation')).to be_empty
@@ -760,7 +760,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#course_form')).not_to be_empty
         expect(html.css('#tab-navigation')).not_to be_empty
       end
@@ -778,7 +778,7 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
         expect(response.body).not_to match /People/
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#tab-users')).to be_empty
 
         add_permission :read_roster
@@ -901,7 +901,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('.section .assignments')).to be_empty
         expect(html.css('.section .syllabus')).to be_empty
         expect(html.css('.section .pages')).to be_empty
@@ -950,7 +950,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('.section .assignments')).not_to be_empty
         expect(html.css('.section .syllabus')).not_to be_empty
         expect(html.css('.section .pages')).not_to be_empty
@@ -986,7 +986,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).to match /Delete this Course/
 
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#course_account_id')).not_to be_empty
         expect(html.css('#course_enrollment_term_id')).not_to be_empty
 

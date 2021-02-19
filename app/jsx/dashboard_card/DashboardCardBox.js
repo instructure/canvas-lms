@@ -28,14 +28,18 @@ import {showNoFavoritesAlert} from './ConfirmUnfavoriteCourseModal'
 
 export default class DashboardCardBox extends React.Component {
   static propTypes = {
+    cardComponent: PropTypes.elementType.isRequired,
     courseCards: PropTypes.arrayOf(PropTypes.object),
+    headingLevel: PropTypes.oneOf(['h2', 'h3']),
     hideColorOverlays: PropTypes.bool,
     connectDropTarget: PropTypes.func,
+    requestTabChange: PropTypes.func,
     showSplitDashboardView: PropTypes.bool
   }
 
   static defaultProps = {
     courseCards: [],
+    headingLevel: 'h2',
     hideColorOverlays: false,
     connectDropTarget: el => el,
     showSplitDashboardView: false
@@ -130,6 +134,9 @@ export default class DashboardCardBox extends React.Component {
   renderCard = card => {
     const position =
       card.position !== null ? card.position : () => this.getOriginalIndex(card.assetString)
+    const cardHeadingLevel = this.props.showSplitDashboardView
+      ? this.props.headingLevel.replace(/\d/, n => ++n)
+      : this.props.headingLevel
     return (
       <DraggableDashboardCard
         key={card.id}
@@ -157,11 +164,15 @@ export default class DashboardCardBox extends React.Component {
         defaultView={card.defaultView}
         pagesUrl={card.pagesUrl}
         frontPageTitle={card.frontPageTitle}
+        cardComponent={this.props.cardComponent}
+        headingLevel={cardHeadingLevel}
+        requestTabChange={this.props.requestTabChange}
       />
     )
   }
 
   renderSplitDashboard = () => {
+    const HeadingElement = this.props.headingLevel
     const {courseCards} = this.state
     const publishedCourses = courseCards
       .filter(card => card.published)
@@ -176,19 +187,19 @@ export default class DashboardCardBox extends React.Component {
     return (
       <div className="unpublished_courses_redesign">
         <div className="ic-DashboardCard__box">
-          <h2 size="large" className="ic-DashboardCard__box__header">
+          <HeadingElement className="ic-DashboardCard__box__header">
             {I18n.t(`Published Courses (%{count})`, {
               count: I18n.n(publishedCourses.length)
             })}
-          </h2>
+          </HeadingElement>
           {publishedCourses.length > 0 ? publishedCourses : emptyEl}
         </div>
         <div className="ic-DashboardCard__box">
-          <h2 size="large" className="ic-DashboardCard__box__header">
+          <HeadingElement className="ic-DashboardCard__box__header">
             {I18n.t(`Unpublished Courses (%{count})`, {
               count: I18n.n(unpublishedCourses.length)
             })}
-          </h2>
+          </HeadingElement>
           {unpublishedCourses.length > 0 ? unpublishedCourses : emptyEl}
         </div>
       </div>

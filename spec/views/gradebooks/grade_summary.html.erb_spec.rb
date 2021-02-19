@@ -68,7 +68,7 @@ describe "/gradebooks/grade_summary" do
     sub.add_comment :author => @teacher, :media_comment_id => '0_ijklmnop', :media_comment_type => 'video'
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
-    doc = Nokogiri::HTML::DocumentFragment.parse response.body
+    doc = Nokogiri::HTML5.fragment response.body
     expect(doc.at_css('.audio_comment ~ span.media_comment_id').text).to eql '0_abcdefgh'
     expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
   end

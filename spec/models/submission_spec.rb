@@ -7142,6 +7142,15 @@ describe Submission do
     end
   end
 
+  describe "redo request" do
+    subject(:submission) { @assignment.submissions.new user: User.create, workflow_state: 'submitted', redo_request: true, attempt: 1 }
+
+    it "redo request is reset on an updated submission" do
+      submission.update!(attempt: 2)
+      expect(submission.redo_request).to eq false
+    end
+  end
+
   context "Assignment Cache" do
     specs_require_cache(:redis_cache_store)
 
