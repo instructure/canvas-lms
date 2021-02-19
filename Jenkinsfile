@@ -488,9 +488,24 @@ pipeline {
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
-                      credentials.withStarlordCredentials({ ->
-                        sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
-                      })
+                      try {
+                        credentials.withStarlordCredentials({ ->
+                          sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                        })
+                      } catch(e) {
+                        if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
+                          // DEBUG: In some cases, such as the cache hash calculation missing a file, it can be useful to be able to
+                          // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
+                          // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.
+
+                          sh(script: """
+                            docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $PATCHSET_TAG-failed
+                            ./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG-failed
+                          """, label: 'upload failed image')
+                        }
+
+                        throw e
+                      }
                     }
                   }
                 }
@@ -653,15 +668,17 @@ pipeline {
                   } catch(e) {
                     jsReady = false
 
-                    if(configuration.isChangeMerged()) {
+                    if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
                       // DEBUG: Sometimes a node can get polluted and produce an error like
                       // The git source https://github.com/rails-api/active_model_serializers.git is not yet checked out
-                      // Take the last successful layer and upload it so it can be debugged.
+                      // Take the last successful layer and upload it so it can be debugged. If we ever start using
+                      // buildkit for the relevant images, then this approach will have to change as buildkit doesn't
+                      // save the intermediate layers as images.
 
-                      sh """
+                      sh(script: """
                         docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $KARMA_RUNNER_IMAGE-failed
                         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE-failed
-                      """
+                      """, label: 'upload failed image')
                     }
 
                     throw e
