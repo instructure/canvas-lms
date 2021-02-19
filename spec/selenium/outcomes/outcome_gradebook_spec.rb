@@ -339,6 +339,22 @@ describe "outcome gradebook" do
             student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
             expect(student_names.sort).to eq(active_students.sort)
           end
+
+          it 'retains focus on filter button after a filter is chosen' do
+            student_4 = User.create!(:name => 'Unassessed Student')
+            student_4.register!
+            @course.enroll_student(student_4)
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            f('button[data-component="lmgb-student-filter-trigger"]').click
+            f('span[data-component="lmgb-student-filter-unassessed-students"]').click
+            wait_for_ajax_requests
+            expect(ff('.outcome-student-cell-content').map(&:text)).to include(a_string_matching(/Unassessed Student/))
+            check_element_has_focus(f('button[data-component="lmgb-student-filter-trigger"]'))
+          end
         end
 
         context 'with learning mastery scales enabled' do

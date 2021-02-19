@@ -90,6 +90,8 @@ module XMLHelper
   end
   
   def open_file(path)
+    # this is cheating; we use HTML because we don't deal properly with namespaces
+    # even though it's really XML
     File.exist?(path) ? ::Nokogiri::HTML(File.open(path)) : nil
   end
 

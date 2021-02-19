@@ -544,5 +544,36 @@ describe "Api::V1::Assignment" do
       expect(assignment.lti_resource_links.size).to eq 1
       expect(assignment.lti_resource_links.first.custom).to eq custom_params
     end
+
+    context 'when Quizzes 2 tool is selected' do
+      let(:tool) do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+      end
+
+      let(:external_tool_tag_attributes) do
+        {
+          content_id: tool.id,
+          content_type: 'context_external_tool',
+          custom_params: custom_params.to_json,
+          external_data: '',
+          new_tab: '0',
+          url: 'http://example.com/launch'
+        }
+      end
+
+      it 'create the assignment and set `custom_params` to lti resource link properly' do
+        new_assignmet = assignment_model(course: course, peer_reviews: true)
+        response = api.create_api_assignment(new_assignmet, assignment_params, user)
+
+        expect(response).to eq :created
+        expect(new_assignmet.peer_reviews).to be_falsey
+      end
+    end
   end
 end

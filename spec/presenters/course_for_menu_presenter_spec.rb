@@ -89,6 +89,30 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq false
     end
 
+    context 'with `homeroom_course` setting enabled' do
+      before do
+        course.update! settings: course.settings.merge(homeroom_course: true)
+      end
+
+      it 'and `canvas_for_elementary` FF disabled, sets `isHomeroom` to `false`' do
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
+        h = cs_presenter.to_h
+        expect(h[:isHomeroom]).to eq false
+      end
+
+      context 'and `canvas_for_elementary` FF enabled' do
+        before(:each) do
+          user.account.enable_feature!(:canvas_for_elementary)
+        end
+
+        it 'sets `isHomeroom` to `true`' do
+          cs_presenter = CourseForMenuPresenter.new(course, user, account)
+          h = cs_presenter.to_h
+          expect(h[:isHomeroom]).to eq true
+        end
+      end
+    end
+
     context 'with the `unpublished_courses` FF enabled' do
       before(:each) do
         course.root_account.enable_feature!(:unpublished_courses)

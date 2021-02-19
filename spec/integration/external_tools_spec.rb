@@ -40,7 +40,7 @@ describe "External Tools" do
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
       form = doc.at_css('form#tool_form')
 
       expect(form.at_css('input#launch_presentation_locale')['value']).to eq 'en'
@@ -62,7 +62,7 @@ describe "External Tools" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
 
       expect(doc.at_css('form#tool_form input#lis_result_sourcedid')['value']).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
       expect(doc.at_css('form#tool_form input#lis_outcome_service_url')['value']).to eq lti_grade_passback_api_url(@tool)
@@ -74,7 +74,7 @@ describe "External Tools" do
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('form#tool_form input#lis_result_sourcedid')).to be_nil
       expect(doc.at_css('form#tool_form input#lis_outcome_service_url')).not_to be_nil
     end
@@ -93,7 +93,7 @@ describe "External Tools" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "America/Juneau"
 
       @user.time_zone = "Hawaii"
@@ -101,7 +101,7 @@ describe "External Tools" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "Pacific/Honolulu"
     end
 
@@ -120,7 +120,7 @@ describe "External Tools" do
       user_session(@user)
       get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
@@ -134,7 +134,7 @@ describe "External Tools" do
       user_session(@user)
       get "/users/#{@user.id}/external_tools/#{tool.id}"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
@@ -150,7 +150,7 @@ describe "External Tools" do
 
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
     expect(response).to be_successful
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     tab = doc.at_css("a.#{@tool.asset_string}")
     expect(tab).not_to be_nil
     expect(tab['class'].split).to include("active")
@@ -188,7 +188,7 @@ describe "External Tools" do
       course_with_teacher_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
       expect(menu_link1).not_to be_nil
@@ -205,7 +205,7 @@ describe "External Tools" do
       course_with_student_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
       expect(menu_link1).to be_nil
@@ -225,7 +225,7 @@ describe "External Tools" do
 
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).never
         get "/courses"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
       end
 
@@ -239,7 +239,7 @@ describe "External Tools" do
         end
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         link = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
         expect(link).to be_present
         expect(link.text).to match_ignoring_whitespace("new url woo")
@@ -248,46 +248,46 @@ describe "External Tools" do
       it "caches the template by old visibility status (admin/nonadmin)" do
         course_with_teacher_logged_in(:account => @account, :active_all => true)
         get "/courses"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
 
         course_with_student_logged_in(:account => @account, :active_all => true)
         get "/courses"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to_not be_present
       end
 
       it "caches the template over courses if permissions are same" do
         course_with_teacher_logged_in(:account => @account, :active_all => true)
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
 
         c2 = course_with_teacher(:account => @account, :active_all => true, :user => @teacher).course
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).never
         get "/courses/#{c2.id}" # viewing different course but permissions are the same - should remain cached
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
       end
 
       it "does not cache the template across courses if permissions are different" do
         course_with_teacher_logged_in(:account => @account, :active_all => true)
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
 
         # they're a student here - doesn't have the teacher permissions anymore
         c2 = course_with_student(:account => @account, :active_all => true, :user => @teacher).course
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses/#{c2.id}" # viewing different course but permissions are the same - should remain cached
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
       end
 
       it "does not cache the template if permission overrides change" do
         course_with_teacher_logged_in(:account => @account, :active_all => true)
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
 
         Timecop.freeze(1.minute.from_now) do
@@ -297,14 +297,14 @@ describe "External Tools" do
 
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses/#{@course.id}" # viewing different course but permissions are the same - should remain cached
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
       end
 
       it "doesn't rebuild the html unless it detects a global_nav root account tool change" do
         course_with_teacher_logged_in(:account => @account, :active_all => true)
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
 
         # trigger the global_nav cache register clearing in a callback
@@ -316,19 +316,19 @@ describe "External Tools" do
         ContextExternalTool.where(:id => @admin_tool).update_all(:settings => new_secret_settings)
 
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         # should still have the old text cached (because we didn't detect a global nav tool change)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to_not include("new text")
 
         # now update it but it still shouldn't take effect because the callback hasn't hit
         ContextExternalTool.where(:id => @admin_tool).update_all(:updated_at => 1.minute.from_now)
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to_not include("new text")
 
         @admin_tool.save! # trigger the callback - now it should rebuild
         get "/courses/#{@course.id}"
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to include("new text")
       end
     end

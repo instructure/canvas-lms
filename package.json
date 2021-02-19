@@ -35,6 +35,7 @@
     "@instructure/ui-billboard": "6",
     "@instructure/ui-breadcrumb": "6",
     "@instructure/ui-buttons": "6",
+    "@instructure/ui-byline": "6",
     "@instructure/ui-calendar": "6",
     "@instructure/ui-checkbox": "6",
     "@instructure/ui-date-input": "6",
@@ -168,7 +169,7 @@
     "@babel/plugin-transform-react-inline-elements": "^7.2.0",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/ui-babel-preset": "6",
-    "@prettier/plugin-ruby": "^0.15.0",
+    "@prettier/plugin-ruby": "^1.5.2",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
     "@testing-library/dom": "^7",
@@ -263,7 +264,7 @@
     "moxios": "^0.4",
     "node-sass": "~4.14.1",
     "nyc": "^13",
-    "prettier": "^1",
+    "prettier": "^2.2.1",
     "qunitjs": "^1.14.0",
     "raven-js": "^3.26.2",
     "react-test-renderer": "^16",
@@ -286,10 +287,11 @@
     "yaml-loader": "^0.5"
   },
   "optionalDependencies": {
-    "@storybook/addon-actions": "^6.0.26",
-    "@storybook/addon-essentials": "^6.0.26",
-    "@storybook/addon-links": "^6.0.26",
-    "@storybook/react": "^6.0.26",
+    "@storybook/addon-actions": "^6.1.17",
+    "@storybook/addon-essentials": "^6.1.17",
+    "@storybook/addon-links": "^6.1.17",
+    "@storybook/addon-storyshots": "^6.1.17",
+    "@storybook/react": "^6.1.17",
     "inspect-process": "^0.5"
   },
   "browserslist": [
@@ -341,7 +343,8 @@
     "upgrade-instructure-ui": "script/upgrade-instructure-ui",
     "dedupe-yarn": "npx yarn-deduplicate",
     "clean": "yarn workspace-run-serial clean",
-    "storybook": "start-storybook -p 6006 --no-dll =s ../public/javascripts"
+    "storybook": "start-storybook -p 6006 --no-dll =s ../public/javascripts",
+    "test-storybook": "yarn jest --roots .storybook --testMatch **/storybook.test.js"
   },
   "resolutions": {
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",

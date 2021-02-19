@@ -77,10 +77,10 @@ describe('useManagedCourseSearchApi', () => {
     )
   })
 
-  it('sets "include" query parameter properly even if no arguments are passed', async () => {
+  it('does not set "include" query parameter if no arguments are passed', async () => {
     setupManagedCoursesResponse()
     renderHook(useManagedCourseSearchApi)
     await fetchMock.flush(true)
-    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses?include=concluded')
+    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses')
   })
 })

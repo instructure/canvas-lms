@@ -159,8 +159,10 @@ describe Api::V1::PlannerItem do
     describe '#submission_statuses_for' do
       it 'should return the submission statuses for the learning object' do
         json = api.planner_item_json(@assignment, @student, session)
-        expect(json.has_key?(:submissions)).to be true
-        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback].all? { |k| json[:submissions].has_key?(k) }).to be true
+        expect(json.key?(:submissions)).to be true
+        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback, :redo_request].all? do |k|
+          json[:submissions].key?(k)
+        end).to be true
       end
 
       it 'should indicate that an assignment is submitted' do

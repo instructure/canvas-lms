@@ -256,6 +256,46 @@ describe('FileUpload', () => {
     })
   })
 
+  it('clears mediaType on files received through the A2ExternalContentReady message event', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
+    const props = await makeProps({
+      Submission: {attempt: 0}
+    })
+    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
+
+    render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'A2ExternalContentReady',
+          content_items: [
+            {
+              url: 'http://lemon.com',
+              title: 'LemonRules.txt',
+              mediaType: 'application/octet-stream'
+            }
+          ]
+        }
+      })
+    )
+
+    await wait(() => {
+      expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith(
+        [{url: 'http://lemon.com', title: 'LemonRules.txt', mediaType: ''}],
+        expect.anything()
+      )
+    })
+  })
+
   it('creates an error alert when given no file id through the Lti response', async () => {
     const mocks = await createGraphqlMocks()
     const setOnFailure = jest.fn()

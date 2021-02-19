@@ -45,7 +45,7 @@ describe Importers::DiscussionTopicImporter do
 
         topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
         expect(topic.title).to eq data[:title]
-        parsed_description = Nokogiri::HTML::DocumentFragment.parse(data[:description]).to_s
+        parsed_description = Nokogiri::HTML5.fragment(data[:description]).to_s
         expect(topic.message.index(parsed_description)).not_to be_nil
 
         if data[:grading]

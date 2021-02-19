@@ -11,9 +11,9 @@
   <label class="ic-Label" for="role_id">{{#t}}Role:{{/t}}</label>
   <select class="ic-Input" name="role_id" id="role_id" class="">
     {{#each roles}}
-      {{#if manageable_by_user}}
+      {{#ifAny manageable_by_user addable_by_user}}
         <option value="{{id}}" {{#ifEqual id ../../role_id}}selected{{/ifEqual}}>{{label}}</option>
-      {{/if}}
+      {{/ifAny}}
     {{/each}}
   </select>
 </div>

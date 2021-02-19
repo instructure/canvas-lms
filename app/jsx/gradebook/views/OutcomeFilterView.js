@@ -69,7 +69,7 @@ export default class StudentColumnHeader extends React.Component {
                   withBackground={false}
                   withBorder={false}
                   size="medium"
-                  screenReaderLabel={I18n.t('Display Filter Options')}
+                  screenReaderLabel={I18n.t('Display Student Filter Options')}
                 />
               }
             >

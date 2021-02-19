@@ -88,7 +88,7 @@ module Importers
           # replace the entire node with a placeholder
           result[:old_value] = node.to_xml
           result[:placeholder] = placeholder(result[:old_value])
-          placeholder_node = Nokogiri::HTML::DocumentFragment.parse(result[:placeholder])
+          placeholder_node = Nokogiri::HTML5.fragment(result[:placeholder])
 
           node.replace(placeholder_node)
         else

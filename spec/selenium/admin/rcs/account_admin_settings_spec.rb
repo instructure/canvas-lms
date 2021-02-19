@@ -27,6 +27,7 @@ describe "root account basic settings" do
   include_examples "settings basic tests", :root_account
 
   before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 

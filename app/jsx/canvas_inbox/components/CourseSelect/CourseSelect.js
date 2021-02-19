@@ -23,13 +23,11 @@ import React from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
-import {Spinner} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-view'
 
 const filterOptions = (value, options) => {
   const filteredOptions = {}
-  Object.keys(options).forEach(key => {
-    filteredOptions[key] = options[key]?.filter(option =>
+  Object.keys(options).forEach((key) => {
+    filteredOptions[key] = options[key]?.filter((option) =>
       option.contextName.toLowerCase().startsWith(value.toLowerCase())
     )
   })
@@ -44,39 +42,38 @@ export class CourseSelect extends React.Component {
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       moreCourses: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       concludedCourses: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       groups: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
-      )
+      ),
     }).isRequired,
-    loading: PropTypes.bool,
-    onCourseFilterSelect: PropTypes.func
+    onCourseFilterSelect: PropTypes.func,
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.options !== state.options) {
       return {
-        filteredOptions: filterOptions(state.inputValue, props.options)
+        filteredOptions: filterOptions(state.inputValue, props.options),
       }
     }
     return null
@@ -88,7 +85,7 @@ export class CourseSelect extends React.Component {
     options: this.props.options,
     filteredOptions: this.props.options,
     highlightedOptionId: null,
-    selectedOptionId: null
+    selectedOptionId: null,
   }
 
   getDefaultHighlightedOption = (newOptions = []) => {
@@ -96,7 +93,7 @@ export class CourseSelect extends React.Component {
     return options.length > 0 ? options[0].assetString : null
   }
 
-  getGroupChangedMessage = newOption => {
+  getGroupChangedMessage = (newOption) => {
     const currentOption = this.getOptionById(this.state.highlightedOptionId)
     const currentOptionGroup = this.getOptionGroup(currentOption)
     const newOptionGroup = this.getOptionGroup(newOption)
@@ -106,22 +103,22 @@ export class CourseSelect extends React.Component {
     const message = isNewGroup
       ? I18n.t('Group %{newOptionGroup} entered. %{newOptionContextName}', {
           newOptionContextName,
-          newOptionGroup
+          newOptionGroup,
         })
       : newOption.contextName
     return message
   }
 
-  getOptionGroup = option => {
+  getOptionGroup = (option) => {
     if (!option) return
     return this.getGroupLabel(
-      Object.keys(this.props.options).find(key =>
+      Object.keys(this.props.options).find((key) =>
         this.props.options[key].find(({assetString}) => assetString === option.assetString)
       )
     )
   }
 
-  getOptionById = id => {
+  getOptionById = (id) => {
     return Object.values(this.props.options)
       .flat()
       .find(({assetString}) => id === assetString)
@@ -137,9 +134,9 @@ export class CourseSelect extends React.Component {
     if (!option) return // prevent highlighting of empty options
     this.getGroupChangedMessage(option)
     this.setState(
-      state => ({
+      (state) => ({
         highlightedOptionId: id,
-        inputValue: event.type === 'keydown' ? option.contextName : state.inputValue
+        inputValue: event.type === 'keydown' ? option.contextName : state.inputValue,
       }),
       () => {
         this.context.setOnSuccess(this.getGroupChangedMessage(option))
@@ -157,7 +154,7 @@ export class CourseSelect extends React.Component {
         selectedOptionId: id,
         inputValue: option.contextName,
         isShowingOptions: false,
-        filteredOptions: this.props.options
+        filteredOptions: this.props.options,
       },
       () => {
         this.context.setOnSuccess(I18n.t('%{contextName} selected', {contextName}))
@@ -165,32 +162,32 @@ export class CourseSelect extends React.Component {
     )
   }
 
-  handleInputChange = event => {
+  handleInputChange = (event) => {
     const value = event.target.value
     const newOptions = filterOptions(value, this.props.options)
-    this.setState(state => ({
+    this.setState((state) => ({
       inputValue: value,
       filteredOptions: newOptions,
       highlightedOptionId: this.getDefaultHighlightedOption(newOptions),
       isShowingOptions: true,
-      selectedOptionId: value === '' ? null : state.selectedOptionId
+      selectedOptionId: value === '' ? null : state.selectedOptionId,
     }))
   }
 
   handleShowOptions = () => {
     this.setState({
-      isShowingOptions: true
+      isShowingOptions: true,
     })
   }
 
   handleHideOptions = () => {
     this.setState({
       isShowingOptions: false,
-      highlightedOptionId: null
+      highlightedOptionId: null,
     })
   }
 
-  getGroupLabel = groupKey => {
+  getGroupLabel = (groupKey) => {
     switch (groupKey) {
       case 'favoriteCourses':
         return I18n.t('Favorite Courses')
@@ -207,10 +204,10 @@ export class CourseSelect extends React.Component {
     const options = this.state.filteredOptions
     const {highlightedOptionId, selectedOptionId} = this.state
 
-    return Object.keys(options).map(key => {
+    return Object.keys(options).map((key) => {
       return options[key]?.length > 0 ? (
         <Select.Group key={key} renderLabel={this.getGroupLabel(key)}>
-          {options[key].map(option => (
+          {options[key].map((option) => (
             <Select.Option
               id={option.assetString}
               key={option.assetString}
@@ -224,14 +221,6 @@ export class CourseSelect extends React.Component {
       ) : null
     })
   }
-
-  renderSpinner = () => (
-    <Select.Option id="loading">
-      <View as="div" height="100%" width="100%" textAlign="center">
-        <Spinner renderTitle={I18n.t('Loading')} size="small" />
-      </View>
-    </Select.Option>
-  )
 
   render() {
     const {inputValue, isShowingOptions} = this.state
@@ -254,7 +243,7 @@ export class CourseSelect extends React.Component {
         onRequestSelectOption={this.handleSelectOption}
         data-testid="course-select"
       >
-        {this.props.loading ? this.renderSpinner() : this.renderGroups()}
+        {this.renderGroups()}
       </Select>
     )
   }

@@ -450,7 +450,7 @@ describe "accounts/settings.html.erb" do
   context 'privacy' do
     let(:account) { account_model }
     let(:account_admin) { account_admin_user(account: account) }
-    let(:dom) { Nokogiri::HTML(response) }
+    let(:dom) { Nokogiri::HTML5(response) }
     let(:enable_fullstory) { dom.at_css('#account_settings_enable_fullstory') }
     let(:enable_google_analytics) { dom.at_css('#account_settings_enable_google_analytics') }
     let(:site_admin) { site_admin_user }

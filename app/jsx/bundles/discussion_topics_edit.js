@@ -100,7 +100,8 @@ const view = new EditView({
     })
   },
   lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
-  announcementsLocked
+  announcementsLocked,
+  homeroomCourse: window.ENV.HOMEROOM_COURSE
 })
 view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 

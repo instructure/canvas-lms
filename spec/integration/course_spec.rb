@@ -82,7 +82,7 @@ describe "course" do
     @student.set_preference(:course_nicknames, @course.id, 'A nickname or something')
     user_session(@student)
     get "/courses"
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     course_rows = doc.css('#my_courses_table tr')
     expect(course_rows.size).to eq 3
     expect(course_rows[1].to_s).to include 'Course 1'
@@ -97,7 +97,7 @@ describe "course" do
     c2 = @course
     user_session(@student)
     get "/courses"
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     course_rows = doc.css('#my_courses_table tr')
     expect(course_rows.size).to eq 3
     expect(course_rows[1].to_s).to include 'Course 1'
@@ -111,7 +111,7 @@ describe "course" do
     @student.set_preference(:course_nicknames, @course.id, 'STUDENT_NICKNAME')
     user_session(account_admin_user)
     get "/accounts/#{@course.root_account.id}/users/#{@student.id}"
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     course_list = doc.at_css('#courses_list').to_s
     expect(course_list).not_to include 'STUDENT_NICKNAME'
   end

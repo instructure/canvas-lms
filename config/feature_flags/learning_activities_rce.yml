@@ -26,3 +26,8 @@ rce_better_file_downloading:
   display_name: RCE Better File Downloading
   description: Include a download link next to each file link in the RCE
   applies_to: SiteAdmin
+rce_better_file_previewing:
+  state: hidden
+  display_name: RCE Better File Previewing
+  description: Preview files linked in the RCE in an overlay rather than a new browser tab.
+  applies_to: SiteAdmin

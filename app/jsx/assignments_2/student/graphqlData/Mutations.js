@@ -138,3 +138,17 @@ export const MARK_SUBMISSION_COMMENT_READ = gql`
   }
   ${Error.fragment}
 `
+
+export const SET_MODULE_ITEM_COMPLETION = gql`
+  mutation SetModuleItemCompletion($moduleId: ID!, $itemId: ID!, $done: Boolean!) {
+    setModuleItemCompletion(input: {moduleId: $moduleId, itemId: $itemId, done: $done}) {
+      moduleItem {
+        _id
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`

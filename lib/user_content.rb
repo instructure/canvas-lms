@@ -27,7 +27,7 @@ module UserContent
     current_host = nil,
     use_updated_math_rendering = Account.site_admin.feature_enabled?(:new_math_equation_handling)
   )
-    html = Nokogiri::HTML::DocumentFragment.parse(str)
+    html = Nokogiri::HTML5.fragment(str)
     find_user_content(html) do |obj, uc|
       uuid = SecureRandom.uuid
       child = Nokogiri::XML::Node.new("iframe", html)
@@ -73,9 +73,9 @@ module UserContent
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
         
-        mathml_span = Nokogiri::HTML::DocumentFragment.parse(
+        mathml_span = node.fragment(
           "<span class=\"hidden-readable\">#{mathml}</span>"
-        )
+        ).children.first
         node.add_next_sibling(mathml_span)
       end
     end

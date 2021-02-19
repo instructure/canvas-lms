@@ -397,6 +397,306 @@ describe 'Speedgrader' do
     end
   end
 
+  context 'reassigning' do
+    before(:once) do
+      @course.root_account.enable_feature!(:reassign_assignments)
+    end
+
+    context 'with assignment' do
+      before(:once) do
+        @assignment_for_course = @course.assignments.create!(
+          title: 'Assignment A',
+          submission_types: 'online_text_entry,online_upload',
+          due_at: 2.years.from_now
+        )
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      it 'does not display reassign button without a submission' do
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+
+      context 'with submission' do
+        let!(:resubmit_with_text) do
+          @assignment_for_course.submit_homework(
+            @students.first, submission_type: 'online_text_entry', body: 'hello!'
+          )
+        end
+
+        it 'displays disabled reassign button with a submission' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment:visible")
+        end
+
+        it 'displays tooltip on reassign button' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          wrapper = ff('#reassign_assignment_wrapper')
+          expect(wrapper[0].attribute('title')).to eq 'Student feedback required in comments above to reassign.'
+        end
+
+        it 'enables reassign button after adding a comment' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          Speedgrader.add_comment_and_submit("commenting")
+          expect(Speedgrader.comments.last).to be_displayed
+          expect(Speedgrader.right_pane).not_to contain_css("#reassign_assignment[disabled]")
+          expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment:visible")
+        end
+
+        it 'does not display tooltip on enabled reassign button' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          Speedgrader.add_comment_and_submit("commenting")
+          expect(Speedgrader.comments.last).to be_displayed
+          wrapper = ff('#reassign_assignment_wrapper')
+          expect(wrapper[0].attribute('title')).to eq ''
+        end
+
+        it 'disables reassign button after reassigning' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          Speedgrader.add_comment_and_submit("commenting")
+          expect(Speedgrader.comments.last).to be_displayed
+
+          Speedgrader.click_reassignment_btn
+          wait_for_ajax_requests
+
+          expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
+        end
+
+        it 'displays alert after reassigning' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          Speedgrader.add_comment_and_submit("commenting")
+          expect(Speedgrader.comments.last).to be_displayed
+
+          Speedgrader.click_reassignment_btn
+          wait_for_ajax_requests
+
+          wrapper = ff('#reassignment_complete')
+          expect(wrapper[0].text).to match(/The assignment has been reassigned./)
+        end
+
+        it 'displays tooltip on disabled reassign button' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          Speedgrader.add_comment_and_submit("commenting")
+          expect(Speedgrader.comments.last).to be_displayed
+
+          Speedgrader.click_reassignment_btn
+          wait_for_ajax_requests
+
+          wrapper = ff('#reassign_assignment_wrapper')
+          expect(wrapper[0].attribute('title')).to eq 'Assignment is reassigned.'
+        end
+
+        context 'student switching' do
+          after :each do
+            clear_local_storage
+          end
+
+          before :once do
+            @assignment_for_course.submit_homework(
+              @students.second, submission_type: 'online_text_entry', body: 'hello!'
+            )
+          end
+
+          it 'switching students during reassignment does not affect next student reassign button' do
+            Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+            Speedgrader.add_comment_and_submit("commenting")
+            expect(Speedgrader.comments.last).to be_displayed
+
+            Speedgrader.click_reassignment_btn
+            wait_for_ajax_requests
+            Speedgrader.click_next_student_btn
+            wait_for_animations
+
+            expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
+            wrapper = ff('#reassign_assignment_wrapper')
+            expect(wrapper[0].attribute('title')).to eq 'Student feedback required in comments above to reassign.'
+          end
+
+          it 'switching back to reassign student shows already asssigned' do
+            Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+            Speedgrader.add_comment_and_submit("commenting")
+            expect(Speedgrader.comments.last).to be_displayed
+
+            Speedgrader.click_reassignment_btn
+            wait_for_ajax_requests
+            Speedgrader.click_next_student_btn
+            wait_for_animations
+            Speedgrader.click_next_or_prev_student :previous
+            wait_for_animations
+
+            expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
+            wrapper = ff('#reassign_assignment_wrapper')
+            expect(wrapper[0].attribute('title')).to eq 'Assignment is reassigned.'
+          end
+        end
+      end
+    end
+
+    context 'with assignment overrides' do
+      before(:once) do
+        @assignment_for_course = @course.assignments.create!(
+          title: 'Assignment A',
+          submission_types: 'online_text_entry,online_upload'
+        )
+        @assignment_for_course.submit_homework(
+          @students.first, submission_type: 'online_text_entry', body: 'hello!'
+        )
+        @assignment_for_course.submit_homework(
+          @students.second, submission_type: 'online_text_entry', body: 'hello!'
+        )
+
+        section = @course.course_sections.create!(:name => "new section")
+        student_in_section(section, user: @students.second)
+        @assignment_for_course.assignment_overrides.create! do |override|
+          override.set = section
+          override.title = "All"
+          override.due_at = 2.years.from_now
+          override.due_at_overridden = true
+        end
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      after :each do
+        clear_local_storage
+      end
+
+      it 'does not display reassign button on submission without assignment override' do
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+
+      it 'switching to submission with assignment override displays reassign button' do
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        Speedgrader.click_next_student_btn
+        wait_for_animations
+
+        expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
+        wrapper = ff('#reassign_assignment_wrapper')
+        expect(wrapper[0].attribute('title')).to eq 'Student feedback required in comments above to reassign.'
+      end
+
+      it 'switching back to submission without assignment override hides reassign button' do
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        Speedgrader.click_next_student_btn
+        wait_for_animations
+        Speedgrader.click_next_or_prev_student :previous
+        wait_for_animations
+
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+    end
+
+    context 'with moderated assignment and submission' do
+      before(:once) do
+        @final_grader = course_with_user('TeacherEnrollment', course: @course, active_enrollment: true).user
+        @course.account.enable_feature!(:moderated_grading)
+        @moderated_assignment = @course.assignments.create!(
+          due_at: 2.years.from_now,
+          final_grader: @final_grader,
+          grader_count: 2,
+          moderated_grading: true,
+          points_possible: 10,
+          submission_types: :online_text_entry,
+          title:'Moderated Assignment'
+        )
+
+        @moderated_assignment.submit_homework(
+          @students.first, submission_type: 'online_text_entry', body: 'hello!'
+        )
+      end
+
+      it 'does not display reassign button for non-moderator' do
+        user_session(@teacher)
+        Speedgrader.visit(@course.id, @moderated_assignment.id)
+
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+
+      it 'displays reassign button for moderator' do
+        user_session(@final_grader)
+        Speedgrader.visit(@course.id, @moderated_assignment.id)
+
+        expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment:visible")
+      end
+    end
+
+    context 'with quiz and submission' do
+      before(:once) do
+        @quiz = seed_quiz_with_submission
+      end
+
+      before(:each) do
+        user_session(@teacher)
+        Speedgrader.visit(@course.id, @quiz.assignment_id)
+      end
+
+      it 'does not display reassign button' do
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+    end
+
+    context 'with on paper assignment and grade' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          title: 'Assignment A',
+          grading_type: 'points',
+          submission_types: 'on_paper,online_upload',
+          due_at: 2.years.from_now
+        )
+        @assignment.grade_student @students[0], grade: 10, grader: @teacher
+      end
+
+      before(:each) do
+        user_session(@teacher)
+        Speedgrader.visit(@course.id, @assignment.id)
+      end
+
+      it 'does not display reassign button' do
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+    end
+
+    context 'with external tool assignment and grade' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          title: 'Assignment A',
+          grading_type: 'points',
+          submission_types: 'external_tool',
+          due_at: 2.years.from_now
+        )
+        @assignment.grade_student @students[0], grade: 10, grader: @teacher
+      end
+
+      before(:each) do
+        user_session(@teacher)
+        Speedgrader.visit(@course.id, @assignment.id)
+      end
+
+      it 'does not display reassign button' do
+        expect(Speedgrader.right_pane).not_to contain_jqcss("#reassign_assignment:visible")
+      end
+    end
+  end
+
   context 'assignment group' do
     it 'should update grades for all students in group', priority: "1", test_id: 164017 do
       skip "Skipped because this spec fails if not run in foreground\nThis is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"

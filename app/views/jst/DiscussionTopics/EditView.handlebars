@@ -166,18 +166,20 @@
                      title="{{accessibleDateFormat}}" />
             </label></div>
             {{#unless announcementsLocked}}
-            <div><label class="checkbox short-label" for="allow_user_comments">
-              {{#if title}}
-              {{checkbox "allow_user_comments" checked=unlocked}}
-              {{else}}
-              {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
-              {{/if}}
-              {{#t}}Allow users to comment{{/t}}
-            </label></div>
-            <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
-              {{checkbox "require_initial_post"}}
-              {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-            </label></div>
+              {{#unless homeroomCourse}}
+                <div><label class="checkbox short-label" for="allow_user_comments">
+                  {{#if title}}
+                  {{checkbox "allow_user_comments" checked=unlocked}}
+                  {{else}}
+                  {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
+                  {{/if}}
+                  {{#t}}Allow users to comment{{/t}}
+                </label></div>
+                <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
+                  {{checkbox "require_initial_post"}}
+                  {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
+                </label></div>
+              {{/unless}}
             {{/unless}}
           {{else}}
           <div><label class="checkbox short-label" for="require_initial_post">
@@ -187,22 +189,24 @@
           {{/if}}
         {{/if}}
         {{#if canModerate}}
-          <div><label class="checkbox short-label" for="podcast_enabled">
-            {{checkbox "podcast_enabled"
-              checked=podcast_url
-              class="element_toggler"
-              aria-controls="podcast_has_student_posts_container"}}
-            {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
-          </label></div>
-
-          {{#if contextIsCourse}}
-            <div><label id="podcast_has_student_posts_container"
-                   style="{{hiddenUnless podcast_url}}"
-                   class="checkbox short-label" for="podcast_has_student_posts">
-              {{checkbox "podcast_has_student_posts"}}
-              {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
+          {{#unless homeroomCourse}}
+            <div><label class="checkbox short-label" for="podcast_enabled">
+              {{checkbox "podcast_enabled"
+                checked=podcast_url
+                class="element_toggler"
+                aria-controls="podcast_has_student_posts_container"}}
+              {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
             </label></div>
-          {{/if}}
+
+            {{#if contextIsCourse}}
+              <div><label id="podcast_has_student_posts_container"
+                    style="{{hiddenUnless podcast_url}}"
+                    class="checkbox short-label" for="podcast_has_student_posts">
+                {{checkbox "podcast_has_student_posts"}}
+                {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
+              </label></div>
+            {{/if}}
+          {{/unless}}
         {{/if}}
         {{#if showAssignment}}
           <div><label class="checkbox short-label" for="use_for_grading">
@@ -215,30 +219,32 @@
           </label></div>
         {{/if}}
 
-        <div><label class="checkbox short-label" for="allow_rating">
-          {{checkbox "allow_rating"
-            id="allow_rating"
-            class="element_toggler"
-            checked=allow_rating
-            aria-controls="rating_settings_container"}}
-          {{#t "allow_liking"}}Allow liking{{/t}}
-        </label></div>
-        <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
-          <div><label class="checkbox short-label" for="only_graders_can_rate">
-            {{checkbox "only_graders_can_rate"
-              id="only_graders_can_rate"
+        {{#unless homeroomCourse}}
+          <div><label class="checkbox short-label" for="allow_rating">
+            {{checkbox "allow_rating"
+              id="allow_rating"
               class="element_toggler"
-              checked=only_graders_can_rate}}
-            {{#t "only_graders_can_like"}}Only graders can like{{/t}}
+              checked=allow_rating
+              aria-controls="rating_settings_container"}}
+            {{#t "allow_liking"}}Allow liking{{/t}}
           </label></div>
-          <div><label class="checkbox short-label" for="sort_by_rating">
-            {{checkbox "sort_by_rating"
-              id="sort_by_rating"
-              class="element_toggler"
-              checked=sort_by_rating}}
-            {{#t "sort_by_likes"}}Sort by likes{{/t}}
-          </label></div>
-        </div>
+          <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
+            <div><label class="checkbox short-label" for="only_graders_can_rate">
+              {{checkbox "only_graders_can_rate"
+                id="only_graders_can_rate"
+                class="element_toggler"
+                checked=only_graders_can_rate}}
+              {{#t "only_graders_can_like"}}Only graders can like{{/t}}
+            </label></div>
+            <div><label class="checkbox short-label" for="sort_by_rating">
+              {{checkbox "sort_by_rating"
+                id="sort_by_rating"
+                class="element_toggler"
+                checked=sort_by_rating}}
+              {{#t "sort_by_likes"}}Sort by likes{{/t}}
+            </label></div>
+          </div>
+        {{/unless}}
 
         {{#if ENV.STUDENT_PLANNER_ENABLED}}
           {{#if isTopic}}

@@ -292,6 +292,22 @@ module Factories
     ], "question_text"=>"<p>abs(x) = 4</p>", "id" => 1}.with_indifferent_access
   end
 
+  def numerical_without_precision_question_data
+    {"name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"numerical_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>26.2,
+      "answers"=>[
+        {"exact"=>4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>9333},
+      ],
+      "question_text"=>"<p>Numerical without precision answers</p>",
+      "id" => 1}.with_indifferent_access
+  end
+
   def calculated_question_data
     {"name"=>"Question",
      "correct_comments"=>"",

@@ -161,18 +161,18 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       beforeEach(() => {
         trayController.showTrayForEditor(editors[0])
         tray = getTray()
+        tray.setIsDecorativeImage(true)
+        tray.$doneButton.click()
       })
 
       it('sets a role to persist the option', () => {
-        tray.setIsDecorativeImage(true)
-        tray.$doneButton.click()
         expect(editors[0].$container.querySelector('img').getAttribute('role')).toEqual(
           'presentation'
         )
-        // removes the deprecated data-is-decorative attribute
-        expect(
-          editors[0].$container.querySelector('img').hasAttribute('data-is-decorative')
-        ).toEqual(false)
+      })
+
+      it('sets data-decorative because a11y-checker requires it', () => {
+        expect(editors[0].$container.querySelector('img').dataset.decorative).toEqual('true')
       })
     })
 
@@ -180,6 +180,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       beforeEach(() => {
         $images[0].alt = ''
         $images[0].setAttribute('role', 'presentation')
+        $images[0].setAttribute('data-decorative', 'true')
         trayController.showTrayForEditor(editors[0])
         tray = getTray()
         tray.setIsDecorativeImage(false)
@@ -195,6 +196,10 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
 
       it('sets a role attribute to persist the option', () => {
         expect(editors[0].$container.querySelector('img').getAttribute('role')).toBeNull()
+      })
+
+      it('removes data-decorative', () => {
+        expect(editors[0].$container.querySelector('img').dataset.decorative).toBeUndefined()
       })
     })
 

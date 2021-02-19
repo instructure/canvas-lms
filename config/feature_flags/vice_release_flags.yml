@@ -15,6 +15,14 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
+discussions_sorting:
+  state: hidden
+  display_name: Discussion reply sorting
+  description: |-
+    Allows for discussion replies to be sorted according to creation
+    timestamps. Default order is newest to oldest for root level replies.
+  applies_to: RootAccount
+
 notification_update_account_ui:
   state: hidden
   display_name: Account level notification preferences UI update

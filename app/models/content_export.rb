@@ -174,7 +174,7 @@ class ContentExport < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :on_permanent_failure => :fail_with_error!
 
   def reset_and_start_job_progress
     self.job_progress.try :reset!
@@ -194,6 +194,12 @@ class ContentExport < ActiveRecord::Base
   def mark_failed
     self.workflow_state = 'failed'
     self.job_progress.try :fail!
+  end
+
+  def fail_with_error!(exception_or_info = nil, error_message: I18n.t('Unexpected error while performing export'))
+    add_error(error_message, exception_or_info) if exception_or_info
+    mark_failed
+    save!
   end
 
   def export_course(opts={})

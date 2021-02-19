@@ -398,6 +398,11 @@ class GroupCategory < ActiveRecord::Base
 
     group_count = groups.active.count
     section_count = self.context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id)
+    if @create_group_member_count
+      GroupBySectionCalculator.new(self, @create_group_member_count).distribute_members
+      return true
+    end
+
     return unless group_count > 0 && section_count > 0
 
     if group_count < section_count
@@ -438,22 +443,24 @@ class GroupCategory < ActiveRecord::Base
        tags: {split_type: split_type, root_account_id: self.root_account&.global_id, root_account_name: self.root_account&.name})
     end
 
-    calculate_group_count_by_membership if @create_group_member_count
+    by_section = @group_by_section && self.context.is_a?(Course)
+    calculate_group_count_by_membership if @create_group_member_count && !by_section
     create_groups(@create_group_count) if @create_group_count
-    if @assign_unassigned_members && @create_group_count
-      by_section = @group_by_section && self.context.is_a?(Course)
+    if @assign_unassigned_members && (@create_group_count || @create_group_member_count)
       assign_unassigned_members(by_section)
     end
     @create_group_count = @assign_unassigned_members = nil
   end
 
   def create_groups(num)
+    new_groups = []
     group_name = name
     # TODO i18n
     group_name = group_name.singularize if I18n.locale == :en
     num.times do |idx|
-      groups.create(name: "#{group_name} #{idx + 1}", :context => context)
+      new_groups << groups.create(name: "#{group_name} #{idx + 1}", :context => context)
     end
+    new_groups
   end
 
   def calculate_group_count_by_membership
@@ -564,15 +571,27 @@ class GroupCategory < ActiveRecord::Base
 
   class GroupBySectionCalculator
     # this got too big and I didn't feel like stuffing it into a giant method anymore
-    def initialize(category)
+    # this was initially written for creating n groups and splitting people into
+    # the different groups. Later a feature for creating groups of n people per
+    # group was added and like simple algebra moved order of operations for
+    # assigning people.
+    # n groups / people count = x members_in_group
+    #   vs
+    # n members_in_group / people count = x groups
+    #
+    # throw keep members within section and this creates more mess to this class
+    #
+    # since the feature was added later, there are @create_group_member_count
+    # sprinkled within this class to either avoid unnecessary queries or to
+    # keep the logic correct.
+    def initialize(category, create_group_member_count = nil)
+      @create_group_member_count = create_group_member_count
       @category = category
     end
 
     attr_accessor :users_by_section_id, :user_count, :groups
 
     def distribute_members
-      @groups = @category.groups.active.to_a
-
       get_users_by_section_id
       determine_group_distribution
       assign_students_to_groups
@@ -594,7 +613,13 @@ class GroupCategory < ActiveRecord::Base
 
     def determine_group_distribution
       # try to figure out how to best split up the groups
-      goal_group_size = [@user_count / @groups.count, 1].max # try to get groups with at least this size
+      goal_group_size = if @create_group_member_count
+        @create_group_member_count
+      else
+        # groups are defined by mocks in specs, so using ||=
+        @groups ||= @category.groups.active.to_a
+        [@user_count / @groups.count, 1].max # try to get groups with at least this size
+      end
 
       num_groups_assigned = 0
       user_counts = {}
@@ -605,10 +630,13 @@ class GroupCategory < ActiveRecord::Base
         user_count = sect_users.count
         user_counts[section_id] = user_count
 
-        group_count = [user_count / goal_group_size, 1].max # at least one group
+        group_count = [(user_count / goal_group_size.to_f).ceil, 1].max if @create_group_member_count
+        group_count ||= [user_count / goal_group_size, 1].max # at least one group
         num_groups_assigned += group_count
         group_counts[section_id] = group_count
       end
+
+      @groups = @category.create_groups(num_groups_assigned) if @create_group_member_count
 
       extra_groups = {}
       while num_groups_assigned != @groups.count # keep going until we get the levels just right

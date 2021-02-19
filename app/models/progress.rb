@@ -125,6 +125,7 @@ class Progress < ActiveRecord::Base
       @progress.message = "Unexpected error, ID: #{er_id || 'unknown'}"
       @progress.save
       @progress.fail
+      @context.fail_with_error!(error) if @context.respond_to?(:fail_with_error!)
     end
   end
 end

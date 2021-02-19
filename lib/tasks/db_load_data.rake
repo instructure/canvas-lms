@@ -207,10 +207,12 @@ namespace :db do
     Rake::Task['db:migrate:predeploy'].invoke
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
+    Account.clear_special_account_cache!(true)
     Rake::Task['db:migrate'].invoke
     load 'app/models/pseudonym.rb'
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
+    Account.clear_special_account_cache!(true)
     Rake::Task['db:load_initial_data'].invoke
   end
 

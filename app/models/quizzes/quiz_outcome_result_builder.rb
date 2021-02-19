@@ -49,8 +49,8 @@ module Quizzes
 
       # get data from quiz submission's question result to ensure result should be generated
       cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
-      cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
       raise "Could not find valid question" unless cached_question
+      cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
       raise "Could not find valid answer" unless cached_answer
 
       # Create a question scoped outcome result linked to the quiz_result.
@@ -105,8 +105,8 @@ module Quizzes
           question.assessment_question_bank_id == alignment.content_id
         end.map do |question|
           cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
-          cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
           raise "Could not find valid question" unless cached_question
+          cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
           raise "Could not find valid answer" unless cached_answer
           [cached_question, cached_answer]
         end

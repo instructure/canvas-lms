@@ -79,7 +79,6 @@ export default data =>
 
     // add extra fields to enrollments
     enrollment.typeLabel = keys[scope][enrollment.type]
-    enrollment.permissions = ENV.PERMISSIONS
     enrollment.typeClass = toUnderscore(enrollment.type)
 
     return enrollment

@@ -31,9 +31,9 @@ const OutcomeSearchBar = ({
   label,
   enabled,
   onChangeHandler,
-  onClearHandler
+  onClearHandler,
 }) => (
-  <View as="div" position="relative" tabIndex="0">
+  <View as="div" position="relative">
     <TextInput
       type="search"
       size="medium"
@@ -64,7 +64,7 @@ const OutcomeSearchBar = ({
 
 OutcomeSearchBar.defaultProps = {
   enabled: true,
-  placeholder: ''
+  placeholder: '',
 }
 
 OutcomeSearchBar.propTypes = {
@@ -73,7 +73,7 @@ OutcomeSearchBar.propTypes = {
   placeholder: PropTypes.string,
   searchString: PropTypes.string.isRequired,
   onChangeHandler: PropTypes.func.isRequired,
-  onClearHandler: PropTypes.func.isRequired
+  onClearHandler: PropTypes.func.isRequired,
 }
 
 export default OutcomeSearchBar

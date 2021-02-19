@@ -42,7 +42,7 @@ describe ApplicationHelper do
     it "should work work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -52,7 +52,7 @@ describe ApplicationHelper do
     it "should limit depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 3
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -62,7 +62,7 @@ describe ApplicationHelper do
     it "should work without supplying all folders" do
       option_string = folders_as_options([@f])
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
