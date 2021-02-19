@@ -34,7 +34,7 @@ while :; do
       SKIP_CANVAS=true
       ;;
     --skip-plugins)
-      if [ "$2" ]; then
+      if [[ "$2" ]] && [[ "$2" != --* ]]; then
         repos=$2
         IFS=',' read -r -a skip_repos <<< "$repos"
         shift
@@ -42,7 +42,7 @@ while :; do
         SKIP_PLUGINS=true
       fi
       ;;
-    -?*)
+    ?*)
       die 'ERROR: Unknown option: ' "$1" >&2
       ;;
     *)
@@ -122,8 +122,12 @@ function check_for_changes {
   if [ ${#stash_code[@]} -gt 0 ]; then
     printf -v joined '%s, ' "${stash_code[@]}"
     message "You have uncommitted changes in ${joined%, }." | tee -a "$LOG"
-    prompt "  Ok to run \"git stash push -m 'Stashed as part of rebase_canvas_and_plugins'\" for each repo above? [y/n]" run_stash
-    [[ ${run_stash:-n} != 'y' ]] && printf "\nStash or commit your changes then run this script again.\n" | tee -a "$LOG" && exit
+    prompt "  Ok to run \"git stash push -m 'Stashed as part of rebase_canvas_and_plugins'\" for each repo above? [y/n/skip]" run_stash
+    if [[ ${run_stash:-n} == 'skip' ]]; then
+      printf "\nSkipping stash, attempting to rebase with uncommitted changes.\n" | tee -a "$LOG" && return
+    elif [[ ${run_stash:-n} != 'y' ]]; then
+      printf "\nStash or commit your changes then run this script again.\n" | tee -a "$LOG" && exit
+    fi
     stash_repos "${stash_code[@]}"
   else
     echo_console_and_log "No uncommitted changes found. \o/"
@@ -140,9 +144,10 @@ function print_results {
     for repo in ${FAILED_REPOS[*]}; do
       echo_console_and_log "  $repo failed to rebase cleanly!"
     done
+    exit 1
   elif [ "${exit_code}" == 0 ]; then
-    # if skipped stashing, don't print anymore.
-    [[ ${run_stash:-n} != 'y' ]] && return
+    # if no stashing, don't print anymore.
+    [[ ${run_stash:-} == 'n' ]] && exit 1
     echo ""
     echo_console_and_log "\o/ SUCCESS!"
   elif [ "${exit_code}" != 130 ]; then
@@ -156,5 +161,5 @@ ensure_in_canvas_root_directory
 create_log_file
 intro_message "Rebase Canvas and Plugins"
 check_for_changes
-[[ -z "$SKIP_CANVAS" ]] && rebase_canvas
-[[ -z "$SKIP_PLUGINS" ]] && rebase_plugins
+[[ -n "$SKIP_CANVAS" ]] || rebase_canvas
+[[ -n "$SKIP_PLUGINS" ]] || rebase_plugins

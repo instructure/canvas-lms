@@ -61,7 +61,7 @@ function check_gemfile {
   if [[ -e Gemfile.lock ]]; then
     message \
 'For historical reasons, the Canvas Gemfile.lock is not tracked by git. We may
-need to remove it before we can install gems, to prevent conflicting depencency
+need to remove it before we can install gems, to prevent conflicting dependency
 errors.'
     confirm_command 'rm -f Gemfile.lock' || true
   fi

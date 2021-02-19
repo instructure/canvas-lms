@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-
 source build/common_docker_build_steps.sh
 
 trap '_canvas_lms_telemetry_report_status' ERR EXIT
@@ -60,6 +59,7 @@ DINGHY_CPUS='4'
 DINGHY_DISK='150'
 # docker-compose version 1.20.0 introduced build-arg that we use for linux
 DOCKER_COMPOSE_MIN_VERSION='1.20.0'
+DOCKER='y'
 
 if [[ $OS == 'Darwin' ]]; then
   #docker-compose is checked separately

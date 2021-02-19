@@ -1,41 +1,79 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -e
+source script/common.sh
+source build/common_docker_build_steps.sh
+
+LOG="$(pwd)/log/docker_dev_update.log"
+DOCKER='y'
+
+trap print_results EXIT
+trap "printf '\nTerminated\n' && exit 130" SIGINT
 
 usage () {
-  echo "usage: $0 [-f] [-h] [-n phase]"
+  echo "usage:"
+  printf "  --update-code [skip-canvas] [skip-plugins [<plugin1>,...]\tRebase canvas-lms and plugins. Optional skip-canvas and\n"
+  printf " \t\t\t\t\t\t\t\tskip-plugins. Comma separated list of plugins to skip.\n"
+  printf "  -h|--help\t\t\t\t\t\t\tDisplay usage\n\n"
 }
 
-bad_usage () {
+die () {
+  echo "$*" 1>&2
   usage
   exit 1
 }
 
-while getopts ":fhn:" opt
-do
-  case $opt in
-    n )
-      case $OPTARG in
-        build )
-          SKIP_BUILD=true;;
-        code )
-          SKIP_CODE=true;;
-        * )
-          bad_usage;;
-      esac
-      echo "Skipping $OPTARG";;
-    f )
-      FORCE=yes;;
-    h )
-      usage;;
-    * )
-      echo "Sorry, -$OPTARG is not a valid option!"
-      bad_usage;;
+while :; do
+  case $1 in
+    -h|-\?|--help)
+      usage
+      exit
+      ;;
+    --update-code)
+      UPDATE_CODE=true
+      params=()
+      while :; do
+        case $2 in
+          skip-canvas)
+            params+=(--skip-canvas)
+            ;;
+          skip-plugins)
+            if [ "$3" ] && [[ "$3" != "skip-canvas" ]]; then
+              repos=$3
+              params+=(--skip-plugins $repos)
+              shift
+            else
+              params+=(--skip-plugins)
+            fi
+            ;;
+          *)
+            break
+        esac
+        shift
+      done
+      ;;
+    ?*)
+      die 'ERROR: Unknown option: ' "$1" >&2
+      ;;
+    *)
+      break
   esac
+  shift
 done
 
-if [[ -z "$FORCE" && "$(docker-compose ps | wc -l)" -gt 2 ]] ; then
-  echo "You should probably stop services before running this command"
-  echo "(use -f to skip this check)"
+if ! docker info &> /dev/null; then
+  echo "Docker is not running! Start docker daemon and try again."
   exit 1
+fi
+
+if [[ "$(docker-compose top | wc -l)" -gt 0 ]] ; then
+  echo "You should probably stop docker containers before running this command"
+  prompt "Would you like to attempt to stop containers with docker-compose stop? [y/n]" stop
+  if [[ ${stop:-n} == 'y' ]]; then
+    docker-compose stop
+  else
+    echo "Continuing with docker containers running, this may cause errors."
+  fi
 fi
 
 if [ -f "docker-compose.override.yml" ]; then
@@ -44,12 +82,12 @@ else
   echo "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
   cp config/docker-compose.override.yml.example docker-compose.override.yml
 fi
+echo ""
 
-[[ -z "$SKIP_CODE" ]] && ./script/canvas_update -n data
-[[ -z "$SKIP_BUILD" ]] && docker-compose build --pull
-if [[ -z "$SKIP_BUILD" ]] ; then
-  # assets are currently compiled during dc build --pull
-  docker-compose run --rm web ./script/canvas_update -n code -n assets
-else
-  docker-compose run --rm web ./script/canvas_update -n code
-fi
+create_log_file
+intro_message "Docker Dev Update"
+[[ -n "$UPDATE_CODE" ]] && ./script/rebase_canvas_and_plugins.sh "${params[@]}"
+bundle_install_with_check
+install_node_packages
+compile_assets
+rake_db_migrate_dev_and_test
