@@ -368,6 +368,7 @@ module Importers
       item.needs_update_cached_due_dates = true if item.new_record? || item.update_cached_due_dates?
       item.save_without_broadcasting!
       item.skip_schedule_peer_reviews = nil
+      item.lti_resource_link_lookup_uuid = hash['resource_link_lookup_uuid']
 
       create_lti_13_models(hash, context, migration, item)
 

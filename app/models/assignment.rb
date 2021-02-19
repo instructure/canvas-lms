@@ -69,6 +69,7 @@ class Assignment < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   attribute :lti_resource_link_custom_params, :string, default: nil
+  attribute :lti_resource_link_lookup_uuid, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
@@ -1111,9 +1112,17 @@ class Assignment < ActiveRecord::Base
       end
 
       if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
-        return if primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+        options = {}
 
-        primary_resource_link.update!(custom: lti_resource_link_custom_params_as_hash)
+        unless primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+          options[:custom] = lti_resource_link_custom_params_as_hash
+        end
+
+        options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
+
+        return if options.empty?
+
+        primary_resource_link.update!(options)
       end
     end
   end

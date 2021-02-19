@@ -99,6 +99,7 @@ module CC::Importer::Standard
       assignment["external_tool_migration_id"] = get_node_val(meta_doc, "external_tool_identifierref") if meta_doc.at_css("external_tool_identifierref")
       assignment["external_tool_id"] = get_node_val(meta_doc, "external_tool_external_identifier") if meta_doc.at_css("external_tool_external_identifier")
       assignment["tool_setting"] = get_tool_setting(meta_doc) if meta_doc.at_css('tool_setting').present?
+      assignment["resource_link_lookup_uuid"] = get_node_val(meta_doc, "resource_link_lookup_uuid") if meta_doc.at_css("resource_link_lookup_uuid")
 
       if meta_doc.at_css("saved_rubric_comments comment")
         assignment[:saved_rubric_comments] = {}

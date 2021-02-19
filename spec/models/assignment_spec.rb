@@ -9045,7 +9045,7 @@ describe Assignment do
         it_behaves_like 'line item and resource link existence check'
         it_behaves_like 'assignment to line item attribute sync check'
 
-        it 'change the `custom` attribute at resource link when it is informed' do
+        it 'change the `custom` attribute at resource link when it is given' do
           assignment.lti_resource_link_custom_params = nil
           assignment.save!
           assignment.reload
@@ -9075,6 +9075,18 @@ describe Assignment do
           resource_link = assignment.line_items.first.resource_link
 
           expect(resource_link.custom).to eq new_custom_params.with_indifferent_access
+        end
+
+        it 'change the `lookup_uuid` attribute at resource link when it is given' do
+          lookup_uuid = '3d719897-4274-44ab-aff2-2fbd3c9d2977'
+
+          assignment.lti_resource_link_lookup_uuid = lookup_uuid
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+
+          expect(resource_link.lookup_uuid).to eq lookup_uuid
         end
 
         context 'and no resource link or line item exist' do
