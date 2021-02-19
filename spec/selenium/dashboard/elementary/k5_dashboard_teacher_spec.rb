@@ -59,15 +59,47 @@ describe "teacher k5 dashboard" do
     expect(driver.current_url).to match(/#schedule/)
   end
 
-  it 'presents homeroom announcement when feature is enabled' do
-    # This one's not fully fleshed out yet.
+  it 'presents latest homeroom announcements' do
     @course.homeroom_course = true
     @course.save!
-    new_announcement(@course, "K5 Let's do this", "So happy to see all of you.")
+    announcement_heading = "K5 Let's do this"
+    announcement_content = "So happy to see all of you."
+    new_announcement(@course, announcement_heading, announcement_content)
+
+    announcement_heading = "Happy Monday!"
+    announcement_content = "Let's get to work"
+    new_announcement(@course, announcement_heading, announcement_content)
 
     get "/"
 
-    expect(true).to eq(true)
+    expect(homeroom_course_title_link(@course_name)).to be_displayed
+    expect(announcement_title(announcement_heading)).to be_displayed
+    expect(announcement_content_text(announcement_content)).to be_displayed
+  end
+
+  it 'navigates to homeroom course when homeroom when homeroom title clicked' do
+    @course.homeroom_course = true
+    @course.save!
+
+    get "/"
+
+    click_homeroom_course_title(@course_name)
+    wait_for_ajaximations
+
+    expect(driver.current_url).to include("/courses/#{@course.id}")
+  end
+
+  it 'navigates to homeroom course announcement edit when announcement button is clicked' do
+    @course.homeroom_course = true
+    @course.save!
+
+    get "/"
+
+    expect(announcement_button).to be_displayed
+    click_announcement_button
+    wait_for_ajaximations
+
+    expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics/new?is_announcement=true")
   end
 
   it 'does not show homeroom course on dashboard' do
@@ -90,5 +122,20 @@ describe "teacher k5 dashboard" do
     get "/"
 
     expect(course_card_announcement(announcement2.title)).to be_displayed
+  end
+
+  it 'goes to the homeroom announcement for edit when clicked' do
+    @course.homeroom_course = true
+    @course.save!
+    announcement_title = "K5 Let's do this"
+    announcement = new_announcement(@course, announcement_title, "So happy to see all of you.")
+
+    get "/"
+
+    click_announcement_edit_pencil
+    wait_for_ajaximations
+
+    expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics/#{announcement.id}/edit")
+
   end
 end
