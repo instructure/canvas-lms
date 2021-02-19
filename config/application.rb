@@ -297,9 +297,18 @@ module CanvasRails
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
 
-    def validate_secret_key_config!
+    def validate_secret_key_base(_)
       # no validation; we don't use Rails' CookieStore session middleware, so we
       # don't care about secret_key_base
+    end
+
+    class DummyKeyGenerator
+      def self.generate_key(*)
+      end
+    end
+
+    def key_generator
+      DummyKeyGenerator
     end
 
     initializer "canvas.init_dynamic_settings", before: "canvas.extend_shard" do
