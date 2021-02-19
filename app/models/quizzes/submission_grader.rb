@@ -110,7 +110,8 @@ module Quizzes
     def track_outcomes(attempt)
       return unless @submission.user_id
 
-      question_ids = (@submission.quiz_data || []).map { |q| q[:assessment_question_id] }.compact.uniq
+      versioned_submission = versioned_submission(@submission, attempt)
+      question_ids = (versioned_submission&.quiz_data || []).map { |q| q[:assessment_question_id] }.compact.uniq
       questions, alignments = questions_and_alignments(question_ids)
       return if questions.empty? || alignments.empty?
 
@@ -124,12 +125,16 @@ module Quizzes
       return if questions.empty? || alignments.empty?
       submission = Quizzes::QuizSubmission.find(submission_id)
 
-      versioned_submission = submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
+      versioned_submission = versioned_submission(submission, attempt)
       builder = Quizzes::QuizOutcomeResultBuilder.new(versioned_submission)
       builder.build_outcome_results(questions, alignments)
     end
 
     private
+
+    def versioned_submission(submission, attempt)
+      submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
+    end
 
     def kept_score_updating?(original_score, original_workflow_state)
       # three scoring policies exist, highest, latest, and avg.

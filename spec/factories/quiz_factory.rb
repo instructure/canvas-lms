@@ -85,6 +85,10 @@ module Factories
     ]
   end
 
+  def test_submission_data
+    [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+  end
+
   def generate_quiz(course)
     quiz = course.quizzes.create(workflow_state: 'available')
     quiz.quiz_questions.create!(question_data: test_quiz_data().first)
@@ -102,7 +106,7 @@ module Factories
     if finished_at.nil?
       qsub.submission_data = {}
     else
-      qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+      qsub.submission_data = test_submission_data
       qsub.score = 0
       qsub.finished_at = finished_at || Time.now.utc
       qsub.workflow_state = 'complete'
