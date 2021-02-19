@@ -34,6 +34,7 @@ import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
 import useModal from '../../shared/hooks/useModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
+import GroupRemoveModal from './GroupRemoveModal'
 
 const NoOutcomesBillboard = ({contextType}) => {
   const isCourse = contextType === 'Course'
@@ -67,6 +68,7 @@ const NoOutcomesBillboard = ({contextType}) => {
 
 const OutcomeManagementPanel = () => {
   const {contextType} = useCanvasContext()
+  const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
   const onSelectOutcomesHandler = id =>
@@ -75,7 +77,6 @@ const OutcomeManagementPanel = () => {
       prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
       return updatedState
     })
-  const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
   const noop = () => {}
   const {
     error,
@@ -88,9 +89,13 @@ const OutcomeManagementPanel = () => {
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
   
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
-  const onSelectOutcomeGroupMenuHandler = (_, value) => {
-    if (value === 'move') openMoveGroupModal()
-    else noop()
+  const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
+  const groupMenuHandler = (_, action) => {
+    if (action === 'move') {
+      openMoveGroupModal()
+    } else if (action === 'remove') {
+      openGroupRemoveModal()
+    }
   }
 
   if (isLoading) {
@@ -160,7 +165,7 @@ const OutcomeManagementPanel = () => {
               overflowY="visible"
               overflowX="auto"
             >
-              <View as="div" padding="none none none x-small">
+              <View as="div" padding="x-small none none x-small">
                 {selectedGroupId && (
                   <ManageOutcomesView
                     key={selectedGroupId}
@@ -169,7 +174,7 @@ const OutcomeManagementPanel = () => {
                     selectedOutcomes={selectedOutcomes}
                     searchString={searchString}
                     onSelectOutcomesHandler={onSelectOutcomesHandler}
-                    onOutcomeGroupMenuHandler={onSelectOutcomeGroupMenuHandler}
+                    onOutcomeGroupMenuHandler={groupMenuHandler}
                     onOutcomeMenuHandler={noop}
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
@@ -189,6 +194,13 @@ const OutcomeManagementPanel = () => {
             isOpen={isMoveGroupModalOpen}
             onCloseHandler={closeMoveGroupModal}
           />
+          {selectedGroupId && (
+            <GroupRemoveModal
+              groupId={selectedGroupId}
+              isOpen={isGroupRemoveModalOpen}
+              onCloseHandler={closeGroupRemoveModal}
+            />
+          )}
         </>
       )}
     </div>
