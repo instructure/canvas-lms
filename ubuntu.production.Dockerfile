@@ -11,6 +11,7 @@ ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV YARN_VERSION 1.19.1-1
+ENV BUNDLER_VERSION 2.2.11
 
 USER root
 WORKDIR /root
@@ -30,7 +31,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
 
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.17.3 \
+  && gem install bundler --no-document -v $BUNDLER_VERSION \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 
