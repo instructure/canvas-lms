@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mapStateToProps} from '../pages/HomeroomPage'
+import {mapStateToProps} from '../HomeroomPage'
 
 jest.mock('moment-timezone', () => ({
   tz: jest.fn(() => ({

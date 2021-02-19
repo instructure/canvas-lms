@@ -20,11 +20,12 @@
 import React from 'react'
 import {cleanup, render} from '@testing-library/react'
 
-import GradesSummary from '../pages/GradesSummary'
+import GradesSummary from '../GradesSummary'
 
 const defaultCourse = {
   courseId: '1',
   courseName: 'Horticulture',
+  currentGradingPeriodId: '1',
   score: 90
 }
 
@@ -67,6 +68,15 @@ describe('GradesSummary', () => {
     expect(
       render(<GradesSummary courses={[{...defaultCourse, score: 0}]} />).getByText('0%')
     ).toBeInTheDocument()
+  })
+
+  it('displays "--" if a course has no current grading period', () => {
+    const {getByText} = render(
+      <GradesSummary
+        courses={[{...defaultCourse, score: undefined, currentGradingPeriodId: undefined}]}
+      />
+    )
+    expect(getByText('--')).toBeInTheDocument()
   })
 
   it('shows the course image if one is given', () => {

@@ -4054,6 +4054,40 @@ describe CoursesController, type: :request do
       expect(response["status"]).to eq "unauthorized"
     end
   end
+
+  describe "grading periods" do
+    before :once do
+      student_in_course :active_all => true
+    end
+
+    let_once(:grading_periods) do
+      group = Account.default.grading_period_groups.create!(title: "Score Test Group")
+      group.enrollment_terms << @course.enrollment_term
+      Factories::GradingPeriodHelper.new.create_presets_for_group(group, :past, :current, :future)
+      group.grading_periods
+    end
+
+    let_once(:expected_common_fields) do
+      {
+          "id" => be,
+          "start_date" => be,
+          "end_date" => be,
+          "workflow_state" => "active"
+      }
+    end
+
+    it "returns all associated grading periods when requested" do
+      results = api_call_as_user(@student, :get, "/api/v1/courses.json",
+                                 { :controller => 'courses', :action => 'index', :format => 'json' },
+                                 { :include => ['grading_periods'] })
+      expect(results[0]["grading_periods"]).to all(include(expected_common_fields))
+      expect(results[0]["grading_periods"]).to match [
+        a_hash_including("title" => "Period 1: past period"),
+        a_hash_including("title" => "Period 2: current period"),
+        a_hash_including("title" => "Period 3: future period"),
+      ]
+    end
+  end
 end
 
 def each_copy_option

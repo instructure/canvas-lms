@@ -31,7 +31,7 @@ export const countByCourseId = arr =>
 export const fetchGrades = (userId = 'self') =>
   asJson(
     window.fetch(
-      `/api/v1/users/${userId}/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image&enrollment_type=student&enrollment_state=active`,
+      `/api/v1/users/${userId}/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image&enrollment_type=student&enrollment_state=active`,
       defaultFetchOptions
     )
   ).then(courses =>
@@ -43,8 +43,10 @@ export const fetchGrades = (userId = 'self') =>
         courseId: course.id,
         courseName: course.name,
         courseImage: course.image_download_url,
+        currentGradingPeriodId: enrollment.current_grading_period_id,
+        currentGradingPeriodTitle: enrollment.current_grading_period_title,
+        gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
         hasGradingPeriods,
-        enrollment,
         score: hasGradingPeriods
           ? enrollment.current_period_computed_current_score
           : enrollment.computed_current_score,
@@ -54,6 +56,20 @@ export const fetchGrades = (userId = 'self') =>
         isHomeroom: course.homeroom_course
       }
     })
+  )
+
+export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
+  asJson(
+    window.fetch(
+      `/api/v1/users/${userId}/enrollments?state[]=active&&type[]=StudentEnrollment&grading_period_id=${gradingPeriodId}`,
+      defaultFetchOptions
+    )
+  ).then(enrollments =>
+    enrollments.map(({course_id, grades}) => ({
+      courseId: course_id,
+      score: grades && grades.current_score,
+      grade: grades && grades.current_grade
+    }))
   )
 
 export const fetchLatestAnnouncement = courseId =>

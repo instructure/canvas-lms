@@ -30,6 +30,8 @@ import {
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 
+import k5Theme from 'jsx/dashboard/k5-theme'
+
 export const TAB_IDS = {
   HOMEROOM: 'tab-homeroom',
   SCHEDULE: 'tab-schedule',
@@ -89,8 +91,12 @@ const DashboardTabs = ({currentTab, name, onRequestTabChange, tabsRef}) => {
   }, [])
 
   return (
-    <div className="ic-Dashboard-tabs" ref={containerRef}>
-      <View as="div" padding="medium 0 0 0" background="primary">
+    <div
+      className="ic-Dashboard-tabs"
+      ref={containerRef}
+      style={{backgroundColor: k5Theme.variables.colors.background.backgroundLightest}}
+    >
+      <View as="div" padding="medium 0 0 0" borderWidth="none none small none">
         <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="0 0 small 0">
           {I18n.t('Welcome, %{name}!', {name})}
         </Heading>

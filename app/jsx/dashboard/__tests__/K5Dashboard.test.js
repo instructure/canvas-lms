@@ -157,19 +157,13 @@ beforeAll(() => {
   })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(
-    '/api/v1/announcements?context_codes=course_homeroom&active_only=true&per_page=1',
+    /\/api\/v1\/announcements\?context_codes=course_homeroom.*/,
     JSON.stringify(homeroomAnnouncement)
   )
-  fetchMock.get('/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1', '[]')
+  fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_test.*/, '[]')
   fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
-  fetchMock.get(
-    '/api/v1/users/self/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image&enrollment_type=student&enrollment_state=active',
-    JSON.stringify(gradeCourses)
-  )
-  fetchMock.get(
-    '/api/v1/courses/homeroom/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments',
-    JSON.stringify(staff)
-  )
+  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
+  fetchMock.get(/\/api\/v1\/courses\/homeroom\/users.*/, JSON.stringify(staff))
 })
 
 afterAll(() => {
