@@ -109,9 +109,8 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
   return options
 }
 
-function renderType(contentType, contentSubtype, onChange, userContextType, containingContextType) {
-  // Check containingContextType so that we always show context links
-  if (containingContextType === 'course' || containingContextType === 'group') {
+function renderType(contentType, contentSubtype, onChange, userContextType) {
+  if (userContextType === 'course' || userContextType === 'group') {
     return (
       <SimpleSelect
         renderLabel={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
@@ -154,8 +153,7 @@ export default function Filter(props) {
     sortValue,
     searchString,
     userContextType,
-    isContentLoading,
-    containingContextType
+    isContentLoading
   } = props
   const [pendingSearchString, setPendingSearchString] = useState(searchString)
   const [searchInputTimer, setSearchInputTimer] = useState(0)
@@ -209,7 +207,7 @@ export default function Filter(props) {
   const msg = isContentLoading ? loadingMessage : searchMessage
   return (
     <View display="block" direction="column">
-      {renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
+      {renderType(contentType, contentSubtype, onChange, userContextType)}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item grow shrink margin="none xx-small none none">
@@ -327,10 +325,5 @@ Filter.propTypes = {
   /**
    * Is my content currently loading?
    */
-  isContentLoading: bool,
-
-  /**
-   * The page context
-   */
-  containingContextType: oneOf(['user', 'course', 'group'])
+  isContentLoading: bool
 }

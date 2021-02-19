@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import {useState} from 'react'
 
 export default function useModal() {
-  const [isModalOpen, setModalOpen] = useState(false)
-  const openModal = useCallback(() => setModalOpen(true), [])
-  const closeModal = useCallback(() => setModalOpen(false), [])
+  const [showModal, setShowModal] = useState(false)
+  const onOpenHandler = () => setShowModal(true)
+  const onCloseHandler = () => setShowModal(false)
 
-  return [isModalOpen, openModal, closeModal]
+  return [showModal, onOpenHandler, onCloseHandler]
 }

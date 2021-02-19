@@ -74,15 +74,5 @@ export const SubmissionMocks = {
     state: 'submitted',
     submissionStatus: 'submitted',
     submittedAt: new Date().toISOString()
-  },
-
-  excused: {
-    attempt: 1,
-    enteredGrade: null,
-    grade: null,
-    gradingStatus: 'excused',
-    state: 'graded',
-    submissionStatus: 'submitted',
-    submittedAt: new Date().toISOString()
   }
 }

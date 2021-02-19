@@ -150,7 +150,7 @@ module Api
       end
 
       def parsed_html
-        @_parsed_html ||= Nokogiri::HTML5.fragment(html)
+        @_parsed_html ||= Nokogiri::HTML::DocumentFragment.parse(html)
       end
 
       def apply_user_content_attributes(node, user_content)

@@ -44,7 +44,7 @@ class MessageStudents extends React.Component {
 
     // Callbacks
     onExited: PropTypes.func,
-    onRequestClose: PropTypes.func.isRequired
+    onRequestClose: PropTypes.func
   }
 
   static defaultProps = {
@@ -156,14 +156,9 @@ class MessageStudents extends React.Component {
       e.preventDefault()
     }
 
-    this.setState(
-      {
-        open: false
-      },
-      () => {
-        this.props.onRequestClose()
-      }
-    )
+    this.setState({
+      open: false
+    })
   }
 
   handleSubmit = e => {
@@ -258,7 +253,6 @@ class MessageStudents extends React.Component {
           onDismiss={this.props.onRequestClose}
           size="medium"
           onExited={this.props.onExited}
-          shouldCloseOnDocumentClick={false}
         >
           <Modal.Body>
             {this.renderAlert(

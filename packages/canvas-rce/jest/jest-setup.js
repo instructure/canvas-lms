@@ -41,6 +41,3 @@ if (typeof window.URL.createObjectURL === 'undefined') {
 }
 
 window.scroll = () => {}
-window.ENV = {
-  FEATURES: {}
-}

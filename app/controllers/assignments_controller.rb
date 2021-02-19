@@ -109,24 +109,12 @@ class AssignmentsController < ApplicationController
       )
     end
 
-    assignment_prereqs = if @locked && @locked[:unlock_at]
-      @locked
-     elsif @locked && !@locked[:can_view]
-       context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
-     else
-       {}
-     end
-
-    mark_done_presenter = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-    if mark_done_presenter.has_requirement?
-      js_env({
-        CONTEXT_MODULE_ITEM: {
-          done: mark_done_presenter.checked?,
-          id: mark_done_presenter.item.id,
-          module_id: mark_done_presenter.module.id
-        }
-      })
-    end
+    assignment_prereqs =
+      if @locked && !@locked[:can_view]
+        context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+      else
+        {}
+      end
 
     js_env({
       ASSIGNMENT_ID: params[:id],
@@ -188,7 +176,6 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
-          js_env({ enrollment_state: @context_enrollment&.state_based_on_date })
           rce_js_env
           render_a2_student_view
           return
@@ -641,9 +628,7 @@ class AssignmentsController < ApplicationController
         ),
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
-        VALID_DATE_RANGE: CourseDateRange.new(@context),
-        ANNOTATED_DOCUMENT_SUBMISSIONS:
-          Account.site_admin.feature_enabled?(:annotated_document_submissions)
+        VALID_DATE_RANGE: CourseDateRange.new(@context)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?

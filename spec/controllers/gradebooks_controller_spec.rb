@@ -715,7 +715,7 @@ describe GradebooksController do
       it "prefetches user ids" do
         get :show, params: { course_id: @course.id }
 
-        scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
         expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
       end
 
@@ -731,14 +731,14 @@ describe GradebooksController do
 
         get :show, params: { course_id: @course.id }
 
-        scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
         expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
       end
 
       it "does not prefetch grading period assignments when the course has no grading periods" do
         get :show, params: { course_id: @course.id }
 
-        scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
+        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
         expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
       end
 
@@ -753,7 +753,7 @@ describe GradebooksController do
         it "does not prefetch user ids" do
           get :show, params: { course_id: @course.id }
 
-          scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
+          scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
           expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
         end
 
@@ -769,7 +769,7 @@ describe GradebooksController do
 
           get :show, params: { course_id: @course.id }
 
-          scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
+          scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
           expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
         end
       end
@@ -2643,53 +2643,6 @@ describe GradebooksController do
       it "is not set if the New Gradebook Plagiarism Icons are off" do
         get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
         expect(assigns[:js_env]).not_to include(:new_gradebook_plagiarism_icons_enabled)
-      end
-    end
-
-    describe 'reassignment' do
-      it 'does not allow reassignment' do
-        @assignment.publish
-        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-        expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq false
-      end
-
-      context 'with reassign_assignments feature flag enabled' do
-        before do
-          @course.root_account.enable_feature!(:reassign_assignments)
-        end
-
-        it 'allows teacher reassignment' do
-          get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-          expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq true
-        end
-
-        it 'does not allow student reassignment' do
-          user_session(@student)
-          get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-          expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq nil
-        end
-
-        context 'with moderated grading' do
-          before(:once) do
-            @mod_assignment = @course.assignments.create!(
-              title: "some assignment", moderated_grading: true, grader_count: 1
-            )
-            course_with_ta(course: @course)
-            @mod_assignment.update!(final_grader: @teacher)
-          end
-
-          it 'does not allow non-final grader to reassign' do
-            user_session(@ta)
-            get 'speed_grader', params: {course_id: @course, assignment_id: @mod_assignment.id}
-            expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq false
-          end
-
-          it 'allows final grader to reassign' do
-            user_session(@teacher)
-            get 'speed_grader', params: {course_id: @course, assignment_id: @mod_assignment.id}
-            expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq true
-          end
-        end
       end
     end
   end

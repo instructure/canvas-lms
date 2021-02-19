@@ -25,7 +25,6 @@ describe 'quizzes question creation' do
   include QuizzesCommon
 
   before(:each) do
-    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 

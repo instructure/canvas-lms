@@ -32,7 +32,7 @@ describe 'shared/_grading_standard' do
   end
 
   let(:doc) do
-    Nokogiri::HTML5(response.body)
+    Nokogiri::HTML(response.body)
   end
 
   before do

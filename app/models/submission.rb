@@ -337,7 +337,6 @@ class Submission < ActiveRecord::Base
   before_save :check_is_new_attempt
   before_save :check_reset_graded_anonymously
   before_save :set_root_account_id
-  before_save :reset_redo_request
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -2440,7 +2439,7 @@ class Submission < ActiveRecord::Base
 
   def update_line_item_result
     return unless saved_change_to_score?
-    Lti::Result.update_score_for_submission(self, score)
+    Lti::Result.where(submission: self).update_all(result_score: score)
   end
 
   def delete_ignores
@@ -2722,10 +2721,6 @@ class Submission < ActiveRecord::Base
   end
 
   private
-
-  def reset_redo_request
-    self.redo_request = false if self.redo_request && self.attempt_changed?
-  end
 
   def set_root_account_id
     self.root_account_id ||= assignment&.course&.root_account_id

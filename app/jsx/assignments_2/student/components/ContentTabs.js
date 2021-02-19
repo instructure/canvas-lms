@@ -54,11 +54,9 @@ function currentSubmissionGrade(assignment, submission) {
       <Text weight="bold">
         <GradeDisplay
           displaySize="medium"
-          gradingStatus={submission.gradingStatus}
           gradingType={assignment.gradingType}
           pointsPossible={assignment.pointsPossible}
           receivedGrade={currentGrade}
-          showGradeForExcused
         />
       </Text>
       <Text size="small">

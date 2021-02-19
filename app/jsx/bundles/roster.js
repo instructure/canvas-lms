@@ -19,7 +19,9 @@
 import ready from '@instructure/ready'
 import I18n from 'i18n!roster_publicjs'
 import {Model} from 'Backbone'
+import CreateUserList from 'compiled/models/CreateUserList'
 import Role from 'compiled/models/Role'
+import CreateUsersView from 'compiled/views/courses/roster/CreateUsersView'
 import RoleSelectView from 'compiled/views/courses/roster/RoleSelectView'
 import rosterUsersTemplate from 'jst/courses/roster/rosterUsers'
 import RosterUserCollection from 'compiled/collections/RosterUserCollection'
@@ -72,13 +74,21 @@ const roleSelectView = new RoleSelectView({
   collection: users,
   rolesCollection
 })
+const createUsersView = new CreateUsersView({
+  collection: users,
+  rolesCollection,
+  model: new CreateUserList({
+    sections: ENV.SECTIONS,
+    roles: ENV.ALL_ROLES,
+    readURL: ENV.USER_LISTS_URL,
+    updateURL: ENV.ENROLL_USERS_URL
+  }),
+  courseModel: course
+})
 const resendInvitationsView = new ResendInvitationsView({
   model: course,
   resendInvitationsUrl: ENV.resend_invitations_url,
-  canResend:
-    ENV.permissions.manage_students ||
-    ENV.permissions.manage_admin_users ||
-    ENV.permissions.can_allow_course_admin_actions
+  canResend: ENV.permissions.manage_students || ENV.permissions.manage_admin_users
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
@@ -96,6 +106,7 @@ const app = new RosterView({
   rosterTabsView,
   inputFilterView,
   roleSelectView,
+  createUsersView,
   resendInvitationsView,
   collection: users,
   roles: ENV.ALL_ROLES,

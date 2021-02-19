@@ -1394,18 +1394,6 @@ class CoursesController < ApplicationController
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
       course_card_images_enabled = @context.feature_enabled?(:course_card_images)
-      js_permissions = {
-        :manage_students => @context.grants_right?(@current_user, session, :manage_students),
-        :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
-        :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
-        :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
-        :manage => @context.grants_right?(@current_user, session, :manage)
-      }
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-        js_permissions[:can_allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
-      else
-        js_permissions[:manage_admin_users] = @context.grants_right?(@current_user, session, :manage_admin_users)
-      end
       js_env({
         COURSE_ID: @context.id,
         USERS_URL: "/api/v1/courses/#{@context.id}/users",
@@ -1414,7 +1402,14 @@ class CoursesController < ApplicationController
         SEARCH_URL: search_recipients_url,
         CONTEXTS: @contexts,
         USER_PARAMS: {:include => ['email', 'enrollments', 'locked', 'observed_users']},
-        PERMISSIONS: js_permissions,
+        PERMISSIONS: {
+          :manage_students => @context.grants_right?(@current_user, session, :manage_students),
+          :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
+          :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
+          :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
+          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
+          :manage => @context.grants_right?(@current_user, session, :manage)
+        },
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
@@ -1643,7 +1638,7 @@ class CoursesController < ApplicationController
 
   def re_send_invitations
     get_context
-    if authorized_action(@context, @current_user, [:manage_students, manage_admin_users_perm])
+    if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
       @context.delay_if_production.re_send_invitations!(@current_user)
 
       respond_to do |format|
@@ -2194,7 +2189,7 @@ class CoursesController < ApplicationController
     get_context
     @enrollment = @context.enrollments.find(params[:id])
     can_remove = @enrollment.is_a?(StudentEnrollment) && @context.grants_right?(@current_user, session, :manage_students)
-    can_remove ||= @context.grants_right?(@current_user, session, manage_admin_users_perm)
+    can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
         if @enrollment.unconclude
@@ -2211,7 +2206,7 @@ class CoursesController < ApplicationController
   def limit_user
     get_context
     @user = @context.users.find(params[:id])
-    if authorized_action(@context, @current_user, manage_admin_users_perm)
+    if authorized_action(@context, @current_user, :manage_admin_users)
       if params[:limit] == "1"
         Enrollment.limit_privileges_to_course_section!(@context, @user, true)
         render :json => {:limited => true}
@@ -2312,7 +2307,7 @@ class CoursesController < ApplicationController
 
   def link_enrollment
     get_context
-    if authorized_action(@context, @current_user, manage_admin_users_perm)
+    if authorized_action(@context, @current_user, :manage_admin_users)
       enrollment = @context.observer_enrollments.find(params[:enrollment_id])
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != 'none'
@@ -2327,7 +2322,7 @@ class CoursesController < ApplicationController
     get_context
     @enrollment = @context.enrollments.find(params[:id])
     can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
-    can_move ||= @context.grants_right?(@current_user, session, manage_admin_users_perm)
+    can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     can_move &&= @context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis) if @enrollment.defined_by_sis?
     if can_move
       respond_to do |format|
@@ -3365,20 +3360,11 @@ class CoursesController < ApplicationController
     end
 
     permissions_to_precalculate = [:read_sis, :manage_sis]
-    if includes.include?('tabs')
-      permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
-
-      # TODO: move granular file permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
-      # after :manage_files gets removed from role overrides
-      if @domain_root_account.feature_enabled?(:granular_permissions_course_files)
-        permissions_to_precalculate += RoleOverride::GRANULAR_FILE_PERMISSIONS
-      end
-
-      # TODO: move granular user permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
-      # when removing :granular_permissions_manage_users flag
-      if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
-        permissions_to_precalculate += RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
-      end
+    permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE if includes.include?('tabs')
+    # TODO: move granular file permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
+    # after :manage_files gets removed from role overrides
+    if @domain_root_account.feature_enabled?(:granular_permissions_course_files) && includes.include?('tabs')
+      permissions_to_precalculate += RoleOverride::GRANULAR_FILE_PERMISSIONS
     end
 
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, permissions_to_precalculate)
@@ -3446,12 +3432,6 @@ class CoursesController < ApplicationController
 
   def effective_due_dates_params
     params.permit(assignment_ids: [])
-  end
-
-  def manage_admin_users_perm
-    @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
-      :allow_course_admin_actions :
-      :manage_admin_users
   end
 
   def course_params

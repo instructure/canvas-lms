@@ -111,10 +111,6 @@ export default class CoursesListRow extends React.Component {
   }
 
   openAddUsersToCourseDialog = () => {
-    const filterFunc = ENV.FEATURES.granular_permissions_manage_users
-      ? role => role.addable_by_user
-      : role => role.manageable_by_user
-    // eslint-disable-next-line promise/catch-or-return
     this.getSections().then(sections => {
       this.addPeopleApp =
         this.addPeopleApp ||
@@ -122,7 +118,7 @@ export default class CoursesListRow extends React.Component {
           courseId: this.props.id,
           courseName: this.props.name,
           defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
-          roles: (this.props.roles || []).filter(filterFunc),
+          roles: (this.props.roles || []).filter(role => role.manageable_by_user),
           sections,
           onClose: () => {
             this.handleNewEnrollments(this.addPeopleApp.usersHaveBeenEnrolled())

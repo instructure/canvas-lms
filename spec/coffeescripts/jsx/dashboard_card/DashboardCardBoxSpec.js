@@ -23,12 +23,12 @@ import ReactDndTestBackend from 'react-dnd-test-backend'
 import sinon from 'sinon'
 import {wait} from '@testing-library/react'
 
-import DashboardCard from 'jsx/dashboard_card/DashboardCard'
 import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
 import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
   let $container
+  let component
   let props
   let server
 
@@ -37,7 +37,6 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     document.body.appendChild($container)
 
     props = {
-      cardComponent: DashboardCard,
       courseCards: [
         {
           id: '1',
@@ -63,8 +62,11 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   })
 
   function mountComponent() {
+    const bindRef = ref => {
+      component = ref
+    }
     const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
-    const CardBox = <Box connectDropTarget={el => el} ref={() => {}} {...props} />
+    const CardBox = <Box connectDropTarget={el => el} ref={bindRef} {...props} />
     ReactDOM.render(CardBox, $container)
   }
 
