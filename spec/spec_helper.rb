@@ -147,7 +147,7 @@ module RSpec::Rails
 
   RSpec::Matchers.define :have_tag do |expected|
     match do |actual|
-      !!Nokogiri::HTML(actual).at_css(expected)
+      !!Nokogiri::HTML5(actual).at_css(expected)
     end
   end
 

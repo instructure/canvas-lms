@@ -62,6 +62,10 @@ def cleanupFn() {
   }
 }
 
+def getLoadAllLocales() {
+  return configuration.isChangeMerged() ? 1 : 0
+}
+
 pipeline {
   agent none
   options {
@@ -76,6 +80,7 @@ pipeline {
     DOCKER_BUILDKIT=1
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC=1
+    RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
     SENTRY_URL="https://sentry.insops.net"
     SENTRY_ORG="instructure"
     SENTRY_PROJECT="master-javascript-build"
@@ -93,6 +98,8 @@ pipeline {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
+
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
               }
             }
 

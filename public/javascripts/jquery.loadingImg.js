@@ -19,10 +19,12 @@
 import $ from 'jquery'
 
 // Shows an ajax-loading image on the given object.
-$.fn.loadingImg = function(options) {
+$.fn.loadingImg = function (options) {
   if (!this || this.length === 0) {
     return this
   }
+  const dir = window.getComputedStyle(this[0]).direction || 'ltr'
+
   const $obj = this.filter(':first')
   let list
   if (options === 'hide' || options === 'remove') {
@@ -34,6 +36,7 @@ $.fn.loadingImg = function(options) {
       }
     })
     $obj.data('loading_images', null)
+    this.css('margin-inline-end', '')
     return this
   } else if (options === 'remove_once') {
     $obj.children('.loading_image').remove()
@@ -44,8 +47,9 @@ $.fn.loadingImg = function(options) {
     }
     $obj.data('loading_images', list)
     return this
-  } else if (options == 'register_image' && arguments.length == 3) {
+  } else if (options === 'register_image' && arguments.length === 3) {
     $.fn.loadingImg.image_files[arguments[1]] = arguments[2]
+    return this
   }
   options = $.extend({}, $.fn.loadingImg.defaults, options)
   let image = $.fn.loadingImg.image_files.normal
@@ -57,13 +61,15 @@ $.fn.loadingImg = function(options) {
   }
   let paddingTop = 0
   if (options.vertical) {
-    if (options.vertical == 'top') {
-    } else if (options.vertical == 'bottom') {
+    if (options.vertical === 'top') {
+      // nothing to do
+    } else if (options.vertical === 'bottom') {
       paddingTop = $obj.outerHeight()
-    } else if (options.vertical == 'middle') {
+    } else if (options.vertical === 'middle') {
       paddingTop = $obj.outerHeight() / 2 - image.height / 2
     } else {
       paddingTop = parseInt(options.vertical, 10)
+      // eslint-disable-next-line no-restricted-globals
       if (isNaN(paddingTop)) {
         paddingTop = 0
       }
@@ -71,13 +77,18 @@ $.fn.loadingImg = function(options) {
   }
   let paddingLeft = 0
   if (options.horizontal) {
-    if (options.horizontal == 'left') {
-    } else if (options.horizontal == 'right') {
+    if (options.horizontal === 'left') {
+      // nothing to do
+    } else if (options.horizontal === 'right') {
       paddingLeft = $obj.outerWidth() - image.width
-    } else if (options.horizontal == 'middle') {
+    } else if (options.horizontal === 'right!') {
+      paddingLeft = dir === 'ltr' ? $obj.outerWidth() + 5 : -5 - (image.width || 16)
+      this.css({'margin-inline-end': '16px'})
+    } else if (options.horizontal === 'middle') {
       paddingLeft = $obj.outerWidth() / 2 - image.width / 2
     } else {
       paddingLeft = parseInt(options.horizontal, 10)
+      // eslint-disable-next-line no-restricted-globals
       if (isNaN(paddingLeft)) {
         paddingLeft = 0
       }
@@ -91,7 +102,7 @@ $.fn.loadingImg = function(options) {
   list.push($imageHolder)
   $obj.data('loading_images', list)
 
-  if (!$obj.css('position') || $obj.css('position') == 'static') {
+  if (!$obj.css('position') || $obj.css('position') === 'static') {
     const offset = $obj.offset()
     let top = offset.top,
       left = offset.left

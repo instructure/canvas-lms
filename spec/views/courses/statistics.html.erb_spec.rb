@@ -36,7 +36,7 @@ describe "courses/statistics.html.erb" do
     view_context(@course, @user)
     render
 
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('.quiz_count').text).to eq "1"
     expect(doc.at_css('.quiz_question_count').text).to eq "1"
     expect(doc.at_css('.quiz_submission_count').text).to eq "1"

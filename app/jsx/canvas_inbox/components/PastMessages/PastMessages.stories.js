@@ -21,24 +21,28 @@ import {PastMessages} from './PastMessages'
 
 export default {
   title: 'Examples/Canvas Inbox/Past Messages',
-  component: PastMessages
+  component: PastMessages,
 }
 
-const Template = args => <PastMessages {...args} />
+const Template = (args) => <PastMessages {...args} />
 
 export const Component = Template.bind({})
 Component.args = {
   messages: [
     {
-      name: 'Rick Sanchez',
-      messageBody:
+      author: {
+        name: 'Rick Sanchez',
+      },
+      body:
         "I don't do magic Morty, I do science. One takes brains, the other takes dark eye liner",
-      date: 'November 5, 2020 at 11:03am'
+      createdAt: 'November 5, 2020 at 11:03am',
     },
     {
-      name: 'Morty Smith',
-      messageBody: 'Is this the first part of some kind of magic trick?',
-      date: 'November 5, 2020 at 11:02am'
-    }
-  ]
+      author: {
+        name: 'Morty Smith',
+      },
+      body: 'Is this the first part of some kind of magic trick?',
+      createdAt: 'November 5, 2020 at 11:02am',
+    },
+  ],
 }

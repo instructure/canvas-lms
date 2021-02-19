@@ -56,8 +56,14 @@ module CC::Exporter::WebZip
 
     def convert_html_to_local(html)
       exported_html = @html_converter.html_content(html)
+      # see below
+      exported_html&.gsub!(CC::CCHelper::WEB_CONTENT_TOKEN, 'viewer/files')
       exported_html&.gsub!(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), 'viewer/files')
       CONTENT_TOKENS.each do |token|
+        # tokens contain $'s. content exported with an HTML4 parser will have
+        # escaped it, but newere content will not; check both ways
+        exported_html&.gsub!("#{token}/", '')
+        # HTML4 parser does
         exported_html&.gsub!("#{CGI.escape(token)}/", '')
       end
       exported_html

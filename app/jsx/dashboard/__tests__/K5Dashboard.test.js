@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,8 +18,8 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {render, waitForElement, within} from '@testing-library/react'
-import K5Dashboard from '../K5Dashboard'
+import {act, render, waitForElement, within} from '@testing-library/react'
+import {K5Dashboard} from '../K5Dashboard'
 import fetchMock from 'fetch-mock'
 
 const currentUser = {
@@ -40,12 +40,68 @@ const dashboardCards = [
     href: '/courses/1',
     shortName: 'Econ 101',
     originalName: 'Economics 101',
-    courseCode: 'ECON-001'
+    courseCode: 'ECON-001',
+    isHomeroom: false,
+    canManage: true
+  },
+  {
+    id: 'homeroom',
+    assetString: 'course_2',
+    href: '/courses/2',
+    shortName: 'Homeroom1',
+    originalName: 'Home Room',
+    courseCode: 'HOME-001',
+    isHomeroom: true,
+    canManage: true
+  }
+]
+const homeroomAnnouncement = [
+  {
+    title: 'Announcement here',
+    message: '<p>This is the announcement</p>',
+    html_url: 'http://google.com/announcement',
+    permissions: {
+      update: true
+    },
+    attachments: [
+      {
+        display_name: 'exam1.pdf',
+        url: 'http://google.com/download',
+        filename: '1608134586_366__exam1.pdf'
+      }
+    ]
+  }
+]
+const gradeCourses = [
+  {
+    id: 'test',
+    name: 'Economics 101',
+    has_grading_periods: false,
+    enrollments: [
+      {
+        computed_current_score: 82,
+        computed_current_grade: 'B-'
+      }
+    ],
+    homeroom_course: false
+  },
+  {
+    id: 'homeroom',
+    name: 'Homeroom Class',
+    has_grading_periods: false,
+    enrollments: [
+      {
+        computed_current_score: null,
+        computed_current_grade: null
+      }
+    ],
+    homeroom_course: true
   }
 ]
 const defaultEnv = {
   current_user: currentUser,
   FEATURES: {
+    canvas_for_elementary: true,
     unpublished_courses: true
   },
   PREFERENCES: {
@@ -76,7 +132,13 @@ const expectSelectedTabText = (wrapper, text) => {
 // passed to the card components (e.g. window.ENV). This causes the test to fail
 // with undefined errors even if the actual test really succeeds.
 const waitForCardsToLoad = async wrapper => {
-  await waitForElement(() => wrapper.getByText('My Subjects'))
+  await waitForElement(() => wrapper.getByTestId('k5-dashboard-card'))
+}
+
+const renderDashboardHomeroomPage = async (props = defaultProps) => {
+  const wrapper = render(<K5Dashboard {...props} />)
+  await waitForCardsToLoad(wrapper)
+  return wrapper
 }
 
 beforeAll(() => {
@@ -93,6 +155,16 @@ beforeAll(() => {
     }
   })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
+  fetchMock.get(
+    '/api/v1/announcements?context_codes=course_homeroom&active_only=true&per_page=1',
+    JSON.stringify(homeroomAnnouncement)
+  )
+  fetchMock.get('/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1', '[]')
+  fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
+  fetchMock.get(
+    '/api/v1/users/self/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image&enrollment_type=student&enrollment_state=active',
+    JSON.stringify(gradeCourses)
+  )
 })
 
 afterAll(() => {
@@ -102,40 +174,30 @@ afterAll(() => {
 
 beforeEach(() => {
   jest.resetModules()
-  window.ENV = defaultEnv
+  global.ENV = defaultEnv
 })
 
 afterEach(() => {
-  window.ENV = {}
+  global.ENV = {}
 })
 
 describe('K-5 Dashboard', () => {
-  jest.spyOn(window, 'fetch').mockImplementation(() =>
-    Promise.resolve().then(() => ({
-      status: 200,
-      json: () => Promise.resolve().then(() => [])
-    }))
-  )
-
   it('displays a welcome message to the logged-in user', async () => {
-    const wrapper = render(<K5Dashboard {...defaultProps} />)
-    await waitForCardsToLoad(wrapper)
+    const wrapper = await renderDashboardHomeroomPage()
 
     expect(wrapper.getByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
   })
 
   describe('Tabs', () => {
     it('show Homeroom, Schedule, Grades, and Resources options', async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} />)
-      await waitForCardsToLoad(wrapper)
+      const wrapper = await renderDashboardHomeroomPage()
       ;['Homeroom', 'Schedule', 'Grades', 'Resources'].forEach(label => {
         expect(wrapper.getByText(label)).toBeInTheDocument()
       })
     })
 
     it('default to the Homeroom tab', async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} />)
-      await waitForCardsToLoad(wrapper)
+      const wrapper = await renderDashboardHomeroomPage()
 
       expectSelectedTabText(wrapper, 'Homeroom')
     })
@@ -145,34 +207,31 @@ describe('K-5 Dashboard', () => {
         window.location.hash = ''
       })
 
-      it('and start at that tab if it is valid', () => {
+      it('and start at that tab if it is valid', async () => {
         window.location.hash = '#grades'
-        const wrapper = render(<K5Dashboard {...defaultProps} />)
+        let wrapper = null
+        await act(async () => {
+          wrapper = await render(<K5Dashboard {...defaultProps} />)
+        })
 
         expectSelectedTabText(wrapper, 'Grades')
       })
 
       it('and start at the default tab if it is invalid', async () => {
         window.location.hash = 'tab-not-a-real-tab'
-        const wrapper = render(<K5Dashboard {...defaultProps} />)
-        await waitForElement(() => wrapper.getByText('My Subjects'))
+        const wrapper = await renderDashboardHomeroomPage()
 
         expectSelectedTabText(wrapper, 'Homeroom')
       })
 
       it('and update the current tab as tabs are changed', async () => {
-        const wrapper = render(<K5Dashboard {...defaultProps} />)
-        await waitForCardsToLoad(wrapper)
+        const wrapper = await renderDashboardHomeroomPage()
 
-        within(wrapper.getByRole('tablist'))
-          .getByText('Grades')
-          .click()
+        await act(async () => within(wrapper.getByRole('tablist')).getByText('Grades').click())
         expect(window.location.hash).toBe('#grades')
         expectSelectedTabText(wrapper, 'Grades')
 
-        within(wrapper.getByRole('tablist'))
-          .getByText('Resources')
-          .click()
+        await act(async () => within(wrapper.getByRole('tablist')).getByText('Resources').click())
         expect(window.location.hash).toBe('#resources')
         expectSelectedTabText(wrapper, 'Resources')
       })
@@ -181,13 +240,23 @@ describe('K-5 Dashboard', () => {
 
   describe('Homeroom Section', () => {
     it('displays "My Subjects" heading', async () => {
-      const {getByText} = render(<K5Dashboard {...defaultProps} />)
-      await waitForElement(() => getByText('My Subjects'))
+      const wrapper = await renderDashboardHomeroomPage()
+      expect(wrapper.getByText('My Subjects')).toBeInTheDocument()
     })
 
-    it('shows course cards', async () => {
-      const {getByText} = render(<K5Dashboard {...defaultProps} />)
-      await waitForElement(() => getByText('Econ 101'))
+    it('shows course cards, excluding homerooms', async () => {
+      const wrapper = await renderDashboardHomeroomPage()
+      expect(wrapper.getByText('Economics 101')).toBeInTheDocument()
+      expect(wrapper.queryByText('Home Room')).toBeNull()
+    })
+
+    it('shows latest announcement from each homeroom', async () => {
+      const wrapper = await renderDashboardHomeroomPage()
+      expect(wrapper.getByText('Announcement here')).toBeInTheDocument()
+      expect(wrapper.getByText('This is the announcement')).toBeInTheDocument()
+      const attachment = wrapper.getByText('exam1.pdf')
+      expect(attachment).toBeInTheDocument()
+      expect(attachment.href).toBe('http://google.com/download')
     })
   })
 
@@ -197,6 +266,17 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
       await waitForElement(() => getByText("Looks like there isn't anything here"))
+    })
+  })
+
+  describe('Grades Section', () => {
+    it('displays a score summary for each non-homeroom course', async () => {
+      const {getByText, queryByText} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-grades" />
+      )
+      await waitForElement(() => getByText('Economics 101'))
+      expect(getByText('B-')).toBeInTheDocument()
+      expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
     })
   })
 })

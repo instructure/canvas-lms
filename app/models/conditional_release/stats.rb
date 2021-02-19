@@ -126,7 +126,7 @@ module ConditionalRelease
       def assignment_detail(assignment, submission, trend_score: nil)
         score = submission ? percent_from_points(submission.score, assignment.points_possible) : nil
         detail = {
-          assignment: {id: assignment.id, name: assignment.title, submission_types: assignment.submission_types_array, grading_type: assignment.grading_type},
+          assignment: {id: assignment.id, course_id: assignment.context_id, name: assignment.title, submission_types: assignment.submission_types_array, grading_type: assignment.grading_type},
           submission: {id: submission.id, score: submission.score, grade: submission.grade, submitted_at: submission.submitted_at},
           score: score
         }

@@ -59,4 +59,38 @@ describe('Moment Date helpers ', () => {
     const check = withinMomentDates(dueDate, startDate, endDate)
     expect(check).toBe(false)
   })
+
+  it('rejects a date before the start of an open-ended period', () => {
+    const dueDate = moment('2021-02-01')
+    const startDate = moment('2021-02-15')
+    const check = withinMomentDates(dueDate, startDate, null)
+    expect(check).toBe(false)
+  })
+
+  it('accepts a date after the start of an open-ended period', () => {
+    const dueDate = moment('2021-03-01')
+    const startDate = moment('2021-02-15')
+    const check = withinMomentDates(dueDate, startDate, null)
+    expect(check).toBe(true)
+  })
+
+  it('rejects a date after the end of an open-beginning period', () => {
+    const dueDate = moment('2021-03-01')
+    const endDate = moment('2021-02-15')
+    const check = withinMomentDates(dueDate, null, endDate)
+    expect(check).toBe(false)
+  })
+
+  it('accepts a date before the end of an open-beginning period', () => {
+    const dueDate = moment('2021-02-01')
+    const endDate = moment('2021-02-15')
+    const check = withinMomentDates(dueDate, null, endDate)
+    expect(check).toBe(true)
+  })
+
+  it('accepts a date in a completely open period', () => {
+    const dueDate = moment('2021-02-01')
+    const check = withinMomentDates(dueDate, null, null)
+    expect(check).toBe(true)
+  })
 })

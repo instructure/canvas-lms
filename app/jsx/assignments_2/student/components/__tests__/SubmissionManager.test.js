@@ -17,9 +17,9 @@
  */
 
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
-import {CREATE_SUBMISSION} from '../../graphqlData/Mutations'
+import {CREATE_SUBMISSION, SET_MODULE_ITEM_COMPLETION} from '../../graphqlData/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/Queries'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {act, fireEvent, render, waitForElement} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -264,6 +264,160 @@ describe('SubmissionManager', () => {
       expect(getByTestId('submission-confirmation-modal')).toBeInTheDocument()
       expect(getByTestId('cancel-submit')).toBeInTheDocument()
       expect(getByTestId('confirm-submit')).toBeInTheDocument()
+    })
+  })
+
+  describe('"Mark as Done" button', () => {
+    describe('when ENV.CONTEXT_MODULE_ITEM is set', () => {
+      let props
+
+      const successfulResponse = {
+        data: {
+          setModuleItemCompletion: {}
+        },
+        errors: null
+      }
+
+      const failedResponse = {data: null, errors: 'yes'}
+
+      beforeEach(async () => {
+        window.ENV.CONTEXT_MODULE_ITEM = {
+          done: false,
+          id: '1',
+          module_id: '2'
+        }
+
+        props = await mockAssignmentAndSubmission()
+      })
+
+      afterEach(() => {
+        delete window.ENV.CONTEXT_MODULE_ITEM
+      })
+
+      it('is rendered as "Mark as done" if the value of "done" is false', async () => {
+        const {getByRole} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        const button = getByRole('button', {name: 'Mark as done'})
+        expect(button).toBeInTheDocument()
+      })
+
+      it('is rendered as "Done" if the value of "done" is true', async () => {
+        window.ENV.CONTEXT_MODULE_ITEM.done = true
+
+        const {getByRole} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        const button = getByRole('button', {name: 'Done'})
+        expect(button).toBeInTheDocument()
+      })
+
+      it('sends a request when clicked', async () => {
+        const variables = {
+          done: true,
+          itemId: '1',
+          moduleId: '2'
+        }
+
+        const mocks = [
+          {
+            request: {query: SET_MODULE_ITEM_COMPLETION, variables},
+            result: successfulResponse
+          }
+        ]
+
+        const {getByRole} = render(
+          <AlertManagerContext.Provider>
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        )
+
+        const markAsDoneButton = getByRole('button', {name: 'Mark as done'})
+        act(() => {
+          fireEvent.click(markAsDoneButton)
+        })
+
+        expect(getByRole('button', {name: 'Done'})).toBeInTheDocument()
+      })
+
+      it('updates itself to the opposite appearance when the request succeeds', async () => {
+        const variables = {
+          done: true,
+          itemId: '1',
+          moduleId: '2'
+        }
+
+        const mocks = [
+          {
+            request: {query: SET_MODULE_ITEM_COMPLETION, variables},
+            result: successfulResponse
+          }
+        ]
+
+        const {getByText, getByRole} = render(
+          <AlertManagerContext.Provider>
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        )
+
+        const markAsDoneButton = getByRole('button', {name: 'Mark as done'})
+        act(() => {
+          fireEvent.click(markAsDoneButton)
+        })
+
+        expect(await waitForElement(() => getByText('Done'))).toBeInTheDocument()
+      })
+
+      it('does not update its appearance when the request fails', async () => {
+        const variables = {
+          done: true,
+          itemId: '1',
+          moduleId: '2'
+        }
+
+        const mocks = [
+          {
+            request: {query: SET_MODULE_ITEM_COMPLETION, variables},
+            result: failedResponse
+          }
+        ]
+
+        const {queryByText, getByRole} = render(
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn()}}>
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        )
+
+        const markAsDoneButton = getByRole('button', {name: 'Mark as done'})
+        act(() => {
+          fireEvent.click(markAsDoneButton)
+        })
+
+        expect(queryByText('Done')).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not render if ENV.CONTEXT_MODULE_ITEM is not set', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      expect(queryByTestId('set-module-item-completion-button')).not.toBeInTheDocument()
     })
   })
 })

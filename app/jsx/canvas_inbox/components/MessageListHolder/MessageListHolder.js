@@ -17,12 +17,96 @@
  */
 
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState} from 'react'
 import {View} from '@instructure/ui-view'
 
 import {MessageListItem, conversationProp} from './MessageListItem'
 
 export const MessageListHolder = ({...props}) => {
+  const [selectedMessages, setSelectedMessages] = useState([])
+  const [rangeClickStart, setRangeClickStart] = useState()
+
+  const provideConversationsForOnSelect = conversationIds => {
+    const matchedConversations = props.conversations.filter(c => conversationIds.includes(c._id))
+    props.onSelect(matchedConversations)
+  }
+
+  // Toggle function for adding/removing IDs from state
+  const updatedSelectedItems = _id => {
+    const updatedSelectedMessage = selectedMessages
+    if (selectedMessages.includes(_id)) {
+      const index = updatedSelectedMessage.indexOf(_id)
+      updatedSelectedMessage.splice(index, 1)
+    } else {
+      updatedSelectedMessage.push(_id)
+    }
+    setSelectedMessages([...updatedSelectedMessage])
+    provideConversationsForOnSelect([...updatedSelectedMessage])
+  }
+
+  // Key handler for MessageListItems
+  const handleItemSelection = (e, _id, conversation, multiple) => {
+    // Prevents selecting text when shift clicking to select range
+    if (e.shiftKey) {
+      window.document.getSelection().removeAllRanges()
+    }
+
+    if (e.shiftKey && rangeClickStart && multiple) {
+      // Range Click
+      rangeSelect(_id)
+    } else if (multiple) {
+      // MultiSelect
+      setRangeClickStart(_id)
+      updatedSelectedItems(_id)
+    } else {
+      // Single Select
+      setRangeClickStart(_id)
+      setSelectedMessages([_id])
+      provideConversationsForOnSelect([_id])
+    }
+  }
+
+  // Logic to select range of items
+  const rangeSelect = rangeClickEnd => {
+    let positionStart = null
+    let positionEnd = null
+
+    // Find position of start/ending messages
+    for (let i = 0; i < props.conversations.length; i++) {
+      const conversation = props.conversations[i]
+      if (conversation._id === rangeClickStart) {
+        positionStart = i
+      } else if (conversation._id === rangeClickEnd) {
+        positionEnd = i
+      }
+
+      if (positionStart !== null && positionEnd !== null) {
+        break // Exit loop when both positions are found
+      }
+    }
+
+    // Determine distance and direction of selection
+    const direction = Math.sign(positionEnd - positionStart)
+    const distance = Math.abs(positionStart - positionEnd) + 1
+
+    // Walk array to add range selected ids
+    const rangeSelectedIds = []
+    for (let i = positionStart, j = distance; j > 0; i += direction, j--) {
+      const conversation = props.conversations[i]
+      rangeSelectedIds.push(conversation._id)
+    }
+
+    // Add newly selected Ids to list
+    const updatedSelectedMessage = selectedMessages
+    rangeSelectedIds.forEach(id => {
+      if (!selectedMessages.includes(id)) {
+        updatedSelectedMessage.push(id)
+      }
+    })
+    setSelectedMessages([...updatedSelectedMessage])
+    provideConversationsForOnSelect([...updatedSelectedMessage])
+  }
+
   return (
     <View
       as="div"
@@ -35,13 +119,15 @@ export const MessageListHolder = ({...props}) => {
       {props.conversations?.map(conversation => {
         return (
           <MessageListItem
+            id={conversation._id}
             conversation={conversation.conversation}
             isStarred={conversation.label === 'starred'}
+            isSelected={selectedMessages.includes(conversation._id)}
             isUnread={conversation.workflowState === 'unread'}
             onOpen={props.onOpen}
-            onSelect={props.onSelect}
+            onSelect={handleItemSelection}
             onStar={props.onStar}
-            key={conversation.id}
+            key={conversation._id}
           />
         )
       })}
@@ -57,7 +143,14 @@ const conversationParticipantsProp = PropTypes.shape({
 
 MessageListHolder.propTypes = {
   conversations: PropTypes.arrayOf(conversationParticipantsProp),
+  id: PropTypes.number,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func
+}
+
+MessageListHolder.defaultProps = {
+  onOpen: () => {},
+  onSelect: () => {},
+  onStar: () => {}
 }

@@ -117,14 +117,19 @@ module SectionTabHelper
     private
 
     def cache_key
-      [
+      k = [
         context,
         current_user,
         domain_root_account,
         Lti::NavigationCache.new(domain_root_account),
         'section_tabs_hash',
         I18n.locale
-      ].cache_key
+      ]
+      if context.is_a?(Course)
+        k << 'homeroom_course' if context.elementary_homeroom_course?
+      end
+
+      k.cache_key
     end
 
     def tab_has_required_attributes?(tab)

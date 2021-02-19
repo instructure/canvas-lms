@@ -124,7 +124,7 @@ describe Quizzes::SubmissionGrader do
     it "should score an essay_question" do
       qd = essay_question_data
       text = "that's too <b>dang</b> hard! <script>alert(1)</script>"
-      sanitized = "that's too <b>dang</b> hard! alert(1)"
+      sanitized = "that's too <b>dang</b> hard! "
       expect(Quizzes::SubmissionGrader.score_question(qd, { "question_1" => text })).to eq(
         { :question_id => 1, :correct => "undefined", :points => 0, :text => sanitized }
       )

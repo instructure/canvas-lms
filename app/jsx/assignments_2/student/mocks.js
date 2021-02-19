@@ -81,6 +81,7 @@ export async function mockAssignment(overrides = []) {
     assignmentUrl: 'mocked-assignment-url',
     courseId: '1',
     currentUser: {id: '1', display_name: 'bob', avatar_image_url: 'awesome.avatar.url'},
+    enrollmentState: 'active',
     modulePrereq: null,
     moduleUrl: 'mocked-module-url'
   }

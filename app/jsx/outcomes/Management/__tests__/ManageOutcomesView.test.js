@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ManageOutcomesView from '../ManageOutcomesView'
 import {outcomeGroup} from './mocks'
+import {addZeroWidthSpace} from '../../../shared/helpers/addZeroWidthSpace'
 
 describe('ManageOutcomesView', () => {
   let onSelectOutcomesHandler
@@ -27,16 +28,19 @@ describe('ManageOutcomesView', () => {
   let onOutcomeMenuHandler
   let onSearchChangeHandler
   let onSearchClearHandler
+  let loadMore
   const defaultProps = (props = {}) => ({
     outcomeGroup,
-    selectedOutcomes: {'1': true},
+    selectedOutcomes: {1: true},
     searchString: 'abc',
+    loading: false,
     onSelectOutcomesHandler,
     onOutcomeGroupMenuHandler,
     onOutcomeMenuHandler,
     onSearchChangeHandler,
     onSearchClearHandler,
-    ...props
+    loadMore,
+    ...props,
   })
 
   beforeEach(() => {
@@ -45,23 +49,49 @@ describe('ManageOutcomesView', () => {
     onOutcomeMenuHandler = jest.fn()
     onSearchChangeHandler = jest.fn()
     onSearchClearHandler = jest.fn()
+    loadMore = jest.fn()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it('renders group title but no list of outcomes if outcomeGroup prop provided with id, title but no children', () => {
+  it('renders loading indicator', () => {
     const {queryByTestId} = render(
-      <ManageOutcomesView {...defaultProps({outcomeGroup: {id: '1', title: 'Group Title'}})} />
+      <ManageOutcomesView {...defaultProps({outcomeGroup: null, loading: true})} />
     )
-    expect(queryByTestId('outcome-group-container')).toBeInTheDocument()
-    expect(queryByTestId('outcome-items-list')).not.toBeInTheDocument()
+    expect(queryByTestId('loading')).toBeInTheDocument()
   })
 
-  it('renders list of outcomes if outcomeGroup prop provided with id, title and children', () => {
-    const {queryByTestId} = render(<ManageOutcomesView {...defaultProps()} />)
+  it('renders group title if outcomeGroup prop provided with id and title only', () => {
+    const {queryByTestId} = render(
+      <ManageOutcomesView
+        {...defaultProps({
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {nodes: [], pageInfo: {hasNextPage: false}},
+          },
+        })}
+      />
+    )
     expect(queryByTestId('outcome-group-container')).toBeInTheDocument()
-    expect(queryByTestId('outcome-items-list')).toBeInTheDocument()
+  })
+
+  it('renders outcomes count', () => {
+    const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
+    expect(
+      getByText(`15 "${addZeroWidthSpace('Grade.2.Math.3A.Elementary.CCSS.Calculus.1')}" Outcomes`)
+    ).toBeInTheDocument()
+  })
+
+  it('renders list of outcomes', () => {
+    const {getAllByText} = render(<ManageOutcomesView {...defaultProps()} />)
+    expect(
+      getAllByText(
+        'Partition circles and rectangle into two, three, or four equal share. Partition circles and rectangle into two, three, or four equal share.'
+      ).length
+    ).not.toBe(0)
   })
 })

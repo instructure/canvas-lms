@@ -506,7 +506,7 @@ module Api::V1::Assignment
     response = :created
 
     Assignment.suspend_due_date_caching do
-      assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
+      assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
       response = if prepared_create[:overrides].present?
         create_api_assignment_with_overrides(prepared_create, user)

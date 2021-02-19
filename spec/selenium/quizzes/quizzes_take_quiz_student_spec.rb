@@ -32,6 +32,21 @@ describe 'taking a quiz' do
 
     before(:each) { user_session(@student) }
 
+    context 'when the quiz is past due' do
+      let(:quiz_past_due) do
+        quiz_past_due = quiz_create(course: @course)
+        quiz_past_due.due_at = default_time_for_due_date(Time.zone.now - 2.days)
+        quiz_past_due.save!
+        quiz_past_due.reload
+      end
+
+      it 'shows the submission as late on the submission details page and marks it as "late"', custom_timeout: 30 do
+        take_and_answer_quiz(quiz: quiz_past_due)
+        verify_quiz_submission_is_late
+        verify_quiz_submission_is_late_in_speedgrader
+      end
+    end
+
     context 'when the quiz has an access code' do
       let(:access_code) { '1234' }
       let(:quiz) do

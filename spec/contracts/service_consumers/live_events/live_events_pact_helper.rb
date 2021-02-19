@@ -53,15 +53,19 @@ module LiveEvents
         run_jobs
 
         # Find the last message with a matching event_name
-        @event_message = stream_client.data.map do |event|
+        @event_data = stream_client.data.map do |event|
           JSON.parse(event[:data])
-        end.reverse.find do |msg|
+        end
+        @event_message = @event_data.reverse.find do |msg|
           msg.dig('attributes', 'event_name') == @event_name
         end
       end
 
       def has_kept_the_contract?
-        raise StandardError, 'You must first call "Event#emit_with" before you can assert the contract has been kept.' unless @event_message
+        unless @event_message
+          le_error = "No Matching Live Event was emitted for event_name: #{@event_name}\nEvent Data: #{@event_data}"
+          raise StandardError, le_error
+        end
         diff = compare_contract_with_live_event
         contract_matches = diff.none?
         print_difference(diff) unless contract_matches

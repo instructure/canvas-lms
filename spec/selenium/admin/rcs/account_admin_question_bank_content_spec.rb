@@ -19,7 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../common')
 
-describe "account admin question bank", ignore_js_errors: true do
+describe "account admin question bank" do
   include_context "in-process server selenium tests"
 
   before(:each) do

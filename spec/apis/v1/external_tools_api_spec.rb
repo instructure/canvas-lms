@@ -102,7 +102,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@course, 'course', {url: tool.url})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end
@@ -111,7 +111,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@course, 'course', {id: tool.id.to_s})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end
@@ -318,7 +318,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@account, 'account', {url: tool.url})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end
@@ -327,7 +327,7 @@ describe ExternalToolsController, type: :request do
           response = sessionless_launch(@account, 'account', {id: tool.id.to_s})
           expect(response.code).to eq '200'
 
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('form')).not_to be_nil
           expect(doc.at_css('form')['action']).to eq tool.url
         end

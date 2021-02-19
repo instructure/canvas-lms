@@ -141,6 +141,19 @@ describe('ContentTabs', () => {
     expect(getByTestId('grade-display')).toBeInTheDocument()
   })
 
+  it('displays the grade of the current submission when it is excused', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.excused
+    })
+
+    const {getByTestId} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+    expect(getByTestId('grade-display').textContent).toEqual('–/10 Points')
+  })
+
   it('does not display the grade of the current submission if it is submitted but not graded', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: SubmissionMocks.submitted

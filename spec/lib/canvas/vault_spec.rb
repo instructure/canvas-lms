@@ -84,6 +84,8 @@ module Canvas
           },
           lease_duration: 3600,
         }.to_json, headers: { 'content-type': 'application/json' })
+        stub_request(:get, "#{addr}/v1/bad/test/path").
+          to_return(status: 404, headers: { 'content-type': 'application/json' })
       end
 
       it 'Caches the read' do
@@ -92,6 +94,14 @@ module Canvas
         # uses the cache
         expect(described_class.read('test/path')).to eq({ foo: 'bar' })
         expect(@stub).to have_been_requested.times(1)
+      end
+
+      it 'Does not cache the read if not desired' do
+        expect(described_class.read('test/path', cache: false)).to eq({ foo: 'bar' })
+        expect(@stub).to have_been_requested.times(1)
+        # still does not use the cache
+        expect(described_class.read('test/path', cache: false)).to eq({ foo: 'bar' })
+        expect(@stub).to have_been_requested.times(2)
       end
 
       it 'Caches the read for less than the lease_duration' do
@@ -127,6 +137,14 @@ module Canvas
         allow(described_class).to receive(:config).and_return(local_config)
         result = described_class.read(cred_path)
         expect(result[:security_token]).to eq("fake-security-token")
+      end
+
+      it 'Throws an error if not found by default' do
+        expect { described_class.read('bad/test/path') }.to raise_error(Vault::MissingVaultSecret)
+      end
+
+      it 'Returns nil if not found and not required' do
+        expect(described_class.read('bad/test/path', required: false)).to be_nil
       end
 
       describe 'locking and loading' do
@@ -169,7 +187,7 @@ module Canvas
           cache_key = ::Canvas::Vault::CACHE_KEY_PREFIX + credential_path
           expect(LocalCache.fetch(cache_key)).to be_nil
           result = described_class.read(credential_path)
-          cache_entry = LocalCache.cache.send(:read_entry, LocalCache.cache.normalize_key(cache_key, {}), {})
+          cache_entry = LocalCache.cache.send(:read_entry, LocalCache.cache.send(:normalize_key, cache_key, {}), {})
           expiry_approximate = Time.now.utc.to_i + (lease_duration / 2)
           expiry_delta = (cache_entry.expires_at - expiry_approximate).abs
           expect(expiry_delta.abs < 30).to be_truthy

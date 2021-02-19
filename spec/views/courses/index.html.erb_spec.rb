@@ -42,7 +42,7 @@ describe "/courses/index" do
     assign(:future_enrollments, [])
     assign(:visible_groups, [@group])
     render "courses/index"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#my_groups_table td:nth-child(2) span.name').text).to eq @course.name
   end
 
@@ -59,7 +59,7 @@ describe "/courses/index" do
     assign(:future_enrollments, [@enrollment])
     assign(:visible_groups, [])
     render "courses/index"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#my_groups_table')).to be_nil
   end
 end

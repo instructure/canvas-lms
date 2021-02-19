@@ -16,200 +16,76 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
-import {
-  IconMoreLine,
-  IconMarkAsReadLine,
-  IconTrashLine,
-  IconLockLine,
-  IconUnlockLine,
-  IconUserLine,
-  IconDuplicateLine,
-  IconEditLine
-} from '@instructure/ui-icons'
-import {Button, IconButton} from '@instructure/ui-buttons'
+
+import {Avatar} from '@instructure/ui-avatar'
+import {Badge} from '@instructure/ui-badge'
+import {Byline} from '@instructure/ui-byline'
+import {Pill} from '@instructure/ui-pill'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!conversations_2'
-import {PublishButton} from './PublishButton'
 
 export function PostMessage({...props}) {
-  const addDebug = true
   return (
-    <View display="block" padding="small">
-      <Flex withVisualDebug={addDebug}>
-        <Flex.Item shouldGrow={false}>
-          {/* TODO: add avatar display VICE-934 */}
-          AVATAR
-        </Flex.Item>
-        <Flex.Item shouldGrow>
-          <Flex direction="column" withVisualDebug={addDebug}>
-            <Flex.Item>
-              <Flex width="100%" justifyItems="space-between">
-                <Flex.Item>
-                  {/* TODO author info VICE-934 */}
-                  AUTHOR INFO
-                </Flex.Item>
-                <Flex.Item>
-                  {props.onTogglePublish && (
-                    <PublishButton
-                      key={props.publishState}
-                      initialState={props.publishState}
-                      onClick={props.onTogglePublish}
-                    />
-                  )}
-                  {props.onEdit && (
-                    <Button
-                      renderIcon={IconEditLine}
-                      onClick={props.onEdit}
-                      margin="0 x-small 0 xxx-small"
-                    >
-                      {I18n.t('Edit')}
-                    </Button>
-                  )}
-                  {renderMenu(props)}
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
-            <Flex.Item>
-              {/* TODO message VICE-932 */}
-              MESSAGE
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-      </Flex>
-    </View>
-  )
-}
-
-const renderMenu = props => {
-  return (
-    <Menu
-      trigger={
-        <IconButton
-          screenReaderLabel={I18n.t('Manage Discussion')}
-          renderIcon={IconMoreLine}
-          data-testid="discussion-post-menu-trigger"
-        />
+    <Byline
+      title={
+        <>
+          <Text weight="bold">{props.authorName}</Text>
+          <View padding="0 small">
+            <Text color="secondary">{props.timingDisplay}</Text>
+          </View>
+          {props.pillText && <Pill data-testid="post-pill">{props.pillText}</Pill>}
+        </>
       }
+      description={props.message}
+      alignContent="top"
     >
-      {getMenuConfigs(props).map(config => renderMenuItem({...config}))}
-    </Menu>
-  )
-}
-
-const getMenuConfigs = props => {
-  const options = [
-    {
-      key: 'read-all',
-      icon: <IconMarkAsReadLine />,
-      labelCallback: () => I18n.t('Mark All as Read'),
-      selectionCallback: props.onReadAll
-    }
-  ]
-  if (props.onDelete) {
-    options.push({
-      key: 'delete',
-      icon: <IconTrashLine />,
-      labelCallback: () => I18n.t('Delete'),
-      selectionCallback: props.onDelete
-    })
-  }
-  if (props.onToggleComments && props.commentsEnabled) {
-    options.push({
-      key: 'toggle-comments',
-      icon: <IconLockLine />,
-      labelCallback: () => I18n.t('Close for Comments'),
-      selectionCallback: props.onToggleComments
-    })
-  } else if (props.onToggleComments && !props.commentsEnabled) {
-    options.push({
-      key: 'toggle-comments',
-      icon: <IconUnlockLine />,
-      labelCallback: () => I18n.t('Open for Comments'),
-      selectionCallback: props.onToggleComments
-    })
-  }
-  if (props.onSend) {
-    options.push({
-      key: 'send',
-      icon: <IconUserLine />,
-      labelCallback: () => I18n.t('Send To...'),
-      selectionCallback: props.onSend
-    })
-  }
-  if (props.onCopy) {
-    options.push({
-      key: 'copy',
-      icon: <IconDuplicateLine />,
-      labelCallback: () => I18n.t('Copy To...'),
-      selectionCallback: props.onCopy
-    })
-  }
-  return options
-}
-
-const renderMenuItem = ({selectionCallback, icon, labelCallback, key}) => {
-  return (
-    <Menu.Item key={key} onSelect={selectionCallback}>
-      <Flex>
-        <Flex.Item>{icon}</Flex.Item>
-        <Flex.Item padding="0 0 0 xx-small">
-          <Text>{labelCallback.call()}</Text>
-        </Flex.Item>
-      </Flex>
-    </Menu.Item>
+      {props.isUnread ? (
+        <Badge
+          type="notification"
+          placement="start center"
+          formatOutput={() => <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>}
+        >
+          <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 small" />
+        </Badge>
+      ) : (
+        <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 small" />
+      )}
+    </Byline>
   )
 }
 
 PostMessage.propTypes = {
   /**
-   * Behavior for marking the thread as read
+   * Display name for the author of the message
    */
-  onReadAll: PropTypes.func.isRequired,
+  authorName: PropTypes.string.isRequired,
   /**
-   * Behavior for deleting the discussion post.
-   * Providing this function will result in the menu option being rendered.
+   * Source url for the user's avatar
    */
-  onDelete: PropTypes.func,
+  avatarUrl: PropTypes.string,
   /**
-   * Behavior for toggling the ability to comment on the post.
-   * Providing this function will result in the menu option being rendered.
+   * Display text for the relative time information. This prop is expected
+   * to be provided as a string of the exact text to be displayed, not a
+   * timestamp to be formatted.
    */
-  onToggleComments: PropTypes.func,
+  timingDisplay: PropTypes.string.isRequired,
   /**
-   * Indicates whether comments have been enabled or not.
-   * Which toggling menu option is rendered is dependent on this prop.
+   * Display text for the post's message
    */
-  commentsEnabled: PropTypes.bool,
+  message: PropTypes.string.isRequired,
   /**
-   * Behavior for sending to a recipient.
-   * Providing this function will result in the menu option being rendered.
+   * Display text for the message pill.
+   * Providing this prop will result in the pill being displayed.
    */
-  onSend: PropTypes.func,
+  pillText: PropTypes.string,
   /**
-   * Behavior for copying a post.
-   * Providing this function will result in the menu option being rendered.
+   * Determines if the unread badge should be displayed
    */
-  onCopy: PropTypes.func,
-  /**
-   * Behavior for editing a post.
-   * Providing this function will result in the button being rendered.
-   */
-  onEdit: PropTypes.func,
-  /**
-   * Behavior for toggling the published state of the post.
-   * Providing this function will result in the button being rendered.
-   */
-  onTogglePublish: PropTypes.func,
-  /**
-   * Indicates whether the post is published, publishing, or unpublished.
-   * Which state the publish button is in is dependent on this prop.
-   */
-  publishState: PropTypes.oneOf(['published', 'publishing', 'unpublished', 'unpublishing'])
+  isUnread: PropTypes.bool
 }
 
 export default PostMessage

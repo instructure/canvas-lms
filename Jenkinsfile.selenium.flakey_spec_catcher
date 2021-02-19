@@ -155,8 +155,8 @@ def executeFlakeySpecCatcher(prefix = 'main') {
       throw e
     }
   } finally {
-    sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/tmp/fsc.out tmp canvas_ --allow-error --clean-dir"
-    archiveArtifacts artifacts: "tmp/**/fsc.out", allowEmptyArchive: true
+    sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/tmp/fsc.out tmp/${env.NODE_NUMBER} canvas_ --allow-error --clean-dir"
+    archiveArtifacts artifacts: "tmp/${env.NODE_NUMBER}/**/fsc.out", allowEmptyArchive: true
   }
 }
 
@@ -240,7 +240,10 @@ pipeline {
               def stages = [:]
 
               stages["flakey set 00"] = {
-                withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
+                withEnv([
+                  "FSC_TESTS=${partitions[0].join(',')}",
+                  "NODE_NUMBER=00"
+                ]) {
                   executeFlakeySpecCatcher()
                 }
               }
@@ -253,7 +256,10 @@ pipeline {
 
                 stages["flakey set $node_number"] = {
                   protectedNode('canvas-docker') {
-                    withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
+                    withEnv([
+                      "FSC_TESTS=${partitions[index].join(',')}",
+                      "NODE_NUMBER=$node_number"
+                    ]) {
                       try {
                         setupNode()
                         executeFlakeySpecCatcher("node$node_number")

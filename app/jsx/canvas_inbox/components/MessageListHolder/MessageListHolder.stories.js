@@ -36,7 +36,7 @@ export const WithUnreadConversations = Template.bind({})
 WithUnreadConversations.args = {
   conversations: [
     {
-      id: 1,
+      _id: 1,
       workflowState: 'unread',
       conversation: {
         subject: 'This is the subject line',
@@ -80,7 +80,7 @@ WithUnreadConversations.args = {
       }
     },
     {
-      id: 2,
+      _id: 2,
       workflowState: 'read',
       conversation: {
         subject: 'This is a different subject line',
@@ -103,7 +103,7 @@ WithUnreadConversations.args = {
       }
     },
     {
-      id: 3,
+      _id: 3,
       workflowState: 'unread',
       conversation: {
         subject: 'This is a different subject line',
@@ -127,7 +127,7 @@ WithUnreadConversations.args = {
       }
     },
     {
-      id: 4,
+      _id: 4,
       workflowState: 'read',
       conversation: {
         subject: 'This is a different subject line',
@@ -156,7 +156,7 @@ export const WithConversations = Template.bind({})
 WithConversations.args = {
   conversations: [
     {
-      id: 1,
+      _id: 1,
       workflowState: 'read',
       conversation: {
         subject: 'This is the subject line',
@@ -198,7 +198,7 @@ WithConversations.args = {
       }
     },
     {
-      id: 2,
+      _id: 2,
       workflowState: 'read',
       conversation: {
         subject: 'This is a different subject line',
@@ -221,7 +221,7 @@ WithConversations.args = {
       }
     },
     {
-      id: 3,
+      _id: 3,
       workflowState: 'read',
       conversation: {
         subject: 'This is a different subject line',
@@ -250,7 +250,7 @@ WithConversations.args = {
       }
     },
     {
-      id: 4,
+      _id: 4,
       workflowState: 'read',
       conversation: {
         subject: 'This is a different subject line',

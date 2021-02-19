@@ -50,7 +50,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
       @course.wiki_pages.create!(
-        title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}"
+        title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}\"></p>"
       )
     end
 
@@ -585,6 +585,29 @@ describe 'RCE next tests', ignore_js_errors: true do
         wait_for_ajaximations
         expect(assignment_due_date_exists?(due_at)).to eq true
       end
+
+      context "without manage files permissions" do
+        before(:each) do
+          RoleOverride.create!(permission: 'manage_files', enabled: false, context: @course.account, role: teacher_role)
+        end
+
+        it 'should still allow inserting course links' do
+          title = 'Discussion-Title'
+          @discussion = @course.discussion_topics.create!(title: title)
+
+          visit_front_page_edit(@course)
+
+          click_links_toolbar_menu_button
+          click_course_links
+
+          click_discussions_accordion
+          click_course_item_link(title)
+
+          in_frame rce_page_body_ifr_id do
+            expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(@course, @discussion)
+          end
+        end
+      end
     end
 
     context 'sidebar search' do
@@ -779,7 +802,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       image = add_embedded_image('email.png')
       @course.wiki_pages.create!(
         title: page_title,
-        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}>"
+        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}\">"
       )
 
       visit_existing_wiki_edit(@course, page_title)
@@ -915,7 +938,12 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       driver.action.send_keys(:escape).perform
 
-      expect(tray_container_exists?).to eq false # Press esc key
+      # tray_container_exists disables implicit waits,
+      # and because we're waiting for something to _disappear_
+      # we can't use implicit waits, so just keep trying for a bit
+      keep_trying_until do
+        expect(tray_container_exists?).to eq false # Press esc key
+      end
     end
 
     it 'should close the course images tray when pressing esc', ignore_js_errors: true do
@@ -927,7 +955,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       driver.action.send_keys(:escape).perform
 
-      expect(tray_container_exists?).to eq false # Press esc key
+      keep_trying_until do
+        expect(tray_container_exists?).to eq false # Press esc key
+      end
     end
 
     it 'should open upload image modal when clicking upload option' do
@@ -1162,6 +1192,8 @@ describe 'RCE next tests', ignore_js_errors: true do
       it 'should display the lti tool modal', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
+        # have to visit the page before we can interact with local storage
+        visit_existing_wiki_edit(@course, page_title)
         driver.local_storage.clear
 
         visit_existing_wiki_edit(@course, page_title)

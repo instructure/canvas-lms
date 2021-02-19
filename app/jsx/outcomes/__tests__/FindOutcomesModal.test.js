@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -62,7 +62,6 @@ describe('FindOutcomesModal', () => {
   it('renders component with "Add Outcomes to Account" title when contextType is Account', async () => {
     const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
-
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
   })
 
@@ -71,14 +70,12 @@ describe('FindOutcomesModal', () => {
       contextType: 'Course'
     })
     await act(async () => jest.runAllTimers())
-
     expect(getByText('Add Outcomes to Course')).toBeInTheDocument()
   })
 
   it('shows modal if open prop true', async () => {
     const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
-
     expect(getByText('Close')).toBeInTheDocument()
   })
 
@@ -143,6 +140,23 @@ describe('FindOutcomesModal', () => {
       await act(async () => jest.runAllTimers())
       expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
     })
+  })
+
+  it('clears selected outcome group on modal close', async () => {
+    const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account Standards'))
+    expect(getByText('Add All Outcomes')).toBeInTheDocument()
+    fireEvent.click(getByText('Done'))
+    rerender(
+      <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+        <MockedProvider cache={cache} mocks={findModalMocks()}>
+          <FindOutcomesModal {...defaultProps({open: false})} />
+        </MockedProvider>
+      </OutcomesContext.Provider>
+    )
+    await act(async () => jest.runAllTimers())
+    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
   describe('global standards', () => {

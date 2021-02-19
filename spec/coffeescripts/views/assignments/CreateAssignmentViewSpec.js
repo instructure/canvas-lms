@@ -31,8 +31,6 @@ import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
 import 'compiled/behaviors/tooltip'
 
-const fixtures = $('#fixtures')
-
 function buildAssignment1() {
   const date1 = {
     due_at: new Date('2103-08-28T00:00:00').toISOString(),
@@ -323,6 +321,46 @@ test('openAgain adds datetime picker', function() {
   const view = createView(this.assignment2)
   view.openAgain()
   ok($.fn.datetime_field.called)
+})
+
+test('adjust datetime to the end of a day for midnight time', function() {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.setLocale('fr_FR')
+  // tz use the key/values to get formats for different locale
+  I18nStubber.stub('fr_FR', {
+    'date.formats.short': '%b %-d',
+    'time.formats.tiny': '%l:%M%P'
+  })
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el
+    .find('.datetime_field')
+    .val('Feb 2, 2021')
+    .trigger('change')
+  equal(view.$el.find('.datetime_field').val(), 'Feb 2 11:59pm')
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
+test('it does not adjust datetime for other date time', function() {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.setLocale('fr_FR')
+  // tz use the key/values to get formats for different locale
+  I18nStubber.stub('fr_FR', {
+    'date.formats.short': '%b %-d',
+    'time.formats.tiny': '%l:%M%P'
+  })
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el
+    .find('#assign_3_assignment_due_at')
+    .val('Feb 2, 2021, 1:27pm')
+    .trigger('change')
+  equal(view.$el.find('#assign_3_assignment_due_at').val(), 'Feb 2 1:27pm')
+  $.screenReaderFlashMessageExclusive = tmp
 })
 
 test("openAgain doesn't add datetime picker if disableDueAt is true", function() {

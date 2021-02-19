@@ -120,6 +120,25 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
     end
 
+    def api_formatted_answer(question, data = {}, options = {})
+      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{question[:id]}/formatted_answer"
+      params = { :controller => 'quizzes/quiz_submission_questions',
+                 :action => 'formatted_answer',
+                 :format => 'json',
+                 :quiz_submission_id => @quiz_submission.id.to_s,
+                 :id => question[:id].to_s }
+      data = {
+        validation_token: @quiz_submission.validation_token,
+        attempt: @quiz_submission.attempt
+      }.merge(data)
+
+      if options[:raw]
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+    end
+
     def api_unflag(data = {}, options = {})
       url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag"
       params = { :controller => 'quizzes/quiz_submission_questions',
@@ -322,6 +341,56 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         })
 
         assert_jsonapi_compliance(json, 'quiz_submission_questions', includables)
+      end
+    end
+  end
+
+  describe 'GET /quiz_submissions/:quiz_submission_id/questions/:id [answer]' do
+    let(:question) { create_question 'numerical' }
+
+    before :once do
+      course_with_student(:active_all => true)
+      @quiz = quiz_model(course: @course)
+      @quiz_submission = @quiz.generate_submission(@student)
+    end
+
+    it 'should return unprocessable_entity if the answer param is not provided' do
+      json = api_formatted_answer(question)
+
+      expect(json['status']).to eq "unprocessable_entity"
+    end
+
+    it 'should return an unchanged string when the given answer param is not a number' do
+      json = api_formatted_answer(question, {answer: "abcd"})
+
+      expect(json['formatted_answer']).to be_present
+      expect(json['formatted_answer']).to eq "abcd"
+    end
+
+    it 'should return a number without trailing zeros' do
+      json = api_formatted_answer(question, {answer: "99.9000000"})
+
+      expect(json['formatted_answer']).to be_present
+      expect(json['formatted_answer']).to eq "99.9"
+    end
+
+    describe 'when the question has precision answers' do
+      it 'should return a number with 16 significant digits' do
+        json = api_formatted_answer(question, {answer: "12.34567890123456789"})
+
+        expect(json['formatted_answer']).to be_present
+        expect(json['formatted_answer']).to eq "12.34567890123457"
+      end
+    end
+
+    describe 'when the question does not have precision answers' do
+      let(:question_without_precision) { create_question 'numerical_without_precision' }
+
+      it 'should return a number with 4 decimal places' do
+        json = api_formatted_answer(question_without_precision, {answer: "12.34567890123456789"})
+
+        expect(json['formatted_answer']).to be_present
+        expect(json['formatted_answer']).to eq "12.3457"
       end
     end
   end

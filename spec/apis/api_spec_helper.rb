@@ -142,7 +142,7 @@ def api_json_response(objects, opts = nil)
 end
 
 def check_document(html, course, attachment, include_verifiers)
-  doc = Nokogiri::HTML::DocumentFragment.parse(html)
+  doc = Nokogiri::HTML5.fragment(html)
   img1 = doc.at_css('img#1')
   expect(img1).to be_present
   params = include_verifiers ? "?verifier=#{attachment.uuid}" : ""

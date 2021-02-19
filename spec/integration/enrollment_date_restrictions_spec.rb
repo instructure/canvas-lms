@@ -44,7 +44,7 @@ describe "enrollment_date_restrictions" do
     user_session(@student, @pseudonym)
 
     get "/courses"
-    page = Nokogiri::HTML(response.body)
+    page = Nokogiri::HTML5(response.body)
     active_enrollments = page.css("#my_courses_table tbody tr")
     expect(active_enrollments.length).to eq 1
     # Make sure that the active courses have the star column.
@@ -66,7 +66,7 @@ describe "enrollment_date_restrictions" do
     user_session(@student, @pseudonym)
 
     get "/courses"
-    page = Nokogiri::HTML(response.body)
+    page = Nokogiri::HTML5(response.body)
     expect(page.css(".past_enrollments tr")).to be_empty
   end
 
@@ -94,7 +94,7 @@ describe "enrollment_date_restrictions" do
     user_session(@user)
 
     get '/grades'
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css('.course').length).to eq 2
 
     Account.default.account_users.create!(user: @user)
@@ -116,7 +116,7 @@ describe "enrollment_date_restrictions" do
     expect(@enrollment.reload.state_based_on_date).to eq :inactive
 
     get '/calendar2'
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     expect(html.css(".group_course_#{@course.id}").length).to eq 0
   end
 end

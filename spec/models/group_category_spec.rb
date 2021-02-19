@@ -524,8 +524,9 @@ describe GroupCategory do
 
   describe "randomly assigning by section" do
     context "group size distribution" do
-      def test_group_distribution(section_counts, group_count)
-        calc = GroupCategory::GroupBySectionCalculator.new(nil)
+      def test_group_distribution(section_counts, group_count, create_group_member_count = nil)
+        gc = GroupCategory.create!(context: course_model, name: 'gc1') if create_group_member_count
+        calc = GroupCategory::GroupBySectionCalculator.new(gc, create_group_member_count)
         mock_users_by_section = {}
         section_counts.each_with_index do |u_count, idx|
           mock_users_by_section[idx] = double(:count => u_count)
@@ -546,6 +547,16 @@ describe GroupCategory do
       it "should try to smartishly distribute users" do
         # can't keep things perfectly evenly distributed, but we can try our best
         expect(test_group_distribution([2, 3, 14, 11], 10)).to eq [[2], [3], [3, 3, 3, 3, 2], [4, 4, 3]]
+      end
+
+      it "should work with sections and create_group_member_count" do
+        # can't keep things perfectly evenly distributed, but we can try our best
+        expect(test_group_distribution([2, 3, 14, 11], 0, 5)).to eq [[2], [3], [5, 5, 4], [4, 4, 3]]
+      end
+
+      it "should work with empty sections and create_group_member_count" do
+        # can't keep things perfectly evenly distributed, but we can try our best
+        expect(test_group_distribution([2, 3, 14, 11, 0, 5], 0, 5)).to eq [[2], [3], [5, 5, 4], [4, 4, 3], [0], [5]]
       end
 
       it "should not split up groups twice in a row" do

@@ -349,6 +349,132 @@ module Lti::Ims
               it_behaves_like 'updates existing submission'
             end
           end
+
+          context 'with content items in extension' do
+            let(:content_items) do
+              [
+                {
+                  type: 'file',
+                  url: 'https://filesamples.com/samples/document/txt/sample1.txt',
+                  title: 'sample1.txt'
+                },
+                {
+                  type: 'not',
+                  url: 'https://filesamples.com/samples/document/txt/sample1.txt',
+                  title: 'notAFile.txt'
+                }
+              ]
+            end
+            let(:params_overrides) do
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items })
+            end
+
+            it 'ignores content items that are not type file' do
+              send_request
+              expect(controller.send(:file_content_items)).to match_array [content_items.first]
+            end
+
+            it 'uses submission_type online_upload' do
+              send_request
+              expect(result.submission.reload.submission_type).to eq 'online_upload'
+            end
+
+            shared_examples_for 'a file submission' do
+              it 'creates an attachment' do
+                send_request
+                attachment = Attachment.last
+                expect(attachment.user).to eq user
+                expect(attachment.display_name).to eq content_items.first[:title]
+              end
+
+              it 'returns a progress url' do
+                send_request
+                progress_url =
+                  json[Lti::Result::AGS_EXT_SUBMISSION]['content_items'].first['progress']
+                expect(progress_url).to include 'http://test.host/api/v1/progress/'
+              end
+            end
+
+            context 'in local storage mode' do
+              before :each do
+                local_storage!
+              end
+
+              it_behaves_like 'creates a new submission'
+              it_behaves_like 'a file submission'
+            end
+
+            context 'in s3 storage mode' do
+              before :each do
+                s3_storage!
+              end
+
+              it_behaves_like 'creates a new submission'
+              it_behaves_like 'a file submission'
+            end
+
+            context 'with InstFS enabled' do
+              before :each do
+                allow(InstFS).to receive(:enabled?).and_return(true)
+                allow(InstFS).to receive(:jwt_secrets).and_return(['jwt signing key'])
+                @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
+                allow(CanvasHttp).to receive(:post).and_return(
+                  double(class: Net::HTTPCreated, code: 201, body: {})
+                )
+              end
+
+              it_behaves_like 'creates a new submission'
+
+              it 'returns a progress url' do
+                send_request
+                progress_url =
+                  json[Lti::Result::AGS_EXT_SUBMISSION]['content_items'].first['progress']
+                expect(progress_url).to include 'http://test.host/api/v1/progress/'
+              end
+
+              shared_examples_for 'a 400' do
+                it 'returns bad request' do
+                  send_request
+                  expect(response).to be_bad_request
+                end
+              end
+
+              shared_examples_for 'a 500' do
+                it 'returns internal server error' do
+                  send_request
+                  expect(response).to be_server_error
+                end
+              end
+
+              context 'when InstFS is unreachable' do
+                before :each do
+                  allow(CanvasHttp).to receive(:post).and_raise(Net::ReadTimeout)
+                end
+
+                it_behaves_like 'a 500'
+              end
+
+              context 'when InstFS responds with a 500' do
+                before :each do
+                  allow(CanvasHttp).to receive(:post).and_return(
+                    double(class: Net::HTTPServerError, code: 500, body: {})
+                  )
+                end
+
+                it_behaves_like 'a 500'
+              end
+
+              context 'when InstFS responds with a 400' do
+                before :each do
+                  allow(CanvasHttp).to receive(:post).and_return(
+                    double(class: Net::HTTPBadRequest, code: 400, body: {})
+                  )
+                end
+
+                it_behaves_like 'a 400'
+              end
+            end
+          end
         end
 
         context 'with different scoreMaximum' do
@@ -364,7 +490,7 @@ module Lti::Ims
           end
         end
 
-        context "with a ZERO score maximum" do
+        context 'with a ZERO score maximum' do
           let(:params_overrides) { super().merge(scoreGiven: 0, scoreMaximum: 0) }
 
           it 'will not tolerate invalid score max' do

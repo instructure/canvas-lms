@@ -22,6 +22,7 @@ require 'spec_helper'
 
 describe SubmissionsController do
   it_behaves_like 'a submission update action', :submissions
+  it_behaves_like 'a submission redo_submission action', :submissions
 
   describe "POST create" do
     it "should require authorization" do

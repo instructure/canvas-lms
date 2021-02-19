@@ -40,13 +40,13 @@ describe UsersController do
 
     it "should count conversations as interaction" do
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
+      expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
 
       @conversation = Conversation.initiate([@e1.user, @teacher], false)
       @conversation.add_message(@teacher, "hello")
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
+      expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
     end
 
     it "should use conversation message participants when calculating interaction" do
@@ -57,10 +57,10 @@ describe UsersController do
       @conversation.add_message(@teacher, "hello", :only_users => [@e1.user]) # only send to one user
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
+      expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
 
       get user_student_teacher_activity_url(@teacher, other_student)
-      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
+      expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
     end
 
     it "should only include students the teacher can view" do
@@ -263,7 +263,7 @@ describe UsersController do
       course_with_student(:user => @student, :active_all => true)
 
       get grades_url
-      student_grades = Nokogiri::HTML(response.body).css('.student_grades tr')
+      student_grades = Nokogiri::HTML5(response.body).css('.student_grades tr')
       expect(student_grades.length).to eq 2
       expect(student_grades.text).to match /#{@first_course.name}/
       expect(student_grades.text).to match /#{@course.name}/
@@ -278,7 +278,7 @@ describe UsersController do
       user_session(@user)
 
       get "/users/#{@student.id}/grades"
-      student_grades = Nokogiri::HTML(response.body).css('.student_grades tr')
+      student_grades = Nokogiri::HTML5(response.body).css('.student_grades tr')
       expect(student_grades.length).to eq 2
       expect(student_grades.text).to match /#{@first_course.name}/
       expect(student_grades.text).to match /#{@course.name}/

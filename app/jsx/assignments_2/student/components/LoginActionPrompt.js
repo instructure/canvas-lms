@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool} from 'prop-types'
+import {bool, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
 import I18n from 'i18n!assignments_2_login_action_prompt'
@@ -26,6 +26,50 @@ import {Text} from '@instructure/ui-elements'
 
 const navigateToLogin = () => {
   window.location.assign('/login')
+}
+
+function LoginActionText(props) {
+  let text
+
+  if (props.enrollmentState === 'accepted') {
+    text = I18n.t('Course has not started yet')
+  } else if (props.nonAcceptedEnrollment) {
+    text = I18n.t('Accept course invitation to participate in this assignment')
+  } else {
+    text = I18n.t('Log in to submit')
+  }
+
+  return (
+    <Text margin="small" size="medium" data-testid="login-action-text">
+      {text}
+    </Text>
+  )
+}
+
+function LoginActionButton(props) {
+  if (props.enrollmentState === 'accepted') {
+    return null
+  }
+
+  if (props.nonAcceptedEnrollment) {
+    return (
+      <a
+        href={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
+        className="Button"
+        data-method="POST"
+        data-url={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
+        data-testid="login-action-button"
+      >
+        {I18n.t('Accept course invitation')}
+      </a>
+    )
+  }
+
+  return (
+    <Button variant="primary" onClick={navigateToLogin} data-testid="login-action-button">
+      {I18n.t('Log in')}
+    </Button>
+  )
 }
 
 function LoginActionPrompt(props) {
@@ -42,28 +86,11 @@ function LoginActionPrompt(props) {
         </Text>
       </Flex.Item>
       <Flex.Item>
-        <Text margin="small" size="medium">
-          {props.nonAcceptedEnrollment
-            ? I18n.t('Accept course invitation to participate in this assignment')
-            : I18n.t('Log in to submit')}
-        </Text>
+        <LoginActionText {...props} />
       </Flex.Item>
       <Flex.Item>
         <View margin="medium" as="div">
-          {props.nonAcceptedEnrollment ? (
-            <a
-              href={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
-              className="Button"
-              data-method="POST"
-              data-url={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
-            >
-              {I18n.t('Accept course invitation')}
-            </a>
-          ) : (
-            <Button variant="primary" onClick={navigateToLogin}>
-              {I18n.t('Log in')}
-            </Button>
-          )}
+          <LoginActionButton {...props} />
         </View>
       </Flex.Item>
     </Flex>
@@ -71,7 +98,12 @@ function LoginActionPrompt(props) {
 }
 
 LoginActionPrompt.propTypes = {
-  nonAcceptedEnrollment: bool
+  nonAcceptedEnrollment: bool,
+  enrollmentState: string
+}
+
+LoginActionPrompt.defaultProps = {
+  enrollmentState: null
 }
 
 export default LoginActionPrompt

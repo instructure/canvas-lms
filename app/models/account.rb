@@ -26,6 +26,8 @@ class Account < ActiveRecord::Base
   include Pronouns
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
+  # a list of columns necessary for validation and save callbacks to work on a slim object
+  BASIC_COLUMNS_FOR_CALLBACKS = %i{id parent_account_id root_account_id name workflow_state}.freeze
 
   include Workflow
   include BrandConfigHelpers
@@ -486,8 +488,8 @@ class Account < ActiveRecord::Base
 
   def ensure_defaults
     self.name&.delete!("\r")
-    self.uuid ||= CanvasSlug.generate_securish_uuid
-    self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
+    self.uuid ||= CanvasSlug.generate_securish_uuid if has_attribute?(:uuid)
+    self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if has_attribute?(:lti_guid)
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
     self.root_account_id ||= self.parent_account_id
     self.parent_account_id ||= self.root_account_id
@@ -495,6 +497,7 @@ class Account < ActiveRecord::Base
   end
 
   def verify_unique_sis_source_id
+    return true unless has_attribute?(:sis_source_id)
     return true unless self.sis_source_id
     return true if !root_account_id_changed? && !sis_source_id_changed?
 
@@ -964,48 +967,72 @@ class Account < ActiveRecord::Base
     end
   end
 
-  # returns all sub_accounts recursively as far down as they go, in id order
-  # because this uses a custom sql query for postgresql, we can't use a normal
-  # named scope, so we pass the limit and offset into the method instead and
-  # build our own query string
+  # compat for reports
   def sub_accounts_recursive(limit, offset)
-    shard.activate do
-      Account.find_by_sql([<<~SQL, self.id, limit.to_i, offset.to_i])
-          WITH RECURSIVE t AS (
-            SELECT * FROM #{Account.quoted_table_name}
-            WHERE parent_account_id = ? AND workflow_state <>'deleted'
-            UNION
-            SELECT accounts.* FROM #{Account.quoted_table_name}
-            INNER JOIN t ON accounts.parent_account_id = t.id
-            WHERE accounts.workflow_state <>'deleted'
-          )
-          SELECT * FROM t ORDER BY parent_account_id, id LIMIT ? OFFSET ?
-      SQL
-    end
+    Account.limit(limit).offset(offset).sub_accounts_recursive(id)
   end
 
-  def self.sub_account_ids_recursive(parent_account_id)
+  def self.sub_accounts_recursive(parent_account_id, pluck = false)
+    raise ArgumentError unless [false, :pluck].include?(pluck)
+
     original_shard = Shard.current
-    Shard.shard_for(parent_account_id).activate do
+    result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
       guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
       GuardRail.activate(guard_rail_env) do
-        sql = Account.sub_account_ids_recursive_sql(parent_account_id)
-        Account.find_by_sql(sql).map { |a| Shard.relative_id_for(a.id, Shard.current, original_shard) }
+        sql = Account.sub_accounts_recursive_sql(parent_account_id)
+        if pluck
+          Account.connection.select_all(sql).map do |row|
+            new_row = row.map do |(column, value)|
+              if sharded_column?(column)
+                Shard.relative_id_for(value, Shard.current, original_shard)
+              else
+                value
+              end
+            end
+            new_row = new_row.first if new_row.length == 1
+            new_row
+          end
+        else
+          Account.find_by_sql(sql)
+        end
       end
     end
+    unless (preload_values = all.preload_values).empty?
+      ActiveRecord::Associations::Preloader.new.preload(result, preload_values)
+    end
+    result
   end
 
+  # a common helper
+  def self.sub_account_ids_recursive(parent_account_id)
+    active.select(:id).sub_accounts_recursive(parent_account_id, :pluck)
+  end
+
+  # compat for reports
   def self.sub_account_ids_recursive_sql(parent_account_id)
+    active.select(:id).sub_accounts_recursive_sql(parent_account_id)
+  end
+
+  # the default ordering will have each tier in a group, followed by the next tier, etc.
+  # if an order is set on the relation, that order is only applied within each group
+  def self.sub_accounts_recursive_sql(parent_account_id)
+    relation = except(:group, :having, :limit, :offset).shard(Shard.current)
+    relation_with_ids = if relation.select_values.empty? || (relation.select_values & [:id, :parent_account_id]).length == 2
+      relation
+    else
+      relation.select(:id, :parent_account_id)
+    end
+
+    relation_with_select = all
+    relation_with_select = relation_with_select.select("*") if relation_with_select.select_values.empty?
+
     "WITH RECURSIVE t AS (
-       SELECT id, parent_account_id FROM #{Account.quoted_table_name}
-       WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
+       #{relation_with_ids.where(parent_account_id: parent_account_id).to_sql}
        UNION
-       SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
-       INNER JOIN t ON accounts.parent_account_id = t.id
-       WHERE accounts.workflow_state <> 'deleted'
+       #{relation_with_ids.joins("INNER JOIN t ON accounts.parent_account_id=t.id").to_sql}
      )
-     SELECT id FROM t"
+     #{relation_with_select.only(:select, :group, :having, :limit, :offset).from("t").to_sql}"
   end
 
   def associated_accounts

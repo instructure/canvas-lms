@@ -444,6 +444,7 @@ export default class Navigation extends React.Component {
             dataUrl="/api/v1/conversations/unread_count"
             onUpdate={unreadCount => this.onInboxUnreadUpdate(unreadCount)}
             srText={this.inboxUnreadSRText}
+            useSessionStorage={false}
           />
         )}
       </>

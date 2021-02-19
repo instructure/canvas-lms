@@ -46,7 +46,7 @@ describe "MediaConverter" do
     end
 
     let(:doc) do
-      Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+      Nokogiri::HTML5.fragment(<<-HTML)
         <div>
           <a href="#{a_href}">
             Image Link
@@ -105,7 +105,7 @@ describe "MediaConverter" do
     end
 
     it "shouldn't explode with non standard file names" do
-      other_doc = Nokogiri::HTML::DocumentFragment.parse(
+      other_doc = Nokogiri::HTML5.fragment(
         "<div><a href=\"#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>")
 
       test_instance.convert_media_paths!(other_doc)
@@ -116,7 +116,7 @@ describe "MediaConverter" do
 
   describe "#convert_flv_paths!" do
     let(:doc) do
-      Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+      Nokogiri::HTML5.fragment(<<-HTML)
         <div>
           <a href="media/media_objects/m-5G7G2CcbF2nd3nZ8pyT1z16ytNaQuQ1X.flv">
             Video Comment Link
@@ -146,7 +146,7 @@ describe "MediaConverter" do
   describe "#convert_audio_tags!" do
     context "for links with class instructure_audio_link" do
       let(:doc) do
-        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+        Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
             class="instructure_audio_link">
             Audio Link
@@ -168,7 +168,7 @@ describe "MediaConverter" do
 
     context "for links with class audio_comment" do
       let(:doc) do
-        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+        Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
             class="audio_comment">
             Audio Link
@@ -192,7 +192,7 @@ describe "MediaConverter" do
   describe "#convert_video_tags!" do
     context "for links with class instructure_video_link" do
       let(:doc) do
-        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+        Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
             class="instructure_video_link">
             Video Link
@@ -214,7 +214,7 @@ describe "MediaConverter" do
 
     context "for links with class video_comment" do
       let(:doc) do
-        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+        Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
             class="video_comment">
             Video Link

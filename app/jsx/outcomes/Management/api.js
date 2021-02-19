@@ -57,3 +57,29 @@ export const CHILD_GROUPS_QUERY = gql`
   }
   ${groupFragment}
 `
+
+export const GROUP_DETAIL_QUERY = gql`
+  query GroupDetailQuery($id: ID!, $outcomesCursor: String) {
+    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
+      ... on LearningOutcomeGroup {
+        _id
+        description
+        title
+        outcomesCount
+        outcomes(first: 10, after: $outcomesCursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            ... on LearningOutcome {
+              _id
+              description
+              title
+            }
+          }
+        }
+      }
+    }
+  }
+`

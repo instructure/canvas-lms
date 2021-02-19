@@ -32,14 +32,14 @@ describe ContextModule do
     it "should require manage_content permission before showing add controls" do
       course_with_teacher_logged_in active_all: true
       get "/courses/#{@course.id}/modules"
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('.add_module_link')).not_to be_nil
 
       @course.account.role_overrides.create! role: ta_role, permission: 'manage_content', enabled: false
       course_with_ta course: @course
       user_session(@ta)
       get "/courses/#{@course.id}/modules"
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('.add_module_link')).to be_nil
     end
   end
@@ -149,7 +149,7 @@ describe ContextModule do
         else
           expect(response).to be_successful
         end
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#test_content').length).to eq(@test_content_length || 0)
 
         # complete first module's requirements
@@ -174,7 +174,7 @@ describe ContextModule do
         # verify the second item is accessible
         get @test_url
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         if @is_attachment
           expect(html.at_css('#file_content')['src']).to match %r{#{@test_url.split("?").first}}
         elsif @is_wiki_page
@@ -264,12 +264,12 @@ describe ContextModule do
         user_session teacher1
         get "/courses/#{@course.id}/modules"
         expect(response).to be_successful
-        body1 = Nokogiri::HTML(response.body)
+        body1 = Nokogiri::HTML5(response.body)
 
         user_session teacher2
         get "/courses/#{@course.id}/modules"
         expect(response).to be_successful
-        body2 = Nokogiri::HTML(response.body)
+        body2 = Nokogiri::HTML5(response.body)
 
         expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/
         expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /7am/

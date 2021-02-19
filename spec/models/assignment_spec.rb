@@ -4864,6 +4864,30 @@ describe Assignment do
       expect(@a.reload.quiz).to be nil
       expect(@a.submission_types).to eq 'external_tool'
     end
+
+    context 'when assignment is created with inconsistent params' do
+      before do
+        @a.peer_reviews = true
+        @a.peer_review_count = 3
+        @a.peer_reviews_due_at = Time.zone.now
+        @a.peer_reviews_assigned = true
+        @a.automatic_peer_reviews = true
+        @a.anonymous_peer_reviews = true
+        @a.intra_group_peer_reviews = true
+        @a.save!
+      end
+
+      it "fixes inconsistent attributes" do
+        @a.quiz_lti! && @a.save!
+        expect(@a.reload.peer_reviews).to be_falsey
+        expect(@a.peer_review_count).to eq 0
+        expect(@a.peer_reviews_due_at).to be_nil
+        expect(@a.peer_reviews_assigned).to be_falsey
+        expect(@a.automatic_peer_reviews).to be_falsey
+        expect(@a.anonymous_peer_reviews).to be_falsey
+        expect(@a.intra_group_peer_reviews).to be_falsey
+      end
+    end
   end
 
   describe "scope :type_quiz_lti" do

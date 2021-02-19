@@ -75,7 +75,7 @@ describe "/submissions/show_preview" do
     let(:teacher) { course.enroll_teacher(User.create!, activate_all: true).user }
     let(:submission) { assignment.submit_homework(student, submission_type: "online_text_entry", body: "zzzz") }
 
-    let(:output) { Nokogiri::HTML.fragment(response.body) }
+    let(:output) { Nokogiri::HTML5.fragment(response.body) }
 
     before(:each) do
       allow(assignment).to receive(:turnitin_enabled?).and_return(true)

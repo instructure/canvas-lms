@@ -76,7 +76,7 @@
         <span class="assignment_presenter_for_submission" style="display: none;"><%= AttachmentUploadStatus.upload_status(attachment) %></span>
         <span class="react_pill_container"></span>
       <% end %>
-    <% elsif @current_user_submission.submission_type == "online_quiz" %>
+    <% elsif @current_user_submission.submission_type == "online_quiz" and @assignment&.quiz&.id %>
       <a href="<%= context_url(@assignment.context, :context_quiz_url, @assignment.quiz.id) %>" target="_new">
         <i class="icon-quiz" aria-hidden="true"></i>
         <%= @assignment.quiz.survey? ? t('links.submission.view_survey', "View the Survey Submission") :
