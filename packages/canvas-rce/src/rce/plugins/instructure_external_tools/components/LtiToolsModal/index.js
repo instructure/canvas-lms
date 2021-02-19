@@ -55,28 +55,29 @@ export function LtiToolsModal(props) {
       data-mce-component
       liveRegion={getLiveRegion}
       size="medium"
-      theme={{mediumMaxWidth: '42rem'}}
       label={formatMessage('Apps')}
       onDismiss={props.onDismiss}
       open
       shouldCloseOnDocumentClick
     >
-      <Modal.Header theme={{padding: '0.5rem'}}>
+      <Modal.Header>
         <CloseButton placement="end" offset="medium" onClick={props.onDismiss}>
           {formatMessage('Close')}
         </CloseButton>
-        <Heading margin="small">{formatMessage('All Apps')}</Heading>
-        <View as="div" padding="x-small none x-small medium">
-          <TextInput
-            type="search"
-            placeholder={formatMessage('Search')}
-            renderAfterInput={<IconSearchLine inline={false} />}
-            onChange={handleFilterChange}
-          />
-        </View>
+        <Heading>{formatMessage('Select App')}</Heading>
       </Modal.Header>
       <Modal.Body overflow="fit">
-        <Flex as="div" direction="column">
+        <Flex height="35rem" as="div" direction="column">
+          <Flex.Item as="div">
+            <View as="div" borderWidth="none none small none" padding="x-small">
+              <TextInput
+                type="search"
+                renderLabel={formatMessage('Search')}
+                renderAfterInput={<IconSearchLine inline={false} />}
+                onChange={handleFilterChange}
+              />
+            </View>
+          </Flex.Item>
           <Flex.Item as="div" shouldShrink shouldGrow>
             <Alert liveRegion={getLiveRegion} variant="info" screenReaderOnly={!filterEmpty}>
               {filterEmpty && formatMessage('No results found for {filterTerm}', {filterTerm})}
@@ -96,9 +97,7 @@ export function LtiToolsModal(props) {
         </Flex>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={props.onDismiss} color="primary">
-          {formatMessage('Done')}
-        </Button>
+        <Button onClick={props.onDismiss}>{formatMessage('Cancel')}</Button>
       </Modal.Footer>
     </Modal>
   )
@@ -108,10 +107,14 @@ export function LtiToolsModal(props) {
       <List variant="unstyled">
         {ltiButtons
           .sort((a, b) => a.title.localeCompare(b.title))
-          .map(b => {
+          .map((b, i) => {
             return (
               <List.Item key={b.id}>
-                <View as="div" padding="medium medium small none">
+                <View
+                  as="div"
+                  borderWidth={i === 0 ? 'small none' : 'none none small none'}
+                  padding="medium"
+                >
                   <LtiTool
                     title={b.title}
                     image={b.image}

@@ -39,10 +39,13 @@ describe('FileUpload', () => {
 
   const defaultProps = (props = {}) => {
     const ref = document.createElement('div')
+    sinon.spy(ref, 'addEventListener')
     return merge(
       {
         filesDirectoryRef: ref,
-        currentFolder: new Folder()
+        currentFolder: new Folder({
+          id: 1000
+        })
       },
       props
     )
@@ -62,7 +65,7 @@ describe('FileUpload', () => {
 
   it('renders a FileDrop when there are no files', () => {
     const props = defaultProps()
-    sandbox.stub(props.currentFolder, 'isEmpty').returns(true)
+    sinon.stub(props.currentFolder, 'isEmpty').returns(true)
     const wrapper = mount(<FileUpload {...props} />)
     expect(wrapper.find('Billboard')).toHaveLength(1)
     expect(wrapper.find('FileDrop')).toHaveLength(1)
@@ -75,10 +78,8 @@ describe('FileUpload', () => {
     expect(wrapper.find('.FileUpload__dragging')).toHaveLength(1)
   })
 
-  it('does not render a full sized FileDrop when the currentFolder is not empty', () => {
-    const props = defaultProps()
-    sandbox.stub(props.currentFolder, 'isEmpty').returns(false)
-    const wrapper = shallow(<FileUpload {...props} />)
-    expect(wrapper.find('.FileUpload__full')).toHaveLength(0)
+  it('renders with FileDrop class when the currentFolder is not empty', () => {
+    const wrapper = shallow(<FileUpload {...defaultProps()} />)
+    expect(wrapper.find('.FileDrop')).toHaveLength(0)
   })
 })

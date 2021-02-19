@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import canvas from '@instructure/canvas-theme'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
-import {mergeDeep} from '@instructure/ui-utils'
+import canvas from '@instructure/canvas-theme'
 
-const {variables} = canvas
-const {typography} = variables
+const {
+  variables: {typography}
+} = canvas
 
 /**
  * These are the base defaults used to generate component-specific theme
@@ -32,10 +32,7 @@ const {typography} = variables
  */
 const base = {
   typography: {
-    fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`,
-    fontSizeMedium: '1.125rem',
-    fontSizeLarge: '1.5rem',
-    fontSizeXLarge: '2rem'
+    fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`
   }
 }
 
@@ -51,9 +48,7 @@ export const theme = {
     h2FontSize: '1.5rem',
     h2FontWeight: typography.fontWeightBold,
     h3FontSize: '1.25rem',
-    h3FontWeight: typography.fontWeightBold,
-    h4FontSize: '1.25rem',
-    h4FontWeight: typography.fontWeightBold
+    h3FontWeight: typography.fontWeightBold
   },
   [Tabs.Tab.theme]: {
     fontSize: '1.25rem'
@@ -61,6 +56,5 @@ export const theme = {
 }
 
 export default {
-  use: () => canvas.use({overrides: base}),
-  variables: mergeDeep(variables, base)
+  use: () => canvas.use({overrides: base})
 }

@@ -23,7 +23,7 @@ function convertManageableCoursesToApi(courses) {
   return courses.map(course => ({name: course.label, ...course}))
 }
 
-export default function useManagedCourseSearchApi(fetchApiOpts = {}, includeConcluded = false) {
+export default function useManagedCourseSearchApi(fetchApiOpts = {}, includeConcluded = true) {
   if (!fetchApiOpts.params) {
     fetchApiOpts.params = {}
   }

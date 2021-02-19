@@ -266,8 +266,7 @@ Canvas::Plugin.register('grade_export', :sis, {
                  :publish_endpoint => "",
                  :wait_for_success => "no",
                  :success_timeout => "600",
-                 :format_type => "instructure_csv" },
-  :test_cluster_inherit => false
+                 :format_type => "instructure_csv" }
 })
 Canvas::Plugin.register('i18n', nil, {
     :name => lambda{ t :name, 'I18n' },
@@ -321,8 +320,7 @@ Canvas::Plugin.register('crocodoc', :previews, {
   :author_website => 'http://www.instructure.com',
   :version => '1.0.0',
   :settings_partial => 'plugins/crocodoc_settings',
-  :settings => nil,
-  :test_cluster_inherit => false
+  :settings => nil
 })
 
 Canvas::Plugin.register('canvadocs', :previews, {

@@ -40,10 +40,7 @@ export default function LoggedOutTabs(props) {
         <Tabs.Panel renderTitle={I18n.t('Attempt 1')} selected={selectedTabIndex === 0}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <Flex.Item>
-              <LoginActionPrompt
-                nonAcceptedEnrollment={props.nonAcceptedEnrollment}
-                enrollmentState={props.assignment.env.enrollmentState}
-              />
+              <LoginActionPrompt nonAcceptedEnrollment={props.nonAcceptedEnrollment} />
             </Flex.Item>
           </Flex>
         </Tabs.Panel>

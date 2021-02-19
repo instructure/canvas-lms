@@ -17,10 +17,10 @@
  */
 
 import * as uploadFileModule from 'jsx/shared/upload_file'
-import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../Mutations'
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
-import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
-import {COURSES_QUERY, REPLY_CONVERSATION_QUERY} from '../../Queries'
+import ComposeModalContainer from '../ComposeModalContainer'
+import {COURSES_QUERY} from '../../Queries'
+import {CREATE_CONVERSATION} from '../../Mutations'
 import {createCache} from '../../../canvas-apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
@@ -70,68 +70,6 @@ const createGraphqlMocks = () => {
           }
         }
       }
-    },
-    {
-      request: {
-        query: REPLY_CONVERSATION_QUERY,
-        variables: {
-          conversationID: 1,
-          participants: ['1337']
-        },
-        overrides: {
-          Node: {
-            __typename: 'Conversation'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: ADD_CONVERSATION_MESSAGE,
-        variables: {
-          conversationId: 1,
-          recipients: ['1337'],
-          attachmentIds: [],
-          body: 'Potato',
-          includedMessages: ['1a', '1a']
-        },
-        overrides: {
-          AddConversationMessagePayload: {
-            errors: null
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: REPLY_CONVERSATION_QUERY,
-        variables: {
-          conversationID: 1,
-          participants: ['1337', '1338']
-        },
-        overrides: {
-          Node: {
-            __typename: 'Conversation'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: ADD_CONVERSATION_MESSAGE,
-        variables: {
-          conversationId: 1,
-          recipients: ['1337', '1338'],
-          attachmentIds: [],
-          body: 'Potato',
-          includedMessages: ['1a', '1a']
-        },
-        overrides: {
-          AddConversationMessagePayload: {
-            errors: null
-          }
-        }
-      }
     }
   ]
 
@@ -147,24 +85,12 @@ const createGraphqlMocks = () => {
   return mockResults
 }
 
-const setup = async (
-  setOnFailure = jest.fn(),
-  setOnSuccess = jest.fn(),
-  isReply,
-  isReplyAll,
-  conversation
-) => {
+const setup = async (setOnFailure = jest.fn(), setOnSuccess = jest.fn()) => {
   const mocks = await createGraphqlMocks()
   return render(
     <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
       <MockedProvider mocks={mocks} cache={createCache()}>
-        <ComposeModalManager
-          open
-          onDismiss={jest.fn()}
-          isReply={isReply}
-          isReplyAll={isReplyAll}
-          conversation={conversation}
-        />
+        <ComposeModalContainer open onDismiss={jest.fn()} />
       </MockedProvider>
     </AlertManagerContext.Provider>
   )
@@ -189,8 +115,8 @@ describe('ComposeModalContainer', () => {
   describe('Attachments', () => {
     it('attempts to upload a file', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
-      const {findByTestId} = await setup()
-      const fileInput = await findByTestId('attachment-input')
+      const {getByTestId} = await setup()
+      const fileInput = getByTestId('attachment-input')
       const file = new File(['foo'], 'file.pdf', {type: 'application/pdf'})
 
       uploadFiles(fileInput, [file])
@@ -203,8 +129,8 @@ describe('ComposeModalContainer', () => {
         {id: '1', name: 'file1.jpg'},
         {id: '2', name: 'file2.jpg'}
       ])
-      const {findByTestId} = await setup()
-      const fileInput = await findByTestId('attachment-input')
+      const {getByTestId} = await setup()
+      const fileInput = getByTestId('attachment-input')
       const file1 = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
       const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
 
@@ -219,8 +145,8 @@ describe('ComposeModalContainer', () => {
 
   describe('Subject', () => {
     it('allows setting the subject', async () => {
-      const {findByTestId} = await setup()
-      const subjectInput = await findByTestId('subject-input')
+      const {getByTestId} = await setup()
+      const subjectInput = getByTestId('subject-input')
       fireEvent.click(subjectInput)
       fireEvent.change(subjectInput, {target: {value: 'Potato'}})
       expect(subjectInput.value).toEqual('Potato')
@@ -229,8 +155,8 @@ describe('ComposeModalContainer', () => {
 
   describe('Body', () => {
     it('allows setting the body', async () => {
-      const {findByTestId} = await setup()
-      const bodyInput = await findByTestId('message-body')
+      const {getByTestId} = await setup()
+      const bodyInput = getByTestId('message-body')
       fireEvent.change(bodyInput, {target: {value: 'Potato'}})
       expect(bodyInput.value).toEqual('Potato')
     })
@@ -238,8 +164,8 @@ describe('ComposeModalContainer', () => {
 
   describe('Send individual messages', () => {
     it('allows toggling the setting', async () => {
-      const {findByTestId} = await setup()
-      const checkbox = await findByTestId('individual-message-checkbox')
+      const {getByTestId} = await setup()
+      const checkbox = getByTestId('individual-message-checkbox')
       expect(checkbox.checked).toBe(false)
 
       fireEvent.click(checkbox)
@@ -286,109 +212,6 @@ describe('ComposeModalContainer', () => {
       fireEvent.click(button)
 
       await waitForApolloLoading()
-      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
-    })
-  })
-
-  describe('reply', () => {
-    it('does not allow changing the context', async () => {
-      const component = await setup(jest.fn(), jest.fn(), true)
-
-      await waitForApolloLoading()
-
-      expect(component.queryByTestId('course-select')).toBe(null)
-    })
-
-    it('does not allow changing the subject', async () => {
-      const component = await setup(jest.fn(), jest.fn(), true)
-
-      await waitForApolloLoading()
-
-      expect(component.queryByTestId('subject-input')).toBe(null)
-    })
-
-    it('should include past messages', async () => {
-      const component = await setup(jest.fn(), jest.fn(), true, false, {
-        _id: 1,
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
-                _id: 1337
-              }
-            }
-          ]
-        }
-      })
-
-      await waitForApolloLoading()
-
-      expect(component.queryByTestId('past-messages')).toBeInTheDocument()
-    })
-
-    it('allows replying to a conversation', async () => {
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = await setup(jest.fn(), mockedSetOnSuccess, true, false, {
-        _id: 1,
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
-                _id: 1337
-              }
-            }
-          ]
-        }
-      })
-
-      await waitForApolloLoading()
-
-      // Set body
-      const bodyInput = component.getByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
-
-      // Hit send
-      const button = component.getByTestId('send-button')
-      fireEvent.click(button)
-
-      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
-    })
-  })
-
-  describe('replyAll', () => {
-    it('allows replying all to a conversation', async () => {
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = await setup(jest.fn(), mockedSetOnSuccess, false, true, {
-        _id: 1,
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
-                _id: 1337
-              },
-              recipients: [
-                {
-                  _id: 1337
-                },
-                {
-                  _id: 1338
-                }
-              ]
-            }
-          ]
-        }
-      })
-
-      await waitForApolloLoading()
-
-      // Set body
-      const bodyInput = component.getByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
-
-      // Hit send
-      const button = component.getByTestId('send-button')
-      fireEvent.click(button)
-
       await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
   })

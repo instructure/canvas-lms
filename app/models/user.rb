@@ -1086,7 +1086,7 @@ class User < ActiveRecord::Base
       # only delete the user's communication channels when the last account is
       # removed (they don't belong to any particular account). they will always
       # be on the user's shard
-      self.communication_channels.unretired.find_each(&:destroy) unless has_other_root_accounts
+      self.communication_channels.each(&:destroy) unless has_other_root_accounts
 
       self.update_account_associations
     end
@@ -2653,25 +2653,15 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
-    granular_admin = course.root_account.feature_enabled?(:granular_permissions_manage_users)
-    return false if type == 'StudentEnrollment' && MasterCourses::MasterTemplate.is_master_course?(course)
-    if granular_admin
-      return true if type == 'TeacherEnrollment' && course.grants_right?(self, session, :add_teacher_to_course)
-      return true if type == 'TaEnrollment' && course.grants_right?(self, session, :add_ta_to_course)
-      return true if type == 'DesignerEnrollment' && course.grants_right?(self, session, :add_designer_to_course)
-      return true if type == 'StudentEnrollment' && course.grants_right?(self, session, :add_student_to_course)
-      return true if type == 'ObserverEnrollment' && course.grants_right?(self, session, :add_observer_to_course)
-    else
-      if type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
+    return false if type == "StudentEnrollment" && MasterCourses::MasterTemplate.is_master_course?(course)
+    if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
+      return true
+    end
+    if course.grants_right?(self, session, :manage_students)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
         return true
       end
-      if course.grants_right?(self, session, :manage_students)
-        if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
-          return true
-        end
-      end
     end
-    false
   end
 
   def can_be_enrolled_in_course?(course)

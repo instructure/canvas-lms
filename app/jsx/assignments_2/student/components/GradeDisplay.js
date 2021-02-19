@@ -25,17 +25,15 @@ import {Flex} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
-export default function PointsDisplay(props) {
+export default function PointsDisplay({displaySize, gradingType, pointsPossible, receivedGrade}) {
   // We need to have a different ungraded values for screenreaders and visual users
   // because voiceover does not read the '–' character in a string like '-/10'
   let ungradedScreenreaderString = null
   let ungradedVisualString = null
-  switch (props.gradingType) {
+  switch (gradingType) {
     case 'points':
-      ungradedScreenreaderString = I18n.t('ungraded/%{pointsPossible}', {
-        pointsPossible: props.pointsPossible
-      })
-      ungradedVisualString = `–/${props.pointsPossible}`
+      ungradedScreenreaderString = I18n.t('ungraded/%{pointsPossible}', {pointsPossible})
+      ungradedVisualString = `–/${pointsPossible}`
       break
     case 'pass_fail':
       ungradedScreenreaderString = I18n.t('ungraded')
@@ -48,18 +46,14 @@ export default function PointsDisplay(props) {
   }
 
   const formatGrade = ({forScreenReader}) => {
-    if (props.gradingStatus === 'excused' && !props.showGradeForExcused) {
-      return I18n.t('Excused!')
-    }
-
-    const formattedGrade = GradeFormatHelper.formatGrade(props.receivedGrade, {
-      gradingType: props.gradingType,
-      pointsPossible: props.pointsPossible,
+    const formattedGrade = GradeFormatHelper.formatGrade(receivedGrade, {
+      gradingType,
+      pointsPossible,
       defaultValue: forScreenReader ? ungradedScreenreaderString : ungradedVisualString,
       formatType: 'points_out_of_fraction'
     })
 
-    if (props.gradingType === 'points') {
+    if (gradingType === 'points') {
       return I18n.t('%{formattedGrade} Points', {formattedGrade})
     } else {
       return formattedGrade
@@ -71,7 +65,7 @@ export default function PointsDisplay(props) {
       <ScreenReaderContent>{formatGrade({forScreenReader: true})}</ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
         <Flex.Item>
-          <Text transform="capitalize" size={props.displaySize} data-testid="grade-display">
+          <Text transform="capitalize" size={displaySize} data-testid="grade-display">
             {formatGrade({forScreenReader: false})}
           </Text>
         </Flex.Item>
@@ -82,16 +76,12 @@ export default function PointsDisplay(props) {
 
 PointsDisplay.propTypes = {
   displaySize: PropTypes.string,
-  gradingStatus: PropTypes.oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
   gradingType: PropTypes.string.isRequired,
-  pointsPossible: PropTypes.number.isRequired,
   receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  showGradeForExcused: PropTypes.bool
+  pointsPossible: PropTypes.number.isRequired
 }
 
 PointsDisplay.defaultProps = {
   displaySize: 'x-large',
-  gradingStatus: null,
-  gradingType: 'points',
-  showGradeForExcused: false
+  gradingType: 'points'
 }

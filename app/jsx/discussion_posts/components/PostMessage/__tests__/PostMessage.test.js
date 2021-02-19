@@ -16,51 +16,169 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {PostMessage} from '../PostMessage'
 
 const setup = props => {
-  return render(
-    <PostMessage
-      authorName="Foo Bar"
-      timingDisplay="Jan 1 2000"
-      message="Posts are fun"
-      {...props}
-    />
-  )
+  return render(<PostMessage onReadAll={Function.prototype} {...props} />)
 }
 
 describe('PostMessage', () => {
-  it('displays the message', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Posts are fun')).toBeTruthy()
-  })
-
-  describe('avatar badge', () => {
-    it('displays when isUnread is true', () => {
-      const {queryByText, rerender} = setup()
-      expect(queryByText('Unread post')).toBeFalsy()
-      rerender(<PostMessage authorName="foo" timingDisplay="foo" message="foo" isUnread />)
-      expect(queryByText('Unread post')).toBeTruthy()
+  describe('publish button', () => {
+    it('does not display if callback is not provided', () => {
+      const {queryByText} = setup()
+      expect(queryByText('Published')).toBeFalsy()
     })
-  })
 
-  describe('post header', () => {
-    it('renders the correct post info', () => {
-      const {queryByText, queryByTestId} = setup({
-        authorName: 'Author Name',
-        timingDisplay: 'Timing Display'
+    it('displays if callback is provided', () => {
+      const onTogglePublishMock = jest.fn()
+      const {getByText} = setup({
+        onTogglePublish: onTogglePublishMock,
+        publishState: 'published'
       })
-      expect(queryByText('Author Name')).toBeTruthy()
-      expect(queryByText('Timing Display')).toBeTruthy()
-      expect(queryByTestId('post-pill')).toBeFalsy()
+      expect(onTogglePublishMock.mock.calls.length).toBe(0)
+      fireEvent.click(getByText('Published'))
+      expect(onTogglePublishMock.mock.calls.length).toBe(1)
+    })
+  })
+
+  describe('edit button', () => {
+    it('does not display if callback is not provided', () => {
+      const {queryByText} = setup()
+      expect(queryByText('Edit')).toBeFalsy()
     })
 
-    it('renders the correct pill if provided', () => {
-      const {queryByText, queryByTestId} = setup({pillText: 'pill text'})
-      expect(queryByTestId('post-pill')).toBeTruthy()
-      expect(queryByText('pill text')).toBeTruthy()
+    it('displays if callback is provided', () => {
+      const onEditMock = jest.fn()
+      const {queryByText, getByText} = setup({onEdit: onEditMock})
+      expect(queryByText('Edit')).toBeTruthy()
+      expect(onEditMock.mock.calls.length).toBe(0)
+      fireEvent.click(getByText('Edit'))
+      expect(onEditMock.mock.calls.length).toBe(1)
+    })
+  })
+
+  describe('menu options', () => {
+    describe('mark all as read', () => {
+      it('calls provided callback when clicked', () => {
+        const onReadAllMock = jest.fn()
+        const {getByTestId, getByText} = setup({onReadAll: onReadAllMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onReadAllMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Mark All as Read'))
+        expect(onReadAllMock.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('delete', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Delete')).toBeFalsy()
+      })
+
+      it('calls provided callback when clicked', () => {
+        const onDeleteMock = jest.fn()
+        const {getByTestId, getByText} = setup({onDelete: onDeleteMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onDeleteMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Delete'))
+        expect(onDeleteMock.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('toggle comments', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Close for Comments')).toBeFalsy()
+        expect(queryByText('Open for Comments')).toBeFalsy()
+      })
+
+      describe('comments are currently enabled', () => {
+        it('renders correct display text', () => {
+          const onToggleCommentsMock = jest.fn()
+          const {queryByText, getByTestId} = setup({
+            onToggleComments: onToggleCommentsMock,
+            commentsEnabled: true
+          })
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+          expect(queryByText('Close for Comments')).toBeTruthy()
+          expect(queryByText('Open for Comments')).toBeFalsy()
+        })
+
+        it('calls provided callback when clicked', () => {
+          const onToggleCommentsMock = jest.fn()
+          const {getByTestId, getByText} = setup({
+            onToggleComments: onToggleCommentsMock,
+            commentsEnabled: true
+          })
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+          expect(onToggleCommentsMock.mock.calls.length).toBe(0)
+          fireEvent.click(getByText('Close for Comments'))
+          expect(onToggleCommentsMock.mock.calls.length).toBe(1)
+        })
+      })
+
+      describe('comments are currently disabled', () => {
+        it('renders correct display text', () => {
+          const onToggleCommentsMock = jest.fn()
+          const {queryByText, getByTestId} = setup({
+            onToggleComments: onToggleCommentsMock,
+            commentsEnabled: false
+          })
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+          expect(queryByText('Open for Comments')).toBeTruthy()
+          expect(queryByText('Close for Comments')).toBeFalsy()
+        })
+
+        it('calls provided callback when clicked', () => {
+          const onToggleCommentsMock = jest.fn()
+          const {getByTestId, getByText} = setup({
+            onToggleComments: onToggleCommentsMock,
+            commentsEnabled: false
+          })
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+          expect(onToggleCommentsMock.mock.calls.length).toBe(0)
+          fireEvent.click(getByText('Open for Comments'))
+          expect(onToggleCommentsMock.mock.calls.length).toBe(1)
+        })
+      })
+    })
+
+    describe('send to', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Sent To...')).toBeFalsy()
+      })
+
+      it('calls provided callback when clicked', () => {
+        const onSendMock = jest.fn()
+        const {getByTestId, getByText} = setup({onSend: onSendMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onSendMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Send To...'))
+        expect(onSendMock.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('copy to', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Copy To...')).toBeFalsy()
+      })
+
+      it('calls provided callback when clicked', () => {
+        const onCopyMock = jest.fn()
+        const {getByTestId, getByText} = setup({onCopy: onCopyMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onCopyMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Copy To...'))
+        expect(onCopyMock.mock.calls.length).toBe(1)
+      })
     })
   })
 })

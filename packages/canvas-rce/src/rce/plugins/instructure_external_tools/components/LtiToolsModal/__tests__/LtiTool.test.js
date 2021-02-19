@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {within, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 
 import LtiTool from '../LtiTool'
 
@@ -50,8 +50,6 @@ describe('RCE Plugins > LtiTool', () => {
 
   it('renders the tool description', () => {
     const {getByText} = renderComponent()
-    const tool = getByText('Tool 1')
-    const toolRow = within(tool.closest('div'))
-    expect(toolRow.getByText('View description')).toBeInTheDocument()
+    expect(getByText('This is tool 1.')).toBeInTheDocument()
   })
 })

@@ -99,17 +99,6 @@ describe('getBadgesForItem', () => {
     ])
   })
 
-  it('prefers redo over submitted if both are present', () => {
-    const item = {status: {redo_request: true, submitted: true}}
-    expect(getBadgesForItem(item)).toEqual([
-      {
-        id: 'redo',
-        text: 'Redo',
-        variant: 'danger'
-      }
-    ])
-  })
-
   it('allows submitted status if not graded', () => {
     const item = {status: {graded: false, submitted: true}}
     expect(getBadgesForItem(item)).toEqual([

@@ -1,0 +1,124 @@
+#!/bin/bash
+
+source script/common.sh
+
+# Set this manually if your computer's username doesn't match your gerrit username
+gerrit_username=$USER
+LOG="$(pwd)/log/prepare.log"
+
+function usage() {
+  echo "usage: prepare [ [-hin] [-p PATCHSET_ID] ]
+
+    prepare prepares Canvas to run natively on your computer.
+
+    Running prepare without any options will rebase on the current HEAD,
+    update plugins, install or update Ruby and Javascript dependencies,
+    create both dev and test databases if necessary, run database migrations,
+    and finally compile CSS and Javascript. If you use powder then it will also
+    restart powder for you.
+
+    The optional -i flag will install all javascript dependencies.
+
+    The optional -n flag will nuke all javascript dependencies, then install
+    them.
+
+    The optional -p PATCHSET_ID will checkout the Gerrit patchset instead of
+    rebasing on HEAD (the default prepare behavior)."
+}
+
+function pull_patchset_from_gerrit() {
+  echo_console_and_log "  Pulling Canvas patchset $1 ..."
+  git fetch ssh://$gerrit_username@gerrit.instructure.com:29418/canvas-lms refs/changes/$1 >>"$LOG" 2>&1 && git checkout FETCH_HEAD >>"$LOG" 2>&1
+}
+
+function db_create_dev_and_test() {
+  echo_console_and_log "  Creating development DB if it doesn't already exist ..."
+  createdb canvas_development >>"$LOG" 2>&1
+
+  echo_console_and_log "  Creating test DB if it doesn't already exist ..."
+  createdb canvas_test >>"$LOG" 2>&1
+}
+
+function nuke_node_modules() {
+  echo_console_and_log "  Removing node_modules and gems/**/node_modules ..."
+  rm -rf node_modules && rm -rf gems/**/node_modules >>"$LOG" 2>&1
+}
+
+function restart_powder() {
+  echo "  Checking if powder is being used in this repo ..."
+  if [ -f .powder ] ; then
+    echo "    Checking if pow is running ..."
+    if ps aux | grep pow | grep -v grep > /dev/null ; then
+      echo_console_and_log "    Restarting powder ..."
+      powder restart >>"$LOG" 2>&1
+    fi
+  else
+    echo "    ... nope."
+  fi
+}
+
+function prepare() {
+  ensure_in_canvas_root_directory
+  intro_message "Prepare"
+
+  if [ "$1" == "" ]; then
+    rebase_canvas
+  else
+    pull_patchset_from_gerrit "$1"
+  fi
+
+  update_plugins
+  bundle_install_with_check
+  db_create_dev_and_test
+  rake_db_migrate_dev_and_test
+
+  if [ "$NUKE_NODE_MODULES" == "true" ]; then
+    nuke_node_modules
+  fi
+
+  if [ "$INSTALL_NODE_PACKAGES" == "true" ] || [ ! -d node_modules ]; then
+    install_node_packages
+  fi
+
+  compile_assets
+  restart_powder
+}
+
+# default options
+PERFORM_UPDATE=true
+INSTALL_NODE_PACKAGES=false
+NUKE_NODE_MODULES=false
+
+# parse options
+# http://www.tldp.org/LDP/abs/html/internal.html#EX33
+while getopts ":hin" Option
+do
+  case $Option in
+    h )
+      PERFORM_UPDATE=false
+      usage;;
+    i )
+      PERFORM_UPDATE=true
+      INSTALL_NODE_PACKAGES=true;;
+    n )
+      PERFORM_UPDATE=true
+      INSTALL_NODE_PACKAGES=true
+      NUKE_NODE_MODULES=true;;
+    * )
+      PERFORM_UPDATE=false
+      echo "Sorry, that's not a valid option!"
+      usage;;
+  esac
+done
+
+if [ "$PERFORM_UPDATE" == "true" ]; then
+  trap print_results INT TERM EXIT
+  create_log_file
+  patchset_id="$1"
+
+  if [ "$patchset_id" == "-i" ] || [ "$patchset_id" == "-n" ]; then
+    patchset_id=""
+  fi
+
+  prepare "$patchset_id"
+fi

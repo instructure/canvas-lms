@@ -148,15 +148,13 @@ describe Pseudonym do
     expect(@pseudonym).to be_deleted
   end
 
-  it "should default to nil for blank integration_id and sis_user_id" do
+  it "should change a blank sis_user_id to nil" do
     user_factory
-    pseudonym = Pseudonym.new(user: @user, unique_id: 'test@example.com', password: 'passwd123')
+    pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'passwd123')
     pseudonym.password_confirmation = 'passwd123'
     pseudonym.sis_user_id = ''
-    pseudonym.integration_id = ''
     expect(pseudonym).to be_valid
     expect(pseudonym.sis_user_id).to be_nil
-    expect(pseudonym.integration_id).to be_nil
   end
 
   context "LDAP errors" do
@@ -717,3 +715,4 @@ describe Pseudonym do
     end
   end
 end
+

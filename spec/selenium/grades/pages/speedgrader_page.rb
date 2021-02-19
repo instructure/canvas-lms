@@ -322,10 +322,6 @@ class Speedgrader
       f("#assessment-audit-trail")
     end
 
-    def reassignment_btn
-      f("#reassign_assignment")
-    end
-
     # action
     def visit(course_id, assignment_id, timeout = 10)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -398,10 +394,6 @@ class Speedgrader
 
     def click_next_student_btn
       next_student_btn.click
-    end
-
-    def click_reassignment_btn
-      reassignment_btn.click
     end
 
     def add_comment_and_submit(comment)
@@ -495,10 +487,6 @@ class Speedgrader
       # was causing certain specs to flicker. this fixes that issue by
       # increasing the width of the right pane
       driver.execute_script("$('#right_side').width('900px')")
-    end
-
-    def right_pane
-      f('#right_side')
     end
 
     # quizzes

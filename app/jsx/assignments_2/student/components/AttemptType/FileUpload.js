@@ -87,9 +87,7 @@ export default class FileUpload extends Component {
     // Since LTI 1.0 handles its own message alerting we don't have to
     if (e.data.messageType === 'A2ExternalContentReady') {
       if (!e.data.errormsg) {
-        // Content type will be set on back-end to allow for DocViewer rendering
-        const files = e.data.content_items.map(file => ({...file, mediaType: ''}))
-        await this.handleDropAccepted(files)
+        await this.handleDropAccepted(e.data.content_items)
       }
     }
   }

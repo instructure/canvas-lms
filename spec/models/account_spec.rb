@@ -29,14 +29,6 @@ describe Account do
     it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
-  context "BASIC_COLUMNS_FOR_CALLBACKS" do
-    it "can save a minimal object" do
-      a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
-      a.name = "Changed"
-      expect { a.save! }.not_to raise_error
-    end
-  end
-
   context "domain_method" do
     it "retrieves correct account domain" do
       root_account = Account.create!
@@ -896,8 +888,8 @@ describe Account do
     subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
     subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
     subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
-    expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
-    expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
+    expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
+    expect(sub.sub_accounts_recursive(10, 0).sort_by(&:id)).to eq(subs.sort_by(&:id))
   end
 
   context "sharding" do
@@ -910,8 +902,8 @@ describe Account do
       subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
       subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
       @shard1.activate do
-        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
-        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
+        expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
+        expect(sub.sub_accounts_recursive(10, 0).sort_by(&:id)).to eq(subs.sort_by(&:id))
       end
     end
   end

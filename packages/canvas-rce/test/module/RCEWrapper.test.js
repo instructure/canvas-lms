@@ -64,11 +64,7 @@ function trayProps() {
   return {
     trayProps: {
       contextType: 'course',
-      contextId: '17',
-      containingContext: {
-        contextType: 'course',
-        contextId: '17'
-      }
+      contextId: '17'
     }
   }
 }
@@ -321,7 +317,7 @@ describe('RCEWrapper', () => {
         // jsdom doesn't support Image
         // mock enough for RCEWrapper.insertImagePlaceholder
         globalImage = global.Image
-        global.Image = function () {
+        global.Image = function() {
           return {
             src: null,
             width: '10',

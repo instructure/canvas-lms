@@ -22,12 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../../spec/spec_hel
 
 describe "Account Reports" , type: :request do
 
-  it "should render account_reports page and show extra text if there is any" do
-    # If this test is failing from a change in a different report plugin, there
-    # is possibly a mis-configured engine or misnamed view. If the debugger is
-    # uncommented you can get a better error to work from, try looking at
-    # ErrorReport.last.message or
-    # puts  ErrorReport.last.backtrace;''
+  it "should see extra text when there is extra text" do
+
     account_admin_user :account => Account.site_admin
     @admin = @user
     user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
@@ -46,7 +42,6 @@ describe "Account Reports" , type: :request do
     @account.save
 
     get "/accounts/#{@account.id}/reports_tab"
-    # debugger
     expect(response).to be_successful
     expect(response.body).to match /someuniquetextstuffgoeshere/
   end

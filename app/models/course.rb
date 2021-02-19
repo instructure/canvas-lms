@@ -1054,6 +1054,26 @@ class Course < ActiveRecord::Base
     true
   end
 
+  def update_course_section_names
+    return if @course_name_was == self.name || !@course_name_was
+    sections = self.course_sections
+    fields_to_possibly_rename = [:name]
+    sections.each do |section|
+      something_changed = false
+      fields_to_possibly_rename.each do |field|
+        section.send("#{field}=", section.default_section ?
+          self.name :
+          (section.send(field) || self.name).sub(@course_name_was, self.name) )
+        something_changed = true if section.send(field) != section.send("#{field}_was")
+      end
+      if something_changed
+        attr_hash = {:updated_at => Time.now.utc}
+        fields_to_possibly_rename.each { |key| attr_hash[key] = section.send(key) }
+        CourseSection.where(:id => section).update_all(attr_hash)
+      end
+    end
+  end
+
   def update_enrollments_later
     self.update_enrolled_users if !self.new_record? && !(self.changes.keys & ['workflow_state', 'name', 'course_code', 'start_at', 'conclude_at', 'enrollment_term_id']).empty?
     true
@@ -2645,15 +2665,9 @@ class Course < ActiveRecord::Base
   end
 
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
-    manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
-      :allow_course_admin_actions
-    else
-      :manage_admin_users
-    end
-
     permissions = require_message_permission ?
       [:send_messages] :
-      [:manage_grades, :manage_students, manage_perm, :read_roster, :view_all_grades, :read_as_admin]
+      [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades, :read_as_admin]
     granted_permissions = self.granted_rights(user, *permissions)
     if granted_permissions.empty?
       :restricted # e.g. observer, can only see admins in the course
@@ -2808,14 +2822,6 @@ class Course < ActiveRecord::Base
     }]
   end
 
-  def self.default_homeroom_tabs
-    default_tabs = Course.default_tabs
-    homeroom_tabs = [default_tabs.find {|tab| tab[:id] == TAB_ANNOUNCEMENTS}]
-    homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_PEOPLE}
-    homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_SETTINGS}
-    homeroom_tabs.compact
-  end
-
   def tab_hidden?(id)
     tab = self.tab_configuration.find{|t| t[:id] == id}
     return tab && tab[:hidden]
@@ -2830,15 +2836,14 @@ class Course < ActiveRecord::Base
 
   def tabs_available(user=nil, opts={})
     opts.reverse_merge!(:include_external => true, include_hidden_unused: true)
-    cache_key = [user, self, opts].cache_key
+    cache_key = [user, opts].cache_key
     @tabs_available ||= {}
     @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
   end
 
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
-    default_tabs = elementary_homeroom_course? ? Course.default_homeroom_tabs : Course.default_tabs
-    opts[:include_external] = false if elementary_homeroom_course?
+    default_tabs = Course.default_tabs
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
@@ -2868,7 +2873,6 @@ class Course < ActiveRecord::Base
       tabs.compact!
       tabs += default_tabs
       tabs += external_tabs
-
       # Ensure that Settings is always at the bottom
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
@@ -2935,8 +2939,7 @@ class Course < ActiveRecord::Base
         tabs -= hidden_exteral_tabs if hidden_exteral_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)
-
-        delete_unless.call([TAB_PEOPLE], :read_roster)
+        delete_unless.call([TAB_PEOPLE], :read_roster, :manage_students, :manage_admin_users)
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
@@ -2965,10 +2968,6 @@ class Course < ActiveRecord::Base
 
         if self.root_account.feature_enabled?(:granular_permissions_course_files)
           additional_checks[TAB_FILES] = RoleOverride::GRANULAR_FILE_PERMISSIONS
-        end
-
-        if self.root_account.feature_enabled?(:granular_permissions_manage_users)
-          additional_checks[TAB_PEOPLE] = RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
         end
 
         tabs.reject! do |t|
@@ -3098,10 +3097,6 @@ class Course < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :homeroom_course, :boolean => true, :default => false
-
-  def elementary_homeroom_course?
-    homeroom_course? && account&.feature_enabled?(:canvas_for_elementary)
-  end
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

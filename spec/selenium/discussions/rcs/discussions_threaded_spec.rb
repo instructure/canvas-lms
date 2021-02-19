@@ -32,7 +32,6 @@ describe "threaded discussions" do
 
   before(:each) do
     user_session(@teacher)
-    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
@@ -52,7 +51,7 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     f('#discussion_topic').find_element(:css, '.discussion-reply-action').click
     wait_for_ajaximations
-    f('[data-btn-id="rce-edit-btn"]').click
+    fj("a:contains('HTML Editor')").click
     wait_for_ajaximations
     f("textarea[data-rich_text='true']").send_keys entry_text
     fj("button:contains('Post Reply')").click

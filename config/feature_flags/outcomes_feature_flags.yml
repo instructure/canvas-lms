@@ -54,8 +54,3 @@ enable_webcam_submission:
   applies_to: RootAccount
   display_name: Enable Webcam on Submissions
   description: Allow students to submit photo using their webcam.
-reassign_assignments:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Reassign Assignments
-  description: Allow reassigning assignments from SpeedGrader to a student's To Do list

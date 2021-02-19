@@ -16,53 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ComposeModalManager from './ComposeModalContainer/ComposeModalManager'
+import ComposeModalContainer from './ComposeModalContainer'
 import {Flex} from '@instructure/ui-flex'
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import MessageListContainer from './MessageListContainer'
 import MessageListActionContainer from './MessageListActionContainer'
 
 const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
-  const [selectedConversations, setSelectedConversations] = useState([])
+  const [selectedIds, setSelectedIds] = useState([])
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
-  const [archiveDisabled, setArchiveDisabled] = useState(true)
-  const [isReply, setIsReply] = useState(false)
-  const [isReplyAll, setIsReplyAll] = useState(false)
-  const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
-  const userID = ENV.current_user_id?.toString()
 
-  const updateSelectedConversations = conversations => {
-    setSelectedConversations(conversations)
-    setDeleteDisabled(conversations.length === 0)
-    setArchiveDisabled(conversations.length === 0)
-  }
-
-  const removeFromSelectedConversations = conversations => {
-    const conversationIds = conversations.map(convo => convo._id)
-    setSelectedConversations(prev => {
-      const updated = prev.filter(selectedConvo => !conversationIds.includes(selectedConvo._id))
-      setDeleteDisabled(updated.length === 0)
-      setArchiveDisabled(updated.length === 0)
-      return updated
-    })
-  }
-
-  useEffect(() => {
-    setDeleteDisabled(selectedConversations.length === 0)
-    setArchiveDisabled(selectedConversations.length === 0)
-    if (selectedConversations.length === 0) {
-      setDisplayUnarchiveButton(false)
+  const toggleSelectedMessages = conversation => {
+    const updatedSelectedIds = selectedIds
+    if (updatedSelectedIds.includes(conversation._id)) {
+      const index = updatedSelectedIds.indexOf(conversation._id)
+      updatedSelectedIds.splice(index, 1)
     } else {
-      setDisplayUnarchiveButton(
-        selectedConversations[0].conversationParticipantsConnection?.nodes?.some(cp => {
-          return cp.userId === userID && cp.workflowState === 'archived'
-        })
-      )
+      updatedSelectedIds.push(conversation._id)
     }
-  }, [selectedConversations, userID])
+    setSelectedIds(updatedSelectedIds)
+    setDeleteDisabled(selectedIds.length === 0)
+  }
 
   return (
     <div className="canvas-inbox-container">
@@ -74,22 +51,10 @@ const CanvasInbox = () => {
             scope={scope}
             onSelectMailbox={setScope}
             onCourseFilterSelect={setCourseFilter}
-            selectedConversations={selectedConversations}
+            selectdIds={selectedIds}
             onCompose={() => setComposeModal(true)}
-            onReply={() => {
-              setIsReply(true)
-              setComposeModal(true)
-            }}
-            onReplyAll={() => {
-              setIsReplyAll(true)
-              setComposeModal(true)
-            }}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
-            archiveDisabled={archiveDisabled}
-            archiveToggler={setArchiveDisabled}
-            onConversationRemove={removeFromSelectedConversations}
-            displayUnarchiveButton={displayUnarchiveButton}
           />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
@@ -98,7 +63,7 @@ const CanvasInbox = () => {
               <MessageListContainer
                 course={courseFilter}
                 scope={scope}
-                onSelectMessage={updateSelectedConversations}
+                onSelectMessage={toggleSelectedMessages}
               />
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%">
@@ -107,17 +72,7 @@ const CanvasInbox = () => {
           </Flex>
         </Flex.Item>
       </Flex>
-      <ComposeModalManager
-        conversation={selectedConversations[0]}
-        isReply={isReply}
-        isReplyAll={isReplyAll}
-        onDismiss={() => {
-          setComposeModal(false)
-          setIsReply(false)
-          setIsReplyAll(false)
-        }}
-        open={composeModal}
-      />
+      <ComposeModalContainer open={composeModal} onDismiss={() => setComposeModal(false)} />
     </div>
   )
 }

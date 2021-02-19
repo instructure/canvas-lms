@@ -17,11 +17,5 @@
  */
 
 export default function withinMomentDates(momentDate, startDate, endDate) {
-  if (startDate && momentDate.isBefore(startDate)) {
-    return false
-  }
-  if (endDate && momentDate.isAfter(endDate)) {
-    return false
-  }
-  return true
+  return !(momentDate.isBefore(startDate) || momentDate.isAfter(endDate))
 }

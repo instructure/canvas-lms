@@ -31,7 +31,7 @@ QUnit.module('RosterUserViewSpec', {
     window.ENV = window.ENV || {}
     existingENV = window.ENV
     window.ENV.permissions = {
-      can_allow_course_admin_actions: true,
+      manage_admin_users: true,
       manage_students: true
     }
     window.ENV.course = {id: 1}

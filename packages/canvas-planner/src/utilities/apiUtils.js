@@ -249,7 +249,7 @@ function isComplete(apiResponse) {
   } else if (plannable_type === 'assessment_request') {
     complete = plannable.workflow_state === 'completed'
   } else if (submissions) {
-    complete = submissions.submitted && !submissions.redo_request
+    complete = submissions.submitted
   }
   return complete
 }

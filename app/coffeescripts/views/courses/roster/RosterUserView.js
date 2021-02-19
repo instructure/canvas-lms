@@ -105,7 +105,7 @@ export default class RosterUserView extends Backbone.View {
     json.canViewSisIdColumn = ENV.permissions.read_sis
 
     const candoAdminActions =
-      ENV.permissions.can_allow_course_admin_actions || ENV.permissions.manage_admin_users
+      ENV.permissions.allow_course_admin_actions || ENV.permissions.manage_admin_users
     json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )
@@ -167,7 +167,7 @@ export default class RosterUserView extends Backbone.View {
     }
   }
 
-  resendInvitation() {
+  resendInvitation(e) {
     if (!invitationDialog) {
       invitationDialog = new InvitationsView()
     }
@@ -175,7 +175,7 @@ export default class RosterUserView extends Backbone.View {
     return invitationDialog.render().show()
   }
 
-  editSections() {
+  editSections(e) {
     if (!editSectionsDialog) {
       editSectionsDialog = new EditSectionsView()
     }
@@ -183,7 +183,7 @@ export default class RosterUserView extends Backbone.View {
     return editSectionsDialog.render().show()
   }
 
-  editRoles() {
+  editRoles(e) {
     if (!editRolesDialog) {
       editRolesDialog = new EditRolesView()
     }
@@ -191,7 +191,7 @@ export default class RosterUserView extends Backbone.View {
     return editRolesDialog.render().show()
   }
 
-  linkToStudents() {
+  linkToStudents(e) {
     if (!linkToStudentsDialog) {
       linkToStudentsDialog = new LinkToStudentsView()
     }
@@ -201,8 +201,7 @@ export default class RosterUserView extends Backbone.View {
 
   deactivateUser() {
     if (
-      // eslint-disable-next-line no-alert
-      !window.confirm(
+      !confirm(
         I18n.t(
           'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.'
         )
@@ -256,8 +255,7 @@ export default class RosterUserView extends Backbone.View {
   }
 
   removeFromCourse(e) {
-    // eslint-disable-next-line no-alert
-    if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
+    if (!confirm(I18n.t('Are you sure you want to remove this user?'))) {
       return
     }
     this.$el.hide()

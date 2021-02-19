@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ConversationMessage} from '../../graphqlData/ConversationMessage'
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -24,30 +23,30 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const PastMessage = (props) => (
+const PastMessage = props => (
   <View as="div" borderWidth="small none none none">
     <Flex direction="column" margin="medium">
       <Flex.Item>
         <Flex wrap="wrap">
           <Flex.Item shouldShrink shouldGrow>
-            <Text>{props.author.name}</Text>
+            <Text>{props.name}</Text>
           </Flex.Item>
           <Flex.Item>
-            <Text weight="light">{props.createdAt}</Text>
+            <Text weight="light">{props.date}</Text>
           </Flex.Item>
         </Flex>
       </Flex.Item>
       <Flex.Item margin="x-small 0 0 0">
-        <Text weight="light">{props.body}</Text>
+        <Text weight="light">{props.messageBody}</Text>
       </Flex.Item>
     </Flex>
   </View>
 )
 
-export const PastMessages = (props) => {
+export const PastMessages = props => {
   return (
-    <Flex direction="column" data-testid="past-messages">
-      {props.messages.map((message) => (
+    <Flex direction="column">
+      {props.messages.map(message => (
         <Flex.Item key={btoa(JSON.stringify(message))}>
           <PastMessage {...message} />
         </Flex.Item>
@@ -57,5 +56,11 @@ export const PastMessages = (props) => {
 }
 
 PastMessages.propTypes = {
-  messages: PropTypes.arrayOf(ConversationMessage.shape),
+  messages: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      date: PropTypes.string,
+      messageBody: PropTypes.string
+    })
+  )
 }

@@ -182,8 +182,6 @@ en:
           billion: Billion
           trillion: Trillion
           quadrillion: Quadrillion
-    nth:
-      ordinalized: !ruby/object:Proc {}
   errors:
     format: "%{attribute} %{message}"
     messages:
@@ -767,11 +765,9 @@ en:
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: If set, the grade calculator will ignore unposted anonymous assignments when calculating totals.
   use_cloudfront_for_docviewer_f21b96db: Use CloudFront for DocViewer
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: Request that DocViewer use CloudFront for serving pdf assets.
-  annotated_document_submissions_88704968: Annotated document submissions
-  ability_to_submit_annotatable_document_assignments_5bc5edd3: Ability to submit annotatable document assignments.
   enable_recaptcha_by_default_for_self_registration_af9d50bd: Enable Recaptcha by default for self-registration
   requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
-  granular_permissions_for_add_remove_roles_from_cou_b0a34301: Granular permissions for Add/Remove roles from Course
+  granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: Granular permissions for Add/Remove admin roles from Course
   adds_granular_permissions_for_adding_and_removing__e1e484a3: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
   granular_permissions_for_managing_course_files_1ed7f019: Granular permissions for managing course files
   add_granularity_to_permissions_around_managing_cou_2244c94a: Add granularity to permissions around managing course files
@@ -802,10 +798,6 @@ en:
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: Let the site administrator select up to 2 LTI apps as favorites, which will then be displayed in the RCE's toolbar
   rce_pretty_html_editor_d8faf2bb: RCE Pretty HTML Editor
   a_much_better_html_code_editor_for_the_rce_though__ef48b3b3: A much better HTML code editor for the RCE, though it suffers from being inaccessible to screenreader users.
-  rce_better_file_downloading_b0a670c4: RCE Better File Downloading
-  include_a_download_link_next_to_each_file_link_in__481761de: Include a download link next to each file link in the RCE
-  rce_better_file_previewing_3018370c: RCE Better File Previewing
-  preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: Preview files linked in the RCE in an overlay rather than a new browser tab.
   assignment_enhancements_student_557372ab: Assignment Enhancements - Student
   use_the_new_assignments_student_page_944262af: Use the new assignments student page
   assignments_2_teacher_view_3cd3aeda: Assignments 2 Teacher View
@@ -880,8 +872,6 @@ en:
   allow_inactive_and_or_concluded_enrollments_to_be__3c9a65ab: Allow inactive and/or concluded enrollments to be displayed in LMGB
   enable_webcam_on_submissions_2e6bfcd4: Enable Webcam on Submissions
   allow_students_to_submit_photo_using_their_webcam_5c18bf01: Allow students to submit photo using their webcam.
-  reassign_assignments_cfd508c5: Reassign Assignments
-  allow_reassigning_assignments_from_speedgrader_to__ff856a96: Allow reassigning assignments from SpeedGrader to a student's To Do list
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
     Differentiate between system- and user-generated live events
@@ -928,10 +918,6 @@ en:
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
     Displays confetti for teachers that run the link validator on
     a course and no issues are found.
-  discussion_reply_sorting_6a14676e: Discussion reply sorting
-  allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
-    Allows for discussion replies to be sorted according to creation
-    timestamps. Default order is newest to oldest for root level replies.
   account_level_notification_preferences_ui_update_f5e189a4: Account level notification preferences UI update
   updates_account_notification_preferences_ui_to_be__1765f66a: |-
     Updates account notification preferences UI to be a more current
@@ -3624,6 +3610,28 @@ en:
         accepted_invitation: "%{name} has already received and accepted the invitation to join the course, but you can still resend the invitation if it is needed."
       link_to_students_view:
         link_student_desc: When an observer is linked to a student, they have access to that student's grades and course interactions.
+      create_users:
+        form_instructions: 'Type or paste a list of email addresses below:'
+        email_field_place_holder: '"Example Student" <student@example.com>, "Lastname, Firstname" <firstlast@example.com>, justAnEmailAddress@example.com'
+        email_field_label: Enter the email addresses of the users you would like to add, seperated by commas
+        user_role: 'Role:'
+        section: Section
+        validating: Validating...
+        next: Next
+        will_not_be_added: These users had errors and will not be added. Please ensure they are formatted correctly.
+        example_formats: 'Examples: user@example.com, "First Last" <user@example.com>, "Last, First" <user@example.com>'
+        user_might_not_exist: If your format is correct, contact your Canvas Admin to ensure the user has a Canvas account.
+        adding_n_users: 'Validated and ready to add %{users.length} users:'
+        duplicates_removed: Some duplicates were removed.
+        name: Name
+        email_or_login: Email/Login
+        go_back: Start Over
+        adding: Adding...
+        add_these_users: Add Users
+        have_been_enrolled: The following users have been enrolled
+        email: Email
+        add_more_users: Add More Users
+        close: Done
       index:
         group_set: Group Set
         search_people: Search people
@@ -4065,6 +4073,7 @@ en:
       load_success_message: You are free to navigate away from this page.
   there_was_an_error_generating_the_tool_launch_fb3f47ac: There was an error generating the tool launch
   couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: 'Couldn''t find valid settings for this link: Resource link not found'
+  couldn_t_find_valid_settings_for_this_link_resourc_cab9f16a: 'Couldn''t find valid settings for this link: Resource link not valid for tool'
   files:
     my_files: My Files
     files_page_title: Files
@@ -5467,7 +5476,7 @@ en:
         margin_of_error: margin of error
         plus_or_minus: "+/-"
       display_question:
-        flag_question: 'Flag question: %{question_name}'
+        flag_this_question: Flag this Question
         not_yet_graded: Not yet graded
         original_score: 'Original Score:'
         points_possible: "%{points_possible} pts"
@@ -7263,7 +7272,6 @@ en:
   date_of_most_recent_bounce_b23d0119: Date of most recent bounce
   bounce_reason_689ed4c6: Bounce reason
   created_at_73839757: Created at
-  unexpected_error_while_performing_export_1e6b4207: Unexpected error while performing export
   content_migration:
     unknown: Unknown
     errors:
@@ -8132,9 +8140,6 @@ en:
   course_sections_edit_bd783e1: Course Sections - edit
   course_sections_delete_e75e3eeb: Course Sections - delete
   users_add_remove_students_in_courses_efe7e748: Users - add / remove students in courses
-  add_students_to_courses_4910cb33: Add Students to courses
-  users_students_ecbb43eb: Users - Students
-  remove_students_from_courses_a8e024fd: Remove Students from courses
   faculty_journal_manage_entries_efc09599: Faculty Journal - manage entries
   rubrics_add_edit_delete_8299eff7: Rubrics - add / edit / delete
   create_pages_581a4d59: Create pages
@@ -9380,7 +9385,6 @@ en:
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   student_current_grades_report_base_86b5962a: Student Current Grades Report - Base
-  talladega_grade_and_last_date_of_attendance_be39b0c7: Talladega Grade and Last Date of Attendance
   uc_merced_student_activity_report_4a9a1eb8: UC Merced Student Activity Report
   template_account_21ac8f4f: Template Account
   rce_contents_replace_display_name: RCE Contents Replace
@@ -12328,7 +12332,6 @@ en:
   notice_concluded_student_6d416c4: 'Notice: Concluded Student'
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: 'Notice: The grading period is closed for this student'
   your_comment_was_auto_saved_as_a_draft_c49d3510: Your comment was auto-saved as a draft.
-  the_assignment_has_been_reassigned_be2377fb: The assignment has been reassigned.
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: This submission has already been graded and is ready for moderation.
   submitted_files_82dd3009: Submitted Files
   click_to_load_a020891b: "(click to load)"
@@ -12349,7 +12352,6 @@ en:
   file_attachment_8e7dbfd1: File Attachment
   media_comment_e494a952: Media Comment
   speech_recognition_c1c0b7f7: Speech Recognition
-  reassign_assignment_e3a70bcb: Reassign Assignment
   grading_standards:
     account_index:
       title: Grading Standards
@@ -13112,13 +13114,6 @@ en:
   trusted_account_url_e6200e41: Trusted Account URL
   trusted_account_669ba397: Trusted Account
   we_could_not_automatically_log_you_in_d836d1b5: We could not automatically log you in
-  the_settings_for_this_plugin_will_be_automatically_6069ba88: The settings for this plugin will be automatically inherited into non-prod environments unless overridden in the non-prod environment specific settings. Non-prod settings will take effect on the next refresh of that environment.
-  the_settings_for_this_plugin_will_not_be_inherited_a16e6119: The settings for this plugin will NOT be inherited into non-prod environments. To enable in non-prod environments, please define non-prod specific settings. Non-prod settings will take effect on the next refresh of that environment.
-  non_prod_settings_9b39c6c9: Non-prod settings
-  settings_for_env_dcae6f02: Settings for %{env}
-  production_settings_62902166: Production Settings
-  back_to_production_fed09f33: Back to Production
-  env_settings_1131f267: "%{env} Settings"
   site_admin:
     domain_not_found:
       page_title: Oops, Canvas can’t find your login page.
@@ -13311,10 +13306,6 @@ en:
   your_content_has_been_exported_bbb57764: Your content has been exported.
   new_export_3ab758: New Export
   content_locks:
-    buttons:
-      ok_thanks: Ok, Thanks
-    titles:
-      content_is_locked: Content Is Locked
     messages:
       quiz_locked_at: This quiz was locked %{at}.
       assignment_locked_at: This assignment was locked %{at}.
@@ -13341,6 +13332,10 @@ en:
       file_locked_no_reason: This file is locked.  No other reason has been provided.
       page_locked_no_reason: This page is locked.  No other reason has been provided.
       content_locked_no_reason: This content is locked.  No other reason has been provided.
+    buttons:
+      ok_thanks: Ok, Thanks
+    titles:
+      content_is_locked: Content Is Locked
   context_modulespublic:
     errors:
       reorder: Reorder failed, please try again.
@@ -13528,8 +13523,6 @@ en:
       previous_module: Previous Module
       next_module: Next Module
   this_image_is_currently_unavailable_25c68857: This image is currently unavailable
-  download_3e89bdef: download
-  someting_went_wrong_loading_the_file_previewer_3315815c: Someting went wrong loading the file previewer.
   disableWhileLoading:
     loading: Loading...
   jquery_doc_previews:
@@ -13907,8 +13900,6 @@ en:
     This action is irreversible. Are you sure you wish to delete %{file}?
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: You do not have permission to delete %{file}. Please contact your account administrator.
   error_deleting_file_551dc16e: Error deleting %{file}
-  assignment_is_reassigned_dd6b6ef2: Assignment is reassigned.
-  student_feedback_required_in_comments_above_to_rea_2f5dafbf: Student feedback required in comments above to reassign.
   similarity_score_see_detailed_report_a113dac0: Similarity Score - See detailed report
   vericite_similarity_score_see_detailed_report_390ab687: VeriCite Similarity Score - See detailed report
   x_y_4a86b3ab: "%{x}/%{y}"
@@ -13918,7 +13909,6 @@ en:
   student_position_6d3b7750: Student %{position}
   submit_comment_commenttext_8e5638d7: 'Submit comment: %{commentText}'
   delete_comment_commenttext_c8afe129: 'Delete comment: %{commentText}'
-  reassigning_682888a2: Reassigning ...
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
     The following students have unsaved changes to their quiz submissions:
 
@@ -15081,6 +15071,8 @@ en:
     one: There is 1 result in the list
     other: There are %{count} results in the list
   move_navigation_item_f034cd8a: Move Navigation Item
+  create_users_view:
+    required: Please enter some email addresses
   edit_course_role_3b992fc2: Edit Course Role
   role_successfully_updated_4317e6a4: Role successfully updated
   something_went_wrong_updating_the_user_s_role_plea_5de95400: Something went wrong updating the user's role. Please try again later.
@@ -15704,7 +15696,6 @@ en:
   you_cannot_leave_comments_until_you_submit_the_ass_82c3ad79: You cannot leave comments until you submit the assignment
   comments_e07bcbe3: Comments
   rubric_fc39da76: Rubric
-  assignment_locked_until_future_date_80cd0df2: Assignment locked until future date
   ungraded_pointspossible_e2f86bd9: ungraded/%{pointsPossible}
   ungraded_147a0dce: ungraded
   formattedgrade_points_90505a61: "%{formattedGrade} Points"
@@ -15727,13 +15718,12 @@ en:
     other: "-%{count} Points"
   assignment_locked_a6233228: Assignment Locked
   attempt_1_7ba3c30f: Attempt 1
-  course_has_not_started_yet_ed525dcc: Course has not started yet
+  submission_locked_image_93aced38: Submission Locked Image
+  submission_locked_a6074f8b: Submission Locked
   accept_course_invitation_to_participate_in_this_as_b8342676: Accept course invitation to participate in this assignment
   log_in_to_submit_962106cf: Log in to submit
   accept_course_invitation_b4c04fbb: Accept course invitation
   log_in_c9e240ef: Log in
-  submission_locked_image_93aced38: Submission Locked Image
-  submission_locked_a6074f8b: Submission Locked
   assignment_locked_with_prerequisite_5b8cb148: Assignment Locked with Prerequisite
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
   go_to_prerequisite_175c1f3f: Go to Prerequisite
@@ -15746,7 +15736,6 @@ en:
   you_are_submitting_a_submissiontype_submission_onl_29c1cdc1: You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.
   okay_1772bbeb: Okay
   error_sending_submission_d32dc075: Error sending submission
-  error_updating_status_of_module_item_80336274: Error updating status of module item
   media_af190855: Media
   url_22a5f3b8: URL
   points_is_required_9a9d05b2: Points is required
@@ -16156,7 +16145,6 @@ en:
   reply_389d6fb9: Reply
   compose_a_new_message_db3a68ed: Compose a new message
   reply_all_80298bee: Reply all
-  unarchive_f245e2d6: Unarchive
   reply_all_b864cd0e: Reply All
   selected_de3a8019: selected
   not_selected_57866888: not selected
@@ -16164,31 +16152,19 @@ en:
   not_starred_98931190: not starred
   open_message_d7b12975: Open Message
   subject_114b2e98: Subject
-  error_adding_files_to_conversation_message_58e83876: Error adding files to conversation message
-  error_uploading_files_f709361f: Error uploading files
-  message_body_is_required_105d5986: Message body is required
-  sending_message_ba2f0f0e: Sending Message
-  uploading_files_9e39dbf9: Uploading Files
-  please_wait_while_we_upload_attachments_fc34efd1: Please wait while we upload attachments
-  error_occurred_while_adding_message_to_conversatio_3dafd0e5: Error occurred while adding message to conversation
   error_occurred_while_creating_conversation_message_43751479: Error occurred while creating conversation message
   message_sent_successfully_7cc86ad3: Message sent successfully
   error_creating_conversation_1d814618: Error creating conversation
-  error_loading_course_data_f056172b: Error loading course data
-  error_loading_past_messages_4f142523: Error loading past messages
-  loading_compose_modal_f6da0e8b: Loading Compose Modal
+  error_adding_files_to_conversation_message_58e83876: Error adding files to conversation message
+  error_uploading_files_f709361f: Error uploading files
+  message_body_is_required_105d5986: Message body is required
+  unable_to_query_for_courses_at_this_time_please_tr_eafb8e73: Unable to query for courses at this time, please try again later
+  uploading_files_9e39dbf9: Uploading Files
+  please_wait_while_we_upload_attachments_fc34efd1: Please wait while we upload attachments
+  sending_message_ba2f0f0e: Sending Message
+  sending_message_75923692: Sending message
   delete_operation_failed_3db8cd19: Delete operation failed
-  messages_archived_58eb202f:
-    one: Message Archived!
-    other: Messages Archived!
-  archive_operation_failed_5504706: Archive operation failed
   unable_to_load_courses_menu_7074ea04: Unable to load courses menu.
-  are_you_sure_you_want_to_archive_your_copy_of_thes_92c9b8f1:
-    one: Are you sure you want to archive your copy of this conversation?
-    other: Are you sure you want to archive your copy of these conversations?
-  are_you_sure_you_want_to_unarchive_your_copy_of_th_c961b520:
-    one: Are you sure you want to unarchive your copy of this conversation?
-    other: Are you sure you want to unarchive your copy of these conversations?
   loading_message_list_226a131e: Loading Message List
   unable_to_load_messages_2b158fd0: 'Unable to load messages. '
   answer_sequence_cfeda025: Answer Sequence
@@ -16633,18 +16609,8 @@ en:
   homeroom_12546f9c: Homeroom
   schedule_e5dd4c32: Schedule
   resources_ccefab27: Resources
-  welcome_name_a16afa7f: Welcome, %{name}!
   failed_to_load_the_schedule_tab_fd7b0911: Failed to load the schedule tab
-  new_announcement_title_30ba7c1b: 'New announcement: %{title}'
-  due_due_today_4dfe420a: "%{due} due today"
-  nothing_due_today_26217223: Nothing due today
-  missing_missing_c1010432: "%{missing} missing"
-  every_new_announcement_shows_up_in_this_area_creat_934a7a0c: Every new announcement shows up in this area. Create your first one now.
-  create_a_new_announcement_for_coursename_8dede2d0: Create a new announcement for %{courseName}
-  failed_to_load_the_grades_tab_c6118c57: Failed to load the grades tab
-  loading_grades_446fc226: Loading grades...
-  grade_for_course_ccc8513c: Grade for %{course}
-  percent_of_points_possible_93cd8127: "%{percent} of points possible"
+  welcome_name_a16afa7f: Welcome, %{name}!
   my_subjects_61936afb: My Subjects
   no_courses_favorited_4e69fd63: No courses favorited
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "You have no courses favorited. Reloading this page will show all\n      your active courses. To add favorites, go to "
@@ -16801,16 +16767,13 @@ en:
   paste_json_26ad8050: Paste JSON
   enter_url_e8bb8a33: Enter URL
   configure_ecb97e30: Configure
-  unread_post_47a1a06b: Unread post
-  unpublish_9f2d730b: Unpublish
-  unsubscribe_8be438ff: Unsubscribe
-  subscribe_4b301fb7: Subscribe
-  subscribed_fe74d22a: Subscribed
-  unsubscribed_c93564a2: Unsubscribed
   manage_discussion_c1dd8f4e: Manage Discussion
   mark_all_as_read_8f3bdf57: Mark All as Read
   close_for_comments_37783f56: Close for Comments
   open_for_comments_f8f7641e: Open for Comments
+  publishing_41bc5431: Publishing...
+  unpublishing_2c317034: Unpublishing...
+  unpublish_9f2d730b: Unpublish
   next_message_780bcf24: Next Message
   previous_message_8804f87e: Previous Message
   edit_current_message_da650d4c: Edit Current Message
@@ -17453,7 +17416,7 @@ en:
   gradebookHeaderFilterView:
     course_average: Course average
     course_median: Course median
-  display_student_filter_options_ab034cfa: Display Student Filter Options
+  display_filter_options_34fb6be2: Display Filter Options
   unassessed_students_3809ac5e: Unassessed students
   gradebookSectionMenuView:
     all_sections: All Sections
@@ -18046,22 +18009,11 @@ en:
     point threshold that will be used to define mastery of this outcome.
   criterion_ratings_3eed22e2: Criterion Ratings
   more_information_about_ratings_57cdd446: More Information About Ratings
-  expand_outcome_description_c5bdd70b: Expand outcome description
-  collapse_outcome_description_de471564: Collapse outcome description
-  add_outcome_597054ad: Add outcome
+  add_outcomes_to_course_88ba09be: Add Outcomes to Course
+  add_outcomes_to_account_4647776f: Add Outcomes to Account
   pro_tip_30e41fa3: PRO TIP!
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: Save yourself a lot of time by only adding the outcomes that are specific to your course content.
   select_a_group_to_reveal_outcomes_here_91883028: Select a group to reveal outcomes here.
-  add_outcomes_to_course_88ba09be: Add Outcomes to Course
-  add_outcomes_to_account_4647776f: Add Outcomes to Account
-  search_within_grouptitle_4d38272f: Search within %{groupTitle}
-  search_within_outcome_group_7ac6ac88: Search within outcome group
-  all_grouptitle_outcomes_dcc565d1: All %{groupTitle} Outcomes
-  all_group_outcomes_25936010: All Group Outcomes
-  count_outcomes_3af5e3e:
-    one: "%{count} Outcome"
-    other: "%{count} Outcomes"
-  add_all_outcomes_6a12d08e: Add All Outcomes
   import_outcomes_7dda186b: Import Outcomes
   upload_your_outcomes_bceeadbe: Upload your Outcomes!
   csv_or_json_formats_only_d8ba36d: CSV or JSON formats only
@@ -18092,19 +18044,19 @@ en:
   an_error_occurred_loading_outcomes_data_cfd18b61: An error occurred loading outcomes data.
   there_are_no_outcomes_in_the_course_1d36d9c6: There are no outcomes in the course.
   select_outcome_7e6e2562: Select outcome
+  expand_outcome_description_c5bdd70b: Expand outcome description
+  collapse_outcome_description_de471564: Collapse outcome description
   outcome_menu_4fe5813: Outcome Menu
   count_outcomes_selected_55902958:
     one: 1 Outcome Selected
     other: "%{count} Outcomes Selected"
+  search_within_grouptitle_4d38272f: Search within %{groupTitle}
   count_grouptitle_outcomes_4ddea09:
     one: 1 "%{groupTitle}" Outcome
     other: '%{count} "%{groupTitle}" Outcomes'
   title_outcomes_7adbd9cc: "%{title} Outcomes"
   outcome_group_menu_2fffeb71: Outcome Group Menu
   menu_39cb0e8e: Menu
-  move_title_cafc5235: Move "%{title}"
-  where_would_you_like_to_move_this_outcome_b38588e6: Where would you like to move this outcome?
-  where_would_you_like_to_move_this_group_e4ddd778: Where would you like to move this group?
   search_field_234156fc: Search field
   clear_search_field_75f595c7: Clear search field
   outcomes_have_not_been_added_to_this_course_yet_7b761b8c: Outcomes have not been added to this course yet.
@@ -18113,7 +18065,6 @@ en:
   get_started_by_finding_importing_or_creating_your__380b6cfb: Get started by finding, importing or creating your account outcomes.
   an_error_occurred_while_loading_course_outcomes_er_accefe77: 'An error occurred while loading course outcomes: %{error}'
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: 'An error occurred while loading account outcomes: %{error}'
-  an_error_occurred_while_loading_selected_group_8b80d3d5: An error occurred while loading selected group.
   must_be_between_lower_and_upper_1f501b2a: Must be between %{lower} and %{upper}
   parameter_91ed199: Parameter
   mastery_calculation_5fd5f5fe: Mastery Calculation
@@ -18619,14 +18570,6 @@ en:
   enrollments_may_be_added_by_your_institution_stude_690188ae: |-
     Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
             To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
-  allows_user_to_view_login_id_information_for_teach_4b30f308: Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.
-  enrollments_may_be_added_by_your_institution_stude_8747f7b5: |-
-    Enrollments may be added by your institution student information system (SIS).
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
-  allows_user_to_view_login_id_information_for_teach_ad237acc: Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.
-  enrollments_may_be_added_by_your_institution_stude_de656136: |-
-    Enrollments may be added by your institution student information system (SIS).
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: Allows user to access the People link in Account Navigation.
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: Allows user to view login/logout activity of users in Admin Tools. Allows user to search grade change logs by grader or student in Admin Tools. (Not available at the subaccount level.)
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: Allows user to differentiate assignments to individual students.
@@ -19072,7 +19015,6 @@ en:
   canvas_failed_to_initiate_the_upload_8e3824d5: Canvas failed to initiate the upload.
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas.
   canvas_failed_to_complete_the_upload_864a4c0f: Canvas failed to complete the upload.
-  failed_getting_file_to_preview_89fe2bf4: Failed getting file to preview
   unknown_event_7a0bcda3: Unknown event
   assignment_created_b3ee04d7: Assignment created
   assignment_muted_4cb590a4: Assignment muted

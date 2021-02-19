@@ -18,20 +18,12 @@
 
 import React from 'react'
 import ManagementHeader from './ManagementHeader'
-import {MockedProvider} from '@apollo/react-testing'
-import {createCache} from 'jsx/canvas-apollo'
 
 export default {
   title: 'Examples/Outcomes/ManagementHeader',
   component: ManagementHeader
 }
 
-const Template = args => {
-  return (
-    <MockedProvider cache={createCache()}>
-      <ManagementHeader {...args} />
-    </MockedProvider>
-  )
-}
+const Template = args => <ManagementHeader {...args} />
 
 export const Default = Template.bind({})

@@ -77,7 +77,7 @@ export default class TrayController {
         role: imageOptions.isDecorativeImage ? 'presentation' : null,
         width: imageOptions.appliedWidth,
         height: imageOptions.appliedHeight,
-        'data-decorative': imageOptions.isDecorativeImage ? true : null // should be replaced by role=presentation once a11y-checker supports it
+        'data-is-decorative': null // replaced by role=presentation
       })
 
       // tell tinymce so the context toolbar resets

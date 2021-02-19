@@ -180,7 +180,7 @@ describe "users/_logins.html.erb" do
       assign(:user, @user)
       render
 
-      doc = Nokogiri::HTML5(response)
+      doc = Nokogiri::HTML(response)
       expect(doc.at_css('.screenreader-only')).to be_nil
     end
   end

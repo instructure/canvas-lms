@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2014 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -26,43 +26,53 @@
   margin-top: 0;
 }
 
+.ic-Dashboard-header__layout {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  height: $ic-breadcrumbs-height;
+  &.small {
+    padding-bottom: .5rem;
+
+    .ic-Dashboard-header__actions {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+h1.ic-Dashboard-header__title {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.ic-Dashboard-header__actions {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 // These overrides are only here because the Dashboard cards don't fully use InstUI.
 // Once they are on InstUI they can be removed
-.ic-DashboardCard__box {
+.ic-DashboardCard {
   font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   & h1, h2, h3, h4, h5, h6 {
     font-family: inherit;
   }
-}
 
-.unpublished_courses_redesign .ic-DashboardCard__box {
-  padding: $ic-sp 0 $ic-sp $ic-sp*1.5 !important;
+  & h3.ic-DashboardCard__header-title {
+    font-size: 1rem;
+  }
 }
 
 // These overrides are required because InstUI Tabs don't natively support icons or
-// themeable "selected" colors. There are also some properties required for the
-// animated sticky header transitions that can't be accomplished easily via InstUI.
+// themeable "selected" colors.
 .ic-Dashboard-tabs {
-  position: sticky;
-  // This is a trick to let our JS code know when position: sticky has kicked in.
-  // See https://developers.google.com/web/updates/2017/09/sticky-headers.
-  top: -1px;
-  padding-top: 1px;
-  border-bottom: $ic-border-color 1px solid;
-  // We need a higher z-index than the planner items, some of which are at 1.
-  z-index: 2;
-
-  & h1 {
-    transition: font-size 0.1s ease;
-  }
-
   & [role="tab"] {
     padding: 0.75rem 1.25rem;
-  }
-
-  & [role="tabpanel"] {
-    display: none;
   }
 
   & .ic-Dashboard-tabs__tab {

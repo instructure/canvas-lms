@@ -27,7 +27,7 @@ import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '../../shared/helpers/addZeroWidthSpace'
 
 const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
-  <View as="div">
+  <View as="div" padding="x-small 0 0">
     <Flex as="div" alignItems="start">
       <Flex.Item size={minWidth} shouldGrow>
         <div style={{padding: '0.21875rem 0'}}>
@@ -51,9 +51,7 @@ const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
 )
 
 OutcomeGroupHeader.defaultProps = {
-  minWidth: 'auto',
-  title: '',
-  description: ''
+  minWidth: 'auto'
 }
 
 OutcomeGroupHeader.propTypes = {

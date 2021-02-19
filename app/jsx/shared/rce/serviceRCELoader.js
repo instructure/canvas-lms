@@ -29,22 +29,26 @@ function getTrayProps() {
   if (!ENV.context_asset_string) {
     return null
   }
-  let [contextType, contextId] = splitAssetString(ENV.context_asset_string, false)
+  let contextType, contextId
   const userId = ENV.current_user_id
-  const containingContext = {contextType, contextId, userId}
 
   // set in rich_content.rb if user has :manage_files right
   // though comment says it may (eventually) be in the jwt
   // TODO: look into that.
-  const canUploadFiles = !ENV.use_rce_enhancements || ENV.RICH_CONTENT_CAN_UPLOAD_FILES
-  if (!canUploadFiles || contextType === 'account') {
+  if (ENV.use_rce_enhancements && !ENV.RICH_CONTENT_CAN_UPLOAD_FILES) {
     contextId = userId
     contextType = 'user'
+  } else {
+    ;[contextType, contextId] = splitAssetString(ENV.context_asset_string, false)
+    if (contextType === 'account') {
+      contextType = 'user'
+      contextId = userId
+    }
   }
 
   return {
     canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
-    containingContext, // this will remain constant
+    containingContext: {contextType, contextId, userId}, // this will remain constant
     contextType, // these will change via the UI
     contextId,
     filesTabDisabled: ENV.RICH_CONTENT_FILES_TAB_DISABLED,

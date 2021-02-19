@@ -40,9 +40,6 @@ export const ConversationMessage = {
       mediaComment {
         ...MediaComment
       }
-      recipients {
-        ...User
-      }
     }
     ${Attachment.fragment}
     ${User.fragment}
@@ -55,9 +52,8 @@ export const ConversationMessage = {
     body: string,
     attachmentsConnection: Attachment.shape,
     author: User.shape,
-    mediaComment: MediaComment.shape,
-    recipients: User.shape,
-  }),
+    mediaComment: MediaComment.shape
+  })
 }
 
 export const DefaultMocks = {
@@ -68,6 +64,6 @@ export const DefaultMocks = {
     createdAt: 'November 5, 2020 at 2:25pm',
     author: {},
     mediaComment: {},
-    attachmentConnection: [{}],
-  }),
+    attachmentConnection: [{}]
+  })
 }

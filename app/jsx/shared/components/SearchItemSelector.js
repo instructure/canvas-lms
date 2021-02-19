@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!managed_course_selector'
 import React, {useState, useEffect} from 'react'
-import {func, string, object} from 'prop-types'
+import {func, string} from 'prop-types'
 
 import CanvasAsyncSelect from './CanvasAsyncSelect'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
@@ -30,15 +30,13 @@ SearchItemSelector.propTypes = {
   itemSearchFunction: func,
   renderLabel: string,
   contextId: string,
-  renderOption: func,
-  additionalParams: object
+  renderOption: func
 }
 
 SearchItemSelector.defaultProps = {
   onItemSelected: () => {},
   itemSearchFunction: () => {},
-  renderLabel: '',
-  additionalParams: {}
+  renderLabel: ''
 }
 
 function isSearchableTerm(value) {
@@ -50,8 +48,7 @@ export default function SearchItemSelector({
   renderLabel,
   itemSearchFunction,
   contextId = '',
-  renderOption,
-  additionalParams
+  renderOption
 }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
@@ -73,7 +70,7 @@ export default function SearchItemSelector({
     success: setItems,
     error: setError,
     loading: setIsLoading,
-    params: {...searchParams, ...additionalParams}
+    params: searchParams
   })
 
   const handleItemSelected = (ev, id) => {

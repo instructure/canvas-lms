@@ -20,7 +20,6 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
-import DashboardCard from 'jsx/dashboard_card/DashboardCard'
 import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard'
 import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
 import fakeENV from 'helpers/fakeENV'
@@ -32,30 +31,24 @@ QUnit.module('DashboardCard Reordering', {
   setup() {
     cards = [
       {
-        id: '1',
+        id: 1,
         assetString: 'course_1',
-        courseCode: 'DASH-101',
         position: 0,
         originalName: 'Intro to Dashcards 1',
-        shortName: 'Dash 101',
-        href: '/course/1'
+        shortName: 'Dash 101'
       },
       {
-        id: '2',
+        id: 2,
         assetString: 'course_2',
-        courseCode: 'DASH-201',
         position: 1,
         originalName: 'Intermediate Dashcarding',
-        shortName: 'Dash 201',
-        href: '/course/2'
+        shortName: 'Dash 201'
       },
       {
-        id: '3',
+        id: 3,
         assetString: 'course_3',
-        courseCode: 'DASH-301',
         originalName: 'Advanced Dashcards',
-        shortName: 'Dash 301',
-        href: '/course/3'
+        shortName: 'Dash 301'
       }
     ]
 
@@ -73,21 +66,14 @@ QUnit.module('DashboardCard Reordering', {
 
 test('it renders', () => {
   const Box = getDroppableDashboardCardBox()
-  const root = TestUtils.renderIntoDocument(
-    <Box cardComponent={DashboardCard} courseCards={cards} />
-  )
+  const root = TestUtils.renderIntoDocument(<Box courseCards={cards} />)
   ok(root)
 })
 
 test('cards have opacity of 0 while moving', () => {
+  const Card = DraggableDashboardCard.DecoratedComponent
   const card = TestUtils.renderIntoDocument(
-    <DashboardCard
-      cardComponent={DashboardCard}
-      {...cards[0]}
-      connectDragSource={el => el}
-      connectDropTarget={el => el}
-      isDragging
-    />
+    <Card {...cards[0]} connectDragSource={el => el} connectDropTarget={el => el} isDragging />
   )
   const div = TestUtils.findRenderedDOMComponentWithClass(card, 'ic-DashboardCard')
   equal(div.style.opacity, 0)
@@ -96,7 +82,7 @@ test('cards have opacity of 0 while moving', () => {
 test('moving a card adjusts the position property', () => {
   const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
   const root = TestUtils.renderIntoDocument(
-    <Box cardComponent={DashboardCard} courseCards={cards} connectDropTarget={el => el} />
+    <Box courseCards={cards} connectDropTarget={el => el} />
   )
 
   const backend = root.getManager().getBackend()
