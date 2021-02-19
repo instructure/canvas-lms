@@ -591,4 +591,24 @@ describe "admin settings tab" do
       end
     end
   end
+
+  context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
+    before :once do
+      @account = Account.default
+      @account.enable_feature! :canvas_for_elementary
+      @subaccount = Account.create!(name: "subaccount1", parent_account_id: @account.id)
+    end
+
+    it "is locked and enabled for subaccounts of an account where setting is enabled" do
+      account_admin_user(:account => @account)
+      user_session(@admin)
+      get "/accounts/#{@account.id}/settings"
+      checkbox = "#account_settings_enable_as_k5_account_value"
+      f(checkbox).click
+      click_submit
+      get "/accounts/#{@subaccount.id}/settings"
+      expect(is_checked(checkbox)).to be_truthy
+      expect(f(checkbox)).to be_disabled
+    end
+  end
 end
