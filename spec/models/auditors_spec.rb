@@ -19,6 +19,8 @@
 
 require 'spec_helper'
 
+# TODO: Remove this spec once Audits engine extraction is complete.
+# for now leaving it here will confirm the Auditors/Audits shim is operating as expected.
 describe Auditors do
 
   after(:each) do
@@ -95,11 +97,6 @@ describe Auditors do
       expect(Auditors.configured?).to eq(true)
       expect(Rails.configuration).to receive(:database_configuration).and_return({})
       expect(Auditors.configured?).to eq(false)
-    end
-
-    it "complains loudly under other configurations" do
-      expect(Auditors).to receive(:backend_strategy).and_return(:s3)
-      expect{ Auditors.configured? }.to raise_error(ArgumentError)
     end
   end
 

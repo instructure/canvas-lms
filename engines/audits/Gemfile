@@ -1,3 +1,9 @@
 source 'https://rubygems.org'
 
 gemspec
+
+path '../../gems' do
+  gem 'canvas_cassandra'
+  gem 'dynamic_settings'
+  gem 'event_stream'
+end

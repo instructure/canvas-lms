@@ -15,6 +15,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails", ">= 5.2.4.5"
   spec.add_dependency "switchman", '>= 2.0.3'
+  spec.add_dependency "canvas_cassandra"
+  spec.add_dependency "dynamic_settings"
+  spec.add_dependency "event_stream"
 
   spec.add_development_dependency "pg"
   spec.add_development_dependency "rspec-rails"

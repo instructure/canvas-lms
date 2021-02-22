@@ -129,6 +129,9 @@ gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
+path 'engines' do
+  gem 'audits'
+end
 path 'gems' do
   gem 'activesupport-suspend_callbacks'
   gem 'acts_as_list'
