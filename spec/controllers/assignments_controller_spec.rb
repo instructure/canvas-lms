@@ -584,6 +584,7 @@ describe AssignmentsController do
       get 'show', params: {:course_id => @course.id, :id => a.id}
       expect(@course.reload.assignment_groups).not_to be_empty
       expect(assigns[:unlocked]).not_to be_nil
+      expect(assigns[:js_env][:media_comment_asset_string]).to eq @student.asset_string
     end
 
     it "does not show direct share options when disabled" do
