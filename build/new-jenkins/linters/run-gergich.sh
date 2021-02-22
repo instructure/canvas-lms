@@ -102,34 +102,36 @@ echo "LINTER OK!"
 EOF
 LINTER_PID=$!
 
-cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
-set -ex
-read -r -a PLUGINS_LIST_ARR <<< "$PLUGINS_LIST"
-rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST_ARR[@]}")
+if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
+  cat <<-EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
+  set -ex
+  read -r -a PLUGINS_LIST_ARR <<< "$PLUGINS_LIST"
+  rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST_ARR[@]}")
 
-export DISABLE_POSTINSTALL=1
-./build/new-jenkins/linters/run-and-collect-output.sh "yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1"
-
-if ! git diff --exit-code yarn.lock; then
-  message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."
-  gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
-else
-  ./build/new-jenkins/linters/run-and-collect-output.sh "yarn dedupe-yarn"
+  export DISABLE_POSTINSTALL=1
+  ./build/new-jenkins/linters/run-and-collect-output.sh "yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1"
 
   if ! git diff --exit-code yarn.lock; then
-    message="yarn.lock changes need to be de-duplicated. Make sure you run 'yarn dedupe-yarn'."
+    message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."
     gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
-  fi
-fi
+  else
+    ./build/new-jenkins/linters/run-and-collect-output.sh "yarn dedupe-yarn"
 
-gergich status
-echo "YARN_LOCK OK!"
+    if ! git diff --exit-code yarn.lock; then
+      message="yarn.lock changes need to be de-duplicated. Make sure you run 'yarn dedupe-yarn'."
+      gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+    fi
+  fi
+
+  gergich status
+  echo "YARN_LOCK OK!"
 EOF
-YARN_LOCK_PID=$!
+  YARN_LOCK_PID=$!
+fi
 
 wait $WEBPACK_BUILD_PID
 wait $LINTER_PID
-wait $YARN_LOCK_PID
+[[ "$GERRIT_PROJECT" == "canvas-lms" ]] && wait $YARN_LOCK_PID
 
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash -
 set -ex
