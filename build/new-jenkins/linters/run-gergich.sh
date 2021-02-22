@@ -104,7 +104,7 @@ LINTER_PID=$!
 
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
 set -ex
-PLUGINS_LIST_ARR=("$PLUGINS_LIST")
+read -r -a PLUGINS_LIST_ARR <<< "$PLUGINS_LIST"
 rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST_ARR[@]}")
 
 export DISABLE_POSTINSTALL=1
