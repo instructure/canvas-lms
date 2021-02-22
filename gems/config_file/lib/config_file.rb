@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,18 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'canvas/reloader'
-
 module ConfigFile
   class << self
     def unstub
       @yaml_cache = {}
       @object_cache = {}
     end
-
-    Canvas::Reloader.on_reload do
-      ConfigFile.unstub
-    end
+    alias :reset_cache :unstub
 
     def stub(config_name, value)
       raise "config settings can only be set via config file" unless Rails.env.test?
@@ -63,7 +58,7 @@ module ConfigFile
       object_cache = @object_cache[config_name] ||= {}
       return object_cache[with_rails_env] if object_cache.key?(with_rails_env)
       config = load(config_name, with_rails_env)
-      object_cache[with_rails_env] = config && yield(config)
+      object_cache[with_rails_env] = (config && yield(config))
     end
 
     def deep_freeze_cached_value(input)

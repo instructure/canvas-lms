@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,11 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper.rb'
+require 'spec_helper'
 
 describe ConfigFile do
   describe ".cache_object" do
-    before { ConfigFile.unstub }
+    before(:each) do
+      ConfigFile.unstub
+      target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))
+      allow(Rails).to receive(:root).and_return(target_location)
+    end
+
+    after(:each) do
+      ConfigFile.unstub
+    end
 
     it "caches objects" do
       expect(File).to receive(:exist?).and_return(true)

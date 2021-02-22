@@ -155,6 +155,7 @@ path 'gems' do
   gem 'canvas_text_helper'
   gem 'canvas_time'
   gem 'canvas_unzip'
+  gem 'config_file'
   gem 'diigo'
   gem 'event_stream'
   gem 'google_drive'
