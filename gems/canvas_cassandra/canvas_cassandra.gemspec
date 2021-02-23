@@ -4,9 +4,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "canvas_cassandra"
-  spec.version       = "0.0.1"
-  spec.authors       = ["Brian Palmer"]
-  spec.email         = ["brianp@instructure.com"]
+  spec.version       = "0.1.0"
+  spec.authors       = ["Ethan Vizitei"]
+  spec.email         = ["evizitei@instructure.com"]
   spec.summary       = %q{Cassandra wrapper for Canvas LMS}
   spec.homepage      = "https://github.com/instructure/canvas-lms"
   spec.license       = "AGPL"
@@ -17,8 +17,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'cassandra-cql', '~> 1.2.2'
+  spec.add_dependency "rails", ">= 5.0"
+  spec.add_dependency "config_file"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.5.0"
+  spec.add_development_dependency "byebug"
 end

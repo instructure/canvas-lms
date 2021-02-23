@@ -17,13 +17,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "rails"
 require "cassandra-cql"
 require "benchmark"
 
 module CanvasCassandra
   require "canvas_cassandra/database"
+  require "canvas_cassandra/database_builder"
+
+  class UnconfiguredError < StandardError; end
+
+  mattr_accessor :logger, default: Rails.logger
+  mattr_writer :settings_store
 
   def self.consistency_level(name)
     CassandraCQL::Thrift::ConsistencyLevel.const_get(name.to_s.upcase)
   end
+
+  # Expected interface for this object is:
+  #   object.get(setting_name, 'default_value')
+  # ^ returning a string
+  # In this instance, it's expected that canvas is going to inject
+  # the Setting class, but we want to break depednencies that directly
+  # point to canvas.
+  def self.settings_store(safe_invoke=false)
+    return @@settings_store if @@settings_store
+    return nil if safe_invoke
+    raise UnconfiguredError, "an object with an interface for loading settings must be specified as 'settings_store'"
+  end
+
 end

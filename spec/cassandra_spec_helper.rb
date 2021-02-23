@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 def truncate_cassandra(config)
-  db = Canvas::Cassandra::DatabaseBuilder.from_config(config)
+  db = CanvasCassandra::DatabaseBuilder.from_config(config)
 
   db.tables.each do |table|
     db.execute("TRUNCATE #{table}")
@@ -30,7 +30,7 @@ end
 
 shared_examples_for "cassandra page views" do
   before do
-    if Canvas::Cassandra::DatabaseBuilder.configured?('page_views')
+    if CanvasCassandra::DatabaseBuilder.configured?('page_views')
       Setting.set('enable_page_views', 'cassandra')
     else
       skip "needs cassandra page_views configuration"
@@ -41,7 +41,7 @@ end
 
 shared_examples_for "cassandra audit logs" do
   before do
-    unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
+    unless CanvasCassandra::DatabaseBuilder.configured?('auditors')
       skip "needs cassandra auditors configuration"
     end
     truncate_cassandra(:auditors)

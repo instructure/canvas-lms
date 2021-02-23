@@ -180,8 +180,8 @@ namespace :db do
       queue = config['queue']
       ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
       ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
-      Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
-        db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
+      CanvasCassandra::DatabaseBuilder.config_names.each do |cass_config|
+        db = CanvasCassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end

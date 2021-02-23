@@ -115,10 +115,10 @@ class Auditors::Course
     course_ar_type = Auditors::ActiveRecord::CourseRecord
     backend_strategy -> { Auditors.backend_strategy }
     active_record_type course_ar_type
-    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
+    database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record
-    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
+    read_consistency_level -> { CanvasCassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :course do
       table :courses_by_course

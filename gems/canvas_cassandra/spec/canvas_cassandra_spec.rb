@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,10 +16,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Canvas
-  module Cassandra
-    # TODO: Remove this shim when all callsites have been updated
-    DatabaseBuilder = CanvasCassandra::DatabaseBuilder
+require "spec_helper"
+
+describe CanvasCassandra do
+  describe "logger" do
+    around(:each) do |example|
+      prev_logger = CanvasCassandra.logger
+      example.run
+    ensure
+      CanvasCassandra.logger = prev_logger
+    end
+
+    it "defaults to rails logger" do
+      expect(CanvasCassandra.logger).to be(Rails.logger)
+    end
+
+    it "can be overridden" do
+      logger_object = Object.new
+      CanvasCassandra.logger = logger_object
+      expect(CanvasCassandra.logger).to be(logger_object)
+    end
   end
 end

@@ -227,10 +227,10 @@ class Auditors::GradeChange
     grades_ar_type = Auditors::ActiveRecord::GradeChangeRecord
     backend_strategy -> { Auditors.backend_strategy }
     active_record_type grades_ar_type
-    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
+    database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
     record_type Auditors::GradeChange::Record
-    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
+    read_consistency_level -> { CanvasCassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :assignment do
       table :grade_changes_by_assignment

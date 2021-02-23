@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,9 +16,5 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas
-  module Cassandra
-    # TODO: Remove this shim when all callsites have been updated
-    DatabaseBuilder = CanvasCassandra::DatabaseBuilder
-  end
-end
+CanvasCassandra.logger = Rails.logger
+CanvasCassandra.settings_store = Setting # to avoid having to pull this out as a full engine yet.

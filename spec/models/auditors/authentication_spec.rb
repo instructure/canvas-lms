@@ -70,7 +70,7 @@ describe Auditors::Authentication do
 
       it "doesn't record an error when not configured" do
         allow(Auditors::Authentication::Stream).to receive(:database).and_return(nil)
-        expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
+        expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
         expect(Canvas::EventStreamLogger).to receive(:error).never
         Auditors::Authentication.record(@pseudonym, 'login')
       end
