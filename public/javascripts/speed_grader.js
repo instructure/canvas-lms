@@ -1567,7 +1567,7 @@ EG = {
         }
       }
       $reassign_assignment.attr('disabled', disableReassign)
-      $reassign_assignment.text(I18n.t('Reassign Assignment'))
+      $reassign_assignment.text(redoRequest ? I18n.t('Reassigned') : I18n.t('Reassign Assignment'))
       $reassign_assignment
         .parent()
         .attr(
@@ -2991,7 +2991,7 @@ EG = {
       jsonData.submissionsMap[studentId].redo_request = true
       // Check if we're still on the same student submission
       if (studentId === EG.currentStudent?.id) {
-        $reassign_assignment.text(I18n.t('Reassign Assignment'))
+        $reassign_assignment.text(I18n.t('Reassigned'))
         $reassign_assignment.parent().attr('title', I18n.t('Assignment is reassigned.'))
       }
       reassignAssignmentInProgress = false
