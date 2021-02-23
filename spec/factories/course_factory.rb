@@ -22,7 +22,14 @@ module Factories
   def course_factory(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
-      @course = Course.create!(:sis_source_id => opts[:sis_source_id], :name => opts[:course_name], :account => account, :is_public => !!opts[:is_public], :enrollment_term_id => opts[:enrollment_term_id])
+      @course = Course.create!(
+        :sis_source_id => opts[:sis_source_id],
+        :name => opts[:course_name],
+        :course_code => opts[:course_code],
+        :account => account,
+        :is_public => !!opts[:is_public],
+        :enrollment_term_id => opts[:enrollment_term_id]
+      )
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!
