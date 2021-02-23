@@ -82,5 +82,8 @@ LtiTool.propTypes = {
 export const styles = StyleSheet.create({
   appTitle: {
     verticalAlign: 'middle'
+  },
+  appButton: {
+    cursor: 'pointer'
   }
 })
