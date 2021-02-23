@@ -1552,7 +1552,13 @@ EG = {
       const redoRequest = this.currentStudent?.submission?.redo_request
       let disableReassign = true
       let submittedAt = this.currentStudent?.submission?.submitted_at
+      let maxAttempts = false
+      let tooltipText = ''
       if (submittedAt) {
+        maxAttempts =
+          window.jsonData.allowed_attempts != null
+            ? (this.currentStudent.submission.attempt || 1) >= window.jsonData.allowed_attempts
+            : false
         submittedAt = new Date(submittedAt)
         let submissionComments = this.currentStudent.submission.submission_comments
         if (submissionComments) {
@@ -1562,22 +1568,22 @@ EG = {
           const lastCommentByUser = submissionComments[submissionComments.length - 1]
           if (lastCommentByUser?.created_at) {
             const commentedAt = new Date(lastCommentByUser.created_at)
-            disableReassign = redoRequest || commentedAt < submittedAt
+            disableReassign = redoRequest || commentedAt < submittedAt || maxAttempts
           }
         }
       }
       $reassign_assignment.attr('disabled', disableReassign)
       $reassign_assignment.text(redoRequest ? I18n.t('Reassigned') : I18n.t('Reassign Assignment'))
-      $reassign_assignment
-        .parent()
-        .attr(
-          'title',
-          disableReassign
-            ? redoRequest
-              ? I18n.t('Assignment is reassigned.')
-              : I18n.t('Student feedback required in comments above to reassign.')
-            : ''
-        )
+      if (disableReassign) {
+        if (redoRequest) {
+          tooltipText = I18n.t('Assignment is reassigned.')
+        } else if (maxAttempts) {
+          tooltipText = I18n.t('Student has met maximum allowed attempts.')
+        } else {
+          tooltipText = I18n.t('Student feedback required in comments above to reassign.')
+        }
+      }
+      $reassign_assignment.parent().attr('title', tooltipText)
     }
   },
 
@@ -2967,13 +2973,7 @@ EG = {
       $comment_submitted_message.attr('tabindex', -1).focus()
     }
     $add_a_comment_submit_button.text(I18n.t('submit', 'Submit'))
-    // This hides the tooltip over the reassignment button
-    // and enables the reassign button if the submission
-    // doesn't already have a redo request
-    if ($reassign_assignment[0] && !EG.currentStudent?.submission?.redo_request) {
-      $reassign_assignment.parent().attr('title', '')
-      $reassign_assignment.removeAttr('disabled')
-    }
+    EG.resetReassignButton()
   },
 
   reassignAssignment() {
