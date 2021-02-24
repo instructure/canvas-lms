@@ -222,7 +222,7 @@ class GradebookImporter
       end
     end
 
-    set_current_override_scores if allow_override_scores?
+    set_current_override_scores if allow_override_scores? && @override_column_indices.present?
 
     translate_pass_fail(@assignments, @students, @gradebook_importer_assignments)
     unless @missing_student
