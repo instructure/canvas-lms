@@ -1938,6 +1938,16 @@ describe GradebookImporter do
             expect(override_scores_by_student.map(&:length)).to all(eq(1))
           end
         end
+
+        it "works as expected if no override score column is included in the import" do
+          expect {
+            importer_with_rows(
+              "Student,ID,Section,Assignment 1,Final Score",
+              "Cyrus,#{student_with_override.id},My Course,20,0",
+              "Ophilia,#{student_without_override.id},My Course,40,0"
+            )
+          }.not_to raise_error
+        end
       end
     end
   end
