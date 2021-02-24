@@ -22,7 +22,7 @@ require 'zlib'
 
 # see https://github.com/redis/redis-rb/pull/739
 
-module Canvas
+module CanvasCache
   class HashRing
 
     POINTS_PER_SERVER = 160 # this is the default in libmemcached

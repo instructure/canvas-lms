@@ -380,7 +380,7 @@ module Canvas::Redis
 
   module Distributed
     def initialize(addresses, options = { })
-      options[:ring] ||= Canvas::HashRing.new([], options[:replicas], options[:digest])
+      options[:ring] ||= CanvasCache::HashRing.new([], options[:replicas], options[:digest])
       super
     end
   end

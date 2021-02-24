@@ -138,6 +138,7 @@ path 'gems' do
   gem 'bookmarked_collection'
   gem 'broadcast_policy'
   gem 'canvas_breach_mitigation'
+  gem 'canvas_cache'
   gem 'canvas_color'
   gem 'canvas_crummy'
   gem 'canvas_dynamodb'
