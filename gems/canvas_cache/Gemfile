@@ -1,3 +1,5 @@
 source 'https://rubygems.org'
 
 gemspec
+
+gem 'config_file', path: '../config_file'

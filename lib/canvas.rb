@@ -33,15 +33,15 @@ module Canvas
   end
 
   def self.redis
-    Canvas::Redis.redis
+    CanvasCache::Redis.redis
   end
 
   def self.redis_config
-    Canvas::Redis.redis_config
+    CanvasCache::Redis.config
   end
 
   def self.redis_enabled?
-    Canvas::Redis.redis_enabled?
+    CanvasCache::Redis.enabled?
   end
 
   def self.reconnect_redis

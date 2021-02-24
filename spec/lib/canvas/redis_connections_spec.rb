@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,15 +20,20 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-if Canvas.redis_enabled?
-
-# TODO: When CanvasCache::Redis has replaced all callsites,
-# we won't need this shim anymore, and can drop this test verifying it.
-describe "Canvas::Redis" do
-  it "doesn't marshall" do
-    Canvas.redis.set('test', 1)
-    expect(Canvas.redis.get('test')).to eq '1'
+describe "Canvas::RedisConnections" do
+  before(:each) do
+    skip("requires redis") unless CanvasCache::Redis.enabled?
   end
-end
 
+  describe "disconnect!" do
+    it "checkes connections without exploding" do
+      expect { Canvas::RedisConnections.disconnect! }.to_not raise_error
+    end
+  end
+
+  describe ".clear_idle!" do
+    it "culls connections without exploding" do
+      expect { Canvas::RedisConnections.clear_idle! }.to_not raise_error
+    end
+  end
 end

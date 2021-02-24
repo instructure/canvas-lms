@@ -7,6 +7,41 @@ For all those things you don't want to go lookup again.
 There are a collection of caching helpers in this library for different
 enhancements for the canvas system to help us scale effectively.
 
+#### Redis Client Management
+
+canvas_cache knows where the redis config info is
+and whether how the local environment is setup.  You
+can ask from anywhere:
+
+```ruby
+CanvasCache::Redis.enabled?
+```
+
+You can access the distrbitued redis client directly
+off the module:
+
+```ruby
+CanvasCache::Redis.redis.set("key", "value")
+```
+
+If your config file has "servers: 'cache_store'", it will
+just give you a vanilla Rails.cache.redis instance, but
+if you give it a set of servers to work with in the config
+it will construct a patched version of the redis client.
+
+It works pretty much like a standard redis client, but
+there are several enhancements that this library makes to the
+way redis caching works.
+
+ - uses the configurable HashRing described below for distributed configs
+ - includes some safety checks to prevent you from accidentally dropping your
+    production cache with a "flushdb"
+ - performs logging with elapsed-time in the output
+ - uses a circuit breaker to tamp down on redis traffic if it gets
+    connectivity issues.
+
+
+
 #### Consistent Hashing on redis with Digest Injection
 
 when spreading cache keys over a ring of nodes, you don't

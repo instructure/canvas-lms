@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'rails'
+
 module ConfigFile
   class << self
     def unstub
