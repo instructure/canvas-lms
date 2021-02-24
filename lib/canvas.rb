@@ -33,58 +33,19 @@ module Canvas
   end
 
   def self.redis
-    raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
-    if redis_config == 'cache_store' || redis_config.is_a?(Hash) && redis_config['servers'] == 'cache_store'
-      return Rails.cache.redis
-    end
-    @redis ||= begin
-      Canvas::Redis.patch
-      settings = ConfigFile.load('redis').dup
-      settings['url'] = settings['servers'] if settings['servers']
-      ActiveSupport::Cache::RedisCacheStore.build_redis(**settings.to_h.symbolize_keys)
-    end
+    Canvas::Redis.redis
   end
 
   def self.redis_config
-    @redis_config ||= ConfigFile.load('redis')
+    Canvas::Redis.redis_config
   end
 
   def self.redis_enabled?
-    @redis_enabled ||= redis_config.present?
+    Canvas::Redis.redis_enabled?
   end
 
-  # technically this is just disconnect_redis, because new connections are created lazily,
-  # but I didn't want to rename it when there are several uses of it
   def self.reconnect_redis
-    if Rails.cache &&
-      defined?(ActiveSupport::Cache::RedisCacheStore) &&
-      Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
-      Canvas::Redis.handle_redis_failure(nil, "none") do
-        redis = Rails.cache.redis
-        if redis.respond_to?(:nodes)
-          redis.nodes.each(&:disconnect!)
-        else
-          redis.disconnect!
-        end
-      end
-    end
-
-    if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore)
-      Canvas::Redis.handle_redis_failure(nil, "none") do
-        redis = MultiCache.cache.redis
-        if redis.respond_to?(:nodes)
-          redis.nodes.each(&:disconnect!)
-        else
-          redis.disconnect!
-        end
-      end
-    end
-
-    return unless @redis
-    # We're sharing redis connections between Canvas.redis and Rails.cache,
-    # so don't call reconnect on the cache too.
-    return if Rails.cache.respond_to?(:redis) && @redis == Rails.cache.redis
-    @redis = nil
+    Canvas::Redis.reconnect_redis
   end
 
   def self.cache_store_config_for(cluster)

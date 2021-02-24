@@ -42,12 +42,12 @@ describe "Canvas::Redis" do
 
     it "should live forever if no expire time is given" do
       expect(Canvas::Redis.lock('test1')).to eq true
-      expect(Canvas.redis.ttl(Canvas::Redis.lock_key('test1'))).to eq -1
+      expect(Canvas::Redis.redis.ttl(Canvas::Redis.lock_key('test1'))).to eq -1
     end
 
     it "should set the expire time if given" do
       expect(Canvas::Redis.lock('test1', 15)).to eq true
-      ttl = Canvas.redis.ttl(Canvas::Redis.lock_key('test1'))
+      ttl = Canvas::Redis.redis.ttl(Canvas::Redis.lock_key('test1'))
       expect(ttl).to be > 0
       expect(ttl).to be <= 15
     end

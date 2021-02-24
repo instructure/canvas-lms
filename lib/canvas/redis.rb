@@ -18,6 +18,61 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Redis
+  def self.redis
+    raise "Redis is not enabled for this install" unless redis_enabled?
+    if redis_config == 'cache_store' || redis_config.is_a?(Hash) && redis_config['servers'] == 'cache_store'
+      return Rails.cache.redis
+    end
+    @redis ||= begin
+      Canvas::Redis.patch
+      settings = ConfigFile.load('redis').dup
+      settings['url'] = settings['servers'] if settings['servers']
+      ActiveSupport::Cache::RedisCacheStore.build_redis(**settings.to_h.symbolize_keys)
+    end
+  end
+
+  def self.redis_config
+    @redis_config ||= ConfigFile.load('redis')
+  end
+
+  def self.redis_enabled?
+    @redis_enabled ||= redis_config.present?
+  end
+
+  # technically this is just disconnect_redis, because new connections are created lazily,
+  # but I didn't want to rename it when there are several uses of it
+  def self.reconnect_redis
+    if Rails.cache &&
+      defined?(ActiveSupport::Cache::RedisCacheStore) &&
+      Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
+      Canvas::Redis.handle_redis_failure(nil, "none") do
+        redis = Rails.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:disconnect!)
+        else
+          redis.disconnect!
+        end
+      end
+    end
+
+    if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore)
+      Canvas::Redis.handle_redis_failure(nil, "none") do
+        redis = MultiCache.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:disconnect!)
+        else
+          redis.disconnect!
+        end
+      end
+    end
+
+    return unless @redis
+    # We're sharing redis connections between Canvas::Redis.redis and Rails.cache,
+    # so don't call reconnect on the cache too.
+    return if Rails.cache.respond_to?(:redis) && @redis == Rails.cache.redis
+    @redis = nil
+  end
+
   def self.clear_idle_connections
     # every 1 minute, clear connections that have been idle at least a minute
     clear_frequency = Setting.get("clear_idle_connections_frequency", 60).to_i
@@ -37,11 +92,12 @@ module Canvas::Redis
   # the lock is grabbed and `ttl` is given, it'll be set to expire after `ttl`
   # seconds.
   def self.lock(key, ttl = nil)
-    return true unless Canvas.redis_enabled?
+    return true unless Canvas::Redis.redis_enabled?
     full_key = lock_key(key)
-    if Canvas.redis.setnx(full_key, 1)
-      Canvas.redis.expire(full_key, ttl.to_i) if ttl
-      true else
+    if Canvas::Redis.redis.setnx(full_key, 1)
+      Canvas::Redis.redis.expire(full_key, ttl.to_i) if ttl
+      true
+    else
       # key is already used
       false
     end
@@ -50,7 +106,7 @@ module Canvas::Redis
   # unlock a previously grabbed Redis lock. This doesn't do anything to verify
   # that this process took the lock.
   def self.unlock(key)
-    Canvas.redis.del(lock_key(key))
+    Canvas::Redis.redis.del(lock_key(key))
     true
   end
 

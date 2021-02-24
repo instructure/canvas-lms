@@ -466,15 +466,15 @@ RSpec.configure do |config|
       super
     end
   end
-  Canvas.singleton_class.prepend(TrackRedisUsage)
-  Canvas.redis_used = true
+  Canvas::Redis.singleton_class.prepend(TrackRedisUsage)
+  Canvas::Redis.redis_used = true
 
   config.before :each do
-    if Canvas.redis_enabled? && Canvas.redis_used
+    if Canvas::Redis.redis_enabled? && Canvas::Redis.redis_used
       # yes, we really mean to run this dangerous redis command
-      GuardRail.activate(:deploy) { Canvas.redis.flushdb }
+      GuardRail.activate(:deploy) { Canvas::Redis.redis.flushdb }
     end
-    Canvas.redis_used = false
+    Canvas::Redis.redis_used = false
   end
 
   #****************************************************************
@@ -568,8 +568,8 @@ RSpec.configure do |config|
   def set_cache(new_cache)
     cache_opts = {}
     if new_cache == :redis_cache_store
-      if Canvas.redis_enabled?
-        cache_opts[:redis] = Canvas.redis
+      if Canvas::Redis.redis_enabled?
+        cache_opts[:redis] = Canvas::Redis.redis
       else
         skip "redis required"
       end
