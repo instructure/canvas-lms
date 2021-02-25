@@ -2585,18 +2585,18 @@ describe Course, "tabs_available" do
     end
 
     describe "with canvas_for_elementary feature on" do
-      let(:canvas_for_elem_flag){@course.account.feature_enabled?(:canvas_for_elementary)}
+      let(:canvas_for_elem_flag){@course.root_account.feature_enabled?(:canvas_for_elementary)}
       let(:is_homeroom) {@course.homeroom_course?}
 
       it 'hides most tabs for homeroom courses' do
         begin
-          @course.account.enable_feature!(:canvas_for_elementary)
+          @course.root_account.enable_feature!(:canvas_for_elementary)
           @course.homeroom_course = true
           @course.save!
           tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
           expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
         ensure
-          @course.account.set_feature_flag!(:canvas_for_elementary, :canvas_for_elem_flag ? 'on' : 'off')
+          @course.root_account.set_feature_flag!(:canvas_for_elementary, :canvas_for_elem_flag ? 'on' : 'off')
           @course.homeroom_course = is_homeroom
           @course.save!
         end
@@ -2615,7 +2615,7 @@ describe Course, "tabs_available" do
           }
         )
         @course.tab_configuration = [{:id => Course::TAB_ANNOUNCEMENTS}, {:id => 'context_external_tool_8'}]
-        @course.account.enable_feature!(:canvas_for_elementary)
+        @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.homeroom_course = true
         @course.save!
         tab_ids = @course.tabs_available(@user).map{|t| t[:id] }

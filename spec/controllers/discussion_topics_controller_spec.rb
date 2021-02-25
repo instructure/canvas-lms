@@ -788,14 +788,14 @@ describe DiscussionTopicsController do
     end
 
     context "in a homeroom course" do
-      let(:canvas_for_elem_flag){@course.account.feature_enabled?(:canvas_for_elementary)}
+      let(:canvas_for_elem_flag){@course.root_account.feature_enabled?(:canvas_for_elementary)}
 
       before(:each) do
-        @course.account.enable_feature!(:canvas_for_elementary)
+        @course.root_account.enable_feature!(:canvas_for_elementary)
       end
 
       after(:each) do
-        @course.account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
+        @course.root_account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
       end
 
       it "does not permit replies to assignments" do
@@ -803,7 +803,7 @@ describe DiscussionTopicsController do
         @course.save!
         user_session(@teacher)
         topic = Announcement.create!(context: @course, title: 'Test Announcement', message: 'hello world')
-        
+
         get 'show', params: {:course_id => @course.id, :id => topic.id}
         expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_REPLY]).to be_falsey
         expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_READ_REPLIES]).to be_falsey

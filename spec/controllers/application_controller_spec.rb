@@ -391,31 +391,32 @@ RSpec.describe ApplicationController do
 
     context "canvas for elementary" do
       let(:course) {create_course}
-      let(:canvas_for_elem_flag) {course.account.feature_enabled?(:canvas_for_elementary)}
+      let(:canvas_for_elem_flag) {course.root_account.feature_enabled?(:canvas_for_elementary)}
+
       before(:each) do
         controller.instance_variable_set(:@context, course)
         allow(controller).to receive('api_v1_course_ping_url').and_return({})
       end
 
       after(:each) do
-        course.account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
+        course.root_account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
       end
 
       describe "HOMEROOM_COURSE" do
         it "is true if course is a homeroom course and canvas_for_elementary flag is on" do
-          course.account.enable_feature!(:canvas_for_elementary)
+          course.root_account.enable_feature!(:canvas_for_elementary)
           course.homeroom_course = true
           expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
         end
 
         it "is false if course is a homeroom course and canvas_for_elementary flag is off" do
-          course.account.disable_feature!(:canvas_for_elementary)
+          course.root_account.disable_feature!(:canvas_for_elementary)
           course.homeroom_course = true
           expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsey
         end
 
         it "is false if course is not a homeroom course and canvas_for_elementary flag is on" do
-          course.account.enable_feature!(:canvas_for_elementary)
+          course.root_account.enable_feature!(:canvas_for_elementary)
           course.homeroom_course = false
           expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsey
         end

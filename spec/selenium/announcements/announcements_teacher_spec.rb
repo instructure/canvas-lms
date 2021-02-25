@@ -243,17 +243,17 @@ describe "announcements" do
     end
 
     context "in a homeroom course" do
-      let(:canvas_for_elem_flag) {@course.account.feature_enabled?(:canvas_for_elementary)}
+      let(:canvas_for_elem_flag) {@course.root_account.feature_enabled?(:canvas_for_elementary)}
       let(:is_homeroom) {@course.homeroom_course}
 
       before :each do
-        @course.account.enable_feature!(:canvas_for_elementary)
+        @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.homeroom_course = true
         @course.save!
       end
 
       after :each do
-        @course.account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
+        @course.root_account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
         @course.homeroom_course = is_homeroom
         @course.save!
       end
