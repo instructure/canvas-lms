@@ -3593,29 +3593,11 @@ class Assignment < ActiveRecord::Base
     # grading periods that have closed within a somewhat larger interval to
     # avoid "missing" a given period if the periodic job doesn't run for a while.
     now = Time.zone.now
-    newly_closed_grading_periods = GradingPeriod.active.joins(:grading_period_group).
-      where(close_date: 20.minutes.ago(now)..now).
-      where(grading_period_groups: {root_account: eligible_root_accounts})
-    return unless newly_closed_grading_periods.any?
-
-    earliest_start_date = newly_closed_grading_periods.pluck(:start_date).min
-    latest_end_date = newly_closed_grading_periods.pluck(:end_date).max
-    eligible_courses = Course.where(root_account: eligible_root_accounts)
-
-    due_at_range = earliest_start_date..latest_end_date
-    Assignment.find_ids_in_ranges do |min_id, max_id|
-      possible_assignments_scope = Assignment.active.
-        where(id: min_id..max_id, course: eligible_courses, post_to_sis: true)
-
-      assignment_ids_to_update = possible_assignments_scope.
-        where(due_at: due_at_range).
-        union(possible_assignments_scope.where("EXISTS (?)",
-          AssignmentOverride.active.
-            where("assignment_id = assignments.id").
-            where(set_type: "CourseSection", due_at_overridden: true, due_at: due_at_range))).
-        select(:id)
-
-      Assignment.where(id: assignment_ids_to_update).update_all(post_to_sis: false, updated_at: Time.zone.now)
+    look_back = Setting.get('disable_post_to_sis_on_grading_period', '60').to_i
+    GradingPeriod.active.joins(:grading_period_group).
+      where(close_date: look_back.minutes.ago(now)..now).
+      where(grading_period_groups: {root_account: eligible_root_accounts}).find_each do |gp|
+      gp.delay(singleton: "disable_post_to_sis_on_grading_period_#{gp.global_id}").disable_post_to_sis
     end
   end
 

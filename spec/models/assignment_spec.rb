@@ -9384,6 +9384,7 @@ describe Assignment do
           assignment.update!(due_at: 1.minute.after(newly_closed_grading_period.start_date))
           expect {
             Assignment.disable_post_to_sis_if_grading_period_closed
+            run_jobs
           }.to change { assignment.reload.post_to_sis }.from(true).to(false)
         end
 
@@ -9392,7 +9393,7 @@ describe Assignment do
           now = Time.zone.now
 
           Timecop.freeze(now) do
-            Assignment.disable_post_to_sis_if_grading_period_closed
+            newly_closed_grading_period.disable_post_to_sis
           end
           expect(assignment.reload.updated_at).to eq now
         end
@@ -9439,6 +9440,12 @@ describe Assignment do
       end
 
       context "with assignment overrides" do
+        it "calls disable_post_to_sis if the grading period is over" do
+          expect_any_instantiation_of(newly_closed_grading_period).to receive(:disable_post_to_sis)
+          Assignment.disable_post_to_sis_if_grading_period_closed
+          run_jobs
+        end
+
         it "sets post_to_sis to false if at least one section has a due date in the closed grading period" do
           course_section = course.course_sections.create!(name: "section")
           assignment.update!(due_at: 1.week.after(newly_closed_grading_period.end_date))
@@ -9449,7 +9456,7 @@ describe Assignment do
           )
 
           expect {
-            Assignment.disable_post_to_sis_if_grading_period_closed
+            newly_closed_grading_period.disable_post_to_sis
           }.to change { assignment.reload.post_to_sis }.from(true).to(false)
         end
 
