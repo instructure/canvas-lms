@@ -727,6 +727,13 @@ describe Message do
       expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
     end
 
+    it "doesnt break when there is an invalid avatar_image_url url" do
+      user.avatar_image_url = "An invalid url"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to be_nil
+    end
+
     describe 'author_account' do
       it 'is nil if there is no author' do
         expect(authorless_message.author_account).to be_nil
