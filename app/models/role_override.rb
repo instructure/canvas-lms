@@ -284,7 +284,7 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_user_observers => {
       :label => lambda { t('permissions.manage_user_observers', "Manage observers for users") },
-      :label_v2 => lambda { t("Users - add / remove observers") },
+      :label_v2 => lambda { t("Users - manage observers") },
       :account_only => :root,
       :true_for => %w(AccountAdmin),
       :available_to => %w(AccountAdmin AccountMembership),
