@@ -166,4 +166,32 @@ describe('CourseAvailabilityOptions', () => {
       getByLabelText('Restrict students from viewing course after term end date').checked
     ).toBeTruthy()
   })
+
+  describe('midnight warning', () => {
+    const warningText =
+      'Course participation is set to expire at midnight, so the previous day is the last day this course will be active.'
+
+    it('is not shown if end date is not set', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is not shown if end date is set to midday', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_conclude_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is shown if end date is set to midnight', () => {
+      const {getByText} = renderComponent(wrapper, {
+        course_conclude_at: moment('2020-10-16T00:00:00Z').toISOString(),
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      expect(getByText(warningText)).toBeInTheDocument()
+    })
+  })
 })
