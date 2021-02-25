@@ -77,13 +77,14 @@ class ContextModulesController < ApplicationController
       sequence_control = true # True by default
 
       if @context && @current_user && enrollment = StudentEnrollment.find_by(course_id: @context.id, user_id: @current_user.id)
-
         settings = SettingsService.get_enrollment_settings(id: enrollment.id)
         sequence_control = false if !settings["sequence_control"].nil? && settings["sequence_control"] == false
       end
 
+
       js_env :course_id => @context.id,
         :SEQUENCE_CONTROL => sequence_control,
+        :STUDENT_ONLY_MODULE_EXPANSION => SettingsService.get_settings(id: 1, object: 'school')["student_only_module_expansion"],
         :CONTEXT_URL_ROOT => polymorphic_path([@context]),
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
         :MODULE_FILE_DETAILS => module_file_details,
