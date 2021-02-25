@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,13 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module DataFixup::AddNewDefaultReport
-  def self.run(new_report)
-    PluginSetting.where(name: 'account_reports').find_each do |s|
-      next if s.disabled?
+class EnableEportfolioReport < ActiveRecord::Migration[6.0]
+  tag :postdeploy
 
-      s.settings[new_report] = true
-      s.save!
-    end
+  def up
+    DataFixup::AddNewDefaultReport.delay_if_production.run('eportfolio_report_csv')
   end
 end
