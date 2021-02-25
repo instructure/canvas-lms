@@ -73,7 +73,7 @@ x-mutagen:
           - "!/packages/translations/lib/*"
           - "!/gems/**/node_modules/"
           - "/gems/**/node_modules/*"
-          - "/packages/canvas-palnner/.babel-cache"
+          - "/packages/canvas-planner/.babel-cache"
           - "!/public/doc/api/"
           - "/public/doc/api/*"
           - "!/app/stylesheets/brandable_css_brands/"
