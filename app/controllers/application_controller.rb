@@ -2225,7 +2225,8 @@ class ApplicationController < ActionController::Base
   # Let's just not use the new math handling there.
   def use_new_math_equation_handling?
     Account.site_admin.feature_enabled?(:new_math_equation_handling) &&
-    !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit")
+    !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit") &&
+    params[:controller] != "question_banks"
   end
 
   def destroy_session
