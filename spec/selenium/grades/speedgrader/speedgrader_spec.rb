@@ -471,6 +471,18 @@ describe 'Speedgrader' do
           expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
         end
 
+        it 'relabels reassign button after reassigning' do
+          Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+          Speedgrader.add_comment_and_submit("commenting")
+          expect(Speedgrader.comments.last).to be_displayed
+
+          Speedgrader.click_reassignment_btn
+          wait_for_ajax_requests
+
+          expect(Speedgrader.reassignment_btn.text()).to eq 'Reassigned'
+        end
+
         it 'displays alert after reassigning' do
           Speedgrader.visit(@course.id, @assignment_for_course.id)
 
@@ -540,8 +552,66 @@ describe 'Speedgrader' do
             expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
             wrapper = ff('#reassign_assignment_wrapper')
             expect(wrapper[0].attribute('title')).to eq 'Assignment is reassigned.'
+            expect(Speedgrader.reassignment_btn.text()).to eq 'Reassigned'
           end
         end
+      end
+    end
+
+    context 'with limited attempt assignment' do
+      before do
+        @assignment_for_course = @course.assignments.create!(
+          title: 'Assignment A',
+          submission_types: 'online_text_entry,online_upload',
+          due_at: 2.years.from_now,
+          allowed_attempts: 2
+        )
+        @assignment_for_course.submit_homework(
+          @students.first, submission_type: 'online_text_entry', body: 'hello!'
+        )
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      after :each do
+        clear_local_storage
+      end
+
+      it 'allows reassignment after first attempt' do
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        Speedgrader.add_comment_and_submit("commenting")
+        expect(Speedgrader.comments.last).to be_displayed
+        expect(Speedgrader.right_pane).not_to contain_css("#reassign_assignment[disabled]")
+        expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment:visible")
+      end
+
+      it 'does not allow reassignment after second attempt' do
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        Speedgrader.add_comment_and_submit("commenting")
+        expect(Speedgrader.comments.last).to be_displayed
+
+        Speedgrader.click_reassignment_btn
+        wait_for_ajax_requests
+
+        @assignment_for_course.submit_homework(
+          @students.first, submission_type: 'online_text_entry', body: 'again!'
+        )
+
+        Speedgrader.visit(@course.id, @assignment_for_course.id)
+
+        expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
+        wrapper = ff('#reassign_assignment_wrapper')
+        expect(wrapper[0].attribute('title')).to eq 'Student has met maximum allowed attempts.'
+
+        # Adding a comment shouldn't enable the button
+        Speedgrader.add_comment_and_submit("commenting")
+        expect(Speedgrader.comments.last).to be_displayed
+
+        expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
       end
     end
 
