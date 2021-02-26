@@ -342,6 +342,18 @@ module Canvas::Security
 
 
   class << self
+    def services_encryption_secret
+      Canvas::DynamicSettings.find("canvas")["encryption-secret"]
+    end
+
+    def services_signing_secret
+      Canvas::DynamicSettings.find("canvas")["signing-secret"]
+    end
+
+    def services_previous_signing_secret
+      Canvas::DynamicSettings.find("canvas")["signing-secret-deprecated"]
+    end
+
     private
     def verify_jwt(body, ignore_expiration: false)
       verification_time = Time.now.utc
@@ -367,18 +379,6 @@ module Canvas::Security
 
     def timestamp_as_integer(timestamp)
       timestamp.is_a?(Time) ? timestamp.to_i : timestamp
-    end
-
-    def services_encryption_secret
-      Canvas::Security::ServicesJwt.encryption_secret
-    end
-
-    def services_signing_secret
-      Canvas::Security::ServicesJwt.signing_secret
-    end
-
-    def services_previous_signing_secret
-      Canvas::Security::ServicesJwt.previous_signing_secret
     end
   end
 end

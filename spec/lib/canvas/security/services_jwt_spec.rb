@@ -317,6 +317,11 @@ module Canvas::Security
         expect(ServicesJwt.previous_signing_secret).to eq(fake_deprecated_signing_secret)
       end
 
+      it "defers direct secrets access to the security module" do
+        allow(Canvas::Security).to receive(:services_encryption_secret).and_return("foo")
+        expect(ServicesJwt.encryption_secret).to eq("foo")
+      end
+
       describe "#wrapper_token" do
         it "can decode tokens built with either key" do
           user_id = 84
