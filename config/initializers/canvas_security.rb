@@ -14,5 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require 'canvas_security'
 
-Canvas::Security.validate_encryption_key(ENV['UPDATE_ENCRYPTION_KEY_HASH'])
+CanvasSecurity.settings_store = Setting
+CanvasSecurity.validate_encryption_key(ENV['UPDATE_ENCRYPTION_KEY_HASH'])

@@ -150,6 +150,7 @@ path 'gems' do
   gem 'canvas_mimetype_fu'
   gem 'canvas_quiz_statistics'
   gem 'canvas_sanitize'
+  gem 'canvas_security'
   gem 'canvas_slug'
   gem 'canvas_sort'
   gem 'canvas_stringex'

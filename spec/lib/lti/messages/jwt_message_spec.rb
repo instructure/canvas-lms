@@ -116,7 +116,7 @@ describe Lti::Messages::JwtMessage do
 
     it 'sets the "iss" to "https://canvas.instructure.com"' do
       config = "test:\n  lti_iss: 'https://canvas.instructure.com'"
-      allow(Canvas::Security).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
+      allow(CanvasSecurity).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
       expect(decoded_jwt['iss']).to eq 'https://canvas.instructure.com'
     end
 

@@ -56,7 +56,7 @@ describe "External Tools" do
     it "should include outcome service params when viewing as student" do
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
-      allow(Canvas::Security).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
+      allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
 

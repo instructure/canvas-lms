@@ -318,7 +318,7 @@ module Canvas::Security
       end
 
       it "defers direct secrets access to the security module" do
-        allow(Canvas::Security).to receive(:services_encryption_secret).and_return("foo")
+        allow(CanvasSecurity).to receive(:services_encryption_secret).and_return("foo")
         expect(ServicesJwt.encryption_secret).to eq("foo")
       end
 
