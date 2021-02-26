@@ -548,5 +548,15 @@ describe QuizzesHelper do
       expect(comment).to match(/MathML/)
       expect(comment).to match(/∐/)
     end
+
+    it 'does not add MathML if new math handling feature is active' do
+      def controller.use_new_math_equation_handling?
+        true
+      end
+      comment = comment_get({
+        foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
+      }, 'foo')
+      expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
+    end
   end
 end

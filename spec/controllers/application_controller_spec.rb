@@ -1930,6 +1930,36 @@ describe ApplicationController do
       end
     end
   end
+
+  describe "new math equation handling feature" do
+    let(:root_account) {Account.default}
+    
+    before(:each) do
+      controller.instance_variable_set(:@domain_root_account, root_account)
+    end
+
+    it "should put false in ENV when disabled at site_admin" do
+      Account.site_admin.disable_feature!(:new_math_equation_handling)
+      expect(@controller.use_new_math_equation_handling?).to be_falsey
+      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+    end
+
+    it "should put false in ENV when enabled at site_admin but disabled at the root account" do
+      Account.site_admin.enable_feature!(:new_math_equation_handling)
+      root_account.disable_feature!(:new_math_equation_handling)
+      expect(@controller.use_new_math_equation_handling?).to be_falsey
+      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+    end
+
+    it "should put true in ENV when enabled at site_admin and the root account" do
+      Account.site_admin.enable_feature!(:new_math_equation_handling)
+      root_account.enable_feature!(:new_math_equation_handling)
+      expect(@controller.use_new_math_equation_handling?).to be_truthy
+      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
+    end
+
+    
+  end
 end
 
 describe WikiPagesController do
