@@ -171,6 +171,7 @@ path 'gems' do
   gem 'lti_outbound'
   gem 'multipart'
   gem 'paginated_collection'
+  gem 'request_context'
   gem 'stringify_ids'
   gem 'twitter'
   gem 'utf8_cleaner'

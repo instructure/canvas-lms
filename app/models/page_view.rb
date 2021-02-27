@@ -54,7 +54,7 @@ class PageView < ActiveRecord::Base
       p.interaction_seconds = 5
       p.created_at = Time.now
       p.updated_at = Time.now
-      p.id = RequestContextGenerator.request_id
+      p.id = RequestContext::Generator.request_id
       p.export_columns.each do |c|
         v = p.send(c)
         if !v.nil? && v.respond_to?(:force_encoding)

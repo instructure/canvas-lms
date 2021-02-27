@@ -622,7 +622,7 @@ class ApplicationController < ActionController::Base
     Canvas::Apm.annotate_trace(
       Shard.current,
       @domain_root_account,
-      RequestContextGenerator.request_id,
+      RequestContext::Generator.request_id,
       @current_user
     )
   end
@@ -676,7 +676,7 @@ class ApplicationController < ActionController::Base
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     headers['Strict-Transport-Security'] = 'max-age=31536000' if request.ssl?
-    RequestContextGenerator.store_request_meta(request, @context)
+    RequestContext::Generator.store_request_meta(request, @context)
     true
   end
 
@@ -1444,7 +1444,7 @@ class ApplicationController < ActionController::Base
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
     return unless page_views_enabled?
 
-    RequestContextGenerator.store_interaction_seconds_update(
+    RequestContext::Generator.store_interaction_seconds_update(
       params[:page_view_token],
       updated_fields[:interaction_seconds]
     )
@@ -1495,7 +1495,7 @@ class ApplicationController < ActionController::Base
       @page_view.account_id = @domain_root_account.id
       @page_view.developer_key_id = @access_token.try(:developer_key_id)
       @page_view.store
-      RequestContextGenerator.store_page_view_meta(@page_view)
+      RequestContext::Generator.store_page_view_meta(@page_view)
     end
   end
 

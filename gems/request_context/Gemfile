@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+gemspec
+
+gem 'canvas_security', path: '../canvas_security'
+gem 'canvas_cache', path: '../canvas_cache'
+gem 'dynamic_settings', path: '../dynamic_settings'
+gem 'config_file', path: '../config_file'

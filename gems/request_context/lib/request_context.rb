@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: This class is being relocated to the request_context gem
-# in the gems directory, this shim will remain until all callsites
-# are transitioned.
-RequestContextGenerator = RequestContext::Generator
+require 'request_context/generator'
+require 'request_context/session'
+
+module RequestContext
+end

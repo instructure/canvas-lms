@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,9 +16,25 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-# TODO: This class is being relocated to the request_context gem
-# in the gems directory, this shim will remain until all callsites
-# are transitioned.
-RequestContextGenerator = RequestContext::Generator
+require 'spec_helper'
+
+describe "RequestContext::Session" do
+  it "should find the session_id from the rack session and add it a cookie" do
+    app_class = Class.new do
+      def config
+        self
+      end
+
+      def session_options
+        {}
+      end
+    end
+    Rails.application = app_class.new
+    env = { 'rack.session.options' => { id: 'abc' } }
+    _, headers, _ = RequestContext::Session.new(->(env) {
+      [200, {}, []]
+    }).call(env)
+    expect(env['action_dispatch.cookies']['log_session_id']).to eq 'abc'
+  end
+end
