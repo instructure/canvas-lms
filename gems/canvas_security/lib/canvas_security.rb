@@ -21,6 +21,7 @@
 require 'active_support/core_ext/module'
 require 'json/jwt'
 require 'dynamic_settings'
+require 'canvas_security/page_view_jwt'
 
 module CanvasSecurity
 

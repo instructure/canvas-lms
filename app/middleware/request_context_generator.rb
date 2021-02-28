@@ -17,6 +17,7 @@
 #
 
 require 'securerandom'
+require 'canvas_security'
 
 class RequestContextGenerator
   def initialize(app)
@@ -70,7 +71,7 @@ class RequestContextGenerator
   end
 
   def self.store_interaction_seconds_update(token, interaction_seconds)
-    data = PageView.decode_token(token)
+    data = CanvasSecurity::PageViewJwt.decode(token)
     if data
       self.add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
     end
