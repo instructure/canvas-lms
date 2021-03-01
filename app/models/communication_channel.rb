@@ -525,6 +525,11 @@ class CommunicationChannel < ActiveRecord::Base
   private :check_if_bouncing_changed
 
   def self.bounce_for_path(path:, timestamp:, details:, permanent_bounce:, suppression_bounce:)
+    # if there is a bounce on a channel that is associated to more than a few
+    # shards there is no reason to bother updating the channel with the bounce
+    # information, because its not a real user.
+    return if !permanent_bounce && CommunicationChannel.associated_shards(path).count > Setting.get("comm_channel_shard_count_too_high", '50').to_i
+
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
       CommunicationChannel.unretired.email.by_path(path).where("bounce_count<?", RETIRE_THRESHOLD).find_in_batches do |batch|
         update = if suppression_bounce
