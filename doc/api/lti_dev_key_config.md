@@ -114,7 +114,6 @@ also found in the placements sub-menu in the left-navigation of this documentati
 {  
    "title":"The Best Tool",
    "description":"1.3 Test Tool used for documentation purposes.",
-   "privacy_level":"public",
    "oidc_initiation_url":"https://your.oidc_initiation_url",
    "target_link_uri":"https://your.target_link_uri",
    "scopes":[
@@ -131,6 +130,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
             "icon_url":"https://some.icon.url/tool-level.png",
             "selection_height": 800,
             "selection_width": 800,
+            "privacy_level":"public",
             "placements":[  
                {  
                   "text":"User Navigation Placement",
@@ -223,30 +223,6 @@ also found in the placements sub-menu in the left-navigation of this documentati
 
       </td>
     </tr>    
-
-<!-- privacy_level -->  
-    <tr class="request-param ">
-      <td>privacy_level</td>
-      <td>
-
-        Required
-
-      </td>
-      <td>string</td>
-
-
-
-      <td class="param-desc">
-
-<p>What level of user information to send to the external tool.</p>
-
-
-        <p class="param-values">
-          <span class="allowed">Allowed values:</span> <code class="enum">anonymous</code>, <code class="enum">public</code>
-        </p>
-
-      </td>
-    </tr>
 
 <!-- oidc_initiation_url -->  
     <tr class="request-param ">
@@ -453,6 +429,30 @@ object for placement-specific target_link_uri's</p>
       <td class="param-desc">
 
 <p>The display width of the iframe. This may be ignored or overidden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
+
+<!-- privacy_level -->  
+    <tr class="request-param ">
+      <td>privacy_level</td>
+      <td>
+
+        Required
+
+      </td>
+      <td>string</td>
+
+
+
+      <td class="param-desc">
+
+<p>What level of user information to send to the external tool.</p>
+
+
+        <p class="param-values">
+          <span class="allowed">Allowed values:</span> <code class="enum">anonymous</code>, <code class="enum">public</code>
+        </p>
+
+      </td>
+    </tr>
 
 <!-- text -->          
       </td>
