@@ -114,8 +114,6 @@ describe SpeedGrader::Assignment do
         subject { @comments }
 
         before do
-          skip("flaky specs - unskip in EVAL-1133")
-
           json = SpeedGrader::Assignment.new(assignment, teacher).json
           student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
           @comments = student_a_submission.fetch(:submission_comments).map do |comment|
