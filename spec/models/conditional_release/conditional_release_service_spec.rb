@@ -22,6 +22,10 @@ require_relative '../../conditional_release_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConditionalRelease::Service do
+  before do
+    skip 'LS-1943 (03/01/2021)'
+  end
+
   Service = ConditionalRelease::Service
 
   def enable_service
@@ -30,7 +34,6 @@ describe ConditionalRelease::Service do
 
   context 'configuration' do
     it 'reports enabled as true when enabled' do
-      skip("LS-1943 -- something with env_for")
       context = Course.create!
       context.enable_feature!(:conditional_release)
       env = Service.env_for(context)
@@ -38,7 +41,6 @@ describe ConditionalRelease::Service do
     end
 
     it 'reports enabled as false if the context is an Account' do
-      skip("LS-1943 -- something with env_for")
       context = Account.create!
       context.enable_feature!(:conditional_release)
       env = Service.env_for(context)
@@ -46,7 +48,6 @@ describe ConditionalRelease::Service do
     end
 
     it 'reports enabled as false if feature flag is off' do
-      skip("LS-1943 -- something with env_for")
       context = Course.create!
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
@@ -61,26 +62,22 @@ describe ConditionalRelease::Service do
     end
 
     it 'returns no env if not enabled' do
-      skip("LS-1943 -- something with env_for")
       allow(Service).to receive(:enabled_in_context?).and_return(false)
       env = Service.env_for(@course, @student)
       expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
 
     it 'returns no env if user not specified' do
-      skip("LS-1943 -- something with env_for")
       env = Service.env_for(@course)
       expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
 
     it 'returns an env if everything enabled' do
-      skip("LS-1943 -- something with env_for")
       env = Service.env_for(@course, @student)
       expect(env[:CONDITIONAL_RELEASE_ENV][:stats_url]).to eq "/api/v1/courses/#{@course.id}/mastery_paths/stats"
     end
 
     it 'includes assignment data when an assignment is specified' do
-      skip("LS-1943 -- something with env_for")
       assignment_model course: @course
       env = Service.env_for(@course, @student, assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
@@ -92,7 +89,6 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a grading scheme when assignment uses it' do
-      skip("LS-1943 -- something with env_for")
       standard = grading_standard_for(@course)
       assignment_model course: @course, grading_type: 'letter_grade', grading_standard: standard
       env = Service.env_for(@course, @student, assignment: @assignment)
@@ -101,7 +97,6 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a default grading scheme even when the assignment does not use it' do
-      skip("LS-1943 -- something with env_for")
       standard = grading_standard_for(@course)
       assignment_model course: @course, grading_type: 'points'
       env = Service.env_for(@course, @student, assignment: @assignment)
@@ -110,7 +105,6 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a relevant rule if includes :rule' do
-      skip("LS-1943 -- something with env_for")
       assignment_model course: @course
       allow(Service).to receive(:rule_triggered_by).and_return(nil)
       env = Service.env_for(@course, @student, assignment: @assignment, includes: [:rule])
@@ -119,7 +113,6 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a active rules if includes :active_rules' do
-      skip("LS-1943 -- something with env_for")
       assignment_model course: @course
       allow(Service).to receive(:rule_triggered_by).and_return(nil)
       env = Service.env_for(@course, @student, assignment: @assignment, includes: [:active_rules])
@@ -176,7 +169,6 @@ describe ConditionalRelease::Service do
 
     context "rules_for" do
       it "should return no assignment set data for unreleased rules" do
-        skip("LS-1943 -- something with rules_for")
         data = Service.rules_for(@course, @student, nil)
         expect(data.count).to eq 1
         rule_hash = data.first
@@ -187,7 +179,6 @@ describe ConditionalRelease::Service do
       end
 
       it "should return data about released assignment sets" do
-        skip("LS-1943 -- something with rules_for")
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
         rule_hash = Service.rules_for(@course, @student, nil).first
         expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
@@ -200,7 +191,6 @@ describe ConditionalRelease::Service do
       end
 
       it "should return data about multiple assignment set choices" do
-        skip("LS-1943 -- something with rules_for")
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # has two choices now
         rule_hash = Service.rules_for(@course, @student, nil).first
         expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
@@ -214,21 +204,18 @@ describe ConditionalRelease::Service do
         specs_require_cache(:redis_cache_store)
 
         it "should cache" do
-          skip("LS-1943 -- something with rules_for")
           data = Service.rules_for(@course, @student, nil)
           @course.conditional_release_rules.update_all(:deleted_at => Time.now.utc) # skip callbacks
           expect(Service.rules_for(@course, @student, nil)).to eq data
         end
 
         it "should invalidate cache on rule change" do
-          skip("LS-1943 -- something with rules_for")
           data = Service.rules_for(@course, @student, nil)
           @rule.update_attribute(:deleted_at, Time.now.utc)
           expect(Service.rules_for(@course, @student, nil)).to eq []
         end
 
         it "should invalidate cache on submission change" do
-          skip("LS-1943 -- something with rules_for")
           data = Service.rules_for(@course, @student, nil)
           @trigger_assmt.grade_student(@student, grade: 8, grader: @teacher)
           expect(Service.rules_for(@course, @student, nil)).to_not eq data
