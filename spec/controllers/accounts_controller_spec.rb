@@ -500,46 +500,92 @@ describe AccountsController do
               @student.reload.dashboard_view(@subaccount)]).to match_array(Array.new(3, "planner"))
     end
 
-    describe "enable_as_k5_account" do
-      before :once do
-        @account = Account.create!
-        @user = account_admin_user(account: @account)
+    describe "k5 settings" do
+      def toggle_k5_params(account_id, enable)
+        {:id => account_id,
+         :account => {
+           :settings => {
+             :enable_as_k5_account => {
+               :value => enable
+             }
+           }
+         }}
       end
 
-      before :each do
-        user_session(@user)
+      describe "enable_as_k5_account setting" do
+        before :once do
+          @account = Account.create!
+          @user = account_admin_user(account: @account)
+        end
+
+        before :each do
+          user_session(@user)
+        end
+
+        it "should be locked once the setting is enabled" do
+          post 'update', params: toggle_k5_params(@account.id, true)
+          @account.reload
+          expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
+          expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
+        end
+
+        it "should be unlocked if the setting is disabled" do
+          @account.settings[:enable_as_k5_account] = {
+            value: true,
+            locked: true
+          }
+          post 'update', params: toggle_k5_params(@account.id, false)
+          @account.reload
+          expect(@account.settings[:enable_as_k5_account][:value]).to be_falsey
+          expect(@account.settings[:enable_as_k5_account][:locked]).to be_falsey
+        end
       end
 
-      it "should be locked once the setting is enabled" do
-        post 'update', params: {:id => @account.id,
-                                :account => {
-                                  :settings => {
-                                    :enable_as_k5_account => {
-                                      :value => true
-                                    }
-                                  }
-                                }}
-        @account.reload
-        expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
-        expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
-      end
+      describe "k5_accounts set on root account" do
+        before :once do
+          @root_account = Account.create!
+          @subaccount1 = @root_account.sub_accounts.create!
+          @subaccount2 = @subaccount1.sub_accounts.create!
+          @user = account_admin_user(account: @root_account)
+        end
 
-      it "should be unlocked if the setting is disabled" do
-        @account.settings[:enable_as_k5_account] = {
-          value: true,
-          locked: true
-        }
-        post 'update', params: {:id => @account.id,
-                                :account => {
-                                  :settings => {
-                                    :enable_as_k5_account => {
-                                      :value => false
-                                    }
-                                  }
-                                }}
-        @account.reload
-        expect(@account.settings[:enable_as_k5_account][:value]).to be_falsey
-        expect(@account.settings[:enable_as_k5_account][:locked]).to be_falsey
+        before :each do
+          user_session(@user)
+        end
+
+        it "is nil by default" do
+          expect(@root_account.settings[:k5_accounts]).to be_nil
+        end
+
+        it "contains root account id if k5 is enabled on root account" do
+          post 'update', params: toggle_k5_params(@root_account.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@root_account.id)
+        end
+
+        it "contains subaccount id (but not other ids) if k5 is enabled on subaccount" do
+          post 'update', params: toggle_k5_params(@subaccount2.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@subaccount2.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount1.id)
+        end
+
+        it "contains middle subaccount id (but not other ids) if k5 is enabled on middle subaccount" do
+          post 'update', params: toggle_k5_params(@subaccount1.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@subaccount1.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount2.id)
+        end
+
+        it "contains nothing once disabled" do
+          @root_account.settings[:k5_accounts] = [@root_account.id]
+          @root_account.save!
+          post 'update', params: toggle_k5_params(@root_account.id, false)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to be_empty
+        end
       end
     end
 

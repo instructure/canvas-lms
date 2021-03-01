@@ -474,7 +474,7 @@ class UsersController < ApplicationController
     clear_crumbs
 
     @show_footer = true
-    @k5_mode = @domain_root_account.feature_enabled?(:canvas_for_elementary)
+    @k5_mode = use_k5?
 
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
@@ -2976,5 +2976,13 @@ class UsersController < ApplicationController
     else
       raise "Error connecting to recaptcha #{response}"
     end
+  end
+
+  def use_k5?
+    k5_accounts = @domain_root_account.settings[:k5_accounts]
+    return false if k5_accounts.blank?
+
+    @domain_root_account.feature_enabled?(:canvas_for_elementary) &&
+      @current_user.user_account_associations.where(account_id: k5_accounts).exists?
   end
 end

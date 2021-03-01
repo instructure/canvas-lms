@@ -1017,11 +1017,18 @@ class AccountsController < ApplicationController
         remove_ip_filters = params[:account].delete(:remove_ip_filters)
         params[:account][:ip_filters] = [] if remove_ip_filters
 
-        # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
-        # This is important in determining whether k5 mode dashboard is shown to a user
         k5_settings = params.dig(:account, :settings, :enable_as_k5_account)
         unless k5_settings.nil?
-          params[:account][:settings][:enable_as_k5_account][:locked] = k5_settings[:value]
+          enable_as_k5 = value_to_boolean(k5_settings[:value])
+          # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
+          # This is important in determining whether k5 mode dashboard is shown to a user
+          params[:account][:settings][:enable_as_k5_account][:locked] = enable_as_k5
+          # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
+          k5_accounts = @account.root_account.settings[:k5_accounts] || []
+          k5_accounts = Set.new(k5_accounts)
+          enable_as_k5 ? k5_accounts.add(@account.id) : k5_accounts.delete(@account.id)
+          @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
+          @account.root_account.save!
         end
 
         # Set default Dashboard view
