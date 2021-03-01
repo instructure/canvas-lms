@@ -53,7 +53,7 @@ class CourseForMenuPresenter
       observee: observee,
       id: course.id,
       isFavorited: course.favorite_for_user?(@user),
-      isHomeroom: @context.root_account.feature_enabled?(:canvas_for_elementary) ? course.homeroom_course : false,
+      isHomeroom: course.homeroom_course,
       canManage: course.grants_right?(@user, :manage_content),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       position: position.present? ? position.to_i : nil

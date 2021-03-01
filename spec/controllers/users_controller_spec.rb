@@ -2447,22 +2447,32 @@ describe UsersController do
         @account = Account.default
       end
 
+      before(:each) do
+        course_with_student_logged_in(active_all: true)
+      end
+
       context "disabled" do
-        it "sets ENV.FEATURES.canvas_for_elementary to false" do
-          course_with_student_logged_in(active_all: true)
-          @current_user = @user
-          get 'user_dashboard'
-          expect(assigns[:js_env][:FEATURES][:canvas_for_elementary]).to be_falsy
+        context "and canvas for elementary setting disabled" do
+          it "only returns classic dashboard bundles" do
+            get 'user_dashboard'
+            expect(assigns[:js_bundles].flatten).to include :dashboard
+            expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+            expect(assigns[:css_bundles].flatten).to include :dashboard
+            expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+          end
         end
 
-        it "only returns classic dashboard bundles" do
-          course_with_student_logged_in(active_all: true)
-          @current_user = @user
-          get 'user_dashboard'
-          expect(assigns[:js_bundles].flatten).to include :dashboard
-          expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
-          expect(assigns[:css_bundles].flatten).to include :dashboard
-          expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+        context "and canvas for elementary setting enabled" do
+          it "only returns classic dashboard bundles" do
+            @current_user = @user
+            @account[:settings][:k5_accounts] = [@account.id]
+            @account.save!
+            get 'user_dashboard'
+            expect(assigns[:js_bundles].flatten).to include :dashboard
+            expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+            expect(assigns[:css_bundles].flatten).to include :dashboard
+            expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+          end
         end
       end
 
@@ -2471,24 +2481,29 @@ describe UsersController do
           @account.enable_feature!(:canvas_for_elementary)
         end
 
-        it "sets ENV.FEATURES.canvas_for_elementary to true when canvas_for_elementary flag is enabled" do
-          course_with_student_logged_in(active_all: true)
-          @current_user = @user
-          get 'user_dashboard'
-          expect(assigns[:js_env][:FEATURES][:canvas_for_elementary]).to be_truthy
+        context "and canvas for elementary setting disabled" do
+          it "only returns classic dashboard bundles" do
+            get 'user_dashboard'
+            expect(assigns[:js_bundles].flatten).to include :dashboard
+            expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+            expect(assigns[:css_bundles].flatten).to include :dashboard
+            expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+          end
         end
 
-        it "returns K-5 dashboard bundles" do
-          course_with_student_logged_in(active_all: true)
-          @current_user = @user
-          get 'user_dashboard'
-          expect(assigns[:js_bundles].flatten).to include :k5_dashboard
-          expect(assigns[:js_bundles].flatten).not_to include :dashboard
-          expect(assigns[:css_bundles].flatten).to include :k5_dashboard
-          expect(assigns[:css_bundles].flatten).not_to include :dashboard
+        context "and canvas for elementary setting enabled" do
+          it "returns K-5 dashboard bundles" do
+            @current_user = @user
+            @account[:settings][:k5_accounts] = [@account.id]
+            @account.save!
+            get 'user_dashboard'
+            expect(assigns[:js_bundles].flatten).to include :k5_dashboard
+            expect(assigns[:js_bundles].flatten).not_to include :dashboard
+            expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+            expect(assigns[:css_bundles].flatten).not_to include :dashboard
+          end
         end
       end
-
     end
   end
 

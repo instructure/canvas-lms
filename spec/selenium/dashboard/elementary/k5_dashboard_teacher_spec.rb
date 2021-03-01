@@ -19,13 +19,17 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
+require_relative '../../helpers/k5_common'
 
 describe "teacher k5 dashboard" do
   include_context "in-process server selenium tests"
   include K5PageObject
+  include K5Common
 
   before :each do
-    Account.default.enable_feature!(:canvas_for_elementary)
+    @account = Account.default
+    @account.enable_feature!(:canvas_for_elementary)
+    toggle_k5_setting(@account)
     @course_name = "K5 Course"
     course_with_teacher_logged_in(active_all: true, new_user: true, user_name: 'K5Teacher', course_name: @course_name)
   end
