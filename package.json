@@ -341,7 +341,7 @@
     "a11y-report": "./spec/jspec.sh --a11y",
     "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production --ignore-scripts && git checkout package.json && yarn install && git add yarn.lock",
     "upgrade-instructure-ui": "script/upgrade-instructure-ui",
-    "dedupe-yarn": "npx yarn-deduplicate",
+    "dedupe-yarn": "npx --yes yarn-deduplicate",
     "clean": "yarn workspace-run-serial clean",
     "storybook": "start-storybook -p 6006 --no-dll =s ../public/javascripts",
     "test-storybook": "yarn jest --roots .storybook --testMatch **/storybook.test.js"

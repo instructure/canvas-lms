@@ -42,6 +42,7 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v $BUNDLER_VERSION \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
+RUN npm install -g npm@latest && npm cache clean --force
 
 # We will need sfnt2woff in order to build fonts
 COPY --chown=docker:docker build/vendor/woff-code-latest.zip ./
