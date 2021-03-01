@@ -22,6 +22,7 @@
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
 <% lti_app_placements ||= [] %>
 <% module_dnd = !!@context.root_account.feature_enabled?(:module_dnd) %>
+<% new_quizzes_enabled = NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context) %>
 <% new_quizzes_modules_support_enabled = !!Account.site_admin.feature_enabled?(:new_quizzes_modules_support) %>
 <%
   newquizzes_engine_selected = @context.settings.dig(:engine_selected, :user_id, :newquizzes_engine_selected)
@@ -268,7 +269,7 @@
         <div class="new" style="margin-top: 5px;">
           <input type="hidden" name="quiz[quiz_type]" value="assignment" />
           <table>
-            <% if new_quizzes_modules_support_enabled %>
+            <% if new_quizzes_enabled && new_quizzes_modules_support_enabled %>
               <tr style="<%= newquizzes_engine_selected ? 'display: none;' : '' %>">
                 <td><%= before_label :quiz_engine, "Quiz Engine" %></td>
                 <td>
