@@ -331,14 +331,14 @@ module PostgreSQLAdapterExtensions
     else
       old_search_path = schema_search_path
       transaction(requires_new: true) do
-        begin
-          self.schema_search_path += ",#{schema}"
-          yield
-        ensure
-          # the transaction rolling back or committing will revert the search path change;
-          # we don't need to do another query to set it
-          @schema_search_path = old_search_path
-        end
+        self.schema_search_path += ",#{schema}"
+        yield
+        self.schema_search_path = old_search_path
+      rescue ActiveRecord::StatementInvalid, ActiveRecord::Rollback
+        # the transaction rolling back will revert the search path change;
+        # we don't need to do another query to set it
+        @schema_search_path = old_search_path
+        raise
       end
     end
   end
