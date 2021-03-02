@@ -19,6 +19,8 @@ group :development do
   gem 'letter_opener', '1.7.0'
   gem 'spring', '2.1.1'
   gem 'spring-commands-rspec', '1.0.4'
+  gem 'spring-commands-rubocop', '0.2.0'
+
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
