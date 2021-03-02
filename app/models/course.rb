@@ -226,6 +226,8 @@ class Course < ActiveRecord::Base
   has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
+  has_one :microsoft_sync_group, class_name: "MicrosoftSync::Group", dependent: :destroy, inverse_of: :course
+
   prepend Profile::Association
 
   before_save :assign_uuid
