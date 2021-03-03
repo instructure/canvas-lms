@@ -2885,6 +2885,32 @@ describe Submission do
       expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
     end
 
+    it 'is available when the plagiarism data shows vericite and there is an LTI 2 assignment configuration for something else' do
+      @submission.turnitin_data[:provider] = 'vericite'
+      AssignmentConfigurationToolLookup.create!(
+        assignment: @assignment,
+        tool_product_code: 'turnitin-lti',
+        tool_type: 'Lti::MessageHandler',
+        context_type: 'Account',
+        tool_resource_type_code: "code",
+        tool_vendor_code: 'turnitin.com'
+      )
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it 'is not available when the plagiarism data shows vericite and there is an LTI 2 assignment configuration for vericite' do
+      @submission.turnitin_data[:provider] = 'vericite'
+      AssignmentConfigurationToolLookup.create!(
+        assignment: @assignment,
+        tool_product_code: 'vericite',
+        tool_type: 'Lti::MessageHandler',
+        context_type: 'Account',
+        tool_resource_type_code: "code",
+        tool_vendor_code: 'vericite'
+      )
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
     it { expect(@submission).to be_grants_right(student, nil, :view_turnitin_report) }
 
     context 'when originality report visibility is after_grading' do

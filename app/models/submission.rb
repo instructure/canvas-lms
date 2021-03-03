@@ -525,7 +525,10 @@ class Submission < ActiveRecord::Base
       settings = assignment.vericite_settings
       type_can_peer_review = true
     else
-      return false unless self.turnitin_data[:provider].to_s != "vericite"
+      unless self.vericite_data_hash[:provider].to_s != "vericite" ||
+        AssignmentConfigurationToolLookup.where(assignment_id: self.assignment_id).where.not(tool_product_code: 'vericite').exists?
+        return false
+      end
       plagData = self.turnitin_data
       @submit_to_turnitin = false
       settings = assignment.turnitin_settings
