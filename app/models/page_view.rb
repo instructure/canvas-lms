@@ -163,7 +163,7 @@ class PageView < ActiveRecord::Base
     self.raise_on_error = Rails.env.test?
 
     on_error do |operation, record, exception|
-      Canvas::EventStreamLogger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
+      EventStream::Logger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
     end
   end
 

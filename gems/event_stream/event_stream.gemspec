@@ -4,9 +4,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "event_stream"
-  spec.version       = "0.0.1"
-  spec.authors       = ["Nick Cloward", "Mark Severson"]
-  spec.email         = ["ncloward@instructure.com", "markse@instructure.com"]
+  spec.version       = "0.1.0"
+  spec.authors       = ["Ethan Vizitei"]
+  spec.email         = ["evizitei@instructure.com"]
   spec.summary       = %q{Instructure event stream gem}
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)

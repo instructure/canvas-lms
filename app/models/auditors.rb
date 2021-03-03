@@ -25,12 +25,12 @@ module Auditors
         stream.raise_on_error = Rails.env.test?
 
         stream.on_insert do |record|
-          Canvas::EventStreamLogger.info('AUDITOR', identifier, 'insert', record.to_json)
+          EventStream::Logger.info('AUDITOR', identifier, 'insert', record.to_json)
         end
 
         stream.on_error do |operation, record, exception|
           next unless Auditors.configured?
-          Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
+          EventStream::Logger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
         end
       end
     end

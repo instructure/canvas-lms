@@ -16,9 +16,32 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require 'inst_statsd'
 
-module Canvas
-  module EventStreamLogger
+module EventStream
+  ##
+  # EventStream::Logger is a simple wrapper
+  # for a standard Rails.logger which structures
+  # log messages from EventStream operations to have some
+  # common structure and knows a few common message types
+  # to turn directly into statsd packages with a common
+  # namespace.
+  #
+  # If you want to use it in your event stream, you can add
+  # an invocation to your stream callbacks:
+  #
+  # EventStream::Stream.new do
+  #   stream.on_insert do |record|
+  #     EventStream::Logger.info('STREAM', identifier, 'insert', record.to_json)
+  #   end
+  #
+  #   stream.on_error do |operation, record, exception|
+  #     EventStream::Logger.error('STREAM', identifier, operation, record.to_json, exception.message.to_s)
+  #   end
+  # end
+  #
+  # TODO: Maybe make this happen automatically for any stream?^
+  module Logger
     def self.logger
       Rails.logger
     end
