@@ -182,12 +182,26 @@ it('will render the unavailable pizza tracker if there is a module prereq lock',
   expect(queryByTestId('unavailable-step-container')).toBeInTheDocument()
 })
 
-it('will render a New Attempt button if submitted and there are more attempts', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Submission: {...SubmissionMocks.submitted}
+describe('if submitted and there are more attempts', () => {
+  it('will render a New Attempt button if changes can be made to the submission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted}
+    })
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
   })
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
+
+  it('will not render a New Attempt button if changes cannot be made to the submission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted}
+    })
+    const {queryByTestId} = render(
+      <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+        <Header {...props} />
+      </StudentViewContext.Provider>
+    )
+    expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+  })
 })
 
 it('renders the attempt select', async () => {

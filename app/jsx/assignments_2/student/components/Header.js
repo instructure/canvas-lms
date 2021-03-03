@@ -114,6 +114,7 @@ class Header extends React.Component {
       (submission.state === 'graded' || submission.state === 'submitted') &&
       submission.gradingStatus !== 'excused' &&
       context.isLatestAttempt &&
+      context.allowChangesToSubmission &&
       (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
     )
   }

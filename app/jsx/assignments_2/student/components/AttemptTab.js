@@ -24,6 +24,7 @@ import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component, lazy, Suspense} from 'react'
+import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionChoiceSVG from '../SVG/SubmissionChoice.svg'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
@@ -175,27 +176,40 @@ export default class AttemptTab extends Component {
   }
 
   render() {
-    if (this.props.assignment.lockInfo.isLocked && this.props.submission.state === 'unsubmitted') {
-      return <LockedAssignment assignment={this.props.assignment} />
-    } else if (this.props.assignment.submissionTypes.length > 1) {
-      const submissionType = ['submitted', 'graded'].includes(this.props.submission.state)
-        ? getCurrentSubmissionType(this.props.submission)
-        : this.props.activeSubmissionType
-      return (
-        <div data-testid="attempt-tab">
-          {this.renderSubmissionTypeSelector()}
-          {this.submissionType !== null &&
-          this.props.assignment.submissionTypes.includes(submissionType)
-            ? this.renderByType(submissionType)
-            : this.renderUnselectedType()}
-        </div>
-      )
-    } else {
-      return (
-        <div data-testid="attempt-tab">
-          {this.renderByType(this.props.assignment.submissionTypes[0])}
-        </div>
-      )
+    const {assignment, submission} = this.props
+    if (assignment.lockInfo.isLocked && submission.state === 'unsubmitted') {
+      return <LockedAssignment assignment={assignment} />
     }
+
+    const submissionType = ['submitted', 'graded'].includes(submission.state)
+      ? getCurrentSubmissionType(submission)
+      : this.props.activeSubmissionType
+
+    const multipleSubmissionTypes = assignment.submissionTypes.length > 1
+
+    let selectedType
+    if (multipleSubmissionTypes) {
+      if (submissionType != null && assignment.submissionTypes.includes(submissionType)) {
+        selectedType = submissionType
+      }
+    } else {
+      selectedType = assignment.submissionTypes[0]
+    }
+
+    return (
+      <StudentViewContext.Consumer>
+        {context => (
+          <div data-testid="attempt-tab">
+            {multipleSubmissionTypes &&
+              context.allowChangesToSubmission &&
+              this.renderSubmissionTypeSelector()}
+
+            {selectedType != null
+              ? this.renderByType(selectedType)
+              : context.allowChangesToSubmission && this.renderUnselectedType()}
+          </div>
+        )}
+      </StudentViewContext.Consumer>
+    )
   }
 }

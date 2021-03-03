@@ -94,6 +94,7 @@ describe('ViewManager', () => {
       context_asset_string: 'test_1',
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
+      enrollment_state: 'active',
       PREREQS: {}
     }
   })
@@ -184,6 +185,18 @@ describe('ViewManager', () => {
 
       it('is not displayed if you are not on the latest submission attempt', async () => {
         const props = await makeProps({currentAttempt: 3, numSubmissionHistories: 4})
+        const {queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
+      })
+
+      it('is not displayed if the enrollment state is something other than active', async () => {
+        window.ENV.enrollment_state = 'completed'
+
+        const props = await makeProps({currentAttempt: 1})
         const {queryByText} = render(
           <MockedProvider>
             <ViewManager {...props} />

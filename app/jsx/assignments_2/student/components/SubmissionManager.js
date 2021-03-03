@@ -442,7 +442,7 @@ export default class SubmissionManager extends Component {
       <>
         {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
         <StudentViewContext.Consumer>
-          {context => this.renderActions(context)}
+          {context => context.allowChangesToSubmission && this.renderActions(context)}
         </StudentViewContext.Consumer>
         {this.state.showConfetti ? <Confetti /> : null}
       </>
