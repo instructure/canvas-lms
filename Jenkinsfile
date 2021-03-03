@@ -20,6 +20,8 @@
 import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
+def BLUE_OCEAN_TESTS_TAB = "display/redirect?page=tests"
+
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
   string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
@@ -114,9 +116,7 @@ def postFn(status) {
         'requestTime': requestEndTime - requestStartTime,
       ])
 
-      failureReport.publishReportFromArtifacts('Rspec Test Failures', 'rspec')
-      failureReport.publishReportFromArtifacts('Selenium Test Failures', 'selenium')
-      failureReport.submit()
+      buildSummaryReport.publishReport('Build Summary Report', status)
 
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
@@ -392,7 +392,7 @@ pipeline {
           // wait for the current steps to complete (even wait to spin up a node), causing
           // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
           protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
-            timedStage('Setup') {
+            buildSummaryReport.timedStageAndReportIfFailure('Setup') {
               timeout(time: 2) {
                 echo "Cleaning Workspace From Previous Runs"
                 sh 'ls -A1 | xargs rm -rf'
@@ -452,7 +452,7 @@ pipeline {
             }
 
             if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
-              timedStage('Rebase') {
+              buildSummaryReport.timedStageAndReportIfFailure('Rebase') {
                 timeout(time: 2) {
                   rebaseHelper(GERRIT_BRANCH)
                   if ( GERRIT_BRANCH ==~ /dev\/.*/ ) {
@@ -466,7 +466,7 @@ pipeline {
               }
             }
 
-            timedStage('Build Docker Image') {
+            buildSummaryReport.timedStageAndReportIfFailure('Build Docker Image') {
               timeout(time: 20) {
                 if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
@@ -533,7 +533,7 @@ pipeline {
               }
             }
 
-            timedStage('Run Migrations') {
+            buildSummaryReport.timedStageAndReportIfFailure('Run Migrations') {
               timeout(time: 10) {
                 def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
                 def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
@@ -610,7 +610,7 @@ pipeline {
 
                 if (!configuration.isChangeMerged()) {
                   echo 'adding Linters'
-                  timedStage('Linters', stages, {
+                  buildSummaryReport.timedStageAndReportIfFailure('Linters', stages, {
                     credentials.withGerritCredentials {
                       withEnv([
                         "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
@@ -629,13 +629,13 @@ pipeline {
                 }
 
                 echo 'adding Consumer Smoke Test'
-                timedStage('Consumer Smoke Test', stages, {
+                buildSummaryReport.timedStageAndReportIfFailure('Consumer Smoke Test', stages, {
                   sh 'build/new-jenkins/consumer-smoke-test.sh'
                 })
 
                 echo 'adding Vendored Gems'
                 timedStage('Vendored Gems', stages, {
-                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
+                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
@@ -644,7 +644,7 @@ pipeline {
 
                 def jsReady = null
 
-                timedStage('Javascript (Build Image)', stages, {
+                buildSummaryReport.timedStageAndReportIfFailure('Javascript (Build Image)', stages, {
                   try {
                     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
@@ -694,10 +694,10 @@ pipeline {
                     error "image dependency failed to build"
                   }
 
-                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                  buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                     string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     string(name: 'TEST_SUITE', value: "jest"),
-                  ], true, "testReport")
+                  ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Jest)")
                 })
 
                 echo 'adding Javascript (Coffeescript)'
@@ -708,10 +708,10 @@ pipeline {
                     error "image dependency failed to build"
                   }
 
-                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                  buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                     string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     string(name: 'TEST_SUITE', value: "coffee"),
-                  ], true, "testReport")
+                  ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Coffeescript)")
                 })
 
                 echo 'adding Javascript (Karma)'
@@ -722,15 +722,15 @@ pipeline {
                     error "image dependency failed to build"
                   }
 
-                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                  buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                     string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     string(name: 'TEST_SUITE', value: "karma"),
-                  ], true, "testReport")
+                  ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Karma)")
                 })
 
                 echo 'adding Contract Tests'
                 timedStage('Contract Tests', stages, {
-                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
+                  buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                     string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
@@ -740,7 +740,7 @@ pipeline {
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                   echo 'adding CDC Schema check'
                   timedStage('CDC Schema Check', stages, {
-                    failureReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
+                    buildSummaryReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
                       string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
                     ])
                   })
@@ -758,7 +758,7 @@ pipeline {
                 ) {
                   echo 'adding Flakey Spec Catcher'
                   timedStage('Flakey Spec Catcher', stages, {
-                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
+                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
@@ -775,12 +775,12 @@ pipeline {
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
                   timedStage('Local Docker Dev Build', stages, {
-                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters)
+                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters)
                   })
                 }
 
                 if(configuration.isChangeMerged()) {
-                  timedStage('Dependency Check', stages, {
+                  buildSummaryReport.timedStageAndReportIfFailure('Dependency Check', stages, {
                     catchError (buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                       try {
                         snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")

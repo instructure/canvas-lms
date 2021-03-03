@@ -121,9 +121,9 @@ pipeline {
     always {
       script {
         ignoreBuildNeverStartedError {
-          failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
-          failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
-          failureReport.submit()
+          node('master') {
+            buildSummaryReport.publishReport('Build Summary Report', currentBuild.getResult() == 'SUCCESS' ? 'SUCCESS' : 'FAILURE')
+          }
         }
       }
     }
