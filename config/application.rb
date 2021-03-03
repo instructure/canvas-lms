@@ -137,7 +137,11 @@ module CanvasRails
             begin
               conn_params[:host] = host
               return super(conn_params)
-            rescue ::PG::Error
+              # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+              # for an error where the database name is in the message (i.e. a hostname lookup failure)
+              # CANVAS_RAILS6_0 rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
+              # for any other error
+            rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
               raise if index == hosts.length - 1
               # else try next host
             end
