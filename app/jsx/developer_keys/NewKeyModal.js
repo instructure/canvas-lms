@@ -156,7 +156,7 @@ export default class DeveloperKeyModal extends React.Component {
       actions
     } = this.props
     const developer_key = {...this.developerKey}
-    if (!this.hasRedirectUris) {
+    if (!this.hasRedirectUris && !this.isUrlConfig) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
       this.setState({submitted: true})
       return
@@ -218,6 +218,8 @@ export default class DeveloperKeyModal extends React.Component {
     } else {
       this.setState({toolConfiguration: update})
     }
+
+    this.updateDeveloperKey('redirect_uris', update.target_link_uri || '')
   }
 
   updateDeveloperKey = (field, update) => {
@@ -280,7 +282,7 @@ export default class DeveloperKeyModal extends React.Component {
                 editing={editing}
                 showRequiredMessages={this.state.submitted}
                 showMissingRedirectUrisMessage={
-                  this.state.submitted && isLtiKey && !this.hasRedirectUris
+                  this.state.submitted && isLtiKey && !this.hasRedirectUris && !this.isUrlConfig
                 }
                 updateToolConfiguration={this.updateToolConfiguration}
                 updateDeveloperKey={this.updateDeveloperKey}
@@ -289,6 +291,7 @@ export default class DeveloperKeyModal extends React.Component {
                 configurationMethod={this.state.configurationMethod}
                 updateConfigurationMethod={this.updateConfigurationMethod}
                 isLtiKey={isLtiKey}
+                isRedirectUriRequired={isLtiKey && !this.isUrlConfig}
               />
             )}
           </Modal.Body>

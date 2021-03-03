@@ -24,7 +24,7 @@ class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
     def find_target
       DeveloperKey.find_cached(owner._read_attribute(reflection.foreign_key))
-    end  
+    end
   end
 
   include CustomValidations
@@ -120,7 +120,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def validate_redirect_uris
-    uris = redirect_uris.map do |value|
+    uris = redirect_uris&.map do |value|
       value, _ = CanvasHttp.validate_url(value, allowed_schemes: nil)
       value
     end
