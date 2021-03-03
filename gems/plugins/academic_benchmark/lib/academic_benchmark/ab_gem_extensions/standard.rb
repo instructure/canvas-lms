@@ -35,7 +35,9 @@ module AcademicBenchmarks
           is_global_standard: true,
           description: description
         }
-        if has_children?
+        # .all? returns true for [], so check has_children? too
+        all_clarification = has_children? && children.all?(&:clarification?)
+        if has_children? && !all_clarification
           # create outcome group
           hash[:type] = 'learning_outcome_group'
           hash[:title] = build_title
@@ -44,6 +46,8 @@ module AcademicBenchmarks
           # create outcome
           hash[:type] = 'learning_outcome'
           hash[:title] = build_num_title
+          # include clarifications with parent standard
+          hash[:description] = [description, *children.map(&:description)].join(' ') if all_clarification
           set_default_ratings(hash, ratings)
         end
         hash
@@ -86,6 +90,10 @@ module AcademicBenchmarks
         # get the first 50 chars of description in a utf-8 friendly way
         d = text
         d && d[/.{0,50}/u]
+      end
+
+      def clarification?
+        'clarification'.in?(utilizations.map(&:type))
       end
 
       private

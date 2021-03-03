@@ -233,6 +233,25 @@ describe AcademicBenchmark::Converter do
           expect(publication["outcomes"][0]['title']).to eq 'Social Studies'
         end
       end
+
+      context 'clarification standards' do
+        let(:standard_instance2) do
+          dup_hash = raw_standard2.dup
+          dup_hash['attributes']['utilizations'] = [{"type"=>"clarification"}]
+          AcademicBenchmarks::Standards::Standard.new(dup_hash)
+        end
+
+        it 'appends the description to the parent standard and treats the parent as an outcome' do
+          expect(course = converter.export).to be_truthy
+          authority = course["learning_outcomes"].first
+          publication = authority["outcomes"].first
+          group1 = publication["outcomes"].first
+          group11 = group1["outcomes"].first
+          group111 = group11["outcomes"].first
+          expect(group111["type"]).to eq "learning_outcome"
+          expect(group111["description"]).to match(/and Yorktown. Locating/)
+        end
+      end
     end
   end
 end
