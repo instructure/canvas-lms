@@ -202,7 +202,11 @@ function calculateWithGradingPeriods(
   }
 
   const allAssignmentGroupGrades = _.map(assignmentGroups, assignmentGroup =>
-    AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+    AssignmentGroupGradeCalculator.calculate(
+      submissions,
+      assignmentGroup,
+      options.ignoreUnpostedAnonymous
+    )
   )
 
   return {
