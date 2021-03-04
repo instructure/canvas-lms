@@ -712,7 +712,7 @@ RSpec.describe ApplicationController do
       allow(controller.request).to receive(:xhr?).and_return(0)
       allow(controller.request).to receive(:put?).and_return(true)
       allow(RequestContextGenerator).to receive(:store_interaction_seconds_update).and_return(true)
-      allow(PageView).to receive(:decode_token).and_return(page_view_info)
+      allow(CanvasSecurity::PageViewJwt).to receive(:decode).and_return(page_view_info)
       allow(PageView).to receive(:find_for_update).and_return(page_view)
       expect {controller.send(:add_interaction_seconds)}.not_to raise_error
     end
