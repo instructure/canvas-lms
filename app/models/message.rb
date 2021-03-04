@@ -283,9 +283,16 @@ class Message < ActiveRecord::Base
 
   def author_avatar_url
     url = author.try(:avatar_url)
-    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
-  rescue URI::InvalidURIError
-    nil
+    # The User model currently supports storing either a path or full
+    # URL for an avatar. Because of this, alternatives to URI.encode
+    # such as CGI.escape end up escaping too much for full URLs. In
+    # order to escape just the path, we'd need to utilize URI.parse
+    # which can't handle URLs with spaces. As that is the root cause
+    # of this change, we'll just use the deprecated URI.encode method.
+    #
+    # rubocop:disable Lint/UriEscapeUnescape
+    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", URI.encode(url)).to_s if url
+    # rubocop:enable Lint/UriEscapeUnescape
   end
 
   def author_short_name
