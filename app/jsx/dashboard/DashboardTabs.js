@@ -100,7 +100,11 @@ const DashboardTabs = ({currentTab, name, onRequestTabChange, tabsRef}) => {
         <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="0 0 small 0">
           {I18n.t('Welcome, %{name}!', {name})}
         </Heading>
-        <Tabs elementRef={tabsRef} onRequestTabChange={onRequestTabChange} tabOverflow="scroll">
+        <Tabs
+          elementRef={tabsRef}
+          onRequestTabChange={onRequestTabChange}
+          theme={{tabVerticalOffset: '0'}}
+        >
           {Object.keys(TABS).map(id => (
             <Tabs.Panel
               id={id}

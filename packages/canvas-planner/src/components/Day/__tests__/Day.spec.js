@@ -27,27 +27,30 @@ it('renders the base component with required props', () => {
   expect(wrapper).toMatchSnapshot()
 })
 
-it('renders the friendly name in large text when it is today', () => {
+it('renders the friendly name in large text and rest of the date on a second line when it is today', () => {
   const today = moment()
-
   const wrapper = shallow(<Day timeZone="America/Denver" day={today.format('YYYY-MM-DD')} />)
-  expect(
-    wrapper
-      .find('Text')
-      .first()
-      .props().size
-  ).toEqual('large')
+  const friendlyName = wrapper.find('Heading').first().childAt(0)
+  const fullDate = wrapper.find('Heading').first().childAt(1)
+
+  expect(friendlyName.props().size).toBe('large')
+  expect(fullDate.text()).toBe(today.format('MMMM D'))
 })
 
-it('renders the friendlyName in medium text when it is not today', () => {
-  const yesterday = moment().add(1, 'days')
+it('renders the full date with friendly name on one line when it is not today', () => {
+  const yesterday = moment().subtract(1, 'days')
   const wrapper = shallow(<Day timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} />)
-  expect(
-    wrapper
-      .find('Text')
-      .first()
-      .props().size
-  ).toEqual('medium')
+  const fullDate = wrapper.find('Heading').first().childAt(0)
+
+  expect(fullDate.text()).toBe(`Yesterday, ${yesterday.format('MMMM D')}`)
+})
+
+it('only renders the year when the date is not in the current year', () => {
+  const lastYear = moment().subtract(1, 'year')
+  const wrapper = shallow(<Day timeZone="America/Denver" day={lastYear.format('YYYY-MM-DD')} />)
+  const fullDate = wrapper.find('Heading').first().childAt(0)
+
+  expect(fullDate.text()).toBe(lastYear.format('dddd, MMMM D, YYYY'))
 })
 
 it('renders grouping correctly when having itemsForDay', () => {

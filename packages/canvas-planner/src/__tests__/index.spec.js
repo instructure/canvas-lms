@@ -32,7 +32,8 @@ function defaultPlannerOptions() {
       },
       PREFERENCES: {
         custom_colors: {}
-      }
+      },
+      K5_MODE: false
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
@@ -67,8 +68,8 @@ describe('with mock api', () => {
   })
 
   describe('initializePlanner', () => {
-    it('cannot be called twice', () => {
-      initializePlanner(defaultPlannerOptions())
+    it('cannot be called twice', async () => {
+      await initializePlanner(defaultPlannerOptions())
       return expect(initializePlanner(defaultPlannerOptions())).rejects.toBeDefined()
     })
 

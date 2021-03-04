@@ -19,7 +19,7 @@ import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
 import classnames from 'classnames'
 import {partition} from 'lodash'
-import {arrayOf, string, number, shape, func} from 'prop-types'
+import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import styles from './styles.css'
@@ -50,13 +50,15 @@ export class Grouping extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     currentUser: shape(userShape),
-    responsiveSize: sizeShape
+    responsiveSize: sizeShape,
+    simplifiedControls: bool
   }
 
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-    responsiveSize: 'large'
+    responsiveSize: 'large',
+    simplifiedControls: false
   }
 
   constructor(props) {
@@ -148,9 +150,6 @@ export class Grouping extends Component {
     return items.map((item, itemIndex) => (
       <li className={styles.item} key={item.uniqueId}>
         <PlannerItem
-          theme={{
-            iconColor: this.props.color
-          }}
           color={this.props.color}
           completed={item.completed}
           overrideId={item.overrideId}
@@ -180,6 +179,7 @@ export class Grouping extends Component {
           endTime={item.endTime}
           dateStyle={item.dateStyle}
           timeZone={this.props.timeZone}
+          simplifiedControls={this.props.simplifiedControls}
         />
       </li>
     ))
@@ -216,7 +216,7 @@ export class Grouping extends Component {
             animatableItemIds={completedItemIds}
             notificationBadge={notificationBadge}
             theme={{
-              labelColor: this.props.color
+              labelColor: this.props.simplifiedControls ? undefined : this.props.color
             }}
             date={theDay}
             responsiveSize={this.props.responsiveSize}
@@ -233,7 +233,7 @@ export class Grouping extends Component {
 
   renderNotificationBadge() {
     // narrower layout puts the indicator next to the actual items
-    if (this.getLayout() !== 'large') {
+    if (this.getLayout() !== 'large' || this.props.simplifiedControls) {
       return null
     }
 
@@ -312,5 +312,7 @@ export class Grouping extends Component {
 }
 
 const ResponsiveGrouping = responsiviser()(Grouping)
-
-export default animatable(themeable(theme, styles)(ResponsiveGrouping))
+const ThemeableGrouping = themeable(theme, styles)(ResponsiveGrouping)
+const AnimatableGrouping = animatable(ThemeableGrouping)
+AnimatableGrouping.theme = ThemeableGrouping.theme
+export default AnimatableGrouping

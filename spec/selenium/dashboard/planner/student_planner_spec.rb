@@ -491,19 +491,22 @@ describe "student planner" do
     end
 
     it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
-      wait_for_spinner
       expect(items_displayed.count).to eq 1
       expect(scroll_height).to eq 0
 
       new_activity_button.click
       wait_for_spinner
-      expect(items_displayed.count).to eq 4
-      expect{scroll_height}.to become_between 600, 620  # 609
+      expect(items_displayed.count).to eq 5
 
+      next_item_y = item_top_position(1)
       new_activity_button.click
-      wait_for_animations
-      expect{scroll_height}.to become_between 450, 470  # 457
+      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
+
+      next_item_y = item_top_position(0)
+      new_activity_button.click
+      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
