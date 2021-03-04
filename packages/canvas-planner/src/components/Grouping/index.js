@@ -131,6 +131,10 @@ export class Grouping extends Component {
     return this.props.responsiveSize
   }
 
+  showNotificationBadgeOnItem() {
+    return this.getLayout() !== 'large' && !this.props.simplifiedControls
+  }
+
   renderItemsAndFacade(items) {
     const [completedItems, otherItems] = partition(items, item => item.completed && !item.show)
     let itemsToRender = otherItems
@@ -146,7 +150,6 @@ export class Grouping extends Component {
   }
 
   renderItems(items) {
-    const showNotificationBadgeOnItem = this.getLayout() !== 'large'
     return items.map((item, itemIndex) => (
       <li className={styles.item} key={item.uniqueId}>
         <PlannerItem
@@ -171,7 +174,7 @@ export class Grouping extends Component {
           status={item.status}
           newActivity={item.newActivity}
           allDay={item.allDay}
-          showNotificationBadge={showNotificationBadgeOnItem}
+          showNotificationBadge={this.showNotificationBadgeOnItem()}
           currentUser={this.props.currentUser}
           feedback={item.feedback}
           location={item.location}
@@ -186,7 +189,6 @@ export class Grouping extends Component {
   }
 
   renderFacade(completedItems, animatableIndex) {
-    const showNotificationBadgeOnItem = this.getLayout() !== 'large'
     if (!this.state.showCompletedItems && completedItems.length > 0) {
       const theDay = completedItems[0].date.clone()
       theDay.startOf('day')
@@ -198,7 +200,7 @@ export class Grouping extends Component {
         return item.uniqueId
       })
       let notificationBadge = 'none'
-      if (showNotificationBadgeOnItem) {
+      if (this.showNotificationBadgeOnItem()) {
         if (newActivity) {
           notificationBadge = 'newActivity'
         } else if (missing) {

@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useEffect, useRef, useState} from 'react'
-import {Provider} from 'react-redux'
+import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import {initializePlanner, responsiviser, store} from '@instructure/canvas-planner'
+import {
+  startLoadingAllOpportunities,
+  initializePlanner,
+  responsiviser,
+  store
+} from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
 
@@ -28,10 +33,12 @@ import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardTabs, {TAB_IDS} from './DashboardTabs'
 import GradesPage from './pages/GradesPage'
 import HomeroomPage from './pages/HomeroomPage'
+import K5DashboardContext from './K5DashboardContext'
 import loadCardDashboard from '../bundles/dashboard_card'
+import {mapStateToProps} from './redux-helpers'
 import {showFlashAlert, showFlashError} from '../shared/FlashAlert'
-import SchedulePage from 'jsx/dashboard/pages/SchedulePage'
-import ResourcesPage from 'jsx/dashboard/pages/ResourcesPage'
+import SchedulePage from './pages/SchedulePage'
+import ResourcesPage from './pages/ResourcesPage'
 import {theme} from './k5-theme'
 
 const getInitialTab = defaultTab => {
@@ -45,8 +52,11 @@ const getInitialTab = defaultTab => {
 }
 
 export const K5Dashboard = ({
+  assignmentsDueToday,
+  assignmentsMissing,
   currentUser: {display_name},
   env,
+  loadAllOpportunities,
   defaultTab = 'tab-homeroom',
   plannerEnabled = false,
   responsiveSize = 'large'
@@ -73,6 +83,7 @@ export const K5Dashboard = ({
 
   useEffect(() => {
     if (plannerEnabled) {
+      loadAllOpportunities()
       initializePlanner({
         getActiveApp: () => (activeTab.current === TAB_IDS.SCHEDULE ? 'planner' : ''),
         flashError: message => showFlashAlert({message, type: 'error'}),
@@ -115,42 +126,55 @@ export const K5Dashboard = ({
   }
 
   return (
-    <ApplyTheme theme={theme}>
-      <Provider store={store}>
-        <View as="section">
-          <DashboardTabs
-            currentTab={currentTab}
-            name={display_name}
-            onRequestTabChange={(_, {id}) => handleRequestTabChange(id)}
-            tabsRef={setTabsRef}
+    <View as="section">
+      <K5DashboardContext.Provider
+        value={{assignmentsDueToday, assignmentsMissing, isStudent: plannerEnabled, responsiveSize}}
+      >
+        <DashboardTabs
+          currentTab={currentTab}
+          name={display_name}
+          onRequestTabChange={(_, {id}) => handleRequestTabChange(id)}
+          tabsRef={setTabsRef}
+        />
+        {cards && (
+          <HomeroomPage
+            cards={cards}
+            isStudent={plannerEnabled}
+            requestTabChange={handleRequestTabChange}
+            responsiveSize={responsiveSize}
+            visible={currentTab === TAB_IDS.HOMEROOM}
           />
-          {cards && (
-            <HomeroomPage
-              cards={cards}
-              isStudent={plannerEnabled}
-              requestTabChange={handleRequestTabChange}
-              responsiveSize={responsiveSize}
-              visible={currentTab === TAB_IDS.HOMEROOM}
-            />
-          )}
-          {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
-          <GradesPage visible={currentTab === TAB_IDS.GRADES} />
-          {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
-        </View>
-      </Provider>
-    </ApplyTheme>
+        )}
+        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
+        <GradesPage visible={currentTab === TAB_IDS.GRADES} />
+        {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
+      </K5DashboardContext.Provider>
+    </View>
   )
 }
 
 K5Dashboard.displayName = 'K5Dashboard'
 K5Dashboard.propTypes = {
+  assignmentsDueToday: PropTypes.object.isRequired,
+  assignmentsMissing: PropTypes.object.isRequired,
   currentUser: PropTypes.shape({
     display_name: PropTypes.string
   }).isRequired,
   env: PropTypes.object.isRequired,
+  loadAllOpportunities: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string
 }
 
-export default responsiviser()(K5Dashboard)
+const WrappedK5Dashboard = connect(mapStateToProps, {
+  loadAllOpportunities: startLoadingAllOpportunities
+})(responsiviser()(K5Dashboard))
+
+export default props => (
+  <ApplyTheme theme={theme}>
+    <Provider store={store}>
+      <WrappedK5Dashboard {...props} />
+    </Provider>
+  </ApplyTheme>
+)

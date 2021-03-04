@@ -143,7 +143,7 @@ export class PlannerApp extends Component {
   // First, when the user starts to resize the window, call beforeLayoutChange
   resizeTimer = 0
 
-  onResize = event => {
+  onResize = () => {
     if (this.resizeTimer === 0) {
       this.resizeTimer = window.setTimeout(() => {
         this.resizeTimer = 0
@@ -188,7 +188,7 @@ export class PlannerApp extends Component {
 
   renderLoading() {
     return (
-      <View display="block" padding="xx-large medium" textAlign="center">
+      <View key="spinner" display="block" padding="xx-large medium" textAlign="center">
         <Spinner renderTitle={() => formatMessage('Loading planner items')} size="medium" />
       </View>
     )
@@ -278,6 +278,7 @@ export class PlannerApp extends Component {
         updateTodo={this.props.updateTodo}
         currentUser={this.props.currentUser}
         simplifiedControls={this.props.k5Mode}
+        showMissingAssignments={this.props.k5Mode}
       />
     )
     workingDay.add(1, 'days')

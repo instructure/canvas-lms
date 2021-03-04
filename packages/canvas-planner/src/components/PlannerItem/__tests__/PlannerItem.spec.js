@@ -671,3 +671,21 @@ describe('with simplifiedControls', () => {
     expect(wrapper.find('.PlannerItem-styles__icon').prop('style').color).toBe(undefined)
   })
 })
+
+describe('with isMissingItem', () => {
+  const props = defaultProps({isMissingItem: true})
+
+  it('renders a warning icon instead of a completed checkbox', () => {
+    const wrapper = shallow(<PlannerItem {...props} />)
+    expect(wrapper.find('Checkbox').exists()).toBeFalsy()
+    expect(wrapper.find('IconWarningLine').exists()).toBeTruthy()
+  })
+
+  it('renders a course name in course color', () => {
+    const wrapper = shallow(<PlannerItem {...props} />)
+    const courseNameText = wrapper.find('Text[data-testid="MissingAssignments-CourseName"]')
+    expect(courseNameText.exists()).toBeTruthy()
+    expect(courseNameText.prop('children')).toBe('A Course about being Diffrient')
+    expect(courseNameText.prop('theme')).toMatchObject({primaryColor: '#d71f85'})
+  })
+})

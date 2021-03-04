@@ -20,7 +20,9 @@ import axios from 'axios'
 import moment from 'moment-timezone'
 import {select, call, put} from 'redux-saga/effects'
 import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from '../loading-actions'
+import {addOpportunities, allOpportunitiesLoaded} from '..'
 import {
+  loadAllOpportunitiesSaga,
   loadPastUntilNewActivitySaga,
   loadPastSaga,
   loadFutureSaga,
@@ -35,6 +37,7 @@ import {
   consumePeekIntoPast,
   mergeWeekItems
 } from '../saga-actions'
+import {initialize} from '../../utilities/alertUtils'
 import {transformApiToInternalGrade} from '../../utilities/apiUtils'
 
 const TZ = 'Asia/Tokyo'
@@ -44,6 +47,7 @@ function initialState(overrides = {}) {
   return {
     loading: {seekingNewActivity: true},
     days: [],
+    opportunities: [],
     timeZone: TZ,
     weeklyDashboard: {
       weekStart: thisWeekStart,
@@ -256,4 +260,56 @@ describe('loadWeekSaga', () => {
     )
   })
   // We're not testing all the scenarios, like multiple pages of items in a week
+})
+
+describe('loadAllOpportunitiesSaga', () => {
+  it('passes page size param to API call', () => {
+    const generator = loadAllOpportunitiesSaga()
+    expect(generator.next().value).toEqual(
+      call(axios.get, '/api/v1/users/self/missing_submissions', {
+        params: {include: ['planner_overrides'], filter: ['submittable'], per_page: 100}
+      })
+    )
+  })
+
+  it('exhausts pagination', () => {
+    const generator = loadAllOpportunitiesSaga()
+    generator.next()
+    expect(
+      generator.next({
+        headers: {link: '<some-url>; rel="next"'},
+        data: []
+      }).value
+    ).toEqual(call(axios.get, expect.anything(), expect.anything()))
+    generator.next({headers: {}, data: []}) // add opportunities
+    generator.next() // mark all opportunities as loaded
+    expect(generator.next().done).toBe(true)
+  })
+
+  it('puts addOpportunities and allOpportunitiesLoaded when all data is loaded', () => {
+    const mockOpps = [
+      {id: '2', name: 'Assignment 1'},
+      {id: '5', name: 'Assignment 2'}
+    ]
+    const generator = loadAllOpportunitiesSaga()
+    generator.next()
+    const putResult = generator.next({
+      data: mockOpps,
+      headers: {}
+    })
+    // add opportunities
+    expect(putResult.value).toEqual(put(addOpportunities({items: mockOpps, nextUrl: null})))
+    // mark all opportunities as loaded
+    expect(generator.next().value).toEqual(put(allOpportunitiesLoaded()))
+    expect(generator.next().done).toBeTruthy()
+  })
+
+  it('alerts if there is a loading error', () => {
+    const alertSpy = jest.fn()
+    initialize({visualErrorCallback: alertSpy})
+    const generator = loadAllOpportunitiesSaga()
+    generator.next()
+    generator.throw('some-error')
+    expect(alertSpy).toHaveBeenCalled()
+  })
 })

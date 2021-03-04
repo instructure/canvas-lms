@@ -29,7 +29,7 @@ function initialState(opts = {}) {
       payload: {
         env: {
           TIMEZONE: TZ,
-          K5_mode: true,
+          K5_MODE: true,
           FEATURES: {
             canvas_for_elementary: true
           }

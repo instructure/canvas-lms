@@ -45,6 +45,22 @@ it('renders the full date with friendly name on one line when it is not today', 
   expect(fullDate.text()).toBe(`Yesterday, ${yesterday.format('MMMM D')}`)
 })
 
+it('renders missing assignments if showMissingAssignments is true and it is today', () => {
+  const today = moment()
+  const wrapper = shallow(
+    <Day timeZone="America/Denver" day={today.format('YYYY-MM-DD')} showMissingAssignments />
+  )
+  expect(wrapper.find('Connect(ResponsiveMissingAssignments)').exists()).toBeTruthy()
+})
+
+it('does not render missing assignments if it is not today', () => {
+  const yesterday = moment().subtract(1, 'days')
+  const wrapper = shallow(
+    <Day timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} showMissingAssignments />
+  )
+  expect(wrapper.find('Connect(ResponsiveMissingAssignments)').exists()).toBeFalsy()
+})
+
 it('only renders the year when the date is not in the current year', () => {
   const lastYear = moment().subtract(1, 'year')
   const wrapper = shallow(<Day timeZone="America/Denver" day={lastYear.format('YYYY-MM-DD')} />)

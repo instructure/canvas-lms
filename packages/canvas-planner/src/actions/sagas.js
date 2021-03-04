@@ -21,8 +21,11 @@ import parseLinkHeader from 'parse-link-header'
 import {put, select, call, all, takeEvery} from 'redux-saga/effects'
 import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
 import {transformApiToInternalGrade} from '../utilities/apiUtils'
+import {alert} from '../utilities/alertUtils'
+import formatMessage from '../format-message'
 
 import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from './loading-actions'
+import {addOpportunities, allOpportunitiesLoaded} from './index'
 
 import {
   mergeFutureItems,
@@ -32,6 +35,8 @@ import {
   mergeWeekItems,
   consumePeekIntoPast
 } from './saga-actions'
+
+const MAX_PAGE_SIZE = 100
 
 export default function* allSagas() {
   yield all([call(watchForSagas)])
@@ -45,6 +50,7 @@ function* watchForSagas() {
   yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga)
   yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga)
   yield takeEvery('START_LOADING_WEEK_SAGA', loadWeekSaga)
+  yield takeEvery('START_LOADING_ALL_OPPORTUNITIES', loadAllOpportunitiesSaga)
 }
 
 // fromMomentFunction: function
@@ -130,6 +136,26 @@ export function* loadGradesSaga() {
   }
 }
 
+export function* loadAllOpportunitiesSaga() {
+  try {
+    let loadingUrl = '/api/v1/users/self/missing_submissions'
+    const items = []
+    while (loadingUrl != null) {
+      const response = yield call(axios.get, loadingUrl, {
+        params: {include: ['planner_overrides'], filter: ['submittable'], per_page: MAX_PAGE_SIZE}
+      })
+      items.push(...response.data)
+
+      const links = parseLinkHeader(response.headers.link)
+      loadingUrl = links?.next ? links.next.url : null
+    }
+    yield put(addOpportunities({items, nextUrl: null}))
+    yield put(allOpportunitiesLoaded())
+  } catch (err) {
+    alert(formatMessage('Failed to load opportunities'), true)
+  }
+}
+
 export function* loadPastUntilTodaySaga() {
   yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {mode: 'past'})
 }
@@ -139,7 +165,7 @@ export function* loadWeekSaga({payload}) {
     mode: 'week',
     extraParams: {
       end_date: payload.weekEnd.format(),
-      per_page: 100
+      per_page: MAX_PAGE_SIZE
     }
   })
 }

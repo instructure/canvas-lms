@@ -19,8 +19,7 @@
 import React from 'react'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
-import {K5Dashboard} from '../K5Dashboard'
+import ConnectedK5Dashboard, {K5Dashboard} from '../K5Dashboard'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
@@ -102,6 +101,26 @@ const gradeCourses = [
     homeroom_course: true
   }
 ]
+const opportunities = [
+  {
+    id: 1,
+    course_id: 1,
+    name: 'Assignment 1',
+    point_possible: 23,
+    html_url: '/courses/1/assignments/1',
+    due_at: '2021-01-10T05:59:00Z',
+    submission_types: ['online_quiz']
+  },
+  {
+    id: 2,
+    course_id: 1,
+    name: 'Assignment 2',
+    point_possible: 10,
+    html_url: '/courses/1/assignments/2',
+    due_at: '2021-01-15T05:59:00Z',
+    submission_types: ['online_url']
+  }
+]
 const staff = [
   {
     id: '1',
@@ -130,6 +149,7 @@ const staff = [
 ]
 const defaultEnv = {
   current_user: currentUser,
+  K5_MODE: true,
   FEATURES: {
     canvas_for_elementary: true,
     unpublished_courses: true
@@ -143,7 +163,8 @@ const defaultEnv = {
 const defaultProps = {
   currentUser,
   env: defaultEnv,
-  plannerEnabled: false
+  plannerEnabled: false,
+  loadAllOpportunities: () => {}
 }
 
 beforeAll(() => {
@@ -151,13 +172,6 @@ beforeAll(() => {
   moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
     status: 200,
     response: dashboardCards
-  })
-  moxios.stubRequest(/\/api\/v1\/planner\/items.*/, {
-    status: 200,
-    response: [],
-    headers: {
-      link: ''
-    }
   })
   moxios.stubRequest(/api\/v1\/planner\/items.*/, {
     status: 200,
@@ -194,13 +208,17 @@ beforeAll(() => {
       }
     ]
   })
+  moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submission.*/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: opportunities
+  })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(
     /\/api\/v1\/announcements\?context_codes=course_homeroom.*/,
     JSON.stringify(homeroomAnnouncement)
   )
   fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_test.*/, '[]')
-  fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(/\/api\/v1\/courses\/homeroom\/users.*/, JSON.stringify(staff))
 })
@@ -298,19 +316,31 @@ describe('K-5 Dashboard', () => {
       resetPlanner()
     })
 
-    it('displays an empty state when no items are fetched', async () => {
-      const {container, findByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+    it('displays the planner with a planned item', async () => {
+      const {findByText} = render(
+        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
+      expect(
+        await findByText('Assignment Assignment 14, due Sunday, March 14, 2021 11:31 AM.')
+      ).toBeInTheDocument()
       // The new weekly planner doesn't display the PlannerEmptyState.
       // This will get addressed one way or another with LS-2042
       // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
-      expect(await findByText('Nothing More To Do')).toBeInTheDocument()
+      // expect(await findByText('Nothing More To Do')).toBeInTheDocument()
     })
 
-    it('renders', async () => {
-      const {container, getByTestId, findByTestId} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+    it('displays a list of missing assignments if there are any', async () => {
+      const {findByText} = render(
+        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const missingAssignments = await findByText('Show 2 missing items')
+      expect(missingAssignments).toBeInTheDocument()
+    })
+
+    it('renders the weekly planner header', async () => {
+      const {findByTestId} = render(
+        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
 
       const planner = await findByTestId('PlannerApp')

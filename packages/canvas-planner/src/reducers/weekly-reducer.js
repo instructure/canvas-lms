@@ -30,7 +30,7 @@ export default handleActions(
     },
     INITIAL_OPTIONS: (state, action) => {
       const env = action.payload.env
-      if (env.K5_mode || env?.FEATURES?.canvas_for_elementary) {
+      if (env.K5_MODE) {
         const thisWeekStart = moment.tz(env.TIMEZONE).startOf('week')
         return {
           weekStart: thisWeekStart,

@@ -10,6 +10,13 @@
   line-height: var(--lineHeight);
   &.small {
     align-items: flex-start;
+    &.missingItem {
+      padding-inline-start: 0;
+    }
+  }
+  &.missingItem {
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 0;
   }
 }
 

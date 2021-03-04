@@ -86,14 +86,6 @@ export const fetchLatestAnnouncement = courseId =>
     return null
   })
 
-export const fetchMissingAssignments = (userId = 'self') =>
-  asJson(
-    window.fetch(
-      `/api/v1/users/${userId}/missing_submissions?filter[]=submittable`,
-      defaultFetchOptions
-    )
-  )
-
 /* Fetches instructors for a given course - in this case an instructor is a user with
    either a Teacher or TA enrollment. */
 export const fetchCourseInstructors = courseId =>
