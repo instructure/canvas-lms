@@ -58,3 +58,10 @@ trophy_case:
   description: |-
     Display historical view of achievements of users
   applies_to: SiteAdmin
+
+show_push_notification_account_setting:
+  state: hidden
+  display_name: Allow push notification opt-out
+  description: |-
+    Enable an account setting which toggles push notifications for that account
+  applies_to: SiteAdmin
