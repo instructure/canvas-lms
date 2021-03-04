@@ -2980,11 +2980,12 @@ class User < ActiveRecord::Base
 
   def update_bouncing_channel_message!(channel=nil)
     force_set_bouncing = channel && channel.bouncing? && !channel.imported?
-    set_bouncing = force_set_bouncing || self.communication_channels.unretired.any? { |cc| cc.bouncing? && !cc.imported? }
+    return show_bouncing_channel_message! if force_set_bouncing
 
-    if force_set_bouncing
-      show_bouncing_channel_message!
-    elsif set_bouncing
+    sis_channel_ids = pseudonyms.shard(self).where.not(sis_communication_channel_id: nil).pluck(:sis_communication_channel_id)
+    set_bouncing = communication_channels.unretired.bouncing.where.not(id: sis_channel_ids).exists?
+
+    if set_bouncing
       show_bouncing_channel_message! unless bouncing_channel_message_dismissed?
     else
       dismiss_bouncing_channel_message!
