@@ -70,7 +70,7 @@ module DynamicSettings
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT)
+      @logger ||= Rails.logger
     end
 
     def cache
