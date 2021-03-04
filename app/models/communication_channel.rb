@@ -384,6 +384,7 @@ class CommunicationChannel < ActiveRecord::Base
   scope :sms, -> { where(path_type: TYPE_SMS) }
 
   scope :active, -> { where(workflow_state: 'active') }
+  scope :bouncing, -> { where(bounce_count: RETIRE_THRESHOLD..) }
   scope :unretired, -> { where.not(workflow_state: 'retired') }
 
   # Get the list of communication channels that overrides an association's default order clause.
