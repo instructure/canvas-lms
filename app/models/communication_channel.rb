@@ -40,6 +40,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
+  validate :under_user_cc_limit, if: -> { new_record? }
   validate :uniqueness_of_path
   validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
@@ -64,6 +65,13 @@ class CommunicationChannel < ActiveRecord::Base
 
 
   RETIRE_THRESHOLD = 1
+
+  def under_user_cc_limit
+    max_ccs = Setting.get('max_ccs_per_user', '100').to_i
+    if self.user.communication_channels.limit(max_ccs + 1).count > max_ccs
+      self.errors.add(:user_id, 'user communication_channels limit exceeded')
+    end
+  end
 
   def clear_user_email_cache
     self.user.clear_email_cache! if self.path_type == TYPE_EMAIL
