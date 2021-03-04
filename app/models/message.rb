@@ -679,6 +679,10 @@ class Message < ActiveRecord::Base
       end
     end
 
+    if path_type == "push" && !check_acct.enable_push_notifications?
+      return skip_and_cancel
+    end
+
     if path_type == 'push' && Account.site_admin.feature_enabled?(:reduce_push_notifications)
       if Notification.types_to_send_in_push.exclude?(notification_name)
         return skip_and_cancel

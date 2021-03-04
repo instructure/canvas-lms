@@ -1588,7 +1588,8 @@ class AccountsController < ApplicationController
                                    {:usage_rights_required => [:value, :locked]}.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
-                                   {:enable_as_k5_account => [:value, :locked]}.freeze].freeze
+                                   {:enable_as_k5_account => [:value, :locked]}.freeze,
+                                   :enable_push_notifications].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,
