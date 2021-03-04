@@ -44,10 +44,14 @@ export default function StaffInfo({
         </Flex.Item>
         <Flex.Item shouldGrow padding="0 small">
           <Heading level="h3">{name}</Heading>
-          <Text as="div" size="small">
+          <Text as="div" size="small" data-automation="instructor-role">
             {readableRoleName(role)}
           </Text>
-          {bio && <Text as="div">{bio}</Text>}
+          {bio && (
+            <Text as="div" data-automation="instructor-bio">
+              {bio}
+            </Text>
+          )}
         </Flex.Item>
         {email && (
           <Flex.Item>
