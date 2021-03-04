@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {within, render, fireEvent} from '@testing-library/react'
 
 import {LtiToolsModal} from '../index'
 
@@ -62,25 +62,33 @@ describe('RCE Plugins > LtiToolModal', () => {
     return render(<LtiToolsModal {...getProps(modalprops)} />)
   }
 
-  it('is labeled "Select App"', () => {
+  it('is labeled "All Apps"', () => {
     const {getByLabelText} = renderComponent()
     expect(getByLabelText('Apps')).toBeInTheDocument()
   })
 
-  it('has heading "Select App"', () => {
+  it('has heading "All Apps"', () => {
     const {getByText} = renderComponent()
-    expect(getByText('Select App')).toBeInTheDocument()
+    expect(getByText('All Apps')).toBeInTheDocument()
   })
 
   it('shows the 3 tools', () => {
     const {baseElement, getByText} = renderComponent()
-    expect(getByText('Tool 1')).toBeInTheDocument()
-    expect(getByText('This is tool 1.')).toBeInTheDocument()
+    const tool1 = getByText('Tool 1')
+    const tool1Row = within(tool1.closest('div'))
+    const tool2 = getByText('Tool 2')
+    const tool2Row = within(tool2.closest('div'))
+    const tool3 = getByText('Tool 3')
+    const tool3Row = within(tool3.closest('div'))
+
+    expect(tool1).toBeInTheDocument()
+    expect(tool1Row.getByText('View description')).toBeInTheDocument()
     expect(baseElement.querySelector('img[src="tool1/icon.png"]')).toBeInTheDocument()
-    expect(getByText('Tool 2')).toBeInTheDocument()
-    expect(getByText('This is tool 2')).toBeInTheDocument()
+    expect(tool2).toBeInTheDocument()
+    expect(tool2Row.getByText('View description')).toBeInTheDocument()
     expect(baseElement.querySelector('img[src="/tool2/image.png"]')).toBeInTheDocument()
-    expect(getByText('Tool 3')).toBeInTheDocument()
+    expect(tool3).toBeInTheDocument()
+    expect(tool3Row.queryByText('View description')).toBeNull()
     expect(
       baseElement.querySelector(
         'img[src="https://www.edu-apps.org/assets/lti_public_resources/tool3.png"]'
@@ -88,10 +96,10 @@ describe('RCE Plugins > LtiToolModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('calls onDismiss when clicking Cancel', () => {
+  it('calls onDismiss when clicking Done', () => {
     const handleDismiss = jest.fn()
     const {getByText} = renderComponent({onDismiss: handleDismiss})
-    const cancelButton = getByText('Cancel')
+    const cancelButton = getByText('Done')
     cancelButton.click()
     expect(handleDismiss).toHaveBeenCalled()
   })
@@ -127,16 +135,16 @@ describe('RCE Plugins > LtiToolModal', () => {
 
   describe('filtering', () => {
     it('shows only results that match the filter value', () => {
-      const {getByText, queryByText, getByLabelText} = renderComponent()
-      const searchBox = getByLabelText('Search')
+      const {getByText, queryByText, getByPlaceholderText} = renderComponent()
+      const searchBox = getByPlaceholderText('Search')
       fireEvent.change(searchBox, {target: {value: 'diff'}})
       expect(queryByText('Tool 1')).not.toBeInTheDocument()
       expect(getByText('Diffrient Tool')).toBeInTheDocument()
     })
 
     it('shows a no results alert when there are no results', () => {
-      const {getByText, getByLabelText} = renderComponent()
-      const searchBox = getByLabelText('Search')
+      const {getByText, getByPlaceholderText} = renderComponent()
+      const searchBox = getByPlaceholderText('Search')
       fireEvent.change(searchBox, {target: {value: 'instructure'}})
       expect(getByText('No results found for instructure')).toBeInTheDocument()
     })

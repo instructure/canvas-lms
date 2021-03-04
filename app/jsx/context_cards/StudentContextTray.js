@@ -116,7 +116,10 @@ export default class StudentContextTray extends React.Component {
   }
 
   handleMessageFormClose = e => {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
+
     this.setState(
       {
         messageFormOpen: false

@@ -72,6 +72,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
   field :delete_conversations, mutation: Mutations::DeleteConversations
   field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
+  field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

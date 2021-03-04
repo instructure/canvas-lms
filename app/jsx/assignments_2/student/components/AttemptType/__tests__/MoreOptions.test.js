@@ -18,6 +18,7 @@
 
 import axios from 'axios'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
+import {within} from '@testing-library/dom'
 import {fireEvent, render} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../../mocks'
@@ -211,6 +212,32 @@ describe('MoreOptions', () => {
       )
 
       expect(queryByTestId('more-options-modal')).not.toBeInTheDocument()
+    })
+
+    it('shows the contents of the tab when a tab is clicked', async () => {
+      const overrides = {
+        ExternalToolConnection: {
+          nodes: [
+            {_id: '1', name: 'Tool 1'},
+            {_id: '2', name: 'Tool 2'}
+          ]
+        }
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {findAllByRole, findByRole, findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
+        </MockedProvider>
+      )
+      const moreOptionsButton = await findByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const tabs = await findAllByRole('tab')
+      fireEvent.click(tabs[1])
+
+      const visiblePanel = await findByRole('tabpanel')
+      const toolFrame = within(visiblePanel).queryByTitle('Tool 2')
+      expect(toolFrame).toBeInTheDocument()
     })
   })
 
@@ -407,6 +434,94 @@ describe('MoreOptions', () => {
       fireEvent.click(uploadButton)
 
       expect(selectedCanvasFiles).toEqual(['11'])
+    })
+  }, 10000)
+
+  // These tests time out because it takes too long to render the tabs and
+  // their contents; we'll unskip them when/if we can find a way to test this
+  // without loading everything involved
+  describe.skip('Canvas Files rendered in conjunction with external tools', () => {
+    let overrides
+    let mocks
+
+    beforeEach(async () => {
+      overrides = {
+        ExternalToolConnection: {
+          nodes: [
+            {_id: '1', name: 'Tool 1'},
+            {_id: '2', name: 'Tool 2'}
+          ]
+        }
+      }
+
+      mocks = await createGraphqlMocks(overrides)
+    })
+
+    it('renders the Canvas Files tab followed by a tab for each tool', async () => {
+      const {findAllByRole, findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            handleCanvasFiles={() => {}}
+            userID="1"
+            renderCanvasFiles
+          />
+        </MockedProvider>
+      )
+
+      const moreOptionsButton = await findByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const tabs = await findAllByRole('tab')
+      expect(tabs.map(tab => tab.innerHTML.trim())).toEqual(['Canvas Files', 'Tool 1', 'Tool 2'])
+    })
+
+    it('shows the file selector when the Canvas Files tab is clicked', async () => {
+      const {findAllByRole, findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            handleCanvasFiles={() => {}}
+            renderCanvasFiles
+            userID="1"
+          />
+        </MockedProvider>
+      )
+
+      const moreOptionsButton = await findByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const tabs = await findAllByRole('tab')
+      fireEvent.click(tabs[0])
+
+      const fileSelect = await findByTestId('more-options-file-select')
+      expect(fileSelect).toBeVisible()
+    })
+
+    it('shows the corresponding contents when a tab for a tool is clicked', async () => {
+      const {findAllByRole, findByRole, findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            handleCanvasFiles={() => {}}
+            renderCanvasFiles
+            userID="1"
+          />
+        </MockedProvider>
+      )
+
+      const moreOptionsButton = await findByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const tabs = await findAllByRole('tab')
+      fireEvent.click(tabs[2])
+
+      const visiblePanel = await findByRole('tabpanel')
+      const toolFrame = within(visiblePanel).queryByTitle('Tool 2')
+      expect(toolFrame).toBeInTheDocument()
     })
   }, 10000)
 })

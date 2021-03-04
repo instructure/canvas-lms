@@ -1,9 +1,14 @@
-# syntax=docker/dockerfile:experimental
-
-ARG PATCHSET_TAG
-FROM $PATCHSET_TAG AS patchset
-
 FROM local/karma-builder
+
 USER docker
-RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
-  cp -rf /tmp/src/. /usr/src/app
+COPY --chown=docker:docker . /usr/src/app
+RUN cp -v docker-compose/config/redis.yml config && \
+  cp -v docker-compose/config/selenium.yml config/ && \
+  cp -vR docker-compose/config/new-jenkins/* config/ && \
+  cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml && \
+  cp -v config/domain.yml.example config/domain.yml && \
+  cp -v config/external_migration.yml.example config/external_migration.yml && \
+  cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
+
+ARG RAILS_LOAD_ALL_LOCALES=0
+RUN bash -c "if [[ "$RAILS_LOAD_ALL_LOCALES" == "1" ]]; then bundle exec rails i18n:generate_js; fi"

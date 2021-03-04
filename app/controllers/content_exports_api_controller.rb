@@ -159,6 +159,14 @@ class ContentExportsApiController < ApplicationController
     end
   end
 
+  def fail
+    if authorized_action(Account.site_admin, @current_user, :read)
+      export = @context.content_exports.find(params[:id])
+      export.fail_with_error! @current_user.global_id, error_message: 'manually marked failed by a site administrator'
+      render json: content_export_json(export, @current_user, session)
+    end
+  end
+
   def content_list
     if authorized_action(@context, @current_user, :read_as_admin)
       base_url = polymorphic_url([:api_v1, @context, :content_list])

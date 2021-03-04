@@ -42,6 +42,11 @@ module SpeedGrader
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
 
+      if course.root_account.feature_enabled?(:reassign_assignments)
+        submission_json_fields << :redo_request
+        submission_json_fields << :cached_due_date
+      end
+
       attachment_json_fields = %i(id comment_id content_type context_id context_type display_name
                                   filename mime_class size submitter_id workflow_state)
 

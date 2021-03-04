@@ -27,6 +27,7 @@ export const Conversation = {
       _id
       contextId
       contextType
+      contextName
       subject
       conversationMessagesConnection {
         nodes {
@@ -47,10 +48,11 @@ export const Conversation = {
     _id: string,
     contextId: number,
     contextType: string,
+    contextName: string,
     subject: string,
     conversationMessagesConnection: ConversationMessage.shape,
-    conversationParticipantsConnection: ConversationParticipant.shape
-  })
+    conversationParticipantsConnection: ConversationParticipant.shape,
+  }),
 }
 
 export const DefaultMocks = {
@@ -58,9 +60,10 @@ export const DefaultMocks = {
     _id: '1a',
     contextType: 'context',
     contextId: 2,
+    contextName: 'Context Name',
     subject: 'Mock Subject',
     updatedAt: 'November 5, 2020 at 2:25pm',
     conversationMessagesConnection: {edges: [{}]},
-    conversationParticipantsConnection: {edges: [{}]}
-  })
+    conversationParticipantsConnection: {edges: [{}]},
+  }),
 }

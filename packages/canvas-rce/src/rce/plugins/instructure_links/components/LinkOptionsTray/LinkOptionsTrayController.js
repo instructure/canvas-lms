@@ -85,7 +85,7 @@ export default class LinkOptionsTrayController {
   }
 
   _renderTray() {
-    let content
+    let content = {}
     if (this._shouldOpen) {
       content = getLinkContentFromEditor(this._editor)
       /*

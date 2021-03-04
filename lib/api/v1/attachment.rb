@@ -279,10 +279,20 @@ module Api::V1::Attachment
       end
     end
 
+    # allow uploading a file for a user, specifically for the LTI workflow.
+    # the Assignment and Grade Service (app/controllers/lti/ims) uses this
+    # to allow LTI tools to upload a file on behalf of a student as part
+    # of submitting an assignment.
+    current_user = opts[:override_current_user_with] || @current_user
+    # since the LTI service has no concept of masquerading, this user should
+    # be considered both current and logged in. `logged_in_user` is nil during
+    # an LTI request
+    actual_user = opts[:override_logged_in_user] ? current_user : logged_in_user
+
     # user must have permission on folder to user a custom folder other
     # than the "preferred" folder (that specified by the caller).
     folder = infer_upload_folder(context, params)
-    return if folder && !authorized_action(folder, @current_user, :manage_contents)
+    return if folder && !authorized_action(folder, current_user, :manage_contents)
 
     # no permission check required to use the preferred folder
 
@@ -292,13 +302,13 @@ module Api::V1::Attachment
     elsif params[:assignment_id].present?
       Assignment.find_by(id: params[:assignment_id])
     else
-      @current_user
+      current_user
     end
 
     if InstFS.enabled?
       additional_capture_params = {}
       progress_json_result = if params[:url]
-        progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
+        progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
         progress.start
         progress.save!
 
@@ -310,14 +320,14 @@ module Api::V1::Attachment
           }
         end
 
-        progress_json(progress, @current_user, session)
+        progress_json(progress, current_user, session)
       end
 
       json = InstFS.upload_preflight_json(
         context: context,
         root_account: context.try(:root_account) || @domain_root_account,
-        user: logged_in_user,
-        acting_as: @current_user,
+        user: actual_user,
+        acting_as: current_user,
         access_token: @access_token,
         folder: folder,
         filename: infer_upload_filename(params),
@@ -334,7 +344,7 @@ module Api::V1::Attachment
       @attachment = Attachment.new
       @attachment.shard = context.shard
       @attachment.context = context
-      @attachment.user = @current_user
+      @attachment.user = current_user
       @attachment.filename = infer_upload_filename(params)
       @attachment.content_type = infer_upload_content_type(params, 'unknown/unknown')
       @attachment.folder = folder
@@ -346,7 +356,7 @@ module Api::V1::Attachment
 
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
-        progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
+        progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
         progress.reset!
 
         executor = Services::SubmitHomeworkService.create_clone_url_executor(
@@ -357,7 +367,7 @@ module Api::V1::Attachment
           @attachment, progress, params[:eula_agreement_timestamp], params[:comment], executor, opts[:submit_assignment]
         )
 
-        json = { progress: progress_json(progress, @current_user, session) }
+        json = { progress: progress_json(progress, current_user, session) }
       else
         on_duplicate = nil if on_duplicate == 'overwrite'
         quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]

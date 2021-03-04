@@ -2921,30 +2921,30 @@ describe Enrollment do
 
   describe '#can_be_deleted_by' do
 
-    describe 'on a student enrollment' do
-      let(:course) { Course.new(id: 99) }
-      let(:enrollment) { StudentEnrollment.new(course_id: course.id) }
+    describe 'on a student enrollment without granular_permissions_manage_users' do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
+      before :each do
+        course_with_student
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
+      end
+
       it 'is true for a user who has been granted :manage_students' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
       it 'is false for a user without :manage_students' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users but without :manage_students' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users in other context' do
@@ -2955,40 +2955,142 @@ describe Enrollment do
       end
 
       it 'is false if a user is trying to remove their own enrollment' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        allow(context).to receive_messages(:account => context)
-        enrollment.user_id = user.id
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        allow(@course).to receive_messages(:account => @course)
+        @enrollment.user_id = user.id
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
 
-    describe 'on an observer enrollment' do
-      let(:course) { Course.new(id: 99) }
-      let(:enrollment) { ObserverEnrollment.new(course_id: course.id) }
+
+    describe 'on a student enrollment with granular_permissions_manage_users' do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      it 'is true with :manage_students' do
-        context = course
+      before :each do
+        course_with_student
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is true for a user who has been granted :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it 'is false for a user without :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it 'is false for someone with :allow_course_admin_actions in other context' do
+        context = CourseSection.new(id: 10)
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        allow(context).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+      end
+
+      it 'is false if a user is trying to remove their own enrollment' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
+        allow(@course).to receive_messages(:account => @course)
+        @enrollment.user_id = user.id
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+    end
+
+    describe 'on an observer enrollment without granular_permissions_manage_users' do
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
+
+      before :each do
+        course_with_observer
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is true with :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
       it 'is true with :manage_admin_users' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
       it 'is false otherwise' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+    end
+
+    describe "on an observer enrollment with granular_permission_manage_users" do
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
+
+      before :each do
+        course_with_observer
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is true with :manage_students' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it "is true without :manage_students but with the :remove_observer_from_account granular" do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_observer_from_course).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it 'is false with :allow_course_admin_actions but not the granular' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it 'is false otherwise' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+    end
+
+    describe "on a teacher enrollment with granular_permission_manage_users" do
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
+
+      before :each do
+        course_with_teacher
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is false with :manage_students' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it "is true without :allow_course_admin_actions but with the :remove_teacher_from_account granular" do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_teacher_from_course).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it 'is false with only :allow_course_admin_actions' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it 'is false otherwise' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
   end

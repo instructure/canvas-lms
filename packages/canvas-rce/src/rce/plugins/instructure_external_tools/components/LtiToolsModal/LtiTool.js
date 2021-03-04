@@ -21,6 +21,8 @@ import {func, string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import ExpandoText from './ExpandoText'
+import formatMessage from '../../../../../format-message'
+import {StyleSheet, css} from 'aphrodite'
 
 export default function LtiTool(props) {
   const [focused, setFocused] = useState(false)
@@ -29,11 +31,13 @@ export default function LtiTool(props) {
   return (
     <>
       <View
-        as="div"
+        as="span"
         focused={focused}
+        className={css(styles.appButton)}
+        padding="xxx-small xxx-small xx-small"
+        borderRadius="medium"
         role="button"
         position="relative"
-        margin="none none small"
         onClick={() => {
           onAction()
         }}
@@ -46,10 +50,14 @@ export default function LtiTool(props) {
         onBlur={() => setFocused(false)}
         tabIndex="0"
       >
-        <span style={{marginRight: '.5rem'}}>
-          <img src={image} width="16" height="16" alt="" />
+        <span>
+          <img src={image} width="28" height="28" alt="" />
         </span>
-        <Text weight="bold">{title}</Text>
+        <View as="span" className={css(styles.appTitle)} margin="none none none small">
+          <Text aria-label={formatMessage('Open {title} application', {title})} weight="bold">
+            {title}
+          </Text>
+        </View>
       </View>
       {description && renderDescription(description)}
     </>
@@ -57,16 +65,22 @@ export default function LtiTool(props) {
 
   function renderDescription(desc) {
     return (
-      <div style={{margin: '0 1.5rem', position: 'relative', boxSizing: 'content-box'}}>
-        <ExpandoText text={desc} />
-      </div>
+      <View as="span" margin="none none none large" display="block">
+        <ExpandoText text={desc} title={title} />
+      </View>
     )
   }
 }
 
 LtiTool.propTypes = {
-  title: String.isRequired,
+  title: string.isRequired,
   image: string.isRequired,
   onAction: func.isRequired,
   description: string
 }
+
+export const styles = StyleSheet.create({
+  appTitle: {
+    verticalAlign: 'middle'
+  }
+})

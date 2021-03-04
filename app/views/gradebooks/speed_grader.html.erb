@@ -124,6 +124,12 @@
           <%= t :comment_submitted, "Your comment has been submitted." %>
         </div>
       </div>
+      <div id="reassignment_complete" class="alert alert-success speedgrader_alert">
+        <button aria-label="<%= t 'Close' %>" class="dismiss_alert close">×</button>
+        <div id="reassignment_complete_message">
+          <%= t "The assignment has been reassigned." %>
+        </div>
+      </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
           <h3>
@@ -352,6 +358,12 @@
                 </div>
               </div>
             </form>
+
+            <% if @can_reassign_submissions %>
+              <div id="reassign_assignment_wrapper">
+                <button id="reassign_assignment" disabled class="Button"><%= t("Reassign Assignment") %></button>
+              </div>
+            <% end %>
           <% end %>
 
           <div id="speed_grader_submission_comments_download_mount_point"></div>

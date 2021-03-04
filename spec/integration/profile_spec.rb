@@ -39,7 +39,7 @@ describe ProfileController do
     user_session(u, p)
 
     get '/profile/settings'
-    expect(Nokogiri::HTML(response.body).css('input#user_short_name')).not_to be_empty
+    expect(Nokogiri::HTML5(response.body).css('input#user_short_name')).not_to be_empty
 
     put '/profile', params: {:user => { :short_name => 'Cody' }}
     expect(response).to be_redirect
@@ -50,7 +50,7 @@ describe ProfileController do
     p.reload
 
     get '/profile/settings'
-    expect(Nokogiri::HTML(response.body).css('input#user_short_name')).to be_empty
+    expect(Nokogiri::HTML5(response.body).css('input#user_short_name')).to be_empty
 
     put '/profile', params: {:user => { :short_name => 'JT' }}
     expect(response).to be_redirect

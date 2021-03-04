@@ -4,7 +4,7 @@ module.exports = {
   env: {
     es6: true,
     amd: true,
-    browser: true
+    browser: true,
   },
   extends: [
     'airbnb',
@@ -12,14 +12,14 @@ module.exports = {
     'plugin:jest/recommended',
     'plugin:prettier/recommended',
     'plugin:eslint-comments/recommended',
-    'plugin:promise/recommended'
+    'plugin:promise/recommended',
   ],
   parserOptions: {
     ecmaVersion: 2018,
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
-    sourceType: 'module'
+    sourceType: 'module',
   },
   parser: 'babel-eslint',
 
@@ -27,7 +27,7 @@ module.exports = {
     ENV: true,
     INST: true,
     tinyMCE: true,
-    tinymce: true
+    tinymce: true,
   },
   plugins: [
     'promise',
@@ -39,7 +39,7 @@ module.exports = {
     'lodash',
     'react',
     'react-hooks',
-    'babel'
+    'babel',
   ],
   rules: {
     'no-cond-assign': ['error', 'except-parens'],
@@ -50,6 +50,7 @@ module.exports = {
 
     // These come from our extended configurations, but we don't care about them
     camelcase: 'off', // because we have a ton of `const $user_name = $('#user_name')`
+    'comma-dangle': 'off',
     'class-methods-use-this': 'off',
     'consistent-return': 'off',
     'default-case': 'off',
@@ -100,7 +101,8 @@ module.exports = {
 
     // don't restrict Math.pow for ** operator
     // ref: https://github.com/airbnb/javascript/blob/1f786e154f6c32385607e1688370d7f2d053f88f/packages/eslint-config-airbnb-base/rules/best-practices.js#L225
-    'no-restricted-properties': ['error',
+    'no-restricted-properties': [
+      'error',
       {
         object: 'arguments',
         property: 'callee',
@@ -152,13 +154,13 @@ module.exports = {
       {
         selector: 'LabeledStatement',
         message:
-          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.'
+          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
       },
       {
         selector: 'WithStatement',
         message:
-          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.'
-      }
+          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
+      },
     ],
 
     // These are discouraged, but allowed
@@ -173,8 +175,8 @@ module.exports = {
         argsIgnorePattern: '^_',
 
         // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
-        ignoreRestSiblings: true
-      }
+        ignoreRestSiblings: true,
+      },
     ],
     'eslint-comments/no-unused-disable': 'error',
     'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
@@ -191,31 +193,31 @@ module.exports = {
         templateFile: path.join(__dirname, 'config', 'copyright-template.js'),
         // purposely lenient so we don't automatically put our copyright notice on
         // top of something already copyrighted by someone else.
-        mustMatch: 'Copyright '
-      }
+        mustMatch: 'Copyright ',
+      },
     ],
     'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
-    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}]
+    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}],
   },
   settings: {
     react: {
-      version: 'detect'
-    }
+      version: 'detect',
+    },
   },
   overrides: [
     {
       files: require('./jest.config').testMatch,
       plugins: ['jest'],
       env: {
-        'jest/globals': true
+        'jest/globals': true,
       },
       rules: {
         'jest/prefer-to-be-null': 'error',
         'jest/prefer-to-be-undefined': 'error',
         'jest/prefer-to-contain': 'error',
         'jest/no-test-return-statement': 'error',
-        'jest/no-large-snapshots': 'warn'
-      }
+        'jest/no-large-snapshots': 'warn',
+      },
     },
     {
       files: ['app/**/*', 'spec/**/*', 'public/**/*'],
@@ -230,8 +232,8 @@ module.exports = {
         'import/no-nodejs-modules': 'error',
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         'import/no-unresolved': 'off',
-        'import/no-webpack-loader-syntax': 'off'
-      }
+        'import/no-webpack-loader-syntax': 'off',
+      },
     },
     {
       files: ['app/jsx/canvas_quizzes/**/*'],
@@ -240,7 +242,7 @@ module.exports = {
         'prefer-const': 'warn',
         'prettier/prettier': 'off',
         'react/no-string-refs': 'warn',
-      }
+      },
     },
-  ]
+  ],
 }

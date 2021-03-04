@@ -56,6 +56,7 @@ class Folder < ActiveRecord::Base
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context
+  after_commit :clear_permissions_cache, if: ->{[:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? {|k| saved_changes.key?(k)}}
 
   def file_attachments_visible_to(user)
     if context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
@@ -584,4 +585,23 @@ class Folder < ActiveRecord::Base
     nil
   end
   private_class_method :find_visible_folders
+
+  def clear_permissions_cache
+    GuardRail.activate(:primary) do
+      delay_if_production(singleton: "clear_downstream_permissions_#{global_id}").clear_downstream_permissions
+      next_clear_cache = next_lock_change
+      if next_clear_cache.present? && next_clear_cache < (Time.zone.now + AdheresToPolicy::Cache::CACHE_EXPIRES_IN)
+        delay(run_at: next_clear_cache, singleton: "clear_permissions_cache_#{global_id}").clear_permissions_cache
+      end
+    end
+  end
+
+  def clear_downstream_permissions
+    active_file_attachments.touch_all
+    active_sub_folders.each(&:clear_permissions_cache)
+  end
+
+  def next_lock_change
+    [lock_at, unlock_at].compact.select {|t| t > Time.zone.now}.min
+  end
 end

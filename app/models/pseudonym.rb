@@ -189,6 +189,8 @@ class Pseudonym < ActiveRecord::Base
     if (!crypted_password || crypted_password == "") && !@require_password
       self.generate_temporary_password
     end
+    # treat empty or whitespaced strings as nullable
+    self.integration_id = nil if self.integration_id.blank?
     self.sis_user_id = nil if self.sis_user_id.blank?
   end
 

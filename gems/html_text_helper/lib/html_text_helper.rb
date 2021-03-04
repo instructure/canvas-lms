@@ -56,7 +56,7 @@ module HtmlTextHelper
   # tweak and improve it as time goes on.
   def html_to_text(html_str, opts = {})
     return '' if html_str.blank?
-    doc = Nokogiri::HTML::DocumentFragment.parse(html_str)
+    doc = Nokogiri::HTML.fragment(html_str)
     text = html_node_to_text(doc, opts)
     text.squeeze!(' ')
     text.gsub!(/\r\n?/, "\n")
@@ -198,7 +198,7 @@ module HtmlTextHelper
   #
   # Returns a string.
   def append_base_url(subject, base)
-    output = Nokogiri::HTML.fragment(subject)
+    output = Nokogiri::HTML5.fragment(subject)
     tags = output.css('*[href]')
 
     tags.each do |tag|

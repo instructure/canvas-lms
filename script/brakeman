@@ -5,7 +5,7 @@ linter_options = {
   linter_name: "brakeman",
   file_regex: /\.rb$/,
   format: 'brakeman',
-  command: 'bundle exec brakeman --quiet --format json --confidence-level 2',
+  command: 'bundle exec brakeman --rails6 --quiet --format json --confidence-level 2',
   append_files_to_command: false,
 }
 

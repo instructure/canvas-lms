@@ -426,8 +426,9 @@ class ProfileController < ApplicationController
     @profile = @user.profile
     @context = @profile
 
-    if @domain_root_account.can_change_pronouns? && params[:pronouns].present? && @domain_root_account.pronouns.include?(params[:pronouns].strip)
-      @user.pronouns = params[:pronouns]
+    if @domain_root_account.can_change_pronouns?
+      valid_pronoun = @domain_root_account.pronouns.include?(params[:pronouns]&.strip) || params[:pronouns] == ""
+      @user.pronouns = params[:pronouns] if valid_pronoun
     end
 
     short_name = params[:user] && params[:user][:short_name]

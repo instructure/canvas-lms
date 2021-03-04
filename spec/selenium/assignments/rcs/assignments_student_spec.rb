@@ -30,6 +30,7 @@ describe "assignments" do
 
     before(:each) do
       course_with_student_logged_in
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
     end
 

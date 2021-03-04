@@ -112,4 +112,21 @@ describe('MessageActionButtons', () => {
     expect(queryByTestId('delete')).toBe(null)
     expect(queryByTestId('settings')).toBe(null)
   })
+
+  it('calls unarchive when unarchive prop exists', async () => {
+    const props = createProps({
+      unarchive: jest.fn()
+    })
+
+    const {queryByTestId} = render(<MessageActionButtons {...props} />)
+    fireEvent.click(queryByTestId('unarchive'))
+    expect(props.unarchive).toHaveBeenCalled()
+  })
+
+  it('calls archive when unarchive prop exists', async () => {
+    const props = createProps()
+    const {queryByTestId} = render(<MessageActionButtons {...props} />)
+    fireEvent.click(queryByTestId('archive'))
+    expect(props.archive).toHaveBeenCalled()
+  })
 })

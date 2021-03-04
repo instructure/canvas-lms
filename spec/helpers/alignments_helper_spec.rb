@@ -81,7 +81,7 @@ describe AlignmentsHelper do
       end
 
       it "should be a blank link tag" do
-        html = Nokogiri::HTML.fragment(string)
+        html = Nokogiri::HTML5.fragment(string)
         expect(html.text).to be_blank
       end
     end
@@ -96,7 +96,7 @@ describe AlignmentsHelper do
       end
 
       it "should be a blank link tag" do
-        html = Nokogiri::HTML.fragment(string)
+        html = Nokogiri::HTML5.fragment(string)
         expect(html.text).to eq(alignment.title)
       end
     end
@@ -105,7 +105,7 @@ describe AlignmentsHelper do
   describe "outcome_alignment_tag" do
     context "without an alignment" do
       let(:string) { outcome_alignment_tag(@course, outcome) {} }
-      let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+      let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "should include an id of 'alignment_blank'" do
         expect(string.match(/alignment\_blank/)).to be_truthy
@@ -128,7 +128,7 @@ describe AlignmentsHelper do
 
     context "with an alignment" do
       let(:string) { outcome_alignment_tag(@course, outcome, alignment) {} }
-      let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+      let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "should include an id of 'alignment_{id}'" do
         expect(string.match(/alignment\_#{alignment.id}/)).to be_truthy
@@ -152,7 +152,7 @@ describe AlignmentsHelper do
 
     context "with a graded alignment" do
       let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
-      let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+      let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "should include html class 'also_assignment'" do
         classes = html['class'].split(' ')
@@ -167,7 +167,7 @@ describe AlignmentsHelper do
         })
       }
       let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
-      let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+      let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "should have html 'data-has-rubric-association' data attritbute" do
         expect(html.keys.find { |k|

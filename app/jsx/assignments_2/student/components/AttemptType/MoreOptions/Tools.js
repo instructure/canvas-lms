@@ -22,6 +22,7 @@ import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import I18n from 'i18n!assignments_2_MoreOptions_Tools'
 import React, {useState} from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
 import {Tabs} from '@instructure/ui-tabs'
 
@@ -65,13 +66,14 @@ const Tools = props => {
       )}
       {props.tools.map((tool, i) => (
         <Tabs.Panel
-          isSelected={selectedIndex === i + 1}
+          isSelected={selectedIndex === (props.renderCanvasFiles ? i + 1 : i)}
           key={tool._id}
           padding="xx-small 0"
           renderTitle={tool.name}
         >
           <div style={tabContentStyle}>
             <iframe
+              allow={iframeAllowances()}
               style={iframeStyle}
               src={launchUrl(props.assignmentID, props.courseID, tool)}
               title={tool.name}

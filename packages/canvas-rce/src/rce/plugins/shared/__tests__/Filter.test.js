@@ -44,7 +44,7 @@ describe('RCE Plugins > Filter', () => {
   }
 
   function renderComponent(props) {
-    component = render(<FilterWithHooks {...props} />)
+    component = render(<FilterWithHooks containingContextType="course" {...props} />)
   }
 
   function selectContentType(contentTypeLabel) {
@@ -161,7 +161,7 @@ describe('RCE Plugins > Filter', () => {
     })
 
     it('includes only User option in user context', () => {
-      renderComponent({userContextType: 'user'})
+      renderComponent({userContextType: 'user', containingContextType: 'user'})
       const contentTypeField = component.queryByLabelText('Content Type')
       expect(contentTypeField).toBeNull() // we replaced the Select with a View
       expect(component.queryByText('Links')).toBeNull()

@@ -354,6 +354,7 @@ class SearchFormComponent extends Component {
                     startAt="small"
                     vAlign="top"
                     messages={this.dateInputErrors()}
+                    width="auto"
                   >
                     <CanvasDateInput
                       renderLabel={I18n.t('Start Date')}

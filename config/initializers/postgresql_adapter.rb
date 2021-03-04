@@ -19,6 +19,20 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
+  def receive_timeout_wrapper
+    return yield unless @config[:receive_timeout]
+    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout") { yield }
+  end
+
+  %I{begin_db_transaction create_savepoint active?}.each do |method|
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{method}(*)
+        receive_timeout_wrapper { super }
+      end
+    RUBY
+  end
+
+
   def explain(arel, binds = [], analyze: false)
     sql = "EXPLAIN #{"ANALYZE " if analyze}#{to_sql(arel, binds)}"
     ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))

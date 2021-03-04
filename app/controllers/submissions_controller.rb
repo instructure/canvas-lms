@@ -319,6 +319,14 @@ class SubmissionsController < SubmissionsBaseController
     super
   end
 
+  def redo_submission
+    @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
+    @user = get_user_considering_section(params.fetch(:submission_id))
+    @submission = @assignment.submission_for_student(@user)
+
+    super
+  end
+
   def audit_events
     return render_unauthorized_action unless @context.grants_right?(@current_user, :view_audit_trail)
     submission = Submission.find(params[:submission_id])

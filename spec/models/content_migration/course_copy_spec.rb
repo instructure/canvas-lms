@@ -635,7 +635,7 @@ describe ContentMigration do
 
     it "should copy weird longdesc things" do
       page = @copy_from.wiki_pages.create!(:title => "page")
-      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/>"
+      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/\">"
       @copy_from.save!
 
       run_course_copy

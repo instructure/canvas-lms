@@ -25,6 +25,7 @@ const unreadCountFromApi = 10
 const pollInterval = 60000
 const allowedAge = 30000
 const maxTries = 5
+const useSessionStorage = true
 const storageKey = `unread_count_${userId}_${apiStem.replace(/\//g, '_')}`
 
 const props = {
@@ -32,7 +33,8 @@ const props = {
   dataUrl: `http://getdata.edu/api/v1/${apiStem}/unread_count`,
   pollIntervalMs: pollInterval,
   allowedAge,
-  maxTries
+  maxTries,
+  useSessionStorage
 }
 
 expect.extend({
@@ -95,6 +97,18 @@ describe('GlobalNavigation::UnreadCounts', () => {
       jest.runAllTimers()
       expect(await findByText(target, `${unreadCountFromApi} unread.`)).toBeInTheDocument()
       expect(fetchMock).toHaveBeenCalled()
+    })
+
+    it('fetches value and skips session store when useSessionStorage is false', async () => {
+      global.localStorage = {getItem: jest.fn(), setItem: jest.fn()}
+      render(<UnreadCounts {...props} targetEl={target} useSessionStorage={false} />)
+      jest.runAllTimers()
+      expect(await findByText(target, `${unreadCountFromApi} unread.`)).toBeInTheDocument()
+      expect(fetchMock).toHaveBeenCalled()
+      expect(localStorage.setItem).not.toHaveBeenCalled()
+      expect(localStorage.getItem).not.toHaveBeenCalled()
+      localStorage.setItem.mockClear()
+      localStorage.getItem.mockClear()
     })
 
     it('delays fetching until the allowed age has expired', () => {

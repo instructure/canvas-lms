@@ -38,13 +38,14 @@ class Header extends React.Component {
   static propTypes = {
     allSubmissions: arrayOf(Submission.shape),
     assignment: Assignment.shape,
-    onChangeSubmission: func.isRequired,
+    onChangeSubmission: func,
     scrollThreshold: number.isRequired,
     submission: Submission.shape
   }
 
   static defaultProps = {
-    scrollThreshold: 150
+    scrollThreshold: 150,
+    onChangeSubmission: () => {}
   }
 
   state = {
@@ -81,25 +82,24 @@ class Header extends React.Component {
     )
   }
 
-  /* eslint-disable jsx-a11y/anchor-is-valid */
   renderFakeMostRecent = () => {
     return (
       <Flex.Item as="div" align="end" textAlign="end">
         {I18n.t('Calculated by: ')}
-        <a>{I18n.t('Most Recent')}</a>
+        <div>{I18n.t('Most Recent')}</div>
       </Flex.Item>
     )
   }
-  /* eslint-enable jsx-a11y/anchor-is-valid */
 
   renderLatestGrade = () => (
     <StudentViewContext.Consumer>
       {context => {
-        const {latestSubmission} = context
+        const submission = context.latestSubmission || {grade: null, gradingStatus: null}
         return (
           <GradeDisplay
+            gradingStatus={submission.gradingStatus}
             gradingType={this.props.assignment.gradingType}
-            receivedGrade={latestSubmission ? latestSubmission.grade : null}
+            receivedGrade={submission.grade}
             pointsPossible={this.props.assignment.pointsPossible}
           />
         )
@@ -112,6 +112,7 @@ class Header extends React.Component {
     return (
       !assignment.lockInfo.isLocked &&
       (submission.state === 'graded' || submission.state === 'submitted') &&
+      submission.gradingStatus !== 'excused' &&
       context.isLatestAttempt &&
       (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
     )
@@ -199,7 +200,7 @@ class Header extends React.Component {
               )}
             </Flex.Item>
           </Flex>
-          {!this.state.isSticky && (
+          {!this.state.isSticky && this.props.submission && this.props.allSubmissions && (
             <AttemptSelect
               allSubmissions={this.props.allSubmissions}
               onChangeSubmission={this.props.onChangeSubmission}

@@ -96,6 +96,29 @@ describe Oauth2ProviderController do
       expect(response).to redirect_to(login_url+'?force_login=true&pseudonym_session%5Bunique_id%5D=test')
     end
 
+    it 'redirects with "login_required" if prompt=none' do
+      get :auth,
+          params: {client_id: key.id,
+          redirect_uri: 'https://example.com/oauth/callback',
+          prompt: 'none',
+          response_type: 'code'}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{^https://example.com/oauth/callback})
+      redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+      expect(redirect_query_params['error']).to eq 'login_required'
+    end
+
+    it 'redirects with "unsupported_prompt_type" if prompt is not recognized' do
+      get :auth,
+          params: {client_id: key.id,
+          redirect_uri: 'https://example.com/oauth/callback',
+          prompt: 'yesplz',
+          response_type: 'code'}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{^https://example.com/oauth/callback})
+      redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+      expect(redirect_query_params['error']).to eq 'unsupported_prompt_type'
+    end
 
     context 'with a user logged in' do
       before :once do
@@ -172,6 +195,39 @@ describe Oauth2ProviderController do
             scope: '/auth/userinfo'}
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
+      end
+
+      context 'when "prompt=none"' do
+        let(:params) { {
+          client_id: key.id,
+            redirect_uri: 'https://example.com',
+            response_type: 'code',
+            scope: '/auth/userinfo',
+            prompt: 'none'
+        } }
+
+        it 'should redirect to the redirect uri if the user already has remember-me token' do
+          @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+          get :auth, params: params
+          expect(response).to be_redirect
+          expect(response.location).to match(/https:\/\/example.com/)
+        end
+
+        it 'should redirect to the redirect uri if the developer key is trusted' do
+          key.trusted = true
+          key.save!
+          get :auth, params: params
+          expect(response).to be_redirect
+          expect(response.location).to match(/https:\/\/example.com/)
+        end
+
+        it 'should redirect with "interaction_required" if the current session cannot be used without a prompt' do
+          get :auth, params: params
+          expect(response).to be_redirect
+          expect(response.location).to match(/https:\/\/example.com/)
+          redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+          expect(redirect_query_params['error']).to eq 'interaction_required'
+        end
       end
 
       shared_examples_for 'the authorization endpoint' do

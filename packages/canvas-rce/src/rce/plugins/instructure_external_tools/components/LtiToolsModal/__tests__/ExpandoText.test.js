@@ -30,29 +30,25 @@ describe('RCE Plugins > LtiTool', () => {
     )
   }
 
-  it('renters right-arrow when first rendered', () => {
-    const {container} = renderComponent('hello world')
-    expect(container.querySelector('svg[name="IconArrowOpenEnd"]')).toBeInTheDocument()
+  it('renders View description when first rendered', () => {
+    const {getByText} = renderComponent('hello world')
+    expect(getByText('View description')).toBeInTheDocument()
   })
 
-  it('renders the text', () => {
+  it('renders description when expanded', () => {
     const {getByText} = renderComponent('hello world')
+    const toggleDescButton = getByText('View description')
+    fireEvent.click(toggleDescButton)
+    expect(getByText('Hide description')).toBeInTheDocument()
     expect(getByText('hello world')).toBeInTheDocument()
   })
 
-  it('renders the down-arrow when expanded', () => {
-    const {container} = renderComponent('hello world')
-    const arrowButton = container.querySelector('svg[name="IconArrowOpenEnd"]')
-    fireEvent.click(arrowButton)
-    expect(container.querySelector('svg[name="IconArrowOpenDown"]')).toBeInTheDocument()
-  })
-
-  it('renders the right-arrow when collapsed', () => {
-    const {container} = renderComponent('hello world')
-    fireEvent.click(container.querySelector('svg[name="IconArrowOpenEnd"]'))
-    const downButton = container.querySelector('svg[name="IconArrowOpenDown"]')
-    expect(downButton).toBeInTheDocument()
-    fireEvent.click(downButton)
-    expect(container.querySelector('svg[name="IconArrowOpenEnd"]')).toBeInTheDocument()
+  it('renders View description when collapsed', () => {
+    const {getByText} = renderComponent('hello world')
+    fireEvent.click(getByText('View description'))
+    const toggleDescButton = getByText('Hide description')
+    expect(toggleDescButton).toBeInTheDocument()
+    fireEvent.click(toggleDescButton)
+    expect(getByText('View description')).toBeInTheDocument()
   })
 })

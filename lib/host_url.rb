@@ -22,6 +22,11 @@ class HostUrl
   class << self
     attr_accessor :outgoing_email_address, :outgoing_email_domain, :outgoing_email_default_name
 
+    # See ActionDispatch::HostAuthorization; HostUrl is added as an object to config.hosts
+    def ===(host)
+      host == default_host || host == file_host
+    end
+
     @@default_host = nil
     @@file_host = nil
     @@domain_config = nil

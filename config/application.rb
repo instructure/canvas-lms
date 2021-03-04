@@ -66,7 +66,7 @@ module CanvasRails
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
     config.time_zone = 'UTC'
 
-    log_config = File.exist?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
+    log_config = File.exist?(Rails.root + 'config/logging.yml') && Rails.application.config_for(:logging).with_indifferent_access
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
@@ -128,6 +128,27 @@ module CanvasRails
     end
 
     module PostgreSQLEarlyExtensions
+      module ConnectionHandling
+        def postgresql_connection(config)
+          conn_params = config.symbolize_keys
+
+          hosts = Array(conn_params[:host]).presence || [nil]
+          hosts.each_with_index do |host, index|
+            begin
+              conn_params[:host] = host
+              return super(conn_params)
+              # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+              # for an error where the database name is in the message (i.e. a hostname lookup failure)
+              # CANVAS_RAILS6_0 rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
+              # for any other error
+            rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
+              raise if index == hosts.length - 1
+              # else try next host
+            end
+          end
+        end
+      end
+
       def initialize(connection, logger, connection_parameters, config)
         unless config.key?(:prepared_statements)
           config = config.dup
@@ -171,6 +192,9 @@ module CanvasRails
       end
     end
 
+    Autoextend.hook(:"ActiveRecord::Base",
+      PostgreSQLEarlyExtensions::ConnectionHandling,
+        singleton: true)
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
@@ -277,9 +301,18 @@ module CanvasRails
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
 
-    def validate_secret_key_config!
+    def validate_secret_key_base(_)
       # no validation; we don't use Rails' CookieStore session middleware, so we
       # don't care about secret_key_base
+    end
+
+    class DummyKeyGenerator
+      def self.generate_key(*)
+      end
+    end
+
+    def key_generator
+      DummyKeyGenerator
     end
 
     initializer "canvas.init_dynamic_settings", before: "canvas.extend_shard" do

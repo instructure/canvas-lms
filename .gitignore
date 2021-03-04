@@ -56,6 +56,13 @@ yarn-error.log
 /gems/*/coverage
 /gems/*/tmp
 /gems/*/node_modules
+/gems/plugins/
+!/gems/plugins/academic_benchmark/
+!/gems/plugins/account_reports/
+!/gems/plugins/moodle_importer/
+!/gems/plugins/qti_exporter/
+!/gems/plugins/respondus_soap_endpoint/
+!/gems/plugins/simply_versioned/
 
 # user docker compose overrides
 docker-compose.local.*

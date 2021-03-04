@@ -264,6 +264,12 @@ class RoleOverridesController < ApplicationController
   #            Lower-case letters indicate permissions that are off by default.
   #            A missing letter indicates the permission cannot be enabled for the role
   #            or any derived custom roles.
+  #     add_designer_to_course           -- [ Tad ] Add a designer enrollment to a course
+  #     add_observer_to_course           -- [ Tad ] Add an observer enrollment to a course
+  #     add_student_to_course            -- [ Tad ] Add a student enrollment to a course
+  #     add_ta_to_course                 -- [ Tad ] Add a TA enrollment to a course
+  #     add_teacher_to_course            -- [ Tad ] Add a Teacher enrollment to a course
+  #     allow_course_admin_actions       -- [ Tad ] Perform miscellaneous course and enrollment admin actions
   #     change_course_state              -- [ TaD ] Course State - manage
   #     create_collaborations            -- [STADo] Student Collaborations - create
   #     create_conferences               -- [STADo] Web conferences - create
@@ -301,6 +307,11 @@ class RoleOverridesController < ApplicationController
   #     read_reports                     -- [ TAD ] Courses - view usage reports
   #     read_roster                      -- [STADo] Users - view list
   #     read_sis                         -- [sTa  ] SIS Data - read
+  #     remove_designer_from_course      -- [ Tad ] Remove a designer enrollment from a course
+  #     remove_observer_from_course      -- [ Tad ] Remove an observer enrollment from a course
+  #     remove_student_from_course       -- [ Tad ] Remove a student enrollment from a course
+  #     remove_ta_from_course            -- [ Tad ] Remove a TA enrollment from a course
+  #     remove_teacher_from_course       -- [ Tad ] Remove a Teacher enrollment from a course
   #     select_final_grade               -- [ TA  ] Grades - select final grade for moderation
   #     send_messages                    -- [STADo] Conversations - send messages to individual course members
   #     send_messages_all                -- [sTADo] Conversations - send messages to entire class
@@ -314,6 +325,22 @@ class RoleOverridesController < ApplicationController
   #   if a specified permission is inapplicable, it will be ignored.
   #
   #   Additional permissions may exist based on installed plugins.
+  #
+  #   Note that the "manage_admin_users" permission will soon be deprecated by eleven new
+  #   permissions which provide finer granularity in controlling the administration of
+  #   courses and course enrollments. "manage_admin_users" OR the eleven new permissions
+  #   will be available in the API, not both. The eleven new permissions are:
+  #          allow_course_admin_actions
+  #          add_designer_to_course
+  #          add_observer_to_course
+  #          add_student_to_course
+  #          add_ta_to_course
+  #          add_teacher_to_course
+  #          remove_designer_from_course
+  #          remove_observer_from_course
+  #          remove_student_from_course
+  #          remove_ta_from_course
+  #          remove_teacher_from_course
   #
   # @argument permissions[<X>][locked] [Boolean]
   #   If the value is 1, permission <X> will be locked downstream (new roles in

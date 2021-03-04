@@ -74,8 +74,7 @@ const ManageOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  cursor={description ? 'pointer' : 'not-allowed'}
-                  interaction={description ? 'enabled' : 'readonly'}
+                  interaction={description ? 'enabled' : 'disabled'}
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>

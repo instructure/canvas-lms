@@ -38,7 +38,7 @@ class ImportedHtmlConverter
 
   def convert(html, item_type, mig_id, field, opts={})
     mig_id = mig_id.to_s
-    doc = Nokogiri::HTML(html || "")
+    doc = Nokogiri::HTML5(html || "")
     doc.search("*").each do |node|
       LINK_ATTRS.each do |attr|
         @link_parser.convert_link(node, attr, item_type, mig_id, field)

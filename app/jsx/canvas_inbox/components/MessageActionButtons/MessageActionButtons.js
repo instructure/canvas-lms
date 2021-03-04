@@ -24,6 +24,7 @@ import {
   IconCollectionSaveLine,
   IconComposeLine,
   IconMiniArrowDownLine,
+  IconRemoveFromCollectionLine,
   IconReplyAll2Line,
   IconReplyLine,
   IconSettingsLine,
@@ -109,11 +110,11 @@ export const MessageActionButtons = props => {
         testid="reply-all"
       />
       <ActionButton
-        tip={I18n.t('Archive')}
-        icon={IconCollectionSaveLine}
-        onClick={props.archive}
+        tip={props.unarchive ? I18n.t('Unarchive') : I18n.t('Archive')}
+        icon={props.unarchive ? IconRemoveFromCollectionLine : IconCollectionSaveLine}
+        onClick={props.unarchive ? props.unarchive : props.archive}
         disabled={props.archiveDisabled}
-        testid="archive"
+        testid={props.unarchive ? 'unarchive' : 'archive'}
       />
       <ActionButton
         tip={I18n.t('Delete')}
@@ -136,7 +137,8 @@ MessageActionButtons.propTypes = {
   compose: PropTypes.func.isRequired,
   reply: PropTypes.func.isRequired,
   replyAll: PropTypes.func.isRequired,
-  archive: PropTypes.func.isRequired,
+  archive: PropTypes.func,
+  unarchive: PropTypes.func,
   delete: PropTypes.func.isRequired,
   markAsUnread: PropTypes.func.isRequired,
   forward: PropTypes.func.isRequired,
