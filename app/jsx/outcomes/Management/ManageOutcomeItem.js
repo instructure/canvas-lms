@@ -42,6 +42,7 @@ const ManageOutcomeItem = ({
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler(id)
+  const onMenuHandlerWrapper = (_, action) => onMenuHandler(id, action)
 
   if (!title) return null
 
@@ -97,7 +98,10 @@ const ManageOutcomeItem = ({
           </div>
         </Flex.Item>
         <Flex.Item>
-          <OutcomeKebabMenu menuTitle={I18n.t('Outcome Menu')} onMenuHandler={onMenuHandler} />
+          <OutcomeKebabMenu
+            menuTitle={I18n.t('Outcome Menu')}
+            onMenuHandler={onMenuHandlerWrapper}
+          />
         </Flex.Item>
       </Flex>
       <Flex as="div" alignItems="start">

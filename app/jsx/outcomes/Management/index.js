@@ -35,6 +35,8 @@ import useModal from '../../shared/hooks/useModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
 import MoveModal from './MoveModal'
 import GroupRemoveModal from './GroupRemoveModal'
+import OutcomeRemoveModal from './OutcomeRemoveModal'
+import useModalWithData from 'jsx/outcomes/shared/hooks/useModalWithData'
 
 const NoOutcomesBillboard = ({contextType}) => {
   const isCourse = contextType === 'Course'
@@ -89,12 +91,20 @@ const OutcomeManagementPanel = () => {
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
+  const [
+    outcomeRemoveModalData,
+    openOutcomeRemoveModal,
+    closeOutcomeRemoveModal
+  ] = useModalWithData()
   const groupMenuHandler = (_, action) => {
     if (action === 'move') {
       openMoveGroupModal()
     } else if (action === 'remove') {
       openGroupRemoveModal()
     }
+  }
+  const outcomeMenuHandler = (id, action) => {
+    if (action === 'remove') openOutcomeRemoveModal({id})
   }
 
   if (isLoading) {
@@ -174,7 +184,7 @@ const OutcomeManagementPanel = () => {
                     searchString={searchString}
                     onSelectOutcomesHandler={onSelectOutcomesHandler}
                     onOutcomeGroupMenuHandler={groupMenuHandler}
-                    onOutcomeMenuHandler={noop}
+                    onOutcomeMenuHandler={outcomeMenuHandler}
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
@@ -198,6 +208,14 @@ const OutcomeManagementPanel = () => {
               groupId={selectedGroupId}
               isOpen={isGroupRemoveModalOpen}
               onCloseHandler={closeGroupRemoveModal}
+            />
+          )}
+          {selectedGroupId && outcomeRemoveModalData?.id && (
+            <OutcomeRemoveModal
+              groupId={selectedGroupId}
+              outcomeId={outcomeRemoveModalData?.id}
+              isOpen={outcomeRemoveModalData?.open}
+              onCloseHandler={closeOutcomeRemoveModal}
             />
           )}
         </>

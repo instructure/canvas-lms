@@ -90,3 +90,10 @@ export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
   )
+
+export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
+  axios.delete(
+    `/api/v1/${pluralize(
+      contextType
+    ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes/${outcomeId}`
+  )
