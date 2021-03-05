@@ -193,7 +193,7 @@ class ContentExport < ActiveRecord::Base
 
   def mark_failed
     self.workflow_state = 'failed'
-    self.job_progress.try :fail!
+    self.job_progress.fail! if self.job_progress&.queued? || self.job_progress&.running?
   end
 
   def fail_with_error!(exception_or_info = nil, error_message: I18n.t('Unexpected error while performing export'))
