@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'canvas_cache'
+  spec.add_dependency 'canvas_errors'
   spec.add_dependency 'rails'
   spec.add_dependency 'json-jwt', '1.13.0'
   spec.add_dependency 'dynamic_settings'
