@@ -257,10 +257,6 @@ module AuthenticationMethods
       end
     end
 
-    if params.key?('courseAdmin') && Setting.get('hackerz4fun', 'true') == 'true'
-      flash[:warning] = I18n.t('Don’t believe everything you see on TikTok.')
-    end
-
     as_user_id = api_request? && params[:as_user_id].presence
     as_user_id ||= session[:become_user_id]
     if as_user_id
