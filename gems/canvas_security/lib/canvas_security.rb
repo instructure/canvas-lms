@@ -21,6 +21,7 @@
 require 'active_support/core_ext/module'
 require 'json/jwt'
 require 'dynamic_settings'
+require 'canvas_errors'
 require 'canvas_security/page_view_jwt'
 
 module CanvasSecurity
@@ -232,8 +233,8 @@ module CanvasSecurity
   #
   # Returns the token body as a Hash if it's valid.
   #
-  # Raises Canvas::Security::TokenExpired if the token has expired, and
-  # Canvas::Security::InvalidToken if the token is otherwise invalid.
+  # Raises CanvasSecurity::TokenExpired if the token has expired, and
+  # CanvasSecurity::InvalidToken if the token is otherwise invalid.
   def self.decode_jwt(token, keys = [], ignore_expiration: false)
     keys += encryption_keys
 
@@ -263,17 +264,26 @@ module CanvasSecurity
     if signing_secret == services_signing_secret && services_previous_signing_secret
       secrets_to_check << services_previous_signing_secret
     end
+
+    begin
+      signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
+    rescue OpenSSL::Cipher::CipherError => e
+      # this seems to happen if the token is of a valid shape,
+      # but signed by some OTHER encryption secret?
+      CanvasErrors.capture_exception(:security_auth, e, :warn)
+      raise CanvasSecurity::InvalidToken
+    end
+
     secrets_to_check.each do |cur_secret|
       begin
-        signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
         raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, cur_secret)
         verify_jwt(raw_jwt, ignore_expiration: ignore_expiration)
         return raw_jwt.with_indifferent_access
       rescue JSON::JWS::VerificationFailed => e
-        Canvas::Errors.capture_exception(:security_auth_old_key, e, :info)
+        CanvasErrors.capture_exception(:security_auth, e, :info)
       end
     end
-    raise Canvas::Security::InvalidToken
+    raise CanvasSecurity::InvalidToken
   end
 
   def self.base64_encode(token_string)

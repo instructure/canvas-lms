@@ -2,6 +2,9 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'canvas_cache', path: '../canvas_cache'
-gem 'config_file', path: '../config_file'
-gem 'dynamic_settings', path: '../dynamic_settings'
+path ".." do
+  gem 'canvas_cache'
+  gem 'canvas_errors'
+  gem 'config_file'
+  gem 'dynamic_settings'
+end
