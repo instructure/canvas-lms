@@ -30,4 +30,34 @@ describe MicrosoftSync::Group do
   it 'defaults to workflow_state=pending' do
     expect(subject.workflow_state).to eq('pending')
   end
+
+  describe 'active scope' do
+    subject { described_class.active }
+
+    before(:once) do
+      %i[pending running errored completed deleted].each do |state|
+        course_model.create_microsoft_sync_group(workflow_state: state)
+      end
+    end
+
+    it 'includes pending groups' do
+      expect(subject.where(workflow_state: 'pending')).not_to be_blank
+    end
+
+    it 'includes running groups' do
+      expect(subject.where(workflow_state: 'running')).not_to be_blank
+    end
+
+    it 'includes errored groups' do
+      expect(subject.where(workflow_state: 'errored')).not_to be_blank
+    end
+
+    it 'includes completed groups' do
+      expect(subject.where(workflow_state: 'completed')).not_to be_blank
+    end
+
+    it 'does not include deleted groups' do
+      expect(subject.where(workflow_state: 'deleted')).to be_blank
+    end
+  end
 end

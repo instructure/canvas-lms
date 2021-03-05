@@ -37,6 +37,8 @@ class MicrosoftSync::Group < ActiveRecord::Base
   validates_presence_of :course
   validates_uniqueness_of :course_id
 
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+
   workflow do
     state :pending # Initial state, before first sync
     state :running

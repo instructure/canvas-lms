@@ -1294,6 +1294,10 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/potential_collaborators', action: :potential_collaborators, as: 'group_potential_collaborators'
     end
 
+    scope(controller: 'microsoft_sync/groups') do
+      get "courses/:course_id/microsoft_sync/group", action: :show
+    end
+
     scope(controller: :external_tools) do
       post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :add_rce_favorite, as: :account_external_tools_add_rce_favorite
       delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
