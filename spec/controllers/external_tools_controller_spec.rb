@@ -30,6 +30,8 @@ describe ExternalToolsController do
     student_in_course(:active_all => true)
   end
 
+  before { consider_all_requests_local(false) }
+
   describe "GET 'jwt_token'" do
 
     before :each do
