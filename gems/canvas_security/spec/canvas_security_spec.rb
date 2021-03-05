@@ -90,6 +90,19 @@ describe CanvasSecurity do
           end.to raise_error(CanvasSecurity::InvalidJwtKey)
         end
 
+        it "can unpack encrypted jwts again" do
+          jwt = CanvasSecurity.create_encrypted_jwt(payload, signing_secret, encryption_secret)
+          original = CanvasSecurity.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
+          expect(original[:arbitrary]).to eq("data")
+        end
+
+        it "gracefully handles using a different encryption secret" do
+          different_secret = encryption_secret.upcase
+          jwt = CanvasSecurity.create_encrypted_jwt(payload, signing_secret, different_secret)
+          expect do
+            CanvasSecurity.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
+          end.to raise_error(CanvasSecurity::InvalidToken)
+        end
       end
     end
 
