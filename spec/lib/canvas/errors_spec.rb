@@ -20,6 +20,9 @@
 require 'spec_helper'
 require_dependency "canvas/errors"
 module Canvas
+  # TODO: Leaving one spec in here to make sure the shim
+  # works until we've successfully re-pointed all
+  # callsites to "CanvasErrors"
   describe Errors do
     error_testing_class = Class.new do
       attr_accessor :exception, :details, :level
@@ -57,52 +60,5 @@ module Canvas
       end
     end
 
-    describe 'with inferred context' do
-      around(:each) do |example|
-        prev_context = Thread.current[:context]
-        example.run
-      ensure
-        Thread.current[:context] = prev_context
-      end
-
-      it "attaches current job context to error hashes" do
-        fake_job_class = Class.new do
-          def perform; end
-        end
-        job = Delayed::Job.enqueue(fake_job_class.new)
-        allow(Delayed::Worker).to receive(:current_job).and_return(job)
-        Canvas::Errors.capture(RuntimeError.new, { my_tag: "my_value"}, :warn)
-        expect(@error_harness.details[:extra][:my_tag]).to eq("my_value")
-        expect(@error_harness.details[:tags][:job_tag]).to match('#perform')
-        expect(@error_harness.level).to eq(:warn)
-      end
-
-      it "attaches request context to error hashes collected manually" do
-        Thread.current[:context] = {
-          request_id: '1234request1234',
-          session_id: '1234session1234'
-        }
-        Canvas::Errors.capture(RuntimeError.new, { my_tag: "custom_value"}, :info)
-        expect(@error_harness.details[:extra][:my_tag]).to eq("custom_value")
-        expect(@error_harness.details[:extra][:request_id]).to eq("1234request1234")
-        expect(@error_harness.details[:extra][:session_id]).to match('1234session1234')
-        expect(@error_harness.level).to eq(:info)
-      end
-    end
-
-    it 'fires callbacks when it handles an exception' do
-      Canvas::Errors.capture(error)
-      expect(@error_harness.exception).to eq(error)
-    end
-
-    it "passes through extra information if available wrapped in extra" do
-      Canvas::Errors.capture(double(), {detail1: 'blah'})
-      expect(@error_harness.details[:extra][:detail1]).to eq('blah')
-    end
-
-    it 'captures output from each callback according to their registry tag' do
-      outputs = Canvas::Errors.capture(double())
-      expect(outputs[:test_thing]).to eq("ERROR_BLOCK_RESPONSE")
-    end
   end
 end
