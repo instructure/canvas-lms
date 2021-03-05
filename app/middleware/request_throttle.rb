@@ -204,11 +204,11 @@ class RequestThrottle
   end
 
   def report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
-    RequestContextGenerator.add_meta_header("b", starting_mem)
-    RequestContextGenerator.add_meta_header("m", ending_mem)
-    RequestContextGenerator.add_meta_header("u", "%.2f" % [user_cpu])
-    RequestContextGenerator.add_meta_header("y", "%.2f" % [system_cpu])
-    RequestContextGenerator.add_meta_header("d", "%.2f" % [db_runtime])
+    RequestContext::Generator.add_meta_header("b", starting_mem)
+    RequestContext::Generator.add_meta_header("m", ending_mem)
+    RequestContext::Generator.add_meta_header("u", "%.2f" % [user_cpu])
+    RequestContext::Generator.add_meta_header("y", "%.2f" % [system_cpu])
+    RequestContext::Generator.add_meta_header("d", "%.2f" % [db_runtime])
 
     if account&.shard&.database_server
       InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu,

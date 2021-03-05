@@ -120,6 +120,16 @@ const speedGraderHelpers = {
     return select + version
   },
 
+  resourceLinkLookupUuidParam(submission) {
+    const resourceLinkLookupUuid = submission.resource_link_lookup_uuid
+
+    if (resourceLinkLookupUuid) {
+      return `&resource_link_lookup_uuid=${resourceLinkLookupUuid}`
+    }
+
+    return ''
+  },
+
   setRightBarDisabled(isDisabled) {
     const elements = [
       '#grading-box-extended',

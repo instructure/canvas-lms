@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, waitForElement} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 import {renderTeacherView} from './integration-utils'
 import {closest, mockAssignment, itBehavesLikeADialog} from '../../../test-utils'
 
@@ -36,6 +36,6 @@ describe('MessageStudentsWho integration', () => {
     )
     fireEvent.click(getAllByText(/students/i)[0])
     fireEvent.click(closest(getByText(/message students/i), 'button'))
-    expect(await waitForElement(() => getByText('Message Students Who...'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Message Students Who...'))).toBeInTheDocument()
   })
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {waitForElement} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 import {mockAssignment} from '../../test-utils'
 import {renderTeacherQuery} from './integration/integration-utils'
 
@@ -26,7 +26,7 @@ describe('TeacherQuery', () => {
     const assignment = mockAssignment()
     const {getAllByText, getByTitle} = renderTeacherQuery(assignment)
     expect(getByTitle('Loading...')).toBeInTheDocument()
-    expect(await waitForElement(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
+    expect(await waitFor(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
   })
 
   /* eslint-disable jest/no-disabled-tests */

@@ -50,6 +50,7 @@ import 'jqueryui/dialog'
 import 'jquery.toJSON'
 import '../../jquery.rails_flash_notifications'
 import '../../behaviors/tooltip'
+import {FileBrowserWrapper} from 'jsx/assignments/EditAssignment'
 
 ###
 xsslint safeString.identifier srOnly
@@ -69,9 +70,11 @@ export default class EditView extends ValidatedFormView
   ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
   NAME = '[name="name"]'
   ALLOW_FILE_UPLOADS = '#assignment_online_upload'
+  ALLOW_ANNOTATED_DOCUMENT = '#assignment_annotated_document'
   ALLOW_TEXT_ENTRY = '#assignment_text_entry'
   RESTRICT_FILE_UPLOADS = '#assignment_restrict_file_extensions'
   RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
+  ANNOTATED_DOCUMENT_OPTIONS = '#annotated_document_chooser_container'
   ALLOWED_EXTENSIONS = '#allowed_extensions_container'
   TURNITIN_ENABLED = '#assignment_turnitin_enabled'
   VERICITE_ENABLED = '#assignment_vericite_enabled'
@@ -115,8 +118,10 @@ export default class EditView extends ValidatedFormView
     els["#{ONLINE_SUBMISSION_TYPES}"] = '$onlineSubmissionTypes'
     els["#{NAME}"] = '$name'
     els["#{ALLOW_FILE_UPLOADS}"] = '$allowFileUploads'
+    els["#{ALLOW_ANNOTATED_DOCUMENT}"] = '$allowAnnotatedDocument'
     els["#{RESTRICT_FILE_UPLOADS}"] = '$restrictFileUploads'
     els["#{RESTRICT_FILE_UPLOADS_OPTIONS}"] = '$restrictFileUploadsOptions'
+    els["#{ANNOTATED_DOCUMENT_OPTIONS}"] = '$annotatedDocumentOptions'
     els["#{ALLOWED_EXTENSIONS}"] = '$allowedExtensions'
     els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
     els["#{VERICITE_ENABLED}"] = '$vericiteEnabled'
@@ -159,6 +164,7 @@ export default class EditView extends ValidatedFormView
     events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
     events["change #{VERICITE_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
     events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
+    events["change #{ALLOW_ANNOTATED_DOCUMENT}"] = 'toggleAnnotatedDocument'
     events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
     events["change #assignment_points_possible"] = 'handlePointsChange'
     events["change #{PEER_REVIEWS_BOX}"] = 'togglePeerReviewsAndGroupCategoryEnabled'
@@ -321,6 +327,29 @@ export default class EditView extends ValidatedFormView
 
   toggleRestrictFileUploads: =>
     @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
+
+  toggleAnnotatedDocument: =>
+    @$annotatedDocumentOptions.toggleAccessibly @$allowAnnotatedDocument.prop('checked')
+
+    documentChooserContainer = document.querySelector('#annotated_document_chooser_container')
+
+    if @$allowAnnotatedDocument.prop('checked')
+      fileBrowserProps = {
+        useContextAssets: true,
+        allowUpload: true,
+        selectFile: (fileInfo) =>
+          document.getElementById('annotated_document_id').value = fileInfo.id
+          $.screenReaderFlashMessageExclusive(
+            I18n.t('selected %{filename}', {filename: fileInfo.name})
+          )
+      }
+
+      ReactDOM.render(
+        React.createElement(FileBrowserWrapper, fileBrowserProps),
+        documentChooserContainer
+      )
+    else
+      ReactDOM.unmountComponentAtNode(documentChooserContainer)
 
   toggleAdvancedTurnitinSettings: (ev) =>
     ev.preventDefault()
@@ -520,6 +549,7 @@ export default class EditView extends ValidatedFormView
       lockedItems: @lockedItems
       anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
       anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
+      annotatedDocumentSubmissionsEnabled: ENV?.ANNOTATED_DOCUMENT_SUBMISSIONS or false
 
   _attachEditorToDescription: =>
     return if @lockedItems.content

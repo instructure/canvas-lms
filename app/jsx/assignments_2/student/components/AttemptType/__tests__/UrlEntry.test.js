@@ -17,7 +17,7 @@
  */
 
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
-import {fireEvent, render, wait} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -223,7 +223,7 @@ describe('UrlEntry', () => {
         })
       )
 
-      await wait(() => {
+      await waitFor(() => {
         expect(props.createSubmissionDraft).toHaveBeenCalledWith({
           variables: {
             activeSubmissionType: 'online_url',

@@ -740,11 +740,15 @@ class DiscussionTopicsController < ApplicationController
               },
               :PERMISSIONS => {
                 # Can reply
-                :CAN_REPLY        => @topic.grants_right?(@current_user, session, :reply),
+                :CAN_REPLY =>
+                  @topic.grants_right?(@current_user, session, :reply) &&
+                    !@topic.homeroom_announcement?(@context),
                 # Can attach files on replies
                 :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),
                 :CAN_RATE         => @topic.grants_right?(@current_user, session, :rate),
-                :CAN_READ_REPLIES => @topic.grants_right?(@current_user, :read_replies),
+                :CAN_READ_REPLIES => 
+                  @topic.grants_right?(@current_user, :read_replies)  &&
+                    !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics
                 :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
                                      !@topic.locked_for?(@current_user, :check_policies => true),

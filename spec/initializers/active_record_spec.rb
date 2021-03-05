@@ -438,11 +438,7 @@ module ActiveRecord
       end
 
       it "foreign_key_for prefers a 'bare' FK first" do
-        if CANVAS_RAILS5_2
-          expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
-        else
-          expect(User.connection.foreign_key_for(:enrollments, to_table: :users).column).to eq 'user_id'
-        end
+        expect(User.connection.foreign_key_for(:enrollments, to_table: :users).column).to eq 'user_id'
       end
 
       it "remove_index allows if_exists" do

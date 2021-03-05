@@ -23,7 +23,6 @@ import React from 'react'
 import {createCache} from 'jsx/canvas-apollo'
 import OutcomeManagementPanel from '../index'
 import OutcomesContext from 'jsx/outcomes/contexts/OutcomesContext'
-
 import {accountMocks, courseMocks, groupDetailMocks, groupMocks} from './mocks'
 
 jest.useFakeTimers()
@@ -59,7 +58,7 @@ describe('OutcomeManagementPanel', () => {
     const {getByText} = render(<OutcomeManagementPanel contextType="Course" contextId="2" />, {
       contextType: 'Course',
       contextId: '2',
-      mocks: courseMocks({childGroupsCount: 0}),
+      mocks: courseMocks({childGroupsCount: 0})
     })
     await act(async () => jest.runAllTimers())
     expect(getByText(/Outcomes have not been added to this course yet/)).not.toBeNull()
@@ -69,7 +68,7 @@ describe('OutcomeManagementPanel', () => {
     const {getByText, getAllByText} = render(
       <OutcomeManagementPanel contextType="Account" contextId="1" />,
       {
-        mocks: accountMocks({childGroupsCount: 2}),
+        mocks: accountMocks({childGroupsCount: 2})
       }
     )
     await act(async () => jest.runAllTimers())
@@ -83,7 +82,7 @@ describe('OutcomeManagementPanel', () => {
     const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
       contextId: '2',
-      mocks: courseMocks({childGroupsCount: 2}),
+      mocks: courseMocks({childGroupsCount: 2})
     })
     await act(async () => jest.runAllTimers())
     expect(getByText(/Outcome Groups/)).toBeInTheDocument()
@@ -94,7 +93,7 @@ describe('OutcomeManagementPanel', () => {
 
   it('loads nested groups', async () => {
     const {getByText} = render(<OutcomeManagementPanel contextType="Account" contextId="1" />, {
-      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})],
+      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
@@ -106,7 +105,7 @@ describe('OutcomeManagementPanel', () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
     const {getByText} = render(<OutcomeManagementPanel contextType="Course" contextId="2" />, {
       contextType: 'Course',
-      mocks: [],
+      mocks: []
     })
     await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
@@ -116,7 +115,7 @@ describe('OutcomeManagementPanel', () => {
   it('displays an error on failed request for account outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
     const {getByText} = render(<OutcomeManagementPanel contextType="Account" contextId="1" />, {
-      mocks: [],
+      mocks: []
     })
     await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading account outcomes.')
@@ -130,8 +129,8 @@ describe('OutcomeManagementPanel', () => {
       mocks: [
         ...courseMocks({childGroupsCount: 2}),
         ...groupMocks({groupId: 200}),
-        ...groupDetailMocks({groupId: 200}),
-      ],
+        ...groupDetailMocks({groupId: 200})
+      ]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
@@ -139,5 +138,49 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Group 200 Outcomes')).toBeInTheDocument()
     expect(getByText('Outcome 1 - Group 200')).toBeInTheDocument()
     expect(getByText('Outcome 2 - Group 200')).toBeInTheDocument()
+  })
+
+  it('shows remove group modal if remove option from group menu is selected', async () => {
+    const {getByText, getAllByText} = render(
+      <OutcomeManagementPanel contextType="Course" contextId="2" />,
+      {
+        contextType: 'Course',
+        contextId: '2',
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: 200}),
+          ...groupDetailMocks({groupId: 200})
+        ]
+      }
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(getAllByText('Remove')[getAllByText('Remove').length - 1])
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Remove Group?')).toBeInTheDocument()
+  })
+
+  it('selects/unselects outcome via checkbox', async () => {
+    const {getByText, getAllByText} = render(
+      <OutcomeManagementPanel contextType="Course" contextId="2" />,
+      {
+        contextType: 'Course',
+        contextId: '2',
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: 200}),
+          ...groupDetailMocks({groupId: 200})
+        ]
+      }
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getAllByText('Select outcome')[0])
+    expect(getByText('1 Outcome Selected')).toBeInTheDocument()
+    fireEvent.click(getAllByText('Select outcome')[0])
+    expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
   })
 })

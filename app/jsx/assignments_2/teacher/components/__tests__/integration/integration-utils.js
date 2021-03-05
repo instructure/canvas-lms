@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitForElement, fireEvent} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import TeacherQuery from '../../TeacherQuery'
 import TeacherView from '../../TeacherView'
 
@@ -52,7 +52,7 @@ export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
 
 export async function renderTeacherQueryAndWaitForResult(assignment, additionalApolloMocks) {
   const fns = renderTeacherQuery(assignment, additionalApolloMocks)
-  await waitForElement(() => fns.getAllByText(assignment.name)[0])
+  await waitFor(() => fns.getAllByText(assignment.name)[0])
   return fns
 }
 

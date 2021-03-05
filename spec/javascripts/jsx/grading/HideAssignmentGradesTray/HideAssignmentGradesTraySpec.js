@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {waitForElement, wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 import HideAssignmentGradesTray from 'jsx/grading/HideAssignmentGradesTray'
 import * as Api from 'jsx/grading/HideAssignmentGradesTray/Api'
@@ -41,7 +41,10 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       },
       onExited: sinon.spy(),
       onHidden: sinon.spy(),
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}]
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'}
+      ]
     }
 
     const bindRef = ref => {
@@ -109,11 +112,11 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
 
   function show() {
     tray.show(context)
-    return waitForElement(getTrayElement)
+    return waitFor(getTrayElement)
   }
 
   function waitForTrayClosed() {
-    return wait(() => {
+    return waitFor(() => {
       if (context.onExited.callCount > 0) {
         return
       }
@@ -165,7 +168,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
 
     test('calls optional onExited', async () => {
       await show()
-      await waitForElement(getTrayElement)
+      await waitFor(getTrayElement)
       getCloseIconButton().click()
       await waitForTrayClosed()
       const {callCount} = context.onExited
@@ -206,7 +209,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
 
     test('calls optional onExited', async () => {
       await show()
-      await waitForElement(getTrayElement)
+      await waitFor(getTrayElement)
       getCloseButton().click()
       await waitForTrayClosed()
       const {callCount} = context.onExited
@@ -229,7 +232,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     })
 
     function waitForHiding() {
-      return wait(() => resolveHideAssignmentGradesStatusStub.callCount > 0)
+      return waitFor(() => resolveHideAssignmentGradesStatusStub.callCount > 0)
     }
 
     function clickHide() {

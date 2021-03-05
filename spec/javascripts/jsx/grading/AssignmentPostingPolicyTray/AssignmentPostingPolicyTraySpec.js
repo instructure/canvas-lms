@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {waitForElement, wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 import AssignmentPostingPolicyTray from 'jsx/grading/AssignmentPostingPolicyTray'
 import * as Api from 'jsx/grading/AssignmentPostingPolicyTray/Api'
@@ -91,11 +91,11 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
 
   function show() {
     tray.show(context)
-    return waitForElement(getTrayElement)
+    return waitFor(getTrayElement)
   }
 
   function waitForTrayClosed() {
-    return wait(() => {
+    return waitFor(() => {
       if (context.onExited.callCount > 0) {
         return
       }
@@ -275,7 +275,7 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
 
     QUnit.module('on success', () => {
       const waitForSuccess = async () => {
-        await wait(() => getTrayElement() == null)
+        await waitFor(() => getTrayElement() == null)
       }
 
       test('renders a success alert', async () => {
@@ -312,7 +312,7 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
 
     QUnit.module('on failure', failureHooks => {
       const waitForFailure = async () => {
-        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
+        await waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
       }
 
       failureHooks.beforeEach(() => {

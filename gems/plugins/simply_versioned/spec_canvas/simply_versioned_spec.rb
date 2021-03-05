@@ -32,11 +32,7 @@ describe 'simply_versioned' do
 
   after :all do
     Woozel.connection.drop_table :woozels
-    if CANVAS_RAILS5_2
-      # Rails 6 started using WeakRefs for this, so it automatically starts ignoring classes
-      # that have been removed
-      ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(Woozel)
-    end
+    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('Woozel')
     Object.send(:remove_const, :Woozel)
     GC.start
   end

@@ -18,13 +18,13 @@
 import React from 'react'
 import LoggedOutTabs from '../LoggedOutTabs'
 import {mockAssignment} from '../../mocks'
-import {render, waitForElement} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 
 describe('LoggedOutTabs', () => {
   it('renders component LoginActionPrompt', async () => {
     const assignment = await mockAssignment()
     const {getByText} = render(<LoggedOutTabs assignment={assignment} />)
-    expect(await waitForElement(() => getByText('Submission Locked'))).toBeInTheDocument()
-    expect(await waitForElement(() => getByText('Log in to submit'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Submission Locked'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Log in to submit'))).toBeInTheDocument()
   })
 })

@@ -135,6 +135,56 @@ describe SubmissionsController do
       end
     end
 
+    context 'setting the `resource_link_lookup_uuid` to the submission' do
+      let(:tool) do
+        Account.default.context_external_tools.create!(
+          name: 'Undertow',
+          url: 'http://www.example.com',
+          consumer_key: '12345',
+          shared_secret: 'secret'
+        )
+      end
+      let(:resource_link) do
+        Lti::ResourceLink.create(context: @course, context_external_tool: tool)
+      end
+      let(:params) do
+        {
+          course_id: @course.id,
+          assignment_id: @assignment.id,
+          submission: {
+            submission_type: 'online_url',
+          }
+        }
+      end
+
+      before do
+        course_with_student_logged_in(active_all: true)
+        @course.account.enable_service(:avatars)
+        @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_url')
+      end
+
+      it "should display an error when lti resource link is not found" do
+        params[:submission][:resource_link_lookup_uuid] = 'FOO&BAR'
+
+        post 'create', params: params
+
+        expect(response).to be_redirect
+        expect(assigns[:submission]).to be_nil
+        expect(flash[:error]).not_to be_nil
+        expect(flash[:error]).to match(/Resource link not found for given `resource_link_lookup_uuid`/)
+      end
+
+      it "should create the submission when lti resource link is found" do
+        params[:submission][:resource_link_lookup_uuid] = resource_link.lookup_uuid
+
+        post 'create', params: params
+
+        expect(response).to be_redirect
+        expect(assigns[:submission]).not_to be_nil
+        expect(assigns[:submission].resource_link_lookup_uuid).to eql(resource_link.lookup_uuid)
+      end
+    end
+
     it "should copy attachments to the submissions folder if that feature is enabled" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)

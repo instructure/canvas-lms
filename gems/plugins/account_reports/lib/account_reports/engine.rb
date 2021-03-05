@@ -23,15 +23,31 @@ module AccountReports
     initializer "account_reports.canvas_plugin" do
       require 'account_reports/course_reports'
       require 'account_reports/default'
+      require 'account_reports/eportfolio_reports'
       require 'account_reports/grade_reports'
+      require 'account_reports/lti_reports'
       require 'account_reports/outcome_export'
       require 'account_reports/outcome_reports'
       require 'account_reports/report_helper'
       require 'account_reports/sis_exporter'
       require 'account_reports/student_reports'
-      require 'account_reports/lti_reports'
 
       AccountReports.configure_account_report 'Default', {
+        'eportfolio_report_csv' => {
+          :title => proc { I18n.t('Eportfolio Report') },
+          :description_partial => true,
+          :parameters_partial => true,
+          :parameters => {
+            :no_enrollments => {
+              :required => false,
+              :description => 'Only include ePortfolios from users with no enrollments'
+            },
+            :include_deleted => {
+              :required => false,
+              :description => 'Include deleted objects'
+            }
+          }
+        },
         'grade_export_csv' => {
           :title => proc { I18n.t(:grade_export_title, 'Grade Export') },
           :description_partial => true,

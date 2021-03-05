@@ -60,10 +60,10 @@ class Auditors::Authentication
     auth_ar_type = Auditors::ActiveRecord::AuthenticationRecord
     backend_strategy -> { Auditors.backend_strategy }
     active_record_type auth_ar_type
-    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
+    database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
     table :authentications
     record_type Auditors::Authentication::Record
-    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
+    read_consistency_level -> { CanvasCassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :pseudonym do
       table :authentications_by_pseudonym

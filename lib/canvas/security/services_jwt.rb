@@ -153,15 +153,15 @@ class Canvas::Security::ServicesJwt
   end
 
   def self.encryption_secret
-    Canvas::DynamicSettings.find("canvas")["encryption-secret"]
+    Canvas::Security.services_encryption_secret
   end
 
   def self.signing_secret
-    Canvas::DynamicSettings.find("canvas")["signing-secret"]
+    Canvas::Security.services_signing_secret
   end
 
   def self.previous_signing_secret
-    Canvas::DynamicSettings.find("canvas")["signing-secret-deprecated"]
+    Canvas::Security.services_previous_signing_secret
   end
 
   private

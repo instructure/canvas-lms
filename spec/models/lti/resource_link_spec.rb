@@ -56,8 +56,8 @@ RSpec.describe Lti::ResourceLink, type: :model do
       expect(resource_link.original_context_external_tool).to eq tool
     end
 
-    it '`lookup_uuid` should be unique' do
-      expect(resource_link).to validate_uniqueness_of(:lookup_uuid).ignoring_case_sensitivity
+    it '`lookup_uuid` should be unique scoped to `context`' do
+      expect(resource_link).to validate_uniqueness_of(:lookup_uuid).scoped_to(:context_id, :context_type).ignoring_case_sensitivity
     end
   end
 

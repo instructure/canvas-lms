@@ -20,7 +20,7 @@ import * as uploadFileModule from '../../../shared/upload_file'
 import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {createCache} from '../../../canvas-apollo'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
@@ -30,7 +30,6 @@ import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../mocks'
 import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'
-import {SubmissionMocks} from '../graphqlData/Submission'
 
 jest.mock('../components/AttemptSelect')
 
@@ -109,7 +108,7 @@ describe('student view integration tests', () => {
         </MockedProvider>
       )
 
-      expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
+      expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
     })
 
     // This cannot be tested at the <AttemptTab> because the new file being
@@ -127,7 +126,7 @@ describe('student view integration tests', () => {
         }
       })
 
-      const {container, findByText, findAllByText} = render(
+      const {findByTestId, findByText, findAllByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -136,9 +135,7 @@ describe('student view integration tests', () => {
       )
 
       const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
-      const fileInput = await waitForElement(() =>
-        container.querySelector('input[id="inputFileDrop"]')
-      )
+      const fileInput = await findByTestId('input-file-drop')
       fireEvent.change(fileInput, {target: {files}})
       await findByText('Loading')
       expect((await findAllByText('test.jpg'))[0]).toBeInTheDocument()
@@ -159,7 +156,7 @@ describe('student view integration tests', () => {
         }
       })
 
-      const {container, findAllByText} = render(
+      const {findByTestId, findAllByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -171,9 +168,7 @@ describe('student view integration tests', () => {
         new File(['foo'], 'file1.jpg', {type: 'image/jpg'}),
         new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
       ]
-      const fileInput = await waitForElement(() =>
-        container.querySelector('input[id="inputFileDrop"]')
-      )
+      const fileInput = await findByTestId('input-file-drop')
       fireEvent.change(fileInput, {target: {files}})
       const elements = await findAllByText('Loading')
       expect(elements).toHaveLength(2)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByText, queryByText, findByText, waitForElementToBeRemoved} from '@testing-library/dom'
+import {getByText, queryByText, findByText, waitForToBeRemoved} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
 import Backbone from 'Backbone'
 import Assignment from 'compiled/models/Assignment'
@@ -34,14 +34,13 @@ import 'helpers/jquery.simulate'
 
 let screenreaderText = null
 let nonScreenreaderText = null
-const fixtures = $('#fixtures')
 class AssignmentCollection extends Backbone.Collection {
   static initClass() {
     this.prototype.model = Assignment
   }
 }
 AssignmentCollection.initClass()
-const assignment1 = function() {
+const assignment1 = function () {
   const date1 = {
     due_at: '2013-08-28T23:59:00-06:00',
     title: 'Summer Session'
@@ -60,21 +59,6 @@ const assignment1 = function() {
     all_dates: [date1, date2]
   })
 }
-const assignment2 = () =>
-  buildAssignment({
-    id: 3,
-    name: 'Math Quiz',
-    due_at: '2013-08-23T23:59:00-06:00',
-    points_possible: 10,
-    position: 2
-  })
-const assignment3 = () =>
-  buildAssignment({
-    id: 2,
-    name: 'Science Quiz',
-    points_possible: 5,
-    position: 3
-  })
 const assignment_grade_percent = () =>
   buildAssignment({
     id: 2,
@@ -99,7 +83,7 @@ const assignment_grade_not_graded = () =>
     name: 'Science Quiz',
     grading_type: 'not_graded'
   })
-var buildAssignment = function(options) {
+const buildAssignment = function (options) {
   if (options == null) {
     options = {}
   }
@@ -122,7 +106,7 @@ var buildAssignment = function(options) {
   sinon.stub(ac.at(0), 'pollUntilFinishedDuplicating')
   return ac.at(0)
 }
-const createView = function(model, options) {
+const createView = function (model, options) {
   options = {
     canManage: true,
     canReadGrades: false,
@@ -152,14 +136,14 @@ const createView = function(model, options) {
   view.render()
   return view
 }
-const genModules = function(count) {
+const genModules = function (count) {
   if (count === 1) {
     return ['First']
   } else {
     return ['First', 'Second']
   }
 }
-const genSetup = function(model = assignment1()) {
+const genSetup = function (model = assignment1()) {
   fakeENV.setup({
     current_user_roles: ['teacher'],
     PERMISSIONS: {manage: false},
@@ -171,13 +155,11 @@ const genSetup = function(model = assignment1()) {
   screenreaderText = () => $.trim(this.view.$('.js-score .screenreader-only').text())
   return (nonScreenreaderText = () => $.trim(this.view.$('.js-score .non-screenreader').text()))
 }
-const genTeardown = function() {
+const genTeardown = function () {
   fakeENV.teardown()
   $('#fixtures').empty()
   // cleanup instui dialogs and trays that render in a portal outside of #fixtures
-  $('[role="dialog"]')
-    .closest('span[dir="ltr"]')
-    .remove()
+  $('[role="dialog"]').closest('span[dir="ltr"]').remove()
 }
 
 QUnit.module('AssignmentListItemViewSpec', {
@@ -198,13 +180,14 @@ QUnit.module('AssignmentListItemViewSpec', {
   }
 })
 
-test('should be accessible', function(assert) {
+// eslint-disable-next-line qunit/resolve-async
+test('should be accessible', function (assert) {
   const view = createView(this.model, {canManage: true})
   const done = assert.async()
   assertions.isAccessible(view, done, {a11yReport: true})
 })
 
-test('initializes child views if can manage', function() {
+test('initializes child views if can manage', function () {
   const view = createView(this.model, {canManage: true})
   ok(view.publishIconView)
   ok(view.dateDueColumnView)
@@ -212,14 +195,14 @@ test('initializes child views if can manage', function() {
   ok(view.editAssignmentView)
 })
 
-test("initializes no child views if can't manage", function() {
+test("initializes no child views if can't manage", function () {
   const view = createView(this.model, {canManage: false})
   ok(!view.publishIconView)
   ok(!view.vddTooltipView)
   ok(!view.editAssignmentView)
 })
 
-test('initializes sis toggle if post to sis enabled', function() {
+test('initializes sis toggle if post to sis enabled', function () {
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: true,
@@ -228,7 +211,7 @@ test('initializes sis toggle if post to sis enabled', function() {
   ok(view.sisButtonView)
 })
 
-test('does not initialize sis toggle if post to sis disabled', function() {
+test('does not initialize sis toggle if post to sis disabled', function () {
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: true,
@@ -237,7 +220,7 @@ test('does not initialize sis toggle if post to sis disabled', function() {
   ok(!view.sisButtonView)
 })
 
-test('does not initialize sis toggle if assignment is not graded', function() {
+test('does not initialize sis toggle if assignment is not graded', function () {
   this.model.set('submission_types', ['not_graded'])
   const view = createView(this.model, {
     canManage: true,
@@ -246,7 +229,7 @@ test('does not initialize sis toggle if assignment is not graded', function() {
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if post to sis disabled but can't manage", function() {
+test("does not initialize sis toggle if post to sis disabled but can't manage", function () {
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: false,
@@ -255,7 +238,7 @@ test("does not initialize sis toggle if post to sis disabled but can't manage", 
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if sis enabled but can't manage", function() {
+test("does not initialize sis toggle if sis enabled but can't manage", function () {
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: false,
@@ -264,7 +247,7 @@ test("does not initialize sis toggle if sis enabled but can't manage", function(
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if post to sis disabled, can't manage and is unpublished", function() {
+test("does not initialize sis toggle if post to sis disabled, can't manage and is unpublished", function () {
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: false,
@@ -273,7 +256,7 @@ test("does not initialize sis toggle if post to sis disabled, can't manage and i
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if sis enabled, can't manage and is unpublished", function() {
+test("does not initialize sis toggle if sis enabled, can't manage and is unpublished", function () {
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: false,
@@ -282,7 +265,7 @@ test("does not initialize sis toggle if sis enabled, can't manage and is unpubli
   ok(!view.sisButtonView)
 })
 
-test('does not initialize sis toggle if post to sis disabled, can manage and is unpublished', function() {
+test('does not initialize sis toggle if post to sis disabled, can manage and is unpublished', function () {
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: true,
@@ -291,7 +274,7 @@ test('does not initialize sis toggle if post to sis disabled, can manage and is 
   ok(!view.sisButtonView)
 })
 
-test('does not initialize sis toggle if sis enabled, can manage and is unpublished', function() {
+test('does not initialize sis toggle if sis enabled, can manage and is unpublished', function () {
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: true,
@@ -302,30 +285,30 @@ test('does not initialize sis toggle if sis enabled, can manage and is unpublish
 
 QUnit.skip(
   'Fix in LA-383 - opens and closes the direct share send to user dialog',
-  async function() {
+  async function () {
     const view = createView(this.model, {directShareEnabled: true})
     $('#fixtures').append('<div id="send-to-mount-point" />')
     view.$('.send_assignment_to').click()
     ok(await findByText(document.body, 'Send to:'))
     getByText(document.body, 'Close').click()
-    await waitForElementToBeRemoved(() => queryByText(document.body, 'Send to:'))
+    await waitForToBeRemoved(() => queryByText(document.body, 'Send to:'))
   }
 )
 
 QUnit.skip(
   'Fix in LA-354 - opens and closes the direct share copy to course tray',
-  async function() {
+  async function () {
     const view = createView(this.model, {directShareEnabled: true})
     $('#fixtures').append('<div id="copy-to-mount-point" />')
     view.$('.copy_assignment_to').click()
     fetchMock.mock('/users/self/manageable_courses', [])
     ok(await findByText(document.body, 'Select a Course'))
     getByText(document.body, 'Close').click()
-    await waitForElementToBeRemoved(() => queryByText(document.body, 'Select a Course'))
+    await waitForToBeRemoved(() => queryByText(document.body, 'Select a Course'))
   }
 )
 
-test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function() {
+test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function () {
   const view = createView(this.model, {
     directShareEnabled: false
   })
@@ -333,14 +316,14 @@ test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED',
   strictEqual(view.$('.copy_assignment_to').length, 0)
 })
 
-test('upatePublishState toggles ig-published', function() {
+test('upatePublishState toggles ig-published', function () {
   const view = createView(this.model, {canManage: true})
   ok(view.$('.ig-row').hasClass('ig-published'))
   this.model.set('published', false)
   ok(!view.$('.ig-row').hasClass('ig-published'))
 })
 
-test('asks for confirmation before deleting an assignment', function() {
+test('asks for confirmation before deleting an assignment', function () {
   const view = createView(this.model)
   sandbox.stub(view, 'visibleAssignments').returns([])
   sandbox.stub(window, 'confirm').returns(true)
@@ -350,7 +333,7 @@ test('asks for confirmation before deleting an assignment', function() {
   ok(view.delete.called)
 })
 
-test('does not attempt to delete an assignment due in a closed grading period', function() {
+test('does not attempt to delete an assignment due in a closed grading period', function () {
   this.model.set('in_closed_grading_period', true)
   const view = createView(this.model)
   sandbox.stub(window, 'confirm').returns(true)
@@ -360,7 +343,7 @@ test('does not attempt to delete an assignment due in a closed grading period', 
   ok(view.delete.notCalled)
 })
 
-test('delete destroys model', function() {
+test('delete destroys model', function () {
   const old_asset_string = ENV.context_asset_string
   ENV.context_asset_string = 'course_1'
   const view = createView(this.model)
@@ -370,7 +353,7 @@ test('delete destroys model', function() {
   ENV.context_asset_string = old_asset_string
 })
 
-test('delete calls screenreader message', function() {
+test('delete calls screenreader message', function () {
   const old_asset_string = ENV.context_asset_string
   ENV.context_asset_string = 'course_1'
   const server = sinon.fakeServer.create()
@@ -398,7 +381,7 @@ test('delete calls screenreader message', function() {
   ENV.context_asset_string = old_asset_string
 })
 
-test('show score if score is set', function() {
+test('show score if score is set', function () {
   this.submission.set({
     score: 1.5555,
     grade: '1.5555'
@@ -409,16 +392,16 @@ test('show score if score is set', function() {
   equal(nonScreenreaderText(), '1.56/2 pts', 'sets non-screenreader text')
 })
 
-test('do not show score if viewing as non-student', function() {
+test('do not show score if viewing as non-student', function () {
   const old_user_roles = ENV.current_user_roles
   ENV.current_user_roles = ['user']
   const view = createView(this.model, {canManage: false})
   const str = view.$('.js-score:eq(0) .non-screenreader').html()
-  ok(str.search('2 pts') !== -1)
+  notStrictEqual(str.search('2 pts'), -1)
   ENV.current_user_roles = old_user_roles
 })
 
-test('show no submission if none exists', function() {
+test('show no submission if none exists', function () {
   this.model.set({submission: null})
   equal(
     screenreaderText(),
@@ -428,7 +411,7 @@ test('show no submission if none exists', function() {
   equal(nonScreenreaderText(), '-/2 pts', 'sets non-screenreader text for null points')
 })
 
-test('show score if 0 correctly', function() {
+test('show score if 0 correctly', function () {
   this.submission.set({
     score: 0,
     grade: '0'
@@ -438,7 +421,7 @@ test('show score if 0 correctly', function() {
   equal(nonScreenreaderText(), '0/2 pts', 'sets non-screenreader text for 0 points')
 })
 
-test('show no submission if submission object with no submission type', function() {
+test('show no submission if submission object with no submission type', function () {
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
   equal(
@@ -449,7 +432,7 @@ test('show no submission if submission object with no submission type', function
   equal(nonScreenreaderText(), '-/2 pts', 'sets correct non-screenreader text for not yet graded')
 })
 
-test('show not yet graded if submission type but no grade', function() {
+test('show not yet graded if submission type but no grade', function () {
   this.submission.set({
     submission_type: 'online',
     notYetGraded: true
@@ -468,7 +451,7 @@ test('show not yet graded if submission type but no grade', function() {
   ok(nonScreenreaderText().match('Not Yet Graded')[0])
 })
 
-test('focus returns to cog after dismissing dialog', function() {
+test('focus returns to cog after dismissing dialog', function () {
   const view = createView(this.model, {canManage: true})
   const trigger = view.$(`#assign_${this.model.id}_manage_link`)
   ok(trigger.length, 'there is an a node with the correct id')
@@ -478,38 +461,38 @@ test('focus returns to cog after dismissing dialog', function() {
   equal(document.activeElement, trigger.get(0))
 })
 
-test('disallows deleting frozen assignments', function() {
+test('disallows deleting frozen assignments', function () {
   this.model.set('frozen', true)
   const view = createView(this.model)
   ok(view.$(`#assignment_${this.model.id} a.delete_assignment.disabled`).length)
 })
 
-test('disallows deleting assignments due in closed grading periods', function() {
+test('disallows deleting assignments due in closed grading periods', function () {
   this.model.set('in_closed_grading_period', true)
   const view = createView(this.model)
   ok(view.$(`#assignment_${this.model.id} a.delete_assignment.disabled`).length)
 })
 
-test('allows deleting non-frozen assignments not due in closed grading periods', function() {
+test('allows deleting non-frozen assignments not due in closed grading periods', function () {
   this.model.set('frozen', false)
   this.model.set('in_closed_grading_period', false)
   const view = createView(this.model)
   ok(view.$(`#assignment_${this.model.id} a.delete_assignment:not(.disabled)`).length)
 })
 
-test('allows deleting frozen assignments for admins', function() {
+test('allows deleting frozen assignments for admins', function () {
   this.model.set('frozen', true)
   const view = createView(this.model, {userIsAdmin: true})
   ok(view.$(`#assignment_${this.model.id} a.delete_assignment:not(.disabled)`).length)
 })
 
-test('allows deleting assignments due in closed grading periods for admins', function() {
+test('allows deleting assignments due in closed grading periods for admins', function () {
   this.model.set('any_assignment_in_closed_grading_period', true)
   const view = createView(this.model, {userIsAdmin: true})
   ok(view.$(`#assignment_${this.model.id} a.delete_assignment:not(.disabled)`).length)
 })
 
-test('allows publishing', function() {
+test('allows publishing', function () {
   this.server = sinon.fakeServer.create()
   this.server.respondWith('PUT', '/api/v1/users/1/assignments/1', [
     200,
@@ -524,43 +507,23 @@ test('allows publishing', function() {
   return this.server.restore()
 })
 
-test("correctly displays module's name", function() {
+test("correctly displays module's name", function () {
   const mods = genModules(1)
   this.model.set('modules', mods)
   const view = createView(this.model)
-  ok(
-    view
-      .$('.modules')
-      .text()
-      .search(`${mods[0]} Module`) !== -1
-  )
+  notStrictEqual(view.$('.modules').text().search(`${mods[0]} Module`), -1)
 })
 
-test("correctly display's multiple modules", function() {
+test("correctly display's multiple modules", function () {
   const mods = genModules(2)
   this.model.set('modules', mods)
   const view = createView(this.model)
-  ok(
-    view
-      .$('.modules')
-      .text()
-      .search('Multiple Modules') !== -1
-  )
-  ok(
-    view
-      .$(`#module_tooltip_${this.model.id}`)
-      .text()
-      .search(`${mods[0]}`) !== -1
-  )
-  ok(
-    view
-      .$(`#module_tooltip_${this.model.id}`)
-      .text()
-      .search(`${mods[1]}`) !== -1
-  )
+  notStrictEqual(view.$('.modules').text().search('Multiple Modules'), -1)
+  notStrictEqual(view.$(`#module_tooltip_${this.model.id}`).text().search(`${mods[0]}`), -1)
+  notStrictEqual(view.$(`#module_tooltip_${this.model.id}`).text().search(`${mods[1]}`), -1)
 })
 
-test('render score template with permission', function() {
+test('render score template with permission', function () {
   const spy = sandbox.spy(AssignmentListItemView.prototype, 'updateScore')
   createView(this.model, {
     canManage: false,
@@ -569,7 +532,7 @@ test('render score template with permission', function() {
   ok(spy.called)
 })
 
-test('does not render score template without permission', function() {
+test('does not render score template without permission', function () {
   const spy = sandbox.spy(AssignmentListItemView.prototype, 'updateScore')
   createView(this.model, {
     canManage: false,
@@ -578,7 +541,7 @@ test('does not render score template without permission', function() {
   equal(spy.callCount, 0)
 })
 
-test('renders lockAt/unlockAt with locale-appropriate format string', function() {
+test('renders lockAt/unlockAt with locale-appropriate format string', function () {
   tz.changeLocale(french, 'fr_FR', 'fr')
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
@@ -602,23 +565,11 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function()
   })
   const view = createView(model, {canManage: true})
   const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
-  equal(
-    $('span', $dds.first())
-      .first()
-      .text()
-      .trim(),
-    '28 août à  4:00'
-  )
-  equal(
-    $('span', $dds.last())
-      .first()
-      .text()
-      .trim(),
-    '28 août à  4:00'
-  )
+  equal($('span', $dds.first()).first().text().trim(), '28 août à  4:00')
+  equal($('span', $dds.last()).first().text().trim(), '28 août à  4:00')
 })
 
-test('renders lockAt/unlockAt in appropriate time zone', function() {
+test('renders lockAt/unlockAt in appropriate time zone', function () {
   tz.changeZone(juneau, 'America/Juneau')
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
@@ -641,24 +592,11 @@ test('renders lockAt/unlockAt in appropriate time zone', function() {
   })
   const view = createView(model, {canManage: true})
   const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
-  equal(
-    $('span', $dds.first())
-      .first()
-      .text()
-      .trim(),
-    'Aug 27 at  8:00pm'
-  )
-  equal(
-    $('span', $dds.last())
-      .first()
-      .text()
-      .trim(),
-    'Aug 27 at  8:00pm'
-  )
+  equal($('span', $dds.first()).first().text().trim(), 'Aug 27 at  8:00pm')
+  equal($('span', $dds.last()).first().text().trim(), 'Aug 27 at  8:00pm')
 })
 
 test('renders lockAt/unlockAt for multiple due dates', () => {
-  const now = new Date()
   const model = buildAssignment({
     id: 1,
     all_dates: [{due_at: new Date().toISOString()}, {due_at: new Date().toISOString()}]
@@ -707,7 +645,7 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
   equal(json.showAvailability, false)
 })
 
-test('renders due date column with locale-appropriate format string', function() {
+test('renders due date column with locale-appropriate format string', function () {
   tz.changeLocale(french, 'fr_FR', 'fr')
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
@@ -716,16 +654,12 @@ test('renders due date column with locale-appropriate format string', function()
   })
   const view = createView(this.model, {canManage: true})
   equal(
-    view.dateDueColumnView
-      .$(`#vdd_tooltip_${this.model.id}_due div dd`)
-      .first()
-      .text()
-      .trim(),
+    view.dateDueColumnView.$(`#vdd_tooltip_${this.model.id}_due div dd`).first().text().trim(),
     '29 août'
   )
 })
 
-test('renders due date column in appropriate time zone', function() {
+test('renders due date column in appropriate time zone', function () {
   tz.changeZone(juneau, 'America/Juneau')
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
@@ -733,11 +667,7 @@ test('renders due date column in appropriate time zone', function() {
   })
   const view = createView(this.model, {canManage: true})
   equal(
-    view.dateDueColumnView
-      .$(`#vdd_tooltip_${this.model.id}_due div dd`)
-      .first()
-      .text()
-      .trim(),
+    view.dateDueColumnView.$(`#vdd_tooltip_${this.model.id}_due div dd`).first().text().trim(),
     'Aug 28'
   )
 })
@@ -822,7 +752,7 @@ test('displays failed to duplicate message when assignment failed to duplicate',
   ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
 })
 
-test('can move when userIsAdmin is true', function() {
+test('can move when userIsAdmin is true', function () {
   const view = createView(this.model, {
     userIsAdmin: true,
     canManage: false
@@ -832,7 +762,7 @@ test('can move when userIsAdmin is true', function() {
   notOk(view.className().includes('sort-disabled'))
 })
 
-test('can move when canManage is true and the assignment group id is not locked', function() {
+test('can move when canManage is true and the assignment group id is not locked', function () {
   sandbox.stub(this.model, 'canMove').returns(true)
   const view = createView(this.model, {
     userIsAdmin: false,
@@ -843,7 +773,7 @@ test('can move when canManage is true and the assignment group id is not locked'
   notOk(view.className().includes('sort-disabled'))
 })
 
-test('cannot move when canManage is true but the assignment group id is locked', function() {
+test('cannot move when canManage is true but the assignment group id is locked', function () {
   sandbox.stub(this.model, 'canMove').returns(false)
   const view = createView(this.model, {
     userIsAdmin: false,
@@ -854,7 +784,7 @@ test('cannot move when canManage is true but the assignment group id is locked',
   ok(view.className().includes('sort-disabled'))
 })
 
-test('cannot move when canManage is false but the assignment group id is not locked', function() {
+test('cannot move when canManage is false but the assignment group id is not locked', function () {
   sandbox.stub(this.model, 'canMove').returns(true)
   const view = createView(this.model, {
     userIsAdmin: false,
@@ -865,29 +795,29 @@ test('cannot move when canManage is false but the assignment group id is not loc
   ok(view.className().includes('sort-disabled'))
 })
 
-test('re-renders when assignment state changes', function() {
+test('re-renders when assignment state changes', function () {
   sandbox.stub(AssignmentListItemView.prototype, 'render')
-  const view = createView(this.model)
+  createView(this.model)
   ok(AssignmentListItemView.prototype.render.calledOnce)
   this.model.trigger('change:workflow_state')
   ok(AssignmentListItemView.prototype.render.calledTwice)
 })
 
-test('polls for updates if assignment is duplicating', function() {
+test('polls for updates if assignment is duplicating', function () {
   sandbox.stub(this.model, 'isDuplicating').returns(true)
-  const view = createView(this.model)
+  createView(this.model)
   ok(this.model.pollUntilFinishedDuplicating.calledOnce)
 })
 
-test('polls for updates if assignment is importing', function() {
+test('polls for updates if assignment is importing', function () {
   sandbox.stub(this.model, 'isImporting').returns(true)
   sandbox.stub(this.model, 'pollUntilFinishedImporting')
-  const view = createView(this.model)
+  createView(this.model)
   ok(this.model.pollUntilFinishedImporting.calledOnce)
 })
 
-QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks) {
-  hooks.beforeEach(function() {
+QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks) {
+  hooks.beforeEach(function () {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'}
@@ -896,12 +826,12 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     genSetup.call(this)
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(function () {
     fakeENV.teardown()
     genTeardown.call(this)
   })
 
-  test('canEdit is true if no individual permissions are set and canManage is true', function() {
+  test('canEdit is true if no individual permissions are set and canManage is true', function () {
     const view = createView(this.model, {
       userIsAdmin: false,
       canManage: true
@@ -911,7 +841,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, true)
   })
 
-  test('canEdit is false if no individual permissions are set and canManage is false', function() {
+  test('canEdit is false if no individual permissions are set and canManage is false', function () {
     const view = createView(this.model, {
       userIsAdmin: false,
       canManage: false
@@ -921,7 +851,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, false)
   })
 
-  test('canEdit is true if no individual permissions are set and userIsAdmin is true', function() {
+  test('canEdit is true if no individual permissions are set and userIsAdmin is true', function () {
     const view = createView(this.model, {
       userIsAdmin: true,
       canManage: false
@@ -931,7 +861,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, true)
   })
 
-  test('canEdit is false if canManage is true and the individual assignment cannot be updated', function() {
+  test('canEdit is false if canManage is true and the individual assignment cannot be updated', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {update: false}
@@ -941,7 +871,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, false)
   })
 
-  test('canEdit is true if canManage is true and the individual assignment can be updated', function() {
+  test('canEdit is true if canManage is true and the individual assignment can be updated', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {update: true}
@@ -951,7 +881,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, true)
   })
 
-  test('canEdit is false if canManage is true and the update parameter does not exist', function() {
+  test('canEdit is false if canManage is true and the update parameter does not exist', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {}
@@ -961,7 +891,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, false)
   })
 
-  test('edit link is enabled when the individual assignment is editable', function() {
+  test('edit link is enabled when the individual assignment is editable', function () {
     const view = createView(this.model, {
       individualAssignmentPermissions: {update: true}
     })
@@ -969,7 +899,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(view.$('.edit_assignment').hasClass('disabled'), false)
   })
 
-  test('edit link is disabled when the individual assignment is not editable', function() {
+  test('edit link is disabled when the individual assignment is not editable', function () {
     const view = createView(this.model, {
       individualAssignmentPermissions: {update: false}
     })
@@ -978,8 +908,8 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
   })
 })
 
-QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks) {
-  hooks.beforeEach(function() {
+QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hooks) {
+  hooks.beforeEach(function () {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'}
@@ -987,12 +917,12 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
     genSetup.call(this)
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(function () {
     fakeENV.teardown()
     genTeardown.call(this)
   })
 
-  test('canDelete is true if no individual permissions are set and userIsAdmin is true', function() {
+  test('canDelete is true if no individual permissions are set and userIsAdmin is true', function () {
     const view = createView(this.model, {
       userIsAdmin: true,
       canManage: false
@@ -1002,7 +932,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
     strictEqual(json.canDelete, true)
   })
 
-  test('canDelete is false if canManage is true and the individual assignment cannot be updated', function() {
+  test('canDelete is false if canManage is true and the individual assignment cannot be updated', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {update: false}
@@ -1012,7 +942,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
     strictEqual(json.canDelete, false)
   })
 
-  test('canDelete is true if canManage is true and the individual assignment can be updated', function() {
+  test('canDelete is true if canManage is true and the individual assignment can be updated', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {update: true}
@@ -1022,7 +952,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
     strictEqual(json.canDelete, true)
   })
 
-  test('delete link is enabled when canDelete returns true', function() {
+  test('delete link is enabled when canDelete returns true', function () {
     const view = createView(this.model, {
       individualAssignmentPermissions: {update: true}
     })
@@ -1030,7 +960,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), false)
   })
 
-  test('delete link is disabled when canDelete returns false', function() {
+  test('delete link is disabled when canDelete returns false', function () {
     const view = createView(this.model, {
       individualAssignmentPermissions: {update: false}
     })
@@ -1039,8 +969,8 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
   })
 })
 
-QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function(hooks) {
-  hooks.beforeEach(function() {
+QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function (hooks) {
+  hooks.beforeEach(function () {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'}
@@ -1048,38 +978,35 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function(hoo
     genSetup.call(this)
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(function () {
     fakeENV.teardown()
     genTeardown.call(this)
   })
 
-  test('publish icon is enabled if the user is an admin', function() {
+  test('publish icon is enabled if the user is an admin', function () {
     const view = createView(this.model, {
       userIsAdmin: true,
       canManage: false
     })
 
-    const json = view.toJSON()
     strictEqual(view.$('.publish-icon').hasClass('disabled'), false)
   })
 
-  test('publish icon is enabled if canManage is true and the individual assignment can be updated', function() {
+  test('publish icon is enabled if canManage is true and the individual assignment can be updated', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {update: true}
     })
 
-    const json = view.toJSON()
     strictEqual(view.$('.publish-icon').hasClass('disabled'), false)
   })
 
-  test('publish icon is disabled if canManage is true and the individual assignment cannot be updated', function() {
+  test('publish icon is disabled if canManage is true and the individual assignment cannot be updated', function () {
     const view = createView(this.model, {
       canManage: true,
       individualAssignmentPermissions: {update: false}
     })
 
-    const json = view.toJSON()
     strictEqual(view.$('.publish-icon').hasClass('disabled'), true)
   })
 })
@@ -1093,7 +1020,7 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: percent', 
   }
 })
 
-test('score and grade outputs', function() {
+test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
     grade: 90
@@ -1106,7 +1033,7 @@ test('score and grade outputs', function() {
   ok(nonScreenreaderText().match('90%')[0], 'sets non-screenreader grade text')
 })
 
-test('excused score and grade outputs', function() {
+test('excused score and grade outputs', function () {
   this.submission.set({excused: true})
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -1123,7 +1050,7 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: pass_fail'
   }
 })
 
-test('score and grade outputs', function() {
+test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
     grade: 'complete'
@@ -1145,7 +1072,7 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: letter_gra
   }
 })
 
-test('score and grade outputs', function() {
+test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
     grade: 'B'
@@ -1167,7 +1094,7 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: not_graded
   }
 })
 
-test('score and grade outputs', function() {
+test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
     grade: 'complete'

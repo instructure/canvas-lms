@@ -163,16 +163,6 @@ module AcademicBenchmark
     [cm, cm.export_content]
   end
 
-  def self.set_common_core_setting!
-    if (guid = AcademicBenchmark.config[:common_core_guid])
-      if (group = LearningOutcomeGroup.where(migration_id: guid).first)
-        s = Shard.current
-        s.settings[:common_core_outcome_group_id] = group.id
-        s.save!
-      end
-    end
-  end
-
   def self.api_handle
     # create a new api connection.  Note that this does not actually
     # make a request to the API

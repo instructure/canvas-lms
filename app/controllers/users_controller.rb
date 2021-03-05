@@ -474,7 +474,7 @@ class UsersController < ApplicationController
     clear_crumbs
 
     @show_footer = true
-    @k5_mode = @current_user.account.feature_enabled?(:canvas_for_elementary)
+    @k5_mode = @domain_root_account.feature_enabled?(:canvas_for_elementary)
 
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
@@ -579,11 +579,7 @@ class UsersController < ApplicationController
       end
     end
 
-    if CANVAS_RAILS5_2
-      render :formats => 'html', :layout => false
-    else
-      render formats: :html, layout: false
-    end
+    render formats: :html, layout: false
   end
 
   def toggle_hide_dashcard_color_overlays

@@ -144,6 +144,26 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
           'no_expansion' => 'foo'
         )
       end
+
+      context 'and `redirect_uris` is not sent at developer key parameter' do
+        it 'set `target_link_uri` to developer_key.redirect_uris' do
+          dev_key_params.delete(:redirect_uris)
+
+          subject
+
+          expect(config_from_response.developer_key.redirect_uris).to eq [settings['target_link_uri']]
+        end
+      end
+
+      context 'and `redirect_uris` is sent at developer key parameter' do
+        let(:redirect_uris) { dev_key_params[:redirect_uris].split(/[\r\n]+/) }
+
+        it 'set redirect_uris parameter to developer_key.redirect_uris' do
+          subject
+
+          expect(config_from_response.developer_key.redirect_uris).to eq redirect_uris
+        end
+      end
     end
 
     context 'when the request times out' do

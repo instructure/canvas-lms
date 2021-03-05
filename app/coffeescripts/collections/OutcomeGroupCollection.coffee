@@ -23,7 +23,3 @@ import OutcomeGroup from '../models/OutcomeGroup'
 export default class OutcomeGroupCollection extends PaginatedCollection
   model: OutcomeGroup
 
-  parse: (response) ->
-    super
-    _.reject response, (groupObj) ->
-      groupObj.id is ENV.COMMON_CORE_GROUP_ID

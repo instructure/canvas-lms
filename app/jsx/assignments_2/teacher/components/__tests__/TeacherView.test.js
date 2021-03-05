@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, waitForElement} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 import {
   mockAssignment,
   findInputForLabel,
@@ -35,15 +35,13 @@ describe('TeacherView', () => {
     it.skip('shows the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, getAllByText} = await renderTeacherView(assignment)
-      expect(await waitForElement(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
+      expect(await waitFor(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
       expect(
-        await waitForElement(() => getAllByText(`${assignment.pointsPossible}`)[0])
+        await waitFor(() => getAllByText(`${assignment.pointsPossible}`)[0])
       ).toBeInTheDocument()
-      expect(await waitForElement(() => getByText('Everyone'))).toBeInTheDocument()
-      expect(
-        await waitForElement(() => getAllByText('Due:', {exact: false})[0])
-      ).toBeInTheDocument()
-      expect(await waitForElement(() => getByText('Available', {exact: false}))).toBeInTheDocument()
+      expect(await waitFor(() => getByText('Everyone'))).toBeInTheDocument()
+      expect(await waitFor(() => getAllByText('Due:', {exact: false})[0])).toBeInTheDocument()
+      expect(await waitFor(() => getByText('Available', {exact: false}))).toBeInTheDocument()
     })
   })
 

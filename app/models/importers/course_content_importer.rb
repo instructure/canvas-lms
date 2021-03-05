@@ -159,6 +159,7 @@ module Importers
         migration.update_import_progress(85)
         Importers::WikiPageImporter.process_migration_course_outline(data, migration)
         Importers::CalendarEventImporter.process_migration(data, migration)
+        Importers::LtiResourceLinkImporter.process_migration(data, migration)
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
         if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])

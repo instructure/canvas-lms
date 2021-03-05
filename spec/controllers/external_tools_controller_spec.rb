@@ -744,7 +744,7 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
       end
 
-      context 'when resource_link_lookup_id is passed' do
+      context 'when resource_link_lookup_uuid is passed' do
         include Lti::RedisMessageClient
         let(:launch_params) do
           JSON.parse(
@@ -768,7 +768,7 @@ describe ExternalToolsController do
           get 'retrieve', params: {
             course_id: @course.id,
             url: 'http://www.example.com/launch',
-            resource_link_lookup_id: rl.lookup_uuid
+            resource_link_lookup_uuid: rl.lookup_uuid
           }
         }
 
@@ -780,17 +780,30 @@ describe ExternalToolsController do
           )
         end
 
-        it 'errors if the resource_link_lookup_id cannot be found' do
+        it 'sets the custom parameters in the launch hash when is the old parameter name `resource_link_lookup_id`' do
           get 'retrieve', params: {
             course_id: @course.id,
             url: 'http://www.example.com/launch',
-            resource_link_lookup_id: 'wrong_do_it_again'
+            resource_link_lookup_id: rl.lookup_uuid
+          }
+
+          expect(launch_hash['https://purl.imsglobal.org/spec/lti/claim/custom']).to include(
+            'abc' => 'def',
+            'expans' => @teacher.id
+          )
+        end
+
+        it 'errors if the resource_link_lookup_uuid cannot be found' do
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_uuid: 'wrong_do_it_again'
           }
           expect(response).to be_redirect
           expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
         end
 
-        it 'errors if the resource_link_lookup_id is for the wrong context' do
+        it 'errors if the resource_link_lookup_uuid is for the wrong context' do
           rl.update(context: Course.create(course_valid_attributes))
           get_page
           expect(response).to be_redirect

@@ -172,9 +172,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     self.discussion_type = DiscussionTypes::SIDE_COMMENT if !read_attribute(:discussion_type)
     @content_changed = self.message_changed? || self.title_changed?
-    
+
     default_submission_values
-    
+
     if self.has_group_category?
       self.subtopics_refreshed_at ||= Time.zone.parse("Jan 1 2000")
     end
@@ -333,6 +333,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def is_announcement; false end
+
+  def homeroom_announcement?(_context)
+    false
+  end
 
   def root_topic?
     !self.root_topic_id && self.has_group_category?

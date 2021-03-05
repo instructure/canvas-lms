@@ -47,7 +47,7 @@ function TotalDetailContent({viewUngradedAsZero}) {
         </View>
 
         <View className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
-          <Text weight="normal" fontStyle="normal" size="x-small">
+          <Text transform="uppercase" weight="bold" fontStyle="normal" size="x-small">
             {I18n.t('Ungraded as 0')}
           </Text>
         </View>

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderHook} from '@testing-library/react-hooks'
+import {renderHook} from '@testing-library/react-hooks/dom'
 import useImmediate from '../useImmediate'
 
 describe('useImmediate', () => {

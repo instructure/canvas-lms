@@ -20,6 +20,7 @@
 require_relative '../common'
 require_relative 'groups_common'
 require_relative 'shared_examples_common'
+require_relative '../rcs/pages/rce_next_page'
 
 # ======================================================================================================================
 # Shared Examples
@@ -27,6 +28,7 @@ require_relative 'shared_examples_common'
 shared_examples 'home_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   it "should display a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273602, teacher: 319909) do
     # Create an event to have something in the Coming up Section
@@ -77,6 +79,7 @@ end
 shared_examples 'announcements_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   it "should center the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273606, teacher: 324936) do
     get announcements_page
@@ -131,8 +134,10 @@ end
 shared_examples 'announcements_page_v2' do
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
@@ -141,7 +146,7 @@ shared_examples 'announcements_page_v2' do
     expect(f('#add_announcement')).to be_displayed
   end
 
-  it "should list all announcements", ignore_js_errors: true do
+  it "should list all announcements" do
     # Create 5 announcements in the group
     announcements = []
     5.times do |n|
@@ -156,37 +161,39 @@ shared_examples 'announcements_page_v2' do
     expect(ff('.ic-announcement-row').size).to eq 5
   end
 
-  it "should only list in-group announcements in the content right pane", ignore_js_errors: true do
+  it "should only list in-group announcements in the content right pane" do
     # create group and course announcements
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
     @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
 
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
-    expect(f('#editor_tabs')).to be_displayed
-
-    fj('[role="tabpanel"] button:contains("Announcements")').click
+    click_links_toolbar_menu_button
+    click_group_links
     wait_for_ajaximations
-    expect(fln('Group Announcement')).to be_displayed
-    expect(f("#content")).not_to contain_link('Course Announcement')
+    announcements_accordion_button.click
+    wait_for_ajaximations
+    expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 
-  it "should only access group files in announcements right content pane", ignore_js_errors: true do
+  it "should only access group files in announcements right content pane" do
     add_test_files
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
-    expand_files_on_content_pane
-    expect(ff('svg[name=IconDocument]').size).to eq 1
+    click_document_toolbar_menu_button
+    click_group_documents
+    wait_for_ajaximations
+    expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 
-  it "should have an Add External Feed link on announcements", ignore_js_errors: true do
+  it "should have an Add External Feed link on announcements" do
     get announcements_page
     f('#external_feed').click
     f('#external-rss-feed__toggle-button').click
     expect(f('#external-rss-feed__submit-button-group')).to be_displayed
   end
 
-  it "should have an RSS feed button on announcements", ignore_js_errors: true do
+  it "should have an RSS feed button on announcements" do
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
     get announcements_page
     expect(f('button[id="external_feed"]')).to be_displayed
@@ -260,7 +267,7 @@ shared_examples 'discussions_page' do |context|
     stub_rcs_config
   end
 
-  it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930), ignore_js_errors: true do
+  it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                        title: 'Group Discussion', message: 'Group')
@@ -276,7 +283,7 @@ shared_examples 'discussions_page' do |context|
     expect(f("#content")).not_to contain_link(course_dt.title.to_s)
   end
 
-  it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933), ignore_js_errors: true do
+  it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
     add_test_files
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }

@@ -495,7 +495,8 @@ const sisDataManagePermissions = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission. To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled. To add users to courses via SIS ID, Users - add/remove students from courses - and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled.`
+        `If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission. To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.
+        To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).`
       )
     },
     {
@@ -571,7 +572,7 @@ const usersActAsPermissions = generateActionTemplates(
     },
     {
       title: I18n.t('SpeedGrader'),
-      description: I18n.t(`Allows uer to delete a submission file.`)
+      description: I18n.t(`Allows user to delete a submission file.`)
     },
     {
       title: I18n.t('People (Course)'),
@@ -623,7 +624,7 @@ const usersManageLoginPermissions = generateActionTemplates(
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        `Allows user to create accounts for new users with the account-level Add People button. Allows user to remove and merge users in an account. Allows user to modify user account details such as name, email, and time zone. Allows user to view and modify login information for a user.`
+        `Allows user to create accounts for new users. Allows user to remove and merge users in an account. Allows user to modify user account details. Allows user to view and modify login information for a user.`
       )
     },
     {
@@ -647,7 +648,7 @@ const usersManageLoginPermissions = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `This permission only controls adding users at the account level. To add users to a course, Users - add/remove students from courses or Users - add/remove teachers, course designers, or TAs from courses to the course must be enabled.`
+        `To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).`
       )
     },
     {
@@ -1029,13 +1030,13 @@ const messagesSentPermissions = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        `When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups.`
+        `When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups.`
       )
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `To edit a student’s section, Users - add/remove students from courses and Users - view must also be enabled. To edit a section for a teacher, course designer, or TA, Users - add/remove teachers, course designers, or TAs from courses and Users - view must also be enabled.`
+        `To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.`
       )
     }
   ],
@@ -1055,7 +1056,7 @@ const messagesSentPermissions = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `To edit a student’s section, Users - add/remove students in courses and Users - view must also be enabled. To edit a section for a teacher, course designer, or TA, Users - add/remove teachers, course designers, or TAs in courses and Users - view list must also both be enabled.`
+        `To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled. `
       )
     }
   ]
@@ -2009,7 +2010,7 @@ const gradesEditPermissions = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        `Allows user to search by course ID or assignment ID in grade change logs in Admin Tools. (Not available at the subaccount level.)`
+        `Allows user to search by course ID or assignment ID in grade change logs in Admin Tools (not available at the subaccount level.)`
       )
     },
     {
@@ -2823,7 +2824,7 @@ const sisDataReadPermissions = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `To view the list of users in the course, Users - view list must also be enabled. To add users via SIS ID, Users - add/remove students from courses and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled.`
+        `To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).`
       )
     },
     {
@@ -2853,7 +2854,7 @@ const sisDataReadPermissions = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To view the list of users in the course, Users - view list must also be enabled. To add users via SIS ID, Users - add/remove students from courses​ - and or Users - add/remove teachers, course designers, or TAs from courses ​ to the course must also be enabled.'
+        'To view the list of users in the course, Users - view list must also be enabled. To add or remove users to a course via SIS, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
       )
     }
   ]
@@ -2909,7 +2910,7 @@ const pairingCodePermissions = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `To generate a pairing code from a student's User Settings page, the User - act as permission must also be enabled. To generate a pairing code from a student's User Details page, the Users - add/remove students from courses permission must also be enabled.`
+        `To generate a pairing code from a student's User Settings page, the User - act as permission must also be enabled. To generate a pairing code from a student's User Details page, the Users - allow administrative actions in courses permission must also be enabled.`
       )
     }
   ],
@@ -2925,7 +2926,7 @@ const pairingCodePermissions = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `To generate a pairing code from a student's User Details page, the Users - add/remove students in courses permission must also be enabled.`
+        `To generate a pairing code from a student's User Details page, the Users - allow administrative actions in courses permission must also be enabled.`
       )
     }
   ]
@@ -2935,154 +2936,22 @@ const courseAddRemovePermissions = generateActionTemplates(
   'manage_students',
   [
     {
-      title: I18n.t('Courses (Account)'),
-      description: I18n.t('Allows user to add students to a course from the account Courses page.')
-    },
-    {
-      title: I18n.t('People (Course)'),
+      title: I18n.t('Deprecated'),
       description: I18n.t(
-        'Allows user to add and remove students. Allows user to add and remove observers. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to edit a student’s section or role. Allows user to resend course invitations from the Course People page.'
+        'This permission is deprecated. Please reference Users - Students and Users - Observers.'
       )
     }
   ],
+  [],
   [
     {
-      title: I18n.t('Account Settings'),
+      title: I18n.t('Deprecated'),
       description: I18n.t(
-        'If the Open Registration account setting is enabled, users with this permission can add students or observers to a course via email address or login ID even if the student or observer does not already have a Canvas account.'
-      )
-    },
-    {
-      title: I18n.t('Courses (Account)'),
-      description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
-      )
-    },
-    {
-      title: I18n.t('People (Course)'),
-      description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student's section and course role, Users - view list and Conversations - send messages to individual course members must also be enabled. To unenroll users the user details page, View the list of courses and See the list of users must also be enabled. Allows user to resend course invitations from the Course People page. If the Open Registration account setting is enabled, users with this permission can add students to a course from the Course People page via email addresses if the user does not already have a Canvas account. To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.`
+        `This permission is deprecated. Please reference Users - Students and Users - Observers.`
       )
     }
   ],
-  [
-    {
-      title: I18n.t('People'),
-      description: I18n.t(
-        `Allows user to add and remove students to the course. Allows user to add and remove observers to the course. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to conclude or delete enrollments on a student’s details page. Allows user to resend course invitations.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('People'),
-      description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        To access the People Page, Users - view list must be enabled. If the Open Registration account setting is enabled, users with this permission can add students to a course via email address if the user does not already have a Canvas account. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student’s section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
-      )
-    }
-  ]
-)
-
-const courseAddRemoveDesignerPermissions = generateActionTemplates(
-  'manage_admin_users',
-  [
-    {
-      title: I18n.t('Courses (Account)'),
-      description: I18n.t(
-        'Allows user to add teachers, course designers, or TAs to a course from the account Courses page.'
-      )
-    },
-    {
-      title: I18n.t('People (Course)'),
-      description: I18n.t(
-        `Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('Account Settings'),
-      description: I18n.t(
-        `If the Open Registration account setting is enabled, users with this permission can add students or observers to a course via email address or login ID even if the student or observer does not already have a Canvas account.`
-      )
-    },
-    {
-      title: I18n.t('Courses (Account)'),
-      description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
-      )
-    },
-    {
-      title: I18n.t('People (Course)'),
-      description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('People'),
-      description: I18n.t(
-        `Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers to the course. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('People'),
-      description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
-      )
-    }
-  ]
-)
-
-const allowCourseAdminActions = generateActionTemplates(
-  'allow_course_admin_actions',
-  [
-    {
-      title: I18n.t('People (Course)'),
-      description: I18n.t(
-        `Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('Courses (Account)'),
-      description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
-      )
-    },
-    {
-      title: I18n.t('People (Course)'),
-      description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS).
-        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('People'),
-      description: I18n.t(
-        `Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('People'),
-      description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS).
-        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
-      )
-    }
-  ]
+  []
 )
 
 const usersViewListPermissions = generateActionTemplates(
@@ -3147,7 +3016,7 @@ const usersViewListPermissions = generateActionTemplates(
     {
       title: I18n.t('Courses'),
       description: I18n.t(
-        `To add users to a course, Users - add/remove students from courses - and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled.`
+        `To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).`
       )
     },
     {
@@ -3159,7 +3028,7 @@ const usersViewListPermissions = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `To edit a student’s section, Users - add/remove students from courses and Send messages to individual course members must also be enabled. To edit a teacher, TA, or course designer’s section, Users - add/remove teachers, course designers, or TAs from courses to the course and Conversations - send messages to individual course members must also be enabled.`
+        `To edit a user’s section, the appropriate Users permission (e.g. Users - Teachers), Users - allow administrative actions in courses, and Conversations - send to individual course members must also be enabled.`
       )
     }
   ],
@@ -3207,7 +3076,7 @@ const usersViewListPermissions = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `To add users to a course, Users - add/remove students from courses and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled. To edit a student’s section, Conversations - send messages to individual course members and Users - add/remove students from courses must also both be enabled. To edit a teacher, course designer, or TAs section, Conversations - send messages to individual course members and Users - add/remove teachers, course designers, or TAs from courses must also both be enabled.`
+        `To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers). To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.`
       )
     }
   ]
@@ -3227,7 +3096,7 @@ const usersViewLoginPermissions = generateActionTemplates(
     {
       title: I18n.t('People (Account, Course)'),
       description: I18n.t(
-        `To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add/remove students in courses and Users - add/remove teachers, course designers, or TAs in courses must also be enabled.`
+        `To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - allow administrative actions in courses must also be enabled.`
       )
     }
   ],
@@ -3243,7 +3112,7 @@ const usersViewLoginPermissions = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add/remove students in courses and Users - add/remove teachers, course designers, or TAs in courses must also be enabled.`
+        `To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - allow administrative actions in courses must also be enabled.`
       )
     }
   ]
@@ -3327,63 +3196,101 @@ const permissionsDesigner = generateActionTemplates(
     {
       title: I18n.t('Designers - Add'),
       description: I18n.t(
-        'Allows user to add designers to the course from the account Courses page. Allows user to add designers in the course. Allows user to view login ID information for designers. Allows user to view user details for designers. Allows user to edit a designer’s section or role.'
+        'Allows user to add designers to a course from the account Courses page. Allows user to add designers to a course.'
       )
     },
     {
       title: I18n.t('Designers - Remove'),
-      description: I18n.t(
-        'Allows user to remove designers to the course from the account Courses page. Allows user to remove designers from the course.'
-      )
+      description: I18n.t('Allows user to remove designers from a course.')
     }
   ],
   [
     {
-      title: I18n.t('Account Settings'),
-      description: I18n.t(
-        `If the Open Registration account setting is enabled, users with this permission can add designers to a course via email address or login ID even if the designer does not already have a Canvas account.`
-      )
-    },
-    {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
-        `To access the account Courses page, Courses - view list must be enabled.`
+        `If the Open Registration account setting is enabled, users with this permission can add designers to a course from the Courses page via email address or login ID even if a designer does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        To access the account Courses page, Courses - view list must be enabled.`
       )
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add designers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-        To edit a designer's section, Conversations - send messages to individual course members must also be enabled.
-        To view the list of designers in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add a designer to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ],
   [
     {
       title: I18n.t('Designers - Add'),
-      description: I18n.t(
-        `Allows user to add designers in the course. Allows user to view login ID information for designers.
-        Allows user to view user details for designers. Allows user to edit a designer’s section or role.`
-      )
+      description: I18n.t(`Allows user to add designers to a course.`)
     },
     {
       title: I18n.t('Designers - Remove'),
-      description: I18n.t(
-        'Allows user to remove designers to the course from the account Courses page.'
-      )
+      description: I18n.t('Allows user to remove designers from a course.')
     }
   ],
   [
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        To edit a designer's section, Conversations - send messages to individual course members must also be enabled.
-        To view the list of designers in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add a designer to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If the Open Registration account setting is enabled, users with this permission can add designers to a course from the People page via email address or login ID even if a designer does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled. If an enrollment is created via SIS, only admins can remove the enrollment from a course. To remove a user via SIS ID, SIS Data - manage must also be enabled.`
+      )
+    }
+  ]
+)
+
+const permissionsStudent = generateActionTemplates(
+  'manage_course_student_enrollments',
+  [
+    {
+      title: I18n.t('Students - Add'),
+      description: I18n.t(
+        'Allows user to add students to a course from the account Courses page. Allows user to add students to a course.'
+      )
+    },
+    {
+      title: I18n.t('Students - Remove'),
+      description: I18n.t(`Allows user to remove students from a course.`)
+    }
+  ],
+  [
+    {
+      title: I18n.t('Courses (Account)'),
+      description: I18n.t(
+        `If the Open Registration account setting is enabled, users with this permission can add students to a course from the Courses page via email address or login ID even if a student does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        To access the account Courses page, Courses - view list must be enabled.`
+      )
+    },
+    {
+      title: I18n.t('People (Course)'),
+      description: I18n.t(
+        `If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('Students - Add'),
+      description: I18n.t('Allows user to add students to a course.')
+    },
+    {
+      title: I18n.t('Students - Remove'),
+      description: I18n.t(`Allows user to remove students from a course.`)
+    }
+  ],
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        `If the Open Registration account setting is enabled, users with this permission can add students to a course from the People page via email address or login ID even if a student does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ]
@@ -3395,75 +3302,49 @@ const permissionsObserver = generateActionTemplates(
     {
       title: I18n.t('Observers - Add'),
       description: I18n.t(
-        'Allows user to add observers to the course from the account Courses page. Allows user to add observers in the course. Allows user to view login ID information for observers. Allows user to view user details for observers. Allows user to edit an observer’s section or role.'
+        'Allows user to add observers to a course from the account Courses page. Allows user to add observers to a course.'
       )
     },
     {
       title: I18n.t('Observers - Remove'),
-      description: I18n.t(
-        `Allows user to remove observers from the course from the account Courses page. Allows user to remove observers from the course.`
-      )
+      description: I18n.t(`Allows user to remove observers from a course.`)
     }
   ],
   [
     {
-      title: I18n.t('Permissions'),
-      description: I18n.t(
-        `Currently, the add/remove students permission overrides this grouped permission. Managing observers through the students permission will eventually be removed.`
-      )
-    },
-    {
-      title: I18n.t('Account Settings'),
-      description: I18n.t(
-        `If the Open Registration account setting is enabled, users with this permission can add observers to a course via email address or login ID even if the observer does not already have a Canvas account.`
-      )
-    },
-    {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
+        `If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Courses page via email address or login ID even if an observer does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        To access the account Courses page, Courses - view list must be enabled.`
       )
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-        To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
-        To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.
-        To view the list of observers in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add an observer to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ],
   [
     {
       title: I18n.t('Observers - Add'),
-      description: I18n.t(
-        'Allows user to add observers in the course. Allows user to view login ID information for observers. Allows user to view user details for observers. Allows user to edit an observer’s section or role.'
-      )
+      description: I18n.t('Allows user to add observers to a course.')
     },
     {
       title: I18n.t('Observers - Remove'),
-      description: I18n.t(`Allows user to remove observers from the course.`)
+      description: I18n.t(`Allows user to remove observers from a course.`)
     }
   ],
   [
     {
-      title: I18n.t('Permissions'),
-      description: I18n.t(
-        `Currently, the add/remove students permission overrides this grouped permission. Managing observers through the students permission will eventually be removed.`
-      )
-    },
-    {
       title: I18n.t('People'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-        To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
-        To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.
-        To view the list of observers in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add an observer to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If the Open Registration account setting is enabled, users with this permission can add observers to a course from the People page via email address or login ID even if an observer does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ]
@@ -3475,37 +3356,28 @@ const permissionsTA = generateActionTemplates(
     {
       title: I18n.t('TAs - Add'),
       description: I18n.t(
-        'Allows user to add TAs to the course from the account Courses page. Allows user to add TAs in the course. Allows user to view login ID information for TAs. Allows user to view user details for TAs. Allows user to edit a TA’s section or role.'
+        'Allows user to add TAs to a course from the account Courses page. Allows user to add TAs in the course.'
       )
     },
     {
       title: I18n.t('TAs - Remove'),
-      description: I18n.t(
-        `Allows user to remove TAs from the course from the account Courses page. Allows user to remove TAs from the course.`
-      )
+      description: I18n.t(`Allows user to remove TAs from a course.`)
     }
   ],
   [
     {
-      title: I18n.t('Account Settings'),
-      description: I18n.t(
-        `If the Open Registration account setting is enabled, users with this permission can add TAs to a course via email address or login ID even if the TA does not already have a Canvas account.`
-      )
-    },
-    {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
+        `If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the Courses page via email address or login ID even if a TA does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        To access the account Courses page, Courses - view list must be enabled.`
       )
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the Course People page via email address or login ID even if the TA does not already have a Canvas account.
-        To edit a TA’s section, Conversations - send to individual course members must also be enabled.
-        To view the list of TAs in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add a TA to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ],
@@ -3525,11 +3397,10 @@ const permissionsTA = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the Course People page via email address or login ID even if the TA does not already have a Canvas account.
-        To edit a TA’s section, Conversations - send to individual course members must also be enabled.
-        To view the list of TAs in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add a TA to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the People page via email address or login ID even if a TA does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ]
@@ -3541,61 +3412,111 @@ const permissionsTeacher = generateActionTemplates(
     {
       title: I18n.t('Teachers - Add'),
       description: I18n.t(
-        'Allows user to add teachers to the course from the account Courses page. Allows user to add teachers in the course. Allows user to view login ID information for teachers. Allows user to view user details for teachers. Allows user to edit a teacher’s section or role.'
+        'Allows user to add teachers to a course from the account Courses page. Allows user to add teachers to a course.'
       )
     },
     {
       title: I18n.t('Teachers - Remove'),
-      description: I18n.t(
-        `Allows user to remove teachers from the course from the account Courses page. Allows user to remove teachers from the course.`
-      )
+      description: I18n.t(`Allows user to remove teachers from a course.`)
     }
   ],
   [
     {
-      title: I18n.t('Account Settings'),
-      description: I18n.t(
-        `If the Open Registration account setting is enabled, users with this permission can add teachers to a course via email address or login ID even if the teacher does not already have a Canvas account.`
-      )
-    },
-    {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
+        `If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Courses page via email address or login ID even if a teacher does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        To access the account Courses page, Courses - view list must be enabled.`
       )
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Course People page via email address or login ID even if the teacher does not already have a Canvas account.
-        To edit a teacher’s section, Conversations - send to individual course members must also be enabled.
-        To view the list of teachers in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add a teacher to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
       )
     }
   ],
   [
     {
       title: I18n.t('Teachers - Add'),
-      description: I18n.t(
-        'Allows user to add teachers in the course. Allows user to view login ID information for teachers. Allows user to view user details for teachers. Allows user to edit a teacher’s section or role.'
-      )
+      description: I18n.t('Allows user to add teachers to a course.')
     },
     {
       title: I18n.t('Teachers - Remove'),
-      description: I18n.t(`Allows user to remove teachers from the course.`)
+      description: I18n.t(`Allows user to remove teachers from a course.`)
     }
   ],
   [
     {
       title: I18n.t('People'),
       description: I18n.t(
-        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-        If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-        To edit a teacher’s section, Conversations - send to individual course members must also be enabled.
-        To view the list of teachers in the course, Users - view list must be enabled.
-        To view SIS IDs, SIS Data - read must be enabled. To add a teacher to a course via SIS ID, SIS Data - manage must also be enabled.`
+        `If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the People page via email address or login ID even if a teacher does not already have a Canvas account.
+        To add a user via SIS ID, SIS Data - manage must also be enabled.
+        If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+        To remove a user via SIS ID, SIS Data - manage must also be enabled.`
+      )
+    }
+  ]
+)
+
+const allowCourseAdminActions = generateActionTemplates(
+  'allow_course_admin_actions',
+  [
+    {
+      title: I18n.t('People (Course)'),
+      description: I18n.t(
+        'Allows user to view login ID information for users. Allows user to view user details for course users. Allows user to edit a user’s section or role (if not added via SIS).'
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('People (Account)'),
+      description: I18n.t(
+        `To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.`
+      )
+    },
+    {
+      title: I18n.t('People (Course)'),
+      description: I18n.t(
+        `To view the People page, Courses - view list must be enabled.
+        To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).
+        To view SIS IDs, SIS Data - read must be enabled.
+        To edit a user’s section, Conversations - send to individual course members must be enabled.`
+      )
+    },
+    {
+      title: I18n.t('Observers (Course)'),
+      description: I18n.t(
+        `To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
+      To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        'Allows user to view login ID information for users. Allows user to view user details for course users. Allows user to edit a user’s section or role (if not added via SIS).'
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        `To view the People page, Courses - view list must be enabled.
+        To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).
+        To view SIS IDs, SIS Data - read must be enabled.
+        To edit a user’s section, Conversations - send to individual course members must be enabled.`
+      )
+    },
+    {
+      title: I18n.t('Observers'),
+      description: I18n.t(
+        `To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
+        To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.`
       )
     }
   ]
@@ -3615,11 +3536,11 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     blueprintCoursePermissions.ACCOUNT,
     courseAddDeletePermissions.ACCOUNT,
     courseAddRemovePermissions.ACCOUNT,
-    courseAddRemoveDesignerPermissions.ACCOUNT,
     permissionsDesigner.ACCOUNT,
     permissionsTA.Account,
     permissionsObserver.ACCOUNT,
     permissionsTeacher.ACCOUNT,
+    permissionsStudent.ACCOUNT,
     courseUndeletePermissions.ACCOUNT,
     courseViewChangePermissions.ACCOUNT,
     courseViewUsagePermissions.ACCOUNT,
@@ -3648,6 +3569,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     learningOutcomesAddEditDeletePermissions.ACCOUNT,
     learningOutcomesImportPermissions.ACCOUNT,
     ltiAddEditPermissions.ACCOUNT,
+    managePermissions.ACCOUNT,
     messagesSentPermissions.ACCOUNT,
     messagesSentEntireClassPermissions.ACCOUNT,
     notificationsPermissions.ACCOUNT,
@@ -3655,7 +3577,6 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     outcomeProficiencyScalesAddEditDeletePermissions.ACCOUNT,
     pagesAddRemovePermissions.ACCOUNT,
     pairingCodePermissions.ACCOUNT,
-    managePermissions.ACCOUNT,
     questionBankPermissions.ACCOUNT,
     rubricsAddPermissions.ACCOUNT,
     sisDataImportPermissions.ACCOUNT,
@@ -3691,11 +3612,11 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     blueprintCoursePermissions.COURSE,
     courseAddDeletePermissions.COURSE,
     courseAddRemovePermissions.COURSE,
-    courseAddRemoveDesignerPermissions.COURSE,
     permissionsDesigner.COURSE,
     permissionsTA.COURSE,
     permissionsObserver.COURSE,
     permissionsTeacher.COURSE,
+    permissionsStudent.COURSE,
     courseUndeletePermissions.COURSE,
     courseViewChangePermissions.COURSE,
     courseViewUsagePermissions.COURSE,
@@ -3728,7 +3649,6 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     messagesSentEntireClassPermissions.COURSE,
     pagesAddRemovePermissions.COURSE,
     pairingCodePermissions.COURSE,
-    managePermissions.COURSE,
     outcomeProficiencyCalculationsAddEditDeletePermissions.COURSE,
     outcomeProficiencyScalesAddEditDeletePermissions.COURSE,
     questionBankPermissions.COURSE,

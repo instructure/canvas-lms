@@ -7,14 +7,13 @@
   <div class="form-column-right">
     <div class="border border-trbl border-round">
       {{!-- Submission type accepted --}}
-      <select id="assignment_submission_type"
-        name="submission_type"
+      <select id="assignment_submission_type" name="submission_type"
         aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         {{#if defaultToolName}}
-          <option value="default_external_tool" {{selectedIf isDefaultTool}}>
-            {{defaultToolName}}
-          </option>
+        <option value="default_external_tool" {{selectedIf isDefaultTool}}>
+          {{defaultToolName}}
+        </option>
         {{/if}}
         <option value="none" {{selectedIf defaultToNone}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
@@ -29,20 +28,19 @@
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
         {{#if submissionTypeSelectionTools}}
-          {{#each submissionTypeSelectionTools}}
-            <option value="external_tool_placement_{{this.id}}" {{selectedIf this.id ../selectedSubmissionTypeToolId}}>
-              {{this.base_title}}
-            </option>
-          {{/each}}
+        {{#each submissionTypeSelectionTools}}
+        <option value="external_tool_placement_{{this.id}}" {{selectedIf this.id ../selectedSubmissionTypeToolId}}>
+          {{this.base_title}}
+        </option>
+        {{/each}}
         {{/if}}
       </select>
-      {{#if submissionTypesFrozen }}
-        <input type="hidden" name="submission_type" value="{{submissionType}}" />
+      {{#if submissionTypesFrozen}}
+      <input type="hidden" name="submission_type" value="{{submissionType}}" />
       {{/if}}
 
       {{!-- Online submission types --}}
-      <div id="assignment_online_submission_types"
-        aria-enabled="{{isOnlineSubmission}}"
+      <div id="assignment_online_submission_types" aria-enabled="{{isOnlineSubmission}}"
         style="{{hiddenUnless isOnlineSubmission}}">
 
         <div class="subtitle">
@@ -53,79 +51,85 @@
 
         <label class="checkbox" for="assignment_text_entry">
           {{checkbox "acceptsOnlineTextEntries"
-            id="assignment_text_entry"
-            name="online_submission_types[online_text_entry]"
-            aria-label=(t "Online Submission Type - Text Entry")
-            disabled=submissionTypesFrozen}}
+          id="assignment_text_entry"
+          name="online_submission_types[online_text_entry]"
+          aria-label=(t "Online Submission Type - Text Entry")
+          disabled=submissionTypesFrozen}}
           {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
 
         <label class="checkbox" for="assignment_online_url">
           {{checkbox "acceptsOnlineURL"
-            id="assignment_online_url"
-            name="online_submission_types[online_url]"
-            aria-label=(t "Online Submission Type - Website URL")
-            disabled=submissionTypesFrozen}}
+          id="assignment_online_url"
+          name="online_submission_types[online_url]"
+          aria-label=(t "Online Submission Type - Website URL")
+          disabled=submissionTypesFrozen}}
           {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
         {{#if kalturaEnabled}}
-          <label class="checkbox" for="assignment_media_recording">
-            {{checkbox "acceptsMediaRecording"
-              id="assignment_media_recording"
-              name="online_submission_types[media_recording]"
-              aria-label=(t "Online Submission Type - Media Recordings")
-              disabled=submissionTypesFrozen}}
-            {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
-          </label>
+        <label class="checkbox" for="assignment_media_recording">
+          {{checkbox "acceptsMediaRecording"
+          id="assignment_media_recording"
+          name="online_submission_types[media_recording]"
+          aria-label=(t "Online Submission Type - Media Recordings")
+          disabled=submissionTypesFrozen}}
+          {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
+        </label>
+        {{/if}}
+        {{#if annotatedDocumentSubmissionsEnabled}}
+        <label class="checkbox" for="assignment_annotated_document">
+          {{checkbox "acceptsAnnotatedDocument"
+          id="assignment_annotated_document"
+          name="online_submission_types[annotated_document]"
+          aria-controls="restrict_file_extensions_container"
+          aria-label=(t "Online Submission Type - Annotated Document")
+          disabled=submissionTypesFrozen}}
+          {{#t "labels.allows_annotated_document"}}Annotated Document{{/t}}
+        </label>
+        <div id="annotated_document_chooser_container" class="nested" aria-expanded="{{acceptsAnnotatedDocument}}"
+          style="{{hiddenUnless acceptsAnnotatedDocument}}; padding: 6px 0 6px 42px;">
+        </div>
+        <input type="hidden" name="annotated_document_id" id="annotated_document_id" />
         {{/if}}
         <label class="checkbox" for="assignment_online_upload">
           {{checkbox "acceptsOnlineUpload"
-            id="assignment_online_upload"
-            name="online_submission_types[online_upload]"
-            aria-controls="restrict_file_extensions_container"
-            aria-label=(t "Online Submission Type - File Uploads")
-            disabled=submissionTypesFrozen}}
+          id="assignment_online_upload"
+          name="online_submission_types[online_upload]"
+          aria-controls="restrict_file_extensions_container"
+          aria-label=(t "Online Submission Type - File Uploads")
+          disabled=submissionTypesFrozen}}
           {{#t "labels.allow_file_uploads"}}File Uploads{{/t}}
         </label>
 
         {{!-- Online submission restrict file types? --}}
-        <div id="restrict_file_extensions_container"
-          class="nested"
-          aria-expanded="{{acceptsOnlineUpload}}"
+        <div id="restrict_file_extensions_container" class="nested" aria-expanded="{{acceptsOnlineUpload}}"
           style="{{hiddenUnless acceptsOnlineUpload}}">
 
           <label class="checkbox" for="assignment_restrict_file_extensions">
             {{checkbox "restrictFileExtensions"
-              id="assignment_restrict_file_extensions"
-              name="restrict_file_extensions"
-              aria-controls="allowed_extensions_container"
-              aria-label=(t "Online Submission Type - File Uploads - Restrict Upload File Types")
-              disabled=submissionTypesFrozen}}
+            id="assignment_restrict_file_extensions"
+            name="restrict_file_extensions"
+            aria-controls="allowed_extensions_container"
+            aria-label=(t "Online Submission Type - File Uploads - Restrict Upload File Types")
+            disabled=submissionTypesFrozen}}
             {{#t "labels.restrict_file_extensions"}}
-              Restrict Upload File Types
+            Restrict Upload File Types
             {{/t}}
           </label>
 
           {{!-- Online submission allowed extensions --}}
-          <div id="allowed_extensions_container"
-            aria-expanded="{{restrictFileExtensions}}"
-            style="{{hiddenUnless restrictFileExtensions}}"
-            class="nested">
+          <div id="allowed_extensions_container" aria-expanded="{{restrictFileExtensions}}"
+            style="{{hiddenUnless restrictFileExtensions}}" class="nested">
             <label for="assignment_allowed_extensions" class="hidden-readable">
               {{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}
             </label>
 
-            <input id="assignment_allowed_extensions"
-              name="allowed_extensions"
-              type="text"
-              maxlength="254"
-              placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
-              aria-labelledby="explanation_nest"
-              value="{{join allowedExtensions ","}}"
-              {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+            <input id="assignment_allowed_extensions" name="allowed_extensions" type="text" maxlength="254" placeholder="{{#t "
+              labels.allowed_extensions"}}Allowed File Extensions{{/t}}" aria-labelledby="explanation_nest"
+              value="{{join allowedExtensions " ,"}}" {{disabledIfIncludes frozenAttributes "submission_types"}} />
             <div id="explanation_nest" class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
-                Enter a list of accepted extensions, for example: doc,xls,txt
+              Enter a list of accepted extensions, for example: doc,xls,txt
               {{/t}}
             </div>
           </div>
@@ -135,17 +139,15 @@
         <div style="{{hiddenUnless turnitinAvailable}}">
           <label for="assignment_turnitin_enabled" class="checkbox">
             {{checkbox "turnitinEnabled"
-              id="assignment_turnitin_enabled"
-              name="turnitin_enabled"
-              aria-controls="advanced_turnitin_settings_link"
-              disabled=submissionTypesFrozen}}
+            id="assignment_turnitin_enabled"
+            name="turnitin_enabled"
+            aria-controls="advanced_turnitin_settings_link"
+            disabled=submissionTypesFrozen}}
             {{#t "label.turnitin_enabled"}}Enable Turnitin Submissions{{/t}}
           </label>
 
           <div class="nested">
-            <a href="#"
-              id="advanced_turnitin_settings_link"
-              aria-expanded="{{turnitinEnabled}}"
+            <a href="#" id="advanced_turnitin_settings_link" aria-expanded="{{turnitinEnabled}}"
               style="{{hiddenUnless turnitinEnabled}}">
               {{#t "advanced_turnitin_settings"}}Advanced Turnitin Settings{{/t}}
             </a>
@@ -155,16 +157,14 @@
         <div style="{{hiddenUnless vericiteAvailable}}">
           <label for="assignment_vericite_enabled" class="checkbox">
             {{checkbox "vericiteEnabled"
-              id="assignment_vericite_enabled"
-              name="vericite_enabled"
-              aria-controls="advanced_turnitin_settings_link"
-              disabled=submissionTypesFrozen}}
+            id="assignment_vericite_enabled"
+            name="vericite_enabled"
+            aria-controls="advanced_turnitin_settings_link"
+            disabled=submissionTypesFrozen}}
             {{#t "label.vericite_enabled"}}Enable VeriCite Submissions{{/t}}
           </label>
           <div class="nested">
-            <a href="#"
-              id="advanced_turnitin_settings_link"
-              aria-expanded="{{vericiteEnabled}}"
+            <a href="#" id="advanced_turnitin_settings_link" aria-expanded="{{vericiteEnabled}}"
               style="{{hiddenUnless vericiteEnabled}}">
               {{#t "advanced_vericite_settings"}}Advanced VeriCite Settings{{/t}}
             </a>
@@ -172,36 +172,43 @@
         </div>
       </div>
 
-      {{!-- LTI launch button for getting additional data for external tool assignments (when selected via placement) --}}
-      <div id="assignment_submission_type_selection_tool_launch_container" style="{{hiddenUnless selectedSubmissionTypeToolId}}">
+      {{!-- LTI launch button for getting additional data for external tool assignments (when selected via placement)
+      --}}
+      <div id="assignment_submission_type_selection_tool_launch_container"
+        style="{{hiddenUnless selectedSubmissionTypeToolId}}">
         <div class="pad-box">
           <div class="ic-Form-control">
             <button class="Button btn-primary" type="button" id="assignment_submission_type_selection_launch_button">
-                <i class="icon-link sr-hide" />
-                <span id="assignment_submission_type_selection_launch_button_text"></span>
+              <i class="icon-link sr-hide" />
+              <span id="assignment_submission_type_selection_launch_button_text"></span>
             </button>
           </div>
-          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]" value="{{externalToolDataStringified}}"/>
-          {{!-- this is very specific to Mastery Connect currently.  We could potentially make this a dynamic partial based on the type of external data --}}
+          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]"
+            value="{{externalToolDataStringified}}" />
+          {{!-- this is very specific to Mastery Connect currently. We could potentially make this a dynamic partial
+          based on the type of external data --}}
           <div>
             <h2>
               <span id="mc_external_data_assessment">{{name}}</span>
             </h2>
-            <div id="mc_external_data_points">{{externalToolData.points}} {{#if externalToolData.points}} {{#t}}Points{{/t}} {{/if}}</div>
+            <div id="mc_external_data_points">{{externalToolData.points}} {{#if externalToolData.points}}
+              {{#t}}Points{{/t}} {{/if}}</div>
             <div id="mc_external_data_objectives">{{externalToolData.objectives}}</div>
             <div> </div>
             <h3>
               <span id="mc_external_data_tracker">{{externalToolData.trackerName}}</span>
             </h3>
             <div id="mc_external_data_tracker_alignment">{{externalToolData.trackerAlignment}}</div>
-            <div id="mc_external_data_students">{{externalToolData.studentCount}} {{externalToolDataStudentLabelText}}</div>
+            <div id="mc_external_data_students">{{externalToolData.studentCount}} {{externalToolDataStudentLabelText}}
+            </div>
           </div>
         </div>
       </div>
       <div id="assignment_submission_type_selection_tool_dialog"></div>
 
       {{!-- Default external tool configuration --}}
-      <div id="default_external_tool_container" data-component="DefaultToolForm" style="{{hiddenUnless isNonPlacementExternalTool}}">
+      <div id="default_external_tool_container" data-component="DefaultToolForm"
+        style="{{hiddenUnless isNonPlacementExternalTool}}">
       </div>
 
       {{!-- External tool submissions --}}
@@ -217,56 +224,47 @@
               {{#t}}Enter or find an External Tool URL{{/t}}
             </label>
             <input type="hidden" id="assignment_external_tool_tag_attributes_custom_params"
-              name="external_tool_tag_attributes[custom_params]"
-              value="{{externalToolCustomParamsStringified}}" />
+              name="external_tool_tag_attributes[custom_params]" value="{{externalToolCustomParamsStringified}}" />
             <div class="ic-Input-group">
               <div class="ic-Input-group__add-on" aria-hidden="true">
                 <i class="icon-link"></i>
               </div>
-              <input id="assignment_external_tool_tag_attributes_url"
-                class="ic-Input"
-                name="external_tool_tag_attributes[url]"
-                type="url"
-                value="{{externalToolUrl}}"
-                placeholder="http://www.example.com/launch"
-                {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+              <input id="assignment_external_tool_tag_attributes_url" class="ic-Input" name="external_tool_tag_attributes[url]"
+                type="url" value="{{externalToolUrl}}" placeholder="http://www.example.com/launch" {{disabledIfIncludes
+                frozenAttributes "submission_types"}} />
               <button class="Button" id="assignment_external_tool_tag_attributes_url_find" type="button">
                 {{#t}}Find{{/t}}
               </button>
-              {{#if submissionTypesFrozen }}
-                <input type="hidden" name="external_tool_tag_attributes[url]" value="{{externalToolUrl}}" />
+              {{#if submissionTypesFrozen}}
+              <input type="hidden" name="external_tool_tag_attributes[url]" value="{{externalToolUrl}}" />
               {{/if}}
             </div>
           </div>
           <input id="assignment_external_tool_tag_attributes_content_type"
-                 name="external_tool_tag_attributes[content_type]"
-                 type="text"
-                 style="display: none"/>
-          <input id="assignment_external_tool_tag_attributes_content_id"
-                 name="external_tool_tag_attributes[content_id]"
-                 type="text"
-                 style="display: none"/>
+            name="external_tool_tag_attributes[content_type]" type="text" style="display: none" />
+          <input id="assignment_external_tool_tag_attributes_content_id" name="external_tool_tag_attributes[content_id]"
+            type="text" style="display: none" />
         </div>
 
         {{#if groupCategoryId}}
-          <div class="alert assignment-edit-external-tool-alert">
-            {{#t "external_tool_group_warning"}}
-              Group assignments can't use External Tools.
-              The group setting will be unchecked when you save
-            {{/t}}
-          </div>
+        <div class="alert assignment-edit-external-tool-alert">
+          {{#t "external_tool_group_warning"}}
+          Group assignments can't use External Tools.
+          The group setting will be unchecked when you save
+          {{/t}}
+        </div>
         {{/if}}
       </div>
       {{#unless isQuizLTIAssignment}}
-        <div id="external_tool_new_tab_container" style="display: none;">
-          <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
-            {{checkbox "externalToolNewTab"
-                       id="assignment_external_tool_tag_attributes_new_tab"
-                       name="external_tool_tag_attributes[new_tab]"
-                       disabled=submissionTypesFrozen}}
-            {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
-          </label>
-        </div>
+      <div id="external_tool_new_tab_container" style="display: none;">
+        <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
+          {{checkbox "externalToolNewTab"
+          id="assignment_external_tool_tag_attributes_new_tab"
+          name="external_tool_tag_attributes[new_tab]"
+          disabled=submissionTypesFrozen}}
+          {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
+        </label>
+      </div>
       {{/unless}}
     </div>
   </div>

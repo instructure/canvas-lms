@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import * as uploadFileModule from '../../../../shared/upload_file'
 import AttemptTab from '../AttemptTab'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -67,7 +67,7 @@ describe('ContentTabs', () => {
           <AttemptTab {...props} />
         </MockedProvider>
       )
-      expect(await waitForElement(() => getByTestId('upload-pane'))).toBeInTheDocument()
+      expect(await waitFor(() => getByTestId('upload-pane'))).toBeInTheDocument()
     })
 
     it('renders the file preview tab when the submission is submitted', async () => {
@@ -104,7 +104,7 @@ describe('ContentTabs', () => {
             <AttemptTab {...props} />
           </MockedProvider>
         )
-        expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
+        expect(await waitFor(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
       })
     })
   })

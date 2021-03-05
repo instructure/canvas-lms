@@ -147,10 +147,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
   editPage(ev = {}) {
     ev.preventDefault()
 
-    const $curCog = $(ev.target)
-      .parents('td')
-      .children()
-      .find('.al-trigger')
+    const $curCog = $(ev.target).parents('td').children().find('.al-trigger')
 
     const editDialog = new WikiPageIndexEditDialog({
       model: this.model,
@@ -160,7 +157,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
 
     const {indexView} = this
     const {collection} = this
-    return editDialog.on('success', function() {
+    return editDialog.on('success', function () {
       indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}-menu.al-trigger`
       indexView.currentSortField = null
       indexView.renderSortHeaders()
@@ -175,22 +172,15 @@ export default class WikiPageIndexItemView extends Backbone.View {
 
     if (!this.model.get('deletable')) return
 
-    const $curCog = $(ev.target)
-      .parents('td')
-      .children()
-      .find('.al-trigger')
-    const $allCogs = $('.collectionViewItems')
-      .children()
-      .find('.al-trigger')
+    const $curCog = $(ev.target).parents('td').children().find('.al-trigger')
+    const $allCogs = $('.collectionViewItems').children().find('.al-trigger')
     const curIndex = $allCogs.index($curCog)
     const newIndex = curIndex - 1
     if (newIndex < 0) {
       // We were at the top, or there wasn't another page item cog
       $focusOnDelete = $('.new_page')
     } else {
-      const $allTitles = $('.collectionViewItems')
-        .children()
-        .find('.wiki-page-link')
+      const $allTitles = $('.collectionViewItems').children().find('.wiki-page-link')
       $focusOnDelete = $allTitles[newIndex]
     }
 
@@ -229,22 +219,15 @@ export default class WikiPageIndexItemView extends Backbone.View {
     }
 
     if (ev != null ? ev.target : undefined) {
-      const $curCog = $(ev.target)
-        .parents('td')
-        .children()
-        .find('.al-trigger')
-      const $allCogs = $('.collectionViewItems')
-        .children()
-        .find('.al-trigger')
+      const $curCog = $(ev.target).parents('td').children().find('.al-trigger')
+      const $allCogs = $('.collectionViewItems').children().find('.al-trigger')
       curIndex = $allCogs.index($curCog)
     }
 
     return this.model.unsetFrontPage(() => {
       // Here's the aforementioned magic and index stuff
       if (curIndex != null) {
-        const cogs = $('.collectionViewItems')
-          .children()
-          .find('.al-trigger')
+        const cogs = $('.collectionViewItems').children().find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
     })
@@ -260,9 +243,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     // isn't valid after the re-render occurs... so we use the index and
     // re-collect the cogs afterwards.
     if (ev != null ? ev.target : undefined) {
-      const $curCog = $(ev.target)
-        .parents('td')
-        .find('.al-trigger')
+      const $curCog = $(ev.target).parents('td').find('.al-trigger')
       const $allCogs = $('.collectionViewItems').find('.al-trigger')
       curIndex = $allCogs.index($curCog)
     }

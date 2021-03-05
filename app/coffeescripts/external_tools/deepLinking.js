@@ -36,14 +36,14 @@ function legacyContentItem(ltiAdvantageContentItem) {
     ltiResourceLink: 'LtiLinkItem',
     file: 'FileItem'
   }
-  const {type, title, text, icon, url} = ltiAdvantageContentItem
+  const {type, title, text, icon, url, lookup_uuid} = ltiAdvantageContentItem
   const legacyType = types[type]
 
   if (!legacyType) {
     throw `Unknown type: ${type}`
   }
 
-  return {
+  const contentItem = {
     '@type': legacyType,
     title,
     text,
@@ -52,4 +52,10 @@ function legacyContentItem(ltiAdvantageContentItem) {
       '@id': icon
     }
   }
+
+  if (type === 'ltiResourceLink' && lookup_uuid) {
+    contentItem.lookup_uuid = lookup_uuid
+  }
+
+  return contentItem
 }

@@ -17,7 +17,7 @@
  */
 import $ from 'jquery'
 import React from 'react'
-import {render, fireEvent, wait, within} from '@testing-library/react'
+import {render, fireEvent, waitFor, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = (props = {}) => ({
@@ -144,7 +144,7 @@ describe('default proficiency', () => {
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
     fireEvent.click(getByText('Save Mastery Scale'))
     fireEvent.click(getByText('Save'))
-    await wait(() => {
+    await waitFor(() => {
       expect(updateSpy).toHaveBeenCalled()
       expect(flashMock).toHaveBeenCalledWith('Mastery scale saved')
     })
@@ -251,7 +251,7 @@ describe('default proficiency', () => {
     fireEvent.click(getByText('Save Mastery Scale'))
     fireEvent.click(getByText('Save'))
 
-    await wait(() => {
+    await waitFor(() => {
       expect(onNotifyPendingChangesSpy.mock.calls.length).toBe(2)
       // first call first argument
       expect(onNotifyPendingChangesSpy.mock.calls[0][0]).toBe(true)

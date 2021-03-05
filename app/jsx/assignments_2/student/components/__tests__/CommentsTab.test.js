@@ -24,14 +24,7 @@ import CommentsTab from '../CommentsTab'
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
-import {
-  act,
-  fireEvent,
-  render,
-  wait,
-  waitForDomChange,
-  waitForElement
-} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
@@ -121,12 +114,12 @@ describe('CommentsTab', () => {
         </MockedProvider>
       )
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
-    await waitForDomChange({textArea})
+    await waitFor(() => expect(getByText('lion')).toBeInTheDocument())
     fireEvent.click(getByText('Send Comment'))
 
-    await wait(() =>
+    await waitFor(() =>
       expect(mockedSetOnFailure).toHaveBeenCalledWith('Error sending submission comment')
     )
   })
@@ -139,7 +132,7 @@ describe('CommentsTab', () => {
         <CommentsTab {...props} />
       </MockedProvider>
     )
-    await wait(() => expect(getByTestId('comments-container')).toBeInTheDocument())
+    await waitFor(() => expect(getByTestId('comments-container')).toBeInTheDocument())
   })
 
   it('renders Load More Comments button when pages remain', async () => {
@@ -160,7 +153,7 @@ describe('CommentsTab', () => {
       </MockedProvider>
     )
 
-    expect(await waitForElement(() => getByText('Load More Comments'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Load More Comments'))).toBeInTheDocument()
   })
 
   it('does not render Load More Comments button when no pages remain', async () => {
@@ -207,7 +200,7 @@ describe('CommentsTab', () => {
       </MockedProvider>
     )
 
-    const loadMoreButton = await waitForElement(() => getByText('Load More Comments'))
+    const loadMoreButton = await waitFor(() => getByText('Load More Comments'))
     fireEvent.click(loadMoreButton)
 
     expect(querySpy).toHaveBeenCalledTimes(3)
@@ -221,7 +214,7 @@ describe('CommentsTab', () => {
         <CommentsTab {...props} />
       </MockedProvider>
     )
-    expect(await waitForElement(() => getByLabelText('Comment input box'))).toBeInTheDocument()
+    expect(await waitFor(() => getByLabelText('Comment input box'))).toBeInTheDocument()
   })
 
   it('notifies user when comment successfully sent', async () => {
@@ -234,10 +227,10 @@ describe('CommentsTab', () => {
         </MockedProvider>
       )
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
-    await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
+    await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
   })
 
   it('renders the optimistic response with env current user', async () => {
@@ -267,7 +260,7 @@ describe('CommentsTab', () => {
         </MockedProvider>
       )
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
     expect(await findByText('test reply comment')).toBeInTheDocument()
@@ -298,7 +291,7 @@ describe('CommentsTab', () => {
         </MockedProvider>
       )
     )
-    expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
 
   it('renders error when query errors', async () => {
@@ -313,7 +306,7 @@ describe('CommentsTab', () => {
       )
     )
 
-    expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
 
   it('marks submission comments as read after timeout', async () => {
@@ -340,10 +333,10 @@ describe('CommentsTab', () => {
       )
     )
 
-    await wait(() => {
-      act(() => jest.runAllTimers())
-    })
-    expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
+    jest.runAllTimers()
+    await waitFor(() =>
+      expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
+    )
   })
 
   it('renders an error when submission comments fail to be marked as read', async () => {
@@ -413,9 +406,7 @@ describe('CommentsTab', () => {
     )
 
     expect(
-      await waitForElement(() =>
-        getByText('Send a comment to your instructor about this assignment.')
-      )
+      await waitFor(() => getByText('Send a comment to your instructor about this assignment.'))
     ).toBeInTheDocument()
   })
 

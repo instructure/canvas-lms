@@ -235,7 +235,7 @@ describe "groups" do
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
-      it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627 do
+      it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627, ignore_js_errors: true do
         skip_if_safari(:alert)
         DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                 title: 'Group Discussion', message: 'Group')

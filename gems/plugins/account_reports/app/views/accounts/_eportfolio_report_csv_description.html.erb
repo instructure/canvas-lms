@@ -1,0 +1,44 @@
+<p><%= t(%{This report provides all active ePortfolios for the current institution.
+Optionally select 'Only include ePortfolios from users with no enrollments' to
+reduce the scope of the ePortfolio results to just those users with no enrollments.
+You can also run the report with 'Include Deleted Objects' to only include those
+ePortfolios that have been removed.}) %></p>
+
+<h3><%= t("Example") %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th><%= t("eportfolio_name") %></th>
+    <th><%= t("eportfolio_id") %></th>
+    <th><%= t("author_name") %></th>
+    <th><%= t("author_id") %></th>
+    <th><%= t("created_at") %></th>
+    <th><%= t("updated_at") %></th>
+    <th><%= t("is_public") %></th>
+    <th><%= t("workflow_state") %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>My Public Portfolio</td>
+    <td>3</td>
+    <td>Student</td>
+    <td>1</td>
+    <td>2021-02-23 15:35:00 UTC</td>
+    <td>2021-02-23 15:33:56 UTC</td>
+    <td>true</td>
+    <td>active</td>
+  </tr>
+  <tr>
+    <td>My Private Portfolio</td>
+    <td>4</td>
+    <td>Student</td>
+    <td>2</td>
+    <td>2021-02-23 15:35:13 UTC</td>
+    <td>2021-02-23 15:35:13 UTC</td>
+    <td>false</td>
+    <td>deleted</td>
+  </tr>
+  </tbody>
+</table>

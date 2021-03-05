@@ -150,7 +150,7 @@ describe "courses" do
       expect(value).to eq 10.megabytes
     end
 
-    it "should redirect to the gradebook when switching courses when viewing a students grades", ignore_js_errors: true do
+    it "should redirect to the gradebook when switching courses when viewing a students grades" do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
 

@@ -17,7 +17,7 @@
 //  */
 
 import React from 'react'
-import {render, fireEvent, wait} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import FeatureFlagButton from '../FeatureFlagButton'
@@ -70,7 +70,7 @@ describe('feature_flags::FeatureFlagButton', () => {
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
     fireEvent.click(getByText('Enabled'))
-    await wait(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
 
     expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
   })
@@ -85,7 +85,7 @@ describe('feature_flags::FeatureFlagButton', () => {
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
     fireEvent.click(getByText('Disabled'))
-    await wait(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
   })

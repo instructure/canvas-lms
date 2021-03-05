@@ -31,6 +31,7 @@ import HomeroomPage from './pages/HomeroomPage'
 import loadCardDashboard from '../bundles/dashboard_card'
 import {showFlashAlert, showFlashError} from '../shared/FlashAlert'
 import SchedulePage from 'jsx/dashboard/pages/SchedulePage'
+import ResourcesPage from 'jsx/dashboard/pages/ResourcesPage'
 import {theme} from './k5-theme'
 
 const getInitialTab = defaultTab => {
@@ -97,7 +98,7 @@ export const K5Dashboard = ({
 
   useEffect(() => {
     activeTab.current = currentTab
-    if (currentTab === TAB_IDS.HOMEROOM && !cards) {
+    if (!cards && (currentTab === TAB_IDS.RESOURCES || currentTab === TAB_IDS.HOMEROOM)) {
       loadCardDashboard(setCards)
     }
   }, [cards, currentTab])
@@ -134,6 +135,7 @@ export const K5Dashboard = ({
           )}
           {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
           <GradesPage visible={currentTab === TAB_IDS.GRADES} />
+          {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
         </View>
       </Provider>
     </ApplyTheme>

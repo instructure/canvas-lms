@@ -462,6 +462,12 @@ describe ContentMigration do
       @copy_from.homeroom_course = true
       @copy_from.save!
 
+      @copy_from.lti_resource_links.create!(
+        context_external_tool: external_tool_model(context: @copy_from),
+        custom: nil,
+        lookup_uuid: '1b302c1e-c0a2-42dc-88b6-c029699a7c7a'
+      )
+
       run_course_copy
 
       #compare settings
@@ -485,6 +491,9 @@ describe ContentMigration do
         expect(@copy_to.send(att)).to eq(@copy_from.send(att)), "@copy_to.#{att}: expected #{@copy_from.send(att)}, got #{@copy_to.send(att)}"
       end
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
+
+      expect(@copy_to.lti_resource_links.size).to eq 1
+      expect(@copy_to.lti_resource_links.first.lookup_uuid).to eq '1b302c1e-c0a2-42dc-88b6-c029699a7c7a'
     end
 
     it "should copy the overridable course visibility setting" do

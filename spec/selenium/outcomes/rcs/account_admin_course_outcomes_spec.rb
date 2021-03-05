@@ -90,7 +90,6 @@ describe "account admin outcomes" do
       1.upto(counter) do |og|
         root_group = root_group.child_outcome_groups.create!(:title => "Level #{og}")
       end
-      Shard.current.settings[:common_core_outcome_group_id] = root_group.id
     end
 
     def open_outcomes_find

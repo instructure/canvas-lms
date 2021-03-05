@@ -69,6 +69,7 @@ class Assignment < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   attribute :lti_resource_link_custom_params, :string, default: nil
+  attribute :lti_resource_link_lookup_uuid, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
@@ -1111,9 +1112,17 @@ class Assignment < ActiveRecord::Base
       end
 
       if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
-        return if primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+        options = {}
 
-        primary_resource_link.update!(custom: lti_resource_link_custom_params_as_hash)
+        unless primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+          options[:custom] = lti_resource_link_custom_params_as_hash
+        end
+
+        options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
+
+        return if options.empty?
+
+        primary_resource_link.update!(options)
       end
     end
   end
@@ -2130,7 +2139,7 @@ class Assignment < ActiveRecord::Base
     body url submission_type media_comment_id media_comment_type submitted_at
   ].freeze
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment attachments require_submission_type_is_valid]).to_set
+                                    %w[comment group_comment attachments require_submission_type_is_valid resource_link_lookup_uuid]).to_set
 
   def submit_homework(original_student, opts={})
     eula_timestamp = opts[:eula_agreement_timestamp]
@@ -2140,6 +2149,7 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
     }
     raise "Student Required" unless original_student
+
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
@@ -2177,6 +2187,7 @@ class Assignment < ActiveRecord::Base
         homework.submitted_at = opts[:submitted_at] || Time.zone.now
         homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
+        homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             Submission.suspend_callbacks(:delete_submission_drafts!) do

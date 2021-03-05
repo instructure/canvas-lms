@@ -3,4 +3,5 @@ gem 'simplecov', '0.14.1', :require => false
 # Specify your gem's dependencies in canvas_cassandra.gemspec
 gemspec
 
+gem 'config_file', path: "../config_file"
 gem 'cassandra-cql', '1.2.2', :github => 'kreynolds/cassandra-cql', :ref => 'beed72e249d02cebc850a4b92b468c8b64b12257'

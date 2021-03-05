@@ -27,7 +27,8 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
 import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 import {Flex} from '@instructure/ui-flex'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 export default function CourseAvailabilityOptions({canManage, viewPastLocked, viewFutureLocked}) {
   const FORM_IDS = {
@@ -116,38 +117,56 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
         />
 
         {selectedApplicabilityValue === 'course' && (
-          <Flex direction="column" display="inline-flex" alignItems="end">
-            <Flex.Item padding="xx-small">
-              <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
-              <CanvasDateInput
-                renderLabel={I18n.t('Start')}
-                formatDate={formatDate}
-                interaction={canInteract()}
-                layout="inline"
-                selectedDate={startDate}
-                onSelectedDateChange={value => {
-                  const start = moment(value).toISOString()
-                  setFormValue(FORM_IDS.START_DATE, start)
-                  setStartDate(start)
-                }}
-              />
-            </Flex.Item>
-            <Flex.Item padding="xx-small">
-              <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
-              <CanvasDateInput
-                renderLabel={I18n.t('End')}
-                formatDate={formatDate}
-                interaction={canInteract()}
-                layout="inline"
-                selectedDate={endDate}
-                onSelectedDateChange={value => {
-                  const end = moment(value).toISOString()
-                  setFormValue(FORM_IDS.END_DATE, end)
-                  setEndDate(end)
-                }}
-              />
-            </Flex.Item>
-          </Flex>
+          <>
+            <Flex direction="column" display="inline-flex" alignItems="end">
+              <Flex.Item padding="xx-small">
+                <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
+                <CanvasDateInput
+                  renderLabel={I18n.t('Start')}
+                  formatDate={formatDate}
+                  interaction={canInteract()}
+                  layout="inline"
+                  selectedDate={startDate}
+                  onSelectedDateChange={value => {
+                    const start = moment(value).toISOString()
+                    setFormValue(FORM_IDS.START_DATE, start)
+                    setStartDate(start)
+                  }}
+                />
+              </Flex.Item>
+              <Flex.Item padding="xx-small">
+                <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
+                <CanvasDateInput
+                  renderLabel={I18n.t('End')}
+                  formatDate={formatDate}
+                  interaction={canInteract()}
+                  layout="inline"
+                  selectedDate={endDate}
+                  onSelectedDateChange={value => {
+                    const end = moment(value).toISOString()
+                    setFormValue(FORM_IDS.END_DATE, end)
+                    setEndDate(end)
+                  }}
+                />
+              </Flex.Item>
+            </Flex>
+            {tz.isMidnight(endDate) && (
+              <Flex>
+                <Flex.Item margin="xx-small small xx-small 0" align="start">
+                  <AccessibleContent alt={I18n.t('Warning')}>
+                    <IconWarningSolid size="x-small" color="warning" />
+                  </AccessibleContent>
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="small">
+                    {I18n.t(
+                      'Course participation is set to expire at midnight, so the previous day is the last day this course will be active.'
+                    )}
+                  </Text>
+                </Flex.Item>
+              </Flex>
+            )}
+          </>
         )}
 
         <Checkbox

@@ -1175,6 +1175,30 @@ XML
     expect(@copy_to.attachments.where(migration_id: 'ghi').first).to be_deleted
   end
 
+  context 'importing lti resource links' do
+    let(:data) do
+      {
+        'lti_resource_links' => [
+          {
+            'custom' => {
+              'param1' => 'value1'
+            },
+            'lookup_uuid' => '1b302c1e-c0a2-42dc-88b6-c029699a7c7a',
+            'context_id' => @copy_from.id,
+            'context_type' => 'Course'
+          }
+        ]
+      }
+    end
+    let(:migration) { ContentMigration.create(context: @copy_to) }
+
+    it 'process migration from LtiResourceLinkImporter' do
+      expect(Importers::LtiResourceLinkImporter).to receive(:process_migration).once.with(data, migration)
+
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+    end
+  end
+
   context "warnings for missing links in imported html" do
     it "should add warnings for assessment questions" do
       data = {

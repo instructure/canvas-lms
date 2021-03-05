@@ -17,13 +17,13 @@
  */
 import React from 'react'
 import LoginActionPrompt from '../LoginActionPrompt'
-import {render, waitForElement, fireEvent} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 
 describe('LoginActionPrompt', () => {
   it('renders component locked and feedback text labels correctly', async () => {
     const {getByText} = render(<LoginActionPrompt />)
-    expect(await waitForElement(() => getByText('Submission Locked'))).toBeInTheDocument()
-    expect(await waitForElement(() => getByText('Log in to submit'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Submission Locked'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Log in to submit'))).toBeInTheDocument()
   })
 
   it('login button redirects towards login page', async () => {
@@ -37,19 +37,19 @@ describe('LoginActionPrompt', () => {
 
   it('displays a message if the course has not started', async () => {
     const {getByTestId} = render(<LoginActionPrompt enrollmentState="accepted" />)
-    const text = await waitForElement(() => getByTestId('login-action-text').textContent)
+    const text = await waitFor(() => getByTestId('login-action-text').textContent)
     expect(text).toEqual('Course has not started yet')
   })
 
   it('displays a message if the student has not accepted their enrollment', async () => {
     const {getByTestId} = render(<LoginActionPrompt nonAcceptedEnrollment />)
-    const text = await waitForElement(() => getByTestId('login-action-text').textContent)
+    const text = await waitFor(() => getByTestId('login-action-text').textContent)
     expect(text).toEqual('Accept course invitation to participate in this assignment')
   })
 
   it('displays a message if the student is not logged in', async () => {
     const {getByTestId} = render(<LoginActionPrompt />)
-    const text = await waitForElement(() => getByTestId('login-action-text').textContent)
+    const text = await waitFor(() => getByTestId('login-action-text').textContent)
     expect(text).toEqual('Log in to submit')
   })
 
@@ -60,13 +60,13 @@ describe('LoginActionPrompt', () => {
 
   it('displays an invitation button if the student has not accepted their enrollment', async () => {
     const {getByTestId} = render(<LoginActionPrompt nonAcceptedEnrollment />)
-    const text = await waitForElement(() => getByTestId('login-action-button').textContent)
+    const text = await waitFor(() => getByTestId('login-action-button').textContent)
     expect(text).toEqual('Accept course invitation')
   })
 
   it('displays a login button if the student is not logged in', async () => {
     const {getByTestId} = render(<LoginActionPrompt />)
-    const text = await waitForElement(() => getByTestId('login-action-button').textContent)
+    const text = await waitFor(() => getByTestId('login-action-button').textContent)
     expect(text).toEqual('Log in')
   })
 })

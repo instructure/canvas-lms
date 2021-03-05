@@ -102,7 +102,7 @@ describe CourseForMenuPresenter do
 
       context 'and `canvas_for_elementary` FF enabled' do
         before(:each) do
-          user.account.enable_feature!(:canvas_for_elementary)
+          course.root_account.enable_feature!(:canvas_for_elementary)
         end
 
         it 'sets `isHomeroom` to `true`' do

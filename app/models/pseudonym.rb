@@ -544,14 +544,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def audit_login(remote_ip, valid_password)
-    return :too_many_attempts unless Canvas::Security.allow_login_attempt?(self, remote_ip)
-
-    if valid_password
-      Canvas::Security.successful_login!(self, remote_ip)
-    else
-      Canvas::Security.failed_login!(self, remote_ip)
-    end
-    nil
+    Canvas::Security::LoginRegistry.audit_login(self, remote_ip, valid_password)
   end
 
   def self.cas_ticket_key(ticket)

@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor, cleanup} from '@testing-library/react'
-import {act} from 'react-dom/test-utils'
+import {act, render, fireEvent, waitFor, cleanup} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 
 afterEach(cleanup)

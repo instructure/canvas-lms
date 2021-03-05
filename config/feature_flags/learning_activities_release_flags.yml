@@ -113,7 +113,8 @@ bounced_emails_admin_tool:
 canvas_for_elementary:
   state: hidden
   display_name: Canvas for Elementary
-  applies_to: Account
+  applies_to: RootAccount
+  beta: true
   description: |-
-    A simplified Canvas interface for K-5
-
+    A simplified Canvas interface for K-5. Enable applicable
+    subaccount(s) as K-5 accounts in account settings.

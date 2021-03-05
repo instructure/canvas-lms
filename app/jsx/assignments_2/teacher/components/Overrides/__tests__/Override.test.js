@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitForElement} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import Override from '../Override'
 
@@ -48,7 +48,7 @@ describe('Override', () => {
     const expandButton = getByText('Click to show details')
     fireEvent.click(expandButton)
     // the detail is now rendered
-    const detail = await waitForElement(() => getByTestId('OverrideDetail'))
+    const detail = await waitFor(() => getByTestId('OverrideDetail'))
     expect(detail).toBeInTheDocument()
     // and the summary's still there
     expect(getByTestId('OverrideSummary')).toBeInTheDocument()

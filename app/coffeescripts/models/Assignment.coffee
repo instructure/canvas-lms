@@ -238,6 +238,9 @@ export default class Assignment extends Model
   acceptsOnlineUpload: =>
     !! _.includes @_submissionTypes(), 'online_upload'
 
+  acceptsAnnotatedDocument: =>
+    !! _.includes @_submissionTypes(), 'annotated_document'
+
   acceptsOnlineURL: =>
     !! _.includes @_submissionTypes(), 'online_url'
 
@@ -250,7 +253,7 @@ export default class Assignment extends Model
   isOnlineSubmission: =>
     _.some @_submissionTypes(), (thing) ->
       thing in ['online', 'online_text_entry',
-        'media_recording', 'online_url', 'online_upload']
+        'media_recording', 'online_url', 'online_upload', 'annotated_document']
 
   postToSIS: (postToSisBoolean) =>
     return @get 'post_to_sis' unless arguments.length > 0
@@ -557,6 +560,7 @@ export default class Assignment extends Model
 
   toView: =>
     fields = [
+      'acceptsAnnotatedDocument',
       'acceptsMediaRecording', 'acceptsOnlineTextEntries', 'acceptsOnlineURL',
       'acceptsOnlineUpload', 'allDates', 'allowedExtensions', 'anonymousGrading',
       'anonymousInstructorAnnotations', 'anonymousPeerReviews', 'assignmentGroupId',

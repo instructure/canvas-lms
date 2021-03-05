@@ -296,7 +296,7 @@ class AssetUserAccessLog
   def self.compaction_sql(aggregation_results)
     values_list = aggregation_results.map do |row|
       max_updated_at = row['max_updated_at']
-      max_updated_at = max_updated_at.to_s(:db) unless CANVAS_RAILS5_2
+      max_updated_at = max_updated_at.to_s(:db)
       "(#{row["aua_id"]}, #{row["view_count"]}, '#{max_updated_at}')"
     end.join(", ")
 

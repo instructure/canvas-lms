@@ -17,12 +17,10 @@
 
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
-if CANVAS_RAILS5_2
-  gem 'rails', '5.2.4.5'
-    gem 'loofah', '2.3.0'
-    gem 'sprockets', '4.0.2'
-else
+if CANVAS_RAILS6_0
   gem 'rails', '6.0.3.5'
+else
+  gem 'rails', '6.1.3'
 end
 
 gem 'academic_benchmarks', '1.1.0', require: false
@@ -140,6 +138,7 @@ path 'gems' do
   gem 'bookmarked_collection'
   gem 'broadcast_policy'
   gem 'canvas_breach_mitigation'
+  gem 'canvas_cache'
   gem 'canvas_color'
   gem 'canvas_crummy'
   gem 'canvas_dynamodb'
@@ -151,13 +150,16 @@ path 'gems' do
   gem 'canvas_mimetype_fu'
   gem 'canvas_quiz_statistics'
   gem 'canvas_sanitize'
+  gem 'canvas_security'
   gem 'canvas_slug'
   gem 'canvas_sort'
   gem 'canvas_stringex'
   gem 'canvas_text_helper'
   gem 'canvas_time'
   gem 'canvas_unzip'
+  gem 'config_file'
   gem 'diigo'
+  gem 'dynamic_settings'
   gem 'event_stream'
   gem 'google_drive'
   gem 'html_text_helper'
@@ -169,6 +171,7 @@ path 'gems' do
   gem 'lti_outbound'
   gem 'multipart'
   gem 'paginated_collection'
+  gem 'request_context'
   gem 'stringify_ids'
   gem 'twitter'
   gem 'utf8_cleaner'

@@ -49,7 +49,7 @@ describe Submission::ShowPresenter do
 
   let(:submission_path) { course_assignment_submission_path(course, assignment, reviewee_submission.user_id) }
   let(:anonymous_submission_path) do
-    course_assignment_anonymous_submission_path(course, assignment, reviewee_submission.anonymous_id) 
+    course_assignment_anonymous_submission_path(course, assignment, reviewee_submission.anonymous_id)
   end
 
   describe "#anonymize_submission_owner?" do
@@ -115,6 +115,22 @@ describe Submission::ShowPresenter do
     it "calls submission_data_url with 'preview' and 'rand' parameters" do
       expect(presenter_for_reviewer).to receive(:submission_data_url).with(hash_including(preview: 1, rand: instance_of(Integer)))
       presenter_for_reviewer.submission_preview_frame_url
+    end
+  end
+
+  describe "#submission_details_tool_launch_url" do
+    it "calls retrieve_course_external_tools_url with 'assignment_id', 'display', 'url' and 'resource_link_lookup_uuid' parameters" do
+      resource_link_lookup_uuid = SecureRandom.uuid
+      reviewee_submission.resource_link_lookup_uuid = resource_link_lookup_uuid
+      parameters = {
+        assignment_id: assignment.id,
+        display: 'borderless',
+        url: reviewee_submission.external_tool_url,
+        resource_link_lookup_uuid: resource_link_lookup_uuid
+      }
+
+      expect(presenter_for_reviewer).to receive(:retrieve_course_external_tools_url).with(course.id, hash_including(parameters))
+      presenter_for_reviewer.submission_details_tool_launch_url
     end
   end
 

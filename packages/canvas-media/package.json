@@ -64,9 +64,9 @@
     "react-dom": "^16"
   },
   "devDependencies": {
-    "@testing-library/dom": "^6",
-    "@testing-library/react": "^9",
-    "@testing-library/user-event": "^4.1.0",
+    "@testing-library/dom": "^7",
+    "@testing-library/react": "^11",
+    "@testing-library/user-event": "^5",
     "moxios": "^0.4",
     "sinon": "^7"
   }

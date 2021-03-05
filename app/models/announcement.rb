@@ -122,6 +122,10 @@ class Announcement < DiscussionTopic
 
   def is_announcement; true end
 
+  def homeroom_announcement?(context)
+    context.is_a?(Course) && context.elementary_homeroom_course?
+  end
+
   # no one should receive discussion entry notifications for announcements
   def subscribers
     []

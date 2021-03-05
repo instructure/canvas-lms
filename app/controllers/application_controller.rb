@@ -225,10 +225,10 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
-    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users
+    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users,
+    :canvas_for_elementary
   ].freeze
-  JS_ENV_ACCOUNT_FEATURES = [:canvas_for_elementary].freeze
-  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_ACCOUNT_FEATURES].sort.join(",")).freeze
+  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
     # can be invalidated by a flag change on either site admin or the domain root account
     MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
@@ -239,9 +239,6 @@ class ApplicationController < ActionController::Base
       end
       JS_ENV_ROOT_ACCOUNT_FEATURES.each do |f|
         results[f] = !!@domain_root_account&.feature_enabled?(f)
-      end
-      JS_ENV_ACCOUNT_FEATURES.each do |f|
-        results[f] = !!@current_user&.account&.feature_enabled?(f)
       end
       results
     end
@@ -622,7 +619,7 @@ class ApplicationController < ActionController::Base
     Canvas::Apm.annotate_trace(
       Shard.current,
       @domain_root_account,
-      RequestContextGenerator.request_id,
+      RequestContext::Generator.request_id,
       @current_user
     )
   end
@@ -676,7 +673,7 @@ class ApplicationController < ActionController::Base
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     headers['Strict-Transport-Security'] = 'max-age=31536000' if request.ssl?
-    RequestContextGenerator.store_request_meta(request, @context)
+    RequestContext::Generator.store_request_meta(request, @context)
     true
   end
 
@@ -1444,11 +1441,11 @@ class ApplicationController < ActionController::Base
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
     return unless page_views_enabled?
 
-    RequestContextGenerator.store_interaction_seconds_update(
+    RequestContext::Generator.store_interaction_seconds_update(
       params[:page_view_token],
       updated_fields[:interaction_seconds]
     )
-    page_view_info = PageView.decode_token(params[:page_view_token])
+    page_view_info = CanvasSecurity::PageViewJwt.decode(params[:page_view_token])
     @page_view = PageView.find_for_update(page_view_info[:request_id])
     if @page_view
       if @page_view.id
@@ -1495,7 +1492,7 @@ class ApplicationController < ActionController::Base
       @page_view.account_id = @domain_root_account.id
       @page_view.developer_key_id = @access_token.try(:developer_key_id)
       @page_view.store
-      RequestContextGenerator.store_page_view_meta(@page_view)
+      RequestContext::Generator.store_page_view_meta(@page_view)
     end
   end
 

@@ -475,7 +475,11 @@ body.responsive_awareness .span4.discussion-header__metadata {
     padding: $ic-sp;
     border-#{direction(left)}: 1px solid $ic-border-light;
     border-#{direction(right)}: 1px solid $ic-border-light;
+    &.no-reply {
+      border-bottom: 1px solid $ic-border-light;
+    }
   }
+
 }
 
 .entry-header {

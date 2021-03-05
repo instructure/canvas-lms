@@ -37,7 +37,7 @@ describe GradeChangeAuditApiController do
 
   before :each do
     user_session(admin)
-    allow(Auditors).to receive(:write_to_cassandra?).and_return(Canvas::Cassandra::DatabaseBuilder.configured?(:auditors))
+    allow(Auditors).to receive(:write_to_cassandra?).and_return(CanvasCassandra::DatabaseBuilder.configured?(:auditors))
     allow(Auditors).to receive(:write_to_postgres?).and_return(true)
     allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
     allow(Auditors).to receive(:read_from_postgres?).and_return(true)
@@ -52,7 +52,7 @@ describe GradeChangeAuditApiController do
 
     context "reading from cassandra" do
       before :each do
-        skip unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
+        skip unless CanvasCassandra::DatabaseBuilder.configured?(:auditors)
         allow(Auditors).to receive(:read_from_cassandra?).and_return(true)
         allow(Auditors).to receive(:read_from_postgres?).and_return(false)
       end

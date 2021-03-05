@@ -21,7 +21,7 @@ import {
   sum,
   sumBy,
   toNumber,
-  weightedPercent
+  weightedPercent,
 } from 'jsx/gradebook/shared/helpers/GradeCalculationHelper'
 
 QUnit.module('GradeCalculationHelper', () => {
@@ -61,11 +61,14 @@ QUnit.module('GradeCalculationHelper', () => {
     })
   })
 
-  QUnit.module('.sumBy()', hooks => {
+  QUnit.module('.sumBy()', (hooks) => {
     let collection
 
     hooks.beforeEach(() => {
-      collection = [{price: 1.25, weight: 5}, {price: 2, weight: 3.5}]
+      collection = [
+        {price: 1.25, weight: 5},
+        {price: 2, weight: 3.5},
+      ]
     })
 
     test('sums up the items in the collection by the specified attribute', () => {
@@ -107,7 +110,7 @@ QUnit.module('GradeCalculationHelper', () => {
     })
 
     test('avoids floating point calculation issues', () => {
-      collection = [7, 6.1, 7, 6.9, 6.27].map(price => ({price}))
+      collection = [7, 6.1, 7, 6.9, 6.27].map((price) => ({price}))
       // 7 + 6.1 + 7 + 6.9 + 6.27 === 33.269999999999996
       strictEqual(sumBy(collection, 'price'), 33.27)
     })
@@ -226,6 +229,12 @@ QUnit.module('GradeCalculationHelper', () => {
 
     test('returns 0 when the weight is 0', () => {
       strictEqual(toNumber(weightedPercent({score: 10, possible: 10, weight: 0})), 0)
+    })
+
+    test('returns 0 when score and weight are > 0 and possible is 0', () => {
+      // This edge case can happen when students are given grades for assignments
+      // worth 0 points.
+      strictEqual(toNumber(weightedPercent({score: 10, possible: 0, weight: 25})), 0)
     })
   })
 })

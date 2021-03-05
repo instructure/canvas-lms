@@ -17,7 +17,7 @@
  */
 
 import useLocalStorage from '../useLocalStorage'
-import {renderHook} from '@testing-library/react-hooks'
+import {renderHook} from '@testing-library/react-hooks/dom'
 
 describe('Module: use-localstorage', () => {
   describe('useLocalStorage', () => {

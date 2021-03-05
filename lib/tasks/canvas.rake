@@ -144,11 +144,7 @@ namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do
     migrations = ActiveRecord::Base.connection.migration_context.migrations
-    if CANVAS_RAILS5_2
-      pending_migrations = ActiveRecord::Migrator.new(:up, migrations).pending_migrations
-    else
-      pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
-    end
+    pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
     pending_migrations.each do |pending_migration|
       tags = pending_migration.tags
       tags = " (#{tags.join(', ')})" unless tags.empty?
@@ -159,11 +155,7 @@ namespace :db do
   desc "Shows skipped db migrations."
   task :skipped_migrations => :environment do
     migrations = ActiveRecord::Base.connection.migration_context.migrations
-    if CANVAS_RAILS5_2
-      skipped_migrations = ActiveRecord::Migrator.new(:up, migrations).skipped_migrations
-    else
-      skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
-    end
+    skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
     skipped_migrations.each do |skipped_migration|
       tags = skipped_migration.tags
       tags = " (#{tags.join(', ')})" unless tags.empty?
@@ -176,11 +168,7 @@ namespace :db do
     task :predeploy => [:environment, :load_config] do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
       migrations = migrations.select { |m| m.tags.include?(:predeploy) }
-      if CANVAS_RAILS5_2
-        ActiveRecord::Migrator.new(:up, migrations).migrate
-      else
-        ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
-      end
+      ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
     end
   end
 
@@ -192,8 +180,8 @@ namespace :db do
       queue = config['queue']
       ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
       ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
-      Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
-        db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
+      CanvasCassandra::DatabaseBuilder.config_names.each do |cass_config|
+        db = CanvasCassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end

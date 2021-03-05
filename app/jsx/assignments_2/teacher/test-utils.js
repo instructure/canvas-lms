@@ -17,7 +17,7 @@
  */
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
-import {fireEvent, wait, waitForElement} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 import {
   SAVE_ASSIGNMENT,
   COURSE_MODULES_QUERY_LOCAL,
@@ -39,9 +39,7 @@ export function findInputForLabel(labelChild, container) {
 }
 
 export async function waitForNoElement(queryFn) {
-  // use wait instead of waitForElement because waitForElement doesn't seem to
-  // trigger the callback when elements disappear
-  await wait(() => {
+  await waitFor(() => {
     let elt = null
     try {
       elt = queryFn()
@@ -274,7 +272,7 @@ export function itBehavesLikeADialog({
       const fns = await render()
       const openDialogTrigger = getOpenDialogElt(fns)
       fireEvent.click(openDialogTrigger)
-      expect(await waitForElement(() => confirmDialogOpen(fns))).toBeInTheDocument()
+      expect(await waitFor(() => confirmDialogOpen(fns))).toBeInTheDocument()
       return fns
     }
 

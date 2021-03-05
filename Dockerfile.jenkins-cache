@@ -70,6 +70,11 @@ RUN --mount=target=/tmp/src \
     -path "*/app/views/jst" -o \
     -path "*/public" -o \
   \) -exec cp -rf --parents {} /tmp/dst \; && \
+  find gems/config_file \
+    -not -path "gems/config_file" \
+    -not -path "gems/config_file/spec" \
+    -not -path "gems/config_file/spec/*" \
+    -exec cp -rf --parents {} /tmp/dst \; && \
   cp --parents -rf \
     app/coffeescripts \
     app/jsx \
@@ -97,7 +102,6 @@ RUN --mount=target=/tmp/src \
     lib/brandable_css.rb \
     lib/canvas_logger.rb \
     lib/canvas_yaml.rb \
-    lib/config_file.rb \
     lib/logging_filter.rb \
     lib/request_cache.rb \
     lib/temp_cache.rb \

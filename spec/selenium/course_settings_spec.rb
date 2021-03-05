@@ -36,14 +36,14 @@ describe "course settings" do
   context "considering homeroom courses" do
     let(:canvas_for_elem_flag){false}
     before(:each) do
-      canvas_for_elem_flag = @account.feature_enabled?(:canvas_for_elementary)
+      canvas_for_elem_flag = @account.root_account.feature_enabled?(:canvas_for_elementary)
     end
     after(:each) do
-      @account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
     end
 
     it 'hides most tabs if set' do
-      @account.enable_feature!(:canvas_for_elementary)
+      @account.root_account.enable_feature!(:canvas_for_elementary)
       @course.homeroom_course = true
       @course.save!
 

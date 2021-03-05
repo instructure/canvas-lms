@@ -28,7 +28,7 @@ export default class ResourceLinkContentItem extends LinkContentItem {
     let endpointParams = 'display=borderless'
 
     if (lookupUuid !== null && lookupUuid !== undefined) {
-      endpointParams += `&resource_link_lookup_id=${lookupUuid}`
+      endpointParams += `&resource_link_lookup_uuid=${lookupUuid}`
     }
 
     return `${endpointParams}&url=${encodeURIComponent(url)}`

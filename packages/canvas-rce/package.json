@@ -137,7 +137,7 @@
     "@instructure/ui-babel-preset": "6",
     "@testing-library/dom": "^7",
     "@testing-library/jest-dom": "^5",
-    "@testing-library/react": "^10",
+    "@testing-library/react": "^11",
     "@testing-library/user-event": "^12",
     "axe-testcafe": "^3",
     "babel-loader": "^8.0.0",
