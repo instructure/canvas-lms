@@ -20,8 +20,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -29,7 +32,6 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!k5_dashboard'
 import instFSOptimizedImageUrl from 'jsx/shared/helpers/instFSOptimizedImageUrl'
 import k5Theme from 'jsx/dashboard/k5-theme'
-import {Link} from '@instructure/ui-link'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
 const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
@@ -38,6 +40,7 @@ const DEFAULT_SIZE = 100
 const GradeSummaryShape = {
   courseId: PropTypes.string.isRequired,
   courseName: PropTypes.string.isRequired,
+  enrollmentType: PropTypes.string.isRequired,
   courseColor: PropTypes.string,
   courseImage: PropTypes.string,
   currentGradingPeriodId: PropTypes.string,
@@ -85,6 +88,7 @@ export const GradeSummaryLine = ({
   courseColor,
   courseName,
   currentGradingPeriodId,
+  enrollmentType,
   grade,
   score
 }) => {
@@ -146,21 +150,34 @@ export const GradeSummaryLine = ({
                 </Link>
               </Heading>
             </Text>
-            <ProgressBar
-              screenReaderLabel={I18n.t('Grade for %{course}', {course: courseName})}
-              formatScreenReaderValue={() =>
-                isPercentage
-                  ? I18n.t('%{percent} of points possible', {percent: gradeText})
-                  : gradeText
-              }
-              size="small"
-              valueNow={score}
-              valueMax={100}
-              margin="small 0"
-            />
-            <PresentationContent>
-              <Text weight="bold">{gradeText}</Text>
-            </PresentationContent>
+            {['student', 'observer'].includes(enrollmentType) && (
+              <>
+                <ProgressBar
+                  screenReaderLabel={I18n.t('Grade for %{course}', {course: courseName})}
+                  formatScreenReaderValue={() =>
+                    isPercentage
+                      ? I18n.t('%{percent} of points possible', {percent: gradeText})
+                      : gradeText
+                  }
+                  size="small"
+                  valueNow={score}
+                  valueMax={100}
+                  margin="small 0"
+                />
+                <PresentationContent>
+                  <Text weight="bold">{gradeText}</Text>
+                </PresentationContent>
+              </>
+            )}
+            {['ta', 'teacher'].includes(enrollmentType) && (
+              <Button
+                renderIcon={IconExternalLinkLine}
+                href={`/courses/${courseId}/gradebook`}
+                target="_blank"
+              >
+                View Gradebook
+              </Button>
+            )}
           </View>
         </Flex.Item>
       </Flex>

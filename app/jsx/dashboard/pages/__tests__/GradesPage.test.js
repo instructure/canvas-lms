@@ -34,6 +34,7 @@ const defaultCourses = [
     courseName: 'ECON 500',
     isHomeroom: false,
     currentGradingPeriodId: '1',
+    enrollmentType: 'student',
     score: 50,
     grade: 'F',
     gradingPeriods: [
@@ -49,6 +50,7 @@ const defaultCourses = [
     courseName: 'Testing 4 Dummies',
     isHomeroom: false,
     currentGradingPeriodId: '1',
+    enrollmentType: 'student',
     score: 90,
     grade: 'A-',
     gradingPeriods: [
@@ -64,6 +66,7 @@ const defaultCourses = [
     courseName: 'Invisible Homeroom',
     isHomeroom: true,
     currentGradingPeriodId: '1',
+    enrollmentType: 'student',
     gradingPeriods: [
       {
         id: '1',
@@ -77,6 +80,7 @@ const defaultCourses = [
     courseName: 'Mastering Grading Periods',
     isHomeroom: false,
     currentGradingPeriodId: '3',
+    enrollmentType: 'student',
     score: 75,
     grade: 'C',
     gradingPeriods: [
@@ -136,6 +140,38 @@ describe('GradesPage', () => {
     expect(queryByText('Invisible Homeroom')).not.toBeInTheDocument()
   })
 
+  it('renders a grading period drop-down if the user has any student enrollments', async () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
+    const {findByText} = render(<GradesPage visible />)
+    expect(await findByText('Select Grading Period')).toBeInTheDocument()
+  })
+
+  it('does not render a grading period drop-down if the user has no student enrollments', async () => {
+    utils.fetchGrades.mockReturnValueOnce(
+      Promise.resolve([
+        {
+          courseId: '99',
+          courseName: 'For Teachers Only',
+          isHomeroom: false,
+          currentGradingPeriod: '1',
+          enrollmentType: 'teacher',
+          score: null,
+          grade: null,
+          gradingPeriods: [
+            {
+              id: '1',
+              title: 'The Only One',
+              workflow_state: 'active'
+            }
+          ]
+        }
+      ])
+    )
+    const {getByText, queryByText} = render(<GradesPage visible />)
+    await waitFor(() => getByText('For Teachers Only'))
+    expect(queryByText('Select Grading Period')).not.toBeInTheDocument()
+  })
+
   it('updates shown courses and grades to match currently selected grading periods', async () => {
     utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     utils.fetchGradesForGradingPeriod.mockReturnValueOnce(
@@ -164,6 +200,7 @@ describe('GradesPage', () => {
       courseName: 'Remedial Arithmetic',
       isHomeroom: false,
       currentGradingPeriodId: '7',
+      enrollmentType: 'student',
       score: 76,
       grade: undefined,
       gradingPeriods: [
@@ -218,6 +255,7 @@ describe('overrideCourseGradingPeriods', () => {
         courseName: 'Mastering Grading Periods',
         isHomeroom: false,
         currentGradingPeriodId: '3',
+        enrollmentType: 'student',
         score: 75,
         grade: 'C',
         gradingPeriods: [
@@ -243,6 +281,7 @@ describe('overrideCourseGradingPeriods', () => {
         courseName: 'ECON 500',
         isHomeroom: false,
         currentGradingPeriodId: '1',
+        enrollmentType: 'student',
         score: 80,
         grade: 'B-',
         gradingPeriods: [
@@ -258,6 +297,7 @@ describe('overrideCourseGradingPeriods', () => {
         courseName: 'Testing 4 Dummies',
         isHomeroom: false,
         currentGradingPeriodId: '1',
+        enrollmentType: 'student',
         score: null,
         grade: null,
         gradingPeriods: [

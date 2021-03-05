@@ -31,7 +31,7 @@ export const countByCourseId = arr =>
 export const fetchGrades = (userId = 'self') =>
   asJson(
     window.fetch(
-      `/api/v1/users/${userId}/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image&enrollment_type=student&enrollment_state=active`,
+      `/api/v1/users/${userId}/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image&enrollment_state=active`,
       defaultFetchOptions
     )
   ).then(courses =>
@@ -45,6 +45,7 @@ export const fetchGrades = (userId = 'self') =>
         courseImage: course.image_download_url,
         currentGradingPeriodId: enrollment.current_grading_period_id,
         currentGradingPeriodTitle: enrollment.current_grading_period_title,
+        enrollmentType: enrollment.type,
         gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
         hasGradingPeriods,
         score: hasGradingPeriods

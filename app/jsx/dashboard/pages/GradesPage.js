@@ -123,13 +123,17 @@ export const GradesPage = ({visible}) => {
     specificPeriodGrades
   )
 
+  // Only show the grading period selector if the user has an enrollment that can view grades
+  const hasStudentEnrollment =
+    !!courses && courses.some(c => ['student', 'observer'].includes(c.enrollmentType))
+
   return (
     <section
       id="dashboard_page_grades"
       style={{display: visible ? 'block' : 'none'}}
       aria-hidden={!visible}
     >
-      {gradingPeriods.length > 1 && (
+      {hasStudentEnrollment && gradingPeriods.length > 1 && (
         <GradingPeriodSelect
           gradingPeriods={gradingPeriods}
           handleSelectGradingPeriod={handleSelectGradingPeriod}

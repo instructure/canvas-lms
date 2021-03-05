@@ -26,6 +26,7 @@ const defaultCourse = {
   courseId: '1',
   courseName: 'Horticulture',
   currentGradingPeriodId: '1',
+  enrollmentType: 'student',
   score: 90
 }
 
@@ -99,5 +100,19 @@ describe('GradesSummary', () => {
     const {getByTestId} = render(<GradesSummary courses={[defaultCourse]} />)
     const image = getByTestId('k5-grades-course-image')
     expect(image.style.getPropertyValue('background-color')).toBe('rgb(199, 205, 209)')
+  })
+
+  it('renders a link to the gradebook if the user is enrolled as a teacher', () => {
+    const {getByTestId, getByRole, queryByLabelText} = render(
+      <GradesSummary courses={[{...defaultCourse, enrollmentType: 'teacher'}]} />
+    )
+    expect(getByTestId('k5-grades-course-image')).toBeInTheDocument()
+    expect(queryByLabelText('Grade for Horticulture', {exact: false})).not.toBeInTheDocument()
+    expect(getByRole('link', {name: 'View Gradebook'})).toBeInTheDocument()
+  })
+
+  it('does not render a link to the gradebook for students', () => {
+    const {queryByRole} = render(<GradesSummary courses={[defaultCourse]} />)
+    expect(queryByRole('link', {name: 'View Gradebook'})).not.toBeInTheDocument()
   })
 })

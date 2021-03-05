@@ -80,7 +80,8 @@ const gradeCourses = [
     enrollments: [
       {
         computed_current_score: 82,
-        computed_current_grade: 'B-'
+        computed_current_grade: 'B-',
+        type: 'student'
       }
     ],
     homeroom_course: false
@@ -92,7 +93,8 @@ const gradeCourses = [
     enrollments: [
       {
         computed_current_score: null,
-        computed_current_grade: null
+        computed_current_grade: null,
+        type: 'student'
       }
     ],
     homeroom_course: true
