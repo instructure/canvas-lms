@@ -142,6 +142,7 @@ path 'gems' do
   gem 'canvas_color'
   gem 'canvas_crummy'
   gem 'canvas_dynamodb'
+  gem 'canvas_errors'
   gem 'canvas_ext'
   gem 'canvas_http'
   gem 'canvas_kaltura'
