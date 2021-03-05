@@ -2462,15 +2462,15 @@ describe User do
   describe "preferred_gradebook_version" do
     subject { user.preferred_gradebook_version }
 
-    let(:user) { User.new }
+    let(:user) { User.create! }
 
     it "returns default gradebook when preferred" do
-      user.preferences[:gradebook_version] = 'default'
+      user.set_preference(:gradebook_version, "default")
       is_expected.to eq 'default'
     end
 
     it "returns individual gradebook when preferred" do
-      user.preferences[:gradebook_version] = 'individual'
+      user.set_preference(:gradebook_version, "individual")
       is_expected.to eq 'individual'
     end
 
