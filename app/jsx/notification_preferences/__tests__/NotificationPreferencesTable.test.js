@@ -33,7 +33,6 @@ describe('Notification Preferences Table', () => {
           label: 'Some Label Text'
         },
         allowed_sms_categories: ['announcement', 'grading'],
-        reduce_push_enabled: true,
         allowed_push_categories: ['announcement']
       }
     }
@@ -43,6 +42,7 @@ describe('Notification Preferences Table', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: null,
+        allowed_push_categories: [],
         allowed_sms_categories: ['announcement', 'grading']
       }
     }

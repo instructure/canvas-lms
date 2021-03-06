@@ -336,7 +336,10 @@ describe Message do
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
@@ -346,19 +349,14 @@ describe Message do
         expect(ne).to receive(:destroy).never
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
-      context 'with the reduce_push_notifications feature enabled' do
-        before :each do
-          Account.site_admin.enable_feature!(:reduce_push_notifications)
-        end
-
-        after :each do
-          Account.site_admin.disable_feature!(:reduce_push_notifications)
-        end
-
+      context 'with the reduce_push_notifications settings' do
         it "allows whitelisted notification types" do
           message_model(
             dispatch_at: Time.now,
