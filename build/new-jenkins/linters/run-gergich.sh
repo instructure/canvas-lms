@@ -142,3 +142,7 @@ if [[ "\$GERGICH_PUBLISH" == "1" ]]; then
   GERGICH_GIT_PATH=".." gergich publish
 fi
 EOF
+
+[[ "$FORCE_FAILURE" == "true" ]] && exit 1
+
+exit 0

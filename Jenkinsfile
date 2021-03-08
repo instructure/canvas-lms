@@ -613,6 +613,7 @@ pipeline {
                   timedStage('Linters', stages, {
                     credentials.withGerritCredentials {
                       withEnv([
+                        "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
                         "PLUGINS_LIST=${configuration.plugins().join(' ')}",
                         "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
                       ]) {
