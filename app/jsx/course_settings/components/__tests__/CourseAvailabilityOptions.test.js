@@ -18,7 +18,7 @@
 
 import React from 'react'
 import moment from 'moment'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import CourseAvailabilityOptions from '../CourseAvailabilityOptions'
 
 function createFormField(wrapper, id, value) {
@@ -150,8 +150,8 @@ describe('CourseAvailabilityOptions', () => {
       course_conclude_at: moment('2020-10-16').toISOString(),
       course_restrict_enrollments_to_course_dates: 'true'
     })
-    expect(getByLabelText('Start').value).toContain('Aug 14 at')
-    expect(getByLabelText('End').value).toContain('Oct 16 at')
+    expect(getByLabelText('Start').value).toContain('Aug 14, 2020 at')
+    expect(getByLabelText('End').value).toContain('Oct 16, 2020 at')
   })
 
   it('sets the restriction checkboxes to currently set values on render', () => {
@@ -165,6 +165,34 @@ describe('CourseAvailabilityOptions', () => {
     expect(
       getByLabelText('Restrict students from viewing course after term end date').checked
     ).toBeTruthy()
+  })
+
+  it('can manually type in a course end date', () => {
+    const {getByLabelText} = renderComponent(wrapper, {
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const endDate = getByLabelText('End')
+    const year = moment().year()
+    fireEvent.change(endDate, {target: {value: `Jan 1, ${year} at 12:00am`}})
+    fireEvent.blur(endDate)
+    fireEvent.click(endDate)
+    fireEvent.blur(endDate)
+    expect(document.getElementById('course_conclude_at').value).toBe(`${year}-01-01T00:00:00.000Z`)
+  })
+
+  it('can set the course end date for a different year', () => {
+    const {getByLabelText} = renderComponent(wrapper, {
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const endDate = getByLabelText('End')
+    const futureYear = moment().year() + 3
+    fireEvent.change(endDate, {target: {value: `Jan 1, ${futureYear} at 12:00am`}})
+    fireEvent.blur(endDate)
+    fireEvent.click(endDate)
+    fireEvent.blur(endDate)
+    expect(document.getElementById('course_conclude_at').value).toBe(
+      `${futureYear}-01-01T00:00:00.000Z`
+    )
   })
 
   describe('midnight warning', () => {
