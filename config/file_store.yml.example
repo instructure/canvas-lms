@@ -3,6 +3,10 @@ development:
   # the secure option in this file is deprecated, use the ssl option in domain.yml instead
   # secure: false
   path_prefix: tmp/files
+  # whether to use sha512 instead of md5 for file digests. this is used only for local storage.
+  # when changing this on an existing site, also run the migration fixup to
+  # recompute existing file digests:  DataFixup::MigrateAttachmentDigests.run
+  # use_sha512_digests: true
 
 test:
   storage: local

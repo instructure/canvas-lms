@@ -455,6 +455,20 @@ describe Attachment do
         @attachment.save
       end
     end
+
+    context "digest classes" do
+      it "should calculate the md5 from uploaded data" do
+        expect(Attachment).to receive(:digest_class).and_return(Digest::MD5)
+        @attachment = attachment_model(:uploaded_data => default_uploaded_data)
+        expect(@attachment.md5).to eql("eff033fad1e01d0b43a9caf8521ad576")
+      end
+
+      it "should calculate the sha512 from uploaded data" do
+        expect(Attachment).to receive(:digest_class).and_return(Digest::SHA512)
+        @attachment = attachment_model(:uploaded_data => default_uploaded_data)
+        expect(@attachment.md5).to eql("bfaaf6564b32aa18aaab9b3448d2a12a3e011e4897f0266b71fb12879786ecee10928cf9386a6b59924551bbf3bfd51b8ca50942bdb13f81e5dfadaaa80ca938")
+      end
+    end
   end
 
   context "ensure_media_object" do

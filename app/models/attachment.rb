@@ -142,7 +142,8 @@ class Attachment < ActiveRecord::Base
       :path_prefix => file_store_config['path_prefix'],
       :s3_access => 'private',
       :thumbnails => { :thumb => '128x128' },
-      :thumbnail_class => 'Thumbnail'
+      :thumbnail_class => 'Thumbnail',
+      :use_sha512_digests => file_store_config['use_sha512_digests'],
   )
 
   # These callbacks happen after the attachment data is saved to disk/s3, or
