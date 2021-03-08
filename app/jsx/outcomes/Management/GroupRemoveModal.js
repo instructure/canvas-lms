@@ -47,7 +47,11 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
       }
     } catch (err) {
       showFlashAlert({
-        message: I18n.t('An error occurred while making a network request.'),
+        message: err.message
+          ? I18n.t('An error occurred while removing this group: %{message}', {
+              message: err.message
+            })
+          : I18n.t('An error occurred while removing this group.'),
         type: 'error'
       })
     }

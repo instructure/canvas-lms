@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as rawRender, fireEvent, wait} from '@testing-library/react'
+import {render as rawRender, fireEvent, waitFor} from '@testing-library/react'
 import GroupRemoveModal from '../GroupRemoveModal'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {removeOutcomeGroup} from '../api'
@@ -105,7 +105,7 @@ describe('GroupRemoveModal', () => {
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
-    await wait(() => {
+    await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed from this account.',
         type: 'success'
@@ -121,7 +121,7 @@ describe('GroupRemoveModal', () => {
     })
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Course', '1', '123')
-    await wait(() => {
+    await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed from this course.',
         type: 'success'
@@ -135,9 +135,9 @@ describe('GroupRemoveModal', () => {
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
-    await wait(() => {
+    await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while making a network request.',
+        message: 'An error occurred while removing this group: Network error',
         type: 'error'
       })
     })
