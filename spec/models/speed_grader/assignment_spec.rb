@@ -564,7 +564,7 @@ describe SpeedGrader::Assignment do
       @course.enroll_student(@student2, enrollment_state: 'active')
       assignment_model(course: @course)
       @teacher.preferences[:gradebook_settings] = {}
-      @teacher.preferences[:gradebook_settings][@course.id] = {
+      @teacher.preferences[:gradebook_settings][@course.global_id] = {
         'show_concluded_enrollments' => 'false'
       }
     end
@@ -577,7 +577,7 @@ describe SpeedGrader::Assignment do
     end
 
     it 'includes concluded when user preference is to include' do
-      @teacher.preferences[:gradebook_settings][@course.id]['show_concluded_enrollments'] = 'true'
+      @teacher.preferences[:gradebook_settings][@course.global_id]['show_concluded_enrollments'] = 'true'
       Enrollment.find_by(user: @student1).conclude
       @course.update!(conclude_at: 1.day.ago, start_at: 2.days.ago)
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
@@ -633,7 +633,7 @@ describe SpeedGrader::Assignment do
 
           before(:once) do
             @teacher.preferences.deep_merge!(gradebook_settings: {
-              @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+              @course.global_id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
             })
           end
 
@@ -665,7 +665,7 @@ describe SpeedGrader::Assignment do
 
             it 'returns only students that belong to the second group' do
               @teacher.preferences.deep_merge!(gradebook_settings: {
-                @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+                @course.global_id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
               })
               json = SpeedGrader::Assignment.new(@assignment, @teacher).json
               json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
@@ -680,7 +680,7 @@ describe SpeedGrader::Assignment do
 
             it "returns all students rather than attempting to filter by the deleted group" do
               @teacher.preferences.deep_merge!(gradebook_settings: {
-                @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+                @course.global_id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
               })
               group.destroy!
 
@@ -864,7 +864,7 @@ describe SpeedGrader::Assignment do
 
     it "only returns students from the selected section if the user has selected one" do
       teacher.preferences.deep_merge!(gradebook_settings: {
-        course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+        course.global_id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
       })
       expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
     end
@@ -875,7 +875,7 @@ describe SpeedGrader::Assignment do
 
     it "returns all eligible students if the selected section is set to nil" do
       teacher.preferences.deep_merge!(gradebook_settings: {
-        course.id => {'filter_rows_by' => {'section_id' => nil}}
+        course.global_id => {'filter_rows_by' => {'section_id' => nil}}
       })
       expect(returned_student_ids).to match_array(all_course_student_ids)
     end
@@ -893,7 +893,7 @@ describe SpeedGrader::Assignment do
 
       it "restricts by both section and group when section_id and group_id are both specified" do
         teacher.preferences.deep_merge!(gradebook_settings: {
-          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
+          course.global_id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
         })
         expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
       end
@@ -1515,7 +1515,7 @@ describe SpeedGrader::Assignment do
 
     it "returns students in accord with user gradebook preferences if assignment is not muted" do
       @teacher.preferences[:gradebook_settings] = {}
-      @teacher.preferences[:gradebook_settings][@course.id] = {
+      @teacher.preferences[:gradebook_settings][@course.global_id] = {
         'show_concluded_enrollments' => 'true',
         'show_inactive_enrollments' => 'true'
       }
@@ -1662,7 +1662,7 @@ describe SpeedGrader::Assignment do
     let_once(:concluded_student) { User.create }
 
     let(:gradebook_settings) do
-      { test_course.id =>
+      { test_course.global_id =>
         {
           'show_inactive_enrollments' => 'false',
           'show_concluded_enrollments' => 'false'
@@ -1682,7 +1682,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "returns active and inactive students and enrollments when inactive enromments is true" do
-      gradebook_settings[test_course.id]['show_inactive_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_inactive_enrollments'] = 'true'
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
@@ -1691,7 +1691,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "returns active and concluded students and enrollments when concluded is true" do
-      gradebook_settings[test_course.id]['show_concluded_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_concluded_enrollments'] = 'true'
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
@@ -1700,8 +1700,8 @@ describe SpeedGrader::Assignment do
     end
 
     it "returns active, inactive, and concluded students and enrollments when both settings are true" do
-      gradebook_settings[test_course.id]['show_inactive_enrollments'] = 'true'
-      gradebook_settings[test_course.id]['show_concluded_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_inactive_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_concluded_enrollments'] = 'true'
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
