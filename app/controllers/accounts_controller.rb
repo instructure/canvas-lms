@@ -1017,6 +1017,20 @@ class AccountsController < ApplicationController
         remove_ip_filters = params[:account].delete(:remove_ip_filters)
         params[:account][:ip_filters] = [] if remove_ip_filters
 
+        k5_settings = params.dig(:account, :settings, :enable_as_k5_account)
+        unless k5_settings.nil?
+          enable_as_k5 = value_to_boolean(k5_settings[:value])
+          # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
+          # This is important in determining whether k5 mode dashboard is shown to a user
+          params[:account][:settings][:enable_as_k5_account][:locked] = enable_as_k5
+          # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
+          k5_accounts = @account.root_account.settings[:k5_accounts] || []
+          k5_accounts = Set.new(k5_accounts)
+          enable_as_k5 ? k5_accounts.add(@account.id) : k5_accounts.delete(@account.id)
+          @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
+          @account.root_account.save!
+        end
+
         # Set default Dashboard view
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
@@ -1571,9 +1585,10 @@ class AccountsController < ApplicationController
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
-                                   {:usage_rights_required => [:value, :locked] }.freeze,
+                                   {:usage_rights_required => [:value, :locked]}.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
-                                   :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics].freeze
+                                   :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
+                                   {:enable_as_k5_account => [:value, :locked]}.freeze].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

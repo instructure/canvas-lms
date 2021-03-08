@@ -94,22 +94,10 @@ describe CourseForMenuPresenter do
         course.update! settings: course.settings.merge(homeroom_course: true)
       end
 
-      it 'and `canvas_for_elementary` FF disabled, sets `isHomeroom` to `false`' do
+      it 'sets `isHomeroom` to `true`' do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
-        expect(h[:isHomeroom]).to eq false
-      end
-
-      context 'and `canvas_for_elementary` FF enabled' do
-        before(:each) do
-          course.root_account.enable_feature!(:canvas_for_elementary)
-        end
-
-        it 'sets `isHomeroom` to `true`' do
-          cs_presenter = CourseForMenuPresenter.new(course, user, account)
-          h = cs_presenter.to_h
-          expect(h[:isHomeroom]).to eq true
-        end
+        expect(h[:isHomeroom]).to eq true
       end
     end
 
