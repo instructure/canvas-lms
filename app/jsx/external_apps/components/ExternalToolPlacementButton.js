@@ -31,7 +31,8 @@ export default class ExternalToolPlacementButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
     type: PropTypes.string, // specify "button" if this is not a menu item
-    returnFocus: PropTypes.func.isRequired
+    returnFocus: PropTypes.func.isRequired,
+    onSuccess: PropTypes.func.isRequired
   }
 
   state = {
@@ -99,6 +100,9 @@ export default class ExternalToolPlacementButton extends React.Component {
         onError: () => {
           $.flashError(I18n.t('Unable to toggle placement'))
           this.togglePlacement(placement)
+        },
+        onSuccess: r => {
+          this.props.onSuccess(r, placement)
         }
       })
     })
@@ -222,6 +226,7 @@ export default class ExternalToolPlacementButton extends React.Component {
 
   getModal = () => (
     <Modal
+      // eslint-disable-next-line react/no-string-refs
       ref="reactModal"
       open={this.state.modalIsOpen}
       onDismiss={this.closeModal}
@@ -239,24 +244,30 @@ export default class ExternalToolPlacementButton extends React.Component {
 
     if (this.props.type === 'button') {
       return (
-        <a
-          href="#"
-          ref="placementButton"
-          role="button"
-          aria-label={editAriaLabel}
-          className="btn long"
-          onClick={this.openModal}
-        >
-          <i className="icon-info" data-tooltip="left" title={I18n.t('Tool Placements')} />
-          {this.getModal()}
-        </a>
+        <>
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a
+            href="#"
+            // eslint-disable-next-line react/no-string-refs
+            ref="placementButton"
+            role="button"
+            aria-label={editAriaLabel}
+            className="btn long"
+            onClick={this.openModal}
+          >
+            <i className="icon-info" data-tooltip="left" title={I18n.t('Tool Placements')} />
+            {this.getModal()}
+          </a>
+        </>
       )
     } else {
       return (
         <li role="presentation" className="ExternalToolPlacementButton">
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             href="#"
             tabIndex="-1"
+            // eslint-disable-next-line react/no-string-refs
             ref="placementButton"
             role="menuitem"
             aria-label={editAriaLabel}

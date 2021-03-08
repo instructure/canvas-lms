@@ -30,6 +30,7 @@ test('normally renders with a menuitem role', () => {
         name: 'A Tool'
       }}
       returnFocus={() => {}}
+      onSuccess={() => {}}
     />
   )
   equal(wrapper.find('a').props().role, 'menuitem')
@@ -44,6 +45,7 @@ test('renders as a button when specified', () => {
         name: 'A Tool'
       }}
       returnFocus={() => {}}
+      onSuccess={() => {}}
     />
   )
   equal(wrapper.find('a').props().role, 'button')
@@ -58,6 +60,7 @@ test('does not attempt to open an opened modal', () => {
         name: 'A Tool'
       }}
       returnFocus={() => {}}
+      onSuccess={() => {}}
     />
   )
 
