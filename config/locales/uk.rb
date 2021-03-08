@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 {
-  ru: {
+  uk: {
     number: {
       nth: {
         ordinals: lambda do |_key, _options|

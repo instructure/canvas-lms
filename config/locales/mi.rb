@@ -2,7 +2,7 @@
 
 # From what I can gather, in Maori regular numerals are used as ordinals
 {
-  he: {
+  mi: {
     number: {
       nth: {
         ordinals: lambda do |_key, _options|
