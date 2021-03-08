@@ -279,7 +279,7 @@
     "waait": "^1",
     "webpack": "^4",
     "webpack-cleanup-plugin": "^0.5",
-    "webpack-cli": "^3",
+    "webpack-cli": "^4",
     "webpack-manifest-plugin": "^2",
     "webpack-stats-plugin": "^0.2.1",
     "wsrun": "^5",
