@@ -21,15 +21,14 @@
 class CourseProgress
   include Rails.application.routes.url_helpers
 
-  attr_accessor :course, :user, :read_only, :overridden_requirements_met
+  attr_accessor :course, :user, :read_only
 
   # use read_only to avoid triggering more progression evaluations
-  def initialize(course, user, read_only: false, preloaded_progressions: nil, overridden_requirements_met: nil)
+  def initialize(course, user, read_only: false, preloaded_progressions: nil)
     @course = course
     @user = user
     @read_only = read_only
     @preloaded_progressions = preloaded_progressions
-    @overridden_requirements_met = overridden_requirements_met
   end
 
   def modules
@@ -167,8 +166,7 @@ class CourseProgress
   def module_requirements_completed(progression)
     @_module_requirements_completed ||= {}
     @_module_requirements_completed[progression.id] ||= begin
-      met = (overridden_requirements_met && overridden_requirements_met[progression.id]) || progression.requirements_met
-      met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
+      progression.requirements_met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
     end
   end
 
