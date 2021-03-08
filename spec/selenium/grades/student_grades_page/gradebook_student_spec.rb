@@ -111,7 +111,7 @@ describe 'Student Gradebook' do
     means = []
     [0, 3, 6].each do |i|
       # the format below ensures that 18.0 is displayed as 18.
-      mean = format('%g' % (('%.1f' % (grades[i, 3].inject {|a, e| a + e}.to_f / 3))))
+      mean = format('%g' % (('%.2f' % (grades[i, 3].inject {|a, e| a + e}.to_f / 3))))
       means.push mean
     end
 
