@@ -60,7 +60,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     getFormValue(FORM_IDS.RESTRICT_PAST) === 'true'
   )
 
-  const formatDate = date => tz.format(date, '%b %-d at %-l:%M%P %Z')
+  const formatDate = date => tz.format(date, '%b %-d, %Y at %-l:%M%P %Z')
 
   const canInteract = () => (canManage ? 'enabled' : 'disabled')
 
@@ -118,14 +118,14 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
 
         {selectedApplicabilityValue === 'course' && (
           <>
-            <Flex direction="column" display="inline-flex" alignItems="end">
+            <Flex direction="column" display="inline-flex">
               <Flex.Item padding="xx-small">
                 <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
                 <CanvasDateInput
                   renderLabel={I18n.t('Start')}
                   formatDate={formatDate}
                   interaction={canInteract()}
-                  layout="inline"
+                  width="16rem"
                   selectedDate={startDate}
                   onSelectedDateChange={value => {
                     const start = moment(value).toISOString()
@@ -140,7 +140,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
                   renderLabel={I18n.t('End')}
                   formatDate={formatDate}
                   interaction={canInteract()}
-                  layout="inline"
+                  width="16rem"
                   selectedDate={endDate}
                   onSelectedDateChange={value => {
                     const end = moment(value).toISOString()
