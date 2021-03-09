@@ -638,7 +638,7 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ])
+                    ], true, "", "Vendored Gems")
                 })
 
                 def jsReady = null
@@ -735,7 +735,7 @@ pipeline {
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                     string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                  ])
+                  ], true, "", "Contract Tests")
                 })
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
@@ -743,7 +743,7 @@ pipeline {
                   timedStage('CDC Schema Check', stages, {
                     buildSummaryReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
                       string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                    ])
+                    ], true, "", "CDC Schema Check")
                   })
                 }
                 else {
@@ -763,7 +763,7 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], configuration.fscPropagate(), "")
+                    ], configuration.fscPropagate(), "", "Flakey Spec Catcher")
                   })
                 }
 
@@ -776,7 +776,7 @@ pipeline {
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
                   timedStage('Local Docker Dev Build', stages, {
-                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters)
+                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "", "Local Docker Dev Build")
                   })
                 }
 
