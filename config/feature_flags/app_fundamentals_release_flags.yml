@@ -19,3 +19,8 @@ release_notes_ui:
   applies_to: SiteAdmin
   display_name: Advertise release notes via the UI
   description: Enables siteadmin users to configure release notes to display to users
+course_templates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Course Templates
+  description: Enables the Course Templates feature globally
