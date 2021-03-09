@@ -100,6 +100,24 @@ Object.assign(CommonEvent.prototype, {
     return this.allPossibleContexts || [this.contextInfo]
   },
 
+  plannerNoteContexts() {
+    const managedContexts = ENV.CALENDAR?.MANAGE_CONTEXTS || []
+    return this.possibleContexts().filter(context => {
+      // to avoid confusion over the audience of the planner note,
+      // don't offer to create new planner notes linked to courses the user teaches
+      // excludes groups as they are not supported for planner notes
+      const assetString = context?.asset_string
+      // No groups because planner notes don't support groups
+      if (!assetString || assetString.startsWith('group_')) return false
+
+      return (
+        assetString === this.contextCode() ||
+        assetString.startsWith('user_') ||
+        !managedContexts.includes(assetString)
+      )
+    })
+  },
+
   addClass(newClass) {
     this.className.push(newClass)
   },
@@ -150,7 +168,7 @@ Object.assign(CommonEvent.prototype, {
     return this.start && this.start < fcUtil.now()
   },
 
-  copyDataFromObject(data) {
+  copyDataFromObject(_data) {
     this.originalStart = this.start && fcUtil.clone(this.start)
     this.midnightFudged = false // clear out cached value because now we have new data
     if (this.isDueAtMidnight()) {
