@@ -28,11 +28,13 @@ jest.useFakeTimers()
 
 describe('MoveModal', () => {
   let onCloseHandlerMock
+  let onMoveHandlerMock
   let cache
 
   const defaultProps = (props = {}) => ({
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
+    onMoveHandler: onMoveHandlerMock,
     title: 'Outcome Group',
     type: 'outcome',
     contextType: 'Account',
@@ -127,5 +129,19 @@ describe('MoveModal', () => {
     await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
     expect(getByText(/course/)).toBeInTheDocument()
+  })
+
+  it('move button is disabled until a group is selected from tree browser', async () => {
+    const {getByText} = render(<MoveModal {...defaultProps()} />, {
+      title: 'Account Outcome Group to be moved',
+      contextType: 'Account',
+      contextId: '1',
+      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]
+    })
+    expect(getByText('Move').closest('button')).toHaveAttribute('disabled')
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Move').closest('button')).not.toHaveAttribute('disabled')
   })
 })

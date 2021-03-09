@@ -43,7 +43,7 @@ const mergeCollections = (groups, collections, parentGroupId) => {
     }
     return {
       ...memo,
-      [g._id]: structFromGroup(g)
+      [g._id]: structFromGroup(g, parentGroupId)
     }
   }, collections)
 
@@ -65,12 +65,13 @@ const groupDescriptor = ({childGroupsCount, outcomesCount}) => {
   })
 }
 
-const structFromGroup = g => ({
+const structFromGroup = (g, parentGroupId) => ({
   id: g._id,
   name: g.title,
   descriptor: groupDescriptor(g),
   collections: [],
-  outcomesCount: g.outcomesCount
+  outcomesCount: g.outcomesCount,
+  parentGroupId
 })
 
 const getCounts = rootGroups => {

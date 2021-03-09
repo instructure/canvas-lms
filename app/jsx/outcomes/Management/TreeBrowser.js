@@ -21,15 +21,23 @@ import {IconArrowOpenDownLine, IconArrowOpenEndLine} from '@instructure/ui-icons
 import {TreeBrowser as InstuiTreeBrowser} from '@instructure/ui-tree-browser'
 import {isRTL} from 'jsx/shared/helpers/rtlHelper'
 
-const TreeBrowser = ({collections, rootId, onCollectionToggle}) => {
+const TreeBrowser = ({
+  collections,
+  rootId,
+  onCollectionToggle,
+  onCollectionClick,
+  selectionType
+}) => {
   const margin = '0.8em'
   const iconMargin = isRTL() ? {marginLeft: margin} : {marginRight: margin}
   return (
     <InstuiTreeBrowser
+      selectionType={selectionType}
       margin="small 0 0"
       collections={collections}
       items={{}}
       onCollectionToggle={onCollectionToggle}
+      onCollectionClick={onCollectionClick}
       collectionIcon={() => (
         <span style={{display: 'inline-block', ...iconMargin}}>
           <IconArrowOpenEndLine size="x-small" />
@@ -48,14 +56,18 @@ const TreeBrowser = ({collections, rootId, onCollectionToggle}) => {
 
 TreeBrowser.defaultProps = {
   onCollectionToggle: () => {},
+  onCollectionClick: () => {},
   collections: {},
-  rootId: 0
+  rootId: 0,
+  selectionType: 'none'
 }
 
 TreeBrowser.propTypes = {
   onCollectionToggle: PropTypes.func.isRequired,
+  onCollectionClick: PropTypes.func,
   collections: PropTypes.object.isRequired,
-  rootId: PropTypes.number.isRequired
+  rootId: PropTypes.number.isRequired,
+  selectionType: PropTypes.string
 }
 
 export default TreeBrowser

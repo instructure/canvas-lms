@@ -27,11 +27,11 @@ const groupFragment = gql`
     childGroupsCount
     childGroups {
       nodes {
-        description
         _id
+        title
+        description
         outcomesCount
         childGroupsCount
-        title
       }
     }
   }
@@ -110,3 +110,9 @@ export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
 
 export const updateOutcome = (outcomeId, outcome) =>
   axios.put(`/api/v1/outcomes/${outcomeId}`, outcome)
+
+export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroupId) =>
+  axios.put(
+    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
+    {parent_outcome_group_id: newParentGroupId}
+  )

@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import {removeOutcomeGroup, removeOutcome, updateOutcome} from '../api'
+import {removeOutcomeGroup, removeOutcome, moveOutcomeGroup, updateOutcome} from '../api'
 
 jest.mock('axios')
 
@@ -55,6 +55,22 @@ describe('api', () => {
       const outcome = {title: 'Outcome', description: 'Description', display_name: 'Display name'}
       updateOutcome('1', outcome)
       expect(axios.put).toHaveBeenCalledWith('/api/v1/outcomes/1', outcome)
+    })
+  })
+
+  describe('moveGroup', () => {
+    it('provides correct arguments to request to move group within account context', () => {
+      moveOutcomeGroup('Account', '1', '2', '3')
+      expect(axios.put).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/2', {
+        parent_outcome_group_id: '3'
+      })
+    })
+
+    it('provides correct arguments to API request to move group within course context', () => {
+      moveOutcomeGroup('Course', '1', '2', '3')
+      expect(axios.put).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2', {
+        parent_outcome_group_id: '3'
+      })
     })
   })
 })

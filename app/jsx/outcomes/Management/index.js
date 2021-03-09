@@ -30,7 +30,7 @@ import ManageOutcomesFooter from './ManageOutcomesFooter'
 import useSearch from 'jsx/shared/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
-import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
+import useCanvasContext from '../shared/hooks/useCanvasContext'
 import useModal from '../../shared/hooks/useModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
 import MoveModal from './MoveModal'
@@ -38,6 +38,8 @@ import EditGroupModal from './EditGroupModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
+import {moveOutcomeGroup} from './api'
+import {showFlashAlert} from '../../shared/FlashAlert'
 
 const NoOutcomesBillboard = () => {
   const {contextType} = useCanvasContext()
@@ -71,7 +73,7 @@ const NoOutcomesBillboard = () => {
 }
 
 const OutcomeManagementPanel = () => {
-  const {contextType} = useCanvasContext()
+  const {contextType, contextId} = useCanvasContext()
   const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
@@ -120,6 +122,35 @@ const OutcomeManagementPanel = () => {
       openOutcomeRemoveModal()
     } else if (action === 'edit') {
       openOutcomeEditModal()
+    }
+  }
+
+  const onMoveHandler = async newParentGroup => {
+    closeMoveGroupModal()
+    try {
+      if (!group) {
+        return
+      }
+      await moveOutcomeGroup(contextType, contextId, group._id, newParentGroup.id)
+      showFlashAlert({
+        message: I18n.t('"%{title}" has been moved to "%{newGroupTitle}".', {
+          title: group.title,
+          newGroupTitle: newParentGroup.name
+        }),
+        type: 'success'
+      })
+    } catch (err) {
+      showFlashAlert({
+        message: err.message
+          ? I18n.t('An error occurred moving group "%{title}": %{message}', {
+              title: group.title,
+              message: err.message
+            })
+          : I18n.t('An error occurred moving group "%{title}"', {
+              title: group.title
+            }),
+        type: 'error'
+      })
     }
   }
 
@@ -218,6 +249,7 @@ const OutcomeManagementPanel = () => {
             type="group"
             isOpen={isMoveGroupModalOpen}
             onCloseHandler={closeMoveGroupModal}
+            onMoveHandler={onMoveHandler}
           />
           {selectedGroupId && (
             <GroupRemoveModal

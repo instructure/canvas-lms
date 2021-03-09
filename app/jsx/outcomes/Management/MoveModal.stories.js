@@ -20,7 +20,7 @@ import React from 'react'
 import MoveModal from './MoveModal'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '../contexts/OutcomesContext'
-import {accountMocks, groupMocks} from './__tests__/mocks'
+import {smallOutcomeTree} from './__tests__/mocks'
 import {createCache} from 'jsx/canvas-apollo'
 
 export default {
@@ -28,21 +28,21 @@ export default {
   component: MoveModal,
   args: {
     isOpen: true,
-    onCloseHandler: () => {},
     title: 'Group Title',
     type: 'group',
     contextType: 'Account',
     contextId: 1
+  },
+  argTypes: {
+    onCloseHandler: {action: 'closed'},
+    onMoveHandler: {action: 'moved'}
   }
 }
 
 const Template = args => {
   return (
     <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
-      <MockedProvider
-        mocks={[...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]}
-        cache={createCache()}
-      >
+      <MockedProvider mocks={smallOutcomeTree()} cache={createCache()}>
         <MoveModal {...args} />
       </MockedProvider>
     </OutcomesContext.Provider>
