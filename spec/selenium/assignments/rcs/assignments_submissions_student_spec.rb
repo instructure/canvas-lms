@@ -76,7 +76,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
       expect(f('#sidebar_content .details')).to include_text "Not Submitted!"
-      expect(f('.submit_assignment_link')).to include_text "Submit Assignment"
+      expect(f('.submit_assignment_link')).to include_text "Start Assignment"
     end
 
     it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
