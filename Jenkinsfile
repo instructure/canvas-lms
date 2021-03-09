@@ -468,44 +468,39 @@ pipeline {
 
             buildSummaryReport.timedStageAndReportIfFailure('Build Docker Image') {
               timeout(time: 20) {
-                if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
-                  sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
-                } else {
-                  def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+                def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
-                  slackSendCacheBuild {
-                    withEnv([
-                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                      "CACHE_SAVE_SCOPE=${cacheScope}",
-                      "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
-                      "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
-                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
-                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-                      "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
-                      "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                      "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
-                    ]) {
-                      try {
-                        credentials.withStarlordCredentials({ ->
-                          sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
-                        })
-                      } catch(e) {
-                        if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
-                          // DEBUG: In some cases, such as the cache hash calculation missing a file, it can be useful to be able to
-                          // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
-                          // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.
+                slackSendCacheBuild {
+                  withEnv([
+                    "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                    "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                    "CACHE_SAVE_SCOPE=${cacheScope}",
+                    "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
+                    "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
+                    "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
+                    "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
+                    "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
+                    "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
+                    "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+                    "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
+                  ]) {
+                    try {
+                      credentials.withStarlordCredentials({ ->
+                        sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                      })
+                    } catch(e) {
+                      if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
+                        // DEBUG: In some cases, such as the cache hash calculation missing a file, it can be useful to be able to
+                        // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
+                        // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.
 
-                          sh(script: """
-                            docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $PATCHSET_TAG-failed
-                            ./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG-failed
-                          """, label: 'upload failed image')
-                        }
-
-                        throw e
+                        sh(script: """
+                          docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $PATCHSET_TAG-failed
+                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG-failed
+                        """, label: 'upload failed image')
                       }
+
+                      throw e
                     }
                   }
                 }
