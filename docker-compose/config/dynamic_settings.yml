@@ -26,6 +26,9 @@ development:
         base_url: "http://mathman.docker"
         use_for_svg: "false"
         use_for_mml: "false"
+      microsoft-sync:
+        client-id: some_client_id
+        client-secret: some_client_secret
       rich-content-service:
         app-host: "rce.docker"
     # another service

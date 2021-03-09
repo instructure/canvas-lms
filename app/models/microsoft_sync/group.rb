@@ -68,4 +68,25 @@ class MicrosoftSync::Group < ActiveRecord::Base
       last_error: nil
     )
   end
+
+  # Returns true if the record was updated (i.e. record exists and is not deleted).
+  # This should be used for most updates to the workflow_state, in case the
+  # group is deleted (e.g. by disabling Microsoft Sync in account settings)
+  # while the job is running.
+  # Whatever the result, this also updates workflow_state on the model passed
+  # in to reflect the actual DB state.
+  def update_workflow_state_unless_deleted(new_state, extra={})
+    records_updated = self.class.where(id: id).where.not(workflow_state: 'deleted').
+      update_all(extra.merge(workflow_state: new_state))
+    if records_updated == 0
+      # It could actually be that the record was hard-deleted and not
+      # workflow_state=deleted, but whatever
+      self.workflow_state = 'deleted'
+      false
+    else
+      self.workflow_state = new_state
+      assign_attributes(extra)
+      true
+    end
+  end
 end
