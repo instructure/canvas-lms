@@ -1811,6 +1811,7 @@ nn:
   add_icon_567dbcaa: "legg til ikon"
   add_link_5c01c1e8: "Legg til ei lenke"
   add_link_fc336ed6: "Legg til ei lenke"
+  add_mastery_level_76469d98: "Legg til meistringsnivå"
   add_media_cfa37b54: "Legg til media"
   add_moderator_review_copy_1st_a484c813: "Legg til gjennomgang frå sensuransvarleg (første eksemplar)"
   add_moderator_review_copy_2nd_e80d458f: "Legg til gjennomgang frå sensuransvarleg (andre eksemplar)"
@@ -3416,6 +3417,7 @@ nn:
   assignments_in_this_group_have_no_points_possible__3cd35922: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i utrekninga."
   assignments_list_fe3e54be: Oppgåveliste
+  assignments_report_faea72b9: Oppgåverapport
   assignments_settings_30613d0c: Oppgåveinnstillingar
   assignments_speedgrader_2fbd6df4: "Oppgåver, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Oppgåver opplæringsmeny"
@@ -3484,6 +3486,7 @@ nn:
   attention_aaca1f1d: Obs!
   attribute_d9f3af72: Attributt
   attributes_locked_1a1a0f46: "%{attributes} låste"
+  audio_1c89b0c8: lyd
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Lydinnhaldet er ikkje støtta av eininga eller appen."
   audio_dd489fcc: Lyd
   australia_61_eb9bb701: "Australia (+61)"
@@ -5892,7 +5895,7 @@ nn:
     one: "1 student"
     other: "%{count} studentar"
   count_students_c9920376: 
-    one: "%{count} studentar"
+    one: "1 student"
     other: "%{count} studentar"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "1 student av andel %{percentile}."
@@ -8090,7 +8093,7 @@ nn:
       Fleire karaktersetjingsperiodar gjer at faglærarar og administratorar kan opprette karaktersetjingsperiodar med fastsette
       fristdagar. Oppgåver kan filtrerast etter desse karaktersetjingsperiodane i karakterboka."
   enable_new_sis_integration_settings_ab6780a4: "Aktiver nye innstillingar for SIS-integrasjon"
-  enable_recaptcha_by_default_for_self_registration_af9d50bd: "Aktiver Recaptcha som standard for eigenregistrering"
+  enable_recaptcha_by_default_for_self_registration_af9d50bd: "Aktiver Recaptcha som standard for sjølvregistrering"
   enable_recording_for_this_conference_b8adff6: "Aktiver opptak for denne konferansen"
   enable_reregistration_for_lti_2_b2a10444: "Aktiver ny registrering for LTI 2 "
   enable_scope_ac28b832: "Aktiver omfang"
@@ -9060,6 +9063,7 @@ nn:
   grade_change_activity_75fb525: Vurderingsendringsaktivitet
   grade_change_log_231f90e4: Vurderingslogg
   grade_change_notifications_98461261: Vurderingsendringsvarsel
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "Endringar i vurdering og kommentarar er publisert for alle i seksjonane: %{section_names}"
   grade_changes_and_new_comments_released_for_title__f1350f92: "Resultatendringar og nye kommentarar kunngjort for: %{title}, %{course}"
   grade_changes_cb5a57a8: Vurderingsendringar
   grade_display_warning_dialog: 
@@ -9958,6 +9962,7 @@ nn:
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Gruppa %{group_name}kan ein berre bli med i etter invitasjon"
   group_group_name_is_not_available_at_this_time_971001c1: "Gruppe %{group_name} er ikkje tilgjengeleg akkurat no"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Gruppa \"%{guid}\" er allereie importert"
+  group_import_api_documentation_7d0d28ee: "Gruppeimport API-dokumentasjon"
   group_is_for_a_different_section_6a843a4d: "Gruppa høyrer til ein annan seksjon"
   group_is_full_56849d78: "Gruppa er full"
   group_is_joined_by_invitation_only_d00f5a63: "Gruppa kan ein berre bli med i etter invitasjon"
@@ -10227,7 +10232,7 @@ nn:
         randomly_assign_students_option: "Tilordne studentar tilfeldig"
         restricted_self_signup_blurb: "Alle studentane i ei gruppe skal vere i same seksjon."
         self_organized_warning: "Desse gruppene er organiserte av studentane sjølve. I motsetning til andre typar grupper kan studentar tilhøyre meir enn ei av desse gruppene samtidig, så gruppene kan ikkje brukast til vurdering av oppgåver."
-        self_signup_blurb: "Eigenregistrering er aktivert for desse gruppene."
+        self_signup_blurb: "Sjølvregistrering er aktivert for desse gruppene."
         settings: Innstillingar
         uncategorized_groups: "Desse gruppene er ikkje tilknytte bestemte gruppesett. Fordi dei er importerte via SIS, kan dei berre oppdaterast eller slettast via SIS."
       group_category_edit: 
@@ -10478,6 +10483,7 @@ nn:
       create: "Opprett %{model}"
       submit: "Lagre %{model}"
       update: "Oppdater %{model}"
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Hjelp til administrator og faglærar til å ta meiningsfulle avgjerder når dei importerer, organiserer og redigerer læringsmål på kontonivå og i emne."
   here_f44564ee: her."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Dette er ein flott sjanse til å bli kjent med kalenderen og legge til hendingar i emnet som ikkje er oppgåver. Vi er der for å hjelpe deg heile vegen."
   hidden_14a032a7: Skjult
@@ -11698,7 +11704,7 @@ nn:
   masquerade_fdbc9594: Forkledning
   master_lock_590266b6: Masterlås
   mastered_34d4c857: Meistra
-  mastery_7ec348b5: Maistringsnivå
+  mastery_7ec348b5: Meistringsnivå
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Meistringsnivå: %{n_mastery_points_precision_2_str} poeng"
   mastery_path_processing_f4471152: "Behandlar meistringssti"
   mastery_paths_breakdown_6e0b5fce: "Sjå meistringssti-detaljar"
@@ -13564,13 +13570,13 @@ nn:
   models_to_include_9fb154ca: "Modellar til inkludering"
   moderate_assignment_ccb00173: "Moderer %{assignment}"
   moderate_assignment_name_cf59e0a7: "Moderer %{assignment_name}"
-  moderate_d0c85e92: Moderat
+  moderate_d0c85e92: Endre
   moderate_grades_4f43f85d: "Moderer karakterar"
   moderated_assignment_12873e87: "Moderert oppgåve"
   moderated_assignments_must_be_manually_posted_unti_39545855: "Modererte oppgåver må postast manuelt fram til vurderingsresultat er sendt ut."
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert karaktersetjing kan ikkje aktiverast for gruppeoppgåver"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert karaktersetjing kan ikkje aktiverast for fagfellevurderte oppgåver"
-  moderated_grading_e6127f72: "Moderert karaktersetjing"
+  moderated_grading_e6127f72: "Endra vurdering"
   moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Innstilling for moderert vurdering kan ikkje endrast dersom det finst vurderte innleveringar"
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Innstilling for moderert karaktersetjing kan ikkje aktiverast for gruppeoppgåver"
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Innstilling for moderert karaktersetjing kan ikkje aktiverast for fagfellevurderte oppgåver"
@@ -16730,10 +16736,10 @@ nn:
         maximum_of_1440_minutes: "Maksimum 1440 minutt (24 timar)"
         minutes: minutt
         minutes_from: "minutt frå"
-        moderate_page_title: "%{title}: Moderer"
+        moderate_page_title: "%{title}: Endre"
         outstanding_autosubmission_description: "Desse quizinnleveringane er ufullførte, mest sannsynleg fordi studenten gjekk ut av quiz-sida før innlevering. Om du vil vurdere dei, trykk på 'Send' nedanfor."
         outstanding_quiz_submissions_found: "Det finst ufullførte quizinnleveringar"
-        page_title: "Moderer quiz"
+        page_title: "Endre quiz"
         reload_student_table: "Last opp studenttabell på nytt"
         student_gets_extra_time: 
           one: "*%{student_name}* **får 1 ekstra minutt på kvart forsøk**"
@@ -16939,8 +16945,8 @@ nn:
           keep_editing_this_quiz: "Hald fram med å redigere quizen"
           keep_editing_this_survey: "Hald fram med å redigere undersøkinga"
           message_students_who: "Send melding til studentar som..."
-          moderate_this_quiz: "Moderer quizen"
-          moderate_this_survey: "Moderer undersøkinga"
+          moderate_this_quiz: "Endre quizen"
+          moderate_this_survey: "Endre undersøkinga"
           preview: Førehandsvising
           quiz_statistics: Quiz-statistikk
           see_full_quiz: "Sjå heile quizen"
@@ -17498,6 +17504,7 @@ nn:
   request_values_89976f2c: "Be om verdiar"
   require_an_access_code_600e06e8: "Krev ein tilgangskode"
   require_assignment_due_date_778b200d: "Krav om innleveringsfrist"
+  require_captcha_for_self_registration_b3b2ea02: "Krav om Captcha ved sjølvregistrering"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Gruppemedlemmar må vere i same seksjon"
   require_respondus_lockdown_browser_31425b3a: "Krev Respondus LockDown Browser"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettar for opplasta filer"
@@ -17508,7 +17515,7 @@ nn:
   required_values_1eb5841f: "Etterspurde verdiar"
   requirement_f5b75da1: Krav
   requirement_subject_7cfac6c8: "Krav om tittel"
-  requires_recaptcha_for_self_registration_by_defaul_c1a9db63: "Recaptcha som standard er obligatorisk for eigenregistrering"
+  requires_recaptcha_for_self_registration_by_defaul_c1a9db63: "Recaptcha som standard er obligatorisk for sjølvregistrering"
   reregister_9ab95a57: "Ny registrering"
   reregister_toolname_3dde0bfc: "Registrer %{toolName} på nytt"
   reschedule_9f780bb8: "Planlegg på nytt"
@@ -18269,6 +18276,7 @@ nn:
   send_message_6ccc90e8: "Send melding"
   send_message_to_name_c8ac05fc: "Send melding til %{name}"
   send_notification_81773687: "Send varsel"
+  send_notification_directly_to_users_when_announcem_c3aac61c: "Send varsel direkte til brukarar når kunngjering startar"
   send_only_to_the_following_types_of_users_d8465c11: "Send berre til følgande brukartypar:"
   send_page_to_another_user_6ef5a7c1: "Send side til annan brukar"
   send_quiz_to_user_e8c47177: "Send quiz til brukar"
@@ -20172,6 +20180,7 @@ nn:
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det oppstod eit problem under lagring av karaktersetjingsskjemaet"
   there_was_a_problem_sending_your_message_22b249a5: "Det oppstod eit problem under sending av meldinga."
   there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: "Det oppstod eit problem ved vising av notatkolonnen til faglærar. "
+  there_was_a_problem_starting_import_operation_4c42c5e: "Det oppstod eit problem under oppstart av importjobben"
   there_was_a_problem_starting_the_copy_operation_dd599cdd: "Det oppstod eit problem under oppstart av kopieringsjobben"
   there_was_a_problem_submitting_your_set_27ca2ed0: "Det oppstod eit problem under innleveringa"
   there_was_a_problem_toggling_the_content_lock_2a5d678b: "Kunne ikkje slå av/på innhaldslås"
@@ -21192,6 +21201,7 @@ nn:
   user_id_ddfbd586: brukar-ID
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Brukar-ID eller SIS-IS (SIS-ID må ha forstavinga sis_user_id:)"
   user_id_user_id_69a9e865: "Brukar-ID: %{user_id}"
+  user_inactivity_report_70cae434: "Rapport over inaktive brukarar"
   user_information_6353d7e1: Brukarinformasjon
   user_is_now_group_leader_60ec9b98: "%{user} er no gruppeleiar"
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "Brukaren har ikkje løyve til å redigere globale læringsmål"
@@ -21655,6 +21665,7 @@ nn:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite likskapsresultat – meir informasjon"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite likskapsresultat – sjå detaljrapport"
   video_b9f27375: Video
+  video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Rettleiar for bruk av videokonferanse i virtuelle klasserom"
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoinnhaldet er ikkje støtta av eininga eller appen."
   video_player_b371005: Videoavspelar
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -21709,6 +21720,7 @@ nn:
   virtual_lectures_in_real_time_a1778dea: "Virtuelle førelesingar i sanntid"
   visit_864b4060: Besøk
   visit_group_group_name_7a816081: "Gå til gruppa %{group_name}"
+  visit_zoom_14636084: "Bruk Zoom"
   waiting_for_attempted_login_6d00cb49: "Ventar på påloggingsforsøk"
   waiting_for_selection_ce0398c7: "Ventar på utval"
   warning_6576b5b8: åtvaring
