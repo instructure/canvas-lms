@@ -37,7 +37,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
   validates_presence_of :course
   validates_uniqueness_of :course_id
 
-  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :not_deleted, -> { where.not(workflow_state: 'deleted') }
 
   workflow do
     state :pending # Initial state, before first sync
@@ -48,4 +48,12 @@ class MicrosoftSync::Group < ActiveRecord::Base
   end
 
   resolves_root_account through: :course
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    return true if deleted?
+
+    self.workflow_state = 'deleted'
+    run_callbacks(:destroy) { save! }
+  end
 end

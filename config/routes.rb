@@ -1296,6 +1296,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'microsoft_sync/groups') do
       get "courses/:course_id/microsoft_sync/group", action: :show
+      delete "courses/:course_id/microsoft_sync/group", action: :destroy
     end
 
     scope(controller: :external_tools) do

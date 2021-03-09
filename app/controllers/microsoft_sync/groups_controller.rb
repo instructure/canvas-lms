@@ -92,6 +92,15 @@ class MicrosoftSync::GroupsController < ApplicationController
     render json: group.as_json(include_root: false)
   end
 
+  # Destroy the MicrosoftSync::Group associated
+  # with the specified course.
+  #
+  # These records are soft-deleted
+  def destroy
+    group.destroy!
+    head :no_content
+  end
+
   private
 
   def validate_user_permissions
@@ -109,7 +118,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   end
 
   def group
-    @group ||= MicrosoftSync::Group.active.find_by(course: course) ||
+    @group ||= MicrosoftSync::Group.not_deleted.find_by(course: course) ||
       (raise ActiveRecord::RecordNotFound)
   end
 end

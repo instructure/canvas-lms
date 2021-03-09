@@ -31,8 +31,13 @@ describe MicrosoftSync::Group do
     expect(subject.workflow_state).to eq('pending')
   end
 
-  describe 'active scope' do
-    subject { described_class.active }
+  it 'is soft deleted' do
+    subject.destroy!
+    expect(subject.reload).to be_deleted
+  end
+
+  describe 'not_deleted scope' do
+    subject { described_class.not_deleted }
 
     before(:once) do
       %i[pending running errored completed deleted].each do |state|
