@@ -73,6 +73,12 @@ module Turnitin
         submission = lti_assignment.submissions.first
         expect(submission.submitted_at).not_to be_nil
       end
+
+      it 'does not increment attempt twice if submitted_at is not nil' do
+        subject.process
+        submission = lti_assignment.submissions.first
+        expect(submission.attempt).to eq 1
+      end
     end
 
     describe "#process with request errors" do
