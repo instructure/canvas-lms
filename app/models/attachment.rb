@@ -86,6 +86,7 @@ class Attachment < ActiveRecord::Base
   has_one :crocodoc_document
   has_one :canvadoc
   belongs_to :usage_rights
+  has_many :canvadocs_annotation_contexts, inverse_of: :attachment
 
   before_save :set_root_account_id
   before_save :infer_display_name

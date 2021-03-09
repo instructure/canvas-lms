@@ -4188,6 +4188,43 @@ describe Submission do
     end
   end
 
+  describe "#annotation_context" do
+    before(:once) do
+      @attachment = attachment_model(context: @user)
+      @assignment.update!(annotatable_attachment_id: @attachment.id)
+      @submission = @assignment.submissions.find_by(user: @user)
+    end
+
+    it "creates a canvadocs_annotation_context if draft is true" do
+      new_student = @course.enroll_student(User.create!).user
+      new_submission = @assignment.submissions.find_by(user: new_student)
+
+      expect {
+        new_submission.annotation_context(draft: true)
+      }.to change {
+        new_submission.canvadocs_annotation_contexts.where(attachment: @attachment, submission_attempt: nil).count
+      }.by(1)
+    end
+
+    it "returns the already existing canvadocs_annotation_context when passed draft multiple times" do
+      existing_context = @submission.annotation_context(draft: true)
+      expect(@submission.annotation_context(draft: true)).to eq existing_context
+    end
+
+    it "returns nil if a canvadocs_annotation_context does not exist" do
+      expect(@submission.annotation_context(attempt: 1)).to be_nil
+    end
+
+    it "returns the annotation_context if one exists for the attempt" do
+      @submission.update!(attempt: 1)
+      context = @submission.canvadocs_annotation_contexts.create!(
+        attachment: @attachment,
+        submission_attempt: @submission.attempt
+      )
+      expect(@submission.annotation_context(attempt: @submission.attempt)).to eq context
+    end
+  end
+
   describe '.process_bulk_update' do
     before(:once) do
       course_with_teacher active_all: true

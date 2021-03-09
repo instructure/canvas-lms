@@ -2116,6 +2116,7 @@ CanvasRails::Application.routes.draw do
 
     get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', as: :crocodoc_session
     get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
+    post '/canvadoc_session', controller: 'canvadoc_sessions', action: 'create'
 
     scope(controller: :grading_period_sets) do
       get 'accounts/:account_id/grading_period_sets', action: :index, as: :account_grading_period_sets

@@ -119,6 +119,7 @@ class Submission < ActiveRecord::Base
 
   has_many :content_participations, :as => :content
 
+  has_many :canvadocs_annotation_contexts, inverse_of: :submission
   has_many :canvadocs_submissions
 
   has_many :auditor_grade_change_records,
@@ -1358,6 +1359,17 @@ class Submission < ActiveRecord::Base
             submit_to_canvadocs(1, opts)
         end
       end
+    end
+  end
+
+  def annotation_context(attempt: nil, draft: false)
+    if draft
+      canvadocs_annotation_contexts.find_or_create_by(
+        attachment_id: assignment.annotatable_attachment_id,
+        submission_attempt: nil
+      )
+    else
+      canvadocs_annotation_contexts.find_by(submission_attempt: attempt)
     end
   end
 
