@@ -468,85 +468,85 @@ pipeline {
 
             buildSummaryReport.timedStageAndReportIfFailure('Build Docker Image') {
               timeout(time: 20) {
-                def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+                credentials.withStarlordCredentials({ ->
+                  def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
-                slackSendCacheBuild {
-                  withEnv([
-                    "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                    "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                    "CACHE_SAVE_SCOPE=${cacheScope}",
-                    "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
-                    "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
-                    "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
-                    "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-                    "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
-                    "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                    "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                    "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
-                  ]) {
-                    try {
-                      credentials.withStarlordCredentials({ ->
+                  slackSendCacheBuild {
+                    withEnv([
+                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                      "CACHE_SAVE_SCOPE=${cacheScope}",
+                      "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
+                      "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
+                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
+                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
+                      "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
+                      "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
+                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+                      "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
+                    ]) {
+                      try {
                         sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
-                      })
-                    } catch(e) {
-                      if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
-                        // DEBUG: In some cases, such as the cache hash calculation missing a file, it can be useful to be able to
-                        // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
-                        // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.
+                      } catch(e) {
+                        if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
+                          // DEBUG: In some cases, such as the cache hash calculation missing a file, it can be useful to be able to
+                          // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
+                          // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.
 
-                        sh(script: """
-                          docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $PATCHSET_TAG-failed
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG-failed
-                        """, label: 'upload failed image')
+                          sh(script: """
+                            docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $PATCHSET_TAG-failed
+                            ./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG-failed
+                          """, label: 'upload failed image')
+                        }
+
+                        throw e
                       }
-
-                      throw e
                     }
                   }
-                }
 
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
-                if(configuration.isChangeMerged()) {
-                  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                  sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
+                  if(configuration.isChangeMerged()) {
+                    def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                    sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
-                }
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
+                  }
 
-                sh(script: """
-                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
-                """, label: 'upload cache images')
+                  sh(script: """
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+                  """, label: 'upload cache images')
 
-                if (isPatchsetPublishable()) {
-                  sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
-                }
+                  if (isPatchsetPublishable()) {
+                    sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
+                  }
+                })
               }
             }
 
             buildSummaryReport.timedStageAndReportIfFailure('Run Migrations') {
               timeout(time: 10) {
-                def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
-                def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
+                credentials.withStarlordCredentials({ ->
+                  def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
+                  def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
 
-                withEnv([
-                  "CACHE_LOAD_SCOPE=${cacheLoadScope}",
-                  "CACHE_SAVE_SCOPE=${cacheSaveScope}",
-                  "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
-                  "CASSANDRA_IMAGE_TAG=${imageTag.cassandra()}",
-                  "CASSANDRA_PREFIX=${env.CASSANDRA_PREFIX}",
-                  "COMPOSE_FILE=docker-compose.new-jenkins.yml",
-                  "DYNAMODB_IMAGE_TAG=${imageTag.dynamodb()}",
-                  "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
-                  "POSTGRES_IMAGE_TAG=${imageTag.postgres()}",
-                  "POSTGRES_PREFIX=${env.POSTGRES_PREFIX}",
-                  "POSTGRES_PASSWORD=sekret"
-                ]) {
-                  credentials.withStarlordCredentials({ ->
+                  withEnv([
+                    "CACHE_LOAD_SCOPE=${cacheLoadScope}",
+                    "CACHE_SAVE_SCOPE=${cacheSaveScope}",
+                    "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
+                    "CASSANDRA_IMAGE_TAG=${imageTag.cassandra()}",
+                    "CASSANDRA_PREFIX=${env.CASSANDRA_PREFIX}",
+                    "COMPOSE_FILE=docker-compose.new-jenkins.yml",
+                    "DYNAMODB_IMAGE_TAG=${imageTag.dynamodb()}",
+                    "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
+                    "POSTGRES_IMAGE_TAG=${imageTag.postgres()}",
+                    "POSTGRES_PREFIX=${env.POSTGRES_PREFIX}",
+                    "POSTGRES_PASSWORD=sekret"
+                  ]) {
                     sh """
                       # Due to https://issues.jenkins.io/browse/JENKINS-15146, we have to set it to empty string here
                       export CACHE_LOAD_SCOPE=\${CACHE_LOAD_SCOPE:-}
@@ -556,11 +556,11 @@ pipeline {
                       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $DYNAMODB_PREFIX || true
                       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTGRES_PREFIX || true
                     """
-                  })
-                }
+                  }
 
-                archiveArtifacts(artifacts: "migrate-*.log", allowEmptyArchive: true)
-                sh 'docker-compose down --remove-orphans'
+                  archiveArtifacts(artifacts: "migrate-*.log", allowEmptyArchive: true)
+                  sh 'docker-compose down --remove-orphans'
+                })
               }
             }
 
@@ -575,51 +575,55 @@ pipeline {
                 if (configuration.isChangeMerged()) {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
-                    withEnv([
-                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                      "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                      "COMPILE_ADDITIONAL_ASSETS=0",
-                      "JS_BUILD_NO_UGLIFY=1",
-                      "RAILS_LOAD_ALL_LOCALES=0",
-                      "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
-                      "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                      "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
-                    ]) {
-                      slackSendCacheBuild {
-                        sh "build/new-jenkins/docker-build.sh"
-                      }
+                    credentials.withStarlordCredentials({ ->
+                      withEnv([
+                        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                        "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                        "COMPILE_ADDITIONAL_ASSETS=0",
+                        "JS_BUILD_NO_UGLIFY=1",
+                        "RAILS_LOAD_ALL_LOCALES=0",
+                        "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
+                        "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
+                        "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+                        "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
+                      ]) {
+                        slackSendCacheBuild {
+                          sh "build/new-jenkins/docker-build.sh"
+                        }
 
-                      // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
-                      // has changed between the post-merge build and this pre-merge build.
-                      sh(script: """
-                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
-                      """, label: 'upload cache images')
-                    }
+                        // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
+                        // has changed between the post-merge build and this pre-merge build.
+                        sh(script: """
+                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
+                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+                        """, label: 'upload cache images')
+                      }
+                    })
                   }
                 }
 
                 if (!configuration.isChangeMerged()) {
                   echo 'adding Linters'
                   buildSummaryReport.timedStageAndReportIfFailure('Linters', stages, {
-                    credentials.withGerritCredentials {
-                      withEnv([
-                        "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
-                        "PLUGINS_LIST=${configuration.plugins().join(' ')}",
-                        "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
-                      ]) {
-                        sh 'build/new-jenkins/linters/run-gergich.sh'
+                    credentials.withStarlordCredentials({ ->
+                      credentials.withGerritCredentials {
+                        withEnv([
+                          "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
+                          "PLUGINS_LIST=${configuration.plugins().join(' ')}",
+                          "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
+                        ]) {
+                          sh 'build/new-jenkins/linters/run-gergich.sh'
+                        }
                       }
-                    }
-                    if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
-                      credentials.withMasterBouncerCredentials {
-                        sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+                      if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
+                        credentials.withMasterBouncerCredentials {
+                          sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+                        }
                       }
-                    }
+                    })
                   })
                 }
 
@@ -640,45 +644,47 @@ pipeline {
                 def jsReady = null
 
                 buildSummaryReport.timedStageAndReportIfFailure('Javascript (Build Image)', stages, {
-                  try {
-                    def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+                  credentials.withStarlordCredentials({ ->
+                    try {
+                      def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
-                    withEnv([
-                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                      "CACHE_SAVE_SCOPE=${cacheScope}",
-                      "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
-                      "PATCHSET_TAG=${env.PATCHSET_TAG}",
-                      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-                      "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
-                    ]) {
-                      sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
+                      withEnv([
+                        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                        "CACHE_SAVE_SCOPE=${cacheScope}",
+                        "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
+                        "PATCHSET_TAG=${env.PATCHSET_TAG}",
+                        "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
+                        "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
+                      ]) {
+                        sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
+                      }
+
+                      sh """
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_BUILDER_PREFIX
+                      """
+
+                      jsReady = true
+                    } catch(e) {
+                      jsReady = false
+
+                      if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
+                        // DEBUG: Sometimes a node can get polluted and produce an error like
+                        // The git source https://github.com/rails-api/active_model_serializers.git is not yet checked out
+                        // Take the last successful layer and upload it so it can be debugged. If we ever start using
+                        // buildkit for the relevant images, then this approach will have to change as buildkit doesn't
+                        // save the intermediate layers as images.
+
+                        sh(script: """
+                          docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $KARMA_RUNNER_IMAGE-failed
+                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE-failed
+                        """, label: 'upload failed image')
+                      }
+
+                      throw e
                     }
-
-                    sh """
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_BUILDER_PREFIX
-                    """
-
-                    jsReady = true
-                  } catch(e) {
-                    jsReady = false
-
-                    if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
-                      // DEBUG: Sometimes a node can get polluted and produce an error like
-                      // The git source https://github.com/rails-api/active_model_serializers.git is not yet checked out
-                      // Take the last successful layer and upload it so it can be debugged. If we ever start using
-                      // buildkit for the relevant images, then this approach will have to change as buildkit doesn't
-                      // save the intermediate layers as images.
-
-                      sh(script: """
-                        docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $KARMA_RUNNER_IMAGE-failed
-                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE-failed
-                      """, label: 'upload failed image')
-                    }
-
-                    throw e
-                  }
+                  })
                 })
 
                 echo 'adding Javascript (Jest)'
