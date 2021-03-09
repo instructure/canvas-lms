@@ -23,15 +23,25 @@ import {Button} from '@instructure/ui-buttons'
 
 export function Reply({...props}) {
   return (
-    <Button onClick={props.onClick} withBackground={false} color="primary">
+    <Button onClick={props.onClick} withBackground={props.withBackground} color="primary">
       {I18n.t('Reply')}
     </Button>
   )
+}
+
+Reply.defaultProps = {
+  withBackground: false
 }
 
 Reply.propTypes = {
   /**
    * Behavior when clicking the reply button
    */
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
+
+  /**
+   * Specifies if the Button should render with a solid background.
+   * When false, the background is transparent.
+   */
+  withBackground: PropTypes.bool
 }
