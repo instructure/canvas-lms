@@ -18,8 +18,8 @@ function yarn_install() {
 }
 
 function compile_assets() {
-  echo "Running compile assets..."
-  COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rails canvas:compile_assets
+  echo "Running compile assets dev (css and js only, no docs or styleguide)..."
+  bundle exec rails canvas:compile_assets_dev
 }
 
 ALL_COMMANDS='y'
