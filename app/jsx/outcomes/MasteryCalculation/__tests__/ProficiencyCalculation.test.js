@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render as rtlRender, fireEvent, waitFor} from '@testing-library/react'
+import OutcomesContext from '../../contexts/OutcomesContext'
 import ProficiencyCalculation from '../ProficiencyCalculation'
 
 describe('ProficiencyCalculation', () => {
@@ -41,10 +42,17 @@ describe('ProficiencyCalculation', () => {
     global.onerror = originalOnError
   })
 
+  const render = (children, {contextType = 'Account', contextId = '1'} = {}) => {
+    return rtlRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        {children}
+      </OutcomesContext.Provider>
+    )
+  }
+
   const makeProps = (overrides = {}) => ({
     update: Function.prototype,
     canManage: true,
-    contextType: 'Account',
     ...overrides,
     method: {
       calculationMethod: 'decaying_average',
@@ -335,9 +343,9 @@ describe('ProficiencyCalculation', () => {
     })
 
     it('renders correct text for the Course context', () => {
-      const {getByDisplayValue, getByText} = render(
-        <ProficiencyCalculation {...makeProps()} contextType="Course" />
-      )
+      const {getByDisplayValue, getByText} = render(<ProficiencyCalculation {...makeProps()} />, {
+        contextType: 'Course'
+      })
       const method = getByDisplayValue('Decaying Average')
       fireEvent.click(method)
       const newMethod = getByText('Most Recent Score')

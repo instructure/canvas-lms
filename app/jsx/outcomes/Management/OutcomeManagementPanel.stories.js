@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import OutcomeManagementPanel from '.'
-import {createCache} from 'jsx/canvas-apollo'
-import {accountMocks} from './__tests__/mocks'
 import {MockedProvider} from '@apollo/react-testing'
+import {accountMocks} from './__tests__/mocks'
+import {createCache} from 'jsx/canvas-apollo'
+import OutcomesContext from '../contexts/OutcomesContext'
+import OutcomeManagementPanel from '.'
 
 export default {
   title: 'Examples/Outcomes/OutcomeManagementPanel',
@@ -42,9 +43,13 @@ const Template = args => {
     response[0].result.data = args.response
   }
   return (
-    <MockedProvider mocks={response} cache={createCache()}>
-      <OutcomeManagementPanel contextType={args.contextType} contextId={args.contextId} />
-    </MockedProvider>
+    <OutcomesContext.Provider
+      value={{env: {contextType: args.contextType, contextId: args.contextId}}}
+    >
+      <MockedProvider mocks={response} cache={createCache()}>
+        <OutcomeManagementPanel />
+      </MockedProvider>
+    </OutcomesContext.Provider>
   )
 }
 

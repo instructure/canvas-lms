@@ -17,9 +17,9 @@
  */
 
 import {useContext} from 'react'
-import OutcomesContext from '../contexts/OutcomesContext'
+import OutcomesContext from '../../contexts/OutcomesContext'
 
-export const useCanvasContext = () => {
+const useCanvasContext = () => {
   const context = useContext(OutcomesContext)
   const contextType = context?.env?.contextType
   const contextId = context?.env?.contextId
@@ -28,3 +28,5 @@ export const useCanvasContext = () => {
     contextId
   }
 }
+
+export default useCanvasContext

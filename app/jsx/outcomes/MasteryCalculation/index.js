@@ -29,8 +29,10 @@ import {
   SET_OUTCOME_CALCULATION_METHOD
 } from './api'
 import {useQuery, useMutation} from 'react-apollo'
+import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
 
-const MasteryCalculation = ({contextType, contextId, onNotifyPendingChanges}) => {
+const MasteryCalculation = ({onNotifyPendingChanges}) => {
+  const {contextType, contextId} = useCanvasContext()
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_CALCULATION_QUERY : ACCOUNT_OUTCOME_CALCULATION_QUERY
   const {loading, error, data} = useQuery(query, {
@@ -71,8 +73,6 @@ const MasteryCalculation = ({contextType, contextId, onNotifyPendingChanges}) =>
   return (
     <>
       <ProficiencyCalculation
-        contextType={contextType}
-        contextId={contextId}
         method={outcomeCalculationMethod || undefined} // send undefined when value is null
         update={setCalculationMethod}
         updateError={setCalculationMethodError}

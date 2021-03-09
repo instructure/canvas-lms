@@ -17,11 +17,14 @@
  */
 
 import React from 'react'
-import {render, waitFor, fireEvent, waitForElementToBeRemoved} from '@testing-library/react'
+import {act, render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
+import OutcomesContext from '../../contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_CALCULATION_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
 import MasteryCalculation from '../index'
-import {masteryCalculationGraphqlMocks as mocks} from '../../__tests__/mocks'
+import {masteryCalculationGraphqlMocks} from '../../__tests__/mocks'
+
+jest.useFakeTimers()
 
 describe('MasteryCalculation', () => {
   beforeEach(() => {
@@ -52,35 +55,37 @@ describe('MasteryCalculation', () => {
     window.ENV = null
   })
 
-  it('loads proficiency data', async () => {
-    const {getByText, queryByText, getByDisplayValue} = render(
-      <MockedProvider mocks={mocks}>
-        <MasteryCalculation contextType="Account" contextId="11" />
-      </MockedProvider>
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '11', mocks = masteryCalculationGraphqlMocks} = {}
+  ) => {
+    return rtlRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        <MockedProvider addTypename={false} mocks={mocks}>
+          {children}
+        </MockedProvider>
+      </OutcomesContext.Provider>
     )
-    expect(getByText('Loading')).not.toEqual(null)
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+  }
+
+  it('loads proficiency data for Account', async () => {
+    const {getByDisplayValue} = render(<MasteryCalculation />)
+    await act(async () => jest.runAllTimers())
     expect(getByDisplayValue(/65/)).not.toEqual(null)
   })
 
   it('loads calculation data for Course', async () => {
-    const {getByText, getByDisplayValue} = render(
-      <MockedProvider mocks={mocks}>
-        <MasteryCalculation contextType="Course" contextId="12" />
-      </MockedProvider>
-    )
-    expect(getByText('Loading')).not.toEqual(null)
-    await waitFor(() => expect(getByDisplayValue(/65/)).not.toEqual(null))
+    const {getByDisplayValue} = render(<MasteryCalculation />, {
+      contextType: 'Course',
+      contextId: '12'
+    })
+    await act(async () => jest.runAllTimers())
+    expect(getByDisplayValue(/65/)).not.toEqual(null)
   })
 
   it('loads role list', async () => {
-    const {getByText, queryByText, getAllByText} = render(
-      <MockedProvider mocks={mocks}>
-        <MasteryCalculation contextType="Account" contextId="11" />
-      </MockedProvider>
-    )
-    expect(getByText('Loading')).not.toEqual(null)
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    const {getByText, getAllByText} = render(<MasteryCalculation />)
+    await act(async () => jest.runAllTimers())
     expect(
       getByText(/Permission to change this mastery calculation at the account level is enabled for/)
     ).not.toEqual(null)
@@ -92,12 +97,8 @@ describe('MasteryCalculation', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={[]}>
-        <MasteryCalculation contextType="Account" contextId="11" />
-      </MockedProvider>
-    )
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    const {getByText} = render(<MasteryCalculation />, {mocks: []})
+    await act(async () => jest.runAllTimers())
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })
 
@@ -120,12 +121,8 @@ describe('MasteryCalculation', () => {
         }
       }
     ]
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={emptyMocks}>
-        <MasteryCalculation contextType="Account" contextId="11" />
-      </MockedProvider>
-    )
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    const {getByText} = render(<MasteryCalculation />, {mocks: emptyMocks})
+    await act(async () => jest.runAllTimers())
     expect(getByText('Mastery Calculation')).not.toBeNull()
   })
 
@@ -149,7 +146,7 @@ describe('MasteryCalculation', () => {
       }
     }))
     const updateMocks = [
-      ...mocks,
+      ...masteryCalculationGraphqlMocks,
       {
         request: {
           query: SET_OUTCOME_CALCULATION_METHOD,
@@ -159,11 +156,8 @@ describe('MasteryCalculation', () => {
       }
     ]
     it('submits a request when calculation method is saved', async () => {
-      const {getByText, findByLabelText} = render(
-        <MockedProvider mocks={updateMocks} addTypename={false}>
-          <MasteryCalculation contextType="Account" contextId="11" />
-        </MockedProvider>
-      )
+      const {getByText, findByLabelText} = render(<MasteryCalculation />, {mocks: updateMocks})
+      await act(async () => jest.runAllTimers())
       const parameter = await findByLabelText(/Parameter/)
       fireEvent.input(parameter, {target: {value: '88'}})
       fireEvent.click(getByText('Save Mastery Calculation'))

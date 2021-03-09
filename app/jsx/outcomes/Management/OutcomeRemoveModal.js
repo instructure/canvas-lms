@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import Modal from '../../shared/components/InstuiModal'
-import {useCanvasContext} from '../shared/hooks'
+import useCanvasContext from '../shared/hooks/useCanvasContext'
 import {showFlashAlert} from '../../shared/FlashAlert'
 import {removeOutcome} from './api'
 

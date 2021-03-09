@@ -30,7 +30,7 @@ import ManageOutcomesFooter from './ManageOutcomesFooter'
 import useSearch from 'jsx/shared/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
-import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
+import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
 import useModal from '../../shared/hooks/useModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
 import MoveModal from './MoveModal'
@@ -38,7 +38,8 @@ import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 import useModalWithData from 'jsx/outcomes/shared/hooks/useModalWithData'
 
-const NoOutcomesBillboard = ({contextType}) => {
+const NoOutcomesBillboard = () => {
+  const {contextType} = useCanvasContext()
   const isCourse = contextType === 'Course'
 
   return (
@@ -89,6 +90,7 @@ const OutcomeManagementPanel = () => {
     selectedGroupId
   } = useManageOutcomes()
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
+
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [
@@ -133,7 +135,7 @@ const OutcomeManagementPanel = () => {
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
       {!hasOutcomes ? (
-        <NoOutcomesBillboard contextType={contextType} />
+        <NoOutcomesBillboard />
       ) : (
         <>
           <Flex>

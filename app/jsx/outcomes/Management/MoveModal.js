@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import Modal from '../../shared/components/InstuiModal'
 import TreeBrowser from './TreeBrowser'
 import {useGroupMoveModal} from 'jsx/outcomes/shared/treeBrowser'
-import {useCanvasContext} from '../shared/hooks'
+import useCanvasContext from '../shared/hooks/useCanvasContext'
 
 const noop = () => {}
 

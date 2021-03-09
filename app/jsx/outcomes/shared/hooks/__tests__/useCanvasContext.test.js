@@ -19,7 +19,7 @@
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks/dom'
 import OutcomesContext from 'jsx/outcomes/contexts/OutcomesContext'
-import {useCanvasContext} from '../hooks'
+import useCanvasContext from '../useCanvasContext'
 
 describe('useCanvasContext', () => {
   test('can return values if they are set', () => {
