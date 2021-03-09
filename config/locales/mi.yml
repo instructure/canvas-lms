@@ -21298,7 +21298,7 @@ mi:
       buttons: 
         accept: Manakohia
         decline: "Te paheketanga"
-      invitation_text: "Kua karangatia ki te uru atu koe [%{course}](%{link_to_course}) rite %{enrollment_type_with_indefinite_article}"
+      invitation_text: "Kua karangatia ki te uru atu koe [%{course}](%{link_to_course}) rite %{role_name}"
     enrollment: 
       enrolled_as_designer: "whakaurua ki te kaihoahoa "
       enrolled_as_limited_designer: "whakaurua ki te kaihoahoa ki te whai wāhi wāhanga-anake "
