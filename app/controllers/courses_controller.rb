@@ -2176,22 +2176,24 @@ class CoursesController < ApplicationController
           load_announcements
         else
           set_active_tab "home"
-          if @context.grants_right?(@current_user, session, :manage_groups)
+          if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
             @contexts += @context.groups
-          else
-            @contexts += @user_groups if @user_groups
+          elsif @user_groups
+            @contexts += @user_groups
           end
           web_conferences = @context.web_conferences.active.to_a
           @current_conferences = web_conferences.select {|c| c.active?(false, false) && c.users.include?(@current_user)}
           @scheduled_conferences = web_conferences.select {|c| c.scheduled? && c.users.include?(@current_user)}
-          @stream_items = @current_user.try(:cached_recent_stream_items, {:contexts => @contexts}) || []
+          @stream_items = @current_user.try(:cached_recent_stream_items, {contexts: @contexts}) || []
         end
 
-        if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
-          @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
+        if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
+          @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
 
-        @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :placements => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user).to_a
+        @course_home_sub_navigation_tools =
+          ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
+                                            root_account: @domain_root_account, current_user: @current_user).to_a
         unless @context.grants_right?(@current_user, session, :manage_content)
           @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
         end

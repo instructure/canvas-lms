@@ -244,7 +244,7 @@ module Types
       Project group sets for this course.
     DOC
     def group_sets_connection
-      if course.grants_right? current_user, :manage_groups
+      if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
         course.group_categories.where(role: nil)
       end
     end

@@ -289,7 +289,7 @@ class GroupsController < ApplicationController
         @categories  = @context.group_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key('name')).preload(:root_account)
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
-        if @context.grants_right?(@current_user, session, :manage_groups)
+        if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
           categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
           uncategorized = @context.groups.active.uncategorized.to_a
           if uncategorized.present?
@@ -298,10 +298,17 @@ class GroupsController < ApplicationController
             categories_json << json
           end
 
+          js_permissions = {
+            can_add_groups: @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_add),
+            can_manage_groups: @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_manage),
+            can_delete_groups: @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_delete)
+          }
+
           js_env group_categories: categories_json,
                  group_user_type: @group_user_type,
                  allow_self_signup: @allow_self_signup,
-                 context_class_name: @context.class.name
+                 context_class_name: @context.class.name,
+                 permissions: js_permissions
 
           if @context.is_a?(Course)
             # get number of sections with students in them so we can enforce a min group size for random assignment on sections
@@ -424,7 +431,7 @@ class GroupsController < ApplicationController
   end
 
   def new
-    if authorized_action(@context, @current_user, :manage_groups)
+    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
       @group = @context.groups.build
     end
   end
@@ -471,14 +478,14 @@ class GroupsController < ApplicationController
         return render :json => {}, :status => bad_request unless group_category
         @context = group_category.context
         attrs[:group_category] = group_category
-        return unless authorized_action(group_category.context, @current_user, :manage_groups)
+        return unless authorized_action(group_category.context, @current_user, [:manage_groups, :manage_groups_add])
       else
         @context = @domain_root_account
         attrs[:group_category] = GroupCategory.communities_for(@context)
       end
     elsif params[:group]
       group_category_id = params[:group].delete :group_category_id
-      if group_category_id && @context.grants_right?(@current_user, session, :manage_groups)
+      if group_category_id && @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_add)
         group_category = @context.group_categories.where(id: group_category_id).first
         return render :json => {}, :status => :bad_request unless group_category
         attrs[:group_category] = group_category

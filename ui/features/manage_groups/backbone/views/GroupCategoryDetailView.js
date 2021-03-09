@@ -80,8 +80,12 @@ export default class GroupCategoryDetailView extends View {
   toJSON() {
     const json = super.toJSON(...arguments)
     json.canMessageMembers = this.model.canMessageUnassignedMembers()
-    json.canAssignMembers = this.model.canAssignUnassignedMembers()
+    json.canAssignMembers =
+      ENV.permissions.can_manage_groups && this.model.canAssignUnassignedMembers()
     json.locked = this.model.isLocked()
+    json.canAdd = ENV.permissions.can_add_groups && !this.model.isLocked()
+    json.canManage = ENV.permissions.can_manage_groups && !this.model.isLocked()
+    json.canDelete = ENV.permissions.can_delete_groups && !this.model.isLocked()
     return json
   }
 

@@ -157,7 +157,8 @@ class ContextController < ApplicationController
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
         manage_students: manage_students,
         add_users_to_course: can_add_enrollments,
-        read_reports: @context.grants_right?(@current_user, session, :read_reports)
+        read_reports: @context.grants_right?(@current_user, session, :read_reports),
+        can_add_groups: can_do(@context.groups.temp_record, @current_user, :create)
       }
       if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
         js_permissions[:can_allow_course_admin_actions] = manage_admins
@@ -360,41 +361,48 @@ class ContextController < ApplicationController
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
-        if @context.class.reflections.key?(workflow_type.to_s)
-          item_types << @context.association(workflow_type).reader
+      @item_types =
+        WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
+          if @context.class.reflections.key?(workflow_type.to_s)
+            item_types << @context.association(workflow_type).reader
+          end
         end
-      end
 
       @deleted_items = []
       @item_types.each do |scope|
-        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).to_a
+        @deleted_items += scope.where(workflow_state: 'deleted').limit(25).to_a
       end
-      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).to_a
-      @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a if @context.grants_right?(@current_user, :manage_groups)
-      @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
+      @deleted_items += @context.attachments.where(file_state: 'deleted').limit(25).to_a
+      if @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
+        @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
+      end
+      @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
 
   def undelete_item
     if authorized_action(@context, @current_user, :manage_content)
-      type = params[:asset_string].split("_")
+      type = params[:asset_string].split('_')
       id = type.pop
-      type = type.join("_")
+      type = type.join('_')
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
       type = 'all_group_category' if type == 'group_category'
-      if ['all_group_category', 'group'].include?(type)
-        return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_groups)
+      if %w[all_group_category group].include?(type)
+        unless @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
+          return render_unauthorized_action
+        end
       end
       type = type.pluralize
       type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
-      raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
+      unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
+        raise 'invalid type'
+      end
 
       @item = scope.association(type).reader.find(id)
       @item.restore
-      render :json => @item
+      render json: @item
     end
   end
 

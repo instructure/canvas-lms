@@ -28,8 +28,28 @@ describe GroupCategoriesController do
 
   describe "POST create" do
     it "should require authorization" do
+      user_session(@student)
       @group = @course.groups.create(:name => "some groups")
       post 'create', params: {:course_id => @course.id, :category => {}}
+      assert_unauthorized
+    end
+
+    it "requires teacher default enabled :manage_groups_add (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      post 'create', params: {course_id: @course.id, category: { name: 'My Category' }}
+      expect(response).to be_successful
+    end
+
+    it "should not be authorized without :manage_groups_add enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.root_account.role_overrides.create!(
+        permission: 'manage_groups_add',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      post 'create', params: {course_id: @course.id, category: { name: 'My Category' }}
       assert_unauthorized
     end
 
@@ -143,6 +163,28 @@ describe GroupCategoriesController do
       expect(assigns[:group_category]).to be_self_signup
     end
 
+    it "should update category (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => "Different Category", :enable_self_signup => "1"}}
+      expect(response).to be_successful
+      expect(assigns[:group_category]).to eql(@group_category)
+      expect(assigns[:group_category].name).to eql("Different Category")
+      expect(assigns[:group_category]).to be_self_signup
+    end
+
+    it "should not update category if :manage_groups_manage is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_manage',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => "Different Category", :enable_self_signup => "1"}}
+      assert_unauthorized
+    end
+
     it "should leave the name alone if not given" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {}}
@@ -211,6 +253,38 @@ describe GroupCategoriesController do
       expect(@course.group_categories.length).to eql(1)
       expect(@course.groups.length).to eql(2)
       expect(@course.groups.active.length).to eql(1)
+    end
+
+    it "should delete the category and groups (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      category1 = @course.group_categories.create(:name => "Study Groups")
+      category2 = @course.group_categories.create(:name => "Other Groups")
+      @course.groups.create(:name => "some group", :group_category => category1)
+      @course.groups.create(:name => "another group", :group_category => category2)
+      delete 'destroy', params: {:course_id => @course.id, :id => category1.id}
+      expect(response).to be_successful
+      @course.reload
+      expect(@course.all_group_categories.length).to eql(2)
+      expect(@course.group_categories.length).to eql(1)
+      expect(@course.groups.length).to eql(2)
+      expect(@course.groups.active.length).to eql(1)
+    end
+
+    it "shouldn't delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_delete',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      category1 = @course.group_categories.create(:name => "Study Groups")
+      category2 = @course.group_categories.create(:name => "Other Groups")
+      @course.groups.create(:name => "some group", :group_category => category1)
+      @course.groups.create(:name => "another group", :group_category => category2)
+      delete 'destroy', params: {:course_id => @course.id, :id => category1.id}
+      assert_unauthorized
     end
 
     it "should fail if category doesn't exist" do
@@ -290,6 +364,37 @@ describe GroupCategoriesController do
       expect(json['context_type']).to eq 'GroupCategory'
       expect(json['tag']).to eq 'course_group_import'
       expect(json['completion']).to eq 0
+    end
+
+    it 'should initiate import (granular permissions)' do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      user_session(@teacher)
+      post 'import', params: {
+        course_id: @course.id,
+        group_category_id: @category.id,
+        attachment: fixture_file_upload('files/group_categories/test_group_categories.csv', 'text/csv')
+      }
+      expect(response).to be_successful
+      json = JSON.parse(response.body)
+      expect(json['context_type']).to eq 'GroupCategory'
+      expect(json['tag']).to eq 'course_group_import'
+      expect(json['completion']).to eq 0
+    end
+
+    it 'should not initiate import if :manage_groups_add is not enabled (granular permissions)' do
+      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+      @course.account.role_overrides.create!(
+        permission: 'manage_groups_add',
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+      post 'import', params: {
+        course_id: @course.id,
+        group_category_id: @category.id,
+        attachment: fixture_file_upload('files/group_categories/test_group_categories.csv', 'text/csv')
+      }
+      assert_unauthorized
     end
 
     it 'should create the groups and add users as specified in the csv' do

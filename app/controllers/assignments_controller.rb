@@ -299,7 +299,7 @@ class AssignmentsController < ApplicationController
         permissions = {
           context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
-          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
+          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
         }
 
         @similarity_pledge = pledge_text
@@ -665,7 +665,7 @@ class AssignmentsController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PERMISSIONS: {
-          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
+          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,

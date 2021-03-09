@@ -1471,7 +1471,13 @@ class AccountsController < ApplicationController
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
-      can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups), # access to view user groups?
+      can_manage_groups: # access to view account-level user groups, People --> hamburger menu
+        @account.grants_any_right?(
+          @current_user,
+          session,
+          :manage_groups,
+          *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
+        ),
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
     }
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
