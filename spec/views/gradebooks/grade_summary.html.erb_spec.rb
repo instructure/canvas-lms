@@ -452,7 +452,7 @@ describe "/gradebooks/grade_summary" do
 
       it 'adds the "hidden" title to the icon' do
         render "gradebooks/grade_summary"
-        expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+        expect(response).to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
       end
 
       context "when submissions are posted" do
@@ -460,7 +460,7 @@ describe "/gradebooks/grade_summary" do
 
         it 'does not add the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+          expect(response).not_to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
         end
 
         it "does not display the 'hidden' icon" do
@@ -477,7 +477,7 @@ describe "/gradebooks/grade_summary" do
 
       it 'does not add the "hidden" title to the icon' do
         render "gradebooks/grade_summary"
-        expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+        expect(response).not_to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
       end
 
       it "does not display the 'hidden' icon" do
@@ -493,7 +493,7 @@ describe "/gradebooks/grade_summary" do
 
         it 'adds the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+          expect(response).to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
         end
 
         it "displays the 'hidden' icon" do

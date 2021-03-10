@@ -142,7 +142,7 @@ function setPageHtmlFixture() {
               <span class="tooltip">
                 <span class="grade">
                   <span class="tooltip_wrap right">
-                    <span class="tooltip_text score_teaser">Instructor is working on grades</span>
+                    <span class="tooltip_text score_teaser">Instructor has not posted this grade</span>
                   </span>
                 </span>
                 <span class="score_value"></span>
@@ -162,7 +162,7 @@ function setPageHtmlFixture() {
               <span class="tooltip">
                 <span class="grade">
                   <span class="tooltip_wrap right">
-                    <span class="tooltip_text score_teaser">Instructor is working on grades</span>
+                    <span class="tooltip_text score_teaser">Instructor has not posted this grade</span>
                   </span>
                 </span>
                 <span class="score_value"></span>
@@ -1183,10 +1183,10 @@ QUnit.module('GradeSummary - Revert Score', hooks => {
     equal($assignment.find('.score_teaser').text(), 'Click to test a different score')
   })
 
-  test('sets the .score_teaser text to the "Instructor is working" message when the assignment is muted', () => {
+  test('sets the .score_teaser text to the "Instructor has not posted" message when the assignment is muted', () => {
     $assignment.data('muted', true)
     GradeSummary.onScoreRevert($assignment)
-    equal($assignment.find('.score_teaser').text(), 'Instructor is working on grades')
+    equal($assignment.find('.score_teaser').text(), 'Instructor has not posted this grade')
   })
 
   test('removes the .revert_score_link element', () => {
@@ -1267,7 +1267,7 @@ QUnit.module('GradeSummary - Revert Score', hooks => {
     GradeSummary.onScoreRevert($unpostedAssignment)
     equal(
       $unpostedAssignment.find('.assignment_score').attr('title'),
-      'Instructor is working on grades'
+      'Instructor has not posted this grade'
     )
   })
 

@@ -226,7 +226,7 @@ const GradeSummary = {
     }
 
     if ($assignment.data('muted')) {
-      title = I18n.t('Instructor is working on grades')
+      title = I18n.t('Instructor has not posted this grade')
       // xsslint safeString.identifier title
       $grade.html(`<i class="icon-off" aria-hidden="true" title="${title}"=></i>`)
     } else {
@@ -283,7 +283,7 @@ function setTooltipForScore($assignment) {
   let tooltipText
 
   if ($assignment.data('muted')) {
-    tooltipText = I18n.t('Instructor is working on grades')
+    tooltipText = I18n.t('Instructor has not posted this grade')
   } else {
     tooltipText = I18n.t('Click to test a different score')
   }
