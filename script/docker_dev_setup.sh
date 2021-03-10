@@ -64,10 +64,10 @@ DOCKER='y'
 if [[ $OS == 'Darwin' ]]; then
   #docker-compose is checked separately
   dependencies='docker docker-machine dinghy'
-elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
-  echo 'This script only supports Debian-based Linux'
-  exit 1
 elif [[ $OS == 'Linux' ]]; then
+  if [ ! -f "/etc/debian_version" ]; then
+    echo "Running this script on a non Debian distro may or may not work and is not officially supported"
+  fi
   #when more dependencies get added, modify Linux install output below
   #docker-compose is checked separately
   dependencies='dory'
