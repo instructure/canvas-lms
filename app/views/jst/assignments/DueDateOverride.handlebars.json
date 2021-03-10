@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/assignments/DueDateOverride",
   "i18nScope": "assignments.due_date_override"
 }

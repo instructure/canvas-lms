@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/groups/manage/groupUsers",
   "i18nScope": "groups.manage.group_users"
 }

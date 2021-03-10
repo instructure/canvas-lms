@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/quizzes/LDBLoginPopup",
   "i18nScope": "quizzes.ldb_login_popup"
 }
