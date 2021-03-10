@@ -2247,4 +2247,100 @@ describe ExternalToolsController do
     end
   end
 
+  describe "GET 'visible_course_nav_tools'" do
+    def add_tool(name)
+      tool = @course.context_external_tools.new(
+        name: name,
+        consumer_key: "key1",
+        shared_secret: "secret1"
+      )
+      tool.url = "http://www.example.com/basic_lti"
+      tool.use_1_3 = true
+      tool.developer_key = DeveloperKey.create!
+      tool.save!
+      tool
+    end
+
+    before :once do
+      course_with_teacher(:active_all => true)
+    end
+
+    it "ignores requests from unauthorized users" do
+      tool1 = add_tool("Course nav tool 1")
+      tool1.course_navigation = {enabled: true}
+      tool1.save!
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      assert_unauthorized
+    end
+
+    it "handles bad requests" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => 'definitely_not_a_course'}
+      expect(response.status).to eq 404
+    end
+
+    it "shows course nav tool to teacher" do
+      name = "Course nav tool 1"
+      tool1 = add_tool(name)
+      tool1.course_navigation = {enabled: true}
+      tool1.save!
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq name
+    end
+
+    it "shows course nav tool to student" do
+      name = "Course nav tool 1"
+      tool1 = add_tool(name)
+      tool1.course_navigation = {enabled: true}
+      tool1.save!
+      student_in_course(:course => @course)
+      user_session(@student)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq name
+    end
+
+    it "returns an empty array if there are no tools" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+
+    it "doesn't return tools without course nav placement" do
+      add_tool("Random tool")
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+
+    it "doesn't return tools to student marked with admins visibility" do
+      name = "Course nav tool 2"
+      tool1 = add_tool(name)
+      tool1.course_navigation = {enabled: true, visibility: "admins"}
+      tool1.save!
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq name
+
+      student_in_course(:course => @course)
+      user_session(@student)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+  end
 end
