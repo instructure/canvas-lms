@@ -581,7 +581,7 @@
     <% end %>
   </table>
   </div>
-  <% if @presenter.hidden_submissions? %>
+  <% if @presenter.hidden_submissions_for_published_assignments? %>
     <small><i class="icon-off" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
   <% end %>
   <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
