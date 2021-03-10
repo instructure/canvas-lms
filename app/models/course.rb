@@ -2633,19 +2633,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # derived from policy for Group#grants_right?(user, :read)
-  def groups_visible_to(user, groups = active_groups)
-    if grants_any_right?(user, :manage_groups, :view_group_pages)
-      # course-wide permissions; all groups are visible
-      groups
-    else
-      # no course-wide permissions; only groups the user is a member of are
-      # visible
-      groups.joins(:participating_group_memberships).
-        where('group_memberships.user_id' => user)
-    end
-  end
-
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
     manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
       :allow_course_admin_actions
