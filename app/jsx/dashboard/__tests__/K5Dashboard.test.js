@@ -19,7 +19,9 @@
 import React from 'react'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 import {K5Dashboard} from '../K5Dashboard'
+import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
 const currentUser = {
@@ -157,6 +159,41 @@ beforeAll(() => {
       link: ''
     }
   })
+  moxios.stubRequest(/api\/v1\/planner\/items.*/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: [
+      {
+        context_name: 'Course2',
+        context_type: 'Course',
+        course_id: '2',
+        html_url: '/courses/2/assignments/15',
+        new_activity: false,
+        plannable: {
+          created_at: '2021-03-16T17:17:17Z',
+          due_at: '2021-03-14T17:31:51Z',
+          id: '15',
+          points_possible: 10,
+          title: 'Assignment 14',
+          updated_at: '2021-03-16T17:31:52Z'
+        },
+        plannable_date: '2021-03-14T17:31:51Z',
+        plannable_id: '15',
+        plannable_type: 'assignment',
+        planner_override: null,
+        submissions: {
+          excused: false,
+          graded: false,
+          has_feedback: false,
+          late: false,
+          missing: true,
+          needs_grading: false,
+          redo_request: false,
+          submitted: false
+        }
+      }
+    ]
+  })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(
     /\/api\/v1\/announcements\?context_codes=course_homeroom.*/,
@@ -257,11 +294,30 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Schedule Section', () => {
+    afterEach(() => {
+      resetPlanner()
+    })
+
     it('displays an empty state when no items are fetched', async () => {
-      const {findByText} = render(
+      const {container, findByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
+      // The new weekly planner doesn't display the PlannerEmptyState.
+      // This will get addressed one way or another with LS-2042
+      // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
+      expect(await findByText('Nothing More To Do')).toBeInTheDocument()
+    })
+
+    it('renders', async () => {
+      const {container, getByTestId, findByTestId} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const planner = await findByTestId('PlannerApp')
+      expect(planner).toBeInTheDocument()
+
+      const header = await findByTestId('WeeklyPlannerHeader')
+      expect(header).toBeInTheDocument()
     })
   })
 

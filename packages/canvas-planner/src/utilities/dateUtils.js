@@ -50,6 +50,11 @@ export function isTodayOrBefore(date, today = moment()) {
   // return momentizedDate.isSameOrBefore(today, 'day');
 }
 
+export function isDay(date, target) {
+  const momentizedDate = new moment(date)
+  const momentizedTarget = new moment(target)
+  return momentizedDate.isSame(momentizedTarget, 'day')
+}
 // determines if the checkMoment falls on or inbetween the firstMoment and the lastMoment
 export function isInMomentRange(checkMoment, firstMoment, lastMoment) {
   const isOnOrAfterFirst = checkMoment.isAfter(firstMoment) || checkMoment.isSame(firstMoment)

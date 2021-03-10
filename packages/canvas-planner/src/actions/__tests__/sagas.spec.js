@@ -25,18 +25,34 @@ import {
   loadPastSaga,
   loadFutureSaga,
   loadGradesSaga,
-  peekIntoPastSaga
+  peekIntoPastSaga,
+  loadWeekSaga
 } from '../sagas'
 import {
   mergeFutureItems,
   mergePastItems,
   mergePastItemsForNewActivity,
-  consumePeekIntoPast
+  consumePeekIntoPast,
+  mergeWeekItems
 } from '../saga-actions'
 import {transformApiToInternalGrade} from '../../utilities/apiUtils'
 
+const TZ = 'Asia/Tokyo'
+
 function initialState(overrides = {}) {
-  return {loading: {seekingNewActivity: true}, days: [], timeZone: 'Asia/Tokyo', ...overrides}
+  const thisWeekStart = moment.tz(TZ).startOf('week')
+  return {
+    loading: {seekingNewActivity: true},
+    days: [],
+    timeZone: TZ,
+    weeklyDashboard: {
+      weekStart: thisWeekStart,
+      weekEnd: moment.tz(TZ).endOf('week'),
+      thisWeek: thisWeekStart,
+      weeks: {}
+    },
+    ...overrides
+  }
 }
 
 function setupLoadingPastUntilNewActivitySaga() {
@@ -56,7 +72,7 @@ describe('loadPastUntilNewActivitySaga', () => {
       call(sendFetchRequest, {
         getState: expect.any(Function),
         fromMoment: startOfDay,
-        intoThePast: true
+        mode: 'past'
       })
     )
   })
@@ -102,8 +118,8 @@ describe('loadPastSaga', () => {
     expect(generator.next(initialState()).value).toEqual(
       call(sendFetchRequest, {
         getState: expect.any(Function),
-        fromMoment: moment.tz('Asia/Tokyo').startOf('day'),
-        intoThePast: true
+        fromMoment: moment.tz(TZ).startOf('day'),
+        mode: 'past'
       })
     )
     expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
@@ -121,8 +137,8 @@ describe('peekIntoPastSaga', () => {
     expect(generator.next(initialState()).value).toEqual(
       call(sendFetchRequest, {
         getState: expect.any(Function),
-        fromMoment: moment.tz('Asia/Tokyo').startOf('day'),
-        intoThePast: true,
+        fromMoment: moment.tz(TZ).startOf('day'),
+        mode: 'past',
         perPage: 1
       })
     )
@@ -139,8 +155,8 @@ describe('loadFutureSaga', () => {
     expect(generator.next(initialState()).value).toEqual(
       call(sendFetchRequest, {
         getState: expect.any(Function),
-        fromMoment: moment.tz('Asia/Tokyo').startOf('day'),
-        intoThePast: false
+        fromMoment: moment.tz(TZ).startOf('day'),
+        mode: 'future'
       })
     )
     expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
@@ -198,8 +214,8 @@ describe('loadGradesSaga', () => {
     expect(putResult.value).toEqual(
       put(
         gotGradesSuccess({
-          '1': transformApiToInternalGrade(mockCourses[0]),
-          '2': transformApiToInternalGrade(mockCourses[1])
+          1: transformApiToInternalGrade(mockCourses[0]),
+          2: transformApiToInternalGrade(mockCourses[1])
         })
       )
     )
@@ -212,4 +228,32 @@ describe('loadGradesSaga', () => {
     expect(generator.throw('some-error').value).toEqual(put(gotGradesError('some-error')))
     expect(() => generator.next()).toThrow()
   })
+})
+
+describe('loadWeekSaga', () => {
+  it('uses the weekly methods', () => {
+    const state = initialState()
+    const generator = loadWeekSaga({
+      payload: {
+        weekStart: state.weeklyDashboard.weekStart,
+        weekEnd: state.weeklyDashboard.weekEnd
+      }
+    })
+    generator.next()
+    expect(generator.next(state).value).toEqual(
+      call(sendFetchRequest, {
+        getState: expect.any(Function),
+        fromMoment: state.weeklyDashboard.weekStart,
+        mode: 'week',
+        extraParams: {
+          end_date: state.weeklyDashboard.weekEnd.format(),
+          per_page: 100
+        }
+      })
+    )
+    expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
+      call(mergeWeekItems, 'some items', 'response')
+    )
+  })
+  // We're not testing all the scenarios, like multiple pages of items in a week
 })

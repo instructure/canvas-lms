@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moment from 'moment-timezone'
-import {gotItemsSuccess} from '../../actions/loading-actions'
+import {gotItemsSuccess, weekLoaded} from '../../actions/loading-actions'
 import daysReducer from '../days-reducer'
 
 describe('getting new items', () => {
@@ -143,5 +143,37 @@ describe('deleting planner items', () => {
       ['2017-04-27', [{uniqueId: '42'}, {uniqueId: '43'}]],
       ['2017-04-29', [{uniqueId: '47'}, {uniqueId: '48'}]]
     ])
+  })
+})
+
+describe('WEEK_LOADED', () => {
+  it("updates state with the week's days", () => {
+    const initialState = []
+    const weekData = [
+      {
+        '2021-03-14': [{id: '1'}, {id: '2'}],
+        '2021-03-15': [{id: '3'}, {id: '4'}],
+        '2021-03-16': [{id: '5'}, {id: '6'}]
+      }
+    ]
+    const weekLoadedAction = weekLoaded(weekData)
+    const newState = daysReducer(initialState, weekLoadedAction)
+    expect(newState).toMatchObject(weekData)
+  })
+})
+
+describe('JUMP_TO_WEEK', () => {
+  it("updates state with the week's days", () => {
+    const initialState = []
+    const weekData = [
+      {
+        '2021-03-14': [{id: '1'}, {id: '2'}],
+        '2021-03-15': [{id: '3'}, {id: '4'}],
+        '2021-03-16': [{id: '5'}, {id: '6'}]
+      }
+    ]
+    const weekLoadedAction = weekLoaded(weekData)
+    const newState = daysReducer(initialState, weekLoadedAction)
+    expect(newState).toMatchObject(weekData)
   })
 })

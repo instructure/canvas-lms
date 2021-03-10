@@ -16,8 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moxios from 'moxios'
-import {findByTestId} from '@testing-library/react'
-import {initializePlanner, loadPlannerDashboard, resetPlanner, renderToDoSidebar} from '../index'
+import {findByTestId, render} from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import {
+  initializePlanner,
+  loadPlannerDashboard,
+  resetPlanner,
+  renderToDoSidebar,
+  renderWeeklyPlannerHeader
+} from '../index'
 import {initialize as alertInitialize} from '../utilities/alertUtils'
 
 function defaultPlannerOptions() {
@@ -41,6 +48,14 @@ function defaultPlannerOptions() {
     convertApiUserContent: jest.fn()
   }
 }
+
+beforeAll(() => {
+  window.ENV = {
+    FEATURES: {
+      canvas_for_elementary: false
+    }
+  }
+})
 
 afterEach(() => {
   resetPlanner()
@@ -127,6 +142,15 @@ describe('with mock api', () => {
       renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
       await findByTestId(document.body, 'ToDoSidebar')
       expect(document.querySelector('.todo-list-header')).toBeTruthy()
+    })
+  })
+
+  describe('renderWeeklyPlannerHeader', () => {
+    it('renders the WeeklyPlannerHeader', async () => {
+      const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
+
+      const wph = await findByTestId('WeeklyPlannerHeader')
+      expect(wph).toBeInTheDocument()
     })
   })
 })

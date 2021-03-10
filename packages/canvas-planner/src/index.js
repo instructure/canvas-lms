@@ -23,7 +23,13 @@ import moment from 'moment-timezone'
 import {Spinner} from '@instructure/ui-spinner'
 import i18n from './i18n'
 import configureStore from './store/configureStore'
-import {initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems} from './actions'
+import {
+  initialOptions,
+  getPlannerItems,
+  getWeeklyPlannerItems,
+  scrollIntoPast,
+  loadFutureItems
+} from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
 import {initializeContent} from './utilities/contentUtils'
@@ -34,6 +40,7 @@ import responsiviser from './components/responsiviser'
 const ToDoSidebar = React.lazy(() => import('./components/ToDoSidebar'))
 const PlannerApp = React.lazy(() => import('./components/PlannerApp'))
 const PlannerHeader = React.lazy(() => import('./components/PlannerHeader'))
+const WeeklyPlannerHeader = React.lazy(() => import('./components/WeeklyPlannerHeader'))
 
 export * from './components'
 
@@ -204,13 +211,18 @@ function loading() {
 }
 
 export function createPlannerApp() {
-  registerScrollEvents({
-    scrollIntoPast: handleScrollIntoPastAttempt,
-    scrollIntoFuture: handleScrollIntoFutureAttempt,
-    scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
-  })
+  if (!store.getState().weeklyDashboard) {
+    // disable load on scroll for weekly dashboard
+    registerScrollEvents({
+      scrollIntoPast: handleScrollIntoPastAttempt,
+      scrollIntoFuture: handleScrollIntoFutureAttempt,
+      scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
+    })
 
-  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+    store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+  } else {
+    store.dispatch(getWeeklyPlannerItems())
+  }
 
   return (
     <DynamicUiProvider manager={dynamicUiManager}>
@@ -223,6 +235,7 @@ export function createPlannerApp() {
             currentUser={store.getState().currentUser}
             focusFallback={() => dynamicUiManager.focusFallback('item')}
             k5Mode={initializedOptions.env.K5_MODE}
+            isWeekly={initializedOptions.env.K5_MODE}
           />
         </Suspense>
       </Provider>
@@ -278,6 +291,18 @@ export function renderToDoSidebar(element) {
       </Suspense>
     </Provider>,
     element
+  )
+}
+
+export function renderWeeklyPlannerHeader(props) {
+  return (
+    <DynamicUiProvider manager={dynamicUiManager}>
+      <Provider store={store}>
+        <Suspense fallback={loading()}>
+          <WeeklyPlannerHeader {...props} />
+        </Suspense>
+      </Provider>
+    </DynamicUiProvider>
   )
 }
 

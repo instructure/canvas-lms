@@ -29,6 +29,7 @@ import {
   mergePastItems,
   mergePastItemsForNewActivity,
   mergePastItemsForToday,
+  mergeWeekItems,
   consumePeekIntoPast
 } from './saga-actions'
 
@@ -43,6 +44,7 @@ function* watchForSagas() {
   yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga)
   yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga)
   yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga)
+  yield takeEvery('START_LOADING_WEEK_SAGA', loadWeekSaga)
 }
 
 // fromMomentFunction: function
@@ -84,19 +86,19 @@ function* loadingLoop(fromMomentFunction, actionCreator, opts) {
 }
 
 export function* loadPastSaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItems, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItems, {mode: 'past'})
 }
 
 export function* loadFutureSaga() {
-  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {intoThePast: false})
+  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {mode: 'future'})
 }
 
 export function* loadPastUntilNewActivitySaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {mode: 'past'})
 }
 
 export function* peekIntoPastSaga() {
-  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {intoThePast: true, perPage: 1})
+  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {mode: 'past', perPage: 1})
 }
 
 export function* loadGradesSaga() {
@@ -129,7 +131,17 @@ export function* loadGradesSaga() {
 }
 
 export function* loadPastUntilTodaySaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {mode: 'past'})
+}
+
+export function* loadWeekSaga({payload}) {
+  yield* loadingLoop(() => payload.weekStart, mergeWeekItems, {
+    mode: 'week',
+    extraParams: {
+      end_date: payload.weekEnd.format(),
+      per_page: 100
+    }
+  })
 }
 
 function fromMomentPast(state) {

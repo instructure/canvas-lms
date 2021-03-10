@@ -19,6 +19,7 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
+import {momentObj} from 'react-moment-proptypes'
 import {connect} from 'react-redux'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -57,6 +58,7 @@ export class PlannerApp extends Component {
     loadPastButtonClicked: func,
     loadPastUntilNewActivity: func,
     loadFutureItems: func,
+    allWeekItemsLoaded: bool,
     changeDashboardView: func,
     togglePlannerItemCompletion: func,
     updateTodo: func,
@@ -67,7 +69,17 @@ export class PlannerApp extends Component {
     responsiveSize: sizeShape,
     appRef: func,
     focusFallback: func,
-    k5Mode: bool
+    // today, the weekly planner is used only for k5 mode, but that's not
+    // strictly necessary. And k5 mode renders different stuff, so it's unique.
+    // Let's keep them both.
+    k5Mode: bool,
+    isWeekly: bool,
+    isCompletelyEmpty: bool,
+    loadingWeek: bool,
+    thisWeek: shape({
+      weekStart: momentObj,
+      weekEnd: momentObj
+    })
   }
 
   static defaultProps = {
@@ -195,6 +207,7 @@ export class PlannerApp extends Component {
 
   renderLoadMore() {
     if (this.props.isLoading || this.props.loadingPast) return
+    if (this.props.isWeekly) return
     return (
       <LoadingFutureIndicator
         loadingFuture={this.props.loadingFuture}
@@ -208,8 +221,9 @@ export class PlannerApp extends Component {
 
   renderLoadPastButton() {
     if (this.props.allPastItemsLoaded) return
+    if (this.props.isWeekly) return
     return (
-      <View as="div" textAlign="center">
+      <View as="div" textAlign="center" margin="x-small 0 0 0">
         <ShowOnFocusButton
           buttonRef={ref => (this.loadPriorButton = ref)}
           buttonProps={{
@@ -386,16 +400,27 @@ export class PlannerApp extends Component {
     const dayHash = daysToDaysHash(this.props.days)
     let dayIndex = 1
 
-    const pastChildren = this.renderPast(workingDay, dayBeforeYesterday, dayHash, dayIndex)
-    dayIndex += pastChildren.length
-    children.splice(children.length, 0, ...pastChildren)
+    if (this.props.isWeekly) {
+      children.push(
+        this.renderPresent(
+          this.props.thisWeek.weekStart.clone(),
+          this.props.thisWeek.weekEnd.clone(),
+          dayHash,
+          dayIndex
+        )
+      )
+    } else {
+      const pastChildren = this.renderPast(workingDay, dayBeforeYesterday, dayHash, dayIndex)
+      dayIndex += pastChildren.length
+      children.splice(children.length, 0, ...pastChildren)
 
-    const presentChildren = this.renderPresent(workingDay, tomorrow, dayHash, dayIndex)
-    dayIndex += presentChildren.length
-    children.splice(children.length, 0, ...presentChildren)
+      const presentChildren = this.renderPresent(workingDay, tomorrow, dayHash, dayIndex)
+      dayIndex += presentChildren.length
+      children.splice(children.length, 0, ...presentChildren)
 
-    const futureChildren = this.renderFuture(workingDay, lastDay, dayHash, dayIndex)
-    children.splice(children.length, 0, ...futureChildren)
+      const futureChildren = this.renderFuture(workingDay, lastDay, dayHash, dayIndex)
+      children.splice(children.length, 0, ...futureChildren)
+    }
     return children
   }
 
@@ -424,8 +449,8 @@ export class PlannerApp extends Component {
   render() {
     const clazz = classnames('PlannerApp', this.props.responsiveSize)
     let children = []
-    if (this.props.isLoading) {
-      children = this.renderLoading()
+    if (this.props.isLoading || this.props.loadingWeek) {
+      children = [this.renderLoading()]
     } else if (this.props.days.length > 0) {
       children = this.renderDays()
     }
@@ -441,13 +466,20 @@ export const mapStateToProps = state => {
     allPastItemsLoaded: state.loading.allPastItemsLoaded,
     loadingFuture: state.loading.loadingFuture,
     allFutureItemsLoaded: state.loading.allFutureItemsLoaded,
+    loadingWeek: state.loading.loadingWeek,
+    allWeekItemsLoaded: state.loading.allWeekItemsLoaded,
     loadingError: state.loading.loadingError,
     timeZone: state.timeZone,
     isCompletelyEmpty:
       state.loading.hasSomeItems === false &&
       state.days.length === 0 &&
       state.loading.partialPastDays.length === 0 &&
-      state.loading.partialFutureDays.length === 0
+      state.loading.partialFutureDays.length === 0 &&
+      state.loading.partialWeekDays.length === 0,
+    thisWeek: state.weeklyDashboard && {
+      weekStart: state.weeklyDashboard.weekStart,
+      weekEnd: state.weeklyDashboard.weekEnd
+    }
   }
 }
 

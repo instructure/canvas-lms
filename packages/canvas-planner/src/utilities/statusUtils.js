@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import formatMessage from '../format-message'
-import {isTodayOrBefore} from './dateUtils'
+import {isTodayOrBefore, isDay} from './dateUtils'
 
 const PILL_MAPPING = {
   missing: () => ({id: 'missing', text: formatMessage('Missing'), variant: 'danger'}),
@@ -44,6 +44,10 @@ export function anyNewActivityDays(days) {
 
 export function didWeFindToday(days) {
   return days.some(day => isTodayOrBefore(day[0]))
+}
+
+export function didWeFindWeekEnd(days, weekEnd) {
+  return days.some(day => isDay(day, weekEnd))
 }
 
 export function showPillForOverdueStatus(status, item) {

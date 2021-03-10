@@ -46,6 +46,7 @@
   "dependencies": {
     "@instructure/babel-plugin-themeable-styles": "7",
     "@instructure/canvas-theme": "7",
+    "@instructure/js-utils": ">=1",
     "@instructure/ui-a11y-content": "7",
     "@instructure/ui-alerts": "7",
     "@instructure/ui-avatar": "7",
