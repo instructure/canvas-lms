@@ -20,9 +20,11 @@
 <%# TODO: aria roles for these. maybe use list/listitem or region
     http://www.w3.org/TR/wai-aria/roles#document_structure_roles %>
 <% js_bundle :past_global_alert %>
-<div id='announcementWrapper'>
-  <%= render :partial => 'shared/account_notification', :collection => @announcements %>
-</div>
+<% if !@current_user.feature_enabled?(:disable_dashboard_account_notification_header) %>
+  <div id='announcementWrapper'>
+    <%= render :partial => 'shared/account_notification', :collection => @announcements %>
+  </div>
+<% end %>
 <%= render :partial => 'users/current_conference', :collection => @current_conferences %>
 <%= render :partial => 'users/scheduled_conference', :collection => @scheduled_conferences %>
 <%= render :partial => 'users/welcome' %>
