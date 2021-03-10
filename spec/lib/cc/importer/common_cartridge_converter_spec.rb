@@ -41,7 +41,7 @@ describe "Standard Common Cartridge importing" do
 
   it "should import webcontent" do
     expect(@course.attachments.count).to eq 10
-    atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+    atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 1990144ed5e490199a7690092fbf38634bd5259834697f6e4373ad165e81f44c I_00003_R_IMAGERESOURCE 255f039da8af813a0f967fe389cb0f820c4ef0d4dc5e969eeb4592efe782b31a abbc5cb34ba838d9ff41c49f1b1117ffd41d4ab8e1d681f0920fbd76990d237c}
     atts.each do |mig_id|
       expect(@course.attachments.where(migration_id: mig_id)).to be_exists
     end
@@ -49,7 +49,7 @@ describe "Standard Common Cartridge importing" do
 
   it "should import files as assignments with intended_use set" do
     assignment = @course.assignments.where(:migration_id => "f5").first
-    att = @course.attachments.where(:migration_id => "8612e3db71e452d5d2952ff64647c0d8").first
+    att = @course.attachments.where(:migration_id => "1990144ed5e490199a7690092fbf38634bd5259834697f6e4373ad165e81f44c").first
     expect(assignment.description).to match_ignoring_whitespace(%{<img src="/courses/#{@course.id}/files/#{att.id}/preview">})
     expect(assignment.title).to eq "Assignment 2"
   end
@@ -234,7 +234,7 @@ describe "Standard Common Cartridge importing" do
 
     it "should import webcontent" do
       expect(@course.attachments.active.count).to eq 10
-      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 255f039da8af813a0f967fe389cb0f820c4ef0d4dc5e969eeb4592efe782b31a abbc5cb34ba838d9ff41c49f1b1117ffd41d4ab8e1d681f0920fbd76990d237c}
       mig_ids.each do |mig_id|
         atts = @course.attachments.where(migration_id: mig_id).to_a
         expect(atts.length).to eq 1
@@ -263,7 +263,7 @@ describe "Standard Common Cartridge importing" do
                         "everything" => "0",
                         "folders" =>
                                 {"I_00006_Media" => true,
-                                 "6a35b0974f59819404dc86d48fe39fc3" => true,
+                                 "abbc5cb34ba838d9ff41c49f1b1117ffd41d4ab8e1d681f0920fbd76990d237c" => true,
                                  "I_00001_R" => true},
                         "all_quizzes" => "1",
                         "all_context_external_tools" => "0",
@@ -281,8 +281,8 @@ describe "Standard Common Cartridge importing" do
                         "all_announcements" => "0",
                         "attachments" =>
                                 {"I_00006_Media" => true,
-                                 "7acb90d1653008e73753aa2cafb16298" => true,
-                                 "6a35b0974f59819404dc86d48fe39fc3" => true,
+                                 "255f039da8af813a0f967fe389cb0f820c4ef0d4dc5e969eeb4592efe782b31a" => true,
+                                 "abbc5cb34ba838d9ff41c49f1b1117ffd41d4ab8e1d681f0920fbd76990d237c" => true,
                                  "I_00003_R_IMAGERESOURCE" => true,
                                  "I_00001_R" => true},
                         "context_modules" => {"I_00000" => true},
