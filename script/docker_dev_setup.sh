@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-source build/common_docker_build_steps.sh
+source script/common.sh
 
 trap '_canvas_lms_telemetry_report_status' ERR EXIT
 SCRIPT_NAME=$0

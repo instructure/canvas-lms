@@ -39,7 +39,7 @@ def buildParameters = [
 
 def dockerDevFiles = [
   '^docker-compose/',
-  '^build/common_docker_build_steps.sh',
+  '^script/common.sh',
   '^script/canvas_update',
   '^docker-compose.yml',
   '^Dockerfile$',

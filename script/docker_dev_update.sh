@@ -2,7 +2,6 @@
 
 set -e
 source script/common.sh
-source build/common_docker_build_steps.sh
 
 LOG="$(pwd)/log/docker_dev_update.log"
 DOCKER='y'

@@ -35,7 +35,6 @@ pipeline {
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.yml:docker-compose.override.yml'
     JENKINS = 'true'
   }
 
@@ -48,18 +47,30 @@ pipeline {
               cleanAndSetup()
               // always pull from gerrit refspec to test the changed docker dev code
               checkoutRepo("canvas-lms", env.GERRIT_REFSPEC, 1)
+              sh '''#!/bin/bash
+              cat <<EOF > docker-compose.local.jenkins.yml
+version: '2.3'
+services:
+    web:
+      environment:
+        CANVAS_LMS_ADMIN_EMAIL: jenkins@fake.com
+        CANVAS_LMS_ADMIN_PASSWORD: iamjenkins
+        CANVAS_LMS_STATS_COLLECTION: opt_out
+        CANVAS_LMS_ACCOUNT_NAME: 'School of Butters'
+EOF
+              '''
             }
 
             stage('Copy Canvas Config') {
               sh 'cp -vr docker-compose/config/*.yml config/'
               sh 'cp -vr config/docker-compose.override.yml.example docker-compose.override.yml'
-              sh 'echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env'
+              sh 'echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.jenkins.yml" > .env'
             }
 
             stage('Build Canvas') {
               sh '''#!/bin/bash
                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                source build/common_docker_build_steps.sh
+                source script/common.sh
 
                 build_images
                 check_gemfile
@@ -70,7 +81,7 @@ pipeline {
             stage('Create DB and Migrate') {
               sh '''#!/bin/bash
                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 source build/common_docker_build_steps.sh
+                 source script/common.sh
 
                  create_db
                '''

@@ -2,7 +2,6 @@
 set -o pipefail
 
 source script/common.sh
-source build/common_docker_build_steps.sh
 
 LOG="$(pwd)/log/rebase_canvas_and_plugins.log"
 FAILED_REPOS=()
