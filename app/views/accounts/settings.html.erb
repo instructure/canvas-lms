@@ -1003,7 +1003,6 @@ acknowledge that you have read and agreed to the
     <ul class="announcements_list unstyled_list">
       <%= will_paginate(@announcements, params: {anchor: "tab-announcements"}) %>
       <% @announcements.each do |announcement| %>
-
         <li class="announcements_list_item">
           <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
             <div class="ic-notification__icon" role="presentation">
@@ -1012,7 +1011,6 @@ acknowledge that you have read and agreed to the
                 <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
               </span>
             </div>
-
             <div class="notification_account_content">
               <div class="ic-notification__content">
                 <div class="ic-notification__message">
@@ -1042,7 +1040,11 @@ acknowledge that you have read and agreed to the
                 </div>
               </div>
               <span class="notification_account_content_text">
-                <%= t("This is a message for *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
+                <% if @account.site_admin? %>
+                  <%= t("This is a message from *Canvas Administration*", wrapper: '<b>\1</b>') %>
+                <% else %>
+                  <%= t("This is a message from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
+                <% end %>
               </span>
             </div>
 
