@@ -931,8 +931,20 @@ class RoleOverride < ActiveRecord::Base
       true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
     },
     :manage_students => {
-      :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
-      :label_v2 => lambda { t("Users - add / remove students in courses") },
+      :label => lambda {
+        if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
+          t("Manage students for the course")
+        else
+          t('permissions.manage_students', "Add/remove students for the course")
+        end
+      },
+      :label_v2 => lambda {
+        if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
+          t("Users - manage students in courses")
+        else
+          t("Users - add / remove students in courses")
+        end
+      },
       :available_to => [
         'TaEnrollment',
         'DesignerEnrollment',

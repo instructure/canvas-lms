@@ -2932,27 +2932,117 @@ const pairingCodePermissions = generateActionTemplates(
   ]
 )
 
-const courseAddRemovePermissions = generateActionTemplates(
+// Old description when flag is off
+let courseAddRemovePermissions = generateActionTemplates(
   'manage_students',
   [
     {
-      title: I18n.t('Deprecated'),
+      title: I18n.t('Courses (Account)'),
+      description: I18n.t('Allows user to add students to a course from the account Courses page.')
+    },
+    {
+      title: I18n.t('People (Course)'),
       description: I18n.t(
-        'This permission is deprecated. Please reference Users - Students and Users - Observers.'
+        'Allows user to add and remove students. Allows user to add and remove observers. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to edit a student’s section or role. Allows user to resend course invitations from the Course People page.'
       )
     }
   ],
-  [],
   [
     {
-      title: I18n.t('Deprecated'),
+      title: I18n.t('Account Settings'),
       description: I18n.t(
-        `This permission is deprecated. Please reference Users - Students and Users - Observers.`
+        'If the Open Registration account setting is enabled, users with this permission can add students or observers to a course via email address or login ID even if the student or observer does not already have a Canvas account.'
+      )
+    },
+    {
+      title: I18n.t('Courses (Account)'),
+      description: I18n.t(
+        'To access the account Courses page, Courses - view list must be enabled.'
+      )
+    },
+    {
+      title: I18n.t('People (Course)'),
+      description: I18n.t(
+        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
+        To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student's section and course role, Users - view list and Conversations - send messages to individual course members must also be enabled. To unenroll users the user details page, View the list of courses and See the list of users must also be enabled. Allows user to resend course invitations from the Course People page. If the Open Registration account setting is enabled, users with this permission can add students to a course from the Course People page via email addresses if the user does not already have a Canvas account. To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.`
       )
     }
   ],
-  []
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        `Allows user to add and remove students to the course. Allows user to add and remove observers to the course. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to conclude or delete enrollments on a student’s details page. Allows user to resend course invitations.`
+      )
+    }
+  ],
+  [
+    {
+      title: I18n.t('People'),
+      description: I18n.t(
+        `Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
+        To access the People Page, Users - view list must be enabled. If the Open Registration account setting is enabled, users with this permission can add students to a course via email address if the user does not already have a Canvas account. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student’s section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.`
+      )
+    }
+  ]
 )
+if (ENV.FEATURES && ENV.FEATURES.granular_permissions_manage_users) {
+  courseAddRemovePermissions = generateActionTemplates(
+    'manage_students',
+    [
+      {
+        title: I18n.t('People (Course)'),
+        description: I18n.t(
+          'Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to edit a student’s section or role. Allows user to resend course invitations from the Course People page.'
+        )
+      }
+    ],
+    [
+      {
+        title: I18n.t('Account Settings'),
+        description: I18n.t(
+          'If the Open Registration account setting is enabled, users with this permission can add students or observers to a course via email address or login ID even if the student or observer does not already have a Canvas account.'
+        )
+      },
+      {
+        title: I18n.t('Courses (Account)'),
+        description: I18n.t(
+          `To access the account Courses page, Courses - view list must be enabled.`
+        )
+      },
+      {
+        title: I18n.t('People (Course)'),
+        description: I18n.t(
+          `To view the list of users in the course, Users - view list must be enabled.
+          To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled.
+          To edit a student’s section, Conversations - send to individual course members must also be enabled.
+          To unenroll users from the user details page, Courses - view list and Users - view list must also be enabled.
+          To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.`
+        )
+      }
+    ],
+    [
+      {
+        title: I18n.t('People (Course)'),
+        description: I18n.t(
+          'Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to edit a student’s section or role. Allows user to resend course invitations from the Course People page.'
+        )
+      }
+    ],
+    [
+      {
+        title: I18n.t('People (Course)'),
+        description: I18n.t(
+          `To view the list of users in the course, Users - view list must be enabled.
+          To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled.
+          To edit a student’s section, Conversations - send to individual course members must also be enabled.
+          To unenroll users from the user details page, Courses - view list and Users - view list must also be enabled.
+          To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.`
+        )
+      }
+    ]
+  )
+}
 
 const usersViewListPermissions = generateActionTemplates(
   'read_roster',
