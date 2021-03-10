@@ -98,21 +98,15 @@ pipeline {
                 }
               }
 
-              stages['Generic'] = {
-                timeout(time: 5) {
-                  runAndCopyResults('pact_test3', 'Generic Consumer')
-                }
-              }
-
               stages['Quiz LTI'] = {
                 timeout(time: 10) {
-                  runAndCopyResults('pact_test4', 'Quiz LTI')
+                  runAndCopyResults('pact_test3', 'Quiz LTI')
                 }
               }
 
               stages['Sistemic'] = {
                 timeout(time: 5) {
-                  runAndCopyResults('pact_test5', 'Sistemic')
+                  runAndCopyResults('pact_test4', 'Sistemic')
                 }
               }
 
