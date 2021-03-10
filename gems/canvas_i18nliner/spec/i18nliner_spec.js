@@ -55,13 +55,8 @@ describe("I18nliner", function() {
       const command = new I18nliner.Commands.Check({});
       const origDir = process.cwd();
 
-      try {
-        process.chdir('spec/fixtures/hbs-missing-i18n-scope');
-        command.checkFiles();
-      }
-      finally {
-        process.chdir(origDir);
-      }
+      scanner.scanFilesFromI18nrc(scanner.loadConfigFromDirectory('spec/fixtures/hbs-missing-i18n-scope'))
+      command.checkFiles();
 
       expect(command.isSuccess()).toBeFalsy()
       expect(command.errors.length).toEqual(1)
