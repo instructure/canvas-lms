@@ -20,7 +20,8 @@
   presenter = Submission::ShowPresenter.new(
     submission: @submission,
     current_user: @current_user,
-    assessment_request: @assessment_request
+    assessment_request: @assessment_request,
+    current_host: request.host
   )
 %>
 

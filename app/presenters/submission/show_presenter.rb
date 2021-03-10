@@ -1,4 +1,5 @@
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -20,17 +21,18 @@ class Submission::ShowPresenter
   include Rails.application.routes.url_helpers
   include ApplicationHelper
 
-  def initialize(submission:, current_user:, assessment_request: nil)
+  def initialize(submission:, current_user:, assessment_request: nil, current_host: nil)
     @submission = submission
     @current_user = current_user
     @assessment_request = assessment_request
 
     @assignment = @submission.assignment
     @context = @assignment.context
+    @current_host = current_host
   end
 
   def default_url_options
-    { protocol: HostUrl.protocol, host: HostUrl.context_host(@context.root_account) }
+    { protocol: HostUrl.protocol, host: find_host }
   end
 
   # NB: Currently this method assumes that the only possible source of anonymity
@@ -108,5 +110,11 @@ class Submission::ShowPresenter
 
   def resource_link_lookup_uuid
     @submission.resource_link_lookup_uuid
+  end
+
+  def find_host
+    return HostUrl.context_host(@context.root_account) unless @current_host
+
+    HostUrl.context_host(@context.root_account, @current_host)
   end
 end
