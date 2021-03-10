@@ -65,4 +65,40 @@ describe MicrosoftSync::Group do
       expect(subject.where(workflow_state: 'deleted')).to be_blank
     end
   end
+
+  describe '#restore!' do
+    context 'with a deleted group' do
+      subject do
+        group = super()
+        group.destroy!
+        group.restore!
+        group
+      end
+
+      it 'resets the job state' do
+        expect(subject.job_state).to be_nil
+      end
+
+      it 'resets the last error' do
+        expect(subject.last_error).to be_nil
+      end
+
+      it 'resets the workflow state' do
+        expect(subject.workflow_state).to eq 'pending'
+      end
+    end
+
+    context 'with an non-deleted group' do
+      subject do
+        group = super()
+        group.update!(workflow_state: 'running')
+        group.restore!
+        group
+      end
+
+      it 'does nothing' do
+        expect(subject.workflow_state).to eq 'running'
+      end
+    end
+  end
 end

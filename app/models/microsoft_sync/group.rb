@@ -56,4 +56,14 @@ class MicrosoftSync::Group < ActiveRecord::Base
     self.workflow_state = 'deleted'
     run_callbacks(:destroy) { save! }
   end
+
+  def restore!
+    return unless self.deleted?
+
+    update!(
+      workflow_state: 'pending',
+      job_state: nil,
+      last_error: nil
+    )
+  end
 end

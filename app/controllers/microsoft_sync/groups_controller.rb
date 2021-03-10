@@ -82,6 +82,28 @@ class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_context
   before_action :require_user
   before_action :validate_user_permissions
+  before_action :require_feature
+
+  # Create a new MicrosoftSync::Group for
+  # the specified course.
+  #
+  # If a MicrosoftSync::Group already exists
+  # for the course, this endpoints responds with
+  # "409 conflict"
+  #
+  # @returns MicrosoftSync::Group
+  def create
+    # Check if a active group already exists
+    existing_group = MicrosoftSync::Group.find_by(course: course)
+    head :conflict and return if existing_group && !existing_group.deleted?
+
+    # If a non-active group exists for the course, restore it.
+    # Otherwise create a new group
+    new_group = (existing_group&.restore! && existing_group) ||
+      MicrosoftSync::Group.create!(course: course)
+
+    render json: new_group.as_json(include_root: false), status: :created
+  end
 
   # Get a single MicrosoftSync::Group
   # Returns the active MicrosoftSync::Group
@@ -102,6 +124,12 @@ class MicrosoftSync::GroupsController < ApplicationController
   end
 
   private
+
+  def require_feature
+    return if course.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
+
+    not_found
+  end
 
   def validate_user_permissions
     # Only users who can manage students in a course
