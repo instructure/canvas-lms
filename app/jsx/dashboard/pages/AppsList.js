@@ -16,41 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!dashboard_pages_AppsList'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {View} from '@instructure/ui-view'
-import StaffInfo, {StaffShape} from 'jsx/dashboard/pages/StaffInfo'
+import K5AppLink, {AppShape} from 'jsx/dashboard/pages/K5AppLink'
 import {Heading} from '@instructure/ui-heading'
-import {PresentationContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
-export default function StaffContactInfoLayout({isLoading, staff}) {
+export default function AppsList({isLoading, apps}) {
   return (
-    <View>
+    <View as="section">
       {isLoading && (
         <View as="div" textAlign="center" margin="large 0">
-          <Spinner renderTitle={I18n.t('Loading staff...')} size="large" />
+          <Spinner renderTitle={I18n.t('Loading apps...')} size="large" />
         </View>
       )}
-      {staff.length > 0 && (
-        <View>
+      {apps.length > 0 && (
+        <>
           <Heading level="h3" as="h2" margin="medium 0 0">
-            {I18n.t('Staff Contact Info')}
+            {I18n.t('Student Applications')}
           </Heading>
-          <PresentationContent>
-            <hr style={{margin: '0.8em 0'}} />
-          </PresentationContent>
-          {staff.map(s => (
-            <StaffInfo key={s.id} {...s} />
+          {apps.map(app => (
+            <K5AppLink key={app.id} app={app} />
           ))}
-        </View>
+        </>
       )}
     </View>
   )
 }
 
-StaffContactInfoLayout.propTypes = {
+AppsList.propTypes = {
   isLoading: PropTypes.bool,
-  staff: PropTypes.arrayOf(PropTypes.shape(StaffShape)).isRequired
+  apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired
 }

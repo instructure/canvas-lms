@@ -96,6 +96,14 @@ export const fetchCourseInstructors = courseId =>
     )
   )
 
+export const fetchCourseApps = courseId =>
+  asJson(
+    window.fetch(
+      `/api/v1/courses/${courseId}/external_tools/visible_course_nav_tools`,
+      defaultFetchOptions
+    )
+  )
+
 export const readableRoleName = role => {
   const ROLES = {
     TeacherEnrollment: I18n.t('Teacher'),

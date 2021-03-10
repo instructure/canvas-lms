@@ -148,6 +148,15 @@ const staff = [
     ]
   }
 ]
+const apps = [
+  {
+    id: '17',
+    course_navigation: {
+      text: 'Google Apps',
+      icon_url: 'google.png'
+    }
+  }
+]
 const defaultEnv = {
   current_user: currentUser,
   K5_MODE: true,
@@ -222,6 +231,10 @@ beforeAll(() => {
   fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_test.*/, '[]')
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(/\/api\/v1\/courses\/homeroom\/users.*/, JSON.stringify(staff))
+  fetchMock.get(
+    '/api/v1/courses/test/external_tools/visible_course_nav_tools',
+    JSON.stringify(apps)
+  )
 })
 
 afterAll(() => {
@@ -371,6 +384,14 @@ describe('K-5 Dashboard', () => {
       expect(wrapper.getByText('Teacher')).toBeInTheDocument()
       expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
       expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
+    })
+
+    it("shows apps installed in the user's courses", async () => {
+      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
+      expect(await wrapper.findByText('Google Apps')).toBeInTheDocument()
+      const icon = wrapper.getByTestId('renderedIcon')
+      expect(icon).toBeInTheDocument()
+      expect(icon.src).toContain('google.png')
     })
   })
 })

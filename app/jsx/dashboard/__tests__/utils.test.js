@@ -23,7 +23,8 @@ import {
   fetchGrades,
   fetchGradesForGradingPeriod,
   fetchLatestAnnouncement,
-  readableRoleName
+  readableRoleName,
+  fetchCourseApps
 } from 'jsx/dashboard/utils'
 
 const ANNOUNCEMENT_URL =
@@ -34,6 +35,8 @@ const GRADING_PERIODS_URL = /\/api\/v1\/users\/self\/enrollments\?.*/
 
 const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
+
+const APPS_URL = '/api/v1/courses/test/external_tools/visible_course_nav_tools'
 
 afterEach(() => {
   fetchMock.restore()
@@ -215,5 +218,25 @@ describe('fetchGradesForGradingPeriod', () => {
         grade: undefined
       }
     ])
+  })
+})
+
+describe('fetchCourseApps', () => {
+  it('calls apps api and returns list of apps', async () => {
+    fetchMock.get(
+      APPS_URL,
+      JSON.stringify([
+        {
+          id: 1
+        },
+        {
+          id: 2
+        }
+      ])
+    )
+    const apps = await fetchCourseApps('test')
+    expect(apps.length).toBe(2)
+    expect(apps[0].id).toBe(1)
+    expect(apps[1].id).toBe(2)
   })
 })
