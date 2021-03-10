@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+import com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritCause
 
 def BLUE_OCEAN_TESTS_TAB = "display/redirect?page=tests"
 
@@ -129,8 +128,20 @@ def postFn(status) {
     if(status == 'FAILURE') {
       maybeSlackSendFailure()
       maybeRetrigger()
+
+      if(timedStage.isAllowStagesFilterUsed()) {
+        node('master') {
+          gerrit.submitVerified("-1", "Build Failed\n\n$BUILD_URL/build-summary-report/")
+        }
+      }
     } else if(status == 'SUCCESS') {
       maybeSlackSendSuccess()
+
+      if(timedStage.isAllowStagesFilterUsed()) {
+        node('master') {
+          gerrit.submitVerified("+1", "Build Successful\n\n$BUILD_URL/build-summary-report/")
+        }
+      }
     }
   }
 }
@@ -295,6 +306,13 @@ def rebaseHelper(branch, commitHistory = 100) {
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
+timedStage.setAlwaysAllowStages([
+    'Setup',
+    'Rebase',
+    'Build Docker Image',
+    'Run Migrations',
+    'Parallel Run Tests',
+])
 
 pipeline {
   agent none
@@ -379,7 +397,18 @@ pipeline {
               error "[skip-ci] flag enabled: skipping the build"
               return
             }
+          } else if(timedStage.isAllowStagesFilterUsed()) {
+            node('master') {
+              // The gerrit trigger configuration options don't provide enough granularity for us to provide
+              // a good UX here. Disable its reporting and handle it manually.
+              def gerritCause = currentBuild.rawBuild.getCause(GerritCause)
+              gerritCause.setSilentMode(true)
+
+              gerrit.submitCodeReview("-2", "Build did not run all stages due to [allow-stages] directive")
+            }
           }
+
+
           // Ensure that all build flags are compatible.
           if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
             error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
