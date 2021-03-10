@@ -165,6 +165,10 @@ namespace :db do
 
   namespace :migrate do
     desc "Run all pending predeploy migrations"
+    # TODO: this is being replaced by outrigger
+    # rake db:migrate:tagged[predeploy].
+    # When all callsites are migrated, this task
+    # definition can be dropped.
     task :predeploy => [:environment, :load_config] do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
       migrations = migrations.select { |m| m.tags.include?(:predeploy) }
@@ -211,7 +215,7 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each do |task_name|
+%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged}.each do |task_name|
   Switchman::Rake.shardify_task(task_name, categories: ->{ Shard.categories })
 end
 

@@ -4,6 +4,7 @@ require:
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
+  - outrigger/cops/migration/tagged
 
 AllCops:
   TargetRubyVersion: 2.6
@@ -169,6 +170,14 @@ Gemspec/RequiredRubyVersion:
 # Rails style changes
 Migration/ModelBehavior:
   Enabled: false
+Migration/Tagged:
+  Enabled: true
+  Severity: error
+  AllowedTags:
+    - predeploy
+    - postdeploy
+    - cassandra
+    - dynamodb
 Rails:
   Enabled: true
 Rails/TimeZone:

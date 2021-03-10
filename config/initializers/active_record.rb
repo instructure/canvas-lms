@@ -1360,20 +1360,10 @@ ActiveRecord::Associations::HasOneAssociation.class_eval do
 end
 
 class ActiveRecord::Migration
-  VALID_TAGS = [:predeploy, :postdeploy, :cassandra, :dynamodb]
   # at least one of these tags is required
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
   class << self
-    def tag(*tags)
-      raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
-      (@tags ||= []).concat(tags).uniq!
-    end
-
-    def tags
-      @tags ||= []
-    end
-
     def is_postgres?
       connection.adapter_name == 'PostgreSQL'
     end
@@ -1397,7 +1387,7 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :tags, :cassandra_cluster, to: :migration
+  delegate :connection, :cassandra_cluster, to: :migration
 
   def initialize(*)
     super
