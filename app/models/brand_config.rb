@@ -25,9 +25,10 @@ class BrandConfig < ActiveRecord::Base
 
   OVERRIDE_TYPES = [:js_overrides, :css_overrides, :mobile_js_overrides, :mobile_css_overrides].freeze
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
+  MD5_REGEX = /^([0-9a-fA-F]{32}|[0-9a-fA-F]{64})$/.freeze
 
   validates :variables, presence: true, unless: :overrides?
-  validates :md5, length: {is: 32}
+  validate :validate_md5
 
   before_validation :generate_md5
   before_update do
@@ -84,12 +85,21 @@ class BrandConfig < ActiveRecord::Base
     ([:variables] + OVERRIDE_TYPES).all? {|a| self[a].blank? }
   end
 
+  def validate_md5
+    if md5.present? && !MD5_REGEX.match?(md5)
+      self.errors.add(:md5, t("must be exactly 32 or 64 hex digits"))
+      false
+    else
+      true
+    end
+  end
+
   def generate_md5
     self.id = BrandConfig.md5_for(self)
   end
 
   def self.md5_for(brand_config)
-    Digest::MD5.hexdigest(ATTRS_TO_INCLUDE_IN_MD5.map { |a| brand_config[a] }.join)
+    Digest::SHA256.hexdigest(ATTRS_TO_INCLUDE_IN_MD5.map { |a| brand_config[a] }.join)
   end
 
   def get_value(variable_name)

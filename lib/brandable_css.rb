@@ -135,7 +135,7 @@ module BrandableCSS
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
         expected_version = (pre_or_post == 'predeploy') ? migration_version : (migration_version + 1)
-        raise BrandConfigWithOutCompileAssets if expected_version == 85663486644871658581990
+        raise BrandConfigWithOutCompileAssets if expected_version == 66777721041301445917021322766375798443641
         raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
       end
     end
@@ -154,7 +154,7 @@ module BrandableCSS
     end
 
     def default_variables_md5_without_migration_check
-      Digest::MD5.hexdigest(things_that_go_into_defaults_md5.to_json).freeze
+      Digest::SHA256.hexdigest(things_that_go_into_defaults_md5.to_json).freeze
     end
 
     def handle_urls(value, config, css_urls)
