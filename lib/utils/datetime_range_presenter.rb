@@ -18,13 +18,14 @@
 
 module Utils
   class DatetimeRangePresenter
-    attr_reader :start, :zone
-    def initialize(datetime, end_datetime = nil, datetime_type=:event, zone=nil)
+    attr_reader :start, :zone, :with_weekday
+    def initialize(datetime, end_datetime = nil, datetime_type=:event, zone=nil, with_weekday: false)
       zone ||= ::Time.zone
       @start = datetime.in_time_zone(zone) rescue datetime
       @_finish = end_datetime.in_time_zone(zone) rescue end_datetime
       @_datetime_type = datetime_type
       @zone = zone
+      @with_weekday = with_weekday
     end
 
     def as_string(options={})
@@ -94,7 +95,7 @@ module Utils
     end
 
     def present_date(date)
-      Utils::DatePresenter.new(date.to_date, zone).as_string(date_style)
+      Utils::DatePresenter.new(date.to_date, zone, with_weekday: with_weekday).as_string(date_style)
     end
 
     def finish

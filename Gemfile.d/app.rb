@@ -128,6 +128,8 @@ gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.7'
 gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
+gem 'week_of_month', '1.2.5',
+  github: 'instructure/week-of-month', ref: 'b3013639e9474f302b5a6f27e4e45313e8d24902'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
 path 'engines' do

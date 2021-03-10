@@ -134,6 +134,12 @@
                   <%= f.time_zone_select :default_time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
                 </td>
               </tr>
+              <% if @account.shard.database_server.maintenance_window_start_hour %>
+              <tr>
+                <td></td>
+                <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @account.shard.database_server } %> </td>
+              </tr>
+              <% end %>
               <%= f.fields_for :settings do |settings| %>
                 <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                   <tr>
