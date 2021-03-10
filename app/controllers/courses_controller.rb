@@ -724,7 +724,8 @@ class CoursesController < ApplicationController
   #
   # @argument course[restrict_enrollments_to_course_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the
-  #   course.
+  #   course. This parameter is required when using the API, as this option is
+  #   not displayed in the Course Settings page.
   #
   # @argument course[term_id] [Integer]
   #   The unique ID of the term to create to course in.
@@ -2505,7 +2506,8 @@ class CoursesController < ApplicationController
   #
   # @argument course[restrict_enrollments_to_course_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the
-  #   course.
+  #   course. This parameter is required when using the API, as this option is
+  #   not displayed in the Course Settings page.
   #
   # @argument course[term_id] [Integer]
   #   The unique ID of the term to create to course in.
