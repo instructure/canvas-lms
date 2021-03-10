@@ -657,6 +657,7 @@ describe "Canvas Cartridge importing" do
     @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
+    expect(page_2.body).to include '</iframe>'
     frame = Nokogiri::HTML5.fragment(page_2.body).at_css("iframe")
     expect(frame['src']).to eq "/media_objects_iframe/#{media_id}?type=video"
   end
