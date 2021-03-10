@@ -155,11 +155,10 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.module_updated(obj)
     when ContextModuleProgression
       if changes["completed_at"]
-        if CourseProgress.new(obj.context_module.course, obj.user, read_only: true).completed?
-          Canvas::LiveEvents.course_completed(obj)
-        else
-          Canvas::LiveEvents.course_progress(obj)
-        end
+        CourseProgress.delay_if_production(
+          singleton: "course_progress_#{obj.global_id}",
+          run_at: Setting.get('course_progress_live_event_delay_seconds', '120').to_i.seconds.from_now
+        ).dispatch_live_event(obj)
       end
     when ContentTag
       case obj.tag_type

@@ -156,6 +156,14 @@ class CourseProgress
     end
   end
 
+  def self.dispatch_live_event(context_module_progression)
+    if CourseProgress.new(context_module_progression.context_module.course, context_module_progression.user, read_only: true).completed?
+      Canvas::LiveEvents.course_completed(context_module_progression)
+    else
+      Canvas::LiveEvents.course_progress(context_module_progression)
+    end
+  end
+
   private
 
   def module_requirements(mod)
