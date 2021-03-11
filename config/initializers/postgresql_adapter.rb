@@ -226,33 +226,41 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def remove_index(table_name, options = {})
-    table = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(table_name.to_s)
+  if CANVAS_RAILS6_0
+    def remove_index(table_name, options = {})
+      table = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(table_name.to_s)
 
-    if options.is_a?(Hash) && options.key?(:name)
-      provided_index = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(options[:name].to_s)
+      if options.is_a?(Hash) && options.key?(:name)
+        provided_index = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(options[:name].to_s)
 
-      options[:name] = provided_index.identifier
-      table = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(provided_index.schema, table.identifier) unless table.schema.present?
+        options[:name] = provided_index.identifier
+        table = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(provided_index.schema, table.identifier) unless table.schema.present?
 
-      if provided_index.schema.present? && table.schema != provided_index.schema
-        raise ArgumentError.new("Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'")
-      end
-    end
-
-    name = index_name_for_remove(table.to_s, options)
-    return if name.nil? && options[:if_exists]
-
-    index_to_remove = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(table.schema, name)
-    algorithm =
-      if options.is_a?(Hash) && options.key?(:algorithm)
-        index_algorithms.fetch(options[:algorithm]) do
-          raise ArgumentError.new("Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}")
+        if provided_index.schema.present? && table.schema != provided_index.schema
+          raise ArgumentError.new("Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'")
         end
       end
-    algorithm = nil if open_transactions > 0
-    if_exists = " IF EXISTS" if options.is_a?(Hash) && options[:if_exists]
-    execute "DROP INDEX #{algorithm} #{if_exists} #{quote_table_name(index_to_remove)}"
+
+      name = index_name_for_remove(table.to_s, options)
+      return if name.nil? && options[:if_exists]
+
+      index_to_remove = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(table.schema, name)
+      algorithm =
+        if options.is_a?(Hash) && options.key?(:algorithm)
+          index_algorithms.fetch(options[:algorithm]) do
+            raise ArgumentError.new("Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}")
+          end
+        end
+      algorithm = nil if open_transactions > 0
+      if_exists = " IF EXISTS" if options.is_a?(Hash) && options[:if_exists]
+      execute "DROP INDEX #{algorithm} #{if_exists} #{quote_table_name(index_to_remove)}"
+    end
+  else
+    def index_algorithm(algorithm)
+      return nil if open_transactions > 0
+
+      super
+    end
   end
 
   def index_name_for_remove(table_name, options = {})
