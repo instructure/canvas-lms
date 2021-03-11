@@ -110,6 +110,7 @@ class Account < ActiveRecord::Base
            inverse_of: :context,
            class_name: 'Lti::ResourceLink',
            dependent: :destroy
+  belongs_to :course_template, class_name: 'Course', inverse_of: :templated_accounts
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql, conds = [], []

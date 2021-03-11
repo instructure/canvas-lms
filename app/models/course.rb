@@ -54,6 +54,7 @@ class Course < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :template_course, :class_name => 'Course'
   has_many :templated_courses, :class_name => 'Course', :foreign_key => 'template_course_id'
+  has_many :templated_accounts, class_name: 'Account', foreign_key: 'course_template_id'
 
   has_many :course_sections
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
@@ -302,6 +303,11 @@ class Course < ActiveRecord::Base
       calendar_events.active.preload(:child_events).reject(&:hidden?) +
         assignments.active
     end
+  end
+
+  def self.ensure_dummy_course
+    Account.ensure_dummy_account
+    Course.find_or_create_by!(id: 0) { |c| c.account_id = c.root_account_id = 0 }
   end
 
   def self.skip_updating_account_associations(&block)
@@ -3613,6 +3619,14 @@ class Course < ActiveRecord::Base
 
   def resolved_outcome_calculation_method
     outcome_calculation_method&.active? ? outcome_calculation_method : account&.resolved_outcome_calculation_method
+  end
+
+  def can_become_template?
+    !enrollments.active.exists?
+  end
+
+  def can_stop_being_template?
+    !templated_accounts.exists?
   end
 
   private
