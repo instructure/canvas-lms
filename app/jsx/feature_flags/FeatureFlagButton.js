@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {bool, object, string} from 'prop-types'
 import I18n from 'i18n!feature_flags'
 import {Text} from '@instructure/ui-text'
@@ -56,6 +56,8 @@ export default function FeatureFlagButton({featureFlag, disableDefaults, display
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
   const popoverEl = useRef(null)
+  const enclosingDivEl = useRef(null)
+  const mustRefocus = useRef(false)
   const effectiveFlag = updatedFlag || featureFlag
 
   async function updateFlag(state) {
@@ -89,6 +91,7 @@ export default function FeatureFlagButton({featureFlag, disableDefaults, display
       })
     } finally {
       setApiBusy(false)
+      mustRefocus.current = true
     }
   }
 
@@ -115,9 +118,21 @@ export default function FeatureFlagButton({featureFlag, disableDefaults, display
     }
   }
 
+  function refocusOnButtonIfNecessary() {
+    if (mustRefocus.current && enclosingDivEl.current) {
+      const button = enclosingDivEl.current.querySelector('button')
+      if (button) {
+        button.focus()
+        mustRefocus.current = false
+      }
+    }
+  }
+
+  useEffect(refocusOnButtonIfNecessary)
+
   // The popover is lifted out of Menu to prevent stupid scrolling to the top of the page
   return (
-    <div title={description}>
+    <div ref={enclosingDivEl} title={description}>
       <Flex direction="row">
         <Popover
           placement="bottom center"

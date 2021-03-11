@@ -89,4 +89,22 @@ describe('feature_flags::FeatureFlagButton', () => {
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
   })
+
+  it('Refocuses on the button after the FF icon changes', async () => {
+    ENV.CONTEXT_BASE_URL = '/accounts/1'
+    const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature4`
+    fetchMock.putOnce(route, JSON.stringify(sampleData.onFeature.feature_flag))
+    const {container, getByText} = render(
+      <div id="ff-test-button-enclosing-div">
+        <FeatureFlagButton featureFlag={sampleData.offFeature.feature_flag} />
+      </div>
+    )
+    container.querySelector('#ff-test-button-enclosing-div').focus()
+    fireEvent.click(getByText('Enabled'))
+    await waitFor(() =>
+      expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
+    )
+    const button = container.querySelector('button')
+    expect(document.activeElement).toBe(button)
+  })
 })
