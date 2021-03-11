@@ -1656,7 +1656,6 @@ describe CoursesController, type: :request do
         expect(JSON.parse(response.body)).to eq({
           'message' => 'Only "delete" and "conclude" events are allowed.'
         })
-
       end
 
       it "should return 400 if an unknown event type is used" do
@@ -1666,7 +1665,15 @@ describe CoursesController, type: :request do
           'message' => 'Only "delete" and "conclude" events are allowed.'
         })
       end
+
+      it "prevents deletion of template courses" do
+        @course.enrollments.each(&:destroy)
+        @course.update!(template: true)
+        raw_api_call(:delete, @path, @params, { event: 'delete' })
+        expect(response.code).to eql '401'
+      end
     end
+
     context "an unauthorized user" do
       it "should return 401" do
         @user = @student

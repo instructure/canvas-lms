@@ -1321,14 +1321,17 @@ class CoursesController < ApplicationController
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-      @context.destroy
-      Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
-      flash[:notice] = t('notices.deleted', "Course successfully deleted")
+      if (success = @context.destroy)
+        Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
+        flash[:notice] = t('notices.deleted', "Course successfully deleted")
+      else
+        flash[:notice] = t("Course cannot be deleted")
+      end
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
 
       @context.complete
-      if @context.save
+      if (success = @context.save)
         Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
@@ -1339,7 +1342,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to dashboard_url }
       format.json {
-        render :json => { params[:event] => true }
+        render :json => { params[:event] => success }, status: success ? 200 : 400
       }
     end
   end
