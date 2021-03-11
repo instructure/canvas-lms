@@ -17,8 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritCause
-
 def BLUE_OCEAN_TESTS_TAB = "display/redirect?page=tests"
 
 def buildParameters = [
@@ -390,24 +388,20 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          if (configuration.skipCi()) {
+          if (configuration.skipCi() || (timedStage.isAllowStagesFilterUsed() && !env.JOB_NAME.endsWith('-allow-stages'))) {
             node('master') {
+              def relevantFlag = configuration.skipCi() ? 'skip-ci' : 'allow-stages'
+
               currentBuild.result = 'NOT_BUILT'
-              gerrit.submitCodeReview("-2", "Build not executed due to skip-ci flag")
-              error "[skip-ci] flag enabled: skipping the build"
+              gerrit.submitCodeReview("-2", "Build not executed due to ${relevantFlag} flag")
+              error "[${relevantFlag}] flag enabled: skipping the build"
               return
             }
           } else if(timedStage.isAllowStagesFilterUsed()) {
             node('master') {
-              // The gerrit trigger configuration options don't provide enough granularity for us to provide
-              // a good UX here. Disable its reporting and handle it manually.
-              def gerritCause = currentBuild.rawBuild.getCause(GerritCause)
-              gerritCause.setSilentMode(true)
-
-              gerrit.submitCodeReview("-2", "Build did not run all stages due to [allow-stages] directive")
+              gerrit.submitReview("", "Build Started\n\n$BUILD_URL")
             }
           }
-
 
           // Ensure that all build flags are compatible.
           if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
