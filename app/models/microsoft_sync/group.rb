@@ -24,10 +24,12 @@
 # of 2021) Teams tool, Microsoft needs up-to-date Canvas course enrollment
 # details.
 #
-#
 # This model is the main model, and is created when a teacher turns on (in
 # course settings) the option to sync enrollments to Microsoft Teams. It is
 # then used to keep track of the syncing.
+#
+# Notable fields:
+# * ms_group_id -- Microsoft's ID used in the their Graph API for the group
 #
 class MicrosoftSync::Group < ActiveRecord::Base
   extend RootAccountResolver
