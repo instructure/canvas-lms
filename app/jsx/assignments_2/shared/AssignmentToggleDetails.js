@@ -41,17 +41,12 @@ export default function AssignmentToggleDetails(props) {
       >
         {props.description ? (
           <View margin="0" padding="0">
-            <Text
-              weight="normal"
-              as="div"
+            {/* html is sanitized on the server side */}
+            <div
+              className="user_content"
+              dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}}
               data-test-id="assignments-2-assignment-toggle-details-text"
-            >
-              {/* html is sanitized on the server side */}
-              <div
-                className="user_content"
-                dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}}
-              />
-            </Text>
+            />
           </View>
         ) : (
           <SVGWithTextPlaceholder text={I18n.t('No Content')} url={noContent} />
