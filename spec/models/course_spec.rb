@@ -2584,6 +2584,12 @@ describe Course, "tabs_available" do
       expect(tab_ids).to be_include(Course::TAB_PEOPLE)
     end
 
+    it "doesn't include the people tab if it's a template" do
+      @course.update!(template: true)
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).not_to include(Course::TAB_PEOPLE)
+    end
+
     describe "with canvas_for_elementary feature on" do
       let(:canvas_for_elem_flag){@course.root_account.feature_enabled?(:canvas_for_elementary)}
       let(:is_homeroom) {@course.homeroom_course?}

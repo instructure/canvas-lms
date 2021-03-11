@@ -2833,6 +2833,8 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     default_tabs = elementary_homeroom_course? ? Course.default_homeroom_tabs : Course.default_tabs
+    # can't manage people in template courses
+    default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
