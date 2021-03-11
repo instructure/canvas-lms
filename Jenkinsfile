@@ -388,7 +388,14 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          if (configuration.skipCi() || (timedStage.isAllowStagesFilterUsed() && !env.JOB_NAME.endsWith('-allow-stages'))) {
+          if (
+            configuration.skipCi() ||
+            (
+              timedStage.isAllowStagesFilterUsed() &&
+              !env.JOB_NAME.endsWith('-allow-stages') &&
+              !env.JOB_NAME.endsWith('-axe')
+            )
+          ) {
             node('master') {
               def relevantFlag = configuration.skipCi() ? 'skip-ci' : 'allow-stages'
 
@@ -399,7 +406,11 @@ pipeline {
             }
           } else if(timedStage.isAllowStagesFilterUsed()) {
             node('master') {
-              gerrit.submitReview("", "Build Started\n\n$BUILD_URL")
+              if(env.JOB_NAME.endsWith('-axe')) {
+                gerrit.submitCodeReview("-2", "Verified status was not for the full build, -axe build was run.")
+              }
+
+              gerrit.submitVerified("0", "Build Started\n\n$BUILD_URL")
             }
           }
 

@@ -138,7 +138,7 @@ module ActionView::TestCase::Behavior
   end
 end
 
-if ENV['ENABLE_AXE_SELENIUM']
+if ENV['ENABLE_AXE_SELENIUM'] == '1'
   require_relative './axe_selenium_helper'
   AxeSelenium.install!
 end

@@ -100,6 +100,7 @@ def _runRspecTestSuite(
       "POSTGRES_PASSWORD=sekret",
       "SELENIUM_VERSION=3.141.59-20201119",
       "PATCHSET_TAG=$patchsetTag",
+      "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
   ]) {
     try {
       cleanAndSetup()
