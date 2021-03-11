@@ -165,7 +165,7 @@ export const GradeSummaryLine = ({
                   margin="small 0"
                 />
                 <PresentationContent>
-                  <Text weight="bold">{gradeText}</Text>
+                  <Text weight="bold" data-automation="course_grade">{gradeText}</Text>
                 </PresentationContent>
               </>
             )}

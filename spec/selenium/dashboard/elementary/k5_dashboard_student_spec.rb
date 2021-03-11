@@ -200,6 +200,79 @@ describe "student k5 dashboard" do
     end
   end
 
+  context 'homeroom dashboard student grades panel' do
+    let(:subject_title1) { "Math" }
+    let(:math_subject_grade) { "75" }
+
+    before :each do
+      @homeroom_course = @course
+      @homeroom_course.update!(homeroom_course: true)
+      course_with_student(active_all: true, user: @student, course_name: subject_title1)
+      @subject = @course
+      @assignment = @subject.assignments.create!(
+        title: subject_title1,
+        description: "General Assignment",
+        points_possible: 100,
+        submission_types: 'online_text_entry',
+        workflow_state: 'published'
+      )
+      @assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    end
+
+    it 'shows the grades panel with two courses' do
+      subject_title2 = "Social Studies"
+      course_with_student(active_all: true, user: @student, course_name: subject_title2)
+      
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(subject_grades_title(subject_title2)).to be_displayed
+    end
+
+    it 'shows the grades in default percentage format' do
+      @assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)
+
+      get "/#grades"
+
+      expect(subject_grade(math_subject_grade + "%")).to be_displayed
+    end
+
+    it 'shows the grades with a different grading scheme' do
+      grading_standard = @subject.grading_standards.create!(
+        title: "Fun Grading Standard",
+        standard_data: {
+          "scheme_0" => { name: "Awesome", value: "90" },
+          "scheme_1" => { name: "Fabulous", value: "80" },
+          "scheme_2" => { name: "You got this", value: "70" },
+          "scheme_3" => { name: "See me", value: "0" }
+        }
+      )
+      @subject.update!(grading_standard_enabled: true, grading_standard_id: grading_standard.id)
+
+      @assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)
+
+      scheme_subject_grade = "You got this"
+      get "/#grades"
+
+      expect(subject_grade(scheme_subject_grade)).to be_displayed
+    end
+
+    it 'shows two dashes and empty progress bar if no grades are available for a course' do
+      get "/#grades"
+
+      expect(subject_grade("--")).to be_displayed
+      expect(grade_progress_bar("0")).to be_displayed
+    end
+
+    it 'show the progress bar with the appropriate progress' do
+      @assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)
+
+      get "/#grades"
+
+      expect(grade_progress_bar(math_subject_grade)).to be_displayed
+    end
+  end
+
   context 'homeroom dashboard resource panel' do
     it 'shows the resource panel staff contacts' do
       @course.homeroom_course = true
@@ -218,7 +291,7 @@ describe "student k5 dashboard" do
       @ta.save!
 
       get "/"
-      
+
       select_resources_tab
 
       expect(staff_heading(@teacher.name)).to be_displayed

@@ -104,6 +104,18 @@ module K5PageObject
   def email_link_selector(email_address)
     "a[href = 'mailto:#{email_address}']"
   end
+
+  def grade_title_selector(title)
+    "div:contains('#{title}')"
+  end
+
+  def subject_grade_selector(value)
+    "//*[@data-automation = 'course_grade' and text() = '#{value}']"
+  end
+
+  def grade_progress_bar_selector(value)
+    "//*[@role = 'progressbar' and @value = '#{value}']"
+  end
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -192,6 +204,18 @@ module K5PageObject
 
   def instructor_bio(instructor_bio)
     fxpath(instructor_bio_selector(instructor_bio))
+  end
+
+  def subject_grades_title(title)
+    fj(grade_title_selector(title))
+  end
+
+  def subject_grade(grade_value)
+    fxpath(subject_grade_selector(grade_value))
+  end
+
+  def grade_progress_bar(grade_value)
+    fxpath(grade_progress_bar_selector(grade_value))
   end
 
   #----------------------- Actions & Methods -------------------------
