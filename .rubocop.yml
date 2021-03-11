@@ -240,28 +240,10 @@ Rails/HttpPositionalArguments:
 Performance/RegexpMatch:
   Enabled: false
 
-# Things we may want to tighten down later
-Metrics/AbcSize:
+# SnR is just too low to have this enabled
+Metrics:
   Enabled: false
-Metrics/LineLength:
-  Max: 160
-Metrics/MethodLength:
-  Max: 100
-Metrics/ClassLength:
-  Enabled: false
-Metrics/ModuleLength:
-  Enabled: false
-Metrics/BlockLength:
-  Max: 50
-  Exclude:
-  - gems/*/spec/**/*.rb
-  - gems/plugins/*/spec_canvas/**/*.rb
-  - spec/**/*.rb
-  - pact/spec/**/*_spec.rb
-Metrics/CyclomaticComplexity:
-  Max: 28
-Metrics/PerceivedComplexity:
-  Max: 28
+
 RSpec/InstanceVariable:
   Enabled: false
 RSpec/ExampleWording:
