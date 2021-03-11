@@ -278,13 +278,14 @@ module Importers
       end
 
       if hash[:available]
-        item.generate_quiz_data
         item.workflow_state = 'available'
         item.published_at = Time.now
       elsif item.can_unpublish? && (new_record || master_migration)
         item.workflow_state = 'unpublished'
         item.assignment.workflow_state = 'unpublished' if item.assignment
       end
+
+      item.generate_quiz_data if item.published?
 
       if hash[:assignment_group_migration_id]
         if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
