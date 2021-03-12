@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,21 +15,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-require 'spec_helper'
+class AddReplicaIdentityForUsers < ActiveRecord::Migration[6.0]
+  tag :postdeploy
+  disable_ddl_transaction!
 
-describe DataFixup::ClearOldCommunicationChannelRootAccountIds do
-  it "clears out root_account_ids" do
-    a = account_model
-    u1 = user_model
-    u2 = user_model(root_account_ids: [a.id])
-    u3 = user_model(root_account_ids: [a.id])
-    CommunicationChannel.create!(user: u1, path: 'a@b.com')
-    CommunicationChannel.create!(user: u2, path: 'a@b.com')
-    CommunicationChannel.create!(user: u3, path: 'a@b.com')
-    expect {
-      described_class.run
-    }.to change { CommunicationChannel.pluck(:root_account_ids).uniq }.from([[], [a.id]]).to([nil])
+  def up
+    add_replica_identity 'User', :root_account_ids, []
+    change_column_default :users, :root_account_ids, []
+    remove_index :users, column: :root_account_ids, if_exists: true
+  end
+
+  def down
+    add_index :users, :root_account_ids, algorithm: :concurrently, using: :gin, if_not_exists: true
+    remove_replica_identity 'User'
+    change_column_null :users, :root_account_ids, true
+    change_column_default :users, :root_account_ids, nil
   end
 end
