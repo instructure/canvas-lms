@@ -80,31 +80,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with AccessToken' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) do
-          dk = DeveloperKey.create!(account: @course.account)
-          at = dk.access_tokens.create!(user: user_model)
-        end
-        let(:reference_record) { @course }
-      end
-
-      context 'with_sharding' do
-        specs_require_sharding
-
-        context 'with DeveloperKey with root_account_id' do
-          it_behaves_like 'a datafixup that populates root_account_id' do
-            let(:account) { @shard1.activate { account_model } }
-            let(:record) do
-              dk = DeveloperKey.create!(account: account)
-              at = dk.access_tokens.create!(user: user_model)
-            end
-            let(:reference_record) { account }
-          end
-        end
-      end
-    end
-
     it 'should populate root_account_id on AssessmentQuestion' do
       aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
       aq.update_columns(root_account_id: nil)
