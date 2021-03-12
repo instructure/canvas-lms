@@ -7,7 +7,7 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest --color --runInBand",
     "jest": "jest --runInBand",
     "test:debug": "node --inspect-brk ../../node_modules/.bin/jest --runInBand",
     "build:es": "babel src --out-dir es --ignore '**/__tests__'",
