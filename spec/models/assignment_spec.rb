@@ -229,6 +229,16 @@ describe Assignment do
 
         assignment.update_cached_due_dates
       end
+
+      it 'does not invoke DueDateCacher on an unchanged assignment in a before_save context' do
+        assignment = Assignment.suspend_callbacks(:update_cached_due_dates) do
+          @course.assignments.create(assignment_valid_attributes)
+        end
+        assignment.reload
+
+        expect(DueDateCacher).not_to receive(:recompute)
+        assignment.update_cached_due_dates
+      end
     end
 
     describe 'update_due_date_smart_alerts' do

@@ -3075,7 +3075,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates?
-    new_record? || id_before_last_save.nil? ||
+    new_record? || just_created ||
       will_save_change_to_due_at? || saved_change_to_due_at? ||
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||
