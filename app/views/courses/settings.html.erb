@@ -217,7 +217,7 @@
           <% end %>
         </div>
       </div>
-      <% if Account.site_admin.feature_enabled?(:new_course_availability_ui) %>
+      <% if @context.root_account.feature_enabled?(:new_course_availability_ui) %>
         <div class="form-row course-participation-row">
           <div class="form-label"><label for="availability_options_container"><%= before_label('Participation') %></label></div>
           <div class="nobr">
