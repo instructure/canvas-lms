@@ -175,6 +175,53 @@ describe "teacher k5 dashboard" do
     end
   end
 
+  context 'homeroom dashboard grades panel' do
+    let(:subject_title1) { "Math" }
+
+    before :each do
+      @homeroom_course = @course
+      @homeroom_course.update!(homeroom_course: true)
+      course_with_teacher(active_all: true, user: @teacher, course_name: subject_title1)
+      @subject = @course
+    end
+    
+    it 'shows the subjects the teacher is enrolled in' do
+      subject_title2 = "Social Studies"
+      course_with_teacher(active_all: true, user: @teacher, course_name: subject_title2)
+
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(subject_grades_title(subject_title2)).to be_displayed
+    end
+
+    it 'provides a button to the gradebook for subject teacher is enrolled in' do
+      get "/#grades"
+
+      expect(view_grades_button(@subject.id)).to be_displayed
+    end
+
+    it 'shows the subjects the TA is enrolled in' do
+      course_with_ta(active_all: true, course: @subject)
+
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(view_grades_button(@subject.id)).to be_displayed
+    end
+
+    it 'show teacher also as student on grades page' do
+      subject_title2 = "Teacher Training"
+      course_with_student(active_all: true, user: @teacher, course_name: subject_title2)
+
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(subject_grades_title(subject_title2)).to be_displayed
+      expect(subject_grade("--")).to be_displayed
+    end
+  end
+
   context 'homeroom dashboard resource panel' do
     it 'shows the resource panel staff contacts' do
       @course.homeroom_course = true

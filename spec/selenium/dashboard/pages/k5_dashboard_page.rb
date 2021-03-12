@@ -116,6 +116,10 @@ module K5PageObject
   def grade_progress_bar_selector(value)
     "//*[@role = 'progressbar' and @value = '#{value}']"
   end
+
+  def view_grades_button_selector(course_id)
+    "a[href = '/courses/#{course_id}/gradebook']"
+  end
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -216,6 +220,10 @@ module K5PageObject
 
   def grade_progress_bar(grade_value)
     fxpath(grade_progress_bar_selector(grade_value))
+  end
+
+  def view_grades_button(course_id)
+    f(view_grades_button_selector(course_id))
   end
 
   #----------------------- Actions & Methods -------------------------
