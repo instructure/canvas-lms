@@ -105,21 +105,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on AccountUser' do
-      au = AccountUser.create!(account: @course.account, user: @user)
-      au.update_columns(root_account_id: nil)
-      expect(au.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(au.reload.root_account_id).to eq @course.root_account_id
-
-      account = account_model(root_account: account_model)
-      au = AccountUser.create!(account: account, user: @user)
-      au.update_columns(root_account_id: nil)
-      expect(au.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(au.reload.root_account_id).to eq account.root_account_id
-    end
-
     it 'should populate root_account_id on AssessmentQuestion' do
       aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
       aq.update_columns(root_account_id: nil)
