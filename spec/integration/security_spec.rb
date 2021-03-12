@@ -681,7 +681,7 @@ describe "security" do
         course_with_teacher
         student_in_course
         @student.update_account_associations
-        @user_note = UserNote.create!(:creator => @teacher, :user => @student)
+        @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
 
         get "/accounts/#{Account.default.id}/user_notes"
         assert_status(401)
