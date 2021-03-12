@@ -412,13 +412,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with EnrollmentState' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { reference_record.enrollment_state }
-        let(:reference_record) { enrollment_model }
-      end
-    end
-
     context 'with GradingPeriod' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { grading_periods(count: 1).first }
