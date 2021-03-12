@@ -540,7 +540,16 @@ class CommunicationChannel < ActiveRecord::Base
     return if !permanent_bounce && CommunicationChannel.associated_shards(path).count > Setting.get("comm_channel_shard_count_too_high", '50').to_i
 
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
-      CommunicationChannel.unretired.email.by_path(path).where("bounce_count<?", RETIRE_THRESHOLD).find_in_batches do |batch|
+      cc_scope = CommunicationChannel.unretired.email.by_path(path).where("bounce_count<?", RETIRE_THRESHOLD)
+      # If alllowed to do this naively, trying to capture bounces on the same
+      # email address over and over can lead to serious db churn.  Here we
+      # try to capture only the newly created communication channels for this path,
+      # or the ones that have NOT been bounced in the last hour, to make sure
+      # we aren't doing un-helpful overwork.
+      debounce_window = Setting.get("comm_channel_bounce_debounce_window_in_min", "60").to_i
+      bounce_field = suppression_bounce ? "last_suppression_bounce_at" : (permanent_bounce ? "last_bounce_at" : "last_transient_bounce_at")
+      bouncable_scope = cc_scope.where("#{bounce_field} IS NULL OR updated_at < ?", debounce_window.minutes.ago)
+      bouncable_scope.find_in_batches do |batch|
         update = if suppression_bounce
                    { last_suppression_bounce_at: timestamp, updated_at: Time.zone.now }
                  elsif permanent_bounce
