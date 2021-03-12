@@ -184,6 +184,14 @@ test('validates grader count', function () {
   view.validateGraderCount.restore()
 })
 
+test('validates presence of attachment when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  const data = {submission_types: ['annotated_document']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentError = errors['online_submission_types[annotated_document]'][0]
+  strictEqual(annotatedDocumentError.message, 'You must attach a file')
+})
+
 test('does not allow group assignment for large rosters', function () {
   ENV.IS_LARGE_ROSTER = true
   const view = this.editView()
@@ -1915,7 +1923,12 @@ QUnit.module('EditView annotatable document submission', hooks => {
   let view
 
   hooks.beforeEach(() => {
-    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fixtures.innerHTML = `
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <div id="annotated_document_chooser_container"></div>
+      <input id="annotated_document_id" type="checkbox"></input>
+    `
+
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
@@ -1941,7 +1954,7 @@ QUnit.module('EditView annotatable document submission', hooks => {
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
-    document.getElementById('fixtures').innerHTML = ''
+    fixtures.innerHTML = ''
   })
 
   test('does not render annotatable document option (flag missing)', function () {
@@ -1955,5 +1968,35 @@ QUnit.module('EditView annotatable document submission', hooks => {
     view = editView()
     const label = view.$('#assignment_annotated_document').parent()
     ok(label.text().includes('Annotated Document'))
+  })
+
+  QUnit.module('when Annotated Document is selected', function (contextHooks) {
+    const filename = 'test.pdf'
+    let assignmentOpts
+
+    contextHooks.beforeEach(function () {
+      ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
+      ENV.ANNOTATED_DOCUMENT = {id: 1, display_name: filename}
+      assignmentOpts = {submissionTypes: ['annotated_document']}
+    })
+
+    test('renders the filename if attachment is present', function () {
+      editView(assignmentOpts)
+      const file = document.querySelector('div#annotated_document_chooser_container span')
+      strictEqual(file.textContent, filename)
+    })
+
+    test('renders a remove button if attachment is present', function () {
+      editView(assignmentOpts)
+      const button = document.querySelector('div#annotated_document_chooser_container button')
+      strictEqual(button.textContent, 'Remove selected attachment')
+    })
+
+    test('clicking the remove button de-selects the file', function () {
+      editView(assignmentOpts)
+      document.querySelector('div#annotated_document_chooser_container button').click()
+      const container = document.querySelector('div#annotated_document_chooser_container')
+      notOk(container.textContent.includes(filename))
+    })
   })
 })

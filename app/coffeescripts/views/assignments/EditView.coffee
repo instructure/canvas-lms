@@ -50,7 +50,7 @@ import 'jqueryui/dialog'
 import 'jquery.toJSON'
 import '../../jquery.rails_flash_notifications'
 import '../../behaviors/tooltip'
-import {FileBrowserWrapper} from 'jsx/assignments/EditAssignment'
+import {AnnotatedDocumentSelector} from 'jsx/assignments/EditAssignment'
 
 ###
 xsslint safeString.identifier srOnly
@@ -331,25 +331,49 @@ export default class EditView extends ValidatedFormView
   toggleAnnotatedDocument: =>
     @$annotatedDocumentOptions.toggleAccessibly @$allowAnnotatedDocument.prop('checked')
 
-    documentChooserContainer = document.querySelector('#annotated_document_chooser_container')
-
     if @$allowAnnotatedDocument.prop('checked')
-      fileBrowserProps = {
-        useContextAssets: true,
-        allowUpload: true,
-        selectFile: (fileInfo) =>
-          document.getElementById('annotated_document_id').value = fileInfo.id
-          $.screenReaderFlashMessageExclusive(
-            I18n.t('selected %{filename}', {filename: fileInfo.name})
-          )
-      }
-
-      ReactDOM.render(
-        React.createElement(FileBrowserWrapper, fileBrowserProps),
-        documentChooserContainer
-      )
+      @renderAnnotatedDocumentSelector()
     else
-      ReactDOM.unmountComponentAtNode(documentChooserContainer)
+      @unmountAnnotatedDocumentSelector()
+
+  getAnnotatedDocumentContainer: =>
+    return document.querySelector('#annotated_document_chooser_container')
+
+  setAnnotatedDocument: (file) =>
+    $annotatedDocumentInput = document.getElementById('annotated_document_id')
+    @annotatedDocument = file
+
+    if @annotatedDocument == null
+      $annotatedDocumentInput.value = ''
+    else
+      $annotatedDocumentInput.value = @annotatedDocument.id
+
+  getAnnotatedDocument: () =>
+    return @annotatedDocument
+
+  renderAnnotatedDocumentSelector: () =>
+    props = {
+      attachment: @getAnnotatedDocument(),
+      onRemove: (fileInfo) =>
+        $.screenReaderFlashMessageExclusive(
+          I18n.t('removed %{filename}', {filename: fileInfo.name})
+        )
+        @setAnnotatedDocument(null)
+        @renderAnnotatedDocumentSelector()
+      onSelect: (fileInfo) =>
+        $.screenReaderFlashMessageExclusive(
+          I18n.t('selected %{filename}', {filename: fileInfo.name})
+        )
+        @setAnnotatedDocument({id: fileInfo.id, name: fileInfo.name})
+        @renderAnnotatedDocumentSelector()
+    }
+
+    element = React.createElement(AnnotatedDocumentSelector, props)
+    ReactDOM.render(element, @getAnnotatedDocumentContainer())
+
+  unmountAnnotatedDocumentSelector: () =>
+    ReactDOM.unmountComponentAtNode(@getAnnotatedDocumentContainer())
+    @setAnnotatedDocument(null)
 
   toggleAdvancedTurnitinSettings: (ev) =>
     ev.preventDefault()
@@ -522,6 +546,10 @@ export default class EditView extends ValidatedFormView
     @handleSubmissionTypeChange()
     @handleGroupCategoryChange()
     @handleAnonymousGradingChange()
+
+    if ENV.ANNOTATED_DOCUMENT_SUBMISSIONS && ENV.ANNOTATED_DOCUMENT
+      @setAnnotatedDocument({id: ENV.ANNOTATED_DOCUMENT.id, name: ENV.ANNOTATED_DOCUMENT.display_name})
+      @renderAnnotatedDocumentSelector()
 
     if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       @conditionalReleaseEditor = ConditionalRelease.attach(
@@ -810,6 +838,8 @@ export default class EditView extends ValidatedFormView
         errors["online_submission_types[online_text_entry]"] = [
           message: I18n.t 'vericite_submission_types_validation', 'VeriCite only supports file submissions and text entry'
         ]
+    else if !@getAnnotatedDocument() && data.submission_types?.includes('annotated_document')
+      errors["online_submission_types[annotated_document]"] = [message: I18n.t('You must attach a file')]
 
     errors
 

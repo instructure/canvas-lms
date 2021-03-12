@@ -696,6 +696,16 @@ class AssignmentsController < ApplicationController
         hash[:allow_self_signup] = true # for group creation
         hash[:group_user_type] = 'student'
       end
+
+      if @assignment.annotatable_attachment_id.present?
+        if Account.site_admin.feature_enabled?(:annotated_document_submissions)
+          hash[:ANNOTATED_DOCUMENT] = {
+            display_name: @assignment.annotatable_attachment.display_name,
+            id: @assignment.annotatable_attachment.id
+          }
+        end
+      end
+
       js_env(hash)
       conditional_release_js_env(@assignment)
       set_master_course_js_env_data(@assignment, @context)

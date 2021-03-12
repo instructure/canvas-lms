@@ -1916,6 +1916,41 @@ describe AssignmentsController do
       end
     end
 
+    describe 'ANNOTATED_DOCUMENT' do
+      before(:once) do
+        @attachment = attachment_model(content_type: 'application/pdf', display_name: 'file.pdf', user: @teacher)
+        @assignment.update!(annotatable_attachment: @attachment)
+      end
+
+      before(:each) do
+        @assignment.update!(annotatable_attachment: @attachment)
+        Account.site_admin.enable_feature!(:annotated_document_submissions)
+        user_session(@teacher)
+      end
+
+      it 'is not present when the assignment is not annotatable' do
+        @assignment.update!(annotatable_attachment: nil)
+        get :edit, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env]).not_to have_key(:ANNOTATED_DOCUMENT)
+      end
+
+      it 'is not present when the feature flag is not enabled' do
+        Account.site_admin.disable_feature!(:annotated_document_submissions)
+        get :edit, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env]).not_to have_key(:ANNOTATED_DOCUMENT)
+      end
+
+      it 'contains the attachment id when the assignment is annotatable' do
+        get :edit, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT][:id]).to eq @assignment.annotatable_attachment_id
+      end
+
+      it 'contains the attachment display_name when the assignment is annotatable' do
+        get :edit, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT][:display_name]).to eq @attachment.display_name
+      end
+    end
+
     describe 'js_env ANNOTATED_DOCUMENT_SUBMISSIONS' do
       it "should set FLAGS/annotated_document_submissions in js_env as true if enabled" do
         user_session(@teacher)
