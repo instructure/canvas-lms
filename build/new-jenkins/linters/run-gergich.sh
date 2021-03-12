@@ -102,7 +102,7 @@ echo "LINTER OK!"
 EOF
 LINTER_PID=$!
 
-if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
+if [ "$GERRIT_PROJECT" == "canvas-lms" ] && git diff --name-only HEAD~1..HEAD | grep -E "package.json|yarn.lock"; then
   cat <<-EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
   set -ex
   read -r -a PLUGINS_LIST_ARR <<< "$PLUGINS_LIST"
@@ -131,7 +131,7 @@ fi
 
 wait $WEBPACK_BUILD_PID
 wait $LINTER_PID
-[[ "$GERRIT_PROJECT" == "canvas-lms" ]] && wait $YARN_LOCK_PID
+[ ! -z "${YARN_LOCK_PID-}" ] && wait $YARN_LOCK_PID
 
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash -
 set -ex
