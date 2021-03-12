@@ -655,13 +655,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with RoleOverride' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { RoleOverride.create!(account: reference_record, role: Role.first) }
-        let(:reference_record) { account_model }
-      end
-    end
-
     context 'with Score' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { reference_record.scores.create! }
