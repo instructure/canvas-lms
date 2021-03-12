@@ -93,13 +93,32 @@ class BounceNotificationProcessor
     InstStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
 
     bouncy_addresses(bounce_notification).each do |address|
-      CommunicationChannel.bounce_for_path(
-        path: address,
-        timestamp: bounce_timestamp(bounce_notification),
-        details: bounce_notification,
-        permanent_bounce: is_permanent_bounce?(bounce_notification),
-        suppression_bounce: is_suppression_bounce?(bounce_notification)
-      )
+      cache_key = "bounce_notification_#{address}"
+      # repeatedly bouncing the same address at the same time is
+      # not helpful (not much additional value info)
+      # and has negative consequences for the database
+      # (queries can pile up).  This redis check is intended to be an inexpensive
+      # "best effort" at not-completely-necessary syncrhonization
+      # while expiring quickly enough to prevent bunches of new users
+      # with the same email address from getting overlooked by bounce methods.
+      # Redis keys get evicted at random, so it might not stick around,
+      # and it expires quickly, so if the process takes a few minutes
+      # another process might start bouncing this address again, but at least
+      # they shouldn't be trying to start within a minute of each other
+      # most of the time.
+      if Rails.cache.read(cache_key) == "running"
+        Rails.logger.info("[BOUNCE_NOTIFICATION] Not processing bounce for #{address}, another job is already processing right now")
+      else
+        Rails.cache.write(cache_key, "running", expires_in: 3.minutes)
+        CommunicationChannel.bounce_for_path(
+          path: address,
+          timestamp: bounce_timestamp(bounce_notification),
+          details: bounce_notification,
+          permanent_bounce: is_permanent_bounce?(bounce_notification),
+          suppression_bounce: is_suppression_bounce?(bounce_notification)
+        )
+        Rails.cache.delete(cache_key)
+      end
     end
   end
 
