@@ -440,6 +440,6 @@ easy_student_view:
     View.
 new_course_availability_ui:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: New Course Availability UI
   description: Refreshes the section of the UI on the course settings page controlling course availability options.

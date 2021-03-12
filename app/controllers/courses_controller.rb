@@ -1440,7 +1440,7 @@ class CoursesController < ApplicationController
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
         NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
-        NEW_COURSE_AVAILABILITY_UI: Account.site_admin.feature_enabled?(:new_course_availability_ui),
+        NEW_COURSE_AVAILABILITY_UI: @context.root_account.feature_enabled?(:new_course_availability_ui),
         RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
         RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked]
       })
