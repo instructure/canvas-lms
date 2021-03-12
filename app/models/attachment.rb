@@ -1255,7 +1255,7 @@ class Attachment < ActiveRecord::Base
     #################### Begin legacy permission block #########################
 
     given do |user, session|
-      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
@@ -1271,7 +1271,7 @@ class Attachment < ActiveRecord::Base
     ##################### End legacy permission block ##########################
 
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_edit) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
@@ -1279,7 +1279,7 @@ class Attachment < ActiveRecord::Base
     can :read and can :update
 
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_delete) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
