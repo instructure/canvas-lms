@@ -394,19 +394,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with CourseAccountAssociation' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) do
-          CourseAccountAssociation.create!(
-            course: course_model(account: account_model(root_account_id: nil)),
-            account: reference_record,
-            depth: 1
-          )
-        end
-        let(:reference_record) { account_model(root_account_id: nil) }
-      end
-    end
-
     context 'with CustomGradebookColumn' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) do
