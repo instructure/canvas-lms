@@ -172,9 +172,9 @@ describe DiscussionTopic do
 
   describe 'default values' do
     subject(:discussion_topic) { @course.discussion_topics.create!(title: title) }
-    
+
     let(:default_title) { I18n.t('#discussion_topic.default_title', "No Title") }
-     
+
     context 'when the title is an empty string' do
       let(:title) { '' }
 
@@ -1184,7 +1184,7 @@ describe DiscussionTopic do
       expect(@student.stream_item_instances.count).to eq 0
     end
 
-    it "should not attempt to clear stream items if a discussion topic was not secton specific before last save" do
+    it "should not attempt to clear stream items if a discussion topic was not section specific before last save" do
       topic = @course.discussion_topics.create!(title: "Ben Loves Panda", user: @teacher)
       expect(topic.stream_item).to receive(:stream_item_instances).never
       topic.update!(title: "Lemon Loves Panda")
