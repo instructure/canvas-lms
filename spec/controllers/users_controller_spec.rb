@@ -267,8 +267,9 @@ describe UsersController do
 
     it "should not include future teacher term courses in manageable courses" do
       course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
-      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment",
-        :start_at => 1.week.from_now, :end_at => 2.weeks.from_now)
+      term = @course.enrollment_term
+      term.enrollment_dates_overrides.create!(
+        enrollment_type: "TeacherEnrollment", start_at: 1.week.from_now, end_at: 2.weeks.from_now, context: term.root_account)
 
       get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
       expect(response).to be_successful

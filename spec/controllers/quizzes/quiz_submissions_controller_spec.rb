@@ -233,8 +233,9 @@ describe Quizzes::QuizSubmissionsController do
       end
 
       it "still works even after the teacher can't actively grade anymore" do
-        @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment",
-          :start_at => 2.days.ago, :end_at => 1.day.ago)
+        term = @course.enrollment_term
+        term.enrollment_dates_overrides.create!(
+          enrollment_type: "TeacherEnrollment", start_at: 2.days.ago, end_at: 1.day.ago, context: term.root_account)
         user_session(@teacher)
         quiz = course_quiz !!:active
         expect(quiz.grants_right?(@teacher, :grade)).to eq false
