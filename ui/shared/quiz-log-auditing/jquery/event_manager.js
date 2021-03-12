@@ -37,7 +37,8 @@ export default class EventManager {
       trackers: [],
       buffer: null,
       deliveryAgent: null,
-      deliveries: []
+      deliveries: [],
+      lastEventType: null,
     }
   }
 
@@ -181,7 +182,13 @@ export default class EventManager {
   // @param {Event} event
   // @param {Number} [priority=0]
   _enqueue(event, priority) {
+    // ignore unnecessary consecutive page_focused events.
+    if (event.type === K.EVT_PAGE_FOCUSED && this._state.lastEventType !== K.EVT_PAGE_BLURRED) {
+      return false
+    }
+
     this._state.buffer.push(event)
+    this._state.lastEventType = event.type
 
     debugConsole.log(`Enqueuing ${event} for delivery.`)
 

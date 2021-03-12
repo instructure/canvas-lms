@@ -25,9 +25,12 @@ export default class PageBlurred extends EventTracker {
       window,
       'blur',
       () => {
-        if (document.activeElement.tagName !== 'IFRAME') {
-          return deliver()
-        }
+        setTimeout(() => {
+          // allow FireFox updating document.activeElement
+          if (document.activeElement.tagName !== 'IFRAME') {
+            deliver()
+          }
+        })
       },
       {throttle: this.getOption('frequency')}
     )

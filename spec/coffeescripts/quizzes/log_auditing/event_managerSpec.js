@@ -30,7 +30,7 @@ QUnit.module('Quizzes::LogAuditing::EventManager', {
   }
 })
 
-test('#start and #stop: should work', function() {
+test('#start and #stop: should work', function () {
   this.evtManager = new EventManager()
   this.evtManager.start()
   ok(this.evtManager.isRunning())
@@ -53,6 +53,31 @@ QUnit.module('Quizzes::LogAuditing::EventManager - Event delivery', {
     }
     TestEventTracker.initClass()
     this.TestEventTracker = TestEventTracker
+
+    class TestPageFocusEventTracker extends EventTracker {
+      static initClass() {
+        this.prototype.eventType = K.EVT_PAGE_FOCUSED
+      }
+
+      install(deliver) {
+        return specThis.testEventFactory.on('focus', deliver)
+      }
+    }
+    TestPageFocusEventTracker.initClass()
+    this.TestPageFocusEventTracker = TestPageFocusEventTracker
+
+    class TestPageBlurredEventTracker extends EventTracker {
+      static initClass() {
+        this.prototype.eventType = K.EVT_PAGE_BLURRED
+      }
+
+      install(deliver) {
+        return specThis.testEventFactory.on('blur', deliver)
+      }
+    }
+    TestPageBlurredEventTracker.initClass()
+    this.TestPageBlurredEventTracker = TestPageBlurredEventTracker
+
     this.testEventFactory = new Backbone.Model()
   },
   teardown() {
@@ -63,7 +88,7 @@ QUnit.module('Quizzes::LogAuditing::EventManager - Event delivery', {
   }
 })
 
-test('it should deliver events', function() {
+test('it should deliver events', function () {
   this.evtManager = new EventManager({
     autoDeliver: false,
     deliveryUrl: '/events'
@@ -91,7 +116,46 @@ test('it should deliver events', function() {
   ok(!this.evtManager.isDirty(), 'it flushes its buffer when sync is complete')
 })
 
-test('it should drop trackers', function() {
+test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BLURRED', function () {
+  this.evtManager = new EventManager({
+    autoDeliver: false,
+    deliveryUrl: '/events'
+  })
+  this.evtManager.registerTracker(this.TestPageFocusEventTracker)
+  this.evtManager.registerTracker(this.TestPageBlurredEventTracker)
+  this.evtManager.registerTracker(this.TestEventTracker)
+
+  this.evtManager.start()
+
+  this.testEventFactory.trigger('change')
+  this.evtManager.deliver()
+  equal(this.server.requests.length, 1)
+  let payload1 = JSON.parse(this.server.requests[0].requestBody)
+  equal(payload1.quiz_submission_events[0].event_type, 'test_event')
+
+  this.testEventFactory.trigger('focus')
+  this.evtManager.deliver()
+
+  equal(this.server.requests.length, 1)
+  payload1 = JSON.parse(this.server.requests[0].requestBody)
+  equal(payload1.quiz_submission_events[0].event_type, 'test_event')
+
+  this.testEventFactory.trigger('blur')
+  this.evtManager.deliver()
+
+  equal(this.server.requests.length, 2)
+  const payload2 = JSON.parse(this.server.requests[1].requestBody)
+  equal(payload2.quiz_submission_events[0].event_type, K.EVT_PAGE_BLURRED)
+
+  this.testEventFactory.trigger('focus')
+  this.evtManager.deliver()
+
+  equal(this.server.requests.length, 3)
+  const payload3 = JSON.parse(this.server.requests[2].requestBody)
+  equal(payload3.quiz_submission_events[0].event_type, K.EVT_PAGE_FOCUSED)
+})
+
+test('it should drop trackers', function () {
   this.evtManager = new EventManager({
     autoDeliver: false,
     deliveryUrl: '/events'
