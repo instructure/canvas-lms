@@ -23,38 +23,45 @@ import I18n from 'i18n!OutcomeManagement'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import Modal from '../../shared/components/InstuiModal'
-import useCanvasContext from '../shared/hooks/useCanvasContext'
-import {showFlashAlert} from '../../shared/FlashAlert'
-import {removeOutcome} from './api'
+import Modal from 'jsx/shared/components/InstuiModal'
+import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
+import {removeOutcome} from 'jsx/outcomes/Management/api'
 
 const OutcomeRemoveModal = ({groupId, outcomeId, isOpen, onCloseHandler}) => {
   const {contextType, contextId} = useCanvasContext()
   const isAccount = contextType === 'Account'
-  const onRemoveOutcomeHandler = async () => {
-    onCloseHandler()
-    try {
-      const result = await removeOutcome(contextType, contextId, groupId, outcomeId)
-      if (result?.status === 200) {
+  const onRemoveOutcomeHandler = () => {
+    ;(async () => {
+      try {
+        const result = await removeOutcome(contextType, contextId, groupId, outcomeId)
+        if (result?.status === 200) {
+          showFlashAlert({
+            message: isAccount
+              ? I18n.t('This outcome was successfully removed from this account.')
+              : I18n.t('This outcome was successfully removed from this course.'),
+            type: 'success'
+          })
+        } else {
+          throw Error()
+        }
+      } catch (err) {
+        err.message =
+          err?.response?.data?.message &&
+          err?.response?.data?.message.match(/cannot be deleted because it is aligned to content/)
+            ? I18n.t('Outcome cannot be removed because it is aligned to content')
+            : err.message
         showFlashAlert({
-          message: isAccount
-            ? I18n.t('This outcome was successfully removed from this account.')
-            : I18n.t('This outcome was successfully removed from this course.'),
-          type: 'success'
+          message: err.message
+            ? I18n.t('An error occurred while removing the outcome: %{message}', {
+                message: err.message
+              })
+            : I18n.t('An error occurred while removing the outcome.'),
+          type: 'error'
         })
-      } else {
-        throw Error()
       }
-    } catch (err) {
-      showFlashAlert({
-        message: err.message
-          ? I18n.t('An error occurred while removing the outcome: %{message}', {
-              message: err.message
-            })
-          : I18n.t('An error occurred while removing the outcome.'),
-        type: 'error'
-      })
-    }
+    })()
+    onCloseHandler()
   }
 
   return (
@@ -62,8 +69,9 @@ const OutcomeRemoveModal = ({groupId, outcomeId, isOpen, onCloseHandler}) => {
       size="small"
       label={I18n.t('Remove Outcome?')}
       open={isOpen}
-      onDismiss={onCloseHandler}
       shouldReturnFocus
+      onDismiss={onCloseHandler}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Body>
         <View as="div" padding="small 0">

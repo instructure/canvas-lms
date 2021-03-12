@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import {useState} from 'react'
 
-const useModalWithData = () => {
-  const [modalData, setModalData] = useState({open: false})
-  const openModal = useCallback((data = {}) => setModalData({...data, open: true}), [])
-  const closeModal = useCallback(() => setModalData({open: false}), [])
+const useInput = (initialValue = '') => {
+  const [value, setValue] = useState(initialValue)
+  const changeValue = event => setValue(event.target.value)
+  const valueChanged = value.length !== initialValue.length || value !== initialValue
 
-  return [modalData, openModal, closeModal]
+  return [value, changeValue, valueChanged]
 }
 
-export default useModalWithData
+export default useInput

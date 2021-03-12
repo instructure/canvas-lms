@@ -209,12 +209,14 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
               {
                 _id: '1',
                 description: '',
+                displayName: '',
                 title: `Outcome 1 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               },
               {
                 _id: '2',
                 description: '',
+                displayName: '',
                 title: `Outcome 2 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -251,6 +253,7 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
               {
                 _id: '3',
                 description: '',
+                displayName: '',
                 title: `Outcome 3 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }

@@ -37,7 +37,7 @@ import MoveModal from './MoveModal'
 import EditGroupModal from './EditGroupModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
-import useModalWithData from 'jsx/outcomes/shared/hooks/useModalWithData'
+import OutcomeEditModal from './OutcomeEditModal'
 
 const NoOutcomesBillboard = () => {
   const {contextType} = useCanvasContext()
@@ -91,15 +91,20 @@ const OutcomeManagementPanel = () => {
     selectedGroupId
   } = useManageOutcomes()
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
-
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
-  const [
-    outcomeRemoveModalData,
-    openOutcomeRemoveModal,
-    closeOutcomeRemoveModal
-  ] = useModalWithData()
+  const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
+  const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
+  const [selectedOutcome, setSelectedOutcome] = useState(null)
+  const onCloseOutcomeRemoveModal = () => {
+    closeOutcomeRemoveModal()
+    setSelectedOutcome(null)
+  }
+  const onCloseOutcomeEditModal = () => {
+    closeOutcomeEditModal()
+    setSelectedOutcome(null)
+  }
   const groupMenuHandler = (_, action) => {
     if (action === 'move') {
       openMoveGroupModal()
@@ -110,7 +115,12 @@ const OutcomeManagementPanel = () => {
     }
   }
   const outcomeMenuHandler = (id, action) => {
-    if (action === 'remove') openOutcomeRemoveModal({id})
+    setSelectedOutcome(group.outcomes.nodes.find(outcome => outcome._id === id))
+    if (action === 'remove') {
+      openOutcomeRemoveModal()
+    } else if (action === 'edit') {
+      openOutcomeEditModal()
+    }
   }
 
   if (isLoading) {
@@ -216,13 +226,20 @@ const OutcomeManagementPanel = () => {
               onCloseHandler={closeGroupRemoveModal}
             />
           )}
-          {selectedGroupId && outcomeRemoveModalData?.id && (
-            <OutcomeRemoveModal
-              groupId={selectedGroupId}
-              outcomeId={outcomeRemoveModalData?.id}
-              isOpen={outcomeRemoveModalData?.open}
-              onCloseHandler={closeOutcomeRemoveModal}
-            />
+          {selectedGroupId && selectedOutcome && (
+            <>
+              <OutcomeRemoveModal
+                groupId={selectedGroupId}
+                outcomeId={selectedOutcome._id}
+                isOpen={isOutcomeRemoveModalOpen}
+                onCloseHandler={onCloseOutcomeRemoveModal}
+              />
+              <OutcomeEditModal
+                outcome={selectedOutcome}
+                isOpen={isOutcomeEditModalOpen}
+                onCloseHandler={onCloseOutcomeEditModal}
+              />
+            </>
           )}
           {group && (
             <EditGroupModal

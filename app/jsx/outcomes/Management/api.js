@@ -78,6 +78,7 @@ export const GROUP_DETAIL_QUERY = gql`
               _id
               description
               title
+              displayName
             }
           }
         }
@@ -106,3 +107,6 @@ export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
       contextType
     ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes/${outcomeId}`
   )
+
+export const updateOutcome = (outcomeId, outcome) =>
+  axios.put(`/api/v1/outcomes/${outcomeId}`, outcome)
