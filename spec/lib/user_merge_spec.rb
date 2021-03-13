@@ -706,7 +706,7 @@ describe UserMerge do
         account = Account.create!
         @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
         UserMerge.from(user1).into(@user2)
-        expect(@user2.past_lti_ids.shard(@user2).take.user_lti_id).to eq 'fake_lti_id_from_old_merge'
+        expect(@user2.reload.past_lti_ids.shard(@user2).take.user_lti_id).to eq 'fake_lti_id_from_old_merge'
       end
     end
 
