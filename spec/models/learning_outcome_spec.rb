@@ -1052,19 +1052,28 @@ describe LearningOutcome do
         })
         result.reload
         rubric.reload
-        { assignment: assignment, assessment: assessment, rubric: rubric }
+        { assignment: assignment, assessment: assessment, rubric: rubric, result: result }
       end
     end
 
     context "learning outcome results" do
-      it "properly reports whether assessed in a course" do
+      before do
         add_student.call(c1, c2)
         add_or_get_rubric(outcome)
         [c1, c2].each { |c| outcome.align(nil, c, :mastery_type => "points") }
-        assess_with.call(outcome, c1)
+        @result = assess_with.call(outcome, c1)[:result]
+      end
 
+      it "properly reports whether assessed in a course" do
         expect(outcome).to be_assessed
         expect(outcome).to be_assessed(c1)
+        expect(outcome).not_to be_assessed(c2)
+      end
+
+      it 'does not include deleted results when testing assessed' do
+        @result.destroy
+        expect(outcome).not_to be_assessed
+        expect(outcome).not_to be_assessed(c1)
         expect(outcome).not_to be_assessed(c2)
       end
     end

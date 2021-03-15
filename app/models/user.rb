@@ -2450,7 +2450,7 @@ class User < ActiveRecord::Base
   end
 
   def last_mastered_assignment
-    self.learning_outcome_results.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
+    self.learning_outcome_results.active.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
   end
 
   def profile_pics_folder

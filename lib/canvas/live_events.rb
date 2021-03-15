@@ -768,7 +768,8 @@ module Canvas::LiveEvents
       original_mastery: result.original_mastery,
       assessed_at: result.assessed_at,
       title: result.title,
-      percent: result.percent
+      percent: result.percent,
+      workflow_state: result.workflow_state
     }
   end
 

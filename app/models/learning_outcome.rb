@@ -317,12 +317,12 @@ class LearningOutcome < ActiveRecord::Base
 
   def assessed?(course = nil)
     if course
-      self.learning_outcome_results.where(context_id: course, context_type: "Course").exists?
+      self.learning_outcome_results.active.where(context_id: course, context_type: "Course").exists?
     else
-      if learning_outcome_results.loaded?
-        learning_outcome_results.any?
+      if learning_outcome_results.active.loaded?
+        learning_outcome_results.active.any?
       else
-        learning_outcome_results.exists?
+        learning_outcome_results.active.exists?
       end
     end
   end
@@ -353,7 +353,7 @@ class LearningOutcome < ActiveRecord::Base
         codes = @tied_context.all_courses.select(:id).map(&:asset_string)
       end
     end
-    self.learning_outcome_results.for_context_codes(codes).count
+    self.learning_outcome_results.active.for_context_codes(codes).count
   end
 
   def self.delete_if_unused(ids)
@@ -380,6 +380,7 @@ class LearningOutcome < ActiveRecord::Base
     lambda do |user|
       joins(:learning_outcome_results)
         .where("learning_outcomes.id=learning_outcome_results.learning_outcome_id " \
+               "AND learning_outcome_results.workflow_state <> 'deleted' " \
                "AND learning_outcome_results.user_id=?", user)
         .order(best_unicode_collation_key('short_description'))
     end

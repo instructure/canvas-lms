@@ -1612,7 +1612,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
@@ -1635,7 +1636,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)

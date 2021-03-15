@@ -365,7 +365,7 @@ describe RubricAssessmentsController do
         :id => @rubric_assessment.id
       }
       expect(response).to be_successful
-      expect(LearningOutcomeResult.find_by(id: result.id)).to be_nil
+      expect(LearningOutcomeResult.active.find_by(id: result.id)).to be_nil
     end
   end
 

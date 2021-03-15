@@ -73,7 +73,7 @@ class OutcomesController < ApplicationController
     end
     @alignments = @outcome.alignments.active.for_context(@context)
     add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
-    @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
+    @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
 
     js_env({
      :PERMISSIONS => {
@@ -104,7 +104,7 @@ class OutcomesController < ApplicationController
         codes = @context.all_courses.pluck(:id).map{|id| "course_#{id}"}
       end
     end
-    @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort])
+    @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort])
     render :json => Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
   end
 
@@ -125,7 +125,7 @@ class OutcomesController < ApplicationController
     else
       @outcomes = @context.available_outcomes
     end
-    @results = LearningOutcomeResult.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
+    @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
 
     @google_analytics_page_title = t("Outcomes for Student")
@@ -199,7 +199,7 @@ class OutcomesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_outcomes)
 
     @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
-    @result = @outcome.learning_outcome_results.find(params[:id])
+    @result = @outcome.learning_outcome_results.active.find(params[:id])
 
     return unless authorized_action(@result.context, @current_user, :manage_outcomes)
 
