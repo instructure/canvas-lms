@@ -44,7 +44,8 @@ export default function Link(props) {
   function linkAttrsFromDoc() {
     const canPreview = isPreviewable(props.content_type)
     const clazz = classnames('instructure_file_link', {
-      instructure_scribd_file: canPreview
+      instructure_scribd_file: canPreview,
+      inline_disabled: true
     })
 
     const attrs = {
