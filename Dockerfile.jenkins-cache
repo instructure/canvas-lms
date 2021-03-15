@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.0-experimental
 
-FROM busybox AS cache-helper-collect-gems
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-gems
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -29,7 +29,7 @@ RUN --mount=target=/tmp/src \
     -name "version.rb" \
   \) -exec cp --parents -rf {} /tmp/dst \;
 
-FROM busybox AS cache-helper-collect-yarn
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-yarn
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -47,7 +47,7 @@ RUN --mount=target=/tmp/src \
     -name 'package.json' \
     -exec cp --parents {} /tmp/dst \;
 
-FROM busybox AS cache-helper-collect-packages
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-packages
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -57,7 +57,7 @@ RUN --mount=target=/tmp/src \
     \
     /tmp/dst
 
-FROM busybox AS cache-helper-collect-webpack
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-webpack
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
