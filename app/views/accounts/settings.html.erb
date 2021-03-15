@@ -583,6 +583,12 @@
                 <%= settings.check_box :enable_course_catalog, :checked => @account.settings[:enable_course_catalog] %>
                 <%= settings.label     :enable_course_catalog, :en => "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled." %>
               </div>
+              <% if Account.site_admin.feature_enabled?(:show_push_notification_account_setting) %>
+                <div>
+                  <%= settings.check_box :enable_push_notifications, :checked => @account.settings[:enable_push_notifications] %>
+                  <%= settings.label     :enable_push_notifications, :en => "Enable push notifications to mobile devices" %>
+                </div>
+              <% end %>
 
             <% end %>
             <% unless @account.site_admin? %>
