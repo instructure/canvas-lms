@@ -116,6 +116,7 @@ class RubricAssociation < ActiveRecord::Base
 
         ra.rubric_assessments.update_all(rubric_association_id: nil)
         ra.assessment_requests.update_all(rubric_association_id: nil)
+        LearningOutcomeResult.where(association_object: ra).destroy_all
         ra.destroy_permanently!
       end
     end
