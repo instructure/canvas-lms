@@ -21,6 +21,6 @@ release_notes_ui:
   description: Enables siteadmin users to configure release notes to display to users
 course_templates:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: Course Templates
   description: Enables the Course Templates feature globally
