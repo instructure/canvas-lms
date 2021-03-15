@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC
-module QTI
-  class QTIManifest
+module Qti
+  class QtiManifest
     include CC::CCHelper
 
     attr_accessor :exporter
@@ -73,7 +73,7 @@ module QTI
 
         manifest_node.resources do |resources|
           begin
-            g = QTI::QTIGenerator.new(self, resources, @html_exporter)
+            g = Qti::QtiGenerator.new(self, resources, @html_exporter)
             g.generate_qti_only
           rescue
             add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)

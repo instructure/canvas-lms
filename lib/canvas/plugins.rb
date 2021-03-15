@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module CC
-  module Importer
-    include CC::CCHelper
-    include ::Canvas::Migration
-    include ::Canvas::Migration::XMLHelper
+# Other plugins want to put validators in this
+# namespace, so we want to make sure it's defined early.
+# This module gets required from the zeitwerk.rb initializer,
+# but TODO: eventually it'd be nice not to need this, maybe
+# by allowing validators to bring their own namespace.
+module Canvas
+  module Plugins
   end
 end
-

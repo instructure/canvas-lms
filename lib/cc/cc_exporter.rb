@@ -62,7 +62,7 @@ module CC
         create_export_dir
         create_zip_file
         if @qti_only_export
-          @manifest = CC::QTI::QTIManifest.new(self)
+          @manifest = CC::Qti::QtiManifest.new(self)
         else
           @manifest = Manifest.new(self, @manifest_opts)
         end

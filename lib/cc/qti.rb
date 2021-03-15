@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Canvas::CC
-  module QTI
+  module Qti
   end
 end
 
