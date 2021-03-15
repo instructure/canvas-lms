@@ -202,7 +202,7 @@ export function enhanceUserContent() {
     })
     .end()
 
-  $('a.instructure_file_link').each(function () {
+  $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
     const $link = $(this)
     let $download_btn, $preview_link, $preview_container
     if ($.trim($link.text())) {
