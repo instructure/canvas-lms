@@ -146,6 +146,7 @@ module Api::V1::Course
       hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
       hash['concluded'] = course.concluded? if includes.include?('concluded')
       apply_master_course_settings(hash, course, user)
+      hash['template'] = course.template? if course.root_account.feature_enabled?(:course_templates)
 
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash

@@ -213,4 +213,45 @@ describe "courses/settings.html.erb" do
       expect(option_ids.sort).to eq all_accounts.map(&:id).sort
     end
   end
+
+  context "course template checkbox" do
+    it "is not visible if the feature isn't enabled" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css("input#course_template")).to be_nil
+    end
+
+    context "with the feature enabled" do
+      before { Account.default.enable_feature!(:course_templates) }
+
+      it "is visible" do
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect((checkbox = doc.at_css("input#course_template"))).not_to be_nil
+        expect(checkbox['disabled']).to eq 'disabled'
+      end
+
+      it "is editable if you have permission" do
+        @user = site_admin_user
+        view_context(@course, @user)
+        # have to remove the teacher
+        @course.enrollments.each(&:destroy)
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        checkbox = doc.at_css("input#course_template")
+        expect(checkbox['disabled']).to be_nil
+      end
+
+      it "is not editable even if you have permission, but it's not possible" do
+        @user = site_admin_user
+        view_context(@course, @user)
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        checkbox = doc.at_css("input#course_template")
+        expect(checkbox['disabled']).to eq 'disabled'
+      end
+    end
+  end
 end

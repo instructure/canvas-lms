@@ -6044,24 +6044,32 @@ describe Course, "#show_total_grade_as_points?" do
     it "is true for an empty course" do
       course = Course.create!
       expect(course.can_become_template?).to be true
+      course.template = true
+      expect(course).to be_valid
     end
 
     it "is false once there's an enrollment" do
       course_with_teacher
       expect(@course.can_become_template?).to be false
+      @course.template = true
+      expect(@course).not_to be_valid
     end
   end
 
   describe "#can_stop_being_template?" do
     it "is false for unattached courses" do
-      course = Course.create!
+      course = Course.create!(template: true)
       expect(course.can_stop_being_template?).to be true
+      course.template = false
+      expect(course).to be_valid
     end
 
     it "is true for courses attached to accounts" do
-      course = Course.create!
+      course = Course.create!(template: true)
       course.account.update!(course_template: course)
       expect(course.can_stop_being_template?).to be false
+      course.template = false
+      expect(course).not_to be_valid
     end
   end
 end

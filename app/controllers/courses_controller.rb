@@ -322,6 +322,11 @@ require 'securerandom'
 #           "description": "optional: Sets of restrictions differentiated by object type applied to locked course objects",
 #           "example": {"assignment": {"content": true, "points": true}, "wiki_page": {"content": true}},
 #           "type": "object"
+#         },
+#         "template": {
+#           "description": "optional: whether the course is set as a template (requires the Course Templates feature)",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -2613,6 +2618,9 @@ class CoursesController < ApplicationController
   #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
   #   is enabled in the course's account.
   #
+  # @argument course[template] [Boolean]
+  #   Enable or disable the course as a template that can be selected by an account
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -2659,6 +2667,13 @@ class CoursesController < ApplicationController
       end
       unless @course.grants_right?(@current_user, :manage_course_visibility)
         params_for_update.delete(:indexed)
+      end
+      if params_for_update.key?(:template)
+        template = value_to_boolean(params_for_update.delete(:template))
+        if template && @course.grants_right?(@current_user, session, :add_course_template) ||
+          !template && @course.grants_right?(@current_user, session, :delete_course_template)
+          @course.template = template
+        end
       end
 
       account_id = params[:course].delete :account_id
@@ -3468,7 +3483,9 @@ class CoursesController < ApplicationController
 
   def course_params
     return {} unless params[:course]
-    params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
+
+    params[:course].permit(
+      :name, :group_weighting_scheme, :start_at, :conclude_at,
       :grading_standard_id, :grade_passback_setting, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :syllabus_course_summary, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
@@ -3477,7 +3494,8 @@ class CoursesController < ApplicationController
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
-      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course
+      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
+      :template
     )
   end
 end

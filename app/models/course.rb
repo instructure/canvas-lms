@@ -254,6 +254,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_dates
   validate :validate_course_image
   validate :validate_default_view
+  validate :validate_template, if: :template_changed?
   validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -479,6 +480,14 @@ class Course < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def validate_template
+    if template? && !can_become_template?
+      errors.add(:template, t("Courses with enrollments can't become templates"))
+    elsif !template? && !can_stop_being_template?
+      errors.add(:template, t("Courses that are set as a template in any account can't stop being templates"))
+    end
   end
 
   def image

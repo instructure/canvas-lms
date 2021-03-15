@@ -1357,9 +1357,28 @@ describe CoursesController, type: :request do
         @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
         @course.grading_standard = @standard
         @course.save!
-        json = api_call(:put, @path, @params, :course => {})
+        api_call(:put, @path, @params, :course => {})
         @course.reload
         expect(@course.grading_standard).to eq @standard
+      end
+
+      context "with course templates" do
+        before { @course.root_account.enable_feature!(:course_templates) }
+
+        it "allows setting a template" do
+          # can't do it if anyone is enrolled
+          @course.enrollments.each(&:destroy)
+          api_call(:put, @path, @params, { 'course' => { 'template' => true } })
+          @course.reload
+          expect(@course).to be_a_template
+        end
+
+        it "ignores setting template if it's not possible" do
+          @course.enroll_user(@user)
+          api_call(:put, @path, @params, { 'course' => { 'template' => true } })
+          @course.reload
+          expect(@course).not_to be_a_template
+        end
       end
 
       context "when an assignment is due in a closed grading period" do
@@ -3598,6 +3617,13 @@ describe CoursesController, type: :request do
         "rubrics"
       ]
       expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
+    end
+
+    it "includes template when feature enabled" do
+      @course1.root_account.enable_feature!(:course_templates)
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+                      { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+      expect(json['template']).to eq false
     end
 
     context "include[]=sections" do
