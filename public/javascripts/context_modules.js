@@ -2231,7 +2231,8 @@ import 'compiled/jquery.rails_flash_notifications'
         $cm.addClass('sm-started').removeClass('collapsed_module');
         update_icon_status($cm.find('.ig-header'));
       }
-
+    }
+    if (ENV.IS_STUDENT) {
       modules.getCourseItems(modules.updateCourseProgress);
     }
 
