@@ -110,6 +110,19 @@ describe 'user_content post processing' do
       ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
       expect(download_btn).to have_attribute('download')
     end
+
+    it 'omits download button if an external link' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='link1' class='instructure_file_link'
+          href='http://instructure.com'>external link</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      # the link has an external-link button
+      expect(f('.ui-icon-extlink')).to be_displayed
+      expect(f('#link1')).not_to contain_css('.file_download_btn')
+    end
   end
 
   describe 'with rce_better_file_downloading flag off' do

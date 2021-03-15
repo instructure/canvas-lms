@@ -228,8 +228,9 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
           props.content.isPreviewable = false
           renderComponent()
           tray.$doneButton.click()
-          const [{embed}] = props.onSave.mock.calls[0]
-          expect(embed).toBeNull()
+          const [linkAttrs] = props.onSave.mock.calls[0]
+          expect(linkAttrs.embed).toBeNull()
+          expect(linkAttrs.class).toEqual('inline_disabled')
         })
 
         it('includes embed info if the file is previewable', () => {
