@@ -104,5 +104,5 @@ export function mimeClass(file) {
 }
 
 function getContentType(file) {
-  return file['content-type'] || file.type
+  return file['content-type'] || file.content_type || file.type
 }
