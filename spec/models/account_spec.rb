@@ -2273,4 +2273,27 @@ describe Account do
       expect(account.enable_as_k5_account[:locked]).to be_truthy
     end
   end
+
+  describe "#effective_course_template" do
+    let(:root_account) { Account.create! }
+    let(:sub_account) { root_account.sub_accounts.create! }
+    let(:template) { root_account.courses.create!(template: true) }
+
+    it "returns an explicit template" do
+      sub_account.update!(course_template: template)
+      expect(sub_account.effective_course_template).to eq template            
+    end
+
+    it "inherits a template" do
+      root_account.update!(course_template: template)
+      expect(sub_account.effective_course_template).to eq template
+    end
+
+    it "doesn't use an explicit non-template" do
+      root_account.update!(course_template: template)
+      Course.ensure_dummy_course
+      sub_account.update!(course_template_id: 0)
+      expect(sub_account.effective_course_template).to be_nil
+    end
+  end
 end

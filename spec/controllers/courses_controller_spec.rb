@@ -3295,4 +3295,40 @@ describe CoursesController do
       expect(course.indexed).to eq true
     end
   end
+
+  describe "POST 'copy_course'" do
+    let(:course) { Course.create! }
+
+    before do
+      course.wiki_pages.create!(title: 'my page')
+      user_session(site_admin_user)
+    end
+
+    it "copies a course" do
+      post 'copy_course', params: { course_id: course.id,
+        course: { name: 'copied course', course_code: 'copied' } }
+      expect(response).to be_redirect
+      run_jobs
+      new_course = Course.last
+      expect(new_course.name).to eq 'copied course'
+      expect(new_course.wiki_pages.length).to eq 1
+      expect(new_course.wiki_pages.first.title).to eq 'my page'
+    end
+
+    it "does not apply an account's course template" do
+      template = course.account.courses.create!(name: 'Template Course', template: true)
+      template.assignments.create!(title: 'my assignment')
+      course.root_account.enable_feature!(:course_templates)
+      course.account.update!(course_template: template)
+
+      post 'copy_course', params: { course_id: course.id,
+        course: { name: 'copied course', course_code: 'copied' } }
+      expect(response).to be_redirect
+      run_jobs
+      new_course = Course.last
+      expect(new_course.name).to eq 'copied course'
+      expect(new_course.wiki_pages.length).to eq 1
+      expect(new_course.assignments.length).to eq 0
+    end
+  end
 end

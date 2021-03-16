@@ -66,7 +66,7 @@ class Auditors::Course
     end
 
     def user
-      @user ||= User.find(user_id)
+      @user ||= User.find(user_id) if user_id
     end
 
     def user=(user)

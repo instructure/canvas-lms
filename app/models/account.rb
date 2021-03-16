@@ -2083,4 +2083,12 @@ class Account < ActiveRecord::Base
       ContextExternalTool.all_tools_for(self, placements: [:editor_button]). # TODO remove after datafixup and the is_rce_favorite column is removed
         where(:is_rce_favorite => true).pluck(:id).map{|id| Shard.global_id_for(id)}
   end
+
+  def effective_course_template
+    owning_account = account_chain.find(&:course_template_id)
+    return nil unless owning_account
+    return nil if owning_account.course_template_id == 0
+
+    owning_account.course_template
+  end
 end

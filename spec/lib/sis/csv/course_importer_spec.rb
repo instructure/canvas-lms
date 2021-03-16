@@ -866,5 +866,23 @@ describe SIS::CSV::CourseImporter do
       )
       expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to be_nil
     end
+
+    it "applies an account's course template" do
+      @account.root_account.enable_feature!(:course_templates)
+      template = @account.courses.create!(name: 'Template Course', template: true)
+      template.assignments.create!(title: 'my assignment')
+      @account.update!(course_template: template)
+
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      run_jobs
+
+      course = @account.courses.where(sis_source_id: "test_1").first
+      expect(course.name).to eq 'Test Course 101'
+      expect(course.assignments.length).to eq 1
+      expect(course.assignments.first.title).to eq 'my assignment'
+    end
   end
 end
