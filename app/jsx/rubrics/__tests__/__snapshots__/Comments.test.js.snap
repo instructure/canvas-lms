@@ -61,7 +61,7 @@ exports[`The Comments component renders the root component as expected when edit
       "May god have mercy on your soul",
     ]
   }
-  setComments={[Function]}
-  setSaveLater={[Function]}
+  setComments={[MockFunction]}
+  setSaveLater={[MockFunction]}
 />
 `;

@@ -19,41 +19,46 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
-import {Checkbox, Select, TextArea} from '@instructure/ui-forms'
+import {Text} from '@instructure/ui-text'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {TextArea} from '@instructure/ui-text-area'
 import I18n from 'i18n!edit_rubricComments'
 
 import {assessmentShape} from './types'
 
 const ellipsis = () => I18n.t('…')
 
-const truncate = comment => (comment.length > 100 ? [comment.slice(0, 99), ellipsis()] : [comment])
+const truncate = comment => (comment.length > 100 ? comment.slice(0, 99) + ellipsis() : comment)
 
 const FreeFormComments = props => {
   const {allowSaving, savedComments, comments, large, saveLater, setComments, setSaveLater} = props
   const first = (
-    <option key="first" value="first">
+    <SimpleSelect.Option key="first" id="first" value="first">
       {I18n.t('[ Select ]')}
-    </option>
+    </SimpleSelect.Option>
   )
 
   const options = savedComments.map((comment, ix) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <option key={ix} value={ix.toString()} label={comment}>
+    <SimpleSelect.Option
+      key={comment.slice(-8)}
+      id={`${comment.slice(-4)}_${ix}`}
+      value={ix.toString()}
+      label={comment}
+    >
       {truncate(comment)}
-    </option>
+    </SimpleSelect.Option>
   ))
   const selector = [
-    <Select
-      key="select"
-      label={I18n.t('Saved Comments')}
+    <SimpleSelect
+      renderLabel={I18n.t('Saved Comments')}
       assistiveText={I18n.t('Select from saved comments')}
       onChange={(_unused, el) => {
         setComments(savedComments[el.value])
       }}
     >
       {[first, ...options]}
-    </Select>,
+    </SimpleSelect>,
     <br key="br" />
   ]
 
