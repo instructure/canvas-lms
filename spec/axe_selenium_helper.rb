@@ -37,7 +37,7 @@ module AxeSelenium
         AxeSelenium::AxeHelper.reset_example_counter
       end
 
-      config.before(:all) do
+      config.before(:suite) do
         AxeSelenium::AxeHelper.reset_total_counter
       end
 
