@@ -45,7 +45,7 @@ describe('RceFileBrowser', () => {
       embedded_iframe_url: undefined,
       content_type: 'application/pdf',
       target: '_blank',
-      class: 'instructure_file_link instructure_scribd_file'
+      class: 'instructure_file_link instructure_scribd_file inline_disabled'
     })
   })
 
@@ -71,7 +71,7 @@ describe('RceFileBrowser', () => {
       media_id: 'm-deadbeef',
       content_type: 'video/mp4',
       target: '_blank',
-      class: 'instructure_file_link'
+      class: 'instructure_file_link inline_disabled'
     })
   })
 })

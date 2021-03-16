@@ -77,7 +77,8 @@ export default function LinkOptionsTray(props) {
       text,
       target: '_blank',
       href: url,
-      id: content.id || null
+      id: content.id || null,
+      class: embedType ? undefined : 'inline_disabled'
     }
 
     props.onSave(linkAttrs)
