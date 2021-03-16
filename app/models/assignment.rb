@@ -2878,6 +2878,10 @@ class Assignment < ActiveRecord::Base
     res.to_sentence(:or)
   end
 
+  def annotated_document?
+    submission_types.match?(/annotated_document/)
+  end
+
   def readable_submission_type(submission_type)
     case submission_type
     when 'online_quiz'
@@ -2888,6 +2892,8 @@ class Assignment < ActiveRecord::Base
       t 'submission_types.a_text_entry_box', "a text entry box"
     when 'online_url'
       t 'submission_types.a_website_url', "a website url"
+    when 'annotated_document'
+      t 'annotated_document', "an annotated document"
     when 'discussion_topic'
       t 'submission_types.a_discussion_post', "a discussion post"
     when 'wiki_page'

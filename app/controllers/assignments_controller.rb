@@ -208,6 +208,11 @@ class AssignmentsController < ApplicationController
         end
 
         env = js_env({COURSE_ID: @context.id})
+        submission = @assignment.submissions.find_by(user: @current_user)
+        if submission
+          js_env({ SUBMISSION_ID: submission.id })
+        end
+
         env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]

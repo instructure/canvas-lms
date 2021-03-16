@@ -587,6 +587,20 @@ describe AssignmentsController do
       expect(assigns[:js_env][:media_comment_asset_string]).to eq @student.asset_string
     end
 
+    it "renders student-specific js_env" do
+      user_session(@student)
+      a = @course.assignments.create(title: "some assignment")
+      get 'show', params: {course_id: @course.id, id: a.id}
+      expect(assigns[:js_env][:SUBMISSION_ID]).to eq a.submissions.find_by(user: @student).id
+    end
+
+    it "renders teacher-specific js_env" do
+      user_session(@teacher)
+      a = @course.assignments.create(title: "some assignment")
+      get 'show', params: {course_id: @course.id, id: a.id}
+      expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
+    end
+
     it "does not show direct share options when disabled" do
       user_session(@teacher)
       get 'show', params: {course_id: @course.id, id: @assignment.id}

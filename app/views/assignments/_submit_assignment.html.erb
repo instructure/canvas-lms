@@ -338,3 +338,15 @@
     <% end %>
   </div>
 </div>
+
+<% if @assignment.annotated_document? %>
+  <div class="ef-file-preview-stretch">
+    <iframe
+      allowfullscreen
+      title="<%= t 'Document to annotate' %>"
+      src=""
+      class="ef-file-preview-frame annotated-document-submission"
+      style="width: 100%;">
+    </iframe>
+  </div>
+<% end %>
