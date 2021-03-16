@@ -2,6 +2,7 @@
 
 set -e
 source script/common.sh
+source script/common/canvas/build_helpers.sh
 
 trap '_canvas_lms_telemetry_report_status' ERR EXIT
 SCRIPT_NAME=$0
@@ -224,34 +225,6 @@ function setup_docker_environment {
     setup_docker_as_nonroot
     [[ ${skip_dory:-n} != 'y' ]] && start_dory
   fi
-  if [ -f "docker-compose.override.yml" ]; then
-    message "docker-compose.override.yml exists, skipping copy of default configuration"
-  else
-    message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-    cp config/docker-compose.override.yml.example docker-compose.override.yml
-  fi
-
-  if [ -f ".env" ]; then
-    prompt '.env file exists, would you like to reset it to default? [y/n]' confirm
-    [[ ${confirm:-n} == 'y' ]] || return 0
-  fi
-  message "Setting up default .env configuration"
-  echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env
-}
-
-function copy_docker_config {
-  message 'Copying Canvas docker configuration...'
-  # Only copy yamls, not contents of new-jenkins folder
-  confirm_command 'cp docker-compose/config/*.yml config/' || true
-}
-
-function setup_canvas {
-  message 'Now we can set up Canvas!'
-  copy_docker_config
-  build_images
-  check_gemfile
-  build_assets
-  create_db
 }
 
 function display_next_steps {
@@ -316,6 +289,13 @@ function display_next_steps {
   "
 }
 
+
 setup_docker_environment
-setup_canvas
+message 'Now we can set up Canvas!'
+copy_docker_config
+setup_docker_compose_override
+build_images
+check_gemfile
+build_assets
+create_db
 display_next_steps

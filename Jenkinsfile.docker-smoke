@@ -70,7 +70,7 @@ EOF
             stage('Build Canvas') {
               sh '''#!/bin/bash
                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                source script/common.sh
+                source script/common/canvas/build_helpers.sh
 
                 build_images
                 check_gemfile
@@ -81,7 +81,7 @@ EOF
             stage('Create DB and Migrate') {
               sh '''#!/bin/bash
                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 source script/common.sh
+                 source script/common/canvas/build_helpers.sh
 
                  create_db
                '''

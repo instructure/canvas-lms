@@ -2,6 +2,7 @@
 
 set -e
 source script/common.sh
+source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/docker_dev_update.log"
 DOCKER='y'

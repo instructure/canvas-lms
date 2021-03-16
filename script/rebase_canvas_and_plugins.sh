@@ -2,6 +2,7 @@
 set -o pipefail
 
 source script/common.sh
+source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/rebase_canvas_and_plugins.log"
 FAILED_REPOS=()

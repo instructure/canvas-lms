@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source script/common.sh
+source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/canvas_update.log"
 
