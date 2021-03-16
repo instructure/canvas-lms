@@ -18,11 +18,11 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!assignments_2'
 import lockedSVG from '../SVG/Locked.svg'
 import React from 'react'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 export default function LockedAssignment({assignment}) {
   return (

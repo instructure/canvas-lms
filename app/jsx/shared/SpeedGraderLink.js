@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, string} from 'prop-types'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!assignment'
 
 function renderLink(anchorProps) {

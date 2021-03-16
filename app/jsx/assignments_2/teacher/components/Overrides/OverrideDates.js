@@ -18,9 +18,9 @@
 import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import AssignmentDate from '../Editables/AssignmentDate'
 

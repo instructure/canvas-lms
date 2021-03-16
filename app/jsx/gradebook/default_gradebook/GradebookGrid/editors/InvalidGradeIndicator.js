@@ -20,8 +20,8 @@ import React from 'react'
 import {func} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-elements'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!gradebook'
 
 export default function InvalidGradeIndicator(props) {

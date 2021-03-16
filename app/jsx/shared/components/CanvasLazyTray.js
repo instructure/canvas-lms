@@ -20,7 +20,7 @@ import I18n from 'i18n!canvas_lazy_tray'
 import React, {Suspense} from 'react'
 import CanvasTray from 'jsx/shared/components/CanvasTray'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 // children should be a react `lazy`. This won't work properly otherwise.
 export default function CanvasLazyTray({children, ...trayProps}) {

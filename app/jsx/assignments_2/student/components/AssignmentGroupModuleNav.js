@@ -20,7 +20,7 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 const MAX_DISPLAYED_MODULES = 2
 
@@ -72,4 +72,3 @@ export default function AssignmentGroupModuleNav({assignment}) {
 AssignmentGroupModuleNav.propTypes = {
   assignment: Assignment.shape
 }
-

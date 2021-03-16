@@ -80,7 +80,7 @@ import {isPostable} from 'jsx/grading/helpers/SubmissionHelper'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import {Button} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
 import {deferPromise} from 'jsx/shared/async'
 import {showConfirmationDialog} from 'jsx/shared/ConfirmationDialog'
@@ -125,12 +125,12 @@ const indexOf = [].indexOf
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
 const HEADER_START_AND_END_WIDTHS_IN_PIXELS = 36
-const testWidth = function(text, minWidth, maxWidth) {
+const testWidth = function (text, minWidth, maxWidth) {
   const padding = HEADER_START_AND_END_WIDTHS_IN_PIXELS * 2
   const width = Math.max(TextMeasure.getWidth(text) + padding, minWidth)
   return Math.min(width, maxWidth)
 }
-const anonymousSpeedGraderAlertMountPoint = function() {
+const anonymousSpeedGraderAlertMountPoint = function () {
   return document.querySelector("[data-component='AnonymousSpeedGraderAlert']")
 }
 
@@ -575,14 +575,14 @@ class Gradebook {
         return column.id
       })
       this.gridData.columns.frozen = updatedFrozenIds
-      this.gridData.columns.scrollable = columns.scrollable.map(function(column) {
+      this.gridData.columns.scrollable = columns.scrollable.map(function (column) {
         return column.id
       })
       if (!_.isEqual(currentFrozenIds, updatedFrozenIds)) {
         currentFrozenColumns = currentFrozenIds.map(columnId => {
           return this.gridData.columns.definitions[columnId]
         })
-        currentCustomColumnIds = (function() {
+        currentCustomColumnIds = (function () {
           let j, len
           const results = []
           for (j = 0, len = currentFrozenColumns.length; j < len; j++) {
@@ -593,7 +593,7 @@ class Gradebook {
           }
           return results
         })()
-        updatedCustomColumnIds = (function() {
+        updatedCustomColumnIds = (function () {
           let j, len
           const ref1 = columns.frozen
           const results = []
@@ -607,10 +607,10 @@ class Gradebook {
         })()
         if (!_.isEqual(currentCustomColumnIds, updatedCustomColumnIds)) {
           this.reorderCustomColumns(updatedCustomColumnIds).then(() => {
-            const colsById = _(this.gradebookContent.customColumns).indexBy(function(c) {
+            const colsById = _(this.gradebookContent.customColumns).indexBy(function (c) {
               return c.id
             })
-            return (this.gradebookContent.customColumns = _(updatedCustomColumnIds).map(function(
+            return (this.gradebookContent.customColumns = _(updatedCustomColumnIds).map(function (
               id
             ) {
               return colsById[id]
@@ -731,7 +731,7 @@ class Gradebook {
 
   updateAssignmentVisibilities(hiddenSub) {
     const assignment = this.assignments[hiddenSub.assignment_id]
-    const filteredVisibility = assignment.assignment_visibility.filter(function(id) {
+    const filteredVisibility = assignment.assignment_visibility.filter(function (id) {
       return id !== hiddenSub.user_id
     })
     return (assignment.assignment_visibility = filteredVisibility)
@@ -845,10 +845,10 @@ class Gradebook {
       return escapedStudent
     }
     students.forEach(student => {
-      student.enrollments = _.filter(student.enrollments, function(e) {
+      student.enrollments = _.filter(student.enrollments, function (e) {
         return e.type === 'StudentEnrollment' || e.type === 'StudentViewEnrollment'
       })
-      student.sections = student.enrollments.map(function(e) {
+      student.sections = student.enrollments.map(function (e) {
         return e.course_section_id
       })
       const isStudentView = student.enrollments[0].type === 'StudentViewEnrollment'
@@ -859,10 +859,10 @@ class Gradebook {
       }
       student.computed_current_score || (student.computed_current_score = 0)
       student.computed_final_score || (student.computed_final_score = 0)
-      student.isConcluded = _.every(student.enrollments, function(e) {
+      student.isConcluded = _.every(student.enrollments, function (e) {
         return e.enrollment_state === 'completed'
       })
-      student.isInactive = _.every(student.enrollments, function(e) {
+      student.isInactive = _.every(student.enrollments, function (e) {
         return e.enrollment_state === 'inactive'
       })
       student.cssClass = `student_${student.id}`
@@ -1068,7 +1068,7 @@ class Gradebook {
       return this.gridData.columns.definitions[columnId]
     })
     columns.sort(this.makeColumnSortFn(newSortOrder))
-    this.gridData.columns.scrollable = columns.map(function(column) {
+    this.gridData.columns.scrollable = columns.map(function (column) {
       return column.id
     })
     this.updateGrid()
@@ -1177,7 +1177,7 @@ class Gradebook {
   }
 
   wrapColumnSortFn(wrappedFn, direction = 'ascending') {
-    return function(a, b) {
+    return function (a, b) {
       if (b.type === 'total_grade_override') {
         return -1
       }
@@ -1212,7 +1212,7 @@ class Gradebook {
     }
     const propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
     const pattern = new RegExp(this.userFilterTerm, 'i')
-    return _.some(propertiesToMatch, function(prop) {
+    return _.some(propertiesToMatch, function (prop) {
       let ref1
       return (ref1 = student[prop]) != null ? ref1.match(pattern) : undefined
     })
@@ -1425,7 +1425,7 @@ class Gradebook {
 
   submissionsForStudent(student) {
     let key, value
-    const allSubmissions = (function() {
+    const allSubmissions = (function () {
       const results = []
       for (key in student) {
         value = student[key]
@@ -1818,7 +1818,7 @@ class Gradebook {
     this.renderGradebookSettingsModal()
     this.renderSettingsButton()
     this.renderStatusesModal()
-    return $('#keyboard-shortcuts').click(function() {
+    return $('#keyboard-shortcuts').click(function () {
       const questionMarkKeyDown = $.Event('keydown', {
         keyCode: 191,
         shiftKey: true
@@ -2218,7 +2218,7 @@ class Gradebook {
 
   setVisibleGridColumns() {
     let assignmentGroupId, ref1
-    const parentColumnIds = this.gridData.columns.frozen.filter(function(columnId) {
+    const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
       return !/^custom_col_/.test(columnId)
     })
     const customColumnIds = this.listVisibleCustomColumns().map(column => {
@@ -2249,7 +2249,7 @@ class Gradebook {
       scrollableColumns.sort(this.makeColumnSortFn(this.getColumnOrder()))
     }
     this.gridData.columns.frozen = [...parentColumnIds, ...customColumnIds]
-    return (this.gridData.columns.scrollable = scrollableColumns.map(function(column) {
+    return (this.gridData.columns.scrollable = scrollableColumns.map(function (column) {
       return column.id
     }))
   }
@@ -2537,9 +2537,9 @@ class Gradebook {
     }
     $('#gradebook-grid-wrapper').show()
     this.uid = this.gradebookGrid.grid.getUID()
-    $('#accessibility_warning').focus(function() {
+    $('#accessibility_warning').focus(function () {
       $('#accessibility_warning').removeClass('screenreader-only')
-      return $('#accessibility_warning').blur(function() {
+      return $('#accessibility_warning').blur(function () {
         return $('#accessibility_warning').addClass('screenreader-only')
       })
     })
@@ -2850,7 +2850,7 @@ class Gradebook {
 
   updateFilteredContentInfo() {
     let assignment, assignmentId, invalidAssignmentGroups
-    const unorderedAssignments = function() {
+    const unorderedAssignments = function () {
       const ref1 = this.assignments
       const results = []
       for (assignmentId in ref1) {
@@ -2862,13 +2862,13 @@ class Gradebook {
     const filteredAssignments = this.filterAssignments(unorderedAssignments)
     this.filteredContentInfo.totalPointsPossible = _.reduce(
       this.assignmentGroups,
-      function(sum, assignmentGroup) {
+      function (sum, assignmentGroup) {
         return sum + getAssignmentGroupPointsPossible(assignmentGroup)
       },
       0
     )
     if (this.weightedGroups()) {
-      invalidAssignmentGroups = _.filter(this.assignmentGroups, function(ag) {
+      invalidAssignmentGroups = _.filter(this.assignmentGroups, function (ag) {
         return getAssignmentGroupPointsPossible(ag) === 0
       })
       return (this.filteredContentInfo.invalidAssignmentGroups = invalidAssignmentGroups)
@@ -2912,7 +2912,7 @@ class Gradebook {
   }
 
   toggleNotesColumn() {
-    const parentColumnIds = this.gridData.columns.frozen.filter(function(columnId) {
+    const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
       return !/^custom_col_/.test(columnId)
     })
     const customColumnIds = this.listVisibleCustomColumns().map(column => {
@@ -3103,7 +3103,7 @@ class Gradebook {
     this.gradebookColumnOrderSettings.freezeTotalGrade = true
     const studentColumnPosition = this.gridData.columns.frozen.indexOf('student')
     this.gridData.columns.frozen.splice(studentColumnPosition + 1, 0, 'total_grade')
-    this.gridData.columns.scrollable = this.gridData.columns.scrollable.filter(function(columnId) {
+    this.gridData.columns.scrollable = this.gridData.columns.scrollable.filter(function (columnId) {
       return columnId !== 'total_grade'
     })
     this.saveColumnOrder()
@@ -3115,10 +3115,10 @@ class Gradebook {
   moveTotalGradeColumnToEnd() {
     this.totalColumnPositionChanged = true
     this.gradebookColumnOrderSettings.freezeTotalGrade = false
-    this.gridData.columns.frozen = this.gridData.columns.frozen.filter(function(columnId) {
+    this.gridData.columns.frozen = this.gridData.columns.frozen.filter(function (columnId) {
       return columnId !== 'total_grade'
     })
-    this.gridData.columns.scrollable = this.gridData.columns.scrollable.filter(function(columnId) {
+    this.gridData.columns.scrollable = this.gridData.columns.scrollable.filter(function (columnId) {
       return columnId !== 'total_grade'
     })
     this.gridData.columns.scrollable.push('total_grade')
@@ -3153,7 +3153,7 @@ class Gradebook {
     const columns = this.gradebookGrid.grid.getColumns()
     const range =
       direction === 'next'
-        ? function() {
+        ? function () {
             const results = []
             for (
               let j = (ref1 = location.cell + 1), ref2 = columns.length;
@@ -3164,7 +3164,7 @@ class Gradebook {
             }
             return results
           }.apply(this)
-        : function() {
+        : function () {
             const results = []
             for (
               let j = (ref3 = location.cell - 1);
@@ -3637,7 +3637,7 @@ class Gradebook {
     if (!(submissions.length > 0)) {
       return false
     }
-    return submissions.some(function(submission) {
+    return submissions.some(function (submission) {
       // A submission is graded if either:
       // - it has a score and the workflow state is 'graded'
       // - it is excused
@@ -3657,7 +3657,7 @@ class Gradebook {
   removePendingGradeInfo(submission) {
     return (this.actionStates.pendingGradeInfo = _.reject(
       this.actionStates.pendingGradeInfo,
-      function(info) {
+      function (info) {
         return info.userId === submission.userId && info.assignmentId === submission.assignmentId
       }
     ))
@@ -3665,7 +3665,7 @@ class Gradebook {
 
   getPendingGradeInfo(submission) {
     return (
-      this.actionStates.pendingGradeInfo.find(function(info) {
+      this.actionStates.pendingGradeInfo.find(function (info) {
         return info.userId === submission.userId && info.assignmentId === submission.assignmentId
       }) || null
     )
@@ -3989,19 +3989,19 @@ class Gradebook {
   }
 
   getCustomColumn(customColumnId) {
-    return this.gradebookContent.customColumns.find(function(column) {
+    return this.gradebookContent.customColumns.find(function (column) {
       return column.id === customColumnId
     })
   }
 
   getTeacherNotesColumn() {
-    return this.gradebookContent.customColumns.find(function(column) {
+    return this.gradebookContent.customColumns.find(function (column) {
       return column.teacher_notes
     })
   }
 
   listVisibleCustomColumns() {
-    return this.gradebookContent.customColumns.filter(function(column) {
+    return this.gradebookContent.customColumns.filter(function (column) {
       return !column.hidden
     })
   }
@@ -4166,7 +4166,7 @@ class Gradebook {
         } else {
           this.showNotesColumn()
           this.reorderCustomColumns(
-            this.gradebookContent.customColumns.map(function(c) {
+            this.gradebookContent.customColumns.map(function (c) {
               return c.id
             })
           )

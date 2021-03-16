@@ -19,8 +19,8 @@
 import React from 'react'
 import {bool, instanceOf, number, shape, string} from 'prop-types'
 import I18n from 'i18n!gradebook'
-import {View} from '@instructure/ui-layout'
-import {Pill} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Pill} from '@instructure/ui-pill'
 import Message from './SubmissionStatus/Message'
 import {isPostable} from '../../../grading/helpers/SubmissionHelper'
 

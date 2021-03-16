@@ -23,8 +23,9 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {IconXLine} from '@instructure/ui-icons'
 

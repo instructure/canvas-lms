@@ -2970,6 +2970,20 @@
     keycode "^2"
     prop-types "^15"
 
+"@instructure/ui-metric@6":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-metric/-/ui-metric-6.27.0.tgz#6d4350b6b891d540ede865f7eeab7347b36e6aa3"
+  integrity sha512-oTryVVO0nQtuJLupTxMjo0Qz5eApqTQylwHj4QyKxl6z7x49GgyeuYWjJnuP5bdwxUStMobe0pUVCX9RPj8HVQ==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/console" "^6.27.0"
+    "@instructure/ui-prop-types" "^6.27.0"
+    "@instructure/ui-react-utils" "^6.27.0"
+    "@instructure/ui-testable" "^6.27.0"
+    "@instructure/ui-themeable" "^6.27.0"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-modal@6", "@instructure/ui-modal@^6.17.0":
   version "6.27.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-modal/-/ui-modal-6.27.0.tgz#5400e0da00995bf3c9c8774b1a75c280055db069"
@@ -3260,6 +3274,23 @@
     "@instructure/uid" "^5.52.3"
     prop-types "^15"
 
+"@instructure/ui-pill@6":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-pill/-/ui-pill-6.27.0.tgz#d1b2e8f8df62699d1f4905c36f50b996f79b05dd"
+  integrity sha512-UikfSOSL+C7uSSTc4PbnSXF0Ck/fRqbSs1yAMIefAXv4PjgmLwL+WhyIGTBUrVDXFUMfTzke8ml7v3vYFXGP/w==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/console" "^6.27.0"
+    "@instructure/ui-react-utils" "^6.27.0"
+    "@instructure/ui-testable" "^6.27.0"
+    "@instructure/ui-themeable" "^6.27.0"
+    "@instructure/ui-tooltip" "^6.27.0"
+    "@instructure/ui-truncate-text" "^6.27.0"
+    "@instructure/ui-utils" "^6.27.0"
+    "@instructure/ui-view" "^6.27.0"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-pill@7":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@instructure/ui-pill/-/ui-pill-7.4.4.tgz#70769b295f7064018b2219b60581baf0c4a3f5c7"
@@ -3524,6 +3555,24 @@
     "@instructure/ui-utils" "^6.27.0"
     "@instructure/ui-view" "^6.27.0"
     "@instructure/uid" "^6.27.0"
+    classnames "^2"
+    prop-types "^15"
+
+"@instructure/ui-rating@6":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-rating/-/ui-rating-6.27.0.tgz#2384be75253718ed8f61dac2a196177857061d64"
+  integrity sha512-n+WiOe9bdcWHTVUushaUwIpoVqdC/fqwFWtUm+Y8dTy4jGo8c42XIPfmAyiBXTswJItjm/as1K6BQ01qNkYdGg==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/console" "^6.27.0"
+    "@instructure/ui-a11y-content" "^6.27.0"
+    "@instructure/ui-dom-utils" "^6.27.0"
+    "@instructure/ui-icons" "^6.27.0"
+    "@instructure/ui-motion" "^6.27.0"
+    "@instructure/ui-react-utils" "^6.27.0"
+    "@instructure/ui-testable" "^6.27.0"
+    "@instructure/ui-themeable" "^6.27.0"
+    "@instructure/ui-view" "^6.27.0"
     classnames "^2"
     prop-types "^15"
 

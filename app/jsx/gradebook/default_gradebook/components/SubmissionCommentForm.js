@@ -21,7 +21,7 @@ import {bool, func, string} from 'prop-types'
 import I18n from 'i18n!gradebook'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class SubmissionCommentForm extends React.Component {
   static propTypes = {

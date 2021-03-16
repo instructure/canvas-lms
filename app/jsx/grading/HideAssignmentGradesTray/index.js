@@ -18,9 +18,11 @@
 
 import React, {PureComponent} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
-import {Heading, TruncateText} from '@instructure/ui-elements'
-import {Tray} from '@instructure/ui-overlays'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Heading} from '@instructure/ui-heading'
+import {Tray} from '@instructure/ui-tray'
 
 import I18n from 'i18n!hide_assignment_grades_tray'
 

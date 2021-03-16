@@ -1,12 +1,12 @@
 // This file is copy/pasted from https://unpkg.com/@instructure/ui-themeable@6.10.0/es/themeable.js but with 'newless' added and the relative imports changed to absolute package paths
 
-import _classCallCheck from "@babel/runtime/helpers/esm/classCallCheck";
-import _createClass from "@babel/runtime/helpers/esm/createClass";
-import _possibleConstructorReturn from "@babel/runtime/helpers/esm/possibleConstructorReturn";
-import _getPrototypeOf from "@babel/runtime/helpers/esm/getPrototypeOf";
-import _get from "@babel/runtime/helpers/esm/get";
-import _inherits from "@babel/runtime/helpers/esm/inherits";
-import { warn as _warn } from "@instructure/console";
+import _classCallCheck from '@babel/runtime/helpers/esm/classCallCheck'
+import _createClass from '@babel/runtime/helpers/esm/createClass'
+import _possibleConstructorReturn from '@babel/runtime/helpers/esm/possibleConstructorReturn'
+import _getPrototypeOf from '@babel/runtime/helpers/esm/getPrototypeOf'
+import _get from '@babel/runtime/helpers/esm/get'
+import _inherits from '@babel/runtime/helpers/esm/inherits'
+import {warn as _warn} from '@instructure/console'
 
 /*
  * The MIT License (MIT)
@@ -31,59 +31,63 @@ import { warn as _warn } from "@instructure/console";
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { decorator } from '@instructure/ui-decorator';
-import { isEmpty, shallowEqual, deepEqual } from '@instructure/ui-utils';
-import { uid } from '@instructure/uid';
-import { findDOMNode } from '@instructure/ui-dom-utils';
-import { ThemeContext } from '@instructure/ui-themeable/es/ThemeContext';
-import { applyVariablesToNode } from '@instructure/ui-themeable/es/applyVariablesToNode';
-import { setTextDirection } from '@instructure/ui-themeable/es/setTextDirection';
-import { generateComponentTheme, generateTheme, registerComponentTheme, mountComponentStyles } from '@instructure/ui-themeable/es/ThemeRegistry';
+import React from 'react'
+import PropTypes from 'prop-types'
+import {decorator} from '@instructure/ui-decorator'
+import {isEmpty, shallowEqual, deepEqual} from '@instructure/ui-utils'
+import {uid} from '@instructure/uid'
+import {findDOMNode} from '@instructure/ui-dom-utils'
+import {ThemeContext} from '@instructure/ui-themeable/es/ThemeContext'
+import {applyVariablesToNode, setTextDirection} from '@instructure/ui-themeable'
+import {
+  generateComponentTheme,
+  generateTheme,
+  registerComponentTheme,
+  mountComponentStyles
+} from '@instructure/ui-themeable/es/ThemeRegistry'
 
 import newless from 'newless'
 
 /**
-* ---
-* category: utilities/themes
-* ---
-* A decorator or higher order component that makes a component `themeable`.
-*
-* As a HOC:
-*
-* ```js
-* import themeable from '@instructure/ui-themeable'
-* import styles from 'styles.css'
-* import theme from 'theme.js'
-*
-* class Example extends React.Component {
-*   render () {
-*     return <div className={styles.root}>Hello</div>
-*   }
-* }
-*
-* export default themeable(theme, styles)(Example)
-* ```
-*
-* Note: in the above example, the CSS file must be transformed into a JS object
-* via [babel](#babel-plugin-themeable-styles) or [webpack](#ui-webpack-config) loader.
-*
-* Themeable components inject their themed styles into the document when they are mounted.
-*
-* After the initial mount, a themeable component's theme can be configured explicitly
-* via its `theme` prop or passed via React context using the [ApplyTheme](#ApplyTheme) component.
-*
-* Themeable components register themselves with the [global theme registry](#registry)
-* when they are imported into the application, so you will need to be sure to import them
-* before you mount your application so that the default themed styles can be generated and injected.
-*
-* @param {function} theme - A function that generates the component theme variables.
-* @param {object} styles - The component styles object.
-* @return {function} composes the themeable component.
-*/
+ * ---
+ * category: utilities/themes
+ * ---
+ * A decorator or higher order component that makes a component `themeable`.
+ *
+ * As a HOC:
+ *
+ * ```js
+ * import themeable from '@instructure/ui-themeable'
+ * import styles from 'styles.css'
+ * import theme from 'theme.js'
+ *
+ * class Example extends React.Component {
+ *   render () {
+ *     return <div className={styles.root}>Hello</div>
+ *   }
+ * }
+ *
+ * export default themeable(theme, styles)(Example)
+ * ```
+ *
+ * Note: in the above example, the CSS file must be transformed into a JS object
+ * via [babel](#babel-plugin-themeable-styles) or [webpack](#ui-webpack-config) loader.
+ *
+ * Themeable components inject their themed styles into the document when they are mounted.
+ *
+ * After the initial mount, a themeable component's theme can be configured explicitly
+ * via its `theme` prop or passed via React context using the [ApplyTheme](#ApplyTheme) component.
+ *
+ * Themeable components register themselves with the [global theme registry](#registry)
+ * when they are imported into the application, so you will need to be sure to import them
+ * before you mount your application so that the default themed styles can be generated and injected.
+ *
+ * @param {function} theme - A function that generates the component theme variables.
+ * @param {object} styles - The component styles object.
+ * @return {function} composes the themeable component.
+ */
 
-var emptyObj = {};
+const emptyObj = {}
 /*
  * Note: there are consumers (like canvas-lms and other edu org repos) that are
  * consuming this file directly from "/src" (as opposed to "/es" or "/lib" like normal)
@@ -101,191 +105,256 @@ var emptyObj = {};
  * so once we do that, this caveat no longer applies.
  */
 
-var themeable = decorator(function (ComposedComponent, theme) {
-  var styles = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
-  var displayName = ComposedComponent.displayName || ComposedComponent.name;
-  var componentId = "".concat(styles && styles.componentId || uid());
+const themeable = decorator(function (ComposedComponent, theme) {
+  const styles = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {}
+  const displayName = ComposedComponent.displayName || ComposedComponent.name
+  let componentId = ''.concat((styles && styles.componentId) || uid())
 
   if (process.env.NODE_ENV !== 'production') {
-    componentId = "".concat(displayName, "__").concat(componentId);
+    componentId = ''.concat(displayName, '__').concat(componentId)
 
-    /*#__PURE__*/
+    /* #__PURE__ */
 
-    /*#__PURE__*/
-    _warn(parseInt(React.version) >= 15, "[themeable] React 15 or higher is required. You are running React version ".concat(React.version, "."));
+    /* #__PURE__ */
+    _warn(
+      parseInt(React.version) >= 15,
+      '[themeable] React 15 or higher is required. You are running React version '.concat(
+        React.version,
+        '.'
+      )
+    )
   }
 
-  var contextKey = Symbol(componentId);
-  var template = styles && typeof styles.template === 'function' ? styles.template : function () {
-    /*#__PURE__*/
+  const contextKey = Symbol(componentId)
+  const template =
+    styles && typeof styles.template === 'function'
+      ? styles.template
+      : function () {
+          /* #__PURE__ */
 
-    /*#__PURE__*/
-    _warn(false, '[themeable] Invalid styles for: %O. Use @instructure/babel-plugin-themeable-styles to transform CSS imports.', displayName);
+          /* #__PURE__ */
+          _warn(
+            false,
+            '[themeable] Invalid styles for: %O. Use @instructure/babel-plugin-themeable-styles to transform CSS imports.',
+            displayName
+          )
 
-    return '';
-  };
-  registerComponentTheme(contextKey, theme);
+          return ''
+        }
+  registerComponentTheme(contextKey, theme)
 
-  var getContext = function getContext(context) {
-    var themeContext = ThemeContext.getThemeContext(context);
-    return themeContext || emptyObj;
-  };
+  const getContext = function getContext(context) {
+    const themeContext = ThemeContext.getThemeContext(context)
+    return themeContext || emptyObj
+  }
 
-  var getThemeFromContext = function getThemeFromContext(context) {
-    var _getContext = getContext(context),
-        theme = _getContext.theme;
+  const getThemeFromContext = function getThemeFromContext(context) {
+    const _getContext = getContext(context),
+      theme = _getContext.theme
 
     if (theme && theme[contextKey]) {
-      return Object.assign({}, theme[contextKey]);
+      return {...theme[contextKey]}
     } else {
-      return emptyObj;
+      return emptyObj
     }
-  };
+  }
 
-  var generateThemeForContextKey = function generateThemeForContextKey(themeKey, overrides) {
-    return generateComponentTheme(contextKey, themeKey, overrides);
-  };
+  const generateThemeForContextKey = function generateThemeForContextKey(themeKey, overrides) {
+    return generateComponentTheme(contextKey, themeKey, overrides)
+  }
 
-  var ThemeableComponent =
-  /*#__PURE__*/
-  function (_ComposedComponent) {
-    _inherits(ThemeableComponent, _ComposedComponent);
+  const ThemeableComponent =
+    /* #__PURE__ */
+    (function (_ComposedComponent) {
+      _inherits(ThemeableComponent, _ComposedComponent)
 
-    function ThemeableComponent() {
-      var _this;
+      function ThemeableComponent() {
+        let _this
 
-      _classCallCheck(this, ThemeableComponent);
+        _classCallCheck(this, ThemeableComponent)
 
-      var res = _this = _possibleConstructorReturn(this, _getPrototypeOf(ThemeableComponent).apply(this, arguments));
+        const res = (_this = _possibleConstructorReturn(
+          this,
+          _getPrototypeOf(ThemeableComponent).apply(this, arguments)
+        ))
 
-      _this._themeCache = null;
-      _this._instanceId = uid(displayName);
-      return _possibleConstructorReturn(_this, res);
-    }
-
-    _createClass(ThemeableComponent, [{
-      key: "componentWillMount",
-      value: function componentWillMount() {
-        var defaultTheme = generateThemeForContextKey();
-        mountComponentStyles(template, defaultTheme, componentId);
-
-        if (_get(_getPrototypeOf(ThemeableComponent.prototype), "componentWillMount", this)) {
-          _get(_getPrototypeOf(ThemeableComponent.prototype), "componentWillMount", this).call(this);
-        }
+        _this._themeCache = null
+        _this._instanceId = uid(displayName)
+        return _possibleConstructorReturn(_this, res)
       }
-    }, {
-      key: "componentDidMount",
-      value: function componentDidMount() {
-        this.applyTheme();
-        setTextDirection();
 
-        if (_get(_getPrototypeOf(ThemeableComponent.prototype), "componentDidMount", this)) {
-          _get(_getPrototypeOf(ThemeableComponent.prototype), "componentDidMount", this).call(this);
-        }
-      }
-    }, {
-      key: "shouldComponentUpdate",
-      value: function shouldComponentUpdate(nextProps, nextState, nextContext) {
-        var themeContextWillChange = !deepEqual(ThemeContext.getThemeContext(this.context), ThemeContext.getThemeContext(nextContext));
-        if (themeContextWillChange) return true;
+      _createClass(ThemeableComponent, [
+        {
+          key: 'componentWillMount',
+          value: function componentWillMount() {
+            const defaultTheme = generateThemeForContextKey()
+            mountComponentStyles(template, defaultTheme, componentId)
 
-        if (_get(_getPrototypeOf(ThemeableComponent.prototype), "shouldComponentUpdate", this)) {
-          return _get(_getPrototypeOf(ThemeableComponent.prototype), "shouldComponentUpdate", this).call(this, nextProps, nextState, nextContext);
-        }
-
-        return !shallowEqual(this.props, nextProps) || !shallowEqual(this.state, nextState) || !shallowEqual(this.context, nextContext);
-      }
-    }, {
-      key: "componentWillUpdate",
-      value: function componentWillUpdate(nextProps, nextState, nextContext) {
-        if (!deepEqual(nextProps.theme, this.props.theme) || !deepEqual(getThemeFromContext(nextContext), getThemeFromContext(this.context))) {
-          this._themeCache = null;
-        }
-
-        if (_get(_getPrototypeOf(ThemeableComponent.prototype), "componentWillUpdate", this)) {
-          _get(_getPrototypeOf(ThemeableComponent.prototype), "componentWillUpdate", this).call(this, nextProps, nextState, nextContext);
-        }
-      }
-    }, {
-      key: "componentDidUpdate",
-      value: function componentDidUpdate(prevProps, prevState, prevContext) {
-        this.applyTheme();
-
-        if (_get(_getPrototypeOf(ThemeableComponent.prototype), "componentDidUpdate", this)) {
-          _get(_getPrototypeOf(ThemeableComponent.prototype), "componentDidUpdate", this).call(this, prevProps, prevState, prevContext);
-        }
-      }
-    }, {
-      key: "applyTheme",
-      value: function applyTheme(DOMNode) {
-        if (isEmpty(this.theme)) {
-          return;
-        }
-
-        var defaultTheme = generateThemeForContextKey();
-        applyVariablesToNode(DOMNode || findDOMNode(this), // eslint-disable-line react/no-find-dom-node
-        this.theme, defaultTheme, componentId, template, // for IE 11
-        this.scope // for IE 11
-        );
-      }
-    }, {
-      key: "scope",
-      get: function get() {
-        return "".concat(componentId, "__").concat(this._instanceId);
-      }
-    }, {
-      key: "theme",
-      get: function get() {
-        if (this._themeCache !== null) {
-          return this._themeCache;
-        }
-
-        var _getContext2 = getContext(this.context),
-            immutable = _getContext2.immutable;
-
-        var theme = getThemeFromContext(this.context);
-
-        if (this.props.theme && !isEmpty(this.props.theme)) {
-          if (!theme) {
-            theme = this.props.theme;
-          } else if (immutable) {
-            /*#__PURE__*/
-
-            /*#__PURE__*/
-            _warn(false, '[themeable] Parent theme is immutable. Cannot apply theme: %O', this.props.theme);
-          } else {
-            theme = isEmpty(theme) ? this.props.theme : Object.assign({}, theme, this.props.theme);
+            if (_get(_getPrototypeOf(ThemeableComponent.prototype), 'componentWillMount', this)) {
+              _get(_getPrototypeOf(ThemeableComponent.prototype), 'componentWillMount', this).call(
+                this
+              )
+            }
           }
-        } // pass in the component theme as overrides
+        },
+        {
+          key: 'componentDidMount',
+          value: function componentDidMount() {
+            this.applyTheme()
+            setTextDirection()
 
+            if (_get(_getPrototypeOf(ThemeableComponent.prototype), 'componentDidMount', this)) {
+              _get(_getPrototypeOf(ThemeableComponent.prototype), 'componentDidMount', this).call(
+                this
+              )
+            }
+          }
+        },
+        {
+          key: 'shouldComponentUpdate',
+          value: function shouldComponentUpdate(nextProps, nextState, nextContext) {
+            const themeContextWillChange = !deepEqual(
+              ThemeContext.getThemeContext(this.context),
+              ThemeContext.getThemeContext(nextContext)
+            )
+            if (themeContextWillChange) return true
 
-        this._themeCache = generateThemeForContextKey(null, theme);
-        return this._themeCache;
-      }
-    }]);
+            if (
+              _get(_getPrototypeOf(ThemeableComponent.prototype), 'shouldComponentUpdate', this)
+            ) {
+              return _get(
+                _getPrototypeOf(ThemeableComponent.prototype),
+                'shouldComponentUpdate',
+                this
+              ).call(this, nextProps, nextState, nextContext)
+            }
 
-    return ThemeableComponent;
-  }(newless(ComposedComponent));
+            return (
+              !shallowEqual(this.props, nextProps) ||
+              !shallowEqual(this.state, nextState) ||
+              !shallowEqual(this.context, nextContext)
+            )
+          }
+        },
+        {
+          key: 'componentWillUpdate',
+          value: function componentWillUpdate(nextProps, nextState, nextContext) {
+            if (
+              !deepEqual(nextProps.theme, this.props.theme) ||
+              !deepEqual(getThemeFromContext(nextContext), getThemeFromContext(this.context))
+            ) {
+              this._themeCache = null
+            }
 
-  ThemeableComponent.componentId = componentId;
-  ThemeableComponent.theme = contextKey;
-  ThemeableComponent.contextTypes = Object.assign({}, ComposedComponent.contextTypes, ThemeContext.types);
-  ThemeableComponent.propTypes = Object.assign({}, ComposedComponent.propTypes, {
+            if (_get(_getPrototypeOf(ThemeableComponent.prototype), 'componentWillUpdate', this)) {
+              _get(_getPrototypeOf(ThemeableComponent.prototype), 'componentWillUpdate', this).call(
+                this,
+                nextProps,
+                nextState,
+                nextContext
+              )
+            }
+          }
+        },
+        {
+          key: 'componentDidUpdate',
+          value: function componentDidUpdate(prevProps, prevState, prevContext) {
+            this.applyTheme()
+
+            if (_get(_getPrototypeOf(ThemeableComponent.prototype), 'componentDidUpdate', this)) {
+              _get(_getPrototypeOf(ThemeableComponent.prototype), 'componentDidUpdate', this).call(
+                this,
+                prevProps,
+                prevState,
+                prevContext
+              )
+            }
+          }
+        },
+        {
+          key: 'applyTheme',
+          value: function applyTheme(DOMNode) {
+            if (isEmpty(this.theme)) {
+              return
+            }
+
+            const defaultTheme = generateThemeForContextKey()
+            applyVariablesToNode(
+              DOMNode || findDOMNode(this), // eslint-disable-line react/no-find-dom-node
+              this.theme,
+              defaultTheme,
+              componentId,
+              template, // for IE 11
+              this.scope // for IE 11
+            )
+          }
+        },
+        {
+          key: 'scope',
+          get: function get() {
+            return ''.concat(componentId, '__').concat(this._instanceId)
+          }
+        },
+        {
+          key: 'theme',
+          get: function get() {
+            if (this._themeCache !== null) {
+              return this._themeCache
+            }
+
+            const _getContext2 = getContext(this.context),
+              immutable = _getContext2.immutable
+
+            let theme = getThemeFromContext(this.context)
+
+            if (this.props.theme && !isEmpty(this.props.theme)) {
+              if (!theme) {
+                theme = this.props.theme
+              } else if (immutable) {
+                /* #__PURE__ */
+
+                /* #__PURE__ */
+                _warn(
+                  false,
+                  '[themeable] Parent theme is immutable. Cannot apply theme: %O',
+                  this.props.theme
+                )
+              } else {
+                theme = isEmpty(theme) ? this.props.theme : {...theme, ...this.props.theme}
+              }
+            } // pass in the component theme as overrides
+
+            this._themeCache = generateThemeForContextKey(null, theme)
+            return this._themeCache
+          }
+        }
+      ])
+
+      return ThemeableComponent
+    })(newless(ComposedComponent))
+
+  ThemeableComponent.componentId = componentId
+  ThemeableComponent.theme = contextKey
+  ThemeableComponent.contextTypes = {
+    ...ComposedComponent.contextTypes,
+    ...ThemeContext.types
+  }
+  ThemeableComponent.propTypes = {
+    ...ComposedComponent.propTypes,
     theme: PropTypes.object // eslint-disable-line react/forbid-prop-types
-
-  });
-  ThemeableComponent.generateTheme = generateThemeForContextKey;
-  return ThemeableComponent;
-});
+  }
+  ThemeableComponent.generateTheme = generateThemeForContextKey
+  return ThemeableComponent
+})
 /**
-* Utility to generate a theme for all themeable components that have been registered.
-* This theme can be applied using the [ApplyTheme](#ApplyTheme) component.
-*
-* @param {String} themeKey The theme to use (for global theme variables across components)
-* @param {Object} overrides theme variable overrides (usually for dynamic/user defined values)
-* @return {Object} A theme config to use with `<ApplyTheme />`
-*/
+ * Utility to generate a theme for all themeable components that have been registered.
+ * This theme can be applied using the [ApplyTheme](#ApplyTheme) component.
+ *
+ * @param {String} themeKey The theme to use (for global theme variables across components)
+ * @param {Object} overrides theme variable overrides (usually for dynamic/user defined values)
+ * @return {Object} A theme config to use with `<ApplyTheme />`
+ */
 
-themeable.generateTheme = generateTheme;
-export default themeable;
-export { themeable };
+themeable.generateTheme = generateTheme
+export default themeable
+export {themeable}

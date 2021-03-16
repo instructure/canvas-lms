@@ -22,7 +22,7 @@ import {func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class DiscussionManageMenu extends Component {
   static propTypes = {

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import StatusColorListItem from 'jsx/gradebook/default_gradebook/components/StatusColorListItem'
 
@@ -47,41 +47,41 @@ QUnit.module('StatusColorListItem', {
   }
 })
 
-test('color is passed to ColorPicker', function() {
+test('color is passed to ColorPicker', function () {
   strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), this.instance.props.color)
 })
 
-test('parentCompontent is StatusColorListItem', function() {
+test('parentCompontent is StatusColorListItem', function () {
   strictEqual(this.wrapper.find('ColorPicker').prop('parentComponent'), 'StatusColorListItem')
 })
 
-test('status is displayed', function() {
+test('status is displayed', function () {
   ok(this.wrapper.contains(<Text>Late</Text>))
 })
 
-test('popover trigger is a kabob', function() {
+test('popover trigger is a kabob', function () {
   ok(this.wrapper.find('PopoverTrigger Button').contains(<IconMoreSolid />))
 })
 
-test('setColor sets the ColorPicker color', function() {
+test('setColor sets the ColorPicker color', function () {
   const color = '#FFFFFF'
   this.instance.setColor(color)
   strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), color)
 })
 
-test('setColor sets the ColorPicker color, even with no octothorpe', function() {
+test('setColor sets the ColorPicker color, even with no octothorpe', function () {
   const color = 'FFFFFF'
   this.instance.setColor(color)
   strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), `#${color}`)
 })
 
-test('setColor sets li style', function() {
+test('setColor sets li style', function () {
   const color = '#FFFFFF'
   this.instance.setColor(color)
   strictEqual(this.wrapper.find('li').prop('style').backgroundColor, color)
 })
 
-test('setColor sets li style, even with no octothorpe', function() {
+test('setColor sets li style, even with no octothorpe', function () {
   const color = 'FFFFFF'
   this.instance.setColor(color)
   strictEqual(this.wrapper.find('li').prop('style').backgroundColor, `#${color}`)

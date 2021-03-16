@@ -19,7 +19,9 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import I18n from 'i18n!gradebook'
-import {Avatar, Link, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
 
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'

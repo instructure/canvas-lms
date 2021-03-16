@@ -20,7 +20,7 @@ import $ from 'jquery'
 import I18n from 'i18n!Navigation'
 import React from 'react'
 import {func} from 'prop-types'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -164,9 +164,7 @@ export default class Navigation extends React.Component {
 
   componentDidUpdate(_prevProps, prevState) {
     if (prevState.activeItem !== this.state.activeItem) {
-      $(`.${ACTIVE_CLASS}`)
-        .removeClass(ACTIVE_CLASS)
-        .removeAttr('aria-current')
+      $(`.${ACTIVE_CLASS}`).removeClass(ACTIVE_CLASS).removeAttr('aria-current')
       $(`#global_nav_${this.state.activeItem}_link`)
         .closest('li')
         .addClass(ACTIVE_CLASS)

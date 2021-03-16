@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine, IconEditLine, IconTrashLine, IconMoveEndLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 
 const OutcomeKebabMenu = ({menuTitle, onMenuHandler}) => (

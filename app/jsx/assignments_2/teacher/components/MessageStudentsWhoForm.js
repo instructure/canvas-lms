@@ -20,10 +20,11 @@ import React from 'react'
 import {bool, func, number, string, arrayOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
-import {TextArea, Select} from '@instructure/ui-forms'
+import {Select} from '@instructure/ui-forms'
+import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 
 import {TeacherAssignmentShape} from '../assignmentData'

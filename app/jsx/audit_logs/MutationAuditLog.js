@@ -22,10 +22,10 @@ import tz from 'timezone'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Grid} from '@instructure/ui-grid'
 
 function formatDate(date) {

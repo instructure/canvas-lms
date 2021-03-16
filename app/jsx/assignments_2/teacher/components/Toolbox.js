@@ -21,10 +21,10 @@ import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
 
-import {Checkbox} from '@instructure/ui-forms'
-import {Flex} from '@instructure/ui-layout'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentPoints from './Editables/AssignmentPoints'

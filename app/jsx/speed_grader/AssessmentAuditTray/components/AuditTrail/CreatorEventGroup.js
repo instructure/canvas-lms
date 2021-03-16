@@ -19,12 +19,14 @@
 import React, {PureComponent} from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text, TruncateText} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import I18n from 'i18n!speed_grader'
 

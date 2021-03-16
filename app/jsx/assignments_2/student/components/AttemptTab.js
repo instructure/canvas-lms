@@ -27,7 +27,7 @@ import React, {Component, lazy, Suspense} from 'react'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionChoiceSVG from '../SVG/SubmissionChoice.svg'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
 const FileUpload = lazy(() => import('./AttemptType/FileUpload'))

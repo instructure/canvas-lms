@@ -19,7 +19,7 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {string, oneOf} from 'prop-types'
 import 'lock_reason'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 
 import locked1SVG from '../SVG/Locked1.svg'
@@ -45,5 +45,5 @@ export default function DateLocked(props) {
 
 DateLocked.propTypes = {
   date: string.isRequired,
-  type: oneOf(['assignment', 'quiz', 'topic', 'file', 'page']),
+  type: oneOf(['assignment', 'quiz', 'topic', 'file', 'page'])
 }

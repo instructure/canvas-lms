@@ -20,8 +20,9 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, func, oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-layout'
-import {Heading, Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -146,8 +147,5 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Header)
+export default connect(mapStateToProps, mapDispatchToProps)(Header)
 /* eslint-enable no-alert */

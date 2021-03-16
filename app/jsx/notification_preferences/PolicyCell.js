@@ -21,8 +21,8 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {Flex} from '@instructure/ui-flex'
 import {IconNoLine} from '@instructure/ui-icons'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 export default class PolicyCell extends React.Component {

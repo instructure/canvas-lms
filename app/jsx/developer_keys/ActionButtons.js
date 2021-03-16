@@ -21,8 +21,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {Button} from '@instructure/ui-buttons'
-import {Tooltip} from '@instructure/ui-overlays'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
 
 class DeveloperKeyActionButtons extends React.Component {

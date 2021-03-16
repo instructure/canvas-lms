@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {string, func, shape} from 'prop-types'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 import {IconMiniArrowUpSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'

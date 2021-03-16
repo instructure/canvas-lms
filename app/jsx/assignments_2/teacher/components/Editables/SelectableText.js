@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, string, func, element, oneOf, oneOfType, arrayOf, shape} from 'prop-types'
 import isEqual from 'lodash/isEqual'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-forms'
 import {InPlaceEdit} from '@instructure/ui-editable'
 import {createChainedFunction} from '@instructure/ui-utils'

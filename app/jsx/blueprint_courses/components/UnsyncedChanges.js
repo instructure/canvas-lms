@@ -23,9 +23,9 @@ import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 
 import {Alert} from '@instructure/ui-alerts'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import UnsyncedChange from './UnsyncedChange'
 import {ConnectedMigrationOptions as MigrationOptions} from './MigrationOptions'

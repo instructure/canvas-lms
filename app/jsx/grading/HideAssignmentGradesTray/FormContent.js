@@ -20,7 +20,8 @@ import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
 import I18n from 'i18n!hide_assignment_grades_tray'

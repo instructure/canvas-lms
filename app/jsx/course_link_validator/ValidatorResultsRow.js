@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import {Flex} from '@instructure/ui-layout'
-import {List, Text, Link, Heading} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import {Button} from '@instructure/ui-buttons'
 import {
   IconSettingsLine,

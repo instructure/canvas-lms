@@ -19,7 +19,7 @@
 import I18n from 'i18n!dashcards'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'

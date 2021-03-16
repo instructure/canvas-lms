@@ -19,8 +19,8 @@
 import React from 'react'
 import I18n from 'i18n!assignment_2_assignment_toggle_details'
 
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import apiUserContent from 'compiled/str/apiUserContent'
 import noContent from './SVG/NoReportsClipboard.svg'

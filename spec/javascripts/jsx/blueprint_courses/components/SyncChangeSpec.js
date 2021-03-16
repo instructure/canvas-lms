@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 import SyncChange from 'jsx/blueprint_courses/components/SyncChange'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import getSampleData from '../getSampleData'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'

@@ -22,7 +22,7 @@ import OverrideAttempts from './OverrideAttempts'
 import OverrideSubmissionTypes from './OverrideSubmissionTypes'
 import OverrideDates from './OverrideDates'
 import {OverrideShape} from '../../assignmentData'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 export default class OverrideDetail extends React.Component {
   static propTypes = {

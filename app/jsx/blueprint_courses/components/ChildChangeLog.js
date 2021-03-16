@@ -22,9 +22,9 @@ import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 
 import ChangeLogRow, {ChangeRow} from './ChangeLogRow'
 import SyncHistoryItem from './SyncHistoryItem'

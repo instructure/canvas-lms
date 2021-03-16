@@ -18,7 +18,7 @@
 
 import {IconMiniArrowUpSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import React from 'react'
 import {string, func} from 'prop-types'
 import preventDefault from 'compiled/fn/preventDefault'

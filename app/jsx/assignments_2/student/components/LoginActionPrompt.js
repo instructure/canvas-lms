@@ -18,11 +18,12 @@
 
 import {bool, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!assignments_2_login_action_prompt'
 import lockedSVG from '../SVG/Locked1.svg'
 import React from 'react'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 const navigateToLogin = () => {
   window.location.assign('/login')

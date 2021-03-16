@@ -19,8 +19,9 @@
 // import I18n from 'i18n!user_search_selector_item'
 import React from 'react'
 
-import {Avatar, Text} from '@instructure/ui-elements'
-import {Flex} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {Avatar} from '@instructure/ui-avatar'
+import {Flex} from '@instructure/ui-flex'
 
 import {basicUser} from '../proptypes/user'
 

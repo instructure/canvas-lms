@@ -18,12 +18,12 @@
 import I18n from 'i18n!a2LatePolicyStatusDisplay'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 import LatePolicyToolTipContent from './LatePolicyToolTipContent'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function LatePolicyStatusDisplay(props) {
   // TODO: actually pass the assignment and submission in here instead of all these
@@ -79,4 +79,3 @@ LatePolicyStatusDisplay.propTypes = {
   pointsDeducted: PropTypes.number.isRequired,
   pointsPossible: PropTypes.number.isRequired
 }
-

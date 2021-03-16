@@ -24,7 +24,7 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import {Query, withApollo} from 'react-apollo'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 import SelectableText from './SelectableText'
 import {ModuleShape, COURSE_MODULES_QUERY, COURSE_MODULES_QUERY_LOCAL} from '../../assignmentData'
@@ -143,7 +143,7 @@ class AssignmentModulesUI extends React.Component {
   }
 }
 
-const AssignmentModules = function(props) {
+const AssignmentModules = function (props) {
   const q = props.mode === 'edit' ? COURSE_MODULES_QUERY : COURSE_MODULES_QUERY_LOCAL
 
   let modules = []

@@ -19,10 +19,10 @@
 import React from 'react'
 import {func, number, shape, string, bool} from 'prop-types'
 import I18n from 'i18n!gradebook'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {NumberInput} from '@instructure/ui-number-input'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import {RadioInput} from '@instructure/ui-radio-input'
 
 import classnames from 'classnames'

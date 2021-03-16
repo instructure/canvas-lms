@@ -21,10 +21,10 @@ import {func, string} from 'prop-types'
 import I18n from 'i18n!gradebook'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {Grid} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-grid'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 class AnonymousSpeedGraderAlert extends React.Component {
   static propTypes = {

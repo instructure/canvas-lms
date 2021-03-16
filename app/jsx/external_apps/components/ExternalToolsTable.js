@@ -26,7 +26,7 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 import store from '../lib/ExternalAppsStore'
 import ExternalToolsTableRow from './ExternalToolsTableRow'
 import InfiniteScroll from './InfiniteScroll'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import splitAssetString from 'compiled/str/splitAssetString'
 

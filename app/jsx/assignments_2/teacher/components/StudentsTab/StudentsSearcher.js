@@ -21,7 +21,11 @@ import I18n from 'i18n!assignments_2'
 import _ from 'lodash'
 import {func} from 'prop-types'
 
-import {ScreenReaderContent, AccessibleContent, PresentationContent} from '@instructure/ui-a11y'
+import {
+  ScreenReaderContent,
+  PresentationContent,
+  AccessibleContent
+} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {
@@ -30,13 +34,13 @@ import {
   IconSpeedGraderLine,
   IconEmailLine
 } from '@instructure/ui-icons'
-import {Badge} from '@instructure/ui-elements'
+import {Badge} from '@instructure/ui-badge'
 
 import {TeacherAssignmentShape} from '../../assignmentData'
 import StudentSearchQuery from './StudentSearchQuery'
 import StudentsTable from './StudentsTable'
 import Filters from './Filters'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 const STUDENT_SEARCH_DELAY = 750
 const MIN_SEARCH_CHARS = 3

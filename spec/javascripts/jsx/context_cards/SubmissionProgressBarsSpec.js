@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import SubmissionProgressBars from 'jsx/context_cards/SubmissionProgressBars'
-import {Progress as InstUIProgress} from '@instructure/ui-elements'
+import {Progress as InstUIProgress} from '@instructure/ui-progress'
 import {shallow} from 'enzyme'
 
 const user = {_id: 1}

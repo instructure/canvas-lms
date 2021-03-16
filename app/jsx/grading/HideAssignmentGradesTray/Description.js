@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {List, Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 export default function Description() {

@@ -22,7 +22,7 @@ import I18n from 'i18n!assignments_2'
 
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 import EditableHeading from './EditableHeading'
 

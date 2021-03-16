@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import I18n from 'i18n!gradingStatusPill'
 
 function forEachNode(nodeList, fn) {

@@ -22,10 +22,10 @@ import React from 'react'
 import {flatten} from 'lodash'
 
 import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-layout'
-import {Heading} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
 import {IconXSolid} from '@instructure/ui-icons'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 
 import actions from '../actions'
 import RoleTrayTable from './RoleTrayTable'

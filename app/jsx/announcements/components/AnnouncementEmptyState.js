@@ -20,9 +20,10 @@ import I18n from 'i18n!announcements_v2'
 import React from 'react'
 import {bool} from 'prop-types'
 
-import {View} from '@instructure/ui-layout'
-import {Heading, Text} from '@instructure/ui-elements'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 
 import AnnouncementHornSVGURL from '../../../../public/images/announcements/announcements-airhorn.svg'
 

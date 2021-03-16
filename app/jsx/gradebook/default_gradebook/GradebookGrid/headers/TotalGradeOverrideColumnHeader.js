@@ -17,8 +17,9 @@
  */
 
 import React, {PureComponent} from 'react'
-import {Grid, View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Grid} from '@instructure/ui-grid'
+import {Text} from '@instructure/ui-text'
 
 import I18n from 'i18n!gradebook'
 

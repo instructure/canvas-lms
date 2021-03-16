@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {transformScore} from '../score-helpers'
 
 const {string, object, bool} = PropTypes

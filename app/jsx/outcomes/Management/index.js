@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'

@@ -24,7 +24,7 @@ import I18n from 'i18n!assignments_2_media_attempt'
 import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Submission} from '../../graphqlData/Submission'
 import UploadMedia from '@instructure/canvas-media'
 import {
@@ -37,7 +37,7 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {MediaPlayer} from '@instructure/ui-media-player'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}

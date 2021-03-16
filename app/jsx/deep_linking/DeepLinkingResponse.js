@@ -19,9 +19,9 @@
 import I18n from 'i18n!external_content.success'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 export class RetrievingContent extends React.Component {
   static messageType = 'LtiDeepLinkingResponse'

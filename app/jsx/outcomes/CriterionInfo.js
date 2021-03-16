@@ -17,11 +17,12 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {IconQuestionLine} from '@instructure/ui-icons'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import I18n from 'i18n!outcomesCriterionInfo'
 
 const spiel = () =>

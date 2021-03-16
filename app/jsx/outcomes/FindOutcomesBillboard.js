@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Billboard} from '@instructure/ui-billboard'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import SVGWrapper from '../shared/SVGWrapper'
 import useCanvasContext from './shared/hooks/useCanvasContext'
 

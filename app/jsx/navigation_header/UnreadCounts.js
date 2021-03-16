@@ -45,7 +45,7 @@
 import React, {useRef, useState, useEffect} from 'react'
 import {createPortal} from 'react-dom'
 import {any, bool, func, number, string} from 'prop-types'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import I18n from 'i18n!UnreadCounts'
 

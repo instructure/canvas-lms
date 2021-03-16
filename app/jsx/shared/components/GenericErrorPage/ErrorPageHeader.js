@@ -17,7 +17,7 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {string} from 'prop-types'
 

@@ -36,32 +36,30 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
         >
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
             size="small"
+            withVisualDebug={false}
           >
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               overflowX="visible"
               overflowY="visible"
               padding="0 0 x-small 0"
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Text
                 as="span"
@@ -75,17 +73,16 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               overflowX="visible"
               overflowY="visible"
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Text
                 as="span"
@@ -99,42 +96,40 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               overflowX="visible"
               overflowY="visible"
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Avatar
                 data-fs-exclude={true}
-                inline={true}
+                display="inline-block"
                 margin="medium 0 x-small 0"
                 name="foo"
                 onImageLoaded={[Function]}
+                shape="circle"
                 size="small"
                 src="testImageUrl"
-                variant="circle"
               />
             </View>
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               overflowX="visible"
               overflowY="visible"
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Table
                 caption="User details"
@@ -283,12 +278,10 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               key="qux"
               margin="large 0 0 0"
               overflowX="visible"
@@ -296,6 +289,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Table
                 caption="Login info"
@@ -417,12 +411,10 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               key="tic"
               margin="large 0 0 0"
               overflowX="visible"
@@ -430,6 +422,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Table
                 caption="Login info"
@@ -551,17 +544,16 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
-              borderColor="default"
-              debug={false}
+              borderColor="primary"
               display="auto"
               focusColor="info"
               focusPosition="offset"
-              focused={false}
               overflowX="visible"
               overflowY="visible"
               position="static"
               shouldAnimateFocus={true}
               textAlign="center"
+              withVisualDebug={false}
             >
               <Button
                 as="button"

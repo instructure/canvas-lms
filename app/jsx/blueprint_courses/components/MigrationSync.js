@@ -25,7 +25,8 @@ import select from '../../shared/select'
 import cx from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
 
-import {Progress, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Progress} from '@instructure/ui-progress'
 import {Button} from '@instructure/ui-buttons'
 import {IconRefreshLine} from '@instructure/ui-icons'
 
@@ -139,7 +140,4 @@ const connectState = state =>
     'willSendNotification'
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedMigrationSync = connect(
-  connectState,
-  connectActions
-)(MigrationSync)
+export const ConnectedMigrationSync = connect(connectState, connectActions)(MigrationSync)

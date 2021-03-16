@@ -27,8 +27,8 @@ import usePostMessage from './hooks/usePostMessage'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 const DefaultToolForm = props => {
   const [launchDefinitions, setLaunchDefinitions] = useState([])

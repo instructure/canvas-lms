@@ -21,8 +21,8 @@ import {bool, func, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import EditableRichText from './Editables/EditableRichText'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 
 const descriptionPlaceholder = I18n.t('Description')
 

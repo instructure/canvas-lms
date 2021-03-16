@@ -18,9 +18,10 @@
 
 import React from 'react'
 import {number, shape, string} from 'prop-types'
-import {PresentationContent} from '@instructure/ui-a11y'
-import {Flex} from '@instructure/ui-layout'
-import {Pill, Text} from '@instructure/ui-elements'
+import {PresentationContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {Pill} from '@instructure/ui-pill'
 
 import I18n from 'i18n!speed_grader'
 

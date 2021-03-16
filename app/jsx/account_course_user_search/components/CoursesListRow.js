@@ -20,8 +20,8 @@ import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Tooltip} from '@instructure/ui-overlays'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconBlueprintLine,
   IconPlusLine,

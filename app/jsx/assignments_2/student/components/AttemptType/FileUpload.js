@@ -32,11 +32,12 @@ import {uploadFiles} from '../../../../shared/upload_file'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
-import {FileDrop} from '@instructure/ui-forms'
-import {Flex, Grid} from '@instructure/ui-layout'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Grid} from '@instructure/ui-grid'
+import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 
 function submissionFileUploadUrl(assignment) {

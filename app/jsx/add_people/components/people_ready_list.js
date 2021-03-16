@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import {personReadyToEnrollShape} from './shapes'
 import {Alert} from '@instructure/ui-alerts'
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 class PeopleReadyList extends React.Component {
   static propTypes = {

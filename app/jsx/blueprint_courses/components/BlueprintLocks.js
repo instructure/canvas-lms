@@ -18,8 +18,8 @@
 
 import I18n from 'i18n!blueprint_coursesBlueprintLocks'
 import React from 'react'
-import {Tooltip} from '@instructure/ui-overlays'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
 export const IconLock = () => (

@@ -21,9 +21,11 @@ import React from 'react'
 import $ from 'jquery'
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {TextInput, Select, TextArea} from '@instructure/ui-forms'
-import {PresentationContent} from '@instructure/ui-a11y'
-import {Grid} from '@instructure/ui-layout'
+import {Select} from '@instructure/ui-forms'
+import {TextArea} from '@instructure/ui-text-area'
+import {TextInput} from '@instructure/ui-text-input'
+import {PresentationContent} from '@instructure/ui-a11y-content'
+import {Grid} from '@instructure/ui-grid'
 
 const validationMessage = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 

@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Select} from '@instructure/ui-forms'
-import {AccessibleContent} from '@instructure/ui-a11y'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {capitalizeFirstLetter} from '@instructure/ui-utils'
 import difference from 'lodash/difference'
 import filter from 'lodash/filter'

@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconSearchLine, IconEndSolid} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 
 const OutcomeSearchBar = ({
@@ -31,7 +31,7 @@ const OutcomeSearchBar = ({
   label,
   enabled,
   onChangeHandler,
-  onClearHandler,
+  onClearHandler
 }) => (
   <View as="div" position="relative">
     <TextInput
@@ -64,7 +64,7 @@ const OutcomeSearchBar = ({
 
 OutcomeSearchBar.defaultProps = {
   enabled: true,
-  placeholder: '',
+  placeholder: ''
 }
 
 OutcomeSearchBar.propTypes = {
@@ -73,7 +73,7 @@ OutcomeSearchBar.propTypes = {
   placeholder: PropTypes.string,
   searchString: PropTypes.string.isRequired,
   onChangeHandler: PropTypes.func.isRequired,
-  onClearHandler: PropTypes.func.isRequired,
+  onClearHandler: PropTypes.func.isRequired
 }
 
 export default OutcomeSearchBar

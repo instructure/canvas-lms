@@ -23,10 +23,12 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {Link, List, Text} from '@instructure/ui-elements'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {Link} from '@instructure/ui-link'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const getIcon = file => {
   if (mimeClass(file.type) === 'image') {

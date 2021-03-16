@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Select} from '@instructure/ui-forms'
-import {View} from '@instructure/ui-layout'
-import {AccessibleContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import $ from 'jquery'
 import I18n from 'i18n!sections_autocomplete'

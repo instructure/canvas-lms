@@ -29,8 +29,12 @@ import cx from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import {Badge, Heading, Pill, Text} from '@instructure/ui-elements'
-import {View, Grid} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {Pill} from '@instructure/ui-pill'
+import {Heading} from '@instructure/ui-heading'
+import {Badge} from '@instructure/ui-badge'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
 import {
   IconAssignmentLine,
   IconBookmarkLine,
@@ -50,7 +54,7 @@ import {
   IconUpdownLine,
   IconUserLine
 } from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
@@ -882,10 +886,7 @@ export const DraggableDiscussionRow = compose(
     connectDragPreview: dConnect.dragPreview()
   }))
 )(DiscussionRow)
-export const ConnectedDiscussionRow = connect(
-  mapState,
-  mapDispatch
-)(DiscussionRow)
+export const ConnectedDiscussionRow = connect(mapState, mapDispatch)(DiscussionRow)
 export const ConnectedDraggableDiscussionRow = connect(
   mapState,
   mapDispatch

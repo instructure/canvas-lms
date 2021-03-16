@@ -21,8 +21,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {missingsShape} from './shapes'
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {TextInput, Checkbox} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 
 const namePrompt = I18n.t('Click to add a name')

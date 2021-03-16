@@ -27,10 +27,10 @@ import {Button} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import I18n from 'i18n!ProficiencyRating'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {Popover} from '@instructure/ui-overlays'
-import {RadioInput} from '@instructure/ui-forms'
+import {Popover} from '@instructure/ui-popover'
+import {RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColorPicker, {PREDEFINED_COLORS} from '../shared/ColorPicker'
 
 function formatColor(color) {

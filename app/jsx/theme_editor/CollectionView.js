@@ -29,7 +29,7 @@ import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
 import {IconAddSolid, IconQuestionLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 
 function NewTheme({onNewTheme, bases}) {

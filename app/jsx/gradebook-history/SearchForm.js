@@ -26,9 +26,10 @@ import {debounce} from 'lodash'
 import {Checkbox} from '@instructure/ui-checkbox'
 import CanvasAsyncSelect from 'jsx/shared/components/CanvasAsyncSelect'
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '../shared/FlashAlert'
 import environment from './environment'
@@ -126,12 +127,7 @@ class SearchFormComponent extends Component {
   }
 
   setSelectedFrom = from => {
-    const value =
-      from == null
-        ? null
-        : moment(from)
-            .startOf('day')
-            .toISOString()
+    const value = from == null ? null : moment(from).startOf('day').toISOString()
 
     this.setState(prevState => ({
       selected: {
@@ -142,12 +138,7 @@ class SearchFormComponent extends Component {
   }
 
   setSelectedTo = to => {
-    const value =
-      to == null
-        ? null
-        : moment(to)
-            .endOf('day')
-            .toISOString()
+    const value = to == null ? null : moment(to).endOf('day').toISOString()
 
     this.setState(prevState => ({
       selected: {

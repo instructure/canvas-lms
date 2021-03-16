@@ -21,7 +21,7 @@ import {bool, func} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!SpeedGraderPostGradesMenu'
 
 export default function SpeedGraderPostGradesMenu(props) {

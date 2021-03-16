@@ -19,8 +19,8 @@
 import I18n from 'i18n!theme_editor'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal} from '@instructure/ui-overlays'
-import {Heading} from '@instructure/ui-elements'
+import {Modal} from '@instructure/ui-modal'
+import {Heading} from '@instructure/ui-heading'
 import ProgressBar from '../shared/ProgressBar'
 
 const messageToName = message =>
@@ -29,9 +29,7 @@ const messageToName = message =>
 function SubAccountProgressBar({message, completion}) {
   return (
     <li className="Theme-editor-progress-list-item">
-      <div className="Theme-editor-progress-list-item__title">
-        {messageToName(message)}
-      </div>
+      <div className="Theme-editor-progress-list-item__title">{messageToName(message)}</div>
       <div className="Theme-editor-progress-list-item__bar">
         <ProgressBar
           progress={completion}

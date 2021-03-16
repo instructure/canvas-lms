@@ -19,8 +19,9 @@
 import I18n from 'i18n!AccounntsTray'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
-import {View} from '@instructure/ui-layout'
-import {Heading, List} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {List} from '@instructure/ui-list'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 

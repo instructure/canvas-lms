@@ -19,7 +19,7 @@
 import React from 'react'
 import {func, number, oneOf, shape} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!gradebook'
 
 import SimilarityIcon from '../../components/SimilarityIcon'

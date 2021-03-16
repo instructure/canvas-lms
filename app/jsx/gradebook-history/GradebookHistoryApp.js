@@ -19,7 +19,7 @@
 import React from 'react'
 import {Provider} from 'react-redux'
 import I18n from 'i18n!gradebook_history'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchForm from './SearchForm'
 import SearchResults from './SearchResults'
 

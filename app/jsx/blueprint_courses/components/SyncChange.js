@@ -21,9 +21,10 @@ import React, {Component} from 'react'
 import cx from 'classnames'
 
 import get from 'lodash/get'
-import {Grid} from '@instructure/ui-layout'
-import {Pill, Text} from '@instructure/ui-elements'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Grid} from '@instructure/ui-grid'
+import {Text} from '@instructure/ui-text'
+import {Pill} from '@instructure/ui-pill'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {IconLock, IconUnlock} from './BlueprintLocks'
 

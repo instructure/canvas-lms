@@ -17,14 +17,16 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox, TextArea, TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {TextArea} from '@instructure/ui-text-area'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {IconInfoLine} from '@instructure/ui-icons'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Grid} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-grid'
 import I18n from 'i18n!react_developer_keys'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -109,7 +111,9 @@ export default class NewKeyForm extends React.Component {
                   onChange={e => updateDeveloperKey('email', e.target.value)}
                 />
                 <TextArea
-                  label={isRedirectUriRequired ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
+                  label={
+                    isRedirectUriRequired ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')
+                  }
                   name="developer_key[redirect_uris]"
                   value={developerKey.redirect_uris}
                   onChange={e => updateDeveloperKey('redirect_uris', e.target.value)}

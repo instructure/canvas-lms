@@ -21,7 +21,7 @@ import I18n from 'i18n!feature_flags'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import FeatureFlagButton from './FeatureFlagButton'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
