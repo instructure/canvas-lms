@@ -130,20 +130,8 @@ def postFn(status) {
     if(status == 'FAILURE') {
       maybeSlackSendFailure()
       maybeRetrigger()
-
-      if(timedStage.isAllowStagesFilterUsed()) {
-        node('master') {
-          gerrit.submitVerified("-1", "Build Failed\n\n${getSummaryUrl()}")
-        }
-      }
     } else if(status == 'SUCCESS') {
       maybeSlackSendSuccess()
-
-      if(timedStage.isAllowStagesFilterUsed()) {
-        node('master') {
-          gerrit.submitVerified("+1", "Build Successful\n\n${getSummaryUrl()}")
-        }
-      }
     }
   }
 }
@@ -392,29 +380,16 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          if (
-            configuration.skipCi() ||
-            (
-              timedStage.isAllowStagesFilterUsed() &&
-              !env.JOB_NAME.endsWith('-allow-stages') &&
-              !env.JOB_NAME.endsWith('-axe')
-            )
-          ) {
-            node('master') {
-              def relevantFlag = configuration.skipCi() ? 'skip-ci' : 'allow-stages'
-
+          node('master') {
+            if (configuration.skipCi()) {
               currentBuild.result = 'NOT_BUILT'
-              gerrit.submitCodeReview("-2", "Build not executed due to ${relevantFlag} flag")
-              error "[${relevantFlag}] flag enabled: skipping the build"
+              gerrit.submitLintReview("-2", "Build not executed due to [skip-ci] flag")
+              error "[skip-ci] flag enabled: skipping the build"
               return
-            }
-          } else if(timedStage.isAllowStagesFilterUsed()) {
-            node('master') {
-              if(env.JOB_NAME.endsWith('-axe')) {
-                gerrit.submitCodeReview("-2", "Verified status was not for the full build, -axe build was run.")
-              }
-
-              gerrit.submitVerified("0", "Build Started\n\n$BUILD_URL")
+            } else if(timedStage.isAllowStagesFilterUsed()) {
+              gerrit.submitLintReview("-2", "Complete build not executed due to [allow-stages] flag")
+            } else {
+              gerrit.submitLintReview("0")
             }
           }
 
