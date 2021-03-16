@@ -50,6 +50,10 @@ def jenkinsFiles = [
   'build/new-jenkins/*'
 ]
 
+def getSummaryUrl() {
+  return "${env.BUILD_URL}/build-summary-report"
+}
+
 def getDockerWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
@@ -129,7 +133,7 @@ def postFn(status) {
 
       if(timedStage.isAllowStagesFilterUsed()) {
         node('master') {
-          gerrit.submitVerified("-1", "Build Failed\n\n$BUILD_URL/build-summary-report/")
+          gerrit.submitVerified("-1", "Build Failed\n\n${getSummaryUrl()}")
         }
       }
     } else if(status == 'SUCCESS') {
@@ -137,7 +141,7 @@ def postFn(status) {
 
       if(timedStage.isAllowStagesFilterUsed()) {
         node('master') {
-          gerrit.submitVerified("+1", "Build Successful\n\n$BUILD_URL/build-summary-report/")
+          gerrit.submitVerified("+1", "Build Successful\n\n${getSummaryUrl()}")
         }
       }
     }
@@ -178,7 +182,7 @@ def maybeSlackSendFailure() {
     slackSend(
       channel: getSlackChannel(),
       color: 'danger',
-      message: "${authorSegment}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\n\n$extra"
+      message: "${authorSegment}. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\n$extra"
     )
   }
 }
@@ -188,7 +192,7 @@ def maybeSlackSendSuccess() {
     slackSend(
       channel: getSlackChannel(),
       color: 'good',
-      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> succeeded on re-trigger. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> succeeded on re-trigger. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>"
     )
   }
 }
