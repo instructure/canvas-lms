@@ -90,7 +90,8 @@ const OutcomeManagementPanel = () => {
     collections,
     queryCollections,
     rootId,
-    selectedGroupId
+    selectedGroupId,
+    selectedParentGroupId
   } = useManageOutcomes()
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
@@ -242,21 +243,29 @@ const OutcomeManagementPanel = () => {
           </Flex>
           <hr />
           {selectedGroupId && (
-            <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
-          )}
-          <MoveModal
-            title={group ? group.title : ''}
-            type="group"
-            isOpen={isMoveGroupModalOpen}
-            onCloseHandler={closeMoveGroupModal}
-            onMoveHandler={onMoveHandler}
-          />
-          {selectedGroupId && (
-            <GroupRemoveModal
-              groupId={selectedGroupId}
-              isOpen={isGroupRemoveModalOpen}
-              onCloseHandler={closeGroupRemoveModal}
-            />
+            <>
+              <ManageOutcomesFooter
+                selected={selected}
+                onRemoveHandler={noop}
+                onMoveHandler={noop}
+              />
+
+              <MoveModal
+                title={loading ? '' : group.title}
+                groupId={selectedGroupId}
+                parentGroupId={selectedParentGroupId}
+                type="group"
+                isOpen={isMoveGroupModalOpen}
+                onCloseHandler={closeMoveGroupModal}
+                onMoveHandler={onMoveHandler}
+              />
+
+              <GroupRemoveModal
+                groupId={selectedGroupId}
+                isOpen={isGroupRemoveModalOpen}
+                onCloseHandler={closeGroupRemoveModal}
+              />
+            </>
           )}
           {selectedGroupId && selectedOutcome && (
             <>

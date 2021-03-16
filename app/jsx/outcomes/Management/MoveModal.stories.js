@@ -30,8 +30,10 @@ export default {
     isOpen: true,
     title: 'Group Title',
     type: 'group',
+    contextId: 1,
     contextType: 'Account',
-    contextId: 1
+    groupId: '101',
+    parentGroupId: 100
   },
   argTypes: {
     onCloseHandler: {action: 'closed'},

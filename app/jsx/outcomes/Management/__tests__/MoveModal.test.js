@@ -18,9 +18,9 @@
 import $ from 'jquery'
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
-import {render as rtlRender, act, fireEvent} from '@testing-library/react'
+import {render as rtlRender, act, fireEvent, within} from '@testing-library/react'
 import MoveModal from '../MoveModal'
-import {accountMocks, groupMocks} from './mocks'
+import {accountMocks, smallOutcomeTree} from './mocks'
 import OutcomesContext from 'jsx/outcomes/contexts/OutcomesContext'
 import {createCache} from 'jsx/canvas-apollo'
 
@@ -35,9 +35,10 @@ describe('MoveModal', () => {
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     onMoveHandler: onMoveHandlerMock,
-    title: 'Outcome Group',
-    type: 'outcome',
-    contextType: 'Account',
+    title: 'Account folder 0',
+    type: 'group',
+    groupId: '100',
+    parentGroupId: 0,
     ...props
   })
 
@@ -66,7 +67,7 @@ describe('MoveModal', () => {
   it('renders component with Group title', async () => {
     const {getByText} = render(<MoveModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
-    expect(getByText('Move "Outcome Group"')).toBeInTheDocument()
+    expect(getByText('Move "Account folder 0"')).toBeInTheDocument()
   })
 
   it('shows modal if open prop true', async () => {
@@ -98,10 +99,8 @@ describe('MoveModal', () => {
   })
 
   it('loads nested groups', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps({contextType: 'Account'})} />, {
-      contextType: 'Account',
-      contextId: '1',
-      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]
+    const {getByText} = render(<MoveModal {...defaultProps()} />, {
+      mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
@@ -109,10 +108,49 @@ describe('MoveModal', () => {
     expect(getByText('Group 100 folder 0')).toBeInTheDocument()
   })
 
+  it('disables the move button when the selected group is equal to the group to be moved', async () => {
+    // Once TreeBrowser is updated to the latest version, groupId can go back to being a string
+    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: 100})} />, {
+      mocks: [...smallOutcomeTree('Account')]
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(within(getByRole('dialog')).getByText('Move').closest('button')).toHaveAttribute(
+      'disabled'
+    )
+  })
+
+  it('disables the move button when the selected parent group is equal to the parent of the group to be moved', async () => {
+    const {getByText, getByRole} = render(
+      <MoveModal {...defaultProps({groupId: 400, parentGroupId: 100})} />,
+      {
+        mocks: [...smallOutcomeTree('Account')]
+      }
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(within(getByRole('dialog')).getByText('Move').closest('button')).toHaveAttribute(
+      'disabled'
+    )
+  })
+
+  it('enables the move button when a valid group is selected', async () => {
+    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: 100})} />, {
+      mocks: [...smallOutcomeTree('Account')]
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 1'))
+    await act(async () => jest.runAllTimers())
+    expect(within(getByRole('dialog')).getByText('Move').closest('button')).not.toHaveAttribute(
+      'disabled'
+    )
+  })
+
   it('displays an error on failed request for account outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<MoveModal {...defaultProps({contextType: 'Account'})} />, {
-      contextType: 'Account',
+    const {getByText} = render(<MoveModal {...defaultProps()} />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
@@ -122,26 +160,13 @@ describe('MoveModal', () => {
 
   it('displays an error on failed request for course outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<MoveModal {...defaultProps({contextType: 'Course'})} />, {
+    const {getByText} = render(<MoveModal {...defaultProps()} />, {
+      contextId: '2',
       contextType: 'Course',
       mocks: []
     })
     await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
     expect(getByText(/course/)).toBeInTheDocument()
-  })
-
-  it('move button is disabled until a group is selected from tree browser', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />, {
-      title: 'Account Outcome Group to be moved',
-      contextType: 'Account',
-      contextId: '1',
-      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]
-    })
-    expect(getByText('Move').closest('button')).toHaveAttribute('disabled')
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account folder 0'))
-    await act(async () => jest.runAllTimers())
-    expect(getByText('Move').closest('button')).not.toHaveAttribute('disabled')
   })
 })

@@ -72,7 +72,7 @@ describe('OutcomeManagementPanel', () => {
     })
 
   it('renders the empty billboard for accounts without child outcomes', async () => {
-    const {getByText} = render(<OutcomeManagementPanel />, {})
+    const {getByText} = render(<OutcomeManagementPanel />)
     await act(async () => jest.runAllTimers())
     expect(getByText(/Outcomes have not been added to this account yet/)).not.toBeNull()
   })
@@ -113,7 +113,11 @@ describe('OutcomeManagementPanel', () => {
 
   it('loads nested groups', async () => {
     const {getByText} = render(<OutcomeManagementPanel />, {
-      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]
+      mocks: [
+        ...accountMocks({childGroupsCount: 2}),
+        ...groupMocks({groupId: 100}),
+        ...groupDetailMocks({groupId: 100})
+      ]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))

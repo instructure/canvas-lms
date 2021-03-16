@@ -25,16 +25,32 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import Modal from '../../shared/components/InstuiModal'
 import TreeBrowser from './TreeBrowser'
-import {useGroupMoveModal} from 'jsx/outcomes/shared/treeBrowser'
+import {useGroupMoveModal} from '../shared/treeBrowser'
 import useCanvasContext from '../shared/hooks/useCanvasContext'
 
-const MoveModal = ({title, type, isOpen, onMoveHandler, onCloseHandler}) => {
-  const {error, isLoading, collections, queryCollections, rootId} = useGroupMoveModal()
+const MoveModal = ({
+  title,
+  groupId,
+  parentGroupId,
+  type,
+  isOpen,
+  onMoveHandler,
+  onCloseHandler
+}) => {
+  const {error, isLoading, collections, queryCollections, rootId} = useGroupMoveModal(groupId)
   const {contextType} = useCanvasContext()
   const [targetGroup, setTargetGroup] = useState(null)
+
   const onCollectionClick = (_, selectedGroupTreeCollectionObject) => {
     const selectedGroupObject = collections[selectedGroupTreeCollectionObject.id]
-    setTargetGroup(selectedGroupObject)
+    if (
+      groupId === selectedGroupObject.id ||
+      selectedGroupObject.id.toString() === parentGroupId.toString()
+    ) {
+      setTargetGroup(null)
+    } else {
+      setTargetGroup(selectedGroupObject)
+    }
   }
 
   const handleMove = () => {
@@ -100,6 +116,8 @@ const MoveModal = ({title, type, isOpen, onMoveHandler, onCloseHandler}) => {
 
 MoveModal.propTypes = {
   title: PropTypes.string.isRequired,
+  groupId: PropTypes.string.isRequired,
+  parentGroupId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   type: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onMoveHandler: PropTypes.func.isRequired,
