@@ -310,6 +310,7 @@ def rebaseHelper(branch, commitHistory = 100) {
 }
 
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
+loadLocalLibrary("local-lib", "build/new-jenkins/library")
 
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
 extendedStage.setAlwaysAllowStages([
@@ -765,7 +766,6 @@ pipeline {
                     }
                   }
 
-                  def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
                   distribution.stashBuildScripts()
 
                   distribution.addRSpecSuites(stages)

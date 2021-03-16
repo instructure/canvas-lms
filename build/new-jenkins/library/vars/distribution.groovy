@@ -68,10 +68,10 @@ def stashBuildScripts() {
  * common helper for adding rspec tests to be ran
  */
 def addRSpecSuites(stages) {
-  def rspec_node_total = load('build/new-jenkins/groovy/rspec.groovy').rspecConfig().node_total
+  def rspec_node_total = rspec.rspecConfig().node_total
   echo 'adding RSpec Test Sets'
   appendStagesAsBuildNodes(stages, rspec_node_total, 'RSpec Test Set', 'rspec') { index ->
-    load('build/new-jenkins/groovy/rspec.groovy').runRSpecSuite(rspec_node_total, index)
+    rspec.runRSpecSuite(rspec_node_total, index)
   }
 }
 
@@ -79,10 +79,10 @@ def addRSpecSuites(stages) {
  * common helper for adding selenium tests to be ran
  */
 def addSeleniumSuites(stages) {
-  def selenium_node_total = load('build/new-jenkins/groovy/rspec.groovy').seleniumConfig().node_total
+  def selenium_node_total = rspec.seleniumConfig().node_total
   echo 'adding Selenium Test Sets'
   appendStagesAsBuildNodes(stages, selenium_node_total, 'Selenium Test Set', 'selenium') { index ->
-    load('build/new-jenkins/groovy/rspec.groovy').runSeleniumSuite(selenium_node_total, index)
+    rspec.runSeleniumSuite(selenium_node_total, index)
   }
 }
 
