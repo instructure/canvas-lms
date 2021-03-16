@@ -1168,28 +1168,6 @@ describe User do
       expect(messageable_users).not_to include @other_section_user.id
     end
 
-    describe "#observation_link?" do
-      before(:once) do
-        @student, @observer = user_model, user_model
-        @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
-        @enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active', associated_user: @student.id, section: @student_enrollment.course_section)
-      end
-
-      it "does not find an observation link when one does not exist between observer and student" do
-        expect(@observer.observation_link?(@student, @course.root_account_id)).to be false
-      end
-
-      it "finds an observation link when one already exists" do
-        add_linked_observer(@student, @observer)
-
-        expect(@observer.observation_link?(@student, @course.root_account_id)).to be true
-      end
-
-      it "always finds an observation link between the user and itself" do
-        expect(@observer.observation_link?(@observer, @course.root_account_id)).to be true
-      end
-    end
-
     it "should not show non-linked observers to students" do
       @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
       student1, student2 = user_model, user_model
