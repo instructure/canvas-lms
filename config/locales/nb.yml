@@ -758,7 +758,7 @@ nb:
       logging_content_pane: 
         authentication: "Inn- og utloggingsaktivitet"
         course: Emneaktivitet
-        grade_change: Karkaterendring
+        grade_change: Karakterendring
         mutations: "GraphQL mutasjonsaktivitet"
         select_default: "Velg en loggtype"
         select_label: "Velg en loggtype å søke i."
