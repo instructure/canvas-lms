@@ -67,7 +67,7 @@ echo "WEBPACK_BUILD OK!"
 EOF
 WEBPACK_BUILD_PID=$!
 
-cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
+cat <<EOF | docker run --env SKIP_ESLINT --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
 set -ex
 # when parent is not in \$GERRIT_BRANCH (i.e. master)
 if ! git merge-base --is-ancestor HEAD~1 \$GERRIT_BRANCH; then
@@ -93,7 +93,7 @@ fi
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/tatl_tael"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/stylelint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/rlint"
-./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/eslint"
+[ "\${SKIP_ESLINT-}" != "true" ] && ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/eslint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/lint_commit_message"
 ./build/new-jenkins/linters/run-and-collect-output.sh "yarn lint:browser-code"
 
