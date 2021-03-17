@@ -5,6 +5,10 @@
 # *be careful* when you modify these functions as doing so will impact multiple
 # scripts that likely aren't used or tested in continuous integration builds.
 
+if [[ -n "${COMMON_LIB_LOADED-}" ]]; then
+     return
+fi
+COMMON_LIB_LOADED=i_am_here
 BOLD="$(tput bold)"
 NORMAL="$(tput sgr0)"
 
