@@ -391,22 +391,37 @@ RSpec.describe ApplicationController do
       end
 
       describe "HOMEROOM_COURSE" do
-        it "is true if course is a homeroom course and canvas_for_elementary flag is on" do
-          course.root_account.enable_feature!(:canvas_for_elementary)
-          course.homeroom_course = true
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
+        describe "with canvas_for_elementary flag on" do
+          before(:once) do
+            course.root_account.enable_feature!(:canvas_for_elementary)
+          end
+
+          it "is true if the course is a homeroom course and in a K-5 account" do
+            course.account.settings[:enable_as_k5_account] = {value: true}
+            course.homeroom_course = true
+            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
+          end
+
+          it "is false if the course is a homeroom course and not in a K-5 account" do
+            course.homeroom_course = true
+            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          end
+
+          it "is false if the course is not a homeroom course and n a K-5 account" do
+            course.account.settings[:enable_as_k5_account] = {value: true}
+            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          end
         end
 
-        it "is false if course is a homeroom course and canvas_for_elementary flag is off" do
-          course.root_account.disable_feature!(:canvas_for_elementary)
-          course.homeroom_course = true
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsey
-        end
+        it "is false with the canvas_for_elementary flag off" do
+          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
 
-        it "is false if course is not a homeroom course and canvas_for_elementary flag is on" do
-          course.root_account.enable_feature!(:canvas_for_elementary)
+          course.homeroom_course = true
+          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+
           course.homeroom_course = false
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsey
+          course.account.settings[:enable_as_k5_account] = {value: true}
+          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
         end
       end
     end

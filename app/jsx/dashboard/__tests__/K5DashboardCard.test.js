@@ -22,7 +22,7 @@ import {render} from '@testing-library/react'
 import K5DashboardCard, {DashboardCardHeaderHero} from '../cards/K5DashboardCard'
 import K5DashboardContext from '../K5DashboardContext'
 
-import {TAB_IDS} from '../DashboardTabs'
+import {TAB_IDS} from '../utils'
 
 const defaultContext = {
   assignmentsDueToday: {},

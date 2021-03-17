@@ -119,7 +119,9 @@ export default function TeacherPreview({timeZone}) {
               {formatMessage('Teacher Schedule Preview')}
             </Heading>
           </Text>
-          <Text>Below is an example of how your students will see their schedule</Text>
+          <Text>
+            {formatMessage('Below is an example of how your students will see their schedule')}
+          </Text>
         </Flex>
       </View>
       <Day

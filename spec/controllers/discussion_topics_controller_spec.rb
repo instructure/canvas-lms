@@ -804,6 +804,8 @@ describe DiscussionTopicsController do
 
       before(:each) do
         @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
       end
 
       after(:each) do

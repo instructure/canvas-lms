@@ -2593,25 +2593,26 @@ describe Course, "tabs_available" do
     end
 
     describe "with canvas_for_elementary feature on" do
-      let(:canvas_for_elem_flag){@course.root_account.feature_enabled?(:canvas_for_elementary)}
-      let(:is_homeroom) {@course.homeroom_course?}
+      let(:canvas_for_elem_flag) {@course.root_account.feature_enabled?(:canvas_for_elementary)}
+
+      before(:each) {
+        @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.homeroom_course = true
+        @course.save!
+      }
+
+      after(:each) {
+        @course.root_account.set_feature_flag!(:canvas_for_elementary, :canvas_for_elem_flag ? 'on' : 'off')
+      }
 
       it 'hides most tabs for homeroom courses' do
-        begin
-          @course.root_account.enable_feature!(:canvas_for_elementary)
-          @course.homeroom_course = true
-          @course.save!
-          tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
-        ensure
-          @course.root_account.set_feature_flag!(:canvas_for_elementary, :canvas_for_elem_flag ? 'on' : 'off')
-          @course.homeroom_course = is_homeroom
-          @course.save!
-        end
+        tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+        expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
       end
 
       it 'hides external tools in nav' do
-        t1 = @course.context_external_tools.create!(
+        @course.context_external_tools.create!(
           :url => "http://example.com/ims/lti",
           :consumer_key => "asdf",
           :shared_secret => "hjkl",
@@ -2623,9 +2624,6 @@ describe Course, "tabs_available" do
           }
         )
         @course.tab_configuration = [{:id => Course::TAB_ANNOUNCEMENTS}, {:id => 'context_external_tool_8'}]
-        @course.root_account.enable_feature!(:canvas_for_elementary)
-        @course.homeroom_course = true
-        @course.save!
         tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
         expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
       end

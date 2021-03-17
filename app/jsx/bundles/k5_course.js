@@ -17,22 +17,24 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import K5Dashboard from '../dashboard/K5Dashboard'
+import K5Course from '../courses/K5Course'
 import k5Theme from '../dashboard/k5-theme'
 import ready from '@instructure/ready'
 
 k5Theme.use()
 
 ready(() => {
-  const dashboardContainer = document.getElementById('dashboard-app-container')
-  if (dashboardContainer) {
+  const courseContainer = document.getElementById('course-dashboard-container')
+  if (courseContainer) {
     ReactDOM.render(
-      <K5Dashboard
+      <K5Course
         currentUser={ENV.current_user}
+        name={ENV.COURSE.name}
+        imageUrl={ENV.COURSE.image_url}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
       />,
-      dashboardContainer
+      courseContainer
     )
   }
 })

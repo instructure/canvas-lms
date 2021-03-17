@@ -3106,10 +3106,18 @@ class Course < ActiveRecord::Base
 
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
-  add_setting :homeroom_course, :boolean => true, :default => false
+    add_setting :homeroom_course, :boolean => true, :default => false
+
+  def elementary_enabled?
+    root_account&.feature_enabled?(:canvas_for_elementary) && account.enable_as_k5_account?
+  end
 
   def elementary_homeroom_course?
-    homeroom_course? && root_account&.feature_enabled?(:canvas_for_elementary)
+    homeroom_course? && elementary_enabled?
+  end
+
+  def elementary_subject_course?
+    !homeroom_course && elementary_enabled?
   end
 
   def lock_all_announcements?

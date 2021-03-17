@@ -124,3 +124,12 @@ export const sendMessage = (recipientId, message, subject) =>
     method: 'POST',
     body: {recipients: [recipientId], body: message, group_conversation: false, subject}
   })
+
+export const TAB_IDS = {
+  HOMEROOM: 'tab-homeroom',
+  SCHEDULE: 'tab-schedule',
+  GRADES: 'tab-grades',
+  RESOURCES: 'tab-resources',
+  OVERVIEW: 'tab-overview',
+  MODULES: 'tab-modules'
+}

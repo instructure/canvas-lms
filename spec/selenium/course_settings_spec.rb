@@ -34,18 +34,20 @@ describe "course settings" do
   end
 
   context "considering homeroom courses" do
-    let(:canvas_for_elem_flag){false}
     before(:each) do
-      canvas_for_elem_flag = @account.root_account.feature_enabled?(:canvas_for_elementary)
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'on')
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      @course.homeroom_course = true
+      @course.save!
     end
+
     after(:each) do
-      @account.root_account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'off')
     end
 
     it 'hides most tabs if set' do
       @account.root_account.enable_feature!(:canvas_for_elementary)
-      @course.homeroom_course = true
-      @course.save!
 
       get "/courses/#{@course.id}/settings"
       expect(ff('#course_details_tabs > ul li').length).to eq 2

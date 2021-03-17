@@ -20,7 +20,7 @@ import React from 'react'
 import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
-import ConnectedK5Dashboard, {K5Dashboard} from '../K5Dashboard'
+import K5Dashboard from '../K5Dashboard'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
@@ -170,9 +170,9 @@ const defaultEnv = {
 }
 const defaultProps = {
   currentUser,
-  env: defaultEnv,
   plannerEnabled: false,
-  loadAllOpportunities: () => {}
+  loadAllOpportunities: () => {},
+  timeZone: defaultEnv.TIMEZONE
 }
 
 beforeAll(() => {
@@ -241,7 +241,6 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.resetModules()
   global.ENV = defaultEnv
 })
 
@@ -330,7 +329,7 @@ describe('K-5 Dashboard', () => {
 
     it('displays the planner with a planned item', async () => {
       const {findByText} = render(
-        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
       expect(await findByText('Assignment 15')).toBeInTheDocument()
       // The new weekly planner doesn't display the PlannerEmptyState.
@@ -341,7 +340,7 @@ describe('K-5 Dashboard', () => {
 
     it('displays a list of missing assignments if there are any', async () => {
       const {findByText} = render(
-        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
 
       const missingAssignments = await findByText('Show 2 missing items')
@@ -350,7 +349,7 @@ describe('K-5 Dashboard', () => {
 
     it('renders the weekly planner header', async () => {
       const {findByTestId} = render(
-        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
 
       const planner = await findByTestId('PlannerApp')
@@ -362,7 +361,7 @@ describe('K-5 Dashboard', () => {
 
     it('displays a teacher preview if the user has no student enrollments', async () => {
       const {findByTestId, getByText} = render(
-        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
       )
 
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()

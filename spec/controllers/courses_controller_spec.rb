@@ -1507,6 +1507,52 @@ describe CoursesController do
         expect(assigns[:course_home_sub_navigation_tools].size).to eq 0
       end
     end
+
+    describe "when in K5 mode" do
+      before :once do
+        @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
+      end
+
+      it "sets the course_home_view to 'k5_dashboard'" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq 'k5_dashboard'
+      end
+
+      it "registers k5_course js and css bundles and sets K5_MODE = true in js_env" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_bundles].flatten).to include :k5_course
+        expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+        expect(assigns[:js_env][:K5_MODE]).to be_truthy
+      end
+
+      it "does not render the sidebar navigation or breadcrumbs" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:show_left_side]).to be_falsy
+        expect(assigns[:_crumbs].length).to be 1
+      end
+
+      it "sets STUDENT_PLANNER_ENABLED = true in js_env if the user has student enrollments" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_truthy
+      end
+
+      it "sets STUDENT_PLANNER_ENABLED = true in js_env if the user doesn't have student enrollments" do
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_falsy
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do

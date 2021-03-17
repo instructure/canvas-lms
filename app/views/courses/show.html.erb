@@ -1,194 +1,196 @@
 <%
-# Copyright (C) 2011 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+  # Copyright (C) 2011 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
 <% provide :page_title, @context.name %>
 
 <h1 class='screenreader-only'><%= @context.name %></h1>
 
-<% provide :right_side do %>
-  <div id="course_show_secondary">
-    <% @can_manage = can_do(@context, @current_user, :manage) %>
-    <% @module_dnd_FF = @domain_root_account.feature_enabled?(:module_dnd) %>
-    <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
-    <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
-      <div id="course_status">
-        <h3>
-          <%= t('headers.course_status', %{Course Status}) %>
-        </h3>
-        <div id='course_status_actions' class="ui-buttonset">
-          <%= form_for @context, html: {id: "course_status_form"} do |f| %>
-            <% if @context.created? || @context.claimed? %>
-              <button type="button" class='ui-button btn-unpublish disabled' disabled>
-                <i class="icon-unpublish"></i><%= t('#buttons.unpublished', %{Unpublished}) %>
-              </button>
-              <button type='submit' class="ui-button btn-publish">
-                <i class="icon-publish icon-Solid"></i><%= t('#buttons.publish', %{Publish}) %>
-              </button>
-              <input type='hidden' name='course[event]' value='offer' />
-            <% else %>
-              <button type='submit' class="ui-button">
-                <i class="icon-unpublish"></i>&nbsp;<%= t('#buttons.unpublish', %{Unpublish}) %>
-              </button>
-              <button type="button" class="ui-button disabled btn-published" disabled>
-                <i class="icon-publish icon-Solid"></i><%= t('#buttons.published', %{Published}) %>
-              </button>
-              <input type='hidden' name='course[event]' value='claim' />
+<% unless @k5_mode %>
+  <% provide :right_side do %>
+    <div id="course_show_secondary">
+      <% @can_manage = can_do(@context, @current_user, :manage) %>
+      <% @module_dnd_FF = @domain_root_account.feature_enabled?(:module_dnd) %>
+      <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
+      <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
+        <div id="course_status">
+          <h3>
+            <%= t('headers.course_status', %{Course Status}) %>
+          </h3>
+          <div id='course_status_actions' class="ui-buttonset">
+            <%= form_for @context, html: {id: "course_status_form"} do |f| %>
+              <% if @context.created? || @context.claimed? %>
+                <button type="button" class='ui-button btn-unpublish disabled' disabled>
+                  <i class="icon-unpublish"></i><%= t('#buttons.unpublished', %{Unpublished}) %>
+                </button>
+                <button type='submit' class="ui-button btn-publish">
+                  <i class="icon-publish icon-Solid"></i><%= t('#buttons.publish', %{Publish}) %>
+                </button>
+                <input type='hidden' name='course[event]' value='offer' />
+              <% else %>
+                <button type='submit' class="ui-button">
+                  <i class="icon-unpublish"></i>&nbsp;<%= t('#buttons.unpublish', %{Unpublish}) %>
+                </button>
+                <button type="button" class="ui-button disabled btn-published" disabled>
+                  <i class="icon-publish icon-Solid"></i><%= t('#buttons.published', %{Published}) %>
+                </button>
+                <input type='hidden' name='course[event]' value='claim' />
+              <% end %>
             <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @module_dnd_FF && can_do(@context, @current_user, :manage_content) %>
+        <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
+          <i class="icon-import"></i>
+          <%= t('links.import', %{Import Existing Content}) %>
+        </a>
+      <% end %>
+
+      <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
+        <div class="course-options">
+          <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
+          <% if @can_manage %>
+            <div id="choose_home_page"></div>
+            <div id="choose_home_page_not_modules"></div>
+          <% end %>
+
+          <% if @course_home_view != 'feed' %>
+            <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
+              <i class="icon-stats"></i>
+              <%= t('links.view_course_stream', %{View Course Stream}) %>
+            </a>
+          <% end %>
+
+          <% if @can_manage && !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) %>
+            <script>
+                Object.assign(
+                    ENV,
+                    <%= raw StringifyIds.recursively_stringify_ids({
+                      COURSE_WIZARD: {
+                        just_saved: @context_just_saved,
+                        checklist_states: {
+                          import_step: !@context.attachments.active.exists?,
+                          assignment_step: !@context.assignments.active.exists?,
+                          add_student_step: !@context.students.exists?,
+                          navigation_step: @context.tab_configuration.empty?,
+                          home_page_step: true,
+                          # The current wizard just always marks this as complete.
+                          calendar_event_step: !@context.calendar_events.active.exists?,
+                          add_ta_step: !@context.tas.exists?,
+                          publish_step: @context.workflow_state === 'available'
+                        },
+                        urls: {
+                          content_import: context_url(@context, :context_content_migrations_url),
+                          add_assignments: context_url(@context, :context_assignments_url, wizard: 1),
+                          add_students: course_users_path(course_id: @context),
+                          add_files: context_url(@context, :context_files_url, wizard: 1),
+                          select_navigation: context_url(@context, :context_details_url),
+                          course_calendar: calendar_path(course_id: @context),
+                          add_tas: course_users_path(course_id: @context),
+                          publish_course: course_path(@context)
+                        },
+                        permissions: {
+                          can_change_course_state: can_do(@context, @current_user, :change_course_state)
+                        }
+                      }
+                    }).to_json %>
+                )
+            </script>
+
+            <% js_bundle :course_wizard %>
+            <% css_bundle :course_wizard %>
+            <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+              <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
+            </a>
+          <% end %>
+
+          <% if @can_create_announcements %>
+            <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
+            </a>
+          <% end %>
+
+          <% course_custom_links.each do |link| %>
+            <a class="btn button-sidebar-wide" href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
           <% end %>
         </div>
-      </div>
-    <% end %>
-
-    <% if @module_dnd_FF && can_do(@context, @current_user, :manage_content) %>
-      <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
-        <i class="icon-import"></i>
-        <%= t('links.import', %{Import Existing Content}) %>
-      </a>
-    <% end %>
-
-    <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
-      <div class="course-options">
-        <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
-        <% if @can_manage %>
-          <div id="choose_home_page"></div>
-          <div id="choose_home_page_not_modules"></div>
-        <% end %>
-
-        <% if @course_home_view != 'feed' %>
-          <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
-            <i class="icon-stats"></i>
-            <%= t('links.view_course_stream', %{View Course Stream}) %>
-          </a>
-        <% end %>
-
-        <% if @can_manage && !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) %>
-          <script>
-            Object.assign(
-              ENV,
-              <%= raw StringifyIds.recursively_stringify_ids({
-                COURSE_WIZARD: {
-                  just_saved: @context_just_saved,
-                  checklist_states: {
-                    import_step: !@context.attachments.active.exists?,
-                    assignment_step: !@context.assignments.active.exists?,
-                    add_student_step: !@context.students.exists?,
-                    navigation_step: @context.tab_configuration.empty?,
-                    home_page_step: true,
-                    # The current wizard just always marks this as complete.
-                    calendar_event_step: !@context.calendar_events.active.exists?,
-                    add_ta_step: !@context.tas.exists?,
-                    publish_step: @context.workflow_state === 'available'
-                  },
-                  urls: {
-                    content_import: context_url(@context, :context_content_migrations_url),
-                    add_assignments: context_url(@context, :context_assignments_url, wizard: 1),
-                    add_students: course_users_path(course_id: @context),
-                    add_files: context_url(@context, :context_files_url, wizard: 1),
-                    select_navigation: context_url(@context, :context_details_url),
-                    course_calendar: calendar_path(course_id: @context),
-                    add_tas: course_users_path(course_id: @context),
-                    publish_course: course_path(@context)
-                  },
-                  permissions: {
-                    can_change_course_state: can_do(@context, @current_user, :change_course_state)
-                  }
-                }
-              }).to_json %>
-            )
-          </script>
-
-          <% js_bundle :course_wizard %>
-          <% css_bundle :course_wizard %>
-          <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
-            <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
-          </a>
-        <% end %>
-
-        <% if @can_create_announcements %>
-          <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
-          </a>
-        <% end %>
-
-        <% course_custom_links.each do |link| %>
-          <a class="btn button-sidebar-wide" href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
-        <% end %>
-      </div>
-    <% end %>
-
-    <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
-      <a href="<%= enroll_url(@context.self_enrollment_code) %>" class="btn button-sidebar-wide self_enrollment_link">
-        <i class="icon-user-add"></i>
-        <%= t('links.join_course', %{Join this Course}) %>
-      </a>
-    <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
-      <a href="#" class="btn button-sidebar-wide self_unenrollment_link">
-        <i class="icon-end"></i>
-        <%= t('links.drop_course', %{Drop this Course}) %>
-      </a>
-      <div id="self_unenrollment_dialog" style="display: none;">
-        <h2><i class="icon-warning"></i> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
-        <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>
-        <div class="button-container">
-          <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn btn-primary action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
-          <a href="#" class="btn dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
-        </div>
-      </div>
-    <% end %>
-
-    <% if @context_enrollment&.student? %>
-      <a class="btn button-sidebar-wide" href="<%= calendar_url_for(@context) %>">
-        <i class="icon-calendar-day"></i>
-        <%= t('links.view_course_calendar', %{View Course Calendar}) %>
-      </a>
-    <% end %>
-
-    <% if @context_enrollment %>
-      <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
-        <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
-        <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
-      </a>
-    <% end %>
-
-    <%= render :partial => 'to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
-    <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
-    <%= nbsp unless @current_user %>
-  </div>
-  <% if @course_home_view == 'assignments' %>
-    <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
-  <% elsif @course_home_view == 'syllabus' %>
-    <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
-  <% elsif !@context_enrollment&.student? %>
-    <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
-    <% if @current_user %>
-      <% cache([@current_user, safe_cache_key(@contexts), 'course_upcoming_events' ].cache_key) do %>
-        <%
-          events = @current_user.upcoming_events(:contexts => @contexts)
-          assignments = events.select{|e| e.is_a?(Assignment)}
-          @current_user_submissions = Submission.where(:assignment_id => assignments, :user_id => @current_user).to_a if assignments.any?
-        %>
-        <%= render :partial => "shared/event_list", :object => events, :locals => locals %>
       <% end %>
-    <% else %>
-      <%= render :partial => "shared/event_list", :object => [], :locals => locals %>
+
+      <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
+        <a href="<%= enroll_url(@context.self_enrollment_code) %>" class="btn button-sidebar-wide self_enrollment_link">
+          <i class="icon-user-add"></i>
+          <%= t('links.join_course', %{Join this Course}) %>
+        </a>
+      <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
+        <a href="#" class="btn button-sidebar-wide self_unenrollment_link">
+          <i class="icon-end"></i>
+          <%= t('links.drop_course', %{Drop this Course}) %>
+        </a>
+        <div id="self_unenrollment_dialog" style="display: none;">
+          <h2><i class="icon-warning"></i> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
+          <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>
+          <div class="button-container">
+            <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn btn-primary action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
+            <a href="#" class="btn dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @context_enrollment&.student? %>
+        <a class="btn button-sidebar-wide" href="<%= calendar_url_for(@context) %>">
+          <i class="icon-calendar-day"></i>
+          <%= t('links.view_course_calendar', %{View Course Calendar}) %>
+        </a>
+      <% end %>
+
+      <% if @context_enrollment %>
+        <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
+          <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
+          <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
+        </a>
+      <% end %>
+
+      <%= render :partial => 'to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
+      <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
+      <%= nbsp unless @current_user %>
+    </div>
+    <% if @course_home_view == 'assignments' %>
+      <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
+    <% elsif @course_home_view == 'syllabus' %>
+      <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
+    <% elsif !@context_enrollment&.student? %>
+      <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
+      <% if @current_user %>
+        <% cache([@current_user, safe_cache_key(@contexts), 'course_upcoming_events' ].cache_key) do %>
+          <%
+            events = @current_user.upcoming_events(:contexts => @contexts)
+            assignments = events.select{|e| e.is_a?(Assignment)}
+            @current_user_submissions = Submission.where(:assignment_id => assignments, :user_id => @current_user).to_a if assignments.any?
+          %>
+          <%= render :partial => "shared/event_list", :object => events, :locals => locals %>
+        <% end %>
+      <% else %>
+        <%= render :partial => "shared/event_list", :object => [], :locals => locals %>
+      <% end %>
     <% end %>
-  <% end %>
-  <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
+    <% if @show_recent_feedback %>
+      <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
+    <% end %>
   <% end %>
 <% end %>
 
@@ -208,6 +210,8 @@
   <% elsif @course_home_view == 'assignments' %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
+  <% elsif @course_home_view == 'k5_dashboard' %>
+    <div id="course-dashboard-container"></div>
   <% else %>
     <%= render :partial => 'shared/dashboard_messages' %>
     <%= render :partial => 'shared/recent_activity' %>
@@ -222,4 +226,3 @@
   </div>
 <% end %>
 <div id="wizard_box"></div>
-

@@ -15,117 +15,88 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
-import $ from 'jquery'
+
 import {
   createTeacherPreview,
   startLoadingAllOpportunities,
-  initializePlanner,
   responsiviser,
   store
 } from '@instructure/canvas-planner'
+import {
+  IconBankLine,
+  IconCalendarMonthLine,
+  IconHomeLine,
+  IconStarLightLine
+} from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
 
-import apiUserContent from 'compiled/str/apiUserContent'
-import DashboardTabs, {TAB_IDS} from './DashboardTabs'
+import K5Tabs from './K5Tabs'
 import GradesPage from './pages/GradesPage'
 import HomeroomPage from './pages/HomeroomPage'
 import K5DashboardContext from './K5DashboardContext'
 import loadCardDashboard from '../bundles/dashboard_card'
 import {mapStateToProps} from './redux-helpers'
-import {showFlashAlert, showFlashError} from '../shared/FlashAlert'
 import SchedulePage from './pages/SchedulePage'
 import ResourcesPage from './pages/ResourcesPage'
+import {TAB_IDS} from './utils'
 import {theme} from './k5-theme'
+import useTabState from 'jsx/dashboard/hooks/useTabState'
+import usePlanner from 'jsx/dashboard/hooks/usePlanner'
 
-const getInitialTab = defaultTab => {
-  if (window.location.hash) {
-    const newTab = window.location.hash.replace('#', 'tab-')
-    if (Object.values(TAB_IDS).includes(newTab)) {
-      return newTab
-    }
+const DASHBOARD_TABS = [
+  {
+    id: TAB_IDS.HOMEROOM,
+    icon: IconHomeLine,
+    label: I18n.t('Homeroom')
+  },
+  {
+    id: TAB_IDS.SCHEDULE,
+    icon: IconCalendarMonthLine,
+    label: I18n.t('Schedule')
+  },
+  {
+    id: TAB_IDS.GRADES,
+    icon: IconStarLightLine,
+    label: I18n.t('Grades')
+  },
+  {
+    id: TAB_IDS.RESOURCES,
+    icon: IconBankLine,
+    label: I18n.t('Resources')
   }
-  return defaultTab
-}
+]
 
 export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
   currentUser: {display_name},
-  env,
   loadAllOpportunities,
-  defaultTab = 'tab-homeroom',
+  timeZone,
+  defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
   responsiveSize = 'large'
 }) => {
-  // This ref is used to pass the current tab to the planner's getActiveApp()
-  // function-- we can't use currentTab directly because that gets stuck in
-  // a stale closure within the effect where it is referenced.
-  const activeTab = useRef()
-  // This is the tab we started on when the dashboard is mounted-- either the
-  // defaultTab or the tab specified in the URL (so we can go back to it via history)
-  const [initialTab] = useState(() => getInitialTab(defaultTab))
-  const [currentTab, setCurrentTab] = useState(initialTab)
+  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [cards, setCards] = useState(null)
-  const [plannerInitialized, setPlannerInitialized] = useState(false)
   const [tabsRef, setTabsRef] = useState(null)
-
-  const handlePopstate = ({state}) => {
-    if (state && Object.values(TAB_IDS).includes(state.id)) {
-      setCurrentTab(state.id)
-    } else {
-      setCurrentTab(initialTab)
-    }
-  }
+  const plannerInitialized = usePlanner({
+    plannerEnabled,
+    isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
+    focusFallback: tabsRef,
+    callback: () => loadAllOpportunities()
+  })
 
   useEffect(() => {
-    if (plannerEnabled) {
-      loadAllOpportunities()
-      initializePlanner({
-        getActiveApp: () => (activeTab.current === TAB_IDS.SCHEDULE ? 'planner' : ''),
-        flashError: message => showFlashAlert({message, type: 'error'}),
-        flashMessage: message => showFlashAlert({message, type: 'info'}),
-        srFlashMessage: message => showFlashAlert({message, type: 'info', srOnly: true}),
-        convertApiUserContent: apiUserContent.convert,
-        dateTimeFormatters: {
-          dateString: $.dateString,
-          timeString: $.timeString,
-          datetimeString: $.datetimeString
-        },
-        externalFallbackFocusable: tabsRef,
-        env
-      })
-        .then(setPlannerInitialized)
-        .catch(showFlashError(I18n.t('Failed to load the schedule tab')))
-    }
-    window.onpopstate = handlePopstate
-    return () => (window.onpopstate = undefined)
-    // This should only run on mount/unmount, so it shouldn't depend on anything
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    activeTab.current = currentTab
     if (!cards && (currentTab === TAB_IDS.RESOURCES || currentTab === TAB_IDS.HOMEROOM)) {
       loadCardDashboard(setCards)
     }
   }, [cards, currentTab])
-
-  const handleRequestTabChange = id => {
-    setCurrentTab(id)
-    if (window.history.replaceState) {
-      let newUrl = window.location.href
-      if (window.location.hash) {
-        newUrl = newUrl.replace(window.location.hash, '')
-      }
-      window.history.replaceState({id}, null, `${newUrl}#${id.replace('tab-', '')}`)
-    }
-  }
 
   return (
     <View as="section">
@@ -138,25 +109,24 @@ export const K5Dashboard = ({
           responsiveSize
         }}
       >
-        <DashboardTabs
+        <K5Tabs
           currentTab={currentTab}
           name={display_name}
-          onRequestTabChange={(_, {id}) => handleRequestTabChange(id)}
+          onTabChange={handleTabChange}
+          tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
         {cards && (
           <HomeroomPage
             cards={cards}
             isStudent={plannerEnabled}
-            requestTabChange={handleRequestTabChange}
+            requestTabChange={handleTabChange}
             responsiveSize={responsiveSize}
             visible={currentTab === TAB_IDS.HOMEROOM}
           />
         )}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
-        {!plannerInitialized &&
-          currentTab === TAB_IDS.SCHEDULE &&
-          createTeacherPreview(env.TIMEZONE)}
+        {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
         {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
       </K5DashboardContext.Provider>
@@ -172,8 +142,8 @@ K5Dashboard.propTypes = {
   currentUser: PropTypes.shape({
     display_name: PropTypes.string
   }).isRequired,
-  env: PropTypes.object.isRequired,
   loadAllOpportunities: PropTypes.func.isRequired,
+  timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string

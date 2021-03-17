@@ -259,18 +259,17 @@ describe "announcements" do
 
     context "in a homeroom course" do
       let(:canvas_for_elem_flag) {@course.root_account.feature_enabled?(:canvas_for_elementary)}
-      let(:is_homeroom) {@course.homeroom_course}
 
       before :each do
         @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
         @course.homeroom_course = true
         @course.save!
       end
 
       after :each do
         @course.root_account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
-        @course.homeroom_course = is_homeroom
-        @course.save!
       end
 
       it "removes the Reply section" do

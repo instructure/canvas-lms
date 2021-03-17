@@ -2034,13 +2034,18 @@ class CoursesController < ApplicationController
 
       @context_enrollment ||= @pending_enrollment
       if @context.grants_right?(@current_user, session, :read)
+        @k5_mode = @context.elementary_subject_course?
+        @show_left_side = !@k5_mode
+
         check_for_readonly_enrollment_state
 
         log_asset_access(["home", @context], "home", "other", nil, @context_enrollment.class.to_s, context: @context)
 
         check_incomplete_registration
 
-        add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
+        unless @k5_mode
+          add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
+        end
         GuardRail.activate(:primary) do
           set_badge_counts_for(@context, @current_user, @current_enrollment)
         end
@@ -2050,10 +2055,14 @@ class CoursesController < ApplicationController
         default_view = @context.default_view || @context.default_home_page
         @course_home_view = "feed" if params[:view] == "feed"
         @course_home_view ||= default_view
+        @course_home_view = "k5_dashboard" if @k5_mode
 
         js_env({
+                 K5_MODE: @k5_mode,
                  COURSE: {
                    id: @context.id.to_s,
+                   name: @context.name,
+                   image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
@@ -2108,6 +2117,8 @@ class CoursesController < ApplicationController
             AssignmentGroup.best_unicode_collation_key('name')
           ).to_a
           @syllabus_body = syllabus_user_content
+        when 'k5_dashboard'
+          # don't do any of this stuff for now
         else
           set_active_tab "home"
           if @context.grants_right?(@current_user, session, :manage_groups)
@@ -2148,6 +2159,11 @@ class CoursesController < ApplicationController
         when 'syllabus'
           js_bundle :syllabus
           css_bundle :syllabus, :tinymce
+        when 'k5_dashboard'
+          js_env(STUDENT_PLANNER_ENABLED: planner_enabled?)
+
+          js_bundle :k5_course
+          css_bundle :k5_dashboard
         else
           js_bundle :dashboard
         end

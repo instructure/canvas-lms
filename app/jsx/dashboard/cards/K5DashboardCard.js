@@ -31,8 +31,7 @@ import {View} from '@instructure/ui-view'
 
 import k5Theme from 'jsx/dashboard/k5-theme'
 import K5DashboardContext from 'jsx/dashboard/K5DashboardContext'
-import {fetchLatestAnnouncement} from 'jsx/dashboard/utils'
-import {TAB_IDS} from '../DashboardTabs'
+import {fetchLatestAnnouncement, TAB_IDS} from 'jsx/dashboard/utils'
 
 import instFSOptimizedImageUrl from 'jsx/shared/helpers/instFSOptimizedImageUrl'
 

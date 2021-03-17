@@ -21,57 +21,25 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import I18n from 'i18n!dashboard'
 import {Heading} from '@instructure/ui-heading'
-import {
-  IconBankLine,
-  IconCalendarMonthLine,
-  IconHomeLine,
-  IconStarLightLine
-} from '@instructure/ui-icons'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 
 import k5Theme from 'jsx/dashboard/k5-theme'
 
-export const TAB_IDS = {
-  HOMEROOM: 'tab-homeroom',
-  SCHEDULE: 'tab-schedule',
-  GRADES: 'tab-grades',
-  RESOURCES: 'tab-resources'
-}
-
-const TABS = {
-  [TAB_IDS.HOMEROOM]: {
-    icon: IconHomeLine,
-    label: I18n.t('Homeroom')
-  },
-  [TAB_IDS.SCHEDULE]: {
-    icon: IconCalendarMonthLine,
-    label: I18n.t('Schedule')
-  },
-  [TAB_IDS.GRADES]: {
-    icon: IconStarLightLine,
-    label: I18n.t('Grades')
-  },
-  [TAB_IDS.RESOURCES]: {
-    icon: IconBankLine,
-    label: I18n.t('Resources')
-  }
-}
-
-const DashboardIconTab = ({icon: Icon, label, selected}) => (
+const K5IconTab = ({icon: Icon, label, selected}) => (
   <span className={classnames('ic-Dashboard-tabs__tab', {selected})}>
     <Icon />
     {label}
   </span>
 )
 
-DashboardIconTab.propTypes = {
+K5IconTab.propTypes = {
   icon: PropTypes.elementType.isRequired,
   label: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired
 }
 
-const DashboardTabs = ({currentTab, name, onRequestTabChange, tabsRef}) => {
+const K5Tabs = ({children, currentTab, name, onTabChange, tabs, tabsRef}) => {
   const [sticky, setSticky] = useState(false)
   const containerRef = useRef(null)
   useEffect(() => {
@@ -97,25 +65,22 @@ const DashboardTabs = ({currentTab, name, onRequestTabChange, tabsRef}) => {
       style={{backgroundColor: k5Theme.variables.colors.background.backgroundLightest}}
     >
       <View as="div" padding="medium 0 0 0" borderWidth="none none small none">
-        <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="0 0 small 0">
-          {I18n.t('Welcome, %{name}!', {name})}
-        </Heading>
+        {name && (
+          <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="0 0 small 0">
+            {I18n.t('Welcome, %{name}!', {name})}
+          </Heading>
+        )}
+        {children}
         <Tabs
           elementRef={tabsRef}
-          onRequestTabChange={onRequestTabChange}
+          onRequestTabChange={(_, {id}) => onTabChange(id)}
           theme={{tabVerticalOffset: '0'}}
         >
-          {Object.keys(TABS).map(id => (
+          {tabs.map(({id, icon, label}) => (
             <Tabs.Panel
               id={id}
               key={id}
-              renderTitle={
-                <DashboardIconTab
-                  icon={TABS[id].icon}
-                  label={TABS[id].label}
-                  selected={currentTab === id}
-                />
-              }
+              renderTitle={<K5IconTab icon={icon} label={label} selected={currentTab === id} />}
               selected={currentTab === id}
             >
               <span />
@@ -127,12 +92,20 @@ const DashboardTabs = ({currentTab, name, onRequestTabChange, tabsRef}) => {
   )
 }
 
-DashboardTabs.propTypes = {
+K5Tabs.propTypes = {
+  children: PropTypes.node,
   currentTab: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  onRequestTabChange: PropTypes.func.isRequired,
+  name: PropTypes.string,
+  onTabChange: PropTypes.func.isRequired,
+  tabs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired,
+      label: PropTypes.string.isRequired
+    })
+  ).isRequired,
   tabsRef: PropTypes.func
 }
 
-export {DashboardIconTab}
-export default DashboardTabs
+export {K5IconTab}
+export default K5Tabs
