@@ -932,7 +932,6 @@ describe CoursesController do
     end
 
     it "should not find deleted courses" do
-      skip "flaky, unskip in LS-1909"
       user_session(@teacher)
       @course.destroy
       assert_page_not_found do
@@ -1795,7 +1794,6 @@ describe CoursesController do
     end
 
     it 'should allow unpublishing of the course' do
-      skip "flaky, unskip in LS-1909"
       user_session(@teacher)
       put 'update', params: {:id => @course.id, :course => {:event => 'claim'}}
       @course.reload
