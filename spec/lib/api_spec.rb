@@ -192,6 +192,11 @@ describe Api do
       expect(@api.api_find(Account, "lti_context_id:#{account.lti_context_id}")).to eq account
     end
 
+    it "finds account by uuid" do
+      account = Account.create!(name: 'account')
+      expect(@api.api_find(Account, "uuid:#{account.uuid}")).to eq account
+    end
+
     it "should find user by uuid" do
       expect(@api.api_find(User, "uuid:#{@user.uuid}")).to eq @user
     end

@@ -124,8 +124,9 @@ module Api
       { :lookups => { 'sis_account_id' => 'sis_source_id',
                       'id' => 'id',
                       'sis_integration_id' => 'integration_id',
-                      'lti_context_id' => 'lti_context_id' }.freeze,
-        :is_not_scoped_to_account => ['id', 'lti_context_id'].freeze,
+                      'lti_context_id' => 'lti_context_id',
+                      'uuid' => 'uuid' }.freeze,
+        :is_not_scoped_to_account => ['id', 'lti_context_id', 'uuid'].freeze,
         :scope => 'root_account_id' }.freeze,
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id',
@@ -155,7 +156,7 @@ module Api
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
-  USER_UUID_REGEX = %r{\Auuid:(\w{40,})\z}
+  UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -170,7 +171,7 @@ module Api
       sis_id = $2
     elsif id =~ ID_REGEX
       return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
-    elsif id =~ USER_UUID_REGEX
+    elsif id =~ UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil
