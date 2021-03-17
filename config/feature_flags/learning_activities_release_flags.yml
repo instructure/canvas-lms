@@ -37,11 +37,6 @@ submission_type_tool_placement:
   description: |-
     If an LTI tool configured with the placement is installed, will show a new entry in the
     assignment submission type dropdown to quickly configure the assignment for the tool
-syllabus_course_summary_option:
-  state: allowed
-  applies_to: SiteAdmin
-  display_name: Syllabus Course Summary Option
-  description: Make the Course Summary (list of assignments and events) optional in the syllabus
 uxs_4_omg_a_scary_blueprint_checkbox:
   state: hidden
   display_name: Allow Blueprint Publishing After Association
