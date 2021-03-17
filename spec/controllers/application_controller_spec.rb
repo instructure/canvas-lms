@@ -1136,6 +1136,39 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context 'is set to modules page when launched from modules page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/modules')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/modules')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+        end
+
+        context 'is set to assignments page when launched from assignments page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+        end
+
+
         context 'is set to quizzes page when launched from quizzes page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
@@ -1151,6 +1184,55 @@ RSpec.describe ApplicationController do
             expect(assigns[:return_url]).to eq 'host/quizzes'
           end
         end
+
+        context 'is set to modules page when launched from edit page accessed from modules' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/100/edit?module_item_id=42')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/1/edit?module_item_id=42')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+        end
+
+        context 'is set to assignments page when launched from edit page accessed from assignments' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/1/edit')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/100/edit')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+        end
+
+        context 'is set to quizzes page when launched from edit page accessed from quizzes' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/1/edit?quiz_lti')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/100/edit?quiz_lti')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+        end
+
 
         it 'is set to quizzes page when launched from assignments/new' do
           allow(controller.request).to receive(:referer).and_return('assignments/new')
