@@ -277,9 +277,9 @@ Then:
 docker-compose exec cassandra cqlsh
 ```
 
-### Mail Catcher
+### Mail Hog
 
-To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`.
+To enable Mail Hog: Add `docker-compose/mailhog.override.yml` to your `COMPOSE_FILE` var in `.env`.
 
 Email is often sent through background jobs if you spin up the `jobs` container.
 If you would like to test or preview any notifications, simply trigger the email

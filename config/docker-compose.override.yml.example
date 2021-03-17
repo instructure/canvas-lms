@@ -39,9 +39,8 @@ services:
       - translations:/usr/src/app/public/javascripts/translations
       - yardoc:/usr/src/app/.yardoc
       - yarn-cache:/home/docker/.cache/yarn
-    environment: &BASE-ENV
-      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
-      RAILS_ENV: development
+    env_file:
+        - ./.env
 
   webpack:
     <<: *BASE
@@ -50,13 +49,15 @@ services:
   web:
     <<: *BASE
     environment:
-      <<: *BASE-ENV
       VIRTUAL_HOST: .canvas.docker
       HTTPS_METHOD: noredirect
 
   postgres:
+    build: ./docker-compose/postgres
     volumes:
       - pg_data:/var/lib/postgresql/data
+    env_file:
+        - ./.env
 
   githook_installer:
     build:

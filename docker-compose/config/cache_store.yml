@@ -1,4 +1,11 @@
-production:
-  cache_store: redis_cache_store
+default: &default
+  cache_store: <%= ENV.fetch('CANVAS_CACHE_STORE', 'redis_cache_store') %>
+
 development:
-  cache_store: redis_cache_store
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

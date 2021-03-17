@@ -4,7 +4,7 @@
 # it whenever a call for consul data is issued. Data should be
 # shaped like the example below, one key for the related set of data,
 # and a hash of key/value pairs (no nesting)
-development:
+default: &default
   # tree
   config:
     # service
@@ -58,3 +58,12 @@ development:
       datadog_apm.yml: |
         sample_rate: 0.0
         host_sample_rate: 0.0
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

@@ -1,16 +1,13 @@
-# production:
-#   host: 10.11.12.13
-#   port: 8500
-#   ssl: true
-#   environment: prod
-#   dc: "consul"
-#   acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
-# test:
+# default: &default
 #   host: consul
 #   port: 8500
 #   ssl: false
-#   environment: test
 #   dc: "consul"
+#   acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
+
+# development:
+#   <<: *default
+#   environment: "dev"
 #   init_values:
 #     canvas:
 #       signing-secret: astringthatisactually32byteslong
@@ -24,29 +21,30 @@
 #     live-events-subscription-service:
 #       app-host: http://les.docker
 #       sad-panda: null
-# development:
-#   host: consul
-#   port: 8500
-#   ssl: false
-#   environment: "dev"
-#   init_values_witnout_env:
+#     live-events:
+#       aws_endpoint: http://kinesis.canvaslms.docker
+#       kinesis_stream_name: live-events
+#     math-man:
+#       base_url: 'http://mathman.docker'
+#       use_for_svg: 'false'
+#       use_for_mml: 'false'
+
+# test:
+#   <<: *default
+#   init_values:
 #     canvas:
 #       signing-secret: astringthatisactually32byteslong
 #       encryption-secret: astringthatisactually32byteslong
 #     rich-content-service:
 #       app-host: rce.docker
-#       cdn-host: null
+#       cdn-host: rce.docker
 #     address-book:
 #       app-host: http://address-book.docker
 #       secret: opensesame
 #     live-events-subscription-service:
 #       app-host: http://les.docker
 #       sad-panda: null
-#     live-events:
-#       aws_endpoint: http://kinesis.canvaslms.docker
-#       kinesis_stream_name: live-events
-#   init_values:
-#     math-man:
-#       base_url: 'http://mathman.docker'
-#       use_for_svg: 'false'
-#       use_for_mml: 'false'
+
+# production:
+#   <<: *default
+#   environment: prod

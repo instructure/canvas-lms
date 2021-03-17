@@ -1,6 +1,10 @@
-production: &default
-  encryption_key: <%= ENV["ENCRYPTION_KEY"] %>
+default: &default
+  encryption_key: <%= ENV.fetch('ENCRYPTION_KEY') %>
   lti_iss: 'https://canvas.instructure.com'
+  lti_grant_host: <%= ENV.fetch('CANVAS_CANVAS_DOMAIN', 'canvas.docker') %>
+
+production:
+  <<: *default
 
 development:
   <<: *default

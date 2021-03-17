@@ -1,0 +1,22 @@
+# to use this add docker-compose/mailhog.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '2.3'
+services:
+  web:
+    links:
+      - mailhog
+
+  mailhog:
+    image: mailhog/mailhog
+    user: root
+    environment:
+      MH_STORAGE: maildir
+      MH_MAILDIR_PATH: /maildir
+      VIRTUAL_HOST: mail.canvas.docker
+      VIRTUAL_PORT: 8025
+    volumes:
+      - maildir:/maildir
+
+volumes:
+  maildir: {}

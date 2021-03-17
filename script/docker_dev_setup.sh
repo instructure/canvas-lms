@@ -224,6 +224,12 @@ function setup_docker_environment {
     setup_docker_as_nonroot
     [[ ${skip_dory:-n} != 'y' ]] && start_dory
   fi
+  if [ -f ".env" ]; then
+    message ".env exists, skipping copy of default environment variables from .env.example"
+  else
+    message "Copying default environment variables from docker-compose/.env.example to .env"
+    cp docker-compose/.env.example .env
+  fi
   if [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml exists, skipping copy of default configuration"
   else

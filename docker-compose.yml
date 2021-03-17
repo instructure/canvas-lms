@@ -4,20 +4,18 @@ services:
   web: &WEB
     build:
       context: .
+    container_name: canvas_web
     links:
       - postgres
       - redis
-    environment:
-      POSTGRES_PASSWORD: sekret
 
   jobs:
     <<: *WEB
+    container_name: canvas_jobs
     command: bundle exec script/delayed_job run
 
   postgres:
     build: ./docker-compose/postgres
-    environment:
-      POSTGRES_PASSWORD: sekret
 
   redis:
     image: redis:alpine

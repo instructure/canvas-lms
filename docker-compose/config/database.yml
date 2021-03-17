@@ -1,27 +1,27 @@
-common: &common
+default: &default
   adapter: postgresql
-  host: <%= ENV.fetch('CANVAS_DATABASE_HOST', 'postgres') %>
-  password: <%= ENV.fetch('POSTGRES_PASSWORD') %>
-  encoding: utf8
+  host: <%= ENV.fetch('CANVAS_DATABASE_HOST', 'db') %>
+  port: <%= ENV.fetch('CANVAS_DATABASE_PORT', '5432') %>
+  database: <%= ENV.fetch('CANVAS_DATABASE_NAME', 'canvas_development') %>
   username: <%= ENV.fetch('CANVAS_DATABASE_USERNAME', 'postgres') %>
+  password: <%= ENV.fetch('CANVAS_DATABASE_PASSWORD', 'password') %>
   timeout: 5000
+  encoding: utf8
   prepared_statements: false
   use_qualified_names: true
   shard_name: public
   schema_search_path: "''"
 
-production:
-  <<: *common
-  database: <%= ENV.fetch('CANVAS_DATABASE_PRODUCTION', 'canvas_production') %>
-
 development:
-  <<: *common
-  database: <%= ENV.fetch('CANVAS_DATABASE_DEVELOPMENT', 'canvas_development') %>
+  <<: *default
 
 test:
-  <<: *common
-  database: <%= ENV.fetch('CANVAS_DATABASE_TEST', 'canvas_test') %>
+  <<: *default
+  database: <%= ENV.fetch('CANVAS_DATABASE_NAME_TEST', 'canvas_test') %>
   shard1: canvas_test_shard_1
   shard2: canvas_test_shard_2
   test_shard_1: canvas_test_shard_1
   test_shard_2: canvas_test_shard_2
+
+production:
+  <<: *default
