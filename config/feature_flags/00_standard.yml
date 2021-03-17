@@ -427,12 +427,6 @@ timer_without_autosubmission:
   description: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
   applies_to: RootAccount
   state: hidden
-easy_student_view:
-  state: hidden
-  applies_to: Course
-  display_name: Easy Toggle Student View
-  description: Places a button in the top-right corner of course pages allowing teachers to quickly switch to Student
-    View.
 new_course_availability_ui:
   state: hidden
   applies_to: RootAccount

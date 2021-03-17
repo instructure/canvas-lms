@@ -24,7 +24,6 @@ describe "student view toggle" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Account.default.enable_feature!(:easy_student_view)
     course_with_teacher :active_all => true
   end
 

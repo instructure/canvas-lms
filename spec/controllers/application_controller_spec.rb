@@ -1847,10 +1847,6 @@ describe ApplicationController do
   end
 
   describe "show_student_view_button? helper" do
-    before :once do
-      Account.default.enable_feature!(:easy_student_view)
-    end
-
     context "for teachers" do
       before :once do
         course_with_teacher :active_all => true
@@ -1872,13 +1868,6 @@ describe ApplicationController do
         controller.params[:controller] = 'context_modules'
         controller.params[:action] = 'index'
         expect(controller.send(:show_student_view_button?)).to be_truthy
-      end
-
-      it "should return false if flag is disabled" do
-        Account.default.disable_feature!(:easy_student_view)
-        controller.params[:controller] = 'courses'
-        controller.params[:action] = 'show'
-        expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
       it "should return false if context is not set" do
@@ -1934,7 +1923,7 @@ describe ApplicationController do
 
   describe "new math equation handling feature" do
     let(:root_account) {Account.default}
-    
+
     before(:each) do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
@@ -1959,7 +1948,7 @@ describe ApplicationController do
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
     end
 
-    
+
   end
 end
 
