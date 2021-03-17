@@ -33,6 +33,7 @@ import StepContainer from './StepContainer'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
+import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
 
 class Header extends React.Component {
   static propTypes = {
@@ -140,6 +141,9 @@ class Header extends React.Component {
   )
 
   render() {
+    const lockAssignment =
+      this.props.assignment.env.modulePrereq || this.props.assignment.env.unlockDate
+
     return (
       <>
         <div
@@ -201,32 +205,25 @@ class Header extends React.Component {
               )}
             </Flex.Item>
           </Flex>
-          {!this.state.isSticky && this.props.submission && this.props.allSubmissions && (
-            <AttemptSelect
-              allSubmissions={this.props.allSubmissions}
-              onChangeSubmission={this.props.onChangeSubmission}
-              submission={this.props.submission}
-            />
+
+          {this.props.submission && (
+            <Flex>
+              {this.props.allSubmissions && (
+                <Flex.Item>
+                  <AttemptSelect
+                    allSubmissions={this.props.allSubmissions}
+                    onChangeSubmission={this.props.onChangeSubmission}
+                    submission={this.props.submission}
+                  />
+                </Flex.Item>
+              )}
+              {this.props.assignment.env.currentUser && !lockAssignment && (
+                <Flex.Item>
+                  <SubmissionWorkflowTracker submission={this.props.submission} />
+                </Flex.Item>
+              )}
+            </Flex>
           )}
-          <div className="assignment-pizza-header-outer">
-            <div
-              className="assignment-pizza-header-inner"
-              data-testid={
-                this.state.isSticky
-                  ? 'assignment-student-pizza-header-sticky'
-                  : 'assignment-student-pizza-header-normal'
-              }
-            >
-              <StepContainer
-                assignment={this.props.assignment}
-                submission={this.props.submission}
-                forceLockStatus={
-                  !this.props.assignment.env.currentUser || !!this.props.assignment.env.modulePrereq
-                }
-                isCollapsed={this.state.isSticky}
-              />
-            </div>
-          </div>
         </div>
         {
           // We need this element to fill the gap that is missing when the regular

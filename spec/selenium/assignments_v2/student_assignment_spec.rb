@@ -44,8 +44,8 @@ describe 'as a student' do
         StudentAssignmentPageV2.visit(@course, @assignment)
       end
 
-      it 'should show available checkmark stepper' do
-        expect(StudentAssignmentPageV2.checkmark_icon).to be_displayed
+      it 'should show submission workflow tracker' do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to be_displayed
       end
 
       it 'should show assignment title' do

@@ -31,67 +31,6 @@ it('renders normally', async () => {
   expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
 })
 
-it('dispatches scroll event properly when less than threshold', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {getByTestId} = render(<Header {...props} />)
-  const scrollEvent = new Event('scroll')
-  window.pageYOffset = 100
-  window.dispatchEvent(scrollEvent)
-
-  expect(getByTestId('assignment-student-pizza-header-normal')).toBeInTheDocument()
-})
-
-it('dispatches scroll event properly when greater than threshold', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {getByTestId} = render(<Header {...props} />)
-  const scrollEvent = new Event('scroll')
-  window.pageYOffset = 500
-  window.dispatchEvent(scrollEvent)
-
-  expect(getByTestId('assignment-student-pizza-header-sticky')).toBeInTheDocument()
-})
-
-it('displays element filler when scroll offset is in correct place', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {getByTestId} = render(<Header {...props} />)
-  const scrollEvent = new Event('scroll')
-  window.pageYOffset = 100
-  window.dispatchEvent(scrollEvent)
-
-  expect(getByTestId('assignment-student-pizza-header-normal')).toBeInTheDocument()
-
-  window.pageYOffset = 200
-  window.dispatchEvent(scrollEvent)
-
-  expect(getByTestId('header-element-filler')).toBeInTheDocument()
-  expect(getByTestId('assignment-student-header-sticky')).toBeInTheDocument()
-})
-
-it('will render the uncollapsed step container when scroll offset is less than scroll threshold', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Submission: SubmissionMocks.submitted
-  })
-  const {getByTestId, queryByTestId} = render(<Header {...props} />)
-  const scrollEvent = new Event('scroll')
-
-  window.pageYOffset = 100
-  window.dispatchEvent(scrollEvent)
-
-  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
-  expect(queryByTestId('collapsed-step-container')).not.toBeInTheDocument()
-})
-
-it('will render the collapsed step container when scroll offset is greater than scroll threshold', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {getByTestId} = render(<Header {...props} />)
-  const scrollEvent = new Event('scroll')
-
-  window.pageYOffset = 200
-  window.dispatchEvent(scrollEvent)
-
-  expect(getByTestId('collapsed-step-container')).toBeInTheDocument()
-})
-
 it('will not render LatePolicyStatusDisplay if the submission is not late', async () => {
   const props = await mockAssignmentAndSubmission()
   const {queryByTestId} = render(<Header {...props} />)
@@ -175,11 +114,40 @@ it('will not render the grade if the latest submission is excused', async () => 
   expect(getByTestId('grade-display').textContent).toEqual('Excused!')
 })
 
-it('will render the unavailable pizza tracker if there is a module prereq lock', async () => {
-  const props = await mockAssignmentAndSubmission()
-  props.assignment.env.modulePrereq = 'simulate not null'
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('unavailable-step-container')).toBeInTheDocument()
+describe('submission workflow tracker', () => {
+  it('is rendered when a submission exists and the assignment is available', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
+  })
+
+  it('is not rendered when no submission object is present', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: null})
+    props.allSubmissions = [{id: 1}]
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when there is no current user', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.currentUser = null
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the assignment has not been unlocked yet', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.modulePrereq = 'simulate not null'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the assignment has uncompleted prerequisites', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.unlockDate = 'soon'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
 })
 
 describe('if submitted and there are more attempts', () => {

@@ -35,8 +35,8 @@ class StudentAssignmentPageV2
       f("svg[name='IconLock']")
     end
 
-    def checkmark_icon
-      f('svg[name="IconCheckMark"]')
+    def submission_workflow_tracker
+      f("div[data-testid='submission-workflow-tracker']")
     end
 
     def assignment_title(title)
