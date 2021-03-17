@@ -284,6 +284,8 @@ class Message < ActiveRecord::Base
   def author_avatar_url
     url = author.try(:avatar_url)
     URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
+  rescue URI::InvalidURIError
+    nil
   end
 
   def author_short_name
@@ -668,6 +670,10 @@ class Message < ActiveRecord::Base
       if Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
         return skip_and_cancel
       end
+    end
+
+    if path_type == "push" && !check_acct.enable_push_notifications?
+      return skip_and_cancel
     end
 
     if path_type == 'push' && Account.site_admin.feature_enabled?(:reduce_push_notifications)

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!k5_dashboard'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 export const countByCourseId = arr =>
@@ -75,3 +76,26 @@ export const fetchMissingAssignments = (userId = 'self') =>
       defaultFetchOptions
     )
   )
+
+/* Fetches instructors for a given course - in this case an instructor is a user with
+   either a Teacher or TA enrollment. */
+export const fetchCourseInstructors = courseId =>
+  asJson(
+    window.fetch(
+      `/api/v1/courses/${courseId}/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments`,
+      defaultFetchOptions
+    )
+  )
+
+export const readableRoleName = role => {
+  const ROLES = {
+    TeacherEnrollment: I18n.t('Teacher'),
+    TaEnrollment: I18n.t('Teaching Assistant'),
+    DesignerEnrollment: I18n.t('Designer'),
+    StudentEnrollment: I18n.t('Student'),
+    StudentViewEnrollment: I18n.t('Student'),
+    ObserverEnrollment: I18n.t('Observer')
+  }
+  // Custom roles return as named
+  return ROLES[role] || role
+}

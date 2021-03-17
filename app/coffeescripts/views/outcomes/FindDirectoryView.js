@@ -31,7 +31,7 @@ import 'jquery.disableWhileLoading'
 // Used in the FindDialog.
 export default class FindDirectoryView extends OutcomesDirectoryView {
   initialize(opts) {
-    let core, course, state
+    let course, state
     this.readOnly = true
 
     const account = new OutcomeGroup({
@@ -56,30 +56,19 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
       })
       state.url = ENV.STATE_STANDARDS_URL
     }
-    if (ENV.COMMON_CORE_GROUP_URL) {
-      core = new OutcomeGroup({
-        dontImport: true,
-        title: I18n.t('common_core', 'Common Core Standards'),
-        description: I18n.t(
-          'common_core_description',
-          'To the left is the familiar outcomes folder structure for each grouping of the Common Core State Standards. This will allow you to effortlessly include any of the Common Core Standards for grading within your course.'
-        )
-      })
-      core.url = ENV.COMMON_CORE_GROUP_URL
-    }
     if (opts.courseGroup) {
       course = opts.courseGroup
     }
 
     this.outcomes = new OutcomeCollection() // empty - not needed
-    this.groups = new OutcomeGroupCollection(_.compact([account, state, core, course]))
+    this.groups = new OutcomeGroupCollection(_.compact([account, state, course]))
     // for PaginatedView
     // @collection starts as @groups but can later change to @outcomes
     this.collection = this.groups
 
     const dfds = (() => {
       const result = []
-      for (const g of _.compact([state, core])) {
+      for (const g of _.compact([state])) {
         g.on('change', this.revertTitle)
         result.push(g.fetch())
       }

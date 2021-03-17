@@ -546,6 +546,26 @@ test('includes grading period weights in gradingPeriods', () => {
   equal(grades.gradingPeriods[702].gradingPeriodWeight, 50)
 })
 
+test('excludes assignments that are anonymizing students in total calculations', () => {
+  assignments[0].anonymize_students = true
+  const ignoreUnpostedAnonymous = true
+  const grades = calculateWithGradingPeriods('percent', ignoreUnpostedAnonymous)
+  equal(grades.assignmentGroups[301].current.score, 5)
+  equal(grades.assignmentGroups[301].final.score, 5)
+  equal(grades.assignmentGroups[301].current.possible, 10)
+  equal(grades.assignmentGroups[301].final.possible, 10)
+})
+
+test('includes assignments that are anonymizing students when the feature flag is disabled', () => {
+  assignments[0].anonymize_students = true
+  const ignoreUnpostedAnonymous = false
+  const grades = calculateWithGradingPeriods('percent', ignoreUnpostedAnonymous)
+  equal(grades.assignmentGroups[301].current.score, 15)
+  equal(grades.assignmentGroups[301].final.score, 15)
+  equal(grades.assignmentGroups[301].current.possible, 20)
+  equal(grades.assignmentGroups[301].final.possible, 20)
+})
+
 test('includes assignment groups point scores in grading period grades', () => {
   const grades = calculateWithGradingPeriods('percent')
   equal(grades.gradingPeriods[701].assignmentGroups[301].current.score, 15)

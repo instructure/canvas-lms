@@ -2441,10 +2441,15 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
     end
 
-    # Result Service
+    # Result Service (LTI AGS)
     scope(controller: 'lti/ims/results') do
       get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
+    end
+
+    # Progress Service (LTI AGS)
+    scope(controller: 'lti/ims/progress') do
+      get "courses/:course_id/progress/:id", action: :show, as: :lti_progress_show
     end
 
     # Public JWK Service

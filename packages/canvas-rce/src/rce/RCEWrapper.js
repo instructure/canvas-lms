@@ -606,7 +606,7 @@ class RCEWrapper extends React.Component {
   focusCurrentView() {
     switch (this.state.editorView) {
       case WYSIWYG_VIEW:
-        this.focus()
+            this.mceInstance().focus()
         break
       case PRETTY_HTML_EDITOR_VIEW:
         {

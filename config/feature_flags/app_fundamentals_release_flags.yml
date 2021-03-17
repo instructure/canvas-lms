@@ -14,3 +14,8 @@ granular_permissions_course_files:
   applies_to: RootAccount
   display_name: Granular permissions for managing course files
   description: Add granularity to permissions around managing course files
+release_notes_ui:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Advertise release notes via the UI
+  description: Enables siteadmin users to configure release notes to display to users

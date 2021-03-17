@@ -21,6 +21,7 @@ import I18n from 'i18n!observees'
 import pairingCodeTemplate from 'jst/PairingCodeUserObservees'
 import itemView from './UserObserveeView'
 import PaginatedCollectionView from './PaginatedCollectionView'
+import 'jquery.disableWhileLoading'
 
 export default class UserObserveesView extends PaginatedCollectionView
   autoFetch: true
@@ -31,6 +32,7 @@ export default class UserObserveesView extends PaginatedCollectionView
 
   events:
     'submit .add-observee-form': 'addObservee'
+    'click .remove-observee': 'removeObservee'
 
   els: _.extend {}, PaginatedCollectionView::els,
     '.add-observee-form': '$form'
@@ -42,7 +44,12 @@ export default class UserObserveesView extends PaginatedCollectionView
     @collection.on 'fetch', =>
       @setLoading(false)
     @collection.on 'fetched:last', =>
-      $('<em>').text(I18n.t('No students being observed')).appendTo(@$('.observees-list-container')) if @collection.size() == 0
+      @checkEmpty()
+    @collection.on 'remove', =>
+      @checkEmpty()
+
+  checkEmpty: =>
+    $('<em>').text(I18n.t('No students being observed')).appendTo(@$('.observees-list-container')) if @collection.size() == 0
 
   addObservee: (ev) ->
     ev.preventDefault()
@@ -65,6 +72,17 @@ export default class UserObserveesView extends PaginatedCollectionView
       @$form.formErrors(JSON.parse(response.responseText))
 
       @focusForm()
+
+  removeObservee: (ev) ->
+    ev.preventDefault()
+    id = $(ev.target).data('user-id')
+    user_name = $(ev.target).data('user-name')
+    if confirm I18n.t("Are you sure you want to stop observing %{name}?", name: user_name)
+      @$form.disableWhileLoading $.ajaxJSON("/api/v1/users/self/observees/#{id}", 'DELETE', {}, () => @removedObservee(id, user_name))
+
+  removedObservee: (id, name) ->
+    @collection.remove(id)
+    $.flashMessage(I18n.t('No longer observing %{user}', user: name))
 
   focusForm: ->
     field = @$form.find(":input[value='']:not(button)").first()

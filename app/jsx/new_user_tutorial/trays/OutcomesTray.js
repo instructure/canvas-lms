@@ -64,7 +64,7 @@ const HomeTray = () => (
       `Set up outcomes in your course as measured by pedagogical goals or desired objectives.
       Help students learn skills and activities, rather than just focusing on grades as a measure of their success.
       Assess student progress through calculation methods, and measure progress directly in the Learning Mastery Gradebook.
-      Import existing account, state, and Common Core Standards outcomes to your course. You can also align outcomes in course rubrics.`
+      Import existing account and state outcomes to your course. You can also align outcomes in course rubrics.`
     )}
   </TutorialTrayContent>
 )

@@ -2440,6 +2440,8 @@ class Submission < ActiveRecord::Base
 
   def update_line_item_result
     return unless saved_change_to_score?
+    return if autograded? # Submission changed by LTI Tool, it will set result score directly
+
     Lti::Result.update_score_for_submission(self, score)
   end
 

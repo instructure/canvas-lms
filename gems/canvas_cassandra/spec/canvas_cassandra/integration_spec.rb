@@ -25,17 +25,18 @@ class TestLogger
   end
 end
 
+# TODO: this spec that interacts directly with the parent app should probably go
+# live in the parent app, not here in the gem...
 describe "execute and update" do
-  let(:config_path) { File.expand_path("../../../../../config/cassandra.yml", __FILE__) }
+  before(:each) do
+    target_location = Pathname.new(File.expand_path("../../../../..", __FILE__))
+    allow(Rails).to receive(:root).and_return(target_location)
+  end
   let(:cassandra_configured?) do
-    File.exist?(config_path) &&
-        YAML.load(ERB.new(File.read(config_path)).result) &&
-        YAML.load(ERB.new(File.read(config_path)).result)['test'] &&
-        YAML.load(ERB.new(File.read(config_path)).result)['test']['page_views']
+    ConfigFile.load("page_views", "test")
   end
   let(:db) do
-    # TODO: ConfigFile.load really deserves to be its own Config component that we could use here
-    test_config = YAML.load(ERB.new(File.read(config_path)).result)['test']['page_views']
+    test_config = ConfigFile.load("page_views", "test")
     CanvasCassandra::Database.new("test_conn", test_config['servers'], {keyspace: test_config['keyspace'], cql_version: '3.0.0'}, TestLogger.new)
   end
 

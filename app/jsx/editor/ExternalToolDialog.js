@@ -47,6 +47,7 @@ export default class ExternalToolDialog extends React.Component {
       addEventListener: PropTypes.func.isRequired,
       removeEventListener: PropTypes.func.isRequired,
       confirm: PropTypes.func.isRequired,
+      dispatchEvent: PropTypes.func.isRequired,
       height: PropTypes.number.isRequired,
       $: PropTypes.func.isRequired
     }).isRequired,
@@ -146,6 +147,8 @@ export default class ExternalToolDialog extends React.Component {
   handleRemove = () => {
     this.setState({button: EMPTY_BUTTON})
     this.props.editor.focus()
+    // force tinyMCE to redraw sticky toolbar otherwise it never goes away
+    this.props.win.dispatchEvent(new Event('resize'))
   }
 
   handleInfoAlertFocus = ev => this.setState({infoAlert: ev.target})

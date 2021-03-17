@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
-      skip("Rails 6.0 specific") if CANVAS_RAILS5_2
+      skip("Rails 6.0 specific") unless CANVAS_RAILS6_0
       translations = {'en' => I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...

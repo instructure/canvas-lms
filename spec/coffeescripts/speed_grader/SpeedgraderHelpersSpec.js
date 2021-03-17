@@ -579,3 +579,27 @@ QUnit.module('SpeedGraderHelpers.plagiarismErrorMessage', () => {
     )
   })
 })
+
+QUnit.module('SpeedGraderHelpers.resourceLinkLookupUuidParam', () => {
+  test('returns an empty string when submission resource_link_lookup_uuid does not exists', () => {
+    const submission = {}
+
+    equal(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), '')
+
+    submission.resource_link_lookup_uuid = null
+
+    equal(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), '')
+
+    submission.resource_link_lookup_uuid = ''
+
+    equal(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), '')
+  })
+
+  test('returns a query string parameter when submission resource_link_lookup_uuid exists', () => {
+    const id = '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    const submission = {resource_link_lookup_uuid: id}
+    const param = `&resource_link_lookup_uuid=${id}`
+
+    strictEqual(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), param)
+  })
+})

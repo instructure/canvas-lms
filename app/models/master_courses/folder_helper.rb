@@ -64,15 +64,27 @@ class MasterCourses::FolderHelper
     cutoff_time = content_export.master_migration&.master_template&.last_export_completed_at
     return unless cutoff_time
 
-    updated_folders = content_export.context.folders.where('updated_at>?', cutoff_time).where.not(cloned_item_id: nil)
+    updated_folders = content_export.context.folders.where('updated_at>?', cutoff_time).where.not(cloned_item_id: nil).preload(:parent_folder)
     updated_folders.each do |source_folder|
       dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
+      sync_folder_location(child_course, dest_folder, source_folder) if dest_folder
       if dest_folder && [:name, :workflow_state, :locked, :lock_at, :unlock_at].any?{|attr| dest_folder.send(attr) != source_folder.send(attr)}
         [:name, :workflow_state, :locked, :lock_at, :unlock_at].each do |attr|
           dest_folder.send("#{attr}=", source_folder.send(attr))
         end
-        dest_folder.save!
       end
+      dest_folder.save! if dest_folder.changed?
+    end
+  end
+
+  def self.sync_folder_location(dest_course, dest_folder, source_folder)
+    return unless dest_folder.cloned_item_id == source_folder.cloned_item_id
+    return unless dest_folder.parent_folder && source_folder.parent_folder
+    source_parent_folder = source_folder.parent_folder
+    return unless source_parent_folder.cloned_item_id.present?
+    if dest_folder.parent_folder.cloned_item_id != source_parent_folder.cloned_item_id
+      new_parent = dest_course.folders.where(cloned_item_id: source_parent_folder.cloned_item_id).take
+      dest_folder.parent_folder = new_parent if new_parent
     end
   end
 end

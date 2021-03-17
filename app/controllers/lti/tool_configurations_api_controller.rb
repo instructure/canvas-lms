@@ -55,6 +55,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # If both the "settings" and "settings_url" parameters are set,
   # the "settings_url" parameter will be ignored.
   #
+  # When "settings_url" parameter is set, the DeveloperKey.redirect_uris will
+  # be created with "target_link_uri" from the JSON tool configuration, in case,
+  # the developer_key.redirect_uris parameter is not given.
+  #
   # Use of this endpoint will create a new developer_key.
   #
   # @argument settings [Object]
@@ -198,11 +202,17 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def developer_key_params
-    return {} unless params.key? :developer_key
+    return {} if params[:developer_key].blank?
     params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :client_credentials_audience, scopes: [])
   end
 
   def developer_key_redirect_uris
-    params.require(:developer_key).require(:redirect_uris)
+    # When settings_url is set, the redirect_uris parameter is not required.
+    # We can infer the redirect_uris from the tool configuration (target_link_uri).
+    if tool_configuration_params[:settings_url].present?
+      params.dig(:developer_key, :redirect_uris)
+    else
+      params.require(:developer_key).require(:redirect_uris)
+    end
   end
 end

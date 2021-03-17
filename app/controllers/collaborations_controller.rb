@@ -207,10 +207,14 @@ class CollaborationsController < ApplicationController
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
           if @collaboration.is_a? ExternalToolCollaboration
-            url = external_tool_launch_url(@collaboration.url)
+            url = external_tool_launch_url(
+              @collaboration.url,
+              @collaboration.resource_link_lookup_uuid
+            )
           else
             url = @collaboration.url
           end
+
           redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
           redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
@@ -411,11 +415,17 @@ class CollaborationsController < ApplicationController
     }
     collaboration.data = content_item
     collaboration.url = content_item['url']
+    collaboration.resource_link_lookup_uuid = content_item['lookup_uuid']
     collaboration
   end
 
-  def external_tool_launch_url(url)
-    polymorphic_url([:retrieve, @context, :external_tools], url: url, display: 'borderless')
+  def external_tool_launch_url(url, resource_link_lookup_uuid)
+    polymorphic_url(
+      [:retrieve, @context, :external_tools],
+      url: url,
+      display: 'borderless',
+      resource_link_lookup_id: resource_link_lookup_uuid
+    )
   end
 
   def content_item_visibility(content_item)

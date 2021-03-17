@@ -72,6 +72,7 @@ export default class NewKeyForm extends React.Component {
   render() {
     const {
       isLtiKey,
+      isRedirectUriRequired,
       developerKey,
       editing,
       showRequiredMessages,
@@ -108,7 +109,7 @@ export default class NewKeyForm extends React.Component {
                   onChange={e => updateDeveloperKey('email', e.target.value)}
                 />
                 <TextArea
-                  label={isLtiKey ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
+                  label={isRedirectUriRequired ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
                   name="developer_key[redirect_uris]"
                   value={developerKey.redirect_uris}
                   onChange={e => updateDeveloperKey('redirect_uris', e.target.value)}
@@ -227,6 +228,7 @@ NewKeyForm.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   isLtiKey: PropTypes.bool.isRequired,
+  isRedirectUriRequired: PropTypes.bool.isRequired,
   developerKey: PropTypes.shape({
     notes: PropTypes.string,
     icon_url: PropTypes.string,

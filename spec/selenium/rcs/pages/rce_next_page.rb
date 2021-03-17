@@ -153,6 +153,10 @@ module RCENextPage
     f('[role^="menuitem"][title="Course Links"]')
   end
 
+  def group_links
+    f('[role^="menuitem"][title="Group Links"]')
+  end
+
   def external_links
     f('[role^="menuitem"][title="External Links"]')
   end
@@ -293,6 +297,10 @@ module RCENextPage
 
   def user_documents
     f('[role^="menuitem"][title="User Documents"]')
+  end
+
+  def group_documents
+    f('[role^="menuitem"][title="Group Documents"]')
   end
 
   def upload_document_modal
@@ -717,6 +725,10 @@ module RCENextPage
     course_links.click
   end
 
+  def click_group_links
+    group_links.click
+  end
+
   def click_external_links
     external_links.click
   end
@@ -794,6 +806,11 @@ module RCENextPage
 
   def click_course_documents
     course_documents.click
+    wait_for_ajaximations
+  end
+
+  def click_group_documents
+    group_documents.click
     wait_for_ajaximations
   end
 

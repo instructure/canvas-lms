@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {wait} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 import ConfirmUnfavoriteCourseModal from 'jsx/dashboard_card/ConfirmUnfavoriteCourseModal'
 
@@ -58,7 +58,7 @@ QUnit.module('ConfirmUnfavoriteCourseModal', suiteHooks => {
 
   async function showModal() {
     component.show()
-    await wait(() => {
+    await waitFor(() => {
       if (props.onEntered.callCount > 0) {
         return
       }
@@ -72,7 +72,7 @@ QUnit.module('ConfirmUnfavoriteCourseModal', suiteHooks => {
   }
 
   async function waitForModalClosed() {
-    await wait(() => {
+    await waitFor(() => {
       if (props.onClose.callCount > 0) {
         return
       }

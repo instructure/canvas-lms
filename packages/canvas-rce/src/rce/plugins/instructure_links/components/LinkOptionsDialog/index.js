@@ -58,7 +58,7 @@ export default function LinkOptionsDialog(props) {
       target: '_blank',
       href: url,
       userText: props.showText,
-      embed: {disablePreview: true}
+      class: 'inline_disabled'
     })
   }
 

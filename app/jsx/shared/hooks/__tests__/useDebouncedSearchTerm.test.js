@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderHook, act} from '@testing-library/react-hooks'
+import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useDebouncedSearchTerm from '../useDebouncedSearchTerm'
 
 describe('useDebouncedSearchTerm', () => {

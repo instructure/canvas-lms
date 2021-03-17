@@ -356,7 +356,7 @@ namespace :i18n do
   def remove_unwanted_translations(translations)
     translations['date'].delete('order')
     translations['number'].fetch('nth', {}).delete('ordinals')
-    translations['number'].fetch('nth', {}).delete('ordinalize')
+    translations['number'].fetch('nth', {}).delete('ordinalized')
   end
 
   def autoimport(source_translations, new_translations)

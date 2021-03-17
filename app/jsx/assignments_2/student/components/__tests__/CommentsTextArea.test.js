@@ -19,7 +19,7 @@
 import * as uploadFileModule from '../../../../shared/upload_file'
 import $ from 'jquery'
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
-import {fireEvent, render, wait, waitForElement} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
@@ -120,9 +120,7 @@ describe('CommentTextArea', () => {
         <CommentTextArea {...props} />
       </MockedProvider>
     )
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
       new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
@@ -141,9 +139,7 @@ describe('CommentTextArea', () => {
         <CommentTextArea {...props} />
       </MockedProvider>
     )
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
       new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
@@ -170,9 +166,7 @@ describe('CommentTextArea', () => {
         <CommentTextArea {...props} />
       </MockedProvider>
     )
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
       new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
@@ -200,9 +194,7 @@ describe('CommentTextArea', () => {
         <CommentTextArea {...props} />
       </MockedProvider>
     )
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
 
     uploadFiles(fileInput, [file])
@@ -224,9 +216,7 @@ describe('CommentTextArea', () => {
         <CommentTextArea {...props} />
       </MockedProvider>
     )
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
@@ -252,9 +242,7 @@ describe('CommentTextArea', () => {
         <CommentTextArea {...props} />
       </MockedProvider>
     )
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
@@ -305,9 +293,7 @@ describe('CommentTextArea', () => {
       )
     )
     const textArea = await findByPlaceholderText('Submit a Comment')
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
 
     const file1 = new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'})
     const file2 = new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'})
@@ -319,7 +305,7 @@ describe('CommentTextArea', () => {
     fireEvent.click(await findByText('Send Comment'))
 
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
-    await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
+    await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
   })
 
   // LS-1339 created to figure out why this is failing
@@ -345,12 +331,12 @@ describe('CommentTextArea', () => {
         <CommentsTab {...props} />
       </MockedProvider>
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: ''}})
     fireEvent.click(getByText('Send Comment'))
 
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
-    expect(await waitForElement(() => queryAllByText('Submission comment sent'))).toHaveLength(0)
+    expect(await waitFor(() => queryAllByText('Submission comment sent'))).toHaveLength(0)
   })
 
   // LS-1339 created to figure out why this is failing
@@ -376,10 +362,8 @@ describe('CommentTextArea', () => {
         </MockedProvider>
       )
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
+    const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
+    const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
 
     const file1 = new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'})
     const file2 = new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'})
@@ -393,6 +377,6 @@ describe('CommentTextArea', () => {
     expect(mockedSetOnFailure).toHaveBeenCalledWith('Error sending submission comment')
 
     // Should not allow user to submit again if comments have error
-    expect(await waitForElement(() => queryAllByText('Send Comment'))).toHaveLength(0)
+    expect(await waitFor(() => queryAllByText('Send Comment'))).toHaveLength(0)
   })
 })

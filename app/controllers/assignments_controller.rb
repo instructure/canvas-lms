@@ -160,6 +160,9 @@ class AssignmentsController < ApplicationController
           return
         end
 
+        # override media comment context: in the show action, these will be submissions
+        js_env media_comment_asset_string: @current_user.asset_string if @current_user
+
         @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
         @assignment.ensure_assignment_group
 

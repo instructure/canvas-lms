@@ -25,7 +25,7 @@ import {createCache} from '../../../canvas-apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
 import React from 'react'
-import {fireEvent, render, wait} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../helpers/waitForApolloLoading'
 
 beforeEach(() => {
@@ -286,7 +286,7 @@ describe('ComposeModalContainer', () => {
       fireEvent.click(button)
 
       await waitForApolloLoading()
-      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
   })
 
@@ -351,7 +351,7 @@ describe('ComposeModalContainer', () => {
       const button = component.getByTestId('send-button')
       fireEvent.click(button)
 
-      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
   })
 
@@ -389,7 +389,7 @@ describe('ComposeModalContainer', () => {
       const button = component.getByTestId('send-button')
       fireEvent.click(button)
 
-      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
   })
 })

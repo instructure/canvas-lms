@@ -82,9 +82,9 @@ describe Auditors do
     it "depends on cass db config for cassandra backend" do
       inject_auditors_settings("write_paths:\n  - cassandra\nread_path: cassandra")
       expect(Auditors.backend_strategy).to eq(:cassandra)
-      expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(true)
+      expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(true)
       expect(Auditors.configured?).to eq(true)
-      expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
+      expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
       expect(Auditors.configured?).to eq(false)
     end
 

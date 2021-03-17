@@ -41,7 +41,6 @@ function installed {
 }
 
 if [[ $OS == 'Darwin' ]]; then
-  install='brew install'
   #docker-compose is checked separately
   dependencies='docker docker-machine dinghy'
 elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
@@ -110,6 +109,8 @@ function check_docker_compose_version {
 
 function create_dinghy_vm {
   if ! dinghy status | grep -q 'not created'; then
+    # make sure DOCKER_MACHINE_NAME is set
+    eval "$(dinghy env)"
     existing_memory="$(docker-machine inspect --format "{{.Driver.Memory}}" "${DOCKER_MACHINE_NAME}")"
     if [[ "$existing_memory" -lt "$DINGHY_MEMORY" ]]; then
       echo "
@@ -208,6 +209,12 @@ function setup_docker_environment {
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
     cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
+
+  if [ -f ".env" ]; then
+    prompt '.env file exists, would you like to reset it to default? [y/n]' confirm
+    [[ ${confirm:-n} == 'y' ]] || return 0
+  fi
+  message "Setting up default .env configuration"
   echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env
 }
 

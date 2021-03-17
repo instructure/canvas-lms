@@ -17,6 +17,8 @@
  */
 
 import {gql} from 'jsx/canvas-apollo'
+import axios from 'axios'
+import pluralize from 'str/pluralize'
 
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
@@ -83,3 +85,8 @@ export const GROUP_DETAIL_QUERY = gql`
     }
   }
 `
+
+export const removeOutcomeGroup = (contextType, contextId, groupId) =>
+  axios.delete(
+    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
+  )

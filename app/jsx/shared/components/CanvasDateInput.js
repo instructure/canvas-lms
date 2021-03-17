@@ -83,6 +83,10 @@ import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-ic
  *   layout  [string: "stacked" | "inline"]
  *      Passed along to DateInput. Controls whether the label is stacked on top of the input
  *      or placed next to the input.
+ *
+ *   width  [string]
+ *      Passed along to DateInput. Controls width of the input. Defaults to null, which leaves
+ *      width setting up to size prop.
  */
 
 CanvasDateInput.propTypes = {
@@ -96,7 +100,8 @@ CanvasDateInput.propTypes = {
   placement: string,
   withRunningValue: bool,
   invalidDateMessage: oneOfType([string, func]),
-  layout: string
+  layout: string,
+  width: string
 }
 
 CanvasDateInput.defaultProps = {
@@ -107,7 +112,8 @@ CanvasDateInput.defaultProps = {
   interaction: 'enabled',
   placement: 'bottom center',
   withRunningValue: false,
-  layout: 'stacked'
+  layout: 'stacked',
+  width: null
 }
 
 export default function CanvasDateInput({
@@ -121,7 +127,8 @@ export default function CanvasDateInput({
   placement,
   withRunningValue,
   invalidDateMessage,
-  layout
+  layout,
+  width
 }) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate && moment.tz(selectedDate, timezone)
@@ -154,10 +161,7 @@ export default function CanvasDateInput({
   }
 
   function generateMonthMoments() {
-    const firstMoment = moment
-      .tz(renderedMoment, timezone)
-      .startOf('month')
-      .startOf('week')
+    const firstMoment = moment.tz(renderedMoment, timezone).startOf('month').startOf('week')
     return [...Array(Calendar.DAY_COUNT).keys()].map(index =>
       firstMoment.clone().add(index, 'days')
     )
@@ -241,22 +245,14 @@ export default function CanvasDateInput({
     // If we do not have a selectedMoment, we'll just select the first day of
     // the currently rendered month.
     const newMoment = selectedMoment
-      ? selectedMoment
-          .clone()
-          .add(step, type)
-          .startOf('day')
+      ? selectedMoment.clone().add(step, type).startOf('day')
       : renderedMoment.clone().startOf('month')
 
     onSelectedDateChange(newMoment.toDate())
   }
 
   function modifyRenderedMoment(step, type) {
-    setRenderedMoment(
-      renderedMoment
-        .clone()
-        .add(step, type)
-        .startOf('day')
-    )
+    setRenderedMoment(renderedMoment.clone().add(step, type).startOf('day'))
   }
 
   function renderWeekdayLabels() {
@@ -321,6 +317,7 @@ export default function CanvasDateInput({
       renderWeekdayLabels={renderWeekdayLabels()}
       interaction={interaction}
       layout={layout}
+      width={width}
     >
       {renderDays()}
     </DateInput>

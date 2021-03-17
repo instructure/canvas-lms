@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, waitForElement} from '@testing-library/react'
+import {render, fireEvent, act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {UploadFile, handleSubmit} from '../UploadFile'
 
@@ -138,7 +138,7 @@ describe('UploadFile', () => {
       act(() => {
         userEvent.click(unsplashTab)
       })
-      const searchInput = await waitForElement(() => getByLabelText('Search Term'))
+      const searchInput = await waitFor(() => getByLabelText('Search Term'))
       expect(searchInput).toBeVisible()
     })
 
@@ -158,7 +158,7 @@ describe('UploadFile', () => {
       act(() => {
         userEvent.click(urlTab)
       })
-      const urlInput = await waitForElement(() => getByLabelText('URL'))
+      const urlInput = await waitFor(() => getByLabelText('URL'))
       expect(urlInput).toBeVisible()
     })
 
@@ -178,7 +178,7 @@ describe('UploadFile', () => {
       act(() => {
         userEvent.click(computerTab)
       })
-      const fileDrop = await waitForElement(() => getByText(/browse your computer/))
+      const fileDrop = await waitFor(() => getByText(/browse your computer/))
       expect(fileDrop).toBeVisible()
     })
 
@@ -198,13 +198,13 @@ describe('UploadFile', () => {
       act(() => {
         userEvent.click(urlTab)
       })
-      await waitForElement(() => getByLabelText('URL'))
+      await waitFor(() => getByLabelText('URL'))
 
       const unsplashTab = getByText('Unsplash')
       act(() => {
         userEvent.click(unsplashTab)
       })
-      const searchBox = await waitForElement(() => getByLabelText('Search Term'))
+      const searchBox = await waitFor(() => getByLabelText('Search Term'))
       expect(searchBox).toBeVisible()
     })
   })

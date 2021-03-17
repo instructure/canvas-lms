@@ -161,6 +161,7 @@ hy:
     no_perms: "Օգտատիրոջը չի թույլատրվում խմբագրել ընդհանուր արդյունքները"
     plugin_settings: 
       api_url_description: "(օր.՝ %{url})"
+      common_core_guid: "(օր.՝ %{ guid})"
       description: "Դուք պետք է մուտք գործեք  [Academic Benchmark](%{url}) հաշիվը"
       labels: 
         api_key: "API բանալի"

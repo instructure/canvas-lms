@@ -21,7 +21,7 @@ import CourseNotificationSettingsManager from '../CourseNotificationSettingsMana
 import {COURSE_NOTIFICATIONS_QUERY} from '../graphqlData/Queries'
 import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from '../graphqlData/Mutations'
 import {createCache} from 'jsx/canvas-apollo'
-import {fireEvent, render, wait} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import mockGraphqlQuery from '../../../shared/graphql_query_mock'
 import React from 'react'
@@ -188,6 +188,6 @@ describe('Course Notification Settings', () => {
     fireEvent.click(button)
     fireEvent.click(getByText('Notifications off'))
 
-    await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+    await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
   })
 })

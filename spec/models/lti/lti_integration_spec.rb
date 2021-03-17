@@ -416,7 +416,7 @@ describe "LTI integration tests" do
     end
 
     it "should include assignment outcome service params for student" do
-      allow(Canvas::Security).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
+      allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
 

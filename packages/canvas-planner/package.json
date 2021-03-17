@@ -124,9 +124,9 @@
     "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
     "redux-devtools-extension": "^2.13.2",
-    "@testing-library/dom": "^6",
-    "@testing-library/jest-dom": "^4",
-    "@testing-library/react": "^9"
+    "@testing-library/dom": "^7",
+    "@testing-library/jest-dom": "^5",
+    "@testing-library/react": "^11"
   },
   "lint-staged": {
     "*.js": "eslint"

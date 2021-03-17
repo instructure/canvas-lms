@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitForElement} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import useManagedCourseSearchApi from 'jsx/shared/effects/useManagedCourseSearchApi'
 import DirectShareCourseTray from '../DirectShareCourseTray'
 
@@ -44,13 +44,13 @@ describe('DirectShareCourseTray', () => {
   it('displays interface for selecting a course', async () => {
     const {getByText} = render(<DirectShareCourseTray open />)
     // loads the panel asynchronously, so we have to wait for it
-    expect(await waitForElement(() => getByText(/select a course/i))).toBeInTheDocument()
+    expect(await waitFor(() => getByText(/select a course/i))).toBeInTheDocument()
   })
 
   it('calls onDismiss when cancel is clicked', async () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(<DirectShareCourseTray open onDismiss={handleDismiss} />)
-    fireEvent.click(await waitForElement(() => getByText(/cancel/i)))
+    fireEvent.click(await waitFor(() => getByText(/cancel/i)))
     expect(handleDismiss).toHaveBeenCalled()
   })
 })

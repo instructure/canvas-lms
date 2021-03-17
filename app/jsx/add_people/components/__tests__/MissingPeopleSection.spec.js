@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import MissingPeopleSection from '../missing_people_section'
-import {fireEvent, render, wait} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 
 describe('MissingPeopleSection', () => {
   const missingLogins = {
@@ -39,7 +39,7 @@ describe('MissingPeopleSection', () => {
       newUserInfo: {name: 'Searched Name1', email: 'addr1'}
     }
   }
-  const noop = function() {}
+  const noop = function () {}
   const inviteUsersURL = '/courses/#/invite_users'
 
   test('renders the component', () => {
@@ -126,7 +126,7 @@ describe('MissingPeopleSection', () => {
     const clickToAddNameLink = container.querySelector('button[data-address="addr1"]')
     fireEvent.click(clickToAddNameLink)
 
-    wait(() =>
+    waitFor(() =>
       expect(container.querySelector('input[type="checkbox"][value="addr1"]').checked).toBe(true)
     )
   })

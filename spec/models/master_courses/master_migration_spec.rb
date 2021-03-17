@@ -1794,6 +1794,31 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.folders.where(:name => "parent RENAMED").first.locked).to eq true
     end
 
+    it "syncs moved folders" do
+      folder_A = Folder.root_folders(@copy_from).first.sub_folders.create!(name: 'A', context: @copy_from)
+      folder_B = Folder.root_folders(@copy_from).first.sub_folders.create!(name: 'B', context: @copy_from)
+      # this needs to be here because empty folders don't sync
+      Attachment.create!(filename: 'decoy.txt', uploaded_data: StringIO.new('1'), folder: folder_B, context: @copy_from)
+      folder_C = folder_A.sub_folders.create!(name: 'C', context: @copy_from)
+      att = Attachment.create!(filename: 'file.txt', uploaded_data: StringIO.new('1'), folder: folder_C, context: @copy_from)
+      att_tag = @template.create_content_tag_for!(att)
+
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+      run_master_migration
+
+      copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
+      expect(copied_att.full_path).to eq "course files/A/C/file.txt"
+
+      Timecop.travel(10.minutes.from_now) do
+        folder_C.parent_folder = folder_B
+        folder_C.save!
+        run_master_migration
+      end
+
+      expect(copied_att.reload.full_path).to eq "course files/B/C/file.txt"
+    end
+
     it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import moment from 'moment'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import CourseAvailabilityOptions from '../CourseAvailabilityOptions'
 
 function createFormField(wrapper, id, value) {
@@ -150,8 +150,8 @@ describe('CourseAvailabilityOptions', () => {
       course_conclude_at: moment('2020-10-16').toISOString(),
       course_restrict_enrollments_to_course_dates: 'true'
     })
-    expect(getByLabelText('Start').value).toContain('Aug 14 at')
-    expect(getByLabelText('End').value).toContain('Oct 16 at')
+    expect(getByLabelText('Start').value).toContain('Aug 14, 2020 at')
+    expect(getByLabelText('End').value).toContain('Oct 16, 2020 at')
   })
 
   it('sets the restriction checkboxes to currently set values on render', () => {
@@ -165,5 +165,61 @@ describe('CourseAvailabilityOptions', () => {
     expect(
       getByLabelText('Restrict students from viewing course after term end date').checked
     ).toBeTruthy()
+  })
+
+  it('can manually type in a course end date', () => {
+    const {getByLabelText} = renderComponent(wrapper, {
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const endDate = getByLabelText('End')
+    const year = moment().year()
+    fireEvent.change(endDate, {target: {value: `Jan 1, ${year} at 12:00am`}})
+    fireEvent.blur(endDate)
+    fireEvent.click(endDate)
+    fireEvent.blur(endDate)
+    expect(document.getElementById('course_conclude_at').value).toBe(`${year}-01-01T00:00:00.000Z`)
+  })
+
+  it('can set the course end date for a different year', () => {
+    const {getByLabelText} = renderComponent(wrapper, {
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const endDate = getByLabelText('End')
+    const futureYear = moment().year() + 3
+    fireEvent.change(endDate, {target: {value: `Jan 1, ${futureYear} at 12:00am`}})
+    fireEvent.blur(endDate)
+    fireEvent.click(endDate)
+    fireEvent.blur(endDate)
+    expect(document.getElementById('course_conclude_at').value).toBe(
+      `${futureYear}-01-01T00:00:00.000Z`
+    )
+  })
+
+  describe('midnight warning', () => {
+    const warningText =
+      'Course participation is set to expire at midnight, so the previous day is the last day this course will be active.'
+
+    it('is not shown if end date is not set', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is not shown if end date is set to midday', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_conclude_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is shown if end date is set to midnight', () => {
+      const {getByText} = renderComponent(wrapper, {
+        course_conclude_at: moment('2020-10-16T00:00:00Z').toISOString(),
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      expect(getByText(warningText)).toBeInTheDocument()
+    })
   })
 })

@@ -66,8 +66,8 @@ describe('ColorPicker', () => {
   })
 
   it('disables Apply button if custom color is invalid', () => {
-    const {getByText} = renderColorPicker({currentColor: '#0e355aa'})
-    const applyButton = getByText('Apply')
+    const {getByRole} = renderColorPicker({currentColor: '#0e355aa'})
+    const applyButton = getByRole('button', {name: 'Apply'})
     expect(applyButton).toBeInTheDocument()
     expect(applyButton).toBeDisabled()
   })

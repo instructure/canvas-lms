@@ -56,6 +56,7 @@ function fakeWindow() {
   return {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
     confirm: jest.fn().mockReturnValue(true),
     height: 1000,
     $: jest.fn().mockReturnValue({bind: noop, unbind: noop})
@@ -317,6 +318,16 @@ describe('handleBeforeUnload', () => {
     const ev = {}
     instance.handleBeforeUnload(ev)
     expect(ev.returnValue).toContain('may not be saved')
+  })
+})
+
+describe('handleRemove', () => {
+  it('dispatches a resize event', async () => {
+    const win = fakeWindow()
+    const instance = await getInstance(container, {win})
+    instance.open({name: 'foo', id: 2})
+    instance.handleClose()
+    expect(win.dispatchEvent).toHaveBeenCalledWith(new Event('resize'))
   })
 })
 

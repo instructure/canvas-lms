@@ -49,6 +49,7 @@ module CCHelper
   WEB_LINK = "imswl_xmlv1p1"
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
+  BASIC_LTI_1_DOT_3 = 'imsbasiclti_xmlv1p3'
   BLTI_NAMESPACE = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
 
   # Common Cartridge 1.2
@@ -98,6 +99,7 @@ module CCHelper
   MEDIA_TRACKS = 'media_tracks.xml'
   ASSIGNMENT_XML = 'assignment.xml'
   EXTERNAL_CONTENT_FOLDER = 'external_content'
+  RESOURCE_LINK_FOLDER = 'lti_resource_links'
 
   def ims_date(date=nil,default=Time.now)
     CCHelper.ims_date(date, default)

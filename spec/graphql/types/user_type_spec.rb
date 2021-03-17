@@ -177,6 +177,19 @@ describe Types::UserType do
       ).to match_array @student.enrollments.map(&:to_param)
     end
 
+    it "excludes deleted course enrollments for a user" do
+      @course1.enroll_student(@student, enrollment_state: "active")
+      @course2.destroy
+
+      site_admin_user
+      expect(
+        user_type.resolve(
+          "enrollments { _id }",
+          current_user: @admin
+        )
+      ).to eq [@student.enrollments.first.to_param]
+    end
+
     it "doesn't return enrollments for courses the user doesn't have permission for" do
       expect(
         user_type.resolve(%|enrollments(courseId: "#{@course2.id}") { _id }|)

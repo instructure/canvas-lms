@@ -6626,15 +6626,21 @@ describe Submission do
       let(:submission) { lti_result.submission }
 
       it 'does nothing if score has not changed' do
-        lti_result
-        expect(lti_result).not_to receive(:update)
-        submission.save!
+        expect {
+          submission.save!
+        }.to_not change { lti_result.result_score }
       end
 
       it 'updates the lti_result score_given if the score has changed' do
-        expect(lti_result.result_score).to eq submission.score
-        submission.update!(score: 1)
-        expect(lti_result.reload.result_score).to eq submission.score
+        expect {
+          submission.update!(score: 1.3)
+        }.to change { lti_result.reload.result_score }.from(nil).to(1.3)
+      end
+
+      it 'does nothing if the lti_result was updated by a tool' do
+        expect {
+          submission.update!(score: 1.3, grader_id: -123)
+        }.to_not change { lti_result.reload.result_score }
       end
     end
   end

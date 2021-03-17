@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitForElement} from '@testing-library/react'
-import {act} from 'react-dom/test-utils'
+import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 
@@ -135,7 +134,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/mp4'
       })
       const {getAllByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const playButton = await waitForElement(() => getAllByText('Play'))
+      const playButton = await waitFor(() => getAllByText('Play'))
       expect(playButton[0].closest('button')).toBeInTheDocument()
     })
 
@@ -145,7 +144,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/avi'
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const icon = await waitForElement(() => getByTestId('preview-video-icon'))
+      const icon = await waitFor(() => getByTestId('preview-video-icon'))
       expect(icon).toBeInTheDocument()
       expect(getByText('No preview is available for this file.')).toBeInTheDocument()
     })
@@ -156,7 +155,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/x-ms-wma'
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const icon = await waitForElement(() => getByTestId('preview-video-icon'))
+      const icon = await waitFor(() => getByTestId('preview-video-icon'))
       expect(icon).toBeInTheDocument()
       expect(getByText('No preview is available for this file.')).toBeInTheDocument()
     })
@@ -167,7 +166,7 @@ describe('UploadMedia: ComputerPanel', () => {
         type: 'video/x-ms-wmv'
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
-      const icon = await waitForElement(() => getByTestId('preview-video-icon'))
+      const icon = await waitFor(() => getByTestId('preview-video-icon'))
       expect(icon).toBeInTheDocument()
       expect(getByText('No preview is available for this file.')).toBeInTheDocument()
     })
@@ -184,7 +183,7 @@ describe('UploadMedia: ComputerPanel', () => {
         setHasUploadedFile,
         hasUploadedFile: true
       })
-      const clearButton = await waitForElement(() => getByText('Clear selected file'))
+      const clearButton = await waitFor(() => getByText('Clear selected file'))
       expect(clearButton).toBeInTheDocument()
       act(() => {
         fireEvent.click(clearButton)

@@ -43,5 +43,8 @@
     <resource identifier="i964fd8107ac2c2e75e9a142971693976" type="tool_profile">
       <file href="i964fd8107ac2c2e75e9a142971693976.json"/>
     </resource>
+    <resource identifier="g534facc599d2202cf67dce042ee3105b" type="imsbasiclti_xmlv1p3">
+      <file href="lti_resource_links/g534facc599d2202cf67dce042ee3105b.xml"/>
+    </resource>
   </resources>
 </manifest>

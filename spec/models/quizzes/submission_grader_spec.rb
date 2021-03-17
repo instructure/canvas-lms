@@ -29,6 +29,49 @@ describe Quizzes::SubmissionGrader do
     @course.enroll_student(@user1)
   end
 
+  describe '#track_outcomes' do
+    before do
+      quiz = generate_quiz(@course)
+      quiz.update!(allowed_attempts: 2)
+
+      @submission = generate_quiz_submission(quiz, student: @user1)
+      @submission.submission_data = test_submission_data
+      @submission.save_with_versioning!
+
+      bank = assessment_question_bank_with_questions
+      @outcome = outcome_model(context: @course)
+      @outcome.align(bank, bank.context, mastery_score: 0.7)
+
+      quiz.add_assessment_questions(bank.assessment_questions)
+      quiz.save!
+      @submission = quiz.generate_submission(@user1)
+      @submission.quiz_data = quiz.generate_quiz_data
+      @submission.submission_data = test_submission_data.concat(
+        quiz.quiz_questions.map do |qq|
+          {
+            question_id: qq.id,
+            answer_id: 1,
+            points: 10
+          }
+        end
+      )
+      @submission.save_with_versioning!
+      @submission.update_column(:workflow_state, 'complete')
+    end
+
+    it 'does not generate results for quiz attempt without outcome alignments' do
+      subject = described_class.new(@submission)
+      subject.track_outcomes(1)
+      expect(@outcome.learning_outcome_results).to be_empty
+    end
+
+    it 'generates results for quiz attempt with outcome alignments' do
+      subject = described_class.new(@submission)
+      subject.track_outcomes(2)
+      expect(@outcome.learning_outcome_results).not_to be_empty
+    end
+  end
+
   describe '#grade_submission' do
     let(:submission_data) { {"question_1" => "1658", "question_2" => "1658", "question_3" => "1658"}}
     let(:quiz_data) { multiple_choice_multiple_question_data(3, {"points_possible" => 1.3 }) }

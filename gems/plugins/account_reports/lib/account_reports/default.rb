@@ -103,5 +103,9 @@ module AccountReports
     def self.lti_report_csv(account_report)
       LtiReports.new(account_report).lti_report
     end
+
+    def self.eportfolio_report_csv(account_report)
+      EportfolioReports.new(account_report).eportfolio_report
+    end
   end
 end

@@ -43,7 +43,7 @@ describe Latex::MathMl do
   end
   let(:service_url) { 'http://get.mml.com' }
   let(:request_id)  { '0c0dad8c-7857-4447-ba1f-9f33a2f1debf' }
-  let(:request_id_signature)  { Canvas::Security.sign_hmac_sha512(request_id) }
+  let(:request_id_signature)  { CanvasSecurity.sign_hmac_sha512(request_id) }
 
   subject(:math_ml) do
     Latex::MathMl.new(latex: latex)
@@ -60,14 +60,14 @@ describe Latex::MathMl do
         expect(MathMan).to receive(:url_for).at_least(:once).and_return(service_url)
         expect(MathMan).to receive(:use_for_mml?).at_least(:once).and_return(true)
         expect(RequestContextGenerator).to receive(:request_id).at_least(:once).and_return(request_id)
-        expect(Canvas::Security).to receive(:services_signing_secret).at_least(:once).and_return('wooper')
+        expect(CanvasSecurity).to receive(:services_signing_secret).at_least(:once).and_return('wooper')
       end
 
       it 'calls `CanvasHttp.get` with full url' do
         expect(CanvasHttp).to receive(:get).
           with(service_url, {
-            'X-Request-Context-Id' => Canvas::Security.base64_encode(request_id),
-            'X-Request-Context-Signature' => Canvas::Security.base64_encode(request_id_signature)
+            'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
+            'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
           }).
           and_return(
             OpenStruct.new(
@@ -95,8 +95,8 @@ describe Latex::MathMl do
         it "doesn't throw an error" do
           expect(CanvasHttp).to receive(:get).
             with(service_url, {
-              'X-Request-Context-Id' => Canvas::Security.base64_encode('5'),
-              'X-Request-Context-Signature' => Canvas::Security.base64_encode(Canvas::Security.sign_hmac_sha512('5'))
+              'X-Request-Context-Id' => CanvasSecurity.base64_encode('5'),
+              'X-Request-Context-Signature' => CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac_sha512('5'))
             }).
             and_return(
               OpenStruct.new(

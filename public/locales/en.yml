@@ -182,8 +182,7 @@ en:
           billion: Billion
           trillion: Trillion
           quadrillion: Quadrillion
-    nth:
-      ordinalized: !ruby/object:Proc {}
+    nth: {}
   errors:
     format: "%{attribute} %{message}"
     messages:
@@ -775,6 +774,8 @@ en:
   adds_granular_permissions_for_adding_and_removing__e1e484a3: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
   granular_permissions_for_managing_course_files_1ed7f019: Granular permissions for managing course files
   add_granularity_to_permissions_around_managing_cou_2244c94a: Add granularity to permissions around managing course files
+  advertise_release_notes_via_the_ui_9254bc6c: Advertise release notes via the UI
+  enables_siteadmin_users_to_configure_release_notes_96c7a7e8: Enables siteadmin users to configure release notes to display to users
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
@@ -861,7 +862,9 @@ en:
     allows you to search email addresses where Canvas notifications
     have bounced
   canvas_for_elementary_e6f5a06f: Canvas for Elementary
-  a_simplified_canvas_interface_for_k_5_80b33391: A simplified Canvas interface for K-5
+  a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
+    A simplified Canvas interface for K-5. Enable applicable
+    subaccount(s) as K-5 accounts in account settings.
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   selectable_outcomes_during_course_content_migratio_3f108a1a: Selectable outcomes during course content migration
@@ -910,6 +913,10 @@ en:
   if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
     If enabled, GraphQL queries will not require
     users to be signed in or use an access token.
+  microsoft_group_enrollment_syncing_854b5ea2: Microsoft Group enrollment syncing
+  if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
+    If enabled, syncing course enrollments to Microsoft Groups will be
+    available. Account admins may enable this in account settings.
   new_quizzes_migration_during_course_import_copy_e9dd124e: New Quizzes migration during course import/copy
   allow_migration_of_quizzes_during_course_copy_and__35d80756: Allow migration of quizzes during course copy and import
   new_quizzes_third_party_importing_1e1b696d: New Quizzes third party importing
@@ -928,10 +935,6 @@ en:
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
     Displays confetti for teachers that run the link validator on
     a course and no issues are found.
-  discussion_reply_sorting_6a14676e: Discussion reply sorting
-  allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
-    Allows for discussion replies to be sorted according to creation
-    timestamps. Default order is newest to oldest for root level replies.
   account_level_notification_preferences_ui_update_f5e189a4: Account level notification preferences UI update
   updates_account_notification_preferences_ui_to_be__1765f66a: |-
     Updates account notification preferences UI to be a more current
@@ -2456,9 +2459,14 @@ en:
         allow_text_entry: Text Entry
         allow_url: Website URL
         allow_media_recordings: Media Recordings
+        allows_annotated_document: Annotated Document
         allow_file_uploads: File Uploads
         restrict_file_extensions: Restrict Upload File Types
         allowed_extensions: Allowed File Extensions
+      ? |2-
+
+                      labels
+      : allowed_extensions: Allowed File Extensions
       descriptions:
         allowed_extensions: 'Enter a list of accepted extensions, for example: doc,xls,txt'
       label:
@@ -6356,6 +6364,7 @@ en:
     download_submissions_title: Download Assignment Submissions
     gathering_files: Gathering Files (%{progress})...
   text_entry_submission_cannot_be_empty_3d187cae: Text entry submission cannot be empty
+  resource_link_not_found_for_given_resource_link_lo_43f5183a: Resource link not found for given `resource_link_lookup_uuid`
   tabs:
     tab_unmanagable_error: "%{css_class} is not manageable"
     tab_location_error: That tab location is invalid
@@ -8075,7 +8084,7 @@ en:
   storage_quotas_manage_6ca14bbb: Storage Quotas - manage
   sis_data_manage_328a4799: SIS Data - manage
   users_manage_login_details_9462b30f: Users - manage login details
-  users_add_remove_observers_d1273d9: Users - add / remove observers
+  users_manage_observers_126f03a3: Users - manage observers
   course_content_view_5f68a57: Course Content - view
   courses_view_list_47885585: Courses - view list
   reset_multi_factor_authentication_2b63a558: Reset Multi-Factor Authentication
@@ -8420,7 +8429,7 @@ en:
       published_course_tooltip: This course has been published.
       published_course: 'Yes'
     dashboard_invitation:
-      invitation_text: You have been invited to join [%{course}](%{link_to_course}) as %{enrollment_type_with_indefinite_article}
+      invitation_text: 'You have been invited to join [%{course}](%{link_to_course}) with the following user role: %{role_name}'
       buttons:
         decline: Decline
         accept: Accept
@@ -8943,6 +8952,7 @@ en:
     report_header_assignment_title: assignment title
     report_header_assignment_id: assignment id
     report_header_assignment_url: assignment url
+  eportfolio_report_140b417f: Eportfolio Report
   grade_export_title: Grade Export
   mgp_grade_export_d29b471f: MGP Grade Export
   last_user_access_title: Last User Access
@@ -8961,6 +8971,15 @@ en:
   zero_activity_title: Zero Activity
   user_access_tokens_title: User Access Tokens
   lti_report_2b6193ab: LTI Report
+  eportfolio_name_fd4b9e13: eportfolio_name
+  eportfolio_id_c69233c1: eportfolio_id
+  author_name_12d871ff: author_name
+  author_id_570d3131: author_id
+  created_at_6373bbea: created_at
+  updated_at_ab9f625d: updated_at
+  is_public_ca8561e8: is_public
+  workflow_state_3a5c99d2: workflow_state
+  include_users_with_no_enrollments_2a888dac: Include users with no enrollments
   student_name_b446c661: student name
   student_id_7cc45fb5: student id
   student_sis_d9f0cd39: student sis
@@ -9262,8 +9281,6 @@ en:
   final_grade_with_teacher_notes_33c8de7c: Final Grade with Teacher Notes
   the_course_to_report_on_b72d0409: The Course to report on
   include_deleted_items_in_report_c94e48b8: Include deleted items in report
-  student_enrollment_data_5ed81e53: Student Enrollment Data
-  submissions_graded_status_f689110d: Submissions - Graded Status
   sioux_city_outcomes_report_710baf47: Sioux City Outcomes Report
   include_deleted_objects_4b75ef93: Include deleted objects
   tempe_grade_export_c611da01: Tempe Grade Export
@@ -9380,6 +9397,8 @@ en:
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   student_current_grades_report_base_86b5962a: Student Current Grades Report - Base
+  submissions_graded_status_f689110d: Submissions - Graded Status
+  student_enrollment_data_5ed81e53: Student Enrollment Data
   talladega_grade_and_last_date_of_attendance_be39b0c7: Talladega Grade and Last Date of Attendance
   uc_merced_student_activity_report_4a9a1eb8: UC Merced Student Activity Report
   template_account_21ac8f4f: Template Account
@@ -11336,6 +11355,7 @@ en:
   this_package_includes_curriculum_standards_which_a_1a137060: This package includes Curriculum Standards, which are not compatible with Canvas and were not included in the import.
   unknown_question_bank: Unknown question bank
   unknown_quiz: Unknown quiz
+  failed_to_import_some_lti_resource_links_ab124c3f: Failed to import some LTI resource links
   cc:
     private: Private (Copyrighted)
     public_domain: Public Domain
@@ -11431,6 +11451,7 @@ en:
   can_destroy_subscription_to_data_service_data_b8dfca27: Can destroy subscription to data service data.
   can_list_categorized_event_types_52596f7: Can list categorized event types.
   can_view_feature_flags_c92e0aa9: Can view feature flags
+  can_view_progress_records_associated_with_the_cont_aa2cd9a2: Can view Progress records associated with the context the tool is installed in
   can_create_external_tools_4c293044: Can create external tools.
   can_destroy_external_tools_cdb0e734: Can destroy external tools.
   can_list_external_tools_9132ad0f: Can list external tools.
@@ -12936,11 +12957,12 @@ en:
       labels:
         partner_id: Partner ID
         partner_key: Partner Key
-        common_core_guid: Common Core GUID (optional)
-      common_core_guid: "(e.g. %{guid})"
   the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: The importer will be migrating from API v3 to v4.1. Credentials will not change, but you should ensure your account has access to v4.1 by February 2021.
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: This report shows all the courses for a given term. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, account id, account sis id, account name, storage used in MB, and sum of all files in MB. The storage used reflects all files that go against the courses quota. The sum of all files in the course is the sum of all files that are in the course regardless of impact to the courses quota.
   example_84698b7d: Example
+  this_report_provides_all_active_eportfolios_for_th_f7432621: This report provides all active ePortfolios for the current institution. Optionally select 'Only include ePortfolios from users with no enrollments' to reduce the scope of the ePortfolio results to just those users with no enrollments. You can also run the report with 'Include Deleted Objects' to only include those ePortfolios that have been removed.
+  only_include_eportfolios_from_users_with_no_enroll_b1e26f4c: Only include ePortfolios from users with no enrollments
+  only_include_eportfolios_that_have_been_removed_da40532c: Only include ePortfolios that have been removed
   configuration_location_ee0f6592: Configuration Location
   associated_account_course_id_d87a01c5: Associated Account/Course ID
   associated_account_name_91854e37: Associated Account Name
@@ -13907,7 +13929,9 @@ en:
     This action is irreversible. Are you sure you wish to delete %{file}?
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: You do not have permission to delete %{file}. Please contact your account administrator.
   error_deleting_file_551dc16e: Error deleting %{file}
+  reassigned_cedad6d9: Reassigned
   assignment_is_reassigned_dd6b6ef2: Assignment is reassigned.
+  student_has_met_maximum_allowed_attempts_fa9a71b5: Student has met maximum allowed attempts.
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: Student feedback required in comments above to reassign.
   similarity_score_see_detailed_report_a113dac0: Similarity Score - See detailed report
   vericite_similarity_score_see_detailed_report_390ab687: VeriCite Similarity Score - See detailed report
@@ -14902,6 +14926,8 @@ en:
     observing: Observing
     new_observee_pairing_code: Student Pairing Code
     being_observed: Students Being Observed
+  are_you_sure_you_want_to_stop_observing_name_b040e7ab: Are you sure you want to stop observing %{name}?
+  no_longer_observing_user_efa5298a: No longer observing %{user}
   auth_logging:
     login: LOGIN
     logout: LOGOUT
@@ -15167,8 +15193,6 @@ en:
     account_standards_description: To the left you'll notice the standards your institution has created for you to use in your courses.
     state_standards: State Standards
     state_standards_description: To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course.
-    common_core: Common Core Standards
-    common_core_description: To the left is the familiar outcomes folder structure for each grouping of the Common Core State Standards. This will allow you to effortlessly include any of the Common Core Standards for grading within your course.
   OutcomeContentBase:
     blank_error: Cannot be blank
     length_error: Must be 255 characters or less
@@ -16524,6 +16548,7 @@ en:
   start_5a4cfcd6: Start
   course_end_date_4c797823: Course End Date
   end_78c581cd: End
+  course_participation_is_set_to_expire_at_midnight__b05fb48e: Course participation is set to expire at midnight, so the previous day is the last day this course will be active.
   restrict_students_from_viewing_course_before_term__3c4924f0: Restrict students from viewing course before term start date
   restrict_students_from_viewing_course_before_cours_cca659a4: Restrict students from viewing course before course start date
   restrict_students_from_viewing_course_after_term_e_1f93ccb9: Restrict students from viewing course after term end date
@@ -16639,6 +16664,7 @@ en:
   due_due_today_4dfe420a: "%{due} due today"
   nothing_due_today_26217223: Nothing due today
   missing_missing_c1010432: "%{missing} missing"
+  staff_contact_info_2f7a6603: Staff Contact Info
   every_new_announcement_shows_up_in_this_area_creat_934a7a0c: Every new announcement shows up in this area. Create your first one now.
   create_a_new_announcement_for_coursename_8dede2d0: Create a new announcement for %{courseName}
   failed_to_load_the_grades_tab_c6118c57: Failed to load the grades tab
@@ -16646,6 +16672,11 @@ en:
   grade_for_course_ccc8513c: Grade for %{course}
   percent_of_points_possible_93cd8127: "%{percent} of points possible"
   my_subjects_61936afb: My Subjects
+  avatar_for_name_e3ba987c: Avatar for %{name}
+  email_name_d1ef8b39: Email %{name}
+  teaching_assistant_9635edaf: Teaching Assistant
+  designer_c458392: Designer
+  observer_248a192e: Observer
   no_courses_favorited_4e69fd63: No courses favorited
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "You have no courses favorited. Reloading this page will show all\n      your active courses. To add favorites, go to "
   all_courses_80701c6f: All Courses.
@@ -17303,9 +17334,9 @@ en:
   grading_scheme_f151d195: Grading Scheme
   re_upload_submissions_125e415d: Re-Upload Submissions
   grade_posting_policy_42c8a94b: Grade Posting Policy
-  weight_of_grade_ungraded_as_0_44e63478: "%{weight} of grade/Ungraded as 0"
-  weight_of_grade_dff535d9: "%{weight} of grade"
+  weight_of_grade_19d9ce0f: "%{weight} of grade/"
   ungraded_as_0_bb864f07: Ungraded as 0
+  weight_of_grade_dff535d9: "%{weight} of grade"
   order_301c3ac1: Order
   a_z_243c3301: A–Z
   z_a_be2ab67c: Z–A
@@ -17909,11 +17940,11 @@ en:
   how_do_i_create_outcome_groups_for_a_course_362429a0: How do I create outcome groups for a course?
   how_do_i_import_outcomes_for_a_course_8eced1a: How do I import outcomes for a course?
   how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?
-  set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
+  set_up_outcomes_in_your_course_as_measured_by_peda_78eb842e: |-
     Set up outcomes in your course as measured by pedagogical goals or desired objectives.
           Help students learn skills and activities, rather than just focusing on grades as a measure of their success.
           Assess student progress through calculation methods, and measure progress directly in the Learning Mastery Gradebook.
-          Import existing account, state, and Common Core Standards outcomes to your course. You can also align outcomes in course rubrics.
+          Import existing account and state outcomes to your course. You can also align outcomes in course rubrics.
   create_interactive_course_content_76665336: Create interactive course content
   how_do_i_create_a_new_page_in_a_course_37a87285: How do I create a new page in a course?
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: How do I publish or unpublish a page as an instructor?
@@ -18062,6 +18093,7 @@ en:
     one: "%{count} Outcome"
     other: "%{count} Outcomes"
   add_all_outcomes_6a12d08e: Add All Outcomes
+  load_more_35d33c7: Load More
   import_outcomes_7dda186b: Import Outcomes
   upload_your_outcomes_bceeadbe: Upload your Outcomes!
   csv_or_json_formats_only_d8ba36d: CSV or JSON formats only
@@ -18091,6 +18123,13 @@ en:
   loading_outcome_results_96e21ce4: Loading outcome results
   an_error_occurred_loading_outcomes_data_cfd18b61: An error occurred loading outcomes data.
   there_are_no_outcomes_in_the_course_1d36d9c6: There are no outcomes in the course.
+  this_group_was_successfully_removed_from_this_acco_63abf7f0: This group was successfully removed from this account.
+  this_group_was_successfully_removed_from_this_cour_8db261c4: This group was successfully removed from this course.
+  an_error_occurred_while_making_a_network_request_544e2b7: An error occurred while making a network request.
+  remove_group_981d6a02: Remove Group?
+  are_you_sure_that_you_want_to_remove_this_group_an_ff69dcff: Are you sure that you want to remove this group and all of its content from your account?
+  are_you_sure_that_you_want_to_remove_this_group_an_2122c9ec: Are you sure that you want to remove this group and all of its content from your course?
+  remove_group_5d2f2f2d: Remove Group
   select_outcome_7e6e2562: Select outcome
   outcome_menu_4fe5813: Outcome Menu
   count_outcomes_selected_55902958:
@@ -18113,7 +18152,6 @@ en:
   get_started_by_finding_importing_or_creating_your__380b6cfb: Get started by finding, importing or creating your account outcomes.
   an_error_occurred_while_loading_course_outcomes_er_accefe77: 'An error occurred while loading course outcomes: %{error}'
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: 'An error occurred while loading account outcomes: %{error}'
-  an_error_occurred_while_loading_selected_group_8b80d3d5: An error occurred while loading selected group.
   must_be_between_lower_and_upper_1f501b2a: Must be between %{lower} and %{upper}
   parameter_91ed199: Parameter
   mastery_calculation_5fd5f5fe: Mastery Calculation
@@ -18173,6 +18211,7 @@ en:
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: Please wait as we upload and process your file.
   an_outcome_import_is_currently_in_progress_11e6cb38: An outcome import is currently in progress.
   it_s_ok_to_leave_this_page_we_ll_email_you_when_th_2dbed7fa: It's ok to leave this page, we'll email you when the import is done.
+  an_error_occurred_while_loading_selected_group_8b80d3d5: An error occurred while loading selected group.
   groups_groups_outcomes_outcomes_72fb5317: "%{groups} Groups | %{outcomes} Outcomes"
   an_error_occurred_while_loading_course_outcomes_320ccc44: An error occurred while loading course outcomes.
   an_error_occurred_while_loading_account_outcomes_8f337857: An error occurred while loading account outcomes.
@@ -18312,7 +18351,9 @@ en:
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: Allows user to view and insert data in the SIS ID field.
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: To edit course settings, Courses - add / edit / delete must be enabled.
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: To view or edit a user’s SIS ID or Integration ID, Users - view list and Users - manage login details must also both be enabled.
-  if_this_permission_is_enabled_users_do_not_need_th_49974dc2: If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission. To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled. To add users to courses via SIS ID, Users - add/remove students from courses - and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled.
+  if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
+    If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission. To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.
+            To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: To import SIS data, SIS Data - import must also be enabled.
   account_statistics_2b52a1c9: Account Statistics
   allows_admin_user_to_view_account_statistics_341f00d9: Allows admin user to view account statistics.
@@ -18327,18 +18368,18 @@ en:
             Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc.
             This permissions also allows admins designated to a sub-account to access settings and information outside of their sub-account.
   allows_user_to_access_the_act_as_user_link_on_stud_c7391722: Allows user to access the Act as User link on student context cards.
-  allows_uer_to_delete_a_submission_file_5302db48: Allows uer to delete a submission file.
+  allows_user_to_delete_a_submission_file_65f1dd7d: Allows user to delete a submission file.
   allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: Allows user to view Login IDs in a course People page.
   api_7bd66e19: API
   the_roles_api_refers_to_this_permission_as_become__bededd25: The Roles API refers to this permission as become_user.
   to_view_the_list_of_users_in_an_account_users_view_9db2061: To view the list of users in an account, Users - view list must be enabled.
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: Student Context Cards must be enabled for an account by an admin.
   allows_user_to_manage_observers_associated_with_st_4b45f2be: Allows user to manage observers associated with students in the account.
-  allows_user_to_create_accounts_for_new_users_with__30b55094: Allows user to create accounts for new users with the account-level Add People button. Allows user to remove and merge users in an account. Allows user to modify user account details such as name, email, and time zone. Allows user to view and modify login information for a user.
+  allows_user_to_create_accounts_for_new_users_allow_bb7575e9: Allows user to create accounts for new users. Allows user to remove and merge users in an account. Allows user to modify user account details. Allows user to view and modify login information for a user.
   allows_user_to_generate_login_logout_activity_repo_bba62f2: Allows user to generate login/logout activity report in Admin Tools.
   if_users_manage_login_details_or_statistics_view_i_cff4155d: If Users - manage login details or Statistics - view is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled.
   to_view_users_and_user_account_details_users_view__ff62392: To view users and user account details, Users - view list must be enabled. To change user passwords, Users - view must also be enabled. To view a user’s SIS ID, SIS Data - manage or SIS Data - read must also be enabled. To view a user’s Integration ID, SIS Data - manage must also be enabled.
-  this_permission_only_controls_adding_users_at_the__5a2463b1: This permission only controls adding users at the account level. To add users to a course, Users - add/remove students from courses or Users - add/remove teachers, course designers, or TAs from courses to the course must be enabled.
+  to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).
   eportfolios_f6dc4579: ePortfolios
   allows_user_to_view_the_eportfolio_moderation_page_5a6be051: Allows user to view the ePortfolio Moderation page and manage ePortfolio spam content.
   canvas_catalog_87f39420: Canvas Catalog
@@ -18380,9 +18421,10 @@ en:
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: Allows user to send a message to “All in [course name]”. Allows user to send a message to “All in [course group]”.
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: Allows user to send a message to “All in [course name],” or “All in [course group].”
   allows_user_to_send_messages_to_individual_course__9347e1e2: Allows user to send messages to individual course members.
+  when_disabled_students_can_still_send_individual_m_3bf396f2: When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups.
+  to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.
   when_disabled_students_can_still_send_individual_m_567a911c: When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups.
-  to_edit_a_student_s_section_users_add_remove_stude_684e6cc3: To edit a student’s section, Users - add/remove students from courses and Users - view must also be enabled. To edit a section for a teacher, course designer, or TA, Users - add/remove teachers, course designers, or TAs from courses and Users - view must also be enabled.
-  to_edit_a_student_s_section_users_add_remove_stude_c05f26: To edit a student’s section, Users - add/remove students in courses and Users - view must also be enabled. To edit a section for a teacher, course designer, or TA, Users - add/remove teachers, course designers, or TAs in courses and Users - view list must also both be enabled.
+  to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: 'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled. '
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: Allows user to add, edit, and delete events in the course calendar.
   scheduler_65b5ac91: Scheduler
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: Allows user to create and manage appointments on the calendar using Scheduler.
@@ -18482,7 +18524,7 @@ en:
   to_publish_final_grades_for_a_moderated_assignment_430368a0: To publish final grades for a moderated assignment, Grades - edit must also be enabled. To post or hide grades for a moderated assignment, Grades - edit must also be enabled.
   allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: Allows user to review an audit trail in assignments, both moderated and anonymous.
   to_moderate_grades_grades_select_final_grade_for_m_57d4f675: To moderate grades, Grades - Select final grade for moderation must also be enabled. To post or hide grades for an assignment, Grades - edit must also be enabled.
-  allows_user_to_search_by_course_id_or_assignment_i_e6f3e7f: Allows user to search by course ID or assignment ID in grade change logs in Admin Tools. (Not available at the subaccount level.)
+  allows_user_to_search_by_course_id_or_assignment_i_1f41eb6a: Allows user to search by course ID or assignment ID in grade change logs in Admin Tools (not available at the subaccount level.)
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: Allows user to view student-specific data in Analytics.
   allows_user_to_view_the_course_grading_scheme_32a6042: Allows user to view the course grading scheme.
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: Allows user to like discussion posts when the Only Graders Can Like checkbox is selected.
@@ -18586,47 +18628,19 @@ en:
   account_and_subaccount_40c6430: Account and Subaccount
   users_and_terms_are_located_at_the_account_so_the__6896b895: Users and terms are located at the account, so the SIS endpoint always confirms the user’s permissions according to account. Subaccounts only have ownership of courses and sections; they do not own user data. Subaccount admins are not able to view SIS information unless they are also granted an instructor role in a course. Subaccount admins cannot view SIS information without the course association, as the instructor role has permission to read SIS data at the account level.
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: To view a user’s login details, Users - view list and Modify login details for users must also both be enabled.
-  to_view_the_list_of_users_in_the_course_users_view_bc0462e3: To view the list of users in the course, Users - view list must also be enabled. To add users via SIS ID, Users - add/remove students from courses and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled.
   to_manage_sis_data_sis_data_manage_must_be_enabled_a92ce831: To manage SIS data, SIS Data - manage must be enabled. If SIS Data - manage is enabled and SIS Data - read is disabled, the account permission overrides the course permission. If SIS Data - manage is disabled and SIS Data - read is enabled, users can only view course, user, and subaccount SIS IDs. To disallow users from viewing any SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.
   allows_user_to_view_course_sis_id_3a1818a5: Allows user to view course SIS ID.
   allows_user_to_view_user_sis_ids_68a9d218: Allows user to view user SIS IDs.
-  to_view_the_list_of_users_in_the_course_users_view_96d03136: To view the list of users in the course, Users - view list must also be enabled. To add users via SIS ID, Users - add/remove students from courses​ - and or Users - add/remove teachers, course designers, or TAs from courses ​ to the course must also be enabled.
+  to_view_the_list_of_users_in_the_course_users_view_d0da7494: To view the list of users in the course, Users - view list must also be enabled. To add or remove users to a course via SIS, the appropriate Users permission must be enabled (e.g. Users - Teachers).
   allows_user_to_create_collaborations_allows_user_t_eff2a175: Allows user to create collaborations. Allows user to view, edit, and delete collaborations they created.
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: To allow view edit delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled. If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view edit delete all collaborations. To add students to a collaboration, Users - view list must also be enabled. To add a course group to a collaboration, Group view all student groups must also be enabled.
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: Allows user to create collaborations. Allows user to view, edit, and delete conferences they created.
   to_allow_view_edit_and_delete_functionality_of_col_47c4821d: To allow view, edit, and delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled. If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view, edit, and delete all collaborations. To add students to a collaboration, Users - view list must also be enabled. To add a course group to a collaboration, Groups - add / edit / delete must also be enabled.
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: Allows user to generate a pairing code on behalf of a student to share with an observer.
-  to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: To generate a pairing code from a student's User Settings page, the User - act as permission must also be enabled. To generate a pairing code from a student's User Details page, the Users - add/remove students from courses permission must also be enabled.
-  to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: To generate a pairing code from a student's User Details page, the Users - add/remove students in courses permission must also be enabled.
-  courses_account_72e4fca7: Courses (Account)
-  allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: Allows user to add students to a course from the account Courses page.
-  allows_user_to_add_and_remove_students_allows_user_6b31aafc: Allows user to add and remove students. Allows user to add and remove observers. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to edit a student’s section or role. Allows user to resend course invitations from the Course People page.
-  if_the_open_registration_account_setting_is_enable_f3b9a75f: If the Open Registration account setting is enabled, users with this permission can add students or observers to a course via email address or login ID even if the student or observer does not already have a Canvas account.
-  to_access_the_account_courses_page_courses_view_li_e1da6165: To access the account Courses page, Courses - view list must be enabled.
-  enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student's section and course role, Users - view list and Conversations - send messages to individual course members must also be enabled. To unenroll users the user details page, View the list of courses and See the list of users must also be enabled. Allows user to resend course invitations from the Course People page. If the Open Registration account setting is enabled, users with this permission can add students to a course from the Course People page via email addresses if the user does not already have a Canvas account. To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
-  allows_user_to_add_and_remove_students_to_the_cour_bb69582a: Allows user to add and remove students to the course. Allows user to add and remove observers to the course. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to conclude or delete enrollments on a student’s details page. Allows user to resend course invitations.
-  enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            To access the People Page, Users - view list must be enabled. If the Open Registration account setting is enabled, users with this permission can add students to a course via email address if the user does not already have a Canvas account. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student’s section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
-  allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: Allows user to add teachers, course designers, or TAs to a course from the account Courses page.
-  allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.
-  enrollments_may_be_added_by_your_institution_stude_cb313429: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
-  allows_user_to_add_and_remove_other_teachers_cours_bff27199: Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers to the course. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.
-  enrollments_may_be_added_by_your_institution_stude_690188ae: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
-  allows_user_to_view_login_id_information_for_teach_4b30f308: Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.
-  enrollments_may_be_added_by_your_institution_stude_8747f7b5: |-
-    Enrollments may be added by your institution student information system (SIS).
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
-  allows_user_to_view_login_id_information_for_teach_ad237acc: Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.
-  enrollments_may_be_added_by_your_institution_stude_de656136: |-
-    Enrollments may be added by your institution student information system (SIS).
-            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
+  to_generate_a_pairing_code_from_a_student_s_user_s_5da92dc: To generate a pairing code from a student's User Settings page, the User - act as permission must also be enabled. To generate a pairing code from a student's User Details page, the Users - allow administrative actions in courses permission must also be enabled.
+  to_generate_a_pairing_code_from_a_student_s_user_d_7a282f3d: To generate a pairing code from a student's User Details page, the Users - allow administrative actions in courses permission must also be enabled.
+  deprecated_59e99d2a: Deprecated
+  this_permission_is_deprecated_please_reference_use_8ce8eb30: This permission is deprecated. Please reference Users - Students and Users - Observers.
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: Allows user to access the People link in Account Navigation.
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: Allows user to view login/logout activity of users in Admin Tools. Allows user to search grade change logs by grader or student in Admin Tools. (Not available at the subaccount level.)
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: Allows user to differentiate assignments to individual students.
@@ -18639,17 +18653,16 @@ en:
   allows_user_to_view_list_of_users_in_the_course_pe_bc91c8fb: Allows user to view list of users in the course People page. Allows user to view the Prior Enrollments button in the course People page.
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: To view account-level groups, Groups - add / edit / delete must also be enabled.
   to_generate_login_logout_activity_in_admin_tools_u_253c565b: To generate login/logout activity in Admin Tools, Users - manage login details or Statistics - view must also be enabled.To generate grade change logs in Admin Tools, Grades - view change logs must also be enabled.
-  to_add_users_to_a_course_users_add_remove_students_a47d4331: To add users to a course, Users - add/remove students from courses - and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled.
   to_edit_user_details_modify_login_details_or_chang_800e894d: To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled. To view user page views, Statistics - view must also be enabled. To act as other users, Users - act as must also be enabled.
-  to_edit_a_student_s_section_users_add_remove_stude_73beca5c: To edit a student’s section, Users - add/remove students from courses and Send messages to individual course members must also be enabled. To edit a teacher, TA, or course designer’s section, Users - add/remove teachers, course designers, or TAs from courses to the course and Conversations - send messages to individual course members must also be enabled.
+  to_edit_a_user_s_section_the_appropriate_users_per_31b7a90d: To edit a user’s section, the appropriate Users permission (e.g. Users - Teachers), Users - allow administrative actions in courses, and Conversations - send to individual course members must also be enabled.
   navigation_allows_user_to_view_the_people_link_in__dd533d29: Navigation Allows user to view the People link in Course Navigation.
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: Allows user to view enrollments on the Sections tab.
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: To send a message to an individual user, Conversations - send messages to individual course members must also be enabled.
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: To add, edit, or delete groups, Groups - add / edit / delete must also be enabled.
-  to_add_users_to_a_course_users_add_remove_students_1c4d63d7: To add users to a course, Users - add/remove students from courses and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled. To edit a student’s section, Conversations - send messages to individual course members and Users - add/remove students from courses must also both be enabled. To edit a teacher, course designer, or TAs section, Conversations - send messages to individual course members and Users - add/remove teachers, course designers, or TAs from courses must also both be enabled.
+  to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers). To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.
   people_account_course_97b2bbb6: People (Account, Course)
   allows_user_to_search_for_other_users_by_login_id__3edb3702: Allows user to search for other users by Login ID in the account People page.
-  to_access_the_people_page_users_view_list_must_be__92f4e2ca: To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add/remove students in courses and Users - add/remove teachers, course designers, or TAs in courses must also be enabled.
+  to_access_the_people_page_users_view_list_must_be__bebc5da6: To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - allow administrative actions in courses must also be enabled.
   allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: Allows user to search for other users by Login ID in the course People page.
   allows_user_to_search_for_account_users_via_primar_14b7d977: Allows user to search for account users via primary email address in the account People page. Allows user to search for other users via primary email address in a course People page.
   to_view_the_account_people_page_users_view_list_mu_f44cef80: To view the account People page, Users - view list must be enabled. If this permission is disabled, and Users - view login IDs is enabled, users will still see email addresses used as login IDs.
@@ -18658,72 +18671,92 @@ en:
   allows_user_to_create_new_conferences_allows_user__89cebec2: Allows user to create new conferences. Allows user to start conferences they created.
   to_allow_full_management_of_conferences_created_by_bece5de: To allow full management of conferences created by the user or others, the Course Content permission must also be enabled. To end a long-running conference, the Course Content permission must be enabled. If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences. This permission controls the user’s ability to create conferences in courses and groups.
   designers_add_fe7e1ea9: Designers - Add
-  allows_user_to_add_designers_to_the_course_from_th_ee349841: Allows user to add designers to the course from the account Courses page. Allows user to add designers in the course. Allows user to view login ID information for designers. Allows user to view user details for designers. Allows user to edit a designer’s section or role.
+  allows_user_to_add_designers_to_a_course_from_the__b48e0a92: Allows user to add designers to a course from the account Courses page. Allows user to add designers to a course.
   designers_remove_3e590bff: Designers - Remove
-  allows_user_to_remove_designers_to_the_course_from_1053d170: Allows user to remove designers to the course from the account Courses page. Allows user to remove designers from the course.
-  if_the_open_registration_account_setting_is_enable_43bfe76c: If the Open Registration account setting is enabled, users with this permission can add designers to a course via email address or login ID even if the designer does not already have a Canvas account.
-  enrollments_may_be_added_by_your_institution_stude_88111dff: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            If the Open Registration account setting is enabled, users with this permission can add designers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-            To edit a designer's section, Conversations - send messages to individual course members must also be enabled.
-            To view the list of designers in the course, Users - view list must be enabled.
-            To view SIS IDs, SIS Data - read must be enabled. To add a designer to a course via SIS ID, SIS Data - manage must also be enabled.
-  allows_user_to_add_designers_in_the_course_allows__ee166883: |-
-    Allows user to add designers in the course. Allows user to view login ID information for designers.
-            Allows user to view user details for designers. Allows user to edit a designer’s section or role.
-  allows_user_to_remove_designers_to_the_course_from_f5a7225e: Allows user to remove designers to the course from the account Courses page.
-  enrollments_may_be_added_by_your_institution_stude_40297562: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            To edit a designer's section, Conversations - send messages to individual course members must also be enabled.
-            To view the list of designers in the course, Users - view list must be enabled.
-            To view SIS IDs, SIS Data - read must be enabled. To add a designer to a course via SIS ID, SIS Data - manage must also be enabled.
+  allows_user_to_remove_designers_from_a_course_fa9e887e: Allows user to remove designers from a course.
+  courses_account_72e4fca7: Courses (Account)
+  if_the_open_registration_account_setting_is_enable_53599868: |-
+    If the Open Registration account setting is enabled, users with this permission can add designers to a course from the Courses page via email address or login ID even if a designer does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            To access the account Courses page, Courses - view list must be enabled.
+  if_an_enrollment_is_created_via_sis_only_admins_ca_205e9a3c: |-
+    If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+            To remove a user via SIS ID, SIS Data - manage must also be enabled.
+  allows_user_to_add_designers_to_a_course_f81791e8: Allows user to add designers to a course.
+  if_the_open_registration_account_setting_is_enable_3ede490a: |-
+    If the Open Registration account setting is enabled, users with this permission can add designers to a course from the People page via email address or login ID even if a designer does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled. If an enrollment is created via SIS, only admins can remove the enrollment from a course. To remove a user via SIS ID, SIS Data - manage must also be enabled.
+  students_add_76d5c2a6: Students - Add
+  allows_user_to_add_students_to_a_course_from_the_a_43abb0e6: Allows user to add students to a course from the account Courses page. Allows user to add students to a course.
+  students_remove_4c8b3c3d: Students - Remove
+  allows_user_to_remove_students_from_a_course_70952ba6: Allows user to remove students from a course.
+  if_the_open_registration_account_setting_is_enable_3cbed3ad: |-
+    If the Open Registration account setting is enabled, users with this permission can add students to a course from the Courses page via email address or login ID even if a student does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            To access the account Courses page, Courses - view list must be enabled.
+  allows_user_to_add_students_to_a_course_aa642fa6: Allows user to add students to a course.
+  if_the_open_registration_account_setting_is_enable_b0c18e48: |-
+    If the Open Registration account setting is enabled, users with this permission can add students to a course from the People page via email address or login ID even if a student does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+            To remove a user via SIS ID, SIS Data - manage must also be enabled.
   observers_add_ab95f683: Observers - Add
-  allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: Allows user to add observers to the course from the account Courses page. Allows user to add observers in the course. Allows user to view login ID information for observers. Allows user to view user details for observers. Allows user to edit an observer’s section or role.
+  allows_user_to_add_observers_to_a_course_from_the__806ec842: Allows user to add observers to a course from the account Courses page. Allows user to add observers to a course.
   observers_remove_aafc8a88: Observers - Remove
-  allows_user_to_remove_observers_from_the_course_fr_6a3625ff: Allows user to remove observers from the course from the account Courses page. Allows user to remove observers from the course.
-  currently_the_add_remove_students_permission_overr_fcd0f6bc: Currently, the add/remove students permission overrides this grouped permission. Managing observers through the students permission will eventually be removed.
-  if_the_open_registration_account_setting_is_enable_88d349f8: If the Open Registration account setting is enabled, users with this permission can add observers to a course via email address or login ID even if the observer does not already have a Canvas account.
-  enrollments_may_be_added_by_your_institution_stude_213d41a4: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-            To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
-            To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.
-            To view the list of observers in the course, Users - view list must be enabled.
-            To view SIS IDs, SIS Data - read must be enabled. To add an observer to a course via SIS ID, SIS Data - manage must also be enabled.
-  allows_user_to_add_observers_in_the_course_allows__9c6bb78c: Allows user to add observers in the course. Allows user to view login ID information for observers. Allows user to view user details for observers. Allows user to edit an observer’s section or role.
-  allows_user_to_remove_observers_from_the_course_2ad4c60c: Allows user to remove observers from the course.
+  allows_user_to_remove_observers_from_a_course_e090d53e: Allows user to remove observers from a course.
+  if_the_open_registration_account_setting_is_enable_a2b9c5e6: |-
+    If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Courses page via email address or login ID even if an observer does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            To access the account Courses page, Courses - view list must be enabled.
+  allows_user_to_add_observers_to_a_course_ca1a678b: Allows user to add observers to a course.
+  if_the_open_registration_account_setting_is_enable_519e246f: |-
+    If the Open Registration account setting is enabled, users with this permission can add observers to a course from the People page via email address or login ID even if an observer does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+            To remove a user via SIS ID, SIS Data - manage must also be enabled.
   tas_add_f4a16393: TAs - Add
-  allows_user_to_add_tas_to_the_course_from_the_acco_254e4c5f: Allows user to add TAs to the course from the account Courses page. Allows user to add TAs in the course. Allows user to view login ID information for TAs. Allows user to view user details for TAs. Allows user to edit a TA’s section or role.
+  allows_user_to_add_tas_to_a_course_from_the_accoun_be5446f0: Allows user to add TAs to a course from the account Courses page. Allows user to add TAs in the course.
   tas_remove_11059e14: TAs - Remove
-  allows_user_to_remove_tas_from_the_course_from_the_fe838c70: Allows user to remove TAs from the course from the account Courses page. Allows user to remove TAs from the course.
-  if_the_open_registration_account_setting_is_enable_1994a971: If the Open Registration account setting is enabled, users with this permission can add TAs to a course via email address or login ID even if the TA does not already have a Canvas account.
-  enrollments_may_be_added_by_your_institution_stude_f600bc5a: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the Course People page via email address or login ID even if the TA does not already have a Canvas account.
-            To edit a TA’s section, Conversations - send to individual course members must also be enabled.
-            To view the list of TAs in the course, Users - view list must be enabled.
-            To view SIS IDs, SIS Data - read must be enabled. To add a TA to a course via SIS ID, SIS Data - manage must also be enabled.
+  allows_user_to_remove_tas_from_a_course_c8002894: Allows user to remove TAs from a course.
+  if_the_open_registration_account_setting_is_enable_2cc15467: |-
+    If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the Courses page via email address or login ID even if a TA does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            To access the account Courses page, Courses - view list must be enabled.
   allows_user_to_add_tas_in_the_course_allows_user_t_7d9841a6: Allows user to add TAs in the course. Allows user to view login ID information for TAs. Allows user to view user details for TAs. Allows user to edit a TA’s section or role.
   allows_user_to_remove_tas_from_the_course_bd8ac630: Allows user to remove TAs from the course.
+  if_the_open_registration_account_setting_is_enable_67da235b: |-
+    If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the People page via email address or login ID even if a TA does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+            To remove a user via SIS ID, SIS Data - manage must also be enabled.
   teachers_add_ed68c8d3: Teachers - Add
-  allows_user_to_add_teachers_to_the_course_from_the_dc03e973: Allows user to add teachers to the course from the account Courses page. Allows user to add teachers in the course. Allows user to view login ID information for teachers. Allows user to view user details for teachers. Allows user to edit a teacher’s section or role.
+  allows_user_to_add_teachers_to_a_course_from_the_a_40af6066: Allows user to add teachers to a course from the account Courses page. Allows user to add teachers to a course.
   teachers_remove_518eb1a6: Teachers - Remove
-  allows_user_to_remove_teachers_from_the_course_fro_75ffab61: Allows user to remove teachers from the course from the account Courses page. Allows user to remove teachers from the course.
-  if_the_open_registration_account_setting_is_enable_6aaf8ead: If the Open Registration account setting is enabled, users with this permission can add teachers to a course via email address or login ID even if the teacher does not already have a Canvas account.
-  enrollments_may_be_added_by_your_institution_stude_8e8fcd3d: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Course People page via email address or login ID even if the teacher does not already have a Canvas account.
-            To edit a teacher’s section, Conversations - send to individual course members must also be enabled.
-            To view the list of teachers in the course, Users - view list must be enabled.
-            To view SIS IDs, SIS Data - read must be enabled. To add a teacher to a course via SIS ID, SIS Data - manage must also be enabled.
-  allows_user_to_add_teachers_in_the_course_allows_u_3f80b57d: Allows user to add teachers in the course. Allows user to view login ID information for teachers. Allows user to view user details for teachers. Allows user to edit a teacher’s section or role.
-  allows_user_to_remove_teachers_from_the_course_bf4b2d8: Allows user to remove teachers from the course.
-  enrollments_may_be_added_by_your_institution_stude_9e5d79eb: |-
-    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
-            If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Course People page via email address or login ID even if the observer does not already have a Canvas account.
-            To edit a teacher’s section, Conversations - send to individual course members must also be enabled.
-            To view the list of teachers in the course, Users - view list must be enabled.
-            To view SIS IDs, SIS Data - read must be enabled. To add a teacher to a course via SIS ID, SIS Data - manage must also be enabled.
+  allows_user_to_remove_teachers_from_a_course_6d627914: Allows user to remove teachers from a course.
+  if_the_open_registration_account_setting_is_enable_9db0bc16: |-
+    If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the Courses page via email address or login ID even if a teacher does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            To access the account Courses page, Courses - view list must be enabled.
+  allows_user_to_add_teachers_to_a_course_37b9594c: Allows user to add teachers to a course.
+  if_the_open_registration_account_setting_is_enable_95ada4ab: |-
+    If the Open Registration account setting is enabled, users with this permission can add teachers to a course from the People page via email address or login ID even if a teacher does not already have a Canvas account.
+            To add a user via SIS ID, SIS Data - manage must also be enabled.
+            If an enrollment is created via SIS, only admins can remove the enrollment from a course.
+            To remove a user via SIS ID, SIS Data - manage must also be enabled.
+  allows_user_to_view_login_id_information_for_users_ab5c64ea: Allows user to view login ID information for users. Allows user to view user details for course users. Allows user to edit a user’s section or role (if not added via SIS).
+  to_edit_user_details_modify_login_details_or_chang_63aa95a5: To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.
+  to_view_the_people_page_courses_view_list_must_be__fa021b7f: |-
+    To view the People page, Courses - view list must be enabled.
+            To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).
+            To view SIS IDs, SIS Data - read must be enabled.
+            To edit a user’s section, Conversations - send to individual course members must be enabled.
+  observers_course_83850091: Observers (Course)
+  to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
+    To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
+          To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.
+  to_link_an_observer_to_a_student_users_manage_logi_c24e1e45: |-
+    To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
+            To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.
   there_was_an_error_generating_the_pairing_code_9edd639b: There was an error generating the pairing code
   share_the_following_pairing_code_with_an_observer__44f50f99: |-
     Share the following pairing code with an observer to allow
@@ -19482,6 +19515,7 @@ en:
     labels:
       group_comment: Send comment to the whole group
     post_comment: Post Comment
+  remove_edf2b8a7: "(Remove)"
   out_of_n_assignment_points_possible_3b026ea9: out of %{n_assignment.points_possible}
   submission_detail:
     go_to_submission_url: Go to submission URL
@@ -19575,6 +19609,7 @@ en:
   online_submission_type_text_entry_ac56d100: Online Submission Type - Text Entry
   online_submission_type_website_url_2c9df33d: Online Submission Type - Website URL
   online_submission_type_media_recordings_9424bf34: Online Submission Type - Media Recordings
+  online_submission_type_annotated_document_f8b57ae1: Online Submission Type - Annotated Document
   online_submission_type_file_uploads_24910d74: Online Submission Type - File Uploads
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: Online Submission Type - File Uploads - Restrict Upload File Types
   enter_or_find_an_external_tool_url_6aebbd0d: Enter or find an External Tool URL

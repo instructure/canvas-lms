@@ -30,6 +30,7 @@ module CC
     include WebLinks
     include BasicLTILinks
     include ToolProfiles
+    include LtiResourceLinks
 
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
@@ -64,6 +65,7 @@ module CC
         @resources = resources
         run_and_set_progress(:add_canvas_non_cc_data, 15, I18n.t('course_exports.errors.canvas_meta', "Failed to export canvas-specific meta data"))
         run_and_set_progress(:add_wiki_pages, 30, I18n.t('course_exports.errors.wiki_pages', "Failed to export wiki pages"))
+        run_and_set_progress(:add_lti_resource_links, 32, I18n.t('Failed to import some LTI resource links'))
         run_and_set_progress(:add_assignments, 35, I18n.t('course_exports.errors.assignments', "Failed to export some assignments"))
         run_and_set_progress(:add_topics, 37, I18n.t('course_exports.errors.topics', "Failed to export some topics"))
         run_and_set_progress(:add_web_links, 40, I18n.t('course_exports.errors.web_links', "Failed to export some web links"))

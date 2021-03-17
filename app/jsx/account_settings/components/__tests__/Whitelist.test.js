@@ -353,7 +353,7 @@ describe('ConnectedWhitelist', () => {
     })
 
     it('does not allow removing items from the list', () => {
-      const {getByText} = renderWithRedux(
+      const {getByRole} = renderWithRedux(
         <ConnectedWhitelist
           context="account"
           contextId="1"
@@ -371,7 +371,7 @@ describe('ConnectedWhitelist', () => {
         }
       )
 
-      const button = getByText('Remove instructure.com as an allowed domain')
+      const button = getByRole('button', {name: 'Remove instructure.com as an allowed domain'})
       expect(button).toBeDisabled()
     })
   })

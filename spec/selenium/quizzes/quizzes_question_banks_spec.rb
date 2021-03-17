@@ -296,7 +296,7 @@ describe 'quizzes question banks' do
       expect(f("#question_#{@quest1.id}")).to include_text new_question_text
     end
 
-    it "should let teachers view question banks in a soft-concluded course (but not edit)", ignore_js_errors: true, custom_timeout: 30, priority: "2", test_id: 456150 do
+    it "should let teachers view question banks in a soft-concluded course (but not edit)", custom_timeout: 30, priority: "2", test_id: 456150 do
       term = Account.default.enrollment_terms.create!
       term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
       @course.enrollment_term = term

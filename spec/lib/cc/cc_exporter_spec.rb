@@ -621,6 +621,92 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
     end
 
+    context 'LTI 1.3 Assignments' do
+      subject do
+        run_export(version: version)
+        @manifest_doc
+      end
+
+      let(:assignment) do
+        @course.assignments.new(
+          name: 'test assignment',
+          submission_types: 'external_tool',
+          points_possible: 10
+        )
+      end
+
+      let(:non_assignment_link) do
+        Lti::ResourceLink.create!(
+          context: @course,
+          context_external_tool: tool,
+          custom: custom_params
+        )
+      end
+
+      let(:custom_params) { { foo: 'bar '} }
+      let(:version) { '1.1.0' }
+      let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
+      let(:tag) { ContentTag.create!(context: assignment, content: tool, url: tool.url) }
+      let(:tool) { external_tool_model(context: @course, opts: { use_1_3: true }) }
+
+      before do
+        non_assignment_link
+        tool.update!(developer_key: developer_key)
+        assignment.external_tool_tag = tag
+        assignment.save!
+        assignment.primary_resource_link.update!(custom: { foo: 'assignment' })
+      end
+
+      shared_examples_for 'an export that includes lti resource links' do
+        it 'includes a "resource" element in the manifest for each link' do
+          expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+        end
+
+        it 'includes a "file" element pointing to the resource link document' do
+          resource_links = subject.css "resource[type='imsbasiclti_xmlv1p3']"
+
+          resource_links.each do |rl|
+            identifier = rl.get_attribute 'identifier'
+            expect(rl.css('file').first.get_attribute('href')).to eq "lti_resource_links/#{identifier}.xml"
+          end
+        end
+
+        context 'when an associated tool is not present' do
+          before { tool.destroy! }
+
+          it 'does not export the resource links' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+          end
+        end
+
+        context 'when the resource link does not include custom parameters' do
+          let(:custom_params) { nil }
+
+          it 'exports resource links that have custom params and those that do not' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+          end
+        end
+
+        context 'when the resource link is not active' do
+          before do
+            Lti::ResourceLink.active.update_all(workflow_state: 'deleted')
+          end
+
+          it 'does not export the resource links' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+          end
+        end
+      end
+
+      it_behaves_like 'an export that includes lti resource links'
+
+      context 'with common cartridge 1.3' do
+        let(:version) { '1.3' }
+
+        it_behaves_like 'an export that includes lti resource links'
+      end
+    end
+
     context 'similarity detection tool associations' do
       include_context "lti2_course_spec_helper"
 

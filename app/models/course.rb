@@ -3100,7 +3100,11 @@ class Course < ActiveRecord::Base
   add_setting :homeroom_course, :boolean => true, :default => false
 
   def elementary_homeroom_course?
-    homeroom_course? && account&.feature_enabled?(:canvas_for_elementary)
+    homeroom_course? && root_account&.feature_enabled?(:canvas_for_elementary)
+  end
+
+  def lock_all_announcements?
+    !!lock_all_announcements || elementary_homeroom_course?
   end
 
   def user_can_manage_own_discussion_posts?(user)

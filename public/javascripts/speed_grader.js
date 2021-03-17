@@ -2460,7 +2460,7 @@ EG = {
       this.renderLtiLaunch(
         $iframe_holder,
         ENV.lti_retrieve_url,
-        submission.external_tool_url || submission.url
+        submission
       )
     } else {
       this.renderSubmissionPreview()
@@ -2498,7 +2498,11 @@ EG = {
     $iframe_holder.html($.raw(iframe)).show()
   },
 
-  renderLtiLaunch($div, urlBase, externalToolUrl) {
+  renderLtiLaunch($div, urlBase, submission) {
+    const externalToolUrl = submission.external_tool_url || submission.url
+
+    urlBase += SpeedgraderHelpers.resourceLinkLookupUuidParam(submission)
+
     this.emptyIframeHolder()
     const launchUrl = `${urlBase}&url=${encodeURIComponent(externalToolUrl)}`
     const iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {

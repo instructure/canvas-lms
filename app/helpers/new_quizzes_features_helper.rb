@@ -19,10 +19,6 @@
 #
 
 module NewQuizzesFeaturesHelper
-  def new_quizzes_enabled?
-      @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present? && !new_quizzes_require_migration?
-  end
-
   def new_quizzes_import_enabled?
       @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:import_to_quizzes_next)
   end
@@ -39,7 +35,13 @@ module NewQuizzesFeaturesHelper
       @context.root_account.feature_enabled?(:migrate_to_new_quizzes_by_default) || new_quizzes_require_migration?
   end
 
-  def new_quizzes_require_migration?
-      @context.root_account.feature_enabled?(:require_migration_to_new_quizzes)
+  module_function
+
+  def new_quizzes_enabled?(context = @context)
+      context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present? && !new_quizzes_require_migration?(context)
+  end
+
+  def new_quizzes_require_migration?(context = @context)
+      context.root_account.feature_enabled?(:require_migration_to_new_quizzes)
   end
 end

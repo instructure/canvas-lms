@@ -16,23 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class RequestContextSession
-  def initialize(app)
-    @app = app
-  end
-
-  def call(env)
-    status, headers, body = @app.call(env)
-
-    session_id = (env['rack.session.options'] || {})[:id]
-    if session_id
-      ActionDispatch::Request.new(env).cookie_jar[:log_session_id] = {
-        :value => session_id,
-        :secure => CanvasRails::Application.config.session_options[:secure],
-        :httponly => true
-      }
-    end
-
-    [ status, headers, body ]
-  end
-end
+# TODO: This class is being relocated to the request_context gem
+# in the gems directory, this shim will remain until all callsites
+# are transitioned.
+RequestContextSession = RequestContext::Session

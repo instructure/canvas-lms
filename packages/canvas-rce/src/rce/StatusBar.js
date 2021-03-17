@@ -93,6 +93,7 @@ function findFocusable(el) {
 
 export default function StatusBar(props) {
   const [focusedBtnId, setFocusedBtnId] = useState(null)
+  const [includeEdtrDesc, setIncludeEdtrDesc] = useState(false)
   const statusBarRef = useRef(null)
 
   useEffect(() => {
@@ -107,6 +108,11 @@ export default function StatusBar(props) {
     if (isHtmlView() && /rce-kbshortcut-btn|rce-a11y-btn/.test(focusedBtnId)) {
       setFocusedBtnId('rce-edit-btn')
     }
+    // adding a delay before including the HTML Editor description to wait the focus moves to the RCE
+    // and prevent JAWS from reading the aria-describedby element when switching back to RCE view
+    setTimeout(() => {
+      setIncludeEdtrDesc(props.use_rce_pretty_html_editor && !isHtmlView())
+    }, 100)
   }, [props.editorView]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleKey(event) {
@@ -233,32 +239,40 @@ export default function StatusBar(props) {
     const toggleToHtml = formatMessage('Switch to html editor')
     const toggleToRich = formatMessage('Switch to rich text editor')
     const toggleText = isHtmlView() ? toggleToRich : toggleToHtml
-    const include_desc = props.use_rce_pretty_html_editor && !isHtmlView()
+
     return (
       <View display="inline-block" padding="0 0 0 x-small">
         <Button
           data-btn-id="rce-edit-btn"
           variant="link"
           icon={emptyTagIcon()}
-          onClick={event => {
-            event.target.focus()
-            let html_view = RAW_HTML_EDITOR_VIEW
-            if (props.use_rce_pretty_html_editor) {
-              html_view = event.shiftKey ? RAW_HTML_EDITOR_VIEW : PRETTY_HTML_EDITOR_VIEW
-            }
+          onClick={() => {
+            const html_view = props.use_rce_pretty_html_editor
+              ? PRETTY_HTML_EDITOR_VIEW
+              : RAW_HTML_EDITOR_VIEW
             props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : html_view)
+          }}
+          onKeyUp={event => {
+            if (
+              props.use_rce_pretty_html_editor &&
+              props.editorView !== PRETTY_HTML_EDITOR_VIEW &&
+              event.shiftKey &&
+              event.keyCode === 79
+            ) {
+              props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : RAW_HTML_EDITOR_VIEW)
+            }
           }}
           onFocus={() => setFocusedBtnId('rce-edit-btn')}
           title={toggleText}
           tabIndex={tabIndexForBtn('rce-edit-btn')}
-          aria-describedby={include_desc ? 'edit-button-desc' : undefined}
+          aria-describedby={includeEdtrDesc ? 'edit-button-desc' : undefined}
         >
           <ScreenReaderContent>{toggleText}</ScreenReaderContent>
         </Button>
-        {include_desc && (
+        {includeEdtrDesc && (
           <span style={{display: 'none'}} id="edit-button-desc">
             {formatMessage(
-              'The html editor is not keyboard accessible. Shift-click to open the raw html view.'
+              'The html editor is not keyboard accessible. Press Shift O to open the raw html view.'
             )}
           </span>
         )}

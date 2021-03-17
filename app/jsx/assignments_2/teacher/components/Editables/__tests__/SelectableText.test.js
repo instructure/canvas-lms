@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitForDomChange} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import SelectableText from '../SelectableText'
 
 const options = [
@@ -106,7 +106,7 @@ describe('SelectableText, multiple', () => {
         element.parentElement.tagName === 'BUTTON' && content.includes(name)
     }
 
-    const {container, getByText, queryByText} = render(
+    const {getByText, queryByText} = render(
       <SelectableText
         mode="edit"
         onChange={() => {}}
@@ -118,14 +118,15 @@ describe('SelectableText, multiple', () => {
         multiple
       />
     )
-    await waitForDomChange({container})
 
     // I can't simply look for the strings for the selected values
     // because they exist as options in the Select
     // I lean on internal knowledge of the SelectMultiple that the current
     // selections are rendered as <button><span>label</span></button>
-    expect(getByText(findCongero('Mongo Santamaria'))).toBeInTheDocument()
-    expect(getByText(findCongero('Giovanni Hidalgo'))).toBeInTheDocument()
-    expect(queryByText(findCongero('Pancho Sanchez'))).toBeNull()
+    await waitFor(() => {
+      expect(getByText(findCongero('Mongo Santamaria'))).toBeInTheDocument()
+      expect(getByText(findCongero('Giovanni Hidalgo'))).toBeInTheDocument()
+      expect(queryByText(findCongero('Pancho Sanchez'))).toBeNull()
+    })
   })
 })

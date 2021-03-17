@@ -295,8 +295,8 @@ module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
     def initialize(course_ids:)
       scope = Enrollment.joins(:course).
-        where.not(enrollments: {workflow_state: "deleted"},
-                  courses: {workflow_state: "deleted"})
+        where.not(enrollments: {workflow_state: "deleted"}).
+        where.not(courses: {workflow_state: "deleted"})
 
       scope = scope.where(course_id: course_ids) if course_ids.present?
 

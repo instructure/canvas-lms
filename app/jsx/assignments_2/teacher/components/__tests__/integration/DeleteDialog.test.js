@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, wait, waitForElement} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 import {mockAssignment, itBehavesLikeADialog, saveAssignmentResult} from '../../../test-utils'
 import {renderTeacherView} from './integration-utils'
 
 async function openDeleteDialog(assignment = mockAssignment(), apolloMocks = []) {
   const fns = await renderTeacherView(assignment, apolloMocks)
-  const openDeleteButton = await waitForElement(() => fns.getByText('delete assignment'))
+  const openDeleteButton = await waitFor(() => fns.getByText('delete assignment'))
   fireEvent.click(openDeleteButton)
   return fns
 }
@@ -48,11 +48,9 @@ describe('assignments 2 delete dialog', () => {
     const {getByTestId} = await openDeleteDialog(assignment, [
       saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'})
     ])
-    const reallyDeleteButton = await waitForElement(() =>
-      getByTestId('delete-dialog-confirm-button')
-    )
+    const reallyDeleteButton = await waitFor(() => getByTestId('delete-dialog-confirm-button'))
     fireEvent.click(reallyDeleteButton)
-    await wait(() => expect(window.location.reload).toHaveBeenCalled())
+    await waitFor(() => expect(window.location.reload).toHaveBeenCalled())
   })
 
   // eslint-disable-next-line jest/no-disabled-tests
@@ -61,10 +59,8 @@ describe('assignments 2 delete dialog', () => {
     const {getByTestId, getAllByText} = await openDeleteDialog(assignment, [
       saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}, 'well rats')
     ])
-    const reallyDeleteButton = await waitForElement(() =>
-      getByTestId('delete-dialog-confirm-button')
-    )
+    const reallyDeleteButton = await waitFor(() => getByTestId('delete-dialog-confirm-button'))
     fireEvent.click(reallyDeleteButton)
-    expect(await waitForElement(() => getAllByText(/unable to delete/i)[0])).toBeInTheDocument()
+    expect(await waitFor(() => getAllByText(/unable to delete/i)[0])).toBeInTheDocument()
   })
 })

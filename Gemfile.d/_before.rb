@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.13.3', '<= 2.2.11'
+gem 'bundler', '>= 2.2.0', '<= 2.2.11'
 
 if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   Gem::Version.new(Gem::VERSION) < Gem::Version.new('2.6.9')
@@ -40,12 +40,12 @@ else
 end
 
 # force a different lockfile for next rails
-unless CANVAS_RAILS5_2
+unless CANVAS_RAILS6_0
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
         lockfile = "#{Bundler.default_gemfile}.lock"
-        lockfile << ".next" unless CANVAS_RAILS5_2
+        lockfile << ".next" unless CANVAS_RAILS6_0
         Pathname.new(lockfile)
       end
     end

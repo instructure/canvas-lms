@@ -59,9 +59,5 @@ export function scoreToPercentage(score, pointsPossible) {
 }
 
 export function weightedPercent({score, possible, weight}) {
-  return score && weight
-    ? Big(score)
-        .div(possible)
-        .times(weight)
-    : Big(0)
+  return score && weight && possible ? Big(score).div(possible).times(weight) : Big(0)
 }

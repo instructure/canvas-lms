@@ -34,6 +34,7 @@ class TokenScopes
   LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly".freeze
   LTI_AGS_RESULT_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly".freeze
   LTI_AGS_SCORE_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/score".freeze
+  LTI_AGS_SHOW_PROGRESS_SCOPE = "https://canvas.instructure.com/lti-ags/progress/scope/show".freeze
   LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".freeze
   LTI_UPDATE_PUBLIC_JWK_SCOPE = "https://canvas.instructure.com/lti/public_jwk/scope/update".freeze
   LTI_ACCOUNT_LOOKUP_SCOPE = "https://canvas.instructure.com/lti/account_lookup/scope/show".freeze
@@ -63,9 +64,16 @@ class TokenScopes
     LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data."),
     LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
     LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
-    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t('Can view feature flags')
+    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t('Can view feature flags'),
+    LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t('Can view Progress records associated with the context the tool is installed in'),
   }.freeze
-  LTI_AGS_SCOPES = [ LTI_AGS_LINE_ITEM_SCOPE, LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE, LTI_AGS_RESULT_READ_ONLY_SCOPE, LTI_AGS_SCORE_SCOPE ].freeze
+  LTI_AGS_SCOPES = [ 
+    LTI_AGS_LINE_ITEM_SCOPE,
+    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+    LTI_AGS_RESULT_READ_ONLY_SCOPE,
+    LTI_AGS_SCORE_SCOPE,
+    LTI_AGS_SHOW_PROGRESS_SCOPE
+  ].freeze
   LTI_HIDDEN_SCOPES = {
     LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can create external tools."),
     LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can destroy external tools."),

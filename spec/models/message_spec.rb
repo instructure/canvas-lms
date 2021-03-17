@@ -385,6 +385,32 @@ describe Message do
           @message.deliver
         end
       end
+
+
+      context 'with the enable_push_notifications account setting disabled' do
+        before :each do
+          account = Account.default
+          account.settings[:enable_push_notifications] = false
+        end
+
+        after :each do
+          account = Account.default
+          account.settings[:enable_push_notifications] = true
+        end
+
+        it 'does not deliver notifications' do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'New Wiki Page',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push).never
+          @message.deliver
+        end
+      end
     end
 
     context 'SMS' do
@@ -725,6 +751,13 @@ describe Message do
       user.save!
       message = Message.new(context: convo_message)
       expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
+    end
+
+    it "doesnt break when there is an invalid avatar_image_url url" do
+      user.avatar_image_url = "An invalid url"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to be_nil
     end
 
     describe 'author_account' do

@@ -501,3 +501,88 @@ test('clears state on modal close', () => {
   notOk(wrapper.state('toolConfiguration'))
   wrapper.unmount()
 })
+
+test('hasRedirectUris', () => {
+  developerKey.redirect_uris = null
+
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createOrEditDeveloperKeyState={{
+        ...createDeveloperKeyState,
+        ...{developerKey: {...developerKey}, isLtiKey: true}
+      }}
+      actions={{}}
+      store={{}}
+      state={{}}
+      mountNode={modalMountNode}
+    />
+  )
+
+  strictEqual(wrapper.instance().hasRedirectUris, null)
+
+  wrapper.instance().updateToolConfiguration(validToolConfig)
+
+  strictEqual(wrapper.instance().hasRedirectUris, true)
+
+  wrapper.unmount()
+})
+
+test('update `redirect_uris` when updating the tool configuration', () => {
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createOrEditDeveloperKeyState={{
+        ...createDeveloperKeyState,
+        ...{developerKey: {...developerKey}, isLtiKey: true}
+      }}
+      actions={{}}
+      store={{}}
+      state={{}}
+      mountNode={modalMountNode}
+    />
+  )
+
+  wrapper.instance().updateConfigurationMethod('json')
+  wrapper.instance().updateToolConfiguration({})
+
+  notOk(wrapper.state().developerKey.redirect_uris)
+
+  wrapper.instance().updateToolConfiguration(validToolConfig)
+
+  strictEqual(wrapper.state().developerKey.redirect_uris, validToolConfig.target_link_uri)
+
+  wrapper.unmount()
+})
+
+test('does not flashes an error if configurationMethod is url', () => {
+  const flashStub = sinon.stub($, 'flashError')
+  const saveLtiToolConfigurationSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
+  const actions = Object.assign(fakeActions, {
+    saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy})
+  })
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={{}}
+      availableScopes={{}}
+      availableScopesPending={false}
+      createOrEditDeveloperKeyState={editDeveloperKeyState}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={actions}
+      store={{dispatch: dispatchSpy}}
+      state={{}}
+      mountNode={modalMountNode}
+      selectedScopes={[]}
+      ctx={{params: {contextId: '1'}}}
+    />
+  )
+
+  wrapper.instance().updateConfigurationMethod('url')
+  wrapper.instance().updateToolConfigurationUrl('http://foo.com')
+  wrapper.instance().saveLtiToolConfiguration()
+
+  ok(saveLtiToolConfigurationSpy.called)
+  notOk(flashStub.calledWith('A redirect_uri is required, please supply one.'))
+
+  flashStub.restore()
+  wrapper.unmount()
+})

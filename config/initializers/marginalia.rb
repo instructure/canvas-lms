@@ -29,7 +29,7 @@ if config[:components].present?
         attr_accessor :migration, :rake_task
 
         def context_id
-          RequestContextGenerator.request_id
+          RequestContext::Generator.request_id
         end
 
         def job_tag

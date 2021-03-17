@@ -124,7 +124,7 @@ describe.skip('MediaAttempt', () => {
   // const editButton = getByTestId('media-modal-launch-button')
   // fireEvent.click(editButton)
   // expect(
-  // await waitForElement(() => getByText('drag and drop or clik to browse'))
+  // await waitFor(() => getByText('drag and drop or clik to browse'))
   // ).toBeInTheDocument()
   // })
 })

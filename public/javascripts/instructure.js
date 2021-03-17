@@ -202,8 +202,13 @@ export function enhanceUserContent() {
     })
     .end()
 
-  $('a.instructure_file_link').each(function () {
+  $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
     const $link = $(this)
+    $('.user_content.unenhanced:visible')
+    if ($link.find('.ui-icon-extlink').length) {
+      // a bug in the new RCE added instructure_file_link class name to external links for a while
+      return
+    }
     let $download_btn, $preview_link, $preview_container
     if ($.trim($link.text())) {
       const $span = $("<span class='instructure_file_holder link_holder'/>")

@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION, SET_MODULE_ITEM_COMPLETION} from '../../graphqlData/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/Queries'
-import {act, fireEvent, render, waitForElement} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -158,7 +158,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {getByText, queryByTestId} = render(
+        const {getByRole, queryByTestId} = render(
           <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -166,9 +166,9 @@ describe('SubmissionManager', () => {
           </AlertManagerContext.Provider>
         )
 
-        const submitButton = getByText('Submit')
+        const submitButton = getByRole('button', {name: 'Submit'})
         fireEvent.click(submitButton)
-        expect(await waitForElement(() => getByText('Submit'))).toBeInTheDocument()
+        await waitFor(() => expect(getByRole('button', {name: 'Submit'})).not.toBeDisabled())
         if (inDocument) {
           expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
         } else {
@@ -345,7 +345,7 @@ describe('SubmissionManager', () => {
           fireEvent.click(markAsDoneButton)
         })
 
-        expect(getByRole('button', {name: 'Done'})).toBeInTheDocument()
+        await waitFor(() => expect(getByRole('button', {name: 'Done'})).toBeInTheDocument())
       })
 
       it('updates itself to the opposite appearance when the request succeeds', async () => {
@@ -362,7 +362,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {getByText, getByRole} = render(
+        const {getByRole} = render(
           <AlertManagerContext.Provider>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -375,7 +375,7 @@ describe('SubmissionManager', () => {
           fireEvent.click(markAsDoneButton)
         })
 
-        expect(await waitForElement(() => getByText('Done'))).toBeInTheDocument()
+        await waitFor(() => expect(getByRole('button', {name: 'Done'})).toBeInTheDocument())
       })
 
       it('does not update its appearance when the request fails', async () => {
@@ -392,7 +392,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {queryByText, getByRole} = render(
+        const {queryByRole, getByRole} = render(
           <AlertManagerContext.Provider value={{setOnFailure: jest.fn()}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -405,7 +405,7 @@ describe('SubmissionManager', () => {
           fireEvent.click(markAsDoneButton)
         })
 
-        expect(queryByText('Done')).not.toBeInTheDocument()
+        await waitFor(() => expect(queryByRole('button', {name: 'Done'})).not.toBeInTheDocument())
       })
     })
 

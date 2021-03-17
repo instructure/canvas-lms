@@ -68,6 +68,27 @@ module K5PageObject
   def today_selector
     "h2 div:contains('Today')"
   end
+
+  def homeroom_course_title_selector(title)
+    "h2:contains('#{title}')"
+  end
+
+  def announcement_title_selector(announcement_title)
+    "h3:contains('#{announcement_title}')"
+  end
+
+  def announcement_content_text_selector(content_text)
+    "div:contains('#{content_text}')"
+  end
+
+  def announcement_button_selector
+    "//a[*//. = 'Announcement']"
+  end
+
+  def announcement_edit_button_selector
+    "a[cursor='pointer']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -118,6 +139,30 @@ module K5PageObject
     fj(today_selector)
   end
 
+  def homeroom_course_title(title)
+    fj(homeroom_course_title_selector(title))
+  end
+
+  def homeroom_course_title_link(title)
+    fln(title)
+  end
+
+  def announcement_title(announcement_title)
+    fj(announcement_title_selector(announcement_title))
+  end
+
+  def announcement_content_text(content_text)
+    fj(announcement_content_text_selector(content_text))
+  end
+
+  def announcement_button
+    fxpath(announcement_button_selector)
+  end
+
+  def announcement_edit_pencil
+    f(announcement_edit_button_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def check_enable_homeroom_checkbox
@@ -152,4 +197,19 @@ module K5PageObject
     subject_title_link(subject_title).click
   end
 
+  def click_homeroom_course_title(course_title)
+    homeroom_course_title_link(course_title).click
+  end
+
+  def click_announcement_button
+    announcement_button.click
+  end
+
+  def announcement_button_exists?
+    element_exists?(announcement_button_selector, true)
+  end
+
+  def click_announcement_edit_pencil
+    announcement_edit_pencil.click
+  end
 end

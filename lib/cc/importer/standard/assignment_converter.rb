@@ -99,6 +99,7 @@ module CC::Importer::Standard
       assignment["external_tool_migration_id"] = get_node_val(meta_doc, "external_tool_identifierref") if meta_doc.at_css("external_tool_identifierref")
       assignment["external_tool_id"] = get_node_val(meta_doc, "external_tool_external_identifier") if meta_doc.at_css("external_tool_external_identifier")
       assignment["tool_setting"] = get_tool_setting(meta_doc) if meta_doc.at_css('tool_setting').present?
+      assignment["resource_link_lookup_uuid"] = get_node_val(meta_doc, "resource_link_lookup_uuid") if meta_doc.at_css("resource_link_lookup_uuid")
 
       if meta_doc.at_css("saved_rubric_comments comment")
         assignment[:saved_rubric_comments] = {}
@@ -160,6 +161,19 @@ module CC::Importer::Standard
       end
       if meta_doc.at_css("post_policy")
         assignment[:post_policy] = {post_manually: get_bool_val(meta_doc, "post_policy post_manually") || false}
+      end
+      if meta_doc.at_css("line_items")
+        assignment[:line_items] = meta_doc.css("line_items line_item").map do |li_node|
+          {
+            client_id: get_int_val(li_node, 'client_id'),
+            coupled: get_bool_val(li_node, 'coupled'),
+            extensions: get_node_val(li_node, 'extensions'),
+            label: get_node_val(li_node, 'label'),
+            resource_id: get_node_val(li_node, 'resource_id'),
+            score_maximum: get_float_val(li_node, 'score_maximum'),
+            tag: get_node_val(li_node, 'tag'),
+          }.compact
+        end
       end
       assignment
     end

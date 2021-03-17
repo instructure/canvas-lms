@@ -31,6 +31,10 @@ describe "assignments" do
   include CustomScreenActions
   include CustomSeleniumActions
 
+  before :each do
+    Account.default.enable_feature!(:rce_enhancements)
+  end
+
   # note: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
@@ -126,35 +130,6 @@ describe "assignments" do
           expect(f('#moderated_grading_button')).not_to be_displayed
         end
       end
-    end
-
-    it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
-      stub_rcs_config
-      @assignment = @course.assignments.create(name: 'Test Assignment')
-      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
-      file.context = @course
-      file.save!
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      insert_file_from_rce
-    end
-
-    it "should switch text editor context from RCE to HTML", priority: "1", test_id: 699624 do
-      get "/courses/#{@course.id}/assignments/new"
-      wait_for_ajaximations
-      text_editor=f('.mce-tinymce')
-      expect(text_editor).to be_displayed
-      html_editor_link=fln('HTML Editor')
-      expect(html_editor_link).to be_displayed
-      type_in_tiny 'textarea[name=description]', 'Testing HTML- RCE Toggle'
-      html_editor_link.click
-      wait_for_ajaximations
-      rce_link=fln('Rich Content Editor')
-      rce_editor=f('#assignment_description')
-      expect(html_editor_link).not_to be_displayed
-      expect(rce_link).to be_displayed
-      expect(text_editor).not_to be_displayed
-      expect(rce_editor).to be_displayed
-      expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
     end
 
     it "should edit an assignment", priority: "1", test_id: 56012 do

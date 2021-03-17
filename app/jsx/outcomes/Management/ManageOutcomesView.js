@@ -68,7 +68,6 @@ const ManageOutcomesView = ({
           minWidth="calc(50% + 4.125rem)"
           onMenuHandler={onOutcomeGroupMenuHandler}
         />
-
         <View as="div" padding="medium 0 xx-small" margin="x-small 0 0">
           <OutcomeSearchBar
             enabled={numOutcomes > 0}
@@ -115,7 +114,7 @@ const ManageOutcomesView = ({
 
 ManageOutcomesView.propTypes = {
   outcomeGroup: PropTypes.shape({
-    _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     outcomesCount: PropTypes.number.isRequired,

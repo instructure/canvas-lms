@@ -2255,4 +2255,22 @@ describe Account do
       a.save!
     end
   end
+
+  describe "enable_as_k5_account setting" do
+    it "enable_as_k5_account? helper returns false by default" do
+      account = Account.create!
+      expect(account).not_to be_enable_as_k5_account
+    end
+
+    it "enable_as_k5_account? and enable_as_k5_account helpers return correct values" do
+      account = Account.create!
+      account.settings[:enable_as_k5_account] = {
+        value: true,
+        locked: true
+      }
+      expect(account).to be_enable_as_k5_account
+      expect(account.enable_as_k5_account[:value]).to be_truthy
+      expect(account.enable_as_k5_account[:locked]).to be_truthy
+    end
+  end
 end

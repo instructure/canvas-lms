@@ -40,7 +40,7 @@ describe('ManageOutcomesView', () => {
     onSearchChangeHandler,
     onSearchClearHandler,
     loadMore,
-    ...props,
+    ...props
   })
 
   beforeEach(() => {
@@ -71,8 +71,8 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {nodes: [], pageInfo: {hasNextPage: false}},
-          },
+            outcomes: {nodes: [], pageInfo: {hasNextPage: false}}
+          }
         })}
       />
     )
@@ -93,5 +93,10 @@ describe('ManageOutcomesView', () => {
         'Partition circles and rectangle into two, three, or four equal share. Partition circles and rectangle into two, three, or four equal share.'
       ).length
     ).not.toBe(0)
+  })
+
+  it('does not render component if outcomeGroup not provided', () => {
+    const {queryByTestId} = render(<ManageOutcomesView {...defaultProps({outcomeGroup: null})} />)
+    expect(queryByTestId('outcome-group-container')).not.toBeInTheDocument()
   })
 })

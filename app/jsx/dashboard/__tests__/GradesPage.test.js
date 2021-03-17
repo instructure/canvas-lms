@@ -18,7 +18,7 @@
  */
 
 import React from 'react'
-import {render, waitForElement} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 
 import GradesPage from 'jsx/dashboard/pages/GradesPage'
 
@@ -54,7 +54,7 @@ describe('GradesPage', () => {
     utils.fetchGrades.mockReturnValueOnce(Promise.reject(new Error('oh no!')))
     const {getAllByText} = render(<GradesPage visible />)
     // showFlashError appears to create both a regular and a screen-reader only alert on the page
-    await waitForElement(() => getAllByText('Failed to load the grades tab'))
+    await waitFor(() => getAllByText('Failed to load the grades tab'))
     expect(getAllByText('Failed to load the grades tab')[0]).toBeInTheDocument()
     expect(getAllByText('oh no!')[0]).toBeInTheDocument()
   })
@@ -62,7 +62,7 @@ describe('GradesPage', () => {
   it('renders fetched non-homeroom courses', async () => {
     utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     const {getByText, queryByText} = render(<GradesPage visible />)
-    await waitForElement(() => getByText('Testing 4 Dummies'))
+    await waitFor(() => getByText('Testing 4 Dummies'))
     expect(getByText('ECON 500')).toBeInTheDocument()
     expect(queryByText('Invisible Homeroom')).not.toBeInTheDocument()
   })

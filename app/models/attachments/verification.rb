@@ -63,7 +63,7 @@ class Attachments::Verification
     pm = opts[:permission_map_id]
     body[:pm] = pm.to_s if pm && PERMISSION_MAPS.key?(pm)
 
-    Canvas::Security.create_jwt(body, opts[:expires])
+    CanvasSecurity.create_jwt(body, opts[:expires])
   end
 
   # Decodes a verifier and asserts its validity (but does not check permissions!). You
@@ -75,7 +75,7 @@ class Attachments::Verification
   # a Hash of the body contents if it can.
   def decode_verifier(verifier)
     begin
-      body = Canvas::Security.decode_jwt(verifier)
+      body = CanvasSecurity.decode_jwt(verifier)
       if body[:id] != attachment.global_id
         InstStatsd::Statsd.increment("attachments.token_verifier_id_mismatch")
         Rails.logger.warn("Attachment verifier token id mismatch. token id: #{body[:id]}, attachment id: #{attachment.global_id}, token: #{verifier}")
@@ -83,11 +83,11 @@ class Attachments::Verification
       end
 
       InstStatsd::Statsd.increment("attachments.token_verifier_success")
-    rescue Canvas::Security::TokenExpired
+    rescue CanvasSecurity::TokenExpired
       InstStatsd::Statsd.increment("attachments.token_verifier_expired")
       Rails.logger.warn("Attachment verifier token expired: #{verifier}")
       return nil
-    rescue Canvas::Security::InvalidToken
+    rescue CanvasSecurity::InvalidToken
       InstStatsd::Statsd.increment("attachments.token_verifier_invalid")
       Rails.logger.warn("Attachment verifier token invalid: #{verifier}")
       return nil

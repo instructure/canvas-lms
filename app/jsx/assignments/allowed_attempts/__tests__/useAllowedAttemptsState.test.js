@@ -17,7 +17,7 @@
  */
 
 import useAllowedAttemptsState from '../useAllowedAttemptsState'
-import {renderHook, act} from '@testing-library/react-hooks'
+import {renderHook, act} from '@testing-library/react-hooks/dom'
 
 it('allows numeric value for the number of attempts', () => {
   const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: 42}))

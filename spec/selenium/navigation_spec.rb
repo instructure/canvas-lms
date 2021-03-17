@@ -124,14 +124,14 @@ describe 'Global Navigation' do
                       asset_code: @quiz.asset_string
       end
 
-      it 'should show the Recent History tray upon clicking', ignore_js_errors: true do
+      it 'should show the Recent History tray upon clicking' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
         expect(f("[aria-label='Recent History tray']")).to be_displayed
       end
 
-      it 'should show recent history items on Recent History tray', ignore_js_errors: true do
+      it 'should show recent history items on Recent History tray' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
@@ -140,7 +140,7 @@ describe 'Global Navigation' do
         expect(navigation_element_list[1].attribute('aria-label')).to eq('another assessment, Assignment')
       end
 
-      it 'should include recent history assignment link', ignore_js_errors: true do
+      it 'should include recent history assignment link' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations

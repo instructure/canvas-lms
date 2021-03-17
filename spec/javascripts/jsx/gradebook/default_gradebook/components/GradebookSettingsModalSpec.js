@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {fireEvent, wait} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 
 import GradebookSettingsModal from 'jsx/gradebook/default_gradebook/components/GradebookSettingsModal'
 import * as GradebookSettingsModalApi from 'jsx/gradebook/default_gradebook/apis/GradebookSettingsModalApi'
@@ -180,7 +180,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
   function openModal() {
     component.open()
-    return wait(() => {
+    return waitFor(() => {
       if (props.onEntered.callCount > 0) {
         return
       }
@@ -196,7 +196,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   function mountOpenAndLoad() {
     return mountAndOpen()
       .then(() => fetchLatePolicyPromise.resolve())
-      .then(() => wait(() => !getSpinner()))
+      .then(() => waitFor(() => !getSpinner()))
   }
 
   function mountOpenLoadAndSelectTab(tabLabel) {
@@ -206,7 +206,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   }
 
   function waitForModalClosed() {
-    return wait(() => {
+    return waitFor(() => {
       if (props.onClose.callCount > 0) {
         return
       }
@@ -525,7 +525,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(() => {
         createLatePolicyPromise.reject(new Error('request failed'))
-        return wait(() => FlashAlert.showFlashAlert.callCount > 0)
+        return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
@@ -586,7 +586,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(() => {
         updateLatePolicyPromise.reject(new Error('request failed'))
-        return wait(() => FlashAlert.showFlashAlert.callCount > 0)
+        return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
@@ -680,7 +680,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       QUnit.module('when getAssignmentPostPolicies fails', assignmentFailureHooks => {
         assignmentFailureHooks.beforeEach(() => {
           getAssignmentPostPoliciesPromise.reject()
-          return wait(() => FlashAlert.showFlashAlert.callCount > 0)
+          return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
         })
 
         test('shows an "error" flash alert', () => {
@@ -693,7 +693,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(() => {
         setCoursePostPolicyPromise.reject(new Error('request failed'))
-        return wait(() => FlashAlert.showFlashAlert.callCount > 0)
+        return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
@@ -766,7 +766,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(() => {
         updateCourseSettingsPromise.reject(new Error('request failed'))
-        return wait(() => FlashAlert.showFlashAlert.callCount > 0)
+        return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
