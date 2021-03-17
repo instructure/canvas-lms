@@ -113,7 +113,6 @@ describe 'Global Navigation' do
     describe 'Recent History' do
       before do
         Setting.set('enable_page_views', 'db')
-        Account.default.enable_feature!(:recent_history)
         @assignment = @course.assignments.create(:name => "another assessment")
         @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
         page_view_for url: app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}", context: @course,

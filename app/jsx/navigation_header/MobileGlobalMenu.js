@@ -387,32 +387,30 @@ export default class MobileGlobalMenu extends React.Component {
             </List.Item>
           ))}
 
-          {ENV.FEATURES?.recent_history && (
-            <List.Item>
-              <ToggleDetails
-                iconPosition="end"
-                fluidWidth
-                onToggle={ensureLoaded('history')}
-                summary={
-                  <Flex padding="xx-small small">
-                    <Flex.Item width="3rem">
-                      <IconClockLine inline={false} size="small" color="brand" />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text color="brand">{I18n.t('History')}</Text>
-                    </Flex.Item>
-                  </Flex>
-                }
-              >
-                <View as="div" margin="0 0 0 xx-large">
-                  <HistoryList
-                    history={this.props.DesktopNavComponent.state.history}
-                    hasLoaded={this.props.DesktopNavComponent.state.historyAreLoaded}
-                  />
-                </View>
-              </ToggleDetails>
-            </List.Item>
-          )}
+          <List.Item>
+            <ToggleDetails
+              iconPosition="end"
+              fluidWidth
+              onToggle={ensureLoaded('history')}
+              summary={
+                <Flex padding="xx-small small">
+                  <Flex.Item width="3rem">
+                    <IconClockLine inline={false} size="small" color="brand" />
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Text color="brand">{I18n.t('History')}</Text>
+                  </Flex.Item>
+                </Flex>
+              }
+            >
+              <View as="div" margin="0 0 0 xx-large">
+                <HistoryList
+                  history={this.props.DesktopNavComponent.state.history}
+                  hasLoaded={this.props.DesktopNavComponent.state.historyAreLoaded}
+                />
+              </View>
+            </ToggleDetails>
+          </List.Item>
 
           {true /* TODO: put a check for if we should show help */ && (
             <List.Item>

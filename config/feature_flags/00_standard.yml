@@ -427,11 +427,6 @@ timer_without_autosubmission:
   description: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
   applies_to: RootAccount
   state: hidden
-recent_history:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Recent History
-  description: Show a list of recently visited pages in the Canvas global navigation
 easy_student_view:
   state: hidden
   applies_to: Course
