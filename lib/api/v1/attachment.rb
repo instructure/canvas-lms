@@ -174,13 +174,22 @@ module Api::V1::Attachment
     hash
   end
 
+  # First, try to find the extension using the name, filename and url parameters,
+  # otherwise, try to find using the content_type parameter.
+  # The order matters because there's more than one mime type to the same
+  # extension, like text/plain: dat,txt,hh,hlp.
+  # The `File.mime_types[mime_type]` returns the last extesion recorded in the
+  # mime_types.yml.
   def infer_file_extension(params)
+    filenames_with_extension = filenames(params).select{ |item| item.include?('.') }
+
+    extension = filenames_with_extension&.first&.split('.')&.last&.downcase
+
+    return extension if extension
+
     mime_type = infer_upload_content_type(params)
 
-    return File.mime_types[mime_type] if mime_type && File.mime_types[mime_type]
-
-    filenames_with_extension = filenames(params).select{ |item| item.include?('.') }
-    filenames_with_extension&.first&.split('.')&.last&.downcase
+    File.mime_types[mime_type] if mime_type
   end
 
   def infer_filename_from_url(url)
