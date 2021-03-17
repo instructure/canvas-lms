@@ -58,6 +58,7 @@ export default function RubricsQuery(props) {
         data.course.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
       }
       rubric={data.assignment.rubric}
+      rubricAssociation={data.assignment.rubricAssociation}
     />
   )
 }

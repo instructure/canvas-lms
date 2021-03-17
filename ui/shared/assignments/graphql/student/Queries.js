@@ -22,6 +22,7 @@ import {ExternalTool} from './ExternalTool'
 import {ProficiencyRating} from './ProficiencyRating'
 import {Rubric} from './Rubric'
 import {RubricAssessment} from './RubricAssessment'
+import {RubricAssociation} from './RubricAssociation'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
 import {UserGroups} from './UserGroups'
@@ -51,6 +52,9 @@ export const RUBRIC_QUERY = gql`
         rubric {
           ...Rubric
         }
+        rubricAssociation {
+          ...RubricAssociation
+        }
       }
     }
     submission(id: $submissionID) {
@@ -74,6 +78,7 @@ export const RUBRIC_QUERY = gql`
   }
   ${Rubric.fragment}
   ${RubricAssessment.fragment}
+  ${RubricAssociation.fragment}
   ${ProficiencyRating.fragment}
 `
 

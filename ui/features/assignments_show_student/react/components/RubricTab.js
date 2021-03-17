@@ -23,6 +23,7 @@ import {ProficiencyRating} from '@canvas/assignments/graphql/student/Proficiency
 import React, {useMemo, useState} from 'react'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
+import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
 import RubricComponent from '@canvas/rubrics/react/Rubric'
 
 const ENROLLMENT_STRINGS = {
@@ -78,7 +79,6 @@ export default function RubricTab(props) {
   const displayedAssessment = assessments?.find(
     assessment => assessment._id === displayedAssessmentId
   )
-  const rubricAssociation = displayedAssessment?.rubric_association
 
   return (
     <div data-testid="rubric-tab">
@@ -102,7 +102,7 @@ export default function RubricTab(props) {
         customRatings={props.proficiencyRatings}
         rubric={rubric}
         rubricAssessment={fillAssessment(rubric, displayedAssessment || {})}
-        rubricAssociation={rubricAssociation}
+        rubricAssociation={props.rubricAssociation}
       />
     </div>
   )
@@ -111,5 +111,6 @@ export default function RubricTab(props) {
 RubricTab.propTypes = {
   assessments: arrayOf(RubricAssessment.shape),
   proficiencyRatings: arrayOf(ProficiencyRating.shape),
-  rubric: Rubric.shape
+  rubric: Rubric.shape,
+  rubricAssociation: RubricAssociation.shape
 }

@@ -117,6 +117,22 @@ describe('RubricTab', () => {
       const {findAllByText} = render(<RubricTab {...props} />)
       expect((await findAllByText('Pts'))[1]).toBeInTheDocument()
     })
+
+    it('shows possible points if the association does not hide points', async () => {
+      const props = await makeProps({graded: false})
+      props.rubricAssociation = {}
+
+      const {findByText} = render(<RubricTab {...props} />)
+      expect(await findByText(/\/ 6 pts/)).toBeInTheDocument()
+    })
+
+    it('does not show possible points for criteria if the association hides points', async () => {
+      const props = await makeProps({graded: false})
+      props.rubricAssociation = {hide_points: true}
+
+      const {queryByText} = render(<RubricTab {...props} />)
+      expect(queryByText(/\/ 6 pts/)).not.toBeInTheDocument()
+    })
   })
 
   describe('graded rubric', () => {
@@ -126,10 +142,18 @@ describe('RubricTab', () => {
       expect((await findAllByText('Comments'))[0]).toBeInTheDocument()
     })
 
-    it('displays the points for a criteria', async () => {
+    it('displays the points for an individual criterion', async () => {
       const props = await makeProps({graded: true})
       const {findByText} = render(<RubricTab {...props} />)
       expect(await findByText('6 / 6 pts')).toBeInTheDocument()
+    })
+
+    it('hides the points for an individual criterion if the association hides points', async () => {
+      const props = await makeProps({graded: true})
+      props.rubricAssociation = {hide_points: true}
+
+      const {queryByText} = render(<RubricTab {...props} />)
+      expect(queryByText('6 / 6 pts')).not.toBeInTheDocument()
     })
 
     it('displays the total points for the rubric assessment', async () => {
