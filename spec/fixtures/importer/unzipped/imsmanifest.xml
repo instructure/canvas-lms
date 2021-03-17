@@ -46,5 +46,8 @@
     <resource identifier="g534facc599d2202cf67dce042ee3105b" type="imsbasiclti_xmlv1p3">
       <file href="lti_resource_links/g534facc599d2202cf67dce042ee3105b.xml"/>
     </resource>
+    <resource identifier="1234facc599d2202cf67dce042ee34321" type="imsbasiclti_xmlv1p3">
+      <file href="lti_resource_links/1234facc599d2202cf67dce042ee34321.xml"/>
+    </resource>
   </resources>
 </manifest>
