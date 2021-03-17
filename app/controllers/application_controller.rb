@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
     :cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :direct_share, :assignment_bulk_edit, :responsive_awareness,
+    :direct_share, :responsive_awareness,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
     :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users,
     :canvas_for_elementary

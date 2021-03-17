@@ -61,7 +61,7 @@ class AssignmentsController < ApplicationController
 
         set_js_assignment_data
         set_tutorial_js_env
-        set_section_list_js_env if @domain_root_account.feature_enabled?(:assignment_bulk_edit)
+        set_section_list_js_env
         hash = {
           WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
           POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],

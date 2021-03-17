@@ -228,10 +228,7 @@ test('should clear search on toggle', () => {
 QUnit.module('bulk edit', {
   setup() {
     fakeENV.setup({
-      PERMISSIONS: {manage_assignments: true},
-      FEATURES: {
-        assignment_bulk_edit: true
-      }
+      PERMISSIONS: {manage_assignments: true}
     })
   },
 
@@ -241,13 +238,7 @@ QUnit.module('bulk edit', {
   }
 })
 
-test('should not show bulk edit menu item if FF is off', () => {
-  ENV.FEATURES.assignment_bulk_edit = false
-  const view = assignmentIndex({withAssignmentSettings: true})
-  equal(view.$('#requestBulkEditMenuItem').length, 0)
-})
-
-test('it should show bulk edit menu if FF is on', () => {
+test('it should show bulk edit menu', () => {
   const view = assignmentIndex({withAssignmentSettings: true})
   equal(view.$('#requestBulkEditMenuItem').length, 1)
 })
