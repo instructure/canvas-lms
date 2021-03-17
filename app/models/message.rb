@@ -859,6 +859,14 @@ class Message < ActiveRecord::Base
     end
   end
 
+  def media_context
+    context = self.context
+    context = context.context if context.respond_to?(:context)
+    return context if context.is_a?(Course)
+    context = (context.respond_to?(:course) && context.course) ? context.course : link_root_account
+    context
+  end
+
   def notification_service_id
     "#{self.global_id}+#{self.created_at.to_i}"
   end
