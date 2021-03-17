@@ -3,7 +3,6 @@
 set -e
 source script/common.sh
 source script/common/canvas/build_helpers.sh
-source script/common/utils/dinghy_setup.sh
 
 trap '_canvas_lms_telemetry_report_status' ERR EXIT
 SCRIPT_NAME=$0
@@ -147,9 +146,7 @@ function start_dory {
 function setup_docker_environment {
   check_dependencies
   if [[ $OS == 'Darwin' ]]; then
-    message "It looks like you're using a Mac. You'll need a dinghy VM. Let's set that up."
-    create_dinghy_vm
-    start_dinghy_vm
+    . script/common/os/mac_setup.sh
   elif [[ $OS == 'Linux' ]]; then
     start_docker_daemon
     setup_docker_as_nonroot
