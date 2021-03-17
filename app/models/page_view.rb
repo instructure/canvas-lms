@@ -140,7 +140,7 @@ class PageView < ActiveRecord::Base
     cassandra? || pv4?
   end
 
-  EventStream = EventStream::Stream.new do
+  EventStream = ::EventStream::Stream.new do
     backend_strategy :cassandra
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:page_views) }
     table :page_views
@@ -163,7 +163,7 @@ class PageView < ActiveRecord::Base
     self.raise_on_error = Rails.env.test?
 
     on_error do |operation, record, exception|
-      EventStream::Logger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
+      ::EventStream::Logger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
     end
   end
 
