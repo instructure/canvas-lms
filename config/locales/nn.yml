@@ -14984,6 +14984,7 @@ nn:
       domain_description: "**hostname** eller **ip address** til BigBlueButton-installasjonen din (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domene
+        free_trial: "Marker BigBlueButton-instansen som ein gratis test"
         recording_enabled: "Tillat opptak av konferansar."
         secret: Hemmelegheit
       secret_description: "Dette er %{parameter_name}-parameteren som du finn i konfigurasjonsfila %{filename}."
