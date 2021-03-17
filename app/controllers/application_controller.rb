@@ -418,7 +418,7 @@ class ApplicationController < ActionController::Base
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
         terms: @context.account.root_account.enrollment_terms.active.to_a.map{|term| {id: term.id, name: term.name}},
         canManageCourse: can_manage,
-        canAutoPublishCourses: can_manage && @domain_root_account.feature_enabled?(:uxs_4_omg_a_scary_blueprint_checkbox)
+        canAutoPublishCourses: can_manage
       )
     end
     js_env :BLUEPRINT_COURSES_DATA => bc_data
