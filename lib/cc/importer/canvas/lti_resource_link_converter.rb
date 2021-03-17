@@ -68,7 +68,7 @@ module CC::Importer::Canvas
           lookup_uuid = el.content if el.attributes['name'].value == 'lookup_uuid'
         end
 
-        launch_url = document.xpath("//blti:launch_url").first.content
+        launch_url = (document.xpath("//blti:launch_url").first || document.xpath("//blti:secure_launch_url").first).content
 
         resource_links << {
           custom: custom,

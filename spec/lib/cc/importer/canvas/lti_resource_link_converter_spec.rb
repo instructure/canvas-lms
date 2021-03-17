@@ -33,11 +33,10 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
 
   let(:manifest) { ImportHelper.get_import_data_xml('unzipped', 'imsmanifest') }
   let(:path) { File.expand_path(File.dirname(__FILE__) + '/../../../../fixtures/importer/unzipped') }
+  let(:lti_resource_links) { subject.convert_lti_resource_links }
 
   describe '#convert_lti_resource_links' do
     it 'extract custom params and lookup_uuid' do
-      lti_resource_links = subject.convert_lti_resource_links
-
       expect(lti_resource_links).to include(
         a_hash_including(
           custom: {
@@ -54,6 +53,30 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
           launch_url: 'http://lti13testtool.docker/launch'
         )
       )
+    end
+
+    context 'with a "secure_launch_url"' do
+      it 'creates a resource link with the secure launch URL' do
+        expect(lti_resource_links).to include(
+          a_hash_including(
+            custom: {
+              param1: 'some string',
+              param2: 1,
+              param3: 2.56,
+              param4: true,
+              param5: false,
+              param6: 'a12.5',
+              param7: '5d781f15-c6b0-4901-a1f7-2a77e7bf4982',
+              param8: '+1(855)552-2338',
+            },
+            lookup_uuid: '123412345c1e-c0a2-42dc-88b6-c029699a7c7a',
+            launch_url: 'https://lti13testtool.docker/launch/secure'
+          )
+        )
+      end
+    end
+
+    context 'with no launch URL' do
     end
   end
 end
