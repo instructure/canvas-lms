@@ -631,32 +631,12 @@ describe CoursesController, type: :request do
     ])
   end
 
-  context 'with granular permissions enabled' do
-    before :each do
-      @course.root_account.enable_feature!(:granular_permissions_course_files)
-    end
+  it "should include files tab if requested (granular)" do
+    course_with_teacher(active_all: true)
+    @course.root_account.enable_feature!(:granular_permissions_course_files)
 
-    it "should include tabs (and precalculate stuff in theory) if requested" do
-      user_session(@teacher)
-
-      json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
-      expect(json.first['tabs']).to match_array([
-        a_hash_including({"id" => "home"}),
-        a_hash_including({"id" => "announcements"}),
-        a_hash_including({"id" => "assignments"}),
-        a_hash_including({"id" => "discussions"}),
-        a_hash_including({"id" => "grades"}),
-        a_hash_including({"id" => "people"}),
-        a_hash_including({"id" => "pages"}),
-        a_hash_including({"id" => "files"}),
-        a_hash_including({"id" => "syllabus"}),
-        a_hash_including({"id" => "outcomes"}),
-        a_hash_including({"id" => "rubrics"}),
-        a_hash_including({"id" => "quizzes"}),
-        a_hash_including({"id" => "modules"}),
-        a_hash_including({"id" => "settings"})
-      ])
-    end
+    json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
+    expect(json.first['tabs']).to include(a_hash_including({"id" => "files"}))
   end
 
   describe "user index" do
