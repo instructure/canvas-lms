@@ -41,6 +41,7 @@ const MediaCaptureStrings = {
 
 const UploadMediaStrings = {
   LOADING_MEDIA: I18n.t('Loading Media'),
+  PROGRESS_LABEL: I18n.t('Uploading media Progress'),
   ADD_CLOSED_CAPTIONS_OR_SUBTITLES: I18n.t('Add CC/Subtitle'),
   COMPUTER_PANEL_TITLE: I18n.t('Computer'),
   DRAG_FILE_TEXT: I18n.t('Drag a File Here'),
