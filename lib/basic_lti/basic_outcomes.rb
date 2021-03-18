@@ -308,7 +308,7 @@ to because the assignment has no points possible.
         end
 
         if new_score || raw_score
-          submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
+          submission_hash[:grade] = (new_score > 0 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
           submission_hash[:grader_id] = -tool.id
           @submission = assignment.grade_student(user, submission_hash).first
           if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?

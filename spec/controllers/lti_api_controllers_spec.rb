@@ -431,9 +431,9 @@ to because the assignment has no points possible.
     end
 
     context "pass_fail zero point assignments" do
-      it "should succeed with incomplete grade when score < 1" do
+      it "should succeed with incomplete grade when score = 0" do
         @assignment.update(:points_possible => 10, :grading_type => 'pass_fail')
-        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        make_call('body' => replace_result(score: '0', sourceid: nil))
         check_success
 
         verify_xml(response)
@@ -447,7 +447,7 @@ to because the assignment has no points possible.
         expect(submission.grade).to eq 'incomplete'
       end
 
-      it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
+      it "should succeed with complete grade when score < 1 for a 0 point assignment" do
         @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
@@ -460,7 +460,7 @@ to because the assignment has no points possible.
         expect(submission).to be_submitted_at
         expect(submission.submission_type).to eql 'external_tool'
         expect(submission.score).to eq 0
-        expect(submission.grade).to eq 'incomplete'
+        expect(submission.grade).to eq 'complete'
       end
 
       it "should succeed with complete grade when score = 1" do
