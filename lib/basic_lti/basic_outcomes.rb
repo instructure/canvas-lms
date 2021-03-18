@@ -80,15 +80,15 @@ module BasicLTI
       end
 
       def sourcedid
-        @lti_request.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
+        @lti_request&.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
       end
 
       def message_ref_identifier
-        @lti_request.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
+        @lti_request&.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
       end
 
       def operation_ref_identifier
-        tag = @lti_request.at_css('imsx_POXBody *:first').try(:name)
+        tag = @lti_request&.at_css('imsx_POXBody *:first').try(:name)
         tag && tag.sub(%r{Request$}, '')
       end
 

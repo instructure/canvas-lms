@@ -185,14 +185,19 @@ class LtiApiController < ApplicationController
   end
 
   def check_outcome(outcome)
-    if ['unsupported', 'failure'].include? outcome.code_major
-      opts = {type: :grade_passback}
-      error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+    return outcome unless ['unsupported', 'failure'].include? outcome.code_major
+
+    opts = {type: :grade_passback}
+    error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+
+    begin
       error_info[:extra][:xml] = @xml.to_s if @xml
-      capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
-      outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
+    rescue => e
+      outcome.description += "\nInvalid XML: #{e.message}"
     end
 
+    capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
+    outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
     outcome
   end
 end

@@ -86,7 +86,6 @@ describe LtiApiController, type: :request do
     post "https://www.example.com#{req.path}",
       params: req.body,
       headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
-
   end
 
   def source_id
@@ -111,6 +110,12 @@ describe LtiApiController, type: :request do
   it "should require a content-type of application/xml" do
     make_call('content-type' => 'application/other')
     assert_status(415)
+  end
+
+  it "fail when the XML encoding is invalid" do
+    body = %{<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    make_call('body' => body)
+    check_failure('unsupported', 'Invalid XML: unknown encoding name - utf8')
   end
 
   context "OAuth Requests" do
