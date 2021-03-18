@@ -72,7 +72,9 @@ pipeline {
 
                checkoutRepo("canvas-lms", refspecToCheckout, 1)
 
-                sh 'build/new-jenkins/docker-compose-pull.sh'
+               credentials.withStarlordCredentials { ->
+                 sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+               }
                 sh 'build/new-jenkins/docker-compose-build-up.sh'
               }
             }
