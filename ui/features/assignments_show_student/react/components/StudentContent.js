@@ -19,6 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
+import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
@@ -78,6 +79,22 @@ function renderSubmissionlessAssignment({assignment}, alertContext) {
   )
 }
 
+function renderAttemptsAndAvailability({assignment}) {
+  return (
+    <View as="div" margin="medium 0">
+      <Text as="div" weight="bold">
+        {I18n.t(
+          {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
+          {count: assignment.allowedAttempts || 0}
+        )}
+      </Text>
+      <Text as="div">
+        <AvailabilityDates assignment={assignment} formatStyle="long" />
+      </Text>
+    </View>
+  )
+}
+
 function renderContentBaseOnAvailability({assignment, submission}, alertContext) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
@@ -90,6 +107,7 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
+        {renderAttemptsAndAvailability({assignment})}
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
@@ -101,6 +119,7 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
   } else {
     return (
       <>
+        {renderAttemptsAndAvailability({assignment})}
         <AssignmentToggleDetails description={assignment.description} />
         {assignment.rubric && (
           <Suspense fallback={<LoadingIndicator />}>

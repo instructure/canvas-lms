@@ -17,10 +17,6 @@
  */
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2'
 
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -37,54 +33,12 @@ ContentTabs.propTypes = {
   submission: Submission.shape
 }
 
-function currentSubmissionGrade(assignment, submission) {
-  const tabBarAlign = {
-    position: 'absolute',
-    right: '50px'
-  }
-
-  const currentGrade = submission.state === 'graded' ? submission.grade : null
-
-  return (
-    <div style={tabBarAlign}>
-      <Text weight="bold">
-        <GradeDisplay
-          displaySize="medium"
-          gradingStatus={submission.gradingStatus}
-          gradingType={assignment.gradingType}
-          pointsPossible={assignment.pointsPossible}
-          receivedGrade={currentGrade}
-          showGradeForExcused
-        />
-      </Text>
-      <Text size="small">
-        {submission.submittedAt ? (
-          <Flex justifyItems="end">
-            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted:')}</Flex.Item>
-            <Flex.Item>
-              <FriendlyDatetime
-                dateTime={submission.submittedAt}
-                format={I18n.t('#date.formats.full')}
-              />
-            </Flex.Item>
-          </Flex>
-        ) : (
-          I18n.t('Not submitted')
-        )}
-      </Text>
-    </div>
-  )
-}
-
 function LoggedInContentTabs(props) {
   const noRightLeftPadding = 'small none' // to make "submit" button edge line up with moduleSequenceFooter "next" button edge
 
   return (
     <div data-testid="assignment-2-student-content-tabs">
       <View padding={noRightLeftPadding}>
-        {props.submission.state === 'graded' || props.submission.state === 'submitted'
-          ? currentSubmissionGrade(props.assignment, props.submission)
-          : null}
         <SubmissionManager assignment={props.assignment} submission={props.submission} />
       </View>
     </div>

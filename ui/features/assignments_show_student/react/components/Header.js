@@ -16,25 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AttemptSelect from './AttemptSelect'
 import AssignmentDetails from './AssignmentDetails'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import GradeDisplay from './GradeDisplay'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {Badge} from '@instructure/ui-badge'
 import {Heading} from '@instructure/ui-heading'
 import {IconChatLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_student_header'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay/index'
-import {number, arrayOf, func} from 'prop-types'
+import {arrayOf, func} from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionStatusPill from '@canvas/assignments/react/SubmissionStatusPill'
 import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
+import {Text} from '@instructure/ui-text'
 import CommentsTray from './CommentsTray/index'
 
 class Header extends React.Component {
@@ -42,38 +43,15 @@ class Header extends React.Component {
     allSubmissions: arrayOf(Submission.shape),
     assignment: Assignment.shape,
     onChangeSubmission: func,
-    scrollThreshold: number.isRequired,
     submission: Submission.shape
   }
 
   static defaultProps = {
-    scrollThreshold: 150,
     onChangeSubmission: () => {}
   }
 
   state = {
-    isSticky: false,
-    nonStickyHeaderheight: 0,
     commentsTrayOpen: false
-  }
-
-  componentDidMount() {
-    const nonStickyHeaderheight = document.getElementById('assignments-2-student-header')
-      .clientHeight
-    this.setState({nonStickyHeaderheight})
-    window.addEventListener('scroll', this.handleScroll)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll)
-  }
-
-  handleScroll = () => {
-    if (window.pageYOffset < this.props.scrollThreshold) {
-      this.setState({isSticky: false})
-    } else {
-      this.setState({isSticky: true})
-    }
   }
 
   isSubmissionLate = () => {
@@ -94,15 +72,6 @@ class Header extends React.Component {
     this.setState({commentsTrayOpen: false})
   }
 
-  renderFakeMostRecent = () => {
-    return (
-      <Flex.Item as="div" align="end" textAlign="end">
-        {I18n.t('Calculated by: ')}
-        <div>{I18n.t('Most Recent')}</div>
-      </Flex.Item>
-    )
-  }
-
   renderLatestGrade = () => (
     <StudentViewContext.Consumer>
       {context => {
@@ -118,6 +87,33 @@ class Header extends React.Component {
       }}
     </StudentViewContext.Consumer>
   )
+
+  selectedSubmissionGrade = () => {
+    const {assignment, submission} = this.props
+    if (submission.gradingStatus === 'excused') {
+      return null
+    }
+
+    const formattedGrade = GradeFormatHelper.formatGrade(submission.grade, {
+      defaultValue: I18n.t('N/A'),
+      formatType: 'points_out_of_fraction',
+      gradingType: assignment.gradingType,
+      pointsPossible: assignment.pointsPossible
+    })
+
+    const textProps =
+      submission.grade != null ? {weight: 'bold', transform: 'capitalize'} : {color: 'secondary'}
+
+    return (
+      <Flex as="div">
+        <Flex.Item>{I18n.t('Attempt %{attempt} Score:', {attempt: submission.attempt})}</Flex.Item>
+
+        <Flex.Item margin="0 0 0 xx-small">
+          <Text {...textProps}>{formattedGrade}</Text>
+        </Flex.Item>
+      </Flex>
+    )
+  }
 
   renderViewFeedbackButton = () => {
     const buttonMargin = this.props.submission.unreadCommentCount ? {} : {margin: 'small xxx-small'}
@@ -145,17 +141,9 @@ class Header extends React.Component {
     return (
       <>
         <div
-          data-testid={
-            this.state.isSticky
-              ? 'assignment-student-header-sticky'
-              : 'assignment-student-header-normal'
-          }
+          data-testid="assignment-student-header"
           id="assignments-2-student-header"
-          className={
-            this.state.isSticky
-              ? 'assignment-student-header-sticky'
-              : 'assignment-student-header-normal'
-          }
+          className="assignment-student-header"
         >
           <Heading level="h1">
             {/* We hide this because in the designs, what visually looks like should
@@ -164,17 +152,12 @@ class Header extends React.Component {
             <ScreenReaderContent> {this.props.assignment.name} </ScreenReaderContent>
           </Heading>
 
-          {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
-          <Flex wrap="wrap" alignItems="start" wrapItems>
+          <Flex margin="0" wrap="wrap" wrapItems>
             <Flex.Item shrink>
-              <AssignmentDetails
-                isSticky={this.state.isSticky}
-                assignment={this.props.assignment}
-              />
+              <AssignmentDetails assignment={this.props.assignment} />
             </Flex.Item>
             <Flex.Item grow align="start">
               {this.renderLatestGrade()}
-              {this.renderFakeMostRecent()}
               {this.props.submission && (
                 <Flex.Item as="div" align="end" textAlign="end">
                   <Flex direction="column">
@@ -230,20 +213,18 @@ class Header extends React.Component {
                 </Flex>
               </Flex.Item>
 
-              <Flex.Item>{this.renderViewFeedbackButton()}</Flex.Item>
+              <Flex.Item shrink>
+                <Flex as="div">
+                  {(this.props.submission.state === 'graded' ||
+                    this.props.submission.state === 'submitted') && (
+                    <Flex.Item margin="0 small 0 0">{this.selectedSubmissionGrade()}</Flex.Item>
+                  )}
+                  <Flex.Item>{this.renderViewFeedbackButton()}</Flex.Item>
+                </Flex>
+              </Flex.Item>
             </Flex>
           )}
         </div>
-        {
-          // We need this element to fill the gap that is missing when the regular
-          // header is removed in the transtion to the sticky header
-        }
-        {this.state.isSticky && (
-          <div
-            data-testid="header-element-filler"
-            style={{height: `${this.state.nonStickyHeaderheight - this.props.scrollThreshold}px`}}
-          />
-        )}
       </>
     )
   }
