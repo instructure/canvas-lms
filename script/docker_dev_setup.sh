@@ -5,6 +5,8 @@ source script/common/canvas/build_helpers.sh
 
 trap '_canvas_lms_telemetry_report_status' ERR EXIT
 SCRIPT_NAME=$0
+OS="$(uname)"
+DOCKER='y'
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME"
 
@@ -31,30 +33,14 @@ if [[ "$USER" == 'root' ]]; then
   exit 1
 fi
 
-OS="$(uname)"
-
-# docker-compose version 1.20.0 introduced build-arg that we use for linux
-DOCKER_COMPOSE_MIN_VERSION='1.20.0'
-DOCKER='y'
-
-if [[ $OS == 'Darwin' ]]; then
-  #docker-compose is checked separately
-  dependencies='docker docker-machine dinghy'
-elif [[ $OS == 'Linux' ]]; then
-  #when more dependencies get added, modify Linux install output below
-  #docker-compose is checked separately
-  dependencies='dory'
-else
-  echo 'This script only supports MacOS and Linux :('
-  exit 1
-fi
-
 function setup_docker_environment {
-  check_dependencies
   if [[ $OS == 'Darwin' ]]; then
     . script/common/os/mac_setup.sh
   elif [[ $OS == 'Linux' ]]; then
     . script/common/os/linux_setup.sh
+  else
+    echo 'This script only supports MacOS and Linux :('
+    exit 1
   fi
 }
 

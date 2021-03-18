@@ -135,55 +135,42 @@ function confirm_command {
 }
 
 function check_dependencies {
-  local packages=()
-  #check for proper docker-compose version
-  if ! check_docker_compose_version; then
-    message "docker-compose $DOCKER_COMPOSE_MIN_VERSION or higher is required."
-    printf "\tPlease see %s for installation instructions.\n" "https://docs.docker.com/compose/install/"
-    packages+=("docker-compose")
-    docker_missing=1
-  fi
-  #check for required packages installed
-  for package in $dependencies; do
-    if ! installed "$package"; then
-      packages+=("$package")
+  message "Checking Dependencies..."
+  missing_packages=()
+  wrong_version=()
+  IFS=',' read -r -a DEPS <<< "$dependencies"
+  for dependency in "${DEPS[@]}"; do
+    IFS=' ' read -r -a dep <<< "$dependency"
+    if ! installed "${dep[0]}"; then
+      missing_packages+=("$dependency")
+      continue
+    fi
+    if [[ ${#dep[@]} -gt 1 ]]; then
+      version=$(eval "${dep[0]}" --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+      if (( $(echo "$version ${dep[1]}" | awk '{print ($1 < $2)}') )); then
+        wrong_version+=("$dependency or higher. Found: ${dep[0]} $version.")
+      fi
     fi
   done
-  #if missing packages, print missing packages with install assistance.
-  if [[ ${#packages[@]} -gt 0 ]]; then
-    #when more dependencies get added, modify this output to include them.
-    if [[ $OS == 'Linux' ]];then
-      if [[ "${packages[*]}" =~ "dory" ]];then
-        message "Some additional dependencies need to be installed for your OS."
-        printf "\tCanvas recommends using dory for a reverse proxy allowing you to
-\taccess canvas at http://canvas.docker. Detailed instructions
-\tare available at https://github.com/FreedomBen/dory.
-\tIf you want to install it, run 'gem install dory' then rerun this script.\n"
-        [[ ${docker_missing:-0} == 1 ]] || prompt 'Would you like to skip dory? [y/n]' skip_dory
-        [[ ${skip_dory:-n} != 'y' ]] || return 0
-      fi
-    elif [[ $OS == 'Darwin' ]];then
-      message "Some additional dependencies need to be installed for your OS."
-      printf -v joined '%s,' "${packages[@]}"
-      echo "Please install ${joined%,}."
-      printf "\tTry: %s %s\n" "$install" "${packages[*]}"
-    else
-      echo 'This script only supports MacOS and Linux :('
-      exit 1
-    fi
-    printf "\nOnce all dependencies are installed, rerun this script.\n"
-    exit 1
+  if [[ ${#missing_packages[@]} -gt 0 ]] || [[ ${#wrong_version[@]} -gt 0 ]]; then
+    message "Some additional dependencies need to be installed before continuing."
+    print_missing_dependencies
   fi
 }
 
-function check_docker_compose_version {
-  if ! installed "docker-compose"; then
-    return 1
+function print_missing_dependencies {
+  echo "    Missing Dependencies:"
+  if [[ ${#missing_packages[@]} -gt 0 ]]; then
+    for dep in "${missing_packages[@]}"; do
+      printf "\t%s\n" "$dep"
+    done
   fi
-  compose_version=$(eval docker-compose --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
-  if (( $(echo "$compose_version $DOCKER_COMPOSE_MIN_VERSION" | awk '{print ($1 < $2)}') )); then
-    return 1
+  if [[ ${#wrong_version[@]} -gt 0 ]]; then
+    printf -v joined '\t%s\n' "${wrong_version[@]}"
+    echo "${joined%}"
   fi
+  printf "Once all dependencies are satisfied, rerun this script.\n"
+  exit 1
 }
 
 function display_next_steps {
