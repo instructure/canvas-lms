@@ -50,7 +50,11 @@ export default function LatePolicyStatusDisplay(props) {
             on={['hover', 'focus']}
             placement="start"
           >
-            <Button href="#" variant="link" theme={{mediumPadding: '0', mediumHeight: 'normal'}}>
+            <Button
+              href="#"
+              variant="link"
+              theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+            >
               <ScreenReaderContent>
                 {I18n.t(
                   {one: 'Late Policy: minus 1 Point', other: 'Late Policy: minus %{count} Points'},
@@ -76,6 +80,10 @@ LatePolicyStatusDisplay.propTypes = {
   grade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  pointsDeducted: PropTypes.number.isRequired,
+  pointsDeducted: PropTypes.number,
   pointsPossible: PropTypes.number.isRequired
+}
+
+LatePolicyStatusDisplay.defaultProps = {
+  pointsDeducted: 0
 }

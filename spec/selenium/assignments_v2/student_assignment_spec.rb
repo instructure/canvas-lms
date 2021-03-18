@@ -56,10 +56,6 @@ describe 'as a student' do
         expect(StudentAssignmentPageV2.details_toggle).to be_displayed
       end
 
-      it 'should show assignment group link' do
-        expect(StudentAssignmentPageV2.assignment_group_link).to be_displayed
-      end
-
       it 'should show assignment due date' do
         expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
       end

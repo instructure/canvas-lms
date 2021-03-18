@@ -15,8 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import AssignmentDetails from '../AssignmentDetails'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
+import {
+  mockAssignment,
+  mockAssignmentAndSubmission,
+  mockQuery
+} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import StudentContent from '../StudentContent'
@@ -40,7 +46,7 @@ describe('Assignment Student Content View', () => {
       LockInfo: {isLocked: true}
     })
     const {getByTestId} = render(<StudentContent {...props} />)
-    expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
+    expect(getByTestId('assignment-student-header')).toBeInTheDocument()
   })
 
   it('renders the assignment details and student content if the assignment is unlocked', async () => {
@@ -198,6 +204,72 @@ describe('Assignment Student Content View', () => {
       )
 
       expect(queryByText(concludedMatch)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('number of attempts', () => {
+    it('renders the number of attempts with one attempt', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: 1}
+      })
+
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('1 Attempt')).toBeInTheDocument()
+    })
+
+    it('renders the number of attempts with unlimited attempts', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: null}
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('Unlimited Attempts')).toBeInTheDocument()
+    })
+
+    it('renders the number of attempts with multiple attempts', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: 3}
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('3 Attempts')).toBeInTheDocument()
+    })
+
+    it('does not render the number of attempts if the assignment does not involve digital submissions', async () => {
+      const assignment = await mockAssignment({
+        Assignment: {allowedAttempts: 3, nonDigitalSubmission: true}
+      })
+
+      const {queryByText} = render(<AssignmentDetails assignment={assignment} />)
+      expect(queryByText('3 Attempts')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('availability dates', () => {
+    it('renders AvailabilityDates', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          unlockAt: '2016-07-11T18:00:00-01:00',
+          lockAt: '2016-11-11T18:00:00-01:00'
+        }
+      })
+      const {getAllByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      // Reason why this is showing up twice is once for screenreader content and again for regular content
+      expect(getAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(2)
     })
   })
 })
