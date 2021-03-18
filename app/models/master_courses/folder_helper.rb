@@ -73,7 +73,7 @@ class MasterCourses::FolderHelper
           dest_folder.send("#{attr}=", source_folder.send(attr))
         end
       end
-      dest_folder.save! if dest_folder.changed?
+      dest_folder.save! if dest_folder&.changed?
     end
   end
 

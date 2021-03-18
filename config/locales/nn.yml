@@ -3409,6 +3409,7 @@ nn:
   assignments_2_e88d7a26: "Oppgåver 2"
   assignments_2_student_error_page_3ca3e0df: "Side med studentfeilmeldingar for Assignments 2"
   assignments_2_student_initial_query_error_52aa5ebd: "Studentfeilmeldingar om spørring i Assignment 2"
+  assignments_2_teacher_view_3cd3aeda: "Assignments 2 - Sjå som faglærar"
   assignments_2_teacher_view_error_page_8e45dedc: "Vis sida med feilmeldingar for Assignments 2 Teacher "
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Oppgåver og Quizzar - legg til / endre / slett"
   assignments_api: 
@@ -6165,6 +6166,7 @@ nn:
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allereie i bruk"
   course_section_7a988066: Emneseksjonar
   course_section_name_ea880ed1: "Emneseksjonar %{name}"
+  course_section_status_ntps_ecdfdc9f: "Status emneseksjonar - NRPS"
   course_sections: "Seksjonar på emnet"
   course_sections_add_edit_delete_c4f4ac19: "Emneseksjonar - legg til / endre / slett"
   course_selection_245808bf: Emneval
@@ -8930,6 +8932,7 @@ nn:
   first_reviewer_9ea05caa: "Fyrste korrekturlesar"
   first_reviewer_sortorder_e2184140: "Første fagfellevurderar %{sortOrder}"
   flash_6afbf65a: Flash
+  flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr viser SafeSearch-filtrerte bilder som er publisert opent under ein Creative Commons-lisens.
@@ -19051,6 +19054,9 @@ nn:
   short_name_ad9bf84f: "kort namn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Må vere sjølvforklarande, Canvas-ID-en til rapporteringsbrukaren"
   show_76c0ed1c: Vis
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
+      Vis ein sjekkboks som lar ein kontoadministrator publisere emne
+      automatisk etter å ha knytta eit eller fleire emne til og synkronisert med eit blueprint-emne
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Vis ei liste over nyleg besøkte sider i globalmenyen i Canvas"
   show_account_navigation_menu_d97270a9: "Vis meny for kontonavigasjon"
   show_admin_navigation_menu_92fb579f: "Vis admin-navigeringsmeny "
@@ -20749,6 +20755,7 @@ nn:
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "For å moderere vurderingar må 'Vurderingar - vel moderering av sluttvurdering' òg  vere slått på."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "For å få ein klient-ID, må kontoadministrator generere ein LTI-utviklarnøkkel."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Dersom du vil feste ein diskusjon øvst på sida, kan du dra ein diskusjon dit eller velje Fest i innstillingsmenyen."
+  to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "For å publisere eller skjule vurderingar må 'Vurderingar - endre' òg vere slått på."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
       For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slette' og 'Emneinnhald - sjå' òg vere slått på.
