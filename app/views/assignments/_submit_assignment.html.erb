@@ -17,6 +17,12 @@
 %>
 
 <%
+    submission_create_url = context_url(
+      @context,
+      controller: :submissions,
+      action: :create,
+      assignment_id: @assignment.id
+    )
     show_google_docs = @assignment.allow_google_docs_submission? &&
                        @real_current_user.blank? &&
                        @domain_root_account &&
@@ -70,7 +76,7 @@
     <% end %>
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
-      <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
+      <%= form_tag(submission_create_url, {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
         <%= hidden_field :submission, :submission_type, :value => "online_url" %>
         <table class="formtable" style="width: 100%;">
           <tr>
@@ -159,7 +165,7 @@
            </p>
             </div>
          <% else %>
-          <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
+          <%= form_tag(submission_create_url, {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
             <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
             <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
             <table class="formtable" style="width: 100%;">
@@ -222,7 +228,7 @@
           <p><%= t 'messages.media_recordings_disabled', "Media recordings are not enabled for this Canvas site, and you will not be able to submit these types of assignments.  Please contact your instructor about changing the settings for this assignment, or your system administrator about enabling media recordings." %></p>
         </div>
       <% else %>
-        <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
+        <%= form_tag(submission_create_url, {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
         <%= hidden_field :submission, :submission_type, :value => "media_recording" %>
         <%= hidden_field :submission, :media_comment_id, :value => "", :class => "media_comment_id" %>
         <%= hidden_field :submission, :media_comment_type, :value => "video" %>
@@ -279,7 +285,7 @@
       user_group = @assignment.group_category.try(:group_for, @current_user)
       file_upload_path = user_group ? api_v1_group_files_path(user_group) : "/api/v1/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@current_user.id}/files"
     %>
-      <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
+      <%= form_tag(submission_create_url, {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
         <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
         <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
         <%= hidden_field :submission, :attachment_ids, :id => 'external_tool_file_id' %>
@@ -337,16 +343,31 @@
       <% end %>
     <% end %>
   </div>
-</div>
 
-<% if @assignment.annotated_document? %>
-  <div class="ef-file-preview-stretch">
-    <iframe
-      allowfullscreen
-      title="<%= t 'Document to annotate' %>"
-      src=""
-      class="ef-file-preview-frame annotated-document-submission"
-      style="width: 100%;">
-    </iframe>
-  </div>
-<% end %>
+  <% if @assignment.annotated_document? %>
+    <%= form_tag(submission_create_url, id: "submit_annotated_document_form", class: "submit_assignment_form") do %>
+      <%= hidden_field :submission, :submission_type, value: "annotated_document" %>
+      <%= hidden_field :submission, :annotated_document_id, value: @assignment.annotatable_attachment_id %>
+
+      <table class="formtable" style="width: 100%;">
+        <tr>
+          <div class="ef-file-preview-stretch">
+            <iframe
+              allowfullscreen
+              title="<%= t 'Document to annotate' %>"
+              src=""
+              class="ef-file-preview-frame annotated-document-submission"
+              style="width: 100%;">
+            </iframe>
+          </div>
+        </tr>
+        <tr>
+          <td colspan="2" class='button-container'>
+            <button type="button" class="cancel_button btn"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="submit" class="btn btn-primary"><%= t "Submit Assignment" %></button>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+  <% end %>
+</div>

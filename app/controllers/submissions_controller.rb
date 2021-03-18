@@ -246,6 +246,9 @@ class SubmissionsController < SubmissionsBaseController
       elsif is_media_recording? && !has_media_recording?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      elsif params[:submission][:submission_type] == 'annotated_document' && params[:submission][:annotated_document_id].blank?
+        flash[:error] = t("Annotated Document submissions require an annotated_document_id to submit")
+        return redirect_to(course_assignment_url(@context, @assignment))
       end
     end
 
@@ -256,7 +259,7 @@ class SubmissionsController < SubmissionsBaseController
     submission_params = params[:submission].permit(
       :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
-      :resource_link_lookup_uuid, attachment_ids: []
+      :resource_link_lookup_uuid, :annotated_document_id, attachment_ids: []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
