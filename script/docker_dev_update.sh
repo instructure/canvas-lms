@@ -6,6 +6,7 @@ source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/docker_dev_update.log"
 DOCKER='y'
+SCRIPT_NAME=$0
 
 trap print_results EXIT
 trap "printf '\nTerminated\n' && exit 130" SIGINT
@@ -22,6 +23,8 @@ die () {
   usage
   exit 1
 }
+
+_canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 
 while :; do
   case $1 in

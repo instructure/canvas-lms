@@ -29,9 +29,11 @@ function print_results {
   if [ "${exit_code}" == "0" ]; then
     echo ""
     echo_console_and_log "  \o/ Success!"
+    _canvas_lms_telemetry_report_status $exit_code
   else
     echo ""
     echo_console_and_log "  /o\ Something went wrong. Check ${LOG} for details."
+    _canvas_lms_telemetry_report_status $exit_code
   fi
 
   exit ${exit_code}
@@ -64,19 +66,55 @@ function run_command {
 
 function _canvas_lms_track {
   command="$@"
-  if type _inst_telemetry >/dev/null 2>&1 &&  _canvas_lms_telemetry_enabled; then
+  if _canvas_lms_telemetry_enabled; then
     _inst_telemetry $command
   else
     $command
   fi
 }
 
+function _canvas_lms_track_with_log {
+  command="$@"
+  if _canvas_lms_telemetry_enabled; then
+    _inst_telemetry_with_log $command
+  else
+    $command >> "$LOG" 2>&1
+  fi
+}
+
 function _canvas_lms_telemetry_enabled() {
-  if [[ ${TELEMETRY_OPT_IN-n} == 'y' ]];
-  then
+  if [[ "${TELEMETRY_OPT_IN-n}" == 'y' ]] && installed _inst_telemetry ; then
     return 0
   fi
   return 1
+}
+
+function _canvas_lms_opt_in_telemetry() {
+  SCRIPT_NAME=$1
+  LOG_FILE=$2
+  if installed _canvas_lms_activate_telemetry; then
+    _canvas_lms_activate_telemetry
+    if installed _inst_setup_telemetry && _inst_setup_telemetry "canvas-lms:$SCRIPT_NAME"; then
+      _inst_track_os
+      if [[ ! -z "${LOG_FILE-}" ]]; then
+        _inst_set_redirect_log_file "$LOG_FILE"
+      fi
+    fi
+  fi
+}
+
+function installed {
+  type "$@" &> /dev/null
+}
+
+function _canvas_lms_telemetry_report_status() {
+  exit_status=$?
+  if [[ ! -z ${1-} ]]; then
+    exit_status=$1
+  fi
+  if installed _inst_report_status && _canvas_lms_telemetry_enabled; then
+    _inst_report_status $exit_status
+  fi
 }
 
 function prompt {

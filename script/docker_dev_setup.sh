@@ -7,27 +7,7 @@ source script/common/canvas/build_helpers.sh
 trap '_canvas_lms_telemetry_report_status' ERR EXIT
 SCRIPT_NAME=$0
 
-function installed {
-  type "$@" &> /dev/null
-}
-
-function _canvas_lms_telemetry_report_status() {
-  exit_status=$?
-  if installed _inst_report_status && _canvas_lms_telemetry_enabled; then
-    _inst_report_status $exit_status
-  fi
-}
-
-function _canvas_lms_opt_in_telemetry() {
-  if installed _canvas_lms_activate_telemetry; then
-    _canvas_lms_activate_telemetry
-    if installed _inst_setup_telemetry && _inst_setup_telemetry "canvas-lms:$SCRIPT_NAME"; then
-        _inst_track_os
-    fi
-  fi
-}
-
-_canvas_lms_opt_in_telemetry
+_canvas_lms_opt_in_telemetry "$SCRIPT_NAME"
 
 # shellcheck disable=1004
 echo '

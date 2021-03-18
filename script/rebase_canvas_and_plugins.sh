@@ -54,7 +54,7 @@ done
 
 function rebase_canvas {
   echo_console_and_log "Rebasing canvas-lms on HEAD ..."
-  if ! git pull --rebase origin master 2>&1 | tee -a "$LOG"; then
+  if ! _canvas_lms_track git pull --rebase origin master 2>&1 | tee -a "$LOG"; then
     FAILED_REPOS+=("canvas-lms")
   fi
   echo ""
@@ -66,7 +66,7 @@ function rebase_plugins {
 
 function rebase_plugin {
     echo_console_and_log "Rebasing plugin $1 ..."
-    if ! git pull --rebase origin master 2>&1 | tee -a "$LOG"; then
+    if ! _canvas_lms_track git pull --rebase origin master 2>&1 | tee -a "$LOG"; then
       FAILED_REPOS+=("$1")
     fi
     echo ""
