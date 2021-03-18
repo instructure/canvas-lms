@@ -824,6 +824,43 @@ describe AccountsController do
         :settings => {:outgoing_email_default_name_option => "default"}}}
       expect(@account.reload.settings[:outgoing_email_default_name]).to eq nil
     end
+
+  context "course_template_id" do
+      before do
+        account_with_admin_logged_in
+        @account.enable_feature!(:course_templates)
+      end
+
+      let(:template) { @account.courses.create!(template: true) }
+
+      it "does nothing when not passed" do
+        @account.update!(course_template: template)
+        post 'update', params: { id: @account.id, account: {} }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+
+      it "sets to null when blank" do
+        @account.grants_right?(@admin, :edit_course_template)
+        @account.update!(course_template: template)
+        post 'update', params: { id: @account.id, account: { course_template_id: ''} }
+        @account.reload
+        expect(@account.course_template).to be_nil
+      end
+
+      it "sets it" do
+        post 'update', params: { id: @account.id, account: { course_template_id: template.id } }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+
+      it "supports lookup by sis id" do
+        template.update!(sis_source_id: 'sis_id')
+        post 'update', params: { id: @account.id, account: { course_template_id: 'sis_course_id:sis_id' } }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+    end
   end
 
   describe "#settings" do

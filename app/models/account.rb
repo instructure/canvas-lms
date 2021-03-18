@@ -172,6 +172,7 @@ class Account < ActiveRecord::Base
   validate :no_active_courses, if: lambda { |a| a.workflow_state_changed? && !a.active? }
   validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
   validate :validate_help_links, if: lambda { |a| a.settings_changed? }
+  validate :validate_course_template, if: -> (a) { a.has_attribute?(:course_template_id) && a.course_template_id_changed? }
 
   include StickySisFields
   are_sis_sticky :name, :parent_account_id
@@ -1375,14 +1376,28 @@ class Account < ActiveRecord::Base
   def validate_help_links
     links = self.settings[:custom_help_links]
     return if links.blank?
+
     link_errors = HelpLinks.validate_links(links)
     link_errors.each do |link_error|
       errors.add(:custom_help_links, link_error)
     end
   end
 
+  def validate_course_template
+    self.course_template_id = nil if course_template_id == 0 && root_account?
+    return if [nil, 0].include?(course_template_id)
+
+    unless course_template.root_account_id == [root_account_id, id].compact.first
+      errors.add(:course_template_id, t('Course template must be in the same root account'))
+    end
+    unless course_template.template?
+      errors.add(:course_template_id, t('Course template must be marked as a template'))
+    end
+  end
+
   def no_active_courses
     return true if root_account?
+
     if associated_courses.not_deleted.exists?
       errors.add(:workflow_state, "Can't delete an account with active courses.")
     end

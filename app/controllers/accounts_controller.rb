@@ -753,6 +753,7 @@ class AccountsController < ApplicationController
 
       # Set default Dashboard View
       set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
+      unauthorized = true if set_course_template == :unauthorized
 
       # account settings (:manage_account_settings)
       account_settings = account_params.slice(:name, :default_time_zone, :settings)
@@ -834,6 +835,12 @@ class AccountsController < ApplicationController
   #
   # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
+  #
+  # @argument account[course_template_id] [Integer]
+  #   The ID of a course to be used as a template for all newly created courses.
+  #   Empty means to inherit the setting from parent account, 0 means to not
+  #   use a template even if a parent account has one set. The course must be
+  #   marked as a template.
   #
   # @argument account[settings][restrict_student_past_view][value] [Boolean]
   #   Restrict students from viewing courses after end date
@@ -1035,6 +1042,7 @@ class AccountsController < ApplicationController
 
         # Set default Dashboard view
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
+        set_course_template
 
         if @account.update(strong_account_params)
           update_user_dashboards
@@ -1523,8 +1531,36 @@ class AccountsController < ApplicationController
     end
   end
 
+  def set_course_template
+    return unless params[:account]&.key?(:course_template_id)
+
+    param = params[:account][:course_template_id]
+    if param.blank?
+      return if @account.course_template_id.nil?
+      return :unauthorized unless @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
+
+      @account.course_template_id = nil
+    elsif param.to_s == '0'
+      return if @account.course_template_id == 0
+      return :unauthorized unless @account.grants_right?(@current_user, :delete_course_template, :edit_course_template)
+
+      @account.course_template_id = 0
+    else
+      return if @account.course_template_id == param.to_i
+
+      course = api_find(@account.root_account.all_courses.templates, param)
+
+      return :unauthorized if @account.course_template_id.nil? && !@account.grants_any_right?(@current_user, :add_course_template, :edit_course_template)
+      return :unauthorized if !@account.course_template_id.nil? && !@account.grants_right?(@current_user, :edit_course_template)
+
+      @account.course_template = course
+    end
+    nil
+  end
+
   def update_user_dashboards
     return unless value_to_boolean(params.dig(:account, :settings, :force_default_dashboard_view))
+
     @account.update_user_dashboards
   end
 

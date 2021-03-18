@@ -762,6 +762,46 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
+        <% if @account.root_account.feature_enabled?(:course_templates) %>
+          <fieldset>
+            <h2 class="screenreader-only"><%= t('Course Template') %></h2>
+            <legend><%= t('Course Template') %></legend>
+            <%
+              disabled = []
+              options = []
+
+              if @account.root_account?
+                options << [t("No Template Selected"), nil]
+                disabled << nil unless @account.course_template_id.nil? || @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
+              else
+                options << [t("Inherit (%{course_name})", course_name: @account.parent_account.effective_course_template&.name || t("No Template Selected")), nil ]
+                options << [t("No Template Selected"), 0]
+                disabled.concast(0, nil) unless @account.course_template_id == 0 || @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
+              end
+
+              visible_templates = @account.
+                root_account.
+                all_courses.
+                templates.
+                limit(Setting.get('max_visible_course_templates', 25).to_i).
+                order(Course.best_unicode_collation_key('courses.name')).
+                pluck(:name, :id)
+              if @account.course_template_id && !visible_templates.find { |_, id| @account.course_template_id }
+                visible_templates.unshift([@account.course_template.name, @account.course_template_id])
+              end
+              options.concat(visible_templates)
+
+              unless @account.grants_right?(@current_user, :edit_course_template)
+                nonselected = visible_templates.map(&:last)
+                nonselected.delete(@account.course_template_id)
+                disabled.concat(nonselected)
+              end
+            %>
+            <%= f.select :course_template_id, options, disabled: disabled %>
+            <p><%= f.label :course_template_id, en: 'The selected course template will be used for all new courses' %></p>
+          </fieldset>
+        <% end %>
+
         <% if @account.root_account? && !@account.site_admin? %>
           <fieldset>
             <h2 class="screenreader-only"><%= t('Who Can Create New Courses') %></h2>

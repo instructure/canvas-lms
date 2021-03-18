@@ -2296,4 +2296,37 @@ describe Account do
       expect(sub_account.effective_course_template).to be_nil
     end
   end
+
+  describe "#course_template_id" do
+    it "resets id of 0 to nil on root accounts" do
+      a = Account.new
+      a.course_template_id = 0
+      expect(a).to be_valid
+      expect(a.course_template_id).to be_nil
+    end
+
+    it "requires the course template to be in the same root account" do
+      a = Account.create!
+      a2 = Account.create!
+      c = a2.courses.create!(template: true)
+      a.course_template = c
+      expect(a).not_to be_valid
+      expect(a.errors.to_h.keys).to eq [:course_template_id]
+    end
+
+    it "requires the course template to actually be a template" do
+      a = Account.create!
+      c = a.courses.create!
+      a.course_template = c
+      expect(a).not_to be_valid
+      expect(a.errors.to_h.keys).to eq [:course_template_id]
+    end
+
+    it "allows a valid course template" do
+      a = Account.create!
+      c = a.courses.create!(template: true)
+      a.course_template = c
+      expect(a).to be_valid
+    end
+  end
 end

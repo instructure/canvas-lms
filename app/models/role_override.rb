@@ -728,6 +728,7 @@ class RoleOverride < ActiveRecord::Base
       label: lambda { t("Create Course Templates") },
       label_v2: lambda { t("Create Course Templates") },
       available_to: [
+        "AccountAdmin",
         "AccountMembership"
       ],
       true_for: [
@@ -742,6 +743,7 @@ class RoleOverride < ActiveRecord::Base
       label: lambda { t("Edit Course Templates") },
       label_v2: lambda { t("Edit Course Templates") },
       available_to: [
+        "AccountAdmin",
         "AccountMembership"
       ],
       true_for: [
@@ -756,6 +758,7 @@ class RoleOverride < ActiveRecord::Base
       label: lambda { t("Delete Course Templates") },
       label_v2: lambda { t("Delete Course Templates") },
       available_to: [
+        "AccountAdmin",
         "AccountMembership"
       ],
       true_for: [
