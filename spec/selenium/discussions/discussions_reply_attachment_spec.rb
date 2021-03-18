@@ -25,10 +25,15 @@ describe "reply attachment" do
   include DiscussionsCommon
 
   before() do
+    Account.default.enable_feature!(:rce_enhancements)
     @topic_title = 'discussion topic'
     course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, 'threaded')
     @student = student_in_course.user
+  end
+
+  before(:each) do
+    stub_rcs_config
   end
 
   it "should create a discussion" do
@@ -45,7 +50,7 @@ describe "reply attachment" do
     force_click('.discussion-reply-box')
     wait_for_ajaximations
     begin
-      tinymce = f('.mce-tinymce')
+      tinymce = f('.tox-tinymce')
       expect(tinymce.enabled?).to eq true
     rescue Selenium::WebDriver::Error::NoSuchElementError
       expect("tinymce not loaded").to eq "loaded"
@@ -85,11 +90,5 @@ describe "reply attachment" do
     @last_entry.find_element(:css, '.edit_html_done').click
     # attachment is gone
     expect(@last_entry).not_to contain_css('.comment_attachments')
-  end
-
-  it 'media attachment modal can be opened' do
-    Discussion.visit(@course, @topic)
-    Discussion.start_reply_with_media
-    expect(Discussion.media_modal).to be_displayed
   end
 end
