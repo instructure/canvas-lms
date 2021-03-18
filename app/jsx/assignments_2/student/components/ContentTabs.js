@@ -18,8 +18,6 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import {Text} from '@instructure/ui-text'
-import {Badge} from '@instructure/ui-badge'
-import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import {Flex} from '@instructure/ui-flex'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './AttemptSelect'
@@ -30,10 +28,8 @@ import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import React, {lazy, Suspense, useState} from 'react'
 import SubmissionManager from './SubmissionManager'
 import {Submission} from '../graphqlData/Submission'
-import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import {Tabs} from '@instructure/ui-tabs'
 
-const CommentsTab = lazy(() => import('./CommentsTab'))
 const RubricsQuery = lazy(() => import('./RubricsQuery'))
 const RubricTab = lazy(() => import('./RubricTab'))
 
@@ -81,42 +77,6 @@ function currentSubmissionGrade(assignment, submission) {
   )
 }
 
-function renderCommentsTab({assignment, submission}) {
-  // Case where this is backed by a submission draft, not a real submission, so
-  // we can't actually save comments.
-  if (submission.state === 'unsubmitted' && submission.attempt > 1) {
-    // TODO: Get design/product to get an updated SVG or something for this: COMMS-2255
-    return (
-      <SVGWithTextPlaceholder
-        text={I18n.t('You cannot leave comments until you submit the assignment')}
-        url={ClosedDiscussionSVG}
-      />
-    )
-  }
-
-  if (submission.gradeHidden) {
-    return (
-      <SVGWithTextPlaceholder
-        text={I18n.t(
-          'You may not see all comments right now because the assignment is currently being graded.'
-        )}
-        url={ClosedDiscussionSVG}
-      />
-    )
-  }
-
-  return (
-    <Suspense fallback={<LoadingIndicator />}>
-      <CommentsTab assignment={assignment} submission={submission} />
-    </Suspense>
-  )
-}
-
-renderCommentsTab.propTypes = {
-  assignment: Assignment.shape,
-  submission: Submission.shape
-}
-
 function LoggedInContentTabs(props) {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [submissionFocus, setSubmissionFocus] = useState(null)
@@ -151,31 +111,12 @@ function LoggedInContentTabs(props) {
             submission={props.submission}
           />
         </Tabs.Panel>
-        <Tabs.Panel
-          key="comments-tab"
-          padding={noRightLeftPadding}
-          selected={selectedTabIndex === 1}
-          renderTitle={
-            <span>
-              {I18n.t('Comments')}{' '}
-              {!!props.submission.unreadCommentCount && (
-                <Badge
-                  count={props.submission.unreadCommentCount}
-                  standalone
-                  margin="0 small 0 0"
-                />
-              )}
-            </span>
-          }
-        >
-          {renderCommentsTab(props)}
-        </Tabs.Panel>
         {props.assignment.rubric && (
           <Tabs.Panel
             key="rubrics-tab"
             padding={noRightLeftPadding}
             renderTitle={I18n.t('Rubric')}
-            selected={selectedTabIndex === 2}
+            selected={selectedTabIndex === 1}
           >
             <Suspense fallback={<LoadingIndicator />}>
               <RubricsQuery assignment={props.assignment} submission={props.submission} />

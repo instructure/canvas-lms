@@ -16,21 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import {View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-text'
-import {string} from 'prop-types'
+import {bool, string} from 'prop-types'
 
-SVGWithTextPlaceholder.propTypes = {
-  text: string.isRequired,
-  url: string.isRequired
+function TextPlaceholder(props) {
+  const text = (
+    <Text weight="bold" as="div">
+      {props.text}
+    </Text>
+  )
+
+  if (props.addMargin) {
+    return (
+      <View as="div" margin="0 medium">
+        {text}
+      </View>
+    )
+  }
+
+  return text
+}
+
+TextPlaceholder.propTypes = {
+  addMargin: bool.isRequired,
+  text: string.isRequired
 }
 
 export default function SVGWithTextPlaceholder(props) {
   return (
     <div className="svg-placeholder-container">
       <img alt="" src={props.url} style={{width: '200px'}} />
-      <Text weight="bold" as="div" margin="x-small auto">
-        {props.text}
-      </Text>
+      <TextPlaceholder addMargin={props.addMargin} text={props.text} />
     </div>
   )
+}
+
+SVGWithTextPlaceholder.propTypes = {
+  addMargin: bool,
+  text: string.isRequired,
+  url: string.isRequired
+}
+
+SVGWithTextPlaceholder.defaultProps = {
+  addMargin: false
 }

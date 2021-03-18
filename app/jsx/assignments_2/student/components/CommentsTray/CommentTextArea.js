@@ -239,7 +239,6 @@ export default class CommentTextArea extends Component {
                 ref={el => {
                   this._commentTextBox = el
                 }}
-                resize="both"
                 value={this.state.commentText}
               />
               {this.state.uploadingComments && <LoadingIndicator />}

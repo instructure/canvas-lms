@@ -23,8 +23,8 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
-import CommentsTab from '../CommentsTab'
-import CommentTextArea from '../CommentsTab/CommentTextArea'
+import CommentsTray from '../CommentsTray'
+import CommentTextArea from '../CommentsTray/CommentTextArea'
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {mockQuery, mockAssignmentAndSubmission} from '../../mocks'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
@@ -288,7 +288,7 @@ describe('CommentTextArea', () => {
     const {container, findByPlaceholderText, findByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTray {...props} />
         </MockedProvider>
       )
     )
@@ -328,7 +328,7 @@ describe('CommentTextArea', () => {
     const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText, queryAllByText} = render(
       <MockedProvider mocks={mocks}>
-        <CommentsTab {...props} />
+        <CommentsTray {...props} />
       </MockedProvider>
     )
     const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
@@ -358,7 +358,7 @@ describe('CommentTextArea', () => {
     const {container, getByPlaceholderText, getByText, queryAllByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTray {...props} />
         </MockedProvider>
       )
     )

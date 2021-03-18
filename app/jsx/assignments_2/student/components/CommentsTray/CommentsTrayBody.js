@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -24,13 +24,14 @@ import GenericErrorPage from '../../../../shared/components/GenericErrorPage/ind
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-layout'
 import React, {useContext, useState} from 'react'
 import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {Submission} from '../../graphqlData/Submission'
 import {useQuery} from 'react-apollo'
 
-export default function CommentsTab(props) {
+export default function CommentsTrayBody(props) {
   const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)
 
   const queryVariables = {
@@ -86,29 +87,34 @@ export default function CommentsTab(props) {
         />
       }
     >
-      <div data-testid="comments-container">
+      <Flex as="div" direction="column" height="100%" data-testid="comments-container">
+        <Flex.Item grow>
+          <div className="load-more-comments-button-container">
+            {isFetchingMoreComments && <LoadingIndicator />}
+            {data.submissionComments.commentsConnection.pageInfo.hasPreviousPage &&
+              !isFetchingMoreComments && (
+                <Button variant="primary" onClick={loadMoreComments}>
+                  {I18n.t('Load Previous Comments')}
+                </Button>
+              )}
+          </div>
+          <CommentContent
+            comments={data.submissionComments.commentsConnection.nodes}
+            submission={props.submission}
+          />
+        </Flex.Item>
+
         {allowChangesToSubmission && (
-          <CommentTextArea assignment={props.assignment} submission={props.submission} />
+          <Flex.Item padding="x-small medium">
+            <CommentTextArea assignment={props.assignment} submission={props.submission} />
+          </Flex.Item>
         )}
-        <CommentContent
-          comments={data.submissionComments.commentsConnection.nodes}
-          submission={props.submission}
-        />
-        <div className="load-more-comments-button-container">
-          {isFetchingMoreComments && <LoadingIndicator />}
-          {data.submissionComments.commentsConnection.pageInfo.hasPreviousPage &&
-            !isFetchingMoreComments && (
-              <Button variant="primary" onClick={loadMoreComments}>
-                {I18n.t('Load More Comments')}
-              </Button>
-            )}
-        </div>
-      </div>
+      </Flex>
     </ErrorBoundary>
   )
 }
 
-CommentsTab.propTypes = {
-  assignment: Assignment.shape,
-  submission: Submission.shape
+CommentsTrayBody.propTypes = {
+  assignment: Assignment.shape.isRequired,
+  submission: Submission.shape.isRequired
 }

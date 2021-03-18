@@ -31,6 +31,19 @@ it('renders normally', async () => {
   expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
 })
 
+it('renders a "View Feedback" button', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByText} = render(<Header {...props} />)
+  expect(getByText('View Feedback')).toBeInTheDocument()
+})
+
+it('does not render a "View Feedback" button when no submission is present', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: null})
+  props.allSubmissions = [{id: 1}]
+  const {queryByText} = render(<Header {...props} />)
+  expect(queryByText('View Feedback')).not.toBeInTheDocument()
+})
+
 it('will not render LatePolicyStatusDisplay if the submission is not late', async () => {
   const props = await mockAssignmentAndSubmission()
   const {queryByTestId} = render(<Header {...props} />)

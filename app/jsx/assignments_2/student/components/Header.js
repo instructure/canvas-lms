@@ -20,9 +20,12 @@ import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptSelect from './AttemptSelect'
 import AssignmentDetails from './AssignmentDetails'
-import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-layout'
 import GradeDisplay from './GradeDisplay'
+import {Badge} from '@instructure/ui-badge'
 import {Heading} from '@instructure/ui-heading'
+import {IconChatLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_student_header'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import {number, arrayOf, func} from 'prop-types'
@@ -32,6 +35,7 @@ import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
+import CommentsTray from './CommentsTray'
 
 class Header extends React.Component {
   static propTypes = {
@@ -49,7 +53,8 @@ class Header extends React.Component {
 
   state = {
     isSticky: false,
-    nonStickyHeaderheight: 0
+    nonStickyHeaderheight: 0,
+    commentsTrayOpen: false
   }
 
   componentDidMount() {
@@ -81,6 +86,14 @@ class Header extends React.Component {
     )
   }
 
+  openCommentsTray = () => {
+    this.setState({commentsTrayOpen: true})
+  }
+
+  closeCommentsTray = () => {
+    this.setState({commentsTrayOpen: false})
+  }
+
   renderFakeMostRecent = () => {
     return (
       <Flex.Item as="div" align="end" textAlign="end">
@@ -105,6 +118,25 @@ class Header extends React.Component {
       }}
     </StudentViewContext.Consumer>
   )
+
+  renderViewFeedbackButton = () => {
+    const buttonMargin = this.props.submission.unreadCommentCount ? {} : {margin: 'small xxx-small'}
+    const button = (
+      <Button renderIcon={IconChatLine} onClick={this.openCommentsTray} {...buttonMargin}>
+        {I18n.t('View Feedback')}
+      </Button>
+    )
+
+    if (!this.props.submission.unreadCommentCount) {
+      return button
+    }
+
+    return (
+      <Badge margin="x-small" count={this.props.submission.unreadCommentCount} countUntil={100}>
+        {button}
+      </Badge>
+    )
+  }
 
   render() {
     const lockAssignment =
@@ -133,7 +165,7 @@ class Header extends React.Component {
           </Heading>
 
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
-          <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'} wrap="wrap" wrapItems>
+          <Flex wrap="wrap" alignItems="start" wrapItems>
             <Flex.Item shrink>
               <AssignmentDetails
                 isSticky={this.state.isSticky}
@@ -158,9 +190,17 @@ class Header extends React.Component {
                         />
                       </Flex.Item>
                     )}
-                    <Flex.Item grow>
+                    <Flex.Item padding="xx-small" grow>
                       <SubmissionStatusPill
                         submissionStatus={this.props.submission.submissionStatus}
+                      />
+                    </Flex.Item>
+                    <Flex.Item grow>
+                      <CommentsTray
+                        submission={this.props.submission}
+                        assignment={this.props.assignment}
+                        open={this.state.commentsTrayOpen}
+                        closeTray={this.closeCommentsTray}
                       />
                     </Flex.Item>
                   </Flex>
@@ -168,23 +208,29 @@ class Header extends React.Component {
               )}
             </Flex.Item>
           </Flex>
-
           {this.props.submission && (
-            <Flex>
-              {this.props.allSubmissions && (
-                <Flex.Item>
-                  <AttemptSelect
-                    allSubmissions={this.props.allSubmissions}
-                    onChangeSubmission={this.props.onChangeSubmission}
-                    submission={this.props.submission}
-                  />
-                </Flex.Item>
-              )}
-              {this.props.assignment.env.currentUser && !lockAssignment && (
-                <Flex.Item>
-                  <SubmissionWorkflowTracker submission={this.props.submission} />
-                </Flex.Item>
-              )}
+            <Flex alignItems="center">
+              <Flex.Item grow>
+                <Flex>
+                  {this.props.allSubmissions && (
+                    <Flex.Item>
+                      <AttemptSelect
+                        allSubmissions={this.props.allSubmissions}
+                        onChangeSubmission={this.props.onChangeSubmission}
+                        submission={this.props.submission}
+                      />
+                    </Flex.Item>
+                  )}
+
+                  {this.props.assignment.env.currentUser && !lockAssignment && (
+                    <Flex.Item>
+                      <SubmissionWorkflowTracker submission={this.props.submission} />
+                    </Flex.Item>
+                  )}
+                </Flex>
+              </Flex.Item>
+
+              <Flex.Item>{this.renderViewFeedbackButton()}</Flex.Item>
             </Flex>
           )}
         </div>

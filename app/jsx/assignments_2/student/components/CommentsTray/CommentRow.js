@@ -47,18 +47,20 @@ export default function CommentRow(props) {
   return (
     <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
-        <Badge
-          theme={read ? {colorPrimary: 'white'} : undefined}
-          type="notification"
-          standalone
-          margin="0 small 0 0"
-        />
-        <Avatar
-          name={author ? author.shortName : I18n.t('Anonymous')}
-          src={author ? author.avatarUrl : ''}
-          margin="0 small 0 0"
-          data-fs-exclude
-        />
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <Badge
+            margin="0 xx-small 0 0"
+            theme={read ? {colorPrimary: 'white'} : undefined}
+            type="notification"
+            standalone
+          />
+          <Avatar
+            name={author ? author.shortName : I18n.t('Anonymous')}
+            src={author ? author.avatarUrl : ''}
+            margin="0 small 0 0"
+            data-fs-exclude
+          />
+        </div>
       </div>
       <div className="comment-text-comment-container">
         {!read && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
@@ -79,7 +81,7 @@ export default function CommentRow(props) {
             key={attachment._id}
             href={attachment.url}
             icon={getIconByType(attachment.mimeClass)}
-            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
             {attachment.displayName}
           </Button>

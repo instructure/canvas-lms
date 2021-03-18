@@ -65,16 +65,18 @@ const FileList = props => {
             <Flex.Item grow shrink>
               <Text size="x-small">{file.name}</Text>
             </Flex.Item>
-            <Flex.Item>
-              <Link href={file.embedded_iframe_url} target="_blank">
-                <span aria-hidden title={I18n.t('Preview')}>
-                  {I18n.t('Preview')}
-                </span>
-                <ScreenReaderContent>
-                  {I18n.t('Preview %{filename}', {filename: file.name})}
-                </ScreenReaderContent>
-              </Link>
-            </Flex.Item>
+            {file.embedded_iframe_url && (
+              <Flex.Item>
+                <Link href={file.embedded_iframe_url} target="_blank">
+                  <span aria-hidden title={I18n.t('Preview')}>
+                    {I18n.t('Preview')}
+                  </span>
+                  <ScreenReaderContent>
+                    {I18n.t('Preview %{filename}', {filename: file.name})}
+                  </ScreenReaderContent>
+                </Link>
+              </Flex.Item>
+            )}
             {canRemove && (
               <Flex.Item padding="0 small 0 x-small">
                 <Button

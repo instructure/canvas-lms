@@ -31,7 +31,12 @@ describe('FileList', () => {
     new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
     new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
   ]
-  files.forEach((file, i) => (file.id = i))
+  files.forEach((file, i) => {
+    file.id = i
+    if (i === 0) {
+      file.embedded_iframe_url = 'some_iframe_url'
+    }
+  })
 
   it('renders an img tag if an image file is provided', () => {
     const {container} = render(
@@ -69,5 +74,23 @@ describe('FileList', () => {
       </MockedProvider>
     )
     expect(container.querySelector('svg[name="IconTrash"]')).toBeNull()
+  })
+
+  it('renders a preview if there is a URL to link to', () => {
+    const {container} = render(
+      <MockedProvider>
+        <FileList canRemove={false} files={files.slice(0, 1)} />
+      </MockedProvider>
+    )
+    expect(container.querySelector('a')).toBeInTheDocument()
+  })
+
+  it('does not render a preview if there is not a URL to link to', () => {
+    const {container} = render(
+      <MockedProvider>
+        <FileList canRemove={false} files={files.slice(1, 2)} />
+      </MockedProvider>
+    )
+    expect(container.querySelector('a')).not.toBeInTheDocument()
   })
 })

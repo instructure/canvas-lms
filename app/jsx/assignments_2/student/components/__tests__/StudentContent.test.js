@@ -55,7 +55,7 @@ describe('Assignment Student Content View', () => {
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })
 
-  describe('when the comments tab is clicked', () => {
+  describe('when the comments tray is opened', () => {
     const makeMocks = async () => {
       const variables = {submissionAttempt: 0, submissionId: '1'}
       const overrides = {
@@ -80,25 +80,25 @@ describe('Assignment Student Content View', () => {
     it.skip('renders Comments', async () => {
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission()
-      const {getAllByText, getByText} = render(
+      const {getByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
         </MockedProvider>
       )
-      fireEvent.click(await getAllByText('Comments')[0])
+      fireEvent.click(getByText('View Feedback'))
       await waitFor(() => expect(getByText('Send Comment')).toBeInTheDocument())
     })
 
     it('renders spinner while lazy loading comments', async () => {
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission()
-      const {getByTitle, getAllByText} = render(
+      const {getAllByTitle, getByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
         </MockedProvider>
       )
-      fireEvent.click(getAllByText('Comments')[0])
-      expect(getByTitle('Loading')).toBeInTheDocument()
+      fireEvent.click(getByText('View Feedback'))
+      expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
     })
   })
 

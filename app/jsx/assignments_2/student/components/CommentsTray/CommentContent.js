@@ -28,6 +28,7 @@ import {SUBMISSION_COMMENT_QUERY, SUBMISSION_HISTORIES_QUERY} from '../../graphq
 import {SubmissionComment} from '../../graphqlData/SubmissionComment'
 import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
+import {View} from '@instructure/ui-layout'
 
 export default function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -141,9 +142,12 @@ export default function CommentContent(props) {
         />
       )}
       {props.comments
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
         .map(comment => (
-          <CommentRow key={comment._id} comment={comment} />
+          <View as="div" key={comment._id} padding="0 medium 0 x-small">
+            <CommentRow comment={comment} />
+            <hr style={{margin: '1rem 1.5rem'}} />
+          </View>
         ))}
     </>
   )

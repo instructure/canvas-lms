@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import * as apollo from 'react-apollo'
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
-import CommentContent from '../CommentsTab/CommentContent'
-import CommentsTab from '../CommentsTab'
+import CommentContent from '../CommentsTray/CommentContent'
+import CommentsTrayBody from '../CommentsTray/CommentsTrayBody'
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -91,7 +91,7 @@ function mockContext(children) {
   )
 }
 
-describe('CommentsTab', () => {
+describe('CommentsTrayBody', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
@@ -111,7 +111,7 @@ describe('CommentsTab', () => {
     const {getByPlaceholderText, getByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -130,13 +130,13 @@ describe('CommentsTab', () => {
     const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
-        <CommentsTab {...props} />
+        <CommentsTrayBody {...props} />
       </MockedProvider>
     )
     await waitFor(() => expect(getByTestId('comments-container')).toBeInTheDocument())
   })
 
-  it('renders Load More Comments button when pages remain', async () => {
+  it('renders Load Previous Comments button when pages remain', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         pageInfo: {
@@ -150,14 +150,14 @@ describe('CommentsTab', () => {
 
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <CommentsTab {...props} />
+        <CommentsTrayBody {...props} />
       </MockedProvider>
     )
 
-    expect(await waitFor(() => getByText('Load More Comments'))).toBeInTheDocument()
+    expect(await waitFor(() => getByText('Load Previous Comments'))).toBeInTheDocument()
   })
 
-  it('does not render Load More Comments button when no pages remain', async () => {
+  it('does not render Load Previous Comments button when no pages remain', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         pageInfo: {
@@ -171,14 +171,14 @@ describe('CommentsTab', () => {
 
     const {queryByText} = render(
       <MockedProvider mocks={mocks}>
-        <CommentsTab {...props} />
+        <CommentsTrayBody {...props} />
       </MockedProvider>
     )
 
-    expect(queryByText('Load More Comments')).not.toBeInTheDocument()
+    expect(queryByText('Load Previous Comments')).not.toBeInTheDocument()
   })
 
-  it('loads more comments when button is clicked', async () => {
+  it('loads previous comments when button is clicked', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         pageInfo: {
@@ -197,11 +197,11 @@ describe('CommentsTab', () => {
 
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <CommentsTab {...props} />
+        <CommentsTrayBody {...props} />
       </MockedProvider>
     )
 
-    const loadMoreButton = await waitFor(() => getByText('Load More Comments'))
+    const loadMoreButton = await waitFor(() => getByText('Load Previous Comments'))
     fireEvent.click(loadMoreButton)
 
     expect(querySpy).toHaveBeenCalledTimes(3)
@@ -212,7 +212,7 @@ describe('CommentsTab', () => {
     const props = await mockAssignmentAndSubmission()
     const {getByLabelText} = render(
       <MockedProvider mocks={mocks}>
-        <CommentsTab {...props} />
+        <CommentsTrayBody {...props} />
       </MockedProvider>
     )
     expect(await waitFor(() => getByLabelText('Comment input box'))).toBeInTheDocument()
@@ -224,7 +224,7 @@ describe('CommentsTab', () => {
     const {queryByLabelText} = render(
       <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       </StudentViewContext.Provider>
     )
@@ -237,7 +237,7 @@ describe('CommentsTab', () => {
     const {getByPlaceholderText, getByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -253,7 +253,7 @@ describe('CommentsTab', () => {
     const {findByPlaceholderText, getByText, findByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -270,7 +270,7 @@ describe('CommentsTab', () => {
     const {getByPlaceholderText, getByText, findByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -287,7 +287,7 @@ describe('CommentsTab', () => {
     const {getByTitle} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -301,7 +301,7 @@ describe('CommentsTab', () => {
     const {getByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -315,7 +315,7 @@ describe('CommentsTab', () => {
     const {getByText} = render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -342,7 +342,7 @@ describe('CommentsTab', () => {
     render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -371,7 +371,7 @@ describe('CommentsTab', () => {
     render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -401,7 +401,7 @@ describe('CommentsTab', () => {
     render(
       mockContext(
         <MockedProvider mocks={mocks}>
-          <CommentsTab {...props} />
+          <CommentsTrayBody {...props} />
         </MockedProvider>
       )
     )
@@ -525,12 +525,12 @@ describe('CommentsTab', () => {
     expect(container.querySelector('a[href]')).toBeNull()
   })
 
-  it('displays the comments in reverse chronological order', async () => {
+  it('displays the comments in chronological order', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [
-          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'last comment'},
-          {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'first comment'},
+          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
+          {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
           {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'}
         ]
       }
@@ -546,11 +546,11 @@ describe('CommentsTab', () => {
 
     expect(rows).toHaveLength(comments.length)
     expect(rows[0]).toHaveTextContent('first comment')
-    expect(rows[0]).toHaveTextContent('Sun Mar 3, 2019 9:32pm')
+    expect(rows[0]).toHaveTextContent('Fri Mar 1, 2019 9:32pm')
     expect(rows[1]).toHaveTextContent('middle comment')
     expect(rows[1]).toHaveTextContent('Sat Mar 2, 2019 9:32pm')
     expect(rows[2]).toHaveTextContent('last comment')
-    expect(rows[2]).toHaveTextContent('Fri Mar 1, 2019 9:32pm')
+    expect(rows[2]).toHaveTextContent('Sun Mar 3, 2019 9:32pm')
   })
 
   it('includes an icon on an attachment', async () => {
