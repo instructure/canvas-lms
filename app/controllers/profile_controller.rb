@@ -258,8 +258,14 @@ class ProfileController < ApplicationController
       end
     end
 
+    channels = @user.communication_channels.all_ordered_for_display(@user).reject{|c|
+      !@domain_root_account.enable_push_notifications? && c.path_type == "push"
+    }.map { |c|
+      communication_channel_json(c, @user, session)
+    }
+
     js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
-      :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
+      :channels => channels,
       :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
       :categories => categories,
       :allowed_sms_categories => Notification.categories_to_send_in_sms(@domain_root_account),
