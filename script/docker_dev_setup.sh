@@ -42,9 +42,6 @@ if [[ $OS == 'Darwin' ]]; then
   #docker-compose is checked separately
   dependencies='docker docker-machine dinghy'
 elif [[ $OS == 'Linux' ]]; then
-  if [ ! -f "/etc/debian_version" ]; then
-    echo "Running this script on a non Debian distro may or may not work and is not officially supported"
-  fi
   #when more dependencies get added, modify Linux install output below
   #docker-compose is checked separately
   dependencies='dory'
@@ -105,52 +102,12 @@ function check_docker_compose_version {
   fi
 }
 
-function start_docker_daemon {
-  if installed "service"; then
-    service docker status &> /dev/null && return 0
-  else
-    systemctl status docker &> /dev/null && return 0
-  fi
-  prompt 'The docker daemon is not running. Start it? [y/n]' confirm
-  [[ ${confirm:-n} == 'y' ]] || return 1
-  if installed "service"; then
-    sudo service docker start
-  else
-    sudo systemctl start docker
-  fi
-  sleep 1 # wait for docker daemon to start
-}
-
-function setup_docker_as_nonroot {
-  docker ps &> /dev/null && return 0
-  message 'Setting up docker for nonroot user...'
-
-  if ! id -Gn "$USER" | grep -q '\bdocker\b'; then
-    message "Adding $USER user to docker group..."
-    confirm_command "sudo usermod -aG docker $USER" || true
-  fi
-
-  message 'We need to login again to apply that change.'
-  confirm_command "exec sg docker -c $0"
-}
-
-function start_dory {
-  message 'Starting dory...'
-  if dory status | grep -q 'not running'; then
-    confirm_command 'dory up'
-  else
-    message 'Looks like dory is already running. Moving on...'
-  fi
-}
-
 function setup_docker_environment {
   check_dependencies
   if [[ $OS == 'Darwin' ]]; then
     . script/common/os/mac_setup.sh
   elif [[ $OS == 'Linux' ]]; then
-    start_docker_daemon
-    setup_docker_as_nonroot
-    [[ ${skip_dory:-n} != 'y' ]] && start_dory
+    . script/common/os/linux_setup.sh
   fi
 }
 
