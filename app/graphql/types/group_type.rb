@@ -48,7 +48,7 @@ module Types
     def member(user_id:)
       if group.grants_right?(current_user, :read_roster)
         Loaders::ForeignKeyLoader.for(members_scope, :user_id).load(user_id).
-          then { |memberships| memberships.first }
+          then { |memberships| memberships&.first }
       end
     end
 
