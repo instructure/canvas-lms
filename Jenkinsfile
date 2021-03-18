@@ -479,6 +479,40 @@ pipeline {
               }
             }
 
+            if (configuration.isChangeMerged()) {
+              buildSummaryReport.timedStageAndReportIfFailure('Build Docker Image (Pre-Merge)') {
+                timeout(time: 20) {
+                  credentials.withStarlordCredentials({ ->
+                    withEnv([
+                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                      "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "COMPILE_ADDITIONAL_ASSETS=0",
+                      "JS_BUILD_NO_UGLIFY=1",
+                      "RAILS_LOAD_ALL_LOCALES=0",
+                      "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
+                      "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
+                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+                      "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
+                    ]) {
+                      slackSendCacheBuild {
+                        sh "build/new-jenkins/docker-build.sh"
+                      }
+
+                      // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
+                      // has changed between the post-merge build and this pre-merge build.
+                      sh(script: """
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+                      """, label: 'upload cache images')
+                    }
+                  })
+                }
+              }
+            }
+
             buildSummaryReport.timedStageAndReportIfFailure('Build Docker Image') {
               timeout(time: 20) {
                 credentials.withStarlordCredentials({ ->
@@ -584,39 +618,6 @@ pipeline {
                   "POSTGRES_IMAGE_TAG=${env.POSTGRES_IMAGE}",
               ]) {
                 def stages = [:]
-
-                if (configuration.isChangeMerged()) {
-                  echo 'adding Build Docker Image Cache'
-                  stages['Build Docker Image Cache'] = {
-                    credentials.withStarlordCredentials({ ->
-                      withEnv([
-                        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                        "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                        "COMPILE_ADDITIONAL_ASSETS=0",
-                        "JS_BUILD_NO_UGLIFY=1",
-                        "RAILS_LOAD_ALL_LOCALES=0",
-                        "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
-                        "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                        "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                        "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
-                      ]) {
-                        slackSendCacheBuild {
-                          sh "build/new-jenkins/docker-build.sh"
-                        }
-
-                        // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
-                        // has changed between the post-merge build and this pre-merge build.
-                        sh(script: """
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
-                        """, label: 'upload cache images')
-                      }
-                    })
-                  }
-                }
 
                 if (!configuration.isChangeMerged()) {
                   echo 'adding Linters'
