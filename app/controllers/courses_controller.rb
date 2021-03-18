@@ -1156,7 +1156,6 @@ class CoursesController < ApplicationController
   # @returns [User]
   def content_share_users
     get_context
-    return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :read_as_admin)
 

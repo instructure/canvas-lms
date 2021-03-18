@@ -248,7 +248,7 @@
               </li>
             <% end %>
 
-            <% if can_do(@quiz, @current_user, :manage) && @context.root_account.feature_enabled?(:direct_share) %>
+            <% if can_do(@quiz, @current_user, :manage) %>
               <%= render :partial => 'direct_share_buttons' %>
             <% end %>
 
@@ -261,7 +261,7 @@
     </div>
   </div>
 
-  <% elsif can_do(@context, @current_user, :read_as_admin) && @context.root_account.feature_enabled?(:direct_share) %>
+  <% elsif can_do(@context, @current_user, :read_as_admin) %>
   <div class="header-bar">
     <div class="header-bar-right">
         <div class="header-group-right">

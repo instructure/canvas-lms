@@ -148,40 +148,28 @@ RSpec.describe ApplicationController do
       end
     end
 
-    describe "DIRECT_SHARE_ENABLED feature flag" do
+    describe "ENV.DIRECT_SHARE_ENABLED" do
       before :each do
         allow(controller).to receive(:user_display_json)
         controller.instance_variable_set(:@domain_root_account, Account.default)
       end
 
-      it "sets the env var to true when FF is enabled and the user can use it" do
-        Account.default.enable_feature!(:direct_share)
-
+      it "sets the env var to true when the user can use it" do
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
       end
 
-      it "sets the env var to false when FF is enabled but the user can't use it" do
-        Account.default.enable_feature!(:direct_share)
-
+      it "sets the env var to false when the user can't use it" do
         course_with_student(:active_all => true)
         controller.instance_variable_set(:@current_user, @student)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
 
       it "sets the env var to false when the context is a group" do
-        Account.default.enable_feature!(:direct_share)
-
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         controller.instance_variable_set(:@context, group_model)
-        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
-      end
-
-      it "sets the env var to false when FF is disabled" do
-        course_with_teacher(:active_all => true)
-        controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
     end

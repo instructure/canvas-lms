@@ -421,7 +421,7 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
         js_env(hash)
         js_env({
-          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin] && @domain_root_account&.feature_enabled?(:direct_share)
+          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin]
         }, true)
         set_tutorial_js_env
 
@@ -753,7 +753,7 @@ class DiscussionTopicsController < ApplicationController
                 # Can attach files on replies
                 :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),
                 :CAN_RATE         => @topic.grants_right?(@current_user, session, :rate),
-                :CAN_READ_REPLIES => 
+                :CAN_READ_REPLIES =>
                   @topic.grants_right?(@current_user, :read_replies)  &&
                     !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics

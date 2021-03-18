@@ -2932,7 +2932,6 @@ describe CoursesController do
   describe '#content_share_users' do
     before :once do
       course_with_teacher(name: 'search teacher', :active_all => true)
-      @course.root_account.enable_feature!(:direct_share)
     end
 
     it 'requires a search term' do
@@ -2953,12 +2952,6 @@ describe CoursesController do
       expect(json[0]).to include({'name' => 'search teacher'})
     end
 
-    it 'requires the feature be enabled' do
-      @course.root_account.disable_feature!(:direct_share)
-      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
-      expect(response).to be_forbidden
-    end
-
     it 'should return email, url avatar (if avatars are enabled), and name' do
       user_session(@teacher)
       @search_context = @course
@@ -2966,7 +2959,7 @@ describe CoursesController do
       @teacher.account.enable_service(:avatars)
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
       json = json_parse(response.body)
-      expect(json[0]).to include({'email' => nil, 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+      expect(json[0]).to include({'email' => nil, 'name' => 'course teacher'})
     end
 
     it 'should search by name and email' do
@@ -2982,11 +2975,11 @@ describe CoursesController do
 
       get 'content_share_users', params: {course_id: @course.id, search_term: 'course teacher'}
       json = json_parse(response.body)
-      expect(json[0]).to include({'email' => 'course_teacher@test.edu', 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+      expect(json[0]).to include({'email' => 'course_teacher@test.edu', 'name' => 'course teacher'})
 
       get 'content_share_users', params: {course_id: @course.id, search_term: 'course_designer@test.edu'}
       json = json_parse(response.body)
-      expect(json[0]).to include({'email' => 'course_designer@test.edu', 'name' => 'course designer', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+      expect(json[0]).to include({'email' => 'course_designer@test.edu', 'name' => 'course designer'})
     end
 
     it 'searches for teachers, TAs, and designers' do

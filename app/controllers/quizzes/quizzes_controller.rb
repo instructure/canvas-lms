@@ -128,7 +128,7 @@ class Quizzes::QuizzesController < ApplicationController
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
-          DIRECT_SHARE_ENABLED: (can_manage || @context.grants_right?(@current_user, session, :read_as_admin)) && @domain_root_account.try(:feature_enabled?, :direct_share),
+          DIRECT_SHARE_ENABLED: can_manage || @context.grants_right?(@current_user, session, :read_as_admin),
         },
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
         :quiz_index_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?

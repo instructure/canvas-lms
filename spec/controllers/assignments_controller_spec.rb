@@ -601,14 +601,7 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
     end
 
-    it "does not show direct share options when disabled" do
-      user_session(@teacher)
-      get 'show', params: {course_id: @course.id, id: @assignment.id}
-      expect(assigns[:can_direct_share]).to eq false
-    end
-
-    it "shows direct share options when enabled" do
-      Account.default.enable_feature!(:direct_share)
+    it "shows direct share options" do
       user_session(@teacher)
       get 'show', params: {course_id: @course.id, id: @assignment.id}
       expect(assigns[:can_direct_share]).to eq true

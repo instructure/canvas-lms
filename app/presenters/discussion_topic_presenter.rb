@@ -48,7 +48,7 @@ class DiscussionTopicPresenter
   end
 
   def can_direct_share?
-    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :read_as_admin) && topic.context.root_account.feature_enabled?(:direct_share)
+    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :read_as_admin)
   end
 
   # Public: Determine if the given user has permissions to view peer reviews.

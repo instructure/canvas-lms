@@ -29,7 +29,6 @@ describe ContentSharesController do
     @course_2 = @course
     @teacher_2 = @teacher
     assignment_model(course: @course_1, name: 'assignment share')
-    @course.root_account.enable_feature!(:direct_share)
   end
 
   describe "POST #create" do

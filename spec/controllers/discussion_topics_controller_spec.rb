@@ -239,8 +239,7 @@ describe DiscussionTopicsController do
       expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
     end
 
-    it "sets DIRECT_SHARE_ENABLED when enabled" do
-      @course.account.enable_feature!(:direct_share)
+    it "sets DIRECT_SHARE_ENABLED when allowed" do
       user_session(@teacher)
       get 'index', params: {course_id: @course.id}
       expect(response).to be_successful
@@ -248,22 +247,13 @@ describe DiscussionTopicsController do
     end
 
     it "does not set DIRECT_SHARE_ENABLED if the user does not have manage_content" do
-      @course.account.enable_feature!(:direct_share)
       user_session(@student)
       get 'index', params: {course_id: @course.id}
       expect(response).to be_successful
       expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
     end
 
-    it "does not set DIRECT_SHARE_ENABLED when disabled" do
-      user_session(@teacher)
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
-    end
-
     it "does not set DIRECT_SHARE_ENABLED when viewing a group" do
-      @course.account.enable_feature!(:direct_share)
       user_session(@teacher)
       group = @course.groups.create!
       get 'index', params: {group_id: group.id}

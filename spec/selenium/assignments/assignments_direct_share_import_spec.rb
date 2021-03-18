@@ -89,10 +89,9 @@ describe 'assignments' do
     module_dropdown_item(@module1.name).click
   }
 
-  context 'with direct share FF ON' do
+  describe 'direct share feature' do
     before(:once) do
       setup
-      Account.default.enable_feature!(:direct_share)
     end
 
     before(:each) do
@@ -210,24 +209,6 @@ describe 'assignments' do
           expect(import_dialog_import_success_alert.text).to include "Import started successfully"
         end
       end
-    end
-  end
-
-  context 'with direct share FF OFF' do
-    before(:each) do
-      course_with_teacher_logged_in
-      @course.save!
-      @course.require_assignment_group
-      @assignment1 = @course.assignments.create!(:title => 'Assignment First', :points_possible => 10)
-      Account.default.disable_feature!(:direct_share)
-      user_session(@teacher)
-      visit_assignments_index_page(@course.id)
-    end
-
-    it 'hides direct share options' do
-      manage_assignment_menu(@assignment1.id).click
-      expect(assignment_settings_menu(@assignment1.id).text).not_to include('Send to...')
-      expect(assignment_settings_menu(@assignment1.id).text).not_to include('Copy to...')
     end
   end
 end

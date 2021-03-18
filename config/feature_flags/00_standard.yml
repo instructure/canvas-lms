@@ -375,13 +375,6 @@ new_features_ui:
   description: This feature creates a SiteAdmin Release Flag tab to be able
     to release features to users through the UI. It also reworks the UI for
     the old Feature Options tabs.
-direct_share:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Direct Share
-  description: This feature allows teachers to easily copy single items from
-    one course to another, and to share a single item of content with other
-    users so they can import those items into their courses as well.
 filter_speed_grader_by_student_group:
   state: allowed
   applies_to: RootAccount
