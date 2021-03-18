@@ -43,14 +43,15 @@ export const PERMISSION_DETAIL_SECTIONS = [
 ]
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
+  manage_courses: () => I18n.t('add / edit / delete Courses'),
+  manage_files: () => I18n.t('add / edit / delete Files'),
+  manage_sections: () => I18n.t('add / edit / delete Sections'),
   manage_wiki: () => I18n.t('Create / Delete / Update Pages'),
   manage_course_student_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_course_teacher_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_course_ta_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_course_observer_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_course_designer_enrollments: () => I18n.t('Add / Remove in courses'),
-  manage_sections: () => I18n.t('add / edit / delete Sections'),
-  manage_files: () => I18n.t('add / edit / delete Files'),
   manage_course_templates: () => I18n.t('add / edit / delete Course Templates')
 }
 
