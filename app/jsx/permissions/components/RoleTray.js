@@ -28,7 +28,8 @@ import {View, Flex} from '@instructure/ui-layout'
 import {Dialog, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Heading, Text} from '@instructure/ui-elements'
 import {IconArrowStartSolid, IconEditLine, IconTrashLine, IconXSolid} from '@instructure/ui-icons'
-import {Select, TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Tray} from '@instructure/ui-overlays'
 
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
@@ -406,18 +407,18 @@ export default class RoleTray extends Component {
 
   renderBaseRoleSelector = () => (
     <View as="div" margin="medium 0 large 0">
-      <Select
-        label={I18n.t('Base Type')}
-        defaultOption={this.props.basedOn}
+      <SimpleSelect
+        renderLabel={I18n.t('Base Type')}
+        defaultValue={this.props.basedOn}
         onChange={(_event, option) => this.showEditBaseRoleAlert(option.value)}
         inputRef={c => (this.editRoleInput = c)}
       >
         {this.props.baseRoleLabels.map(label => (
-          <option key={label} value={label}>
+          <SimpleSelect.Option id={label} key={label} value={label}>
             {label}
-          </option>
+          </SimpleSelect.Option>
         ))}
-      </Select>
+      </SimpleSelect>
     </View>
   )
 
