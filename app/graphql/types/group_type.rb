@@ -47,8 +47,10 @@ module Types
     end
     def member(user_id:)
       if group.grants_right?(current_user, :read_roster)
-        Loaders::ForeignKeyLoader.for(members_scope, :user_id).load(user_id).
-          then { |memberships| memberships&.first }
+        members_scope.then do |m|
+          Loaders::ForeignKeyLoader.for(m, :user_id).load(user_id).
+            then { |memberships| memberships&.first }
+        end
       end
     end
 
@@ -60,9 +62,9 @@ module Types
     end
 
     def members_scope
-      group.group_memberships.where(
-        workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER
-      )
+      load_association(:group_memberships).then do |group_memberships|
+        group_memberships.where(workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER)
+      end
     end
     private :members_scope
   end
