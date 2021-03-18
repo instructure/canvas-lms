@@ -26,6 +26,7 @@
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
+  can_change_course_availability = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_availability_editing_by_teachers])
   can_manage_master_courses = can_manage_courses && can_do(@context.account, @current_user, :manage_master_courses)
   has_multiple_sections = @context.course_sections.active.count > 1
 
@@ -250,17 +251,20 @@
           </div>
         </div>
       <% else %>
-        <div class="form-row">
-          <div></div>
-          <div class="tall-row">
-            <div class="aside top-hint">
-              <%= t "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates." %>
+        <% if can_change_course_availability %>
+          <div class="form-row">
+            <div></div>
+            <div class="tall-row">
+              <div class="aside top-hint">
+                <%= t "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates." %>
+              </div>
             </div>
           </div>
-        </div><div class="form-row">
+        <% end %>
+        <div class="form-row">
           <div class="form-label"><%= f.blabel :start_at, :en => "Starts" %></div>
           <div class="nobr">
-            <% if can_manage %>
+            <% if can_change_course_availability %>
               <%= f.text_field :start_at, :class => "date_entry", :value => datetime_string(@context.start_at, :verbose) %>
             <% else %>
               <%= datetime_string(@context.start_at, :verbose) %>
@@ -269,7 +273,7 @@
         </div><div class="form-row course-conclude-at-row">
           <div class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></div>
           <div class="nobr tall-row">
-            <% if can_manage %>
+            <% if can_change_course_availability %>
             <div>
               <% warning_message = t(:course_conclude_at_warning_message, "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active.") %>
               <%= f.text_field :conclude_at, :class => "date_entry", :value => datetime_string(@context.conclude_at, :verbose) %>
@@ -303,11 +307,11 @@
           <div class="tall-row">
             <div class="nobr" role="group" aria-describedby="restrict-view-description">
               <div class="checkbox-flex-container">
-                <%= f.check_box :restrict_student_past_view, :disabled => !can_manage || @context.account.restrict_student_past_view[:locked] %>
+                <%= f.check_box :restrict_student_past_view, :disabled => !can_manage || @context.account.restrict_student_past_view[:locked] || !can_change_course_availability %>
                 <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing this course after end date" %>
               </div>
               <div class="checkbox-flex-container">
-                <%= f.check_box :restrict_student_future_view, :disabled => !can_manage || @context.account.restrict_student_future_view[:locked] %>
+                <%= f.check_box :restrict_student_future_view, :disabled => !can_manage || @context.account.restrict_student_future_view[:locked] || !can_change_course_availability %>
                 <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing this course before start date" %>
               </div>
             </div>

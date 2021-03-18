@@ -70,7 +70,10 @@ const availabilityOptionsContainer = document.getElementById('availability_optio
 if (availabilityOptionsContainer) {
   ReactDOM.render(
     <CourseAvailabilityOptions
-      canManage={ENV.PERMISSIONS.manage}
+      canManage={
+        ENV.PERMISSIONS.manage_courses ||
+        (ENV.PERMISSIONS.manage && !ENV.PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS)
+      }
       viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
       viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
     />,

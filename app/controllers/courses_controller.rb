@@ -1415,6 +1415,7 @@ class CoursesController < ApplicationController
 
       course_card_images_enabled = @context.feature_enabled?(:course_card_images)
       js_permissions = {
+        :manage_courses => @context.account.grants_right?(@current_user, session, :manage_courses),
         :manage_students => @context.grants_right?(@current_user, session, :manage_students),
         :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
         :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
@@ -1450,7 +1451,8 @@ class CoursesController < ApplicationController
         NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
         NEW_COURSE_AVAILABILITY_UI: @context.root_account.feature_enabled?(:new_course_availability_ui),
         RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
-        RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked]
+        RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked],
+        PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers]
       })
 
       set_tutorial_js_env

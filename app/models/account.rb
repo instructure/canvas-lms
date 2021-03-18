@@ -250,6 +250,7 @@ class Account < ActiveRecord::Base
   add_setting :support_url, :root_only => true
 
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
+  add_setting :prevent_course_availability_editing_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
   add_setting :unknown_user_url, root_only: true
