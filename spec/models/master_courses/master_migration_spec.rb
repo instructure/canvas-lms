@@ -1794,6 +1794,36 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.folders.where(:name => "parent RENAMED").first.locked).to eq true
     end
 
+    it "deals with a deleted folder being changed upstream" do
+      blueprint_folder = nil
+      att_tag = nil
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      Timecop.travel(10.minutes.ago) do
+        blueprint_folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "folder", :context => @copy_from)
+        att = Attachment.create!(:filename => 'file.txt', :uploaded_data => StringIO.new('1'), :folder => blueprint_folder, :context => @copy_from)
+        att_tag = @template.create_content_tag_for!(att)
+        run_master_migration
+      end
+
+      att2_tag = nil
+      Timecop.travel(5.minutes.ago) do
+        associated_folder = @copy_to.folders.where(cloned_item_id: blueprint_folder.cloned_item_id).take
+        associated_folder.destroy
+
+        blueprint_folder.update(:name => "folder RENAMED", :locked => true)
+        att2 = Attachment.create!(:filename => 'file2.txt', :uploaded_data => StringIO.new('2'), :folder => blueprint_folder, :context => @copy_from)
+        att2_tag = @template.create_content_tag_for!(att2)
+      end
+
+      m = run_master_migration
+      expect(m).to be_completed
+
+      copied_att = @copy_to.attachments.where(:migration_id => att2_tag.migration_id).first
+      expect(copied_att.full_path).to eq "course files/folder RENAMED/file2.txt"
+    end
+
     it "syncs moved folders" do
       folder_A = Folder.root_folders(@copy_from).first.sub_folders.create!(name: 'A', context: @copy_from)
       folder_B = Folder.root_folders(@copy_from).first.sub_folders.create!(name: 'B', context: @copy_from)
