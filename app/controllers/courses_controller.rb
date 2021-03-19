@@ -1945,6 +1945,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::ContextModule
   include ContextModulesController::ModuleIndexHelper
+  include AnnouncementsController::AnnouncementsIndexHelper
 
   # @API Get a single course
   # Return information on a single course.
@@ -2058,6 +2059,7 @@ class CoursesController < ApplicationController
         @course_home_view = "feed" if params[:view] == "feed"
         @course_home_view ||= default_view
         @course_home_view = "k5_dashboard" if @k5_mode
+        @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
         js_env({
                  K5_MODE: @k5_mode,
@@ -2121,6 +2123,10 @@ class CoursesController < ApplicationController
           @syllabus_body = syllabus_user_content
         when 'k5_dashboard'
           # don't do any of this stuff for now
+        when 'announcements'
+          add_crumb(t('Announcements'))
+          set_active_tab 'announcements'
+          load_announcements
         else
           set_active_tab "home"
           if @context.grants_right?(@current_user, session, :manage_groups)
@@ -2166,6 +2172,9 @@ class CoursesController < ApplicationController
 
           js_bundle :k5_course
           css_bundle :k5_dashboard
+        when 'announcements'
+          js_bundle :announcements_index_v2
+          css_bundle :announcements_index
         else
           js_bundle :dashboard
         end

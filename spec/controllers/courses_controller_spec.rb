@@ -1508,7 +1508,7 @@ describe CoursesController do
       end
     end
 
-    describe "when in K5 mode" do
+    describe "when account is enabled as k5 account" do
       before :once do
         @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.account.settings[:enable_as_k5_account] = {value: true}
@@ -1551,6 +1551,17 @@ describe CoursesController do
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_falsy
+      end
+
+      it "loads announcements on home page when course is a k5 homeroom course" do
+        @course.homeroom_course = true
+        @course.save!
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq "announcements"
+        bundle = assigns[:js_bundles].select { |b| b.include? :announcements_index_v2 }
+        expect(bundle.size).to eq 1
       end
     end
   end

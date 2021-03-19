@@ -26,6 +26,7 @@
       <% @can_manage = can_do(@context, @current_user, :manage) %>
       <% @module_dnd_FF = @domain_root_account.feature_enabled?(:module_dnd) %>
       <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
+      <% @homeroom_course = @context.elementary_homeroom_course? %>
       <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
         <div id="course_status">
           <h3>
@@ -65,19 +66,19 @@
       <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
         <div class="course-options">
           <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
-          <% if @can_manage %>
+          <% if @can_manage && !@homeroom_course %>
             <div id="choose_home_page"></div>
             <div id="choose_home_page_not_modules"></div>
           <% end %>
 
-          <% if @course_home_view != 'feed' %>
+          <% if @course_home_view != 'feed' && !@homeroom_course %>
             <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
               <i class="icon-stats"></i>
               <%= t('links.view_course_stream', %{View Course Stream}) %>
             </a>
           <% end %>
 
-          <% if @can_manage && !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) %>
+          <% if @can_manage && !@domain_root_account.try(:feature_enabled?, :new_user_tutorial) && !@homeroom_course %>
             <script>
                 Object.assign(
                     ENV,
@@ -120,7 +121,7 @@
             </a>
           <% end %>
 
-          <% if @can_create_announcements %>
+          <% if @can_create_announcements && !@homeroom_course %>
             <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
             </a>
           <% end %>
@@ -173,6 +174,7 @@
       <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
     <% elsif @course_home_view == 'syllabus' %>
       <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
+    <% elsif @homeroom_course %>
     <% elsif !@context_enrollment&.student? %>
       <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
       <% if @current_user %>
@@ -188,7 +190,7 @@
         <%= render :partial => "shared/event_list", :object => [], :locals => locals %>
       <% end %>
     <% end %>
-    <% if @show_recent_feedback %>
+    <% if @show_recent_feedback && !@homeroom_course %>
       <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
     <% end %>
   <% end %>
@@ -208,6 +210,7 @@
   <% elsif @course_home_view == 'modules' %>
     <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'assignments' %>
+  <% elsif @homeroom_course %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'k5_dashboard' %>
