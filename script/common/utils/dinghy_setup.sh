@@ -1,5 +1,5 @@
 #!/bin/bash
-source script/common.sh
+source script/common/utils/common.sh
 
 # Defaults
 DINGHY_MEMORY='8192'

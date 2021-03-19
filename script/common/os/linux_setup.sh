@@ -1,5 +1,5 @@
 #!/bin/bash
-source script/common.sh
+source script/common/utils/common.sh
 # TODO use with check_dependencies refactor
 #dependencies='docker,docker-compose 1.20.0'
 #optional_dependencies='dory'

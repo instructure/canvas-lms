@@ -1,5 +1,5 @@
 #!/bin/bash
-source script/common.sh
+source script/common/utils/common.sh
 
 function ensure_in_canvas_root_directory {
   if ! is_canvas_root; then
