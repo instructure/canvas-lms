@@ -131,7 +131,7 @@ module AdheresToPolicy
     # Public: Checks the right passed in for a user.
     #
     # user - The user for which to determine the right.
-    # session - The session to use if the rights are dependend upon the session.
+    # session - The session to use if the rights are dependent upon the session.
     # right - The right to get the status for.  Will return true if the user
     #         is granted the right provided.
     #

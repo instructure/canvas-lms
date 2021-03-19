@@ -262,10 +262,13 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
 
+  # legacy account settings for allowing course creation
+  # will be handled through :manage_courses_add granular permission role override
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
-  add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
+
+  add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
   add_setting :can_change_pronouns, :boolean => true, :root_only => true, :default => true
@@ -1208,24 +1211,29 @@ class Account < ActiveRecord::Base
   # returns all active account users for this entire account tree
   def all_account_users_for(user)
     raise "must be a root account" unless self.root_account?
+
     Shard.partition_by_shard(account_chain(include_site_admin: true).uniq) do |accounts|
       next unless user.associated_shards.include?(Shard.current)
+
       AccountUser.active.eager_load(:account).where("user_id=? AND (accounts.root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end
   end
 
   def cached_all_account_users_for(user)
     return [] unless user
-    Rails.cache.fetch_with_batched_keys(['all_account_users_for_user', user.cache_key(:account_users)].cache_key,
-        batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
-      all_account_users_for(user)
-    end
+
+    Rails.cache.fetch_with_batched_keys(
+      ['all_account_users_for_user', user.cache_key(:account_users)].cache_key,
+      batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true
+    ) {all_account_users_for(user)}
   end
 
   set_policy do
     RoleOverride.permissions.each do |permission, _details|
       given { |user| self.cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
+      can :create_courses if permission == :manage_courses_add
+      # deprecated
       can :create_courses if permission == :manage_courses
     end
 
@@ -1235,10 +1243,11 @@ class Account < ActiveRecord::Base
     given { |user| self.root_account? && self.cached_all_account_users_for(user).any? }
     can :read_terms
 
-    given { |user|
+    #################### Begin legacy permission block #########################
+    given do |user|
       result = false
 
-      if !root_account.site_admin? && user
+      if user && !root_account.feature_enabled?(:granular_permissions_manage_courses) && !root_account.site_admin?
         scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
@@ -1249,7 +1258,31 @@ class Account < ActiveRecord::Base
       end
 
       result
-    }
+    end
+    can :create_courses
+    ##################### End legacy permission block ##########################
+
+    # any logged in user with no active enrollments (i.e. FFT)
+    # combined with root account setting that is enabled for Users with no enrollments
+    given do |user|
+      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        !root_account.site_admin? &&
+        !root_account.enrollments.active.where(user_id: user).exists? &&
+        root_account.no_enrollments_can_create_courses?
+    end
+    can :create_courses
+
+    # any logged in user with an active enrollment granting :manage_courses_add
+    # scope is checked against user's associated courses on the account's residing shard
+    given do |user|
+      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        !root_account.site_admin? && self.shard.activate do
+        Enrollment
+          .active
+          .where(user_id: user, course_id: self.associated_courses)
+          .any? { |e| e.has_permission_to?(:manage_courses_add) }
+      end
+    end
     can :create_courses
 
     # allow teachers to view term dates

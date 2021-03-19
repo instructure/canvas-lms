@@ -1524,7 +1524,7 @@ class Course < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.available? &&  unenrolled_user_can_read?(user, session)}
+    given { |user, session| self.available? && unenrolled_user_can_read?(user, session)}
     can :read and can :read_outcomes and can :read_syllabus
 
     given { |user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.has_key?(:user_id)))}
@@ -1546,7 +1546,7 @@ class Course < ActiveRecord::Base
 
     # Active students
     given { |user|
-      available?  && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? }
+      available? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? }
     }
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
@@ -1554,22 +1554,59 @@ class Course < ActiveRecord::Base
       fetch_on_enrollments("has_active_observer_enrollment", user) { enrollments.for_user(user).active_by_date.where(:type => "ObserverEnrollment").where.not(:associated_user_id => nil).exists? } }
     can :read_grades
 
-    given { |user| available? && !template? && teacherless? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? } }
+    # we need to look into removing teacherless and the permission checks
+    given { |user| available? && !template? && self.teacherless? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? } }
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
     # Active admins (Teacher/TA/Designer)
-    given { |user| (self.available? || self.created? || self.claimed?) && user &&
-      fetch_on_enrollments("has_active_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.active_by_date.exists? } }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags and can :read_rubrics
-
-    # Teachers and Designers can delete/reset, but not TAs
-    given { |user| !self.deleted? && !template? && !self.sis_source_id && user &&
-      fetch_on_enrollments("active_content_admin_enrollments", user) { enrollments.for_user(user).of_content_admins.active_by_date.to_a }.any?{|e| e.has_permission_to?(:change_course_state)}
-    }
+    #################### Begin legacy permission block #########################
+    given do |user|
+      !self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        !self.sis_source_id && user && !template? &&
+        fetch_on_enrollments('active_content_admin_enrollments', user) {
+          enrollments.for_user(user).of_content_admins.active_by_date.to_a
+        }.any? {|e| e.has_permission_to?(:change_course_state) }
+    end
     can :delete
 
-    given { |user| !self.deleted? && user && fetch_on_enrollments("has_active_content_admin_enrollment", user) { enrollments.for_user(user).of_content_admins.active_by_date.exists? } }
+    given do |user|
+      !self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        user && fetch_on_enrollments('has_active_content_admin_enrollment', user) do
+          enrollments.for_user(user).of_content_admins.active_by_date.exists?
+        end
+    end
     can :reset_content
+    ##################### End legacy permission block ##########################
+
+    given do |user|
+      user && (self.available? || self.created? || self.claimed?) &&
+        fetch_on_enrollments('has_active_admin_enrollment', user) do
+          enrollments.for_user(user).of_admin_type.active_by_date.exists?
+        end
+    end
+    can :read_as_admin and can :read and can :manage and can :update and
+      can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and
+      can :view_feature_flags and can :read_rubrics and can :use_student_view
+
+    # Teachers and Designers can reset content, but not TAs
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        user && !self.deleted? &&
+        fetch_on_enrollments('active_content_admin_enrollments', user) {
+          enrollments.for_user(user).of_content_admins.active_by_date.to_a
+        }.any? {|e| e.has_permission_to?(:manage_courses_delete) }
+    end
+    can :reset_content
+
+    # Teachers and Designers can delete, but not TAs
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && user &&
+        !template? && !self.deleted? && !self.sis_source_id &&
+        fetch_on_enrollments('active_content_admin_enrollments', user) {
+          enrollments.for_user(user).of_content_admins.active_by_date.to_a
+        }.any? {|e| e.has_permission_to?(:manage_courses_delete) }
+    end
+    can :delete
 
     # Student view student
     given { |user| user && user.fake_student? && current_enrollments.for_user(user).exists? }
@@ -1601,37 +1638,101 @@ class Course < ActiveRecord::Base
     end
 
     # Teacher or Designer of a concluded course
+    #################### Begin legacy permission block #########################
     given do |user|
-      !self.deleted? && !template? && !self.sis_source_id && user &&
-        enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any?{|e| e.has_permission_to?(:change_course_state)}
+      !self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        !self.sis_source_id && user && !template? &&
+        enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any? do |e|
+          e.has_permission_to?(:change_course_state)
+        end
+    end
+    can :delete
+    ##################### End legacy permission block ##########################
+
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && user &&
+        !self.sis_source_id && !self.deleted? && !template? &&
+        enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any? do |e|
+          e.has_permission_to?(:manage_courses_delete)
+        end
     end
     can :delete
 
     # Student of a concluded course
     given do |user|
       (self.available? || self.completed?) && user &&
-        fetch_on_enrollments("has_completed_student_enrollment", user) {
+        fetch_on_enrollments("has_completed_student_enrollment", user) do
           enrollments.for_user(user).completed_by_date.
-          where("enrollments.type = ? OR (enrollments.type = ? AND enrollments.associated_user_id IS NOT NULL)", "StudentEnrollment", "ObserverEnrollment").exists?
-        }
+            where("enrollments.type = ? OR (enrollments.type = ? AND enrollments.associated_user_id IS NOT NULL)", "StudentEnrollment", "ObserverEnrollment").exists?
+        end
     end
     can :read, :read_grades, :read_outcomes
 
     # Admin
+    #################### Begin legacy permission block #########################
+    given do |user|
+      !self.root_account&.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.account_membership_allows(user, :manage_courses)
+    end
+    can :read_as_admin and can :manage and can :update and can :use_student_view and can :reset_content and
+    can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
+
+    given do |user|
+      !self.root_account&.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
+        self.account_membership_allows(user, :manage_courses) && self.grants_right?(user, :change_course_state)
+    end
+    can :delete
+
+    given do |user|
+      !self.root_account&.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        self.sis_source_id && self.account_membership_allows(user, :manage_sis) && !template? &&
+        self.grants_right?(user, :change_course_state)
+    end
+    can :delete
+    ##################### End legacy permission block ##########################
+
     given { |user| self.account_membership_allows(user) }
     can :read_as_admin and can :view_unpublished_items
 
-    given { |user| self.account_membership_allows(user, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.account_membership_allows(user, :manage_courses_admin)
+    end
+    can :manage and can :update and can :use_student_view and can :manage_feature_flags and
+    can :view_feature_flags
 
-    given { |user| !template? && self.account_membership_allows(user, :manage_courses) && self.grants_right?(user, :change_course_state) }
+    # delete and undelete manually created course
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
+        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
+    end
     can :delete
+
+    # reset manually created course
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
+    end
+    can :reset_content
+
+    # delete course managed by SIS
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        self.sis_source_id && self.account_membership_allows(user, :manage_sis) && !template? &&
+        self.account_membership_allows(user, :manage_courses_delete)
+    end
+    can :delete
+
+    # reset course managed by SIS
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
+        self.sis_source_id && self.account_membership_allows(user, :manage_sis) &&
+        self.account_membership_allows(user, :manage_courses_delete)
+    end
+    can :reset_content
 
     given { |user| self.account_membership_allows(user, :read_course_content) }
     can :read and can :read_outcomes
-
-    given { |user| !self.deleted? && !template? && self.sis_source_id && self.account_membership_allows(user, :manage_sis) && self.grants_right?(user, :change_course_state) }
-    can :delete
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
     # because students can't see prior enrollments)

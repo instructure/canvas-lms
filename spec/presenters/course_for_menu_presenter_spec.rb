@@ -110,7 +110,7 @@ describe CourseForMenuPresenter do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h.key?(:published)).to eq true
-        expect(h.key?(:canChangeCourseState)).to eq true
+        expect(h.key?(:canChangeCoursePublishState)).to eq true
         expect(h.key?(:defaultView)).to eq true
         expect(h.key?(:pagesUrl)).to eq true
         expect(h.key?(:frontPageTitle)).to eq true
