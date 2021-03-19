@@ -18,6 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# It seems like it sometimes gets confused and misses the table prefix without this...
+require_dependency 'microsoft_sync'
+
 #
 # MicrosoftSync contains models used to sync course enrollments to Microsoft
 # Teams via Microsoft's APIs. For customers using their new (in development as
@@ -69,12 +72,13 @@ class MicrosoftSync::Group < ActiveRecord::Base
     )
   end
 
-  # Returns true if the record was updated (i.e. record exists and is not deleted).
   # This should be used for most updates to the workflow_state, in case the
   # group is deleted (e.g. by disabling Microsoft Sync in account settings)
   # while the job is running.
+  # NOTE: this does not run any AR callbacks/validations (uses update_all)
   # Whatever the result, this also updates workflow_state on the model passed
   # in to reflect the actual DB state.
+  # Returns true if the record was updated (i.e. record exists and is not deleted).
   def update_workflow_state_unless_deleted(new_state, extra={})
     records_updated = self.class.where(id: id).where.not(workflow_state: 'deleted').
       update_all(extra.merge(workflow_state: new_state))
@@ -88,5 +92,9 @@ class MicrosoftSync::Group < ActiveRecord::Base
       assign_attributes(extra)
       true
     end
+  end
+
+  def sync!
+    MicrosoftSync::Syncer.new(self).sync!
   end
 end

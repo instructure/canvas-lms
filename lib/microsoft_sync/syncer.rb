@@ -31,11 +31,13 @@ module MicrosoftSync
       @group = group
     end
 
-    def sync
+    def sync!
       return unless tenant
       return unless group&.update_workflow_state_unless_deleted(:running) # quits now if deleted
 
       ensure_class_group_exists
+      ensure_enrollments_user_mappings_filled
+
       group.update_workflow_state_unless_deleted(:completed, last_error: nil)
     rescue => e
       error_msg = MicrosoftSync::Errors.user_facing_message(e)
@@ -74,6 +76,27 @@ module MicrosoftSync
 
       canvas_graph_service.update_group_with_course_data(new_group_id, course)
       group.update! ms_group_id: new_group_id
+    end
+
+    ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
+
+    # Gets users enrolled in course, get UPNs (e.g. email addresses) for them,
+    # looks up the AADs from Microsoft, and writes the User->AAD mapping into
+    # the UserMapping table.  If a user doesn't have a UPN or Microsoft doesn't
+    # have an AAD for them, skips that user.
+    def ensure_enrollments_user_mappings_filled
+      MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
+        course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
+      ) do |user_ids|
+        users_and_upns = CommunicationChannel.
+          where(user_id: user_ids, path_type: 'email').pluck(:user_id, :path)
+
+        users_and_upns.each_slice(CanvasGraphService::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
+          upn_to_aad = canvas_graph_service.users_upns_to_aads(slice.map(&:last))
+          user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
+          UserMapping.bulk_insert_for_root_account_id(course.root_account_id, user_id_to_aad)
+        end
+      end
     end
 
     def tenant

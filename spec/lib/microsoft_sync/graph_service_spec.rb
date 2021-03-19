@@ -123,4 +123,36 @@ describe MicrosoftSync::GraphService do
       it { is_expected.to eq(response_body) }
     end
   end
+
+  describe '#list_users' do
+    subject { service.list_users }
+
+    let(:http_method) { :get }
+    let(:url) { 'https://graph.microsoft.com/v1.0/users' }
+    let(:response_body) { {'value' => [{'id' => 'user1'}] } }
+
+    it { is_expected.to eq(response_body['value']) }
+
+    it_behaves_like 'a graph service endpoint'
+
+    context 'when a filter and select are used' do
+      subject do
+        service.list_users(
+          filter: {userPrincipalName: %w[user1@domain.com user2@domain.com]},
+          select: %w[id userPrincipalName]
+        )
+      end
+
+      let(:with_params) do
+        {
+          query: {
+            '$filter' => "userPrincipalName in ('user1@domain.com', 'user2@domain.com')",
+            '$select' => 'id,userPrincipalName'
+          }
+        }
+      end
+
+      it { is_expected.to eq(response_body['value']) }
+    end
+  end
 end

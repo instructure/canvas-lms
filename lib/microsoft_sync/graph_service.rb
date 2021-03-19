@@ -59,6 +59,12 @@ module MicrosoftSync
       request(:get, "groups/#{group_id}", query: expand_options(**options))
     end
 
+    # === Users ===
+
+    def list_users(options={})
+      request(:get, 'users', query: expand_options(**options))['value']
+    end
+
     # ===== Helpers =====
 
     def request(method, path, options={})
@@ -97,7 +103,12 @@ module MicrosoftSync
 
     def filter_clause(filter)
       filter.map do |filter_key, filter_value|
-        "#{filter_key} eq #{filter_quote_value(filter_value)}"
+        if filter_value.is_a?(Array)
+          quoted_values = filter_value.map{|v| filter_quote_value(v)}
+          "#{filter_key} in (#{quoted_values.join(', ')})"
+        else
+          "#{filter_key} eq #{filter_quote_value(filter_value)}"
+        end
       end.join(' and ')
     end
 

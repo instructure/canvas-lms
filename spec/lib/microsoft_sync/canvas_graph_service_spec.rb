@@ -91,4 +91,29 @@ describe MicrosoftSync::CanvasGraphService do
       expect(subject.update_group_with_course_data('msgroupid', @course)).to eq('foo')
     end
   end
+
+  describe '#users_upns_to_aads' do
+    it 'returns a hash from UPN to AAD object id' do
+      expect(subject.graph_service).to \
+        receive(:list_users).
+        with(select: %w[id userPrincipalName], filter: {userPrincipalName: %w[a b c d]}).
+        and_return([
+          {'id' => '789', 'userPrincipalName' => 'd'},
+          {'id' => '456', 'userPrincipalName' => 'b'},
+          {'id' => '123', 'userPrincipalName' => 'a'},
+        ])
+      expect(subject.users_upns_to_aads(%w[a b c d])).to eq(
+        'a' => '123',
+        'b' => '456',
+        'd' => '789'
+      )
+    end
+
+    context 'when passed in more than 15' do
+      it 'raises ArgumentError' do
+        expect { subject.users_upns_to_aads((1..16).map(&:to_s)) }.to \
+          raise_error(ArgumentError, "Can't look up 16 UPNs at once")
+      end
+    end
+  end
 end

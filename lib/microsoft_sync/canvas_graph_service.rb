@@ -60,5 +60,21 @@ module MicrosoftSync
         }
       )
     end
+
+    USERS_UPNS_TO_AADS_BATCH_SIZE = 15 # According to Microsoft
+
+    # Returns a hash from UPN -> AAD. Accepts 15 at a time.
+    def users_upns_to_aads(upns)
+      if upns.length > USERS_UPNS_TO_AADS_BATCH_SIZE
+        raise ArgumentError, "Can't look up #{upns.length} UPNs at once"
+      end
+
+      graph_service.list_users(
+        select: %w[id userPrincipalName],
+        filter: {userPrincipalName: upns}
+      ).map do |result|
+        [result['userPrincipalName'], result['id']]
+      end.to_h
+    end
   end
 end
