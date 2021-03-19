@@ -28,5 +28,27 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
+    field :title, String, null: true
+    field :delayed_post_at, Types::DateTimeType, null: true
+    field :lock_at, Types::DateTimeType, null: true
+    field :last_reply_at, Types::DateTimeType, null: true
+    field :posted_at, Types::DateTimeType, null: true
+    field :podcast_has_student_posts, Boolean, null: true
+    field :discussion_type, String, null: true
+    field :position, Int, null: true
+    field :allow_rating, Boolean, null: true
+    field :only_graders_can_rate, Boolean, null: true
+    field :sort_by_rating, Boolean, null: true
+    field :is_section_specific, Boolean, null: true
+
+    field :assignment, Types::AssignmentType, null: true
+    def assignment
+      load_association(:assignment)
+    end
+
+    field :root_topic, Types::DiscussionType, null: true
+    def root_topic
+      load_association(:root_topic)
+    end
   end
 end

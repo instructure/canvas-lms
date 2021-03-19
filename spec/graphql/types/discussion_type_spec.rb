@@ -30,6 +30,23 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
+  it "queries the attribute" do
+    expect(discussion_type.resolve("title")).to eq discussion.title
+    expect(discussion_type.resolve("podcastHasStudentPosts")).to eq discussion.podcast_has_student_posts
+    expect(discussion_type.resolve("discussionType")).to eq discussion.discussion_type
+    expect(discussion_type.resolve("position")).to eq discussion.position
+    expect(discussion_type.resolve("allowRating")).to eq discussion.allow_rating
+    expect(discussion_type.resolve("onlyGradersCanRate")).to eq discussion.only_graders_can_rate
+    expect(discussion_type.resolve("sortByRating")).to eq discussion.sort_by_rating
+    expect(discussion_type.resolve("isSectionSpecific")).to eq discussion.is_section_specific
+
+    expect(discussion_type.resolve("rootTopic { _id }")).to eq discussion.root_topic_id
+    
+    expect(discussion_type.resolve("assignment { _id }")).to eq discussion.assignment_id.to_s
+    expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
+    expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
+  end
+
   it "has modules" do
     module1 = discussion.course.context_modules.create!(name: 'Module 1')
     module2 = discussion.course.context_modules.create!(name: 'Module 2')
