@@ -77,12 +77,17 @@ describe('K-5 Dashboard redux-helpers', () => {
           timeZone
         })
         expect(Object.keys(assignmentsDueToday).length).toBe(2)
-        expect(assignmentsDueToday.science).toBe(2)
+        expect(assignmentsDueToday.science).toBe(3)
         expect(assignmentsDueToday.math).toBe(1)
       })
 
       it('filters out assignments in submitted status', () => {
         const assignments = [
+          {
+            type: 'Announcement',
+            course_id: 'science',
+            status: false
+          },
           {
             type: 'Assignment',
             course_id: 'science',
@@ -99,12 +104,13 @@ describe('K-5 Dashboard redux-helpers', () => {
             status: {submitted: true}
           }
         ]
-        const {assignmentsDueToday} = mapStateToProps({
+        const {assignmentsDueToday, assignmentsCompletedForToday} = mapStateToProps({
           days: [['2021-02-06', assignments]],
           timeZone
         })
         expect(Object.keys(assignmentsDueToday).length).toBe(1)
-        expect(assignmentsDueToday.science).toBe(1)
+        expect(assignmentsDueToday.science).toBe(2)
+        expect(assignmentsCompletedForToday.science).toBe(1)
       })
     })
   })

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import {render, waitFor} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import K5DashboardCard, {DashboardCardHeaderHero} from '../cards/K5DashboardCard'
 import K5DashboardContext from '../K5DashboardContext'
 
@@ -27,6 +27,7 @@ import {TAB_IDS} from '../DashboardTabs'
 const defaultContext = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
+  assignmentsCompletedForToday: {},
   isStudent: true
 }
 
@@ -97,42 +98,54 @@ describe('K-5 Dashboard Card', () => {
       ]),
       {overwriteRoutes: true}
     )
-    const {getByText} = render(<K5DashboardCard {...defaultProps} />)
-    const linkText = await waitFor(() => getByText('How do you do, fellow kids?'))
+    const {findByText} = render(<K5DashboardCard {...defaultProps} />)
+    const linkText = await findByText('How do you do, fellow kids?')
     const link = linkText.closest('a')
     expect(link.href).toBe('http://localhost/courses/test/discussion_topics/55')
   })
 
   it('displays "Nothing due today" if no assignments are due today', async () => {
-    const {getByText} = render(
+    const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext}}>
         <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
-    const message = await waitFor(() => getByText('Nothing due today'))
+    const message = await findByText('Nothing due today')
     expect(message).toBeInTheDocument()
   })
 
   it('displays a link to the schedule tab if any assignments are due today', async () => {
     const requestTabChange = jest.fn()
-    const {getByText} = render(
+    const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsDueToday: {test: 3}}}>
         <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
       </K5DashboardContext.Provider>
     )
-    const link = await waitFor(() => getByText('3 due today'))
+    const link = await findByText('3 due today')
     link.click()
     expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
   })
 
+  it('displays "Nothing else due" if all assignments due today are completed', async () => {
+    const {findByText, queryByText} = render(
+      <K5DashboardContext.Provider
+        value={{...defaultContext, assignmentsCompletedForToday: {test: 2}}}
+      >
+        <K5DashboardCard {...defaultProps} />
+      </K5DashboardContext.Provider>
+    )
+    expect(await findByText('Nothing else due')).toBeInTheDocument()
+    expect(queryByText('Nothing due today')).not.toBeInTheDocument()
+  })
+
   it('displays a link to the schedule tab if any assignments are missing', async () => {
     const requestTabChange = jest.fn()
-    const {getByText} = render(
+    const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsMissing: {test: 2}}}>
         <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
       </K5DashboardContext.Provider>
     )
-    const link = await waitFor(() => getByText('2 missing'))
+    const link = await findByText('2 missing')
     link.click()
     expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
   })

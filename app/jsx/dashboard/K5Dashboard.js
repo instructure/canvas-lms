@@ -55,6 +55,7 @@ const getInitialTab = defaultTab => {
 export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
+  assignmentsCompletedForToday,
   currentUser: {display_name},
   env,
   loadAllOpportunities,
@@ -129,7 +130,13 @@ export const K5Dashboard = ({
   return (
     <View as="section">
       <K5DashboardContext.Provider
-        value={{assignmentsDueToday, assignmentsMissing, isStudent: plannerEnabled, responsiveSize}}
+        value={{
+          assignmentsDueToday,
+          assignmentsMissing,
+          assignmentsCompletedForToday,
+          isStudent: plannerEnabled,
+          responsiveSize
+        }}
       >
         <DashboardTabs
           currentTab={currentTab}
@@ -161,6 +168,7 @@ K5Dashboard.displayName = 'K5Dashboard'
 K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
+  assignmentsCompletedForToday: PropTypes.object.isRequired,
   currentUser: PropTypes.shape({
     display_name: PropTypes.string
   }).isRequired,

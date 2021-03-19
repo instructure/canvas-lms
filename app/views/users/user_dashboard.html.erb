@@ -30,7 +30,7 @@
 <% end %>
 
 <% provide :right_side do %>
-  <% unless show_planner? %>
+  <% if !show_planner? and !@k5_mode %>
     <div class="placeholder"></div>
   <% end %>
 <% end %>

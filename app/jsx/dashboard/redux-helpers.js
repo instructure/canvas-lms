@@ -21,12 +21,15 @@ import moment from 'moment-timezone'
 import {countByCourseId} from './utils'
 
 export const mapStateToProps = ({days, opportunities, timeZone}) => {
-  const props = {assignmentsDueToday: {}, assignmentsMissing: {}}
+  const props = {assignmentsDueToday: {}, assignmentsMissing: {}, assignmentsCompletedForToday: {}}
   const todaysDate = moment.tz(timeZone).format('YYYY-MM-DD')
   const today = days?.length > 0 && days.find(([date]) => date === todaysDate)
   if (today?.length === 2 && today[1]?.length > 0) {
     props.assignmentsDueToday = countByCourseId(
-      today[1].filter(({status, type}) => type === 'Assignment' && !status.submitted)
+      today[1].filter(({status}) => status && !status.submitted)
+    )
+    props.assignmentsCompletedForToday = countByCourseId(
+      today[1].filter(({status}) => status && status.submitted)
     )
   }
   if (opportunities?.items?.length > 0) {

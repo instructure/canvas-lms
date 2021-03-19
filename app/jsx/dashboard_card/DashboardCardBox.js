@@ -192,7 +192,11 @@ export default class DashboardCardBox extends React.Component {
               count: I18n.n(publishedCourses.length)
             })}
           </HeadingElement>
-          {publishedCourses.length > 0 ? publishedCourses : emptyEl}
+          {publishedCourses.length > 0 ? (
+            <div className="ic-DashboardCard__box__container">{publishedCourses}</div>
+          ) : (
+            emptyEl
+          )}
         </div>
         <div className="ic-DashboardCard__box">
           <HeadingElement className="ic-DashboardCard__box__header">
@@ -200,7 +204,11 @@ export default class DashboardCardBox extends React.Component {
               count: I18n.n(unpublishedCourses.length)
             })}
           </HeadingElement>
-          {unpublishedCourses.length > 0 ? unpublishedCourses : emptyEl}
+          {unpublishedCourses.length > 0 ? (
+            <div className="ic-DashboardCard__box__container">{unpublishedCourses}</div>
+          ) : (
+            emptyEl
+          )}
         </div>
       </div>
     )
@@ -208,10 +216,14 @@ export default class DashboardCardBox extends React.Component {
 
   render() {
     const {connectDropTarget, showSplitDashboardView} = this.props
-    let dashboardCardBox = null
+    let dashboardCardBox
     if (!showSplitDashboardView) {
       const cards = this.state.courseCards.map(card => this.renderCard(card))
-      dashboardCardBox = <div className="ic-DashboardCard__box">{cards}</div>
+      dashboardCardBox = (
+        <div className="ic-DashboardCard__box">
+          <div className="ic-DashboardCard__box__container">{cards}</div>
+        </div>
+      )
     } else {
       dashboardCardBox = this.renderSplitDashboard()
     }

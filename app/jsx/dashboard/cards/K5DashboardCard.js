@@ -48,7 +48,7 @@ export function DashboardCardHeaderHero({image, backgroundColor, onClick}) {
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
-        height: '50%',
+        height: `${CARD_SIZE_PX / 2}px`,
         cursor: 'pointer'
       }}
       onClick={onClick}
@@ -66,7 +66,7 @@ DashboardCardHeaderHero.propTypes = {
 }
 
 const LatestAnnouncementLink = ({color, title, html_url}) => (
-  <Link href={html_url} display="block" isWithinText={false} margin="small">
+  <Link href={html_url} display="block" isWithinText={false} margin="xx-small small xx-small small">
     <Flex alignItems="start">
       <Flex.Item margin="0 small 0 0">
         <IconAnnouncementLine style={{color}} size="x-small" />
@@ -89,7 +89,15 @@ LatestAnnouncementLink.propTypes = {
   title: PropTypes.string.isRequired
 }
 
-const AssignmentLinks = ({color, requestTabChange, numDueToday = 0, numMissing = 0}) => {
+const AssignmentLinks = ({
+  color,
+  requestTabChange,
+  numDueToday = 0,
+  numMissing = 0,
+  numSubmittedToday = 0
+}) => {
+  const noneDueMessage =
+    numSubmittedToday > 0 ? I18n.t('Nothing else due') : I18n.t('Nothing due today')
   const content = (
     <>
       {numDueToday > 0 ? (
@@ -112,7 +120,7 @@ const AssignmentLinks = ({color, requestTabChange, numDueToday = 0, numMissing =
         </Flex.Item>
       ) : (
         <Text color="secondary" fontStyle="italic">
-          {I18n.t('Nothing due today')}
+          {noneDueMessage}
         </Text>
       )}
       {numMissing > 0 && (
@@ -142,7 +150,7 @@ const AssignmentLinks = ({color, requestTabChange, numDueToday = 0, numMissing =
     </>
   )
   return (
-    <Flex alignItems="center" margin="small">
+    <Flex alignItems="center" margin="small small xx-small small">
       <Flex.Item margin="0 small xxx-small 0">
         <IconBulletListLine style={{color}} size="x-small" />
       </Flex.Item>
@@ -156,7 +164,8 @@ AssignmentLinks.propTypes = {
   color: PropTypes.string.isRequired,
   requestTabChange: PropTypes.func.isRequired,
   numDueToday: PropTypes.number,
-  numMissing: PropTypes.number
+  numMissing: PropTypes.number,
+  numSubmittedToday: PropTypes.number
 }
 
 const K5DashboardCard = ({
@@ -181,8 +190,9 @@ const K5DashboardCard = ({
     (k5Context?.assignmentsDueToday && k5Context.assignmentsDueToday[id]) || 0
   const assignmentsMissing =
     (k5Context?.assignmentsMissing && k5Context.assignmentsMissing[id]) || 0
+  const assignmentsCompletedForToday =
+    (k5Context?.assignmentsCompletedForToday && k5Context.assignmentsCompletedForToday[id]) || 0
   const isStudent = k5Context?.isStudent || false
-  const responsiveWidth = k5Context?.responsiveSize === 'large' ? CARD_SIZE_PX : '100%'
 
   const handleHeaderClick = e => {
     if (e) {
@@ -198,10 +208,12 @@ const K5DashboardCard = ({
     <div
       className="ic-DashboardCard"
       style={{
+        display: 'inline-flex',
+        flexDirection: 'column',
         opacity: isDragging ? 0 : 1,
         transform: 'translate3d(0,0,0)',
-        width: responsiveWidth,
-        height: `${CARD_SIZE_PX}px`
+        minHeight: `${CARD_SIZE_PX}px`,
+        minWidth: `${CARD_SIZE_PX}px`
       }}
       aria-label={originalName}
       data-testid="k5-dashboard-card"
@@ -211,7 +223,7 @@ const K5DashboardCard = ({
         backgroundColor={backgroundColor}
         onClick={handleHeaderClick}
       />
-      <View as="div" height="50%">
+      <View as="div" minHeight={`${CARD_SIZE_PX / 2}px`}>
         <Heading
           as={headingLevel}
           level="h4"
@@ -248,6 +260,7 @@ const K5DashboardCard = ({
             color={backgroundColor}
             numDueToday={assignmentsDueToday}
             numMissing={assignmentsMissing}
+            numSubmittedToday={assignmentsCompletedForToday}
             requestTabChange={requestTabChange}
           />
         )}
