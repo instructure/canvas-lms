@@ -2585,8 +2585,10 @@ describe Course, "tabs_available" do
     end
 
     it "doesn't include the people tab if it's a template" do
-      @course.update!(template: true)
-      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      admin = account_admin_user
+      course = course_factory
+      course.update!(template: true)
+      tab_ids = course.tabs_available(admin).map{|t| t[:id] }
       expect(tab_ids).not_to include(Course::TAB_PEOPLE)
     end
 
