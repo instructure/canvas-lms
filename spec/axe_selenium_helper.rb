@@ -21,8 +21,8 @@ require 'axe-rspec'
 require 'rspec/core/formatters/base_text_formatter'
 
 module AxeSelenium
-  RULES = [:wcag2a, :wcag2aa, :section508, :best_practice].freeze
-  SKIP = [:'color-contrast'].freeze
+  RULES = [:wcag2a, :wcag2aa, :section508].freeze
+  SKIP = [:'color-contrast', :'duplicate-id'].freeze
 
   def self.install!
     ::RSpec::Expectations::ExpectationTarget.prepend AxeRSpecAuditor
@@ -83,6 +83,7 @@ module AxeSelenium
   class AxeHelper
     @example_summary = {}
     @total_summary = {}
+    @called_by = {}
 
     def self.assert_axe
       driver = SeleniumDriverSetup.driver
@@ -94,12 +95,16 @@ module AxeSelenium
         # Always assert that driver's current page _is_ axe compliant
         RSpec::Expectations::PositiveExpectationHandler.handle_matcher(driver, axe_matcher)
 
+        call_stack = caller.select{|line| line =~ /selenium.*_spec\.rb/}.first(5)
         violations = axe_matcher.audit([]).results.violations
         violations.each do |v|
           v.nodes.each do |node|
             error_summary = node.failure_messages.flatten.join("\n")
-            @example_summary[v.description] ||= Set.new()
-            @example_summary[v.description] << error_summary
+            rule_description = "#{v.description} - Severity: #{v.impact}"
+            @example_summary[rule_description] ||= Set.new()
+            @example_summary[rule_description] << error_summary
+            @called_by[rule_description] ||= Set.new()
+            @called_by[rule_description] << call_stack
           end
         end
         add_example_runs_to_total
@@ -115,6 +120,7 @@ module AxeSelenium
 
     def self.reset_example_counter
       @example_summary = {}
+      @called_by = {}
     end
 
     def self.reset_total_counter
@@ -141,7 +147,8 @@ module AxeSelenium
       @example_summary.map do |k,v|
         error_description = "#{k}\n\n"
         indented_errors = v.to_a.map{|i| i.indent(2)}
-        error_description + "#{indented_errors.join("\n\n")}\n\n"
+        call_stack = "Violations Found In:\n" + @called_by[k].to_a.flatten.map{|s| "  #{s.split(':in')[0]}"}.join("\n")
+        error_description + "#{indented_errors.join("\n\n")}\n\n" + call_stack + "\n\n"
       end.join("\n")
     end
   end
