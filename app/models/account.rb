@@ -245,6 +245,11 @@ class Account < ActiveRecord::Base
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :sub_account_includes, :boolean => true, :default => false
 
+  # Microsoft Sync Account Settings
+  add_setting :microsoft_sync_enabled, :root_only => true, :boolean => true, :default => false
+  add_setting :microsoft_sync_tenant, :root_only => true
+  add_setting :microsoft_sync_login_attribute, :root_only => true
+
   # Help link settings
   add_setting :custom_help_links, :root_only => true
   add_setting :help_link_icon, :root_only => true
