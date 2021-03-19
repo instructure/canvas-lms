@@ -71,4 +71,6 @@ group :test do
   gem 'flakey_spec_catcher', require: false
   gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
+  gem 'axe-core-selenium', '4.1.0', require: false
+  gem 'axe-core-rspec', '4.1.0', require: false
 end

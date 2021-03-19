@@ -24,4 +24,6 @@
 <%= before_label :cancel_reason, "Reason for canceling" %>
 <%= data.cancel_reason || t(:no_reason_given, "none given") %>
 
+<% if asset.appointment_group.active? -%>
 <%= t :instructions, 'Sign up for a different time slot at the following link: %{link}', :link => content(:link) %>
+<% end %>

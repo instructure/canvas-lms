@@ -73,11 +73,7 @@ module.exports = {
             'canvas-rce-async-chunk',
             'canvas-rce-old-async-chunk',
             'permissions_index',
-            'screenreader_gradebook',
-            // This bundle got pushed over the limit by translations being added and
-            // the simplest fix was to ignore it at the moment, to unblock selenium
-            // tests for everyone. CORE-3106 will resolve this.
-            'quizzes_bundle'
+            'assignment_edit'
           ]
           return (
             assetFilename.endsWith('.js') &&
@@ -139,7 +135,9 @@ module.exports = {
 
   devtool: skipSourcemaps
     ? false
-    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1' || process.env.SENTRY_DSN
+    : process.env.NODE_ENV === 'production' ||
+      process.env.COVERAGE === '1' ||
+      process.env.SENTRY_DSN
     ? 'source-map'
     : 'eval',
 
@@ -195,10 +193,13 @@ module.exports = {
       jst: path.resolve(__dirname, '../app/views/jst'),
       jqueryui: path.resolve(__dirname, '../public/javascripts/vendor/jqueryui'),
       coffeescripts: path.resolve(__dirname, '../app/coffeescripts'),
-      'lodash.underscore$': path.resolve(__dirname, '../public/javascripts/vendor/lodash.underscore.js'),
+      'lodash.underscore$': path.resolve(
+        __dirname,
+        '../public/javascripts/vendor/lodash.underscore.js'
+      ),
       jsx: path.resolve(__dirname, '../app/jsx'),
 
-      'jquery.qtip$': path.resolve(__dirname, '../public/javascripts/vendor/jquery.qtip.js'),
+      'jquery.qtip$': path.resolve(__dirname, '../public/javascripts/vendor/jquery.qtip.js')
     },
 
     modules: [
@@ -218,7 +219,7 @@ module.exports = {
       /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce$/, // has 'require' and 'define' but they are from it's own internal closure
-      /i18nliner\/dist\/lib\/i18nliner/, // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
       {
@@ -283,7 +284,7 @@ module.exports = {
 
   plugins: [
     // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
-    function() {
+    function () {
       this.plugin('done', ({compilation}) => {
         if (compilation.warnings && compilation.warnings.length) {
           console.error(compilation.warnings)
@@ -323,8 +324,8 @@ module.exports = {
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({
       context: root,
-      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), { absolute: true }),
-      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions'),
+      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), {absolute: true}),
+      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions')
     }),
 
     new WebpackHooks(),

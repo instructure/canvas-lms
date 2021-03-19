@@ -89,6 +89,37 @@ module K5PageObject
     "a[cursor='pointer']"
   end
 
+  def staff_selector(staff_name)
+    "h3:contains('#{staff_name}')"
+  end
+
+  def instructor_role_selector(inst_role)
+    "//*[@data-automation = 'instructor-role' and text() = '#{inst_role}']"
+  end
+
+  def instructor_bio_selector(inst_bio)
+    "//*[@data-automation = 'instructor-bio' and text() = '#{inst_bio}']"
+  end
+
+  def email_link_selector(email_address)
+    "a[href = 'mailto:#{email_address}']"
+  end
+
+  def grade_title_selector(title)
+    "div:contains('#{title}')"
+  end
+
+  def subject_grade_selector(value)
+    "//*[@data-automation = 'course_grade' and text() = '#{value}']"
+  end
+
+  def grade_progress_bar_selector(value)
+    "//*[@role = 'progressbar' and @value = '#{value}']"
+  end
+
+  def view_grades_button_selector(course_id)
+    "a[href = '/courses/#{course_id}/gradebook']"
+  end
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -161,6 +192,38 @@ module K5PageObject
 
   def announcement_edit_pencil
     f(announcement_edit_button_selector)
+  end
+
+  def staff_heading(staff_name)
+    fj(staff_selector(staff_name))
+  end
+
+  def email_link(email_address)
+    f(email_link_selector(email_address))
+  end
+
+  def instructor_role(role_type)
+    fxpath(instructor_role_selector(role_type))
+  end
+
+  def instructor_bio(instructor_bio)
+    fxpath(instructor_bio_selector(instructor_bio))
+  end
+
+  def subject_grades_title(title)
+    fj(grade_title_selector(title))
+  end
+
+  def subject_grade(grade_value)
+    fxpath(subject_grade_selector(grade_value))
+  end
+
+  def grade_progress_bar(grade_value)
+    fxpath(grade_progress_bar_selector(grade_value))
+  end
+
+  def view_grades_button(course_id)
+    f(view_grades_button_selector(course_id))
   end
 
   #----------------------- Actions & Methods -------------------------

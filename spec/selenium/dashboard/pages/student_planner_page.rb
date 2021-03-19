@@ -457,7 +457,8 @@ module PlannerPageObject
     old = graded_discussion_in_the_past
     older = graded_discussion_in_the_past(Time.zone.now-4.days, 'older')
     oldest = graded_discussion_in_the_past(Time.zone.now-6.days, 'oldest')
-    [old, older, oldest]
+    ancient = graded_discussion_in_the_past(Time.zone.now-8.days, 'ancient')
+    [old, older, oldest, ancient]
   end
 
   def create_new_todo
@@ -474,5 +475,14 @@ module PlannerPageObject
 
   def scroll_height
     driver.execute_script("return window.pageYOffset")
+  end
+
+  def item_top_position(index)
+    items_displayed[index].location.y
+  end
+
+  def header_bottom_position
+    header = planner_header_container
+    header.location.y + header.size.height
   end
 end

@@ -1467,6 +1467,28 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe 'ContextModuleProgression LiveEventsCallback' do
+    it "queues a job to dispatch .course_completed" do
+      course = course_model(sis_source_id: "abc123")
+      user = user_model
+      context_module = course.context_modules.create!
+      context_module_progression = context_module.context_module_progressions.create!(user_id: user.id)
+      context_module_progression.workflow_state = 'completed'
+      context_module_progression.completed_at = Time.now
+
+      allow(Rails.env).to receive(:production?).and_return(true)
+
+      # post-transaction callbacks won't happen in specs, so do this manually
+      Canvas::LiveEventsCallbacks.after_update(context_module_progression, context_module_progression.changes)
+
+      job = Delayed::Job.where(strand: "course_progress_#{context_module_progression.global_id}").take
+      expect(job).not_to be_nil
+      expect(job.run_at).to be > Time.now
+      expect(job.max_concurrent).to eq 1
+      expect(job.tag).to eq 'CourseProgress.dispatch_live_event'
+    end
+  end
+
   describe '.discussion_topic_created' do
     it 'should trigger a discussion topic created live event' do
       course = course_model

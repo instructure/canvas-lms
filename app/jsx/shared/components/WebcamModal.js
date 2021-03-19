@@ -21,6 +21,7 @@ import Modal from './InstuiModal'
 import {getUserMedia} from '../utils/mediaUtils'
 import {IconVideoCameraOffSolid} from '@instructure/ui-icons'
 import I18n from 'i18n!webcam_modal'
+import Focus from './Focus'
 
 const WebcamModal = ({onSelectImage, open, onDismiss}) => {
   const videoRef = useRef(null)
@@ -118,9 +119,11 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
       {permission === 'granted' && (
         <Modal.Footer>
           {!takenImage.dataURL && (
-            <Button variant="primary" onClick={onTakePicture}>
-              {I18n.t('Take Photo')}
-            </Button>
+            <Focus>
+              <Button variant="primary" onClick={onTakePicture}>
+                {I18n.t('Take Photo')}
+              </Button>
+            </Focus>
           )}
 
           {takenImage.dataURL && (
@@ -128,9 +131,12 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
               <Button onClick={() => setTakenImage({})} margin="none small">
                 {I18n.t('Try Again')}
               </Button>
-              <Button variant="primary" onClick={innerOnSelectImage}>
-                {I18n.t('Use This Photo')}
-              </Button>
+
+              <Focus>
+                <Button variant="primary" onClick={innerOnSelectImage}>
+                  {I18n.t('Use This Photo')}
+                </Button>
+              </Focus>
             </>
           )}
         </Modal.Footer>

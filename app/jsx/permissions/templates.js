@@ -50,7 +50,8 @@ export const GROUP_PERMISSION_DESCRIPTIONS = {
   manage_course_observer_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_course_designer_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_sections: () => I18n.t('add / edit / delete Sections'),
-  manage_files: () => I18n.t('add / edit / delete Files')
+  manage_files: () => I18n.t('add / edit / delete Files'),
+  manage_course_templates: () => I18n.t('add / edit / delete Course Templates')
 }
 
 export const generateActionTemplates = (

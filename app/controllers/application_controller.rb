@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
     :cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
+    :direct_share, :responsive_awareness,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
     :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users,
     :canvas_for_elementary
@@ -418,7 +418,7 @@ class ApplicationController < ActionController::Base
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
         terms: @context.account.root_account.enrollment_terms.active.to_a.map{|term| {id: term.id, name: term.name}},
         canManageCourse: can_manage,
-        canAutoPublishCourses: can_manage && @domain_root_account.feature_enabled?(:uxs_4_omg_a_scary_blueprint_checkbox)
+        canAutoPublishCourses: can_manage
       )
     end
     js_env :BLUEPRINT_COURSES_DATA => bc_data
@@ -534,7 +534,7 @@ class ApplicationController < ActionController::Base
     !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit") &&
     params[:controller] != "question_banks"
   end
-  
+
   protected
 
   # we track the cost of each request in RequestThrottle in order
@@ -2785,7 +2785,7 @@ class ApplicationController < ActionController::Base
   }.freeze
 
   def show_student_view_button?
-    return false unless @context&.is_a?(Course) && @context&.feature_enabled?(:easy_student_view) && can_do(@context, @current_user, :use_student_view)
+    return false unless @context&.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
 
     controller_action = "#{params[:controller]}##{params[:action]}"
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))

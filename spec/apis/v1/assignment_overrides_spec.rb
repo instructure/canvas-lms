@@ -206,7 +206,6 @@ describe AssignmentOverridesController, type: :request do
 
       @group = @course.groups.create!(:name => 'my group', :group_category => @assignment.group_category)
       @group.add_user(@teacher, 'accepted')
-      expect(@course.groups_visible_to(@teacher)).to include @group
 
       @override.reload
       @override.set = @group

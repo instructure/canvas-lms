@@ -25,6 +25,7 @@ describe 'quizzes accessibility' do
   include QuizzesCommon
 
   before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end

@@ -226,6 +226,8 @@ class Course < ActiveRecord::Base
   has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
+  has_one :microsoft_sync_group, class_name: "MicrosoftSync::Group", dependent: :destroy, inverse_of: :course
+
   prepend Profile::Association
 
   before_save :assign_uuid
@@ -2628,19 +2630,6 @@ class Course < ActiveRecord::Base
       is_scope ? sections.none : []
     when Array
       is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
-    end
-  end
-
-  # derived from policy for Group#grants_right?(user, :read)
-  def groups_visible_to(user, groups = active_groups)
-    if grants_any_right?(user, :manage_groups, :view_group_pages)
-      # course-wide permissions; all groups are visible
-      groups
-    else
-      # no course-wide permissions; only groups the user is a member of are
-      # visible
-      groups.joins(:participating_group_memberships).
-        where('group_memberships.user_id' => user)
     end
   end
 

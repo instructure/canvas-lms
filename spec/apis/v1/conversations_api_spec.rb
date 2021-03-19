@@ -762,6 +762,25 @@ describe ConversationsController, type: :request do
                     { :recipients => [@bob.id], :body => "test", :context_code => "account_#{@sub_account.id}" })
             assert_status(400)
           end
+
+          context "cross-shard" do
+            specs_require_sharding
+
+            it 'should find valid context for user on other shard' do
+              @shard1.activate do
+                new_root = Account.create!(name: 'shard2 account')
+                sub_account = new_root.sub_accounts.create!(name: 'sub dept')
+                course_with_student(account: sub_account, name: "sub student", active_all: true)
+                # @admin is defined above and is from the default shard.
+                account_admin_user(user: @admin, account: sub_account, name: "sub admin", active_all: true)
+                json = api_call(:post, "/api/v1/conversations",
+                                { controller: 'conversations', action: 'create', format: 'json' },
+                                { recipients: [@student.id], body: "test", context_code: "account_#{new_root.id}" })
+                conv = Conversation.find(json.first['id'])
+                expect(conv.context).to eq new_root
+              end
+            end
+          end
         end
       end
 

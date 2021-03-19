@@ -19,6 +19,10 @@
  */
 
 def SYNC_IMAGES = [
+  'busybox:latest': [
+    job: null,
+    target: 'starlord.inscloudgate.net/jenkins/busybox:latest',
+  ],
   'instructure/ruby-passenger:2.6': [
     job: '/Canvas/main-canvas-postgres-12-ruby-2.6-postmerge',
     target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.6',

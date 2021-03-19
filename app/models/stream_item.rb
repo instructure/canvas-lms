@@ -349,7 +349,9 @@ class StreamItem < ActiveRecord::Base
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
     if item = asset.stream_item
-      StreamItemInstance.where(user_id: user_id, stream_item_id: item).first.try(:update_attribute, :workflow_state, new_state)
+      Shard.shard_for(user_id).activate do
+        StreamItemInstance.where(user_id: user_id, stream_item_id: item).first&.update_attribute(:workflow_state, new_state)
+      end
     end
   end
 

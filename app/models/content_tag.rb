@@ -63,6 +63,7 @@ class ContentTag < ActiveRecord::Base
   after_save :run_due_date_cacher_for_quizzes_next
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
+  after_save :clear_total_outcomes_cache
   after_create :update_outcome_contexts
 
   include CustomValidations
@@ -679,4 +680,10 @@ class ContentTag < ActiveRecord::Base
     super({:methods => :quiz_lti}.merge(options))
   end
 
+  def clear_total_outcomes_cache
+    return unless tag_type == 'learning_outcome_association' && associated_asset_type == 'LearningOutcomeGroup'
+
+    clear_context = context_type == 'LearningOutcomeGroup' ? nil : context
+    Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
+  end
 end

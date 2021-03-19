@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC
-  module QTI
-    class QTIGenerator
+  module Qti
+    class QtiGenerator
       include CC::CCHelper
-      include QTIItems
+      include QtiItems
       delegate :add_error, :export_object?, :add_exported_asset, :create_key, :to => :@manifest
 
       def initialize(manifest, resources_node, html_exporter)
@@ -34,7 +34,7 @@ module CC
       end
 
       def self.generate_qti(*args)
-        qti = QTI::QTIGenerator.new(*args)
+        qti = Qti::QtiGenerator.new(*args)
         qti.generate
       end
 

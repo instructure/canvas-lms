@@ -78,7 +78,7 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def has_attached_rubric?
-    !!assignment.rubric_association.try(:rubric)
+    !!assignment.rubric
   end
 
   # Public: Determine if the given user can manage rubrics.

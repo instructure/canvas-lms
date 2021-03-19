@@ -94,7 +94,7 @@ export default class IndexView extends Backbone.View
       contextId = parseInt(contextInfo[1], 10)
 
       requestBulkEditFn =
-        (!ENV.COURSE_HOME && ENV.FEATURES.assignment_bulk_edit && @requestBulkEdit) ||
+        (!ENV.COURSE_HOME && @requestBulkEdit) ||
         undefined
 
       if @$settingsMountPoint.length

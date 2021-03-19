@@ -9,6 +9,7 @@ export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Initial"
 
 success_status=0
 test_failure_status=1
+rerun_number=1
 runs_remaining=${RERUNS_RETRY:=2}
 
 echo "STARTING"
@@ -46,7 +47,7 @@ while true; do
     if [[ $last_status == $success_status ]]; then
       continue
     elif [[ $last_status == $test_failure_status ]]; then
-      export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Rerun_$runs_remaining"
+      export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Rerun_$rerun_number"
 
       if [[ $runs_remaining == 0 ]]; then
         exit_code=$last_status
@@ -65,6 +66,7 @@ while true; do
   done
 
   [[ $exit_code == 0 ]] && break
+  rerun_number=$((rerun_number+1))
   runs_remaining=$((runs_remaining-1))
 done
 

@@ -119,6 +119,7 @@ class Submission < ActiveRecord::Base
 
   has_many :content_participations, :as => :content
 
+  has_many :canvadocs_annotation_contexts, inverse_of: :submission
   has_many :canvadocs_submissions
 
   has_many :auditor_grade_change_records,
@@ -525,7 +526,10 @@ class Submission < ActiveRecord::Base
       settings = assignment.vericite_settings
       type_can_peer_review = true
     else
-      return false unless self.turnitin_data[:provider].to_s != "vericite"
+      unless self.vericite_data_hash[:provider].to_s != "vericite" ||
+        AssignmentConfigurationToolLookup.where(assignment_id: self.assignment_id).where.not(tool_product_code: 'vericite').exists?
+        return false
+      end
       plagData = self.turnitin_data
       @submit_to_turnitin = false
       settings = assignment.turnitin_settings
@@ -1355,6 +1359,17 @@ class Submission < ActiveRecord::Base
             submit_to_canvadocs(1, opts)
         end
       end
+    end
+  end
+
+  def annotation_context(attempt: nil, draft: false)
+    if draft
+      canvadocs_annotation_contexts.find_or_create_by(
+        attachment_id: assignment.annotatable_attachment_id,
+        submission_attempt: nil
+      )
+    else
+      canvadocs_annotation_contexts.find_by(submission_attempt: attempt)
     end
   end
 

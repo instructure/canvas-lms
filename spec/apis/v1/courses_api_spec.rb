@@ -631,32 +631,12 @@ describe CoursesController, type: :request do
     ])
   end
 
-  context 'with granular permissions enabled' do
-    before :each do
-      @course.root_account.enable_feature!(:granular_permissions_course_files)
-    end
+  it "should include files tab if requested (granular)" do
+    course_with_teacher(active_all: true)
+    @course.root_account.enable_feature!(:granular_permissions_course_files)
 
-    it "should include tabs (and precalculate stuff in theory) if requested" do
-      user_session(@teacher)
-
-      json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
-      expect(json.first['tabs']).to match_array([
-        a_hash_including({"id" => "home"}),
-        a_hash_including({"id" => "announcements"}),
-        a_hash_including({"id" => "assignments"}),
-        a_hash_including({"id" => "discussions"}),
-        a_hash_including({"id" => "grades"}),
-        a_hash_including({"id" => "people"}),
-        a_hash_including({"id" => "pages"}),
-        a_hash_including({"id" => "files"}),
-        a_hash_including({"id" => "syllabus"}),
-        a_hash_including({"id" => "outcomes"}),
-        a_hash_including({"id" => "rubrics"}),
-        a_hash_including({"id" => "quizzes"}),
-        a_hash_including({"id" => "modules"}),
-        a_hash_including({"id" => "settings"})
-      ])
-    end
+    json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
+    expect(json.first['tabs']).to include(a_hash_including({"id" => "files"}))
   end
 
   describe "user index" do
@@ -4052,6 +4032,40 @@ describe CoursesController, type: :request do
     it "returns unauthorized if the caller does not have permission to use the student view" do
       response = api_call_as_user(student, :get, path, request_params)
       expect(response["status"]).to eq "unauthorized"
+    end
+  end
+
+  describe "grading periods" do
+    before :once do
+      student_in_course :active_all => true
+    end
+
+    let_once(:grading_periods) do
+      group = Account.default.grading_period_groups.create!(title: "Score Test Group")
+      group.enrollment_terms << @course.enrollment_term
+      Factories::GradingPeriodHelper.new.create_presets_for_group(group, :past, :current, :future)
+      group.grading_periods
+    end
+
+    let_once(:expected_common_fields) do
+      {
+          "id" => be,
+          "start_date" => be,
+          "end_date" => be,
+          "workflow_state" => "active"
+      }
+    end
+
+    it "returns all associated grading periods when requested" do
+      results = api_call_as_user(@student, :get, "/api/v1/courses.json",
+                                 { :controller => 'courses', :action => 'index', :format => 'json' },
+                                 { :include => ['grading_periods'] })
+      expect(results[0]["grading_periods"]).to all(include(expected_common_fields))
+      expect(results[0]["grading_periods"]).to match [
+        a_hash_including("title" => "Period 1: past period"),
+        a_hash_including("title" => "Period 2: current period"),
+        a_hash_including("title" => "Period 3: future period"),
+      ]
     end
   end
 end

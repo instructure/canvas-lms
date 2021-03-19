@@ -22,7 +22,14 @@ module Factories
   def course_factory(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
-      @course = Course.create!(:sis_source_id => opts[:sis_source_id], :name => opts[:course_name], :account => account, :is_public => !!opts[:is_public], :enrollment_term_id => opts[:enrollment_term_id])
+      @course = Course.create!(
+        :sis_source_id => opts[:sis_source_id],
+        :name => opts[:course_name],
+        :course_code => opts[:course_code],
+        :account => account,
+        :is_public => !!opts[:is_public],
+        :enrollment_term_id => opts[:enrollment_term_id]
+      )
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!
@@ -148,7 +155,7 @@ module Factories
       course_data
 
     if options[:account_associations]
-      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0}})
+      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0, root_account_id: account.root_account_id || account.id}})
     end
     if user = options[:enroll_user]
       section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})

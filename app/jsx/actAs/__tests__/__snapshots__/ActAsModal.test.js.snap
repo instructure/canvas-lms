@@ -145,6 +145,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                   <Row>
                     <ColHeader
                       id="actasmodal-category"
+                      scope="col"
                       sortDirection="none"
                       textAlign="start"
                     >
@@ -156,6 +157,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     </ColHeader>
                     <ColHeader
                       id="actasmodal-userinfo"
+                      scope="col"
                       sortDirection="none"
                       textAlign="start"
                     >
@@ -304,6 +306,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                   <Row>
                     <ColHeader
                       id="actasmodal-category"
+                      scope="col"
                       sortDirection="none"
                       textAlign="start"
                     >
@@ -315,6 +318,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     </ColHeader>
                     <ColHeader
                       id="actasmodal-userinfo"
+                      scope="col"
                       sortDirection="none"
                       textAlign="start"
                     >
@@ -436,6 +440,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                   <Row>
                     <ColHeader
                       id="actasmodal-category"
+                      scope="col"
                       sortDirection="none"
                       textAlign="start"
                     >
@@ -447,6 +452,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     </ColHeader>
                     <ColHeader
                       id="actasmodal-userinfo"
+                      scope="col"
                       sortDirection="none"
                       textAlign="start"
                     >

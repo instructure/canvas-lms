@@ -17,11 +17,15 @@
  */
 
 import axios from 'axios'
-import {removeOutcomeGroup} from '../api'
+import {removeOutcomeGroup, removeOutcome} from '../api'
 
 jest.mock('axios')
 
 describe('api', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('removeOutcomeGroup', () => {
     it('provides correct arguments to API request to delete group within account context', () => {
       removeOutcomeGroup('Account', '1', '2')
@@ -31,6 +35,18 @@ describe('api', () => {
     it('provides correct arguments to API request to delete group within course context', () => {
       removeOutcomeGroup('Course', '1', '2')
       expect(axios.delete).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2')
+    })
+  })
+
+  describe('removeOutcome', () => {
+    it('provides correct arguments to API request to delete outcome within account context', () => {
+      removeOutcome('Account', '1', '2', '3')
+      expect(axios.delete).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/2/outcomes/3')
+    })
+
+    it('provides correct arguments to API request to delete outcome within course context', () => {
+      removeOutcome('Course', '1', '2', '3')
+      expect(axios.delete).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2/outcomes/3')
     })
   })
 })

@@ -71,8 +71,8 @@ module CC
         run_and_set_progress(:add_web_links, 40, I18n.t('course_exports.errors.web_links', "Failed to export some web links"))
 
         begin
-          QTI::QTIGenerator.generate_qti(@manifest, resources, @html_exporter)
-        rescue
+          Qti::QtiGenerator.generate_qti(@manifest, resources, @html_exporter)
+        rescue # TODO: This swallowed a missing constant, which is not ideal.... replace with actual expected error
           add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)
         end
         set_progress(60)

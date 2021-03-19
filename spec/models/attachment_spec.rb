@@ -2324,14 +2324,19 @@ describe Attachment do
     expect(tag1).not_to be_nil
   end
 
-  it "should unlock files at the right time even if they're accessed shortly before" do
+  it "should unlock and lock files at the right time even if they're accessed shortly before" do
     enable_cache do
       course_with_student :active_all => true
-      attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now
+      attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now, lock_at: 35.seconds.from_now
       expect(@attachment.grants_right?(@student, :download)).to eq false # prime cache
       Timecop.freeze(@attachment.unlock_at + 1.second) do
         run_jobs
         expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq true
+      end
+
+      Timecop.freeze(@attachment.lock_at + 1.second) do
+        run_jobs
+        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq false
       end
     end
   end

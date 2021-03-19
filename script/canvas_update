@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source script/common.sh
+source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/canvas_update.log"
 
@@ -26,8 +27,7 @@ function update_canvas {
   intro_message "Canvas Update"
 
   if [[ -z "$SKIP_CODE" ]] ; then
-    update_plugins
-    rebase_canvas
+    ./script/rebase_canvas_and_plugins.sh
   fi
 
   if [[ -z "$SKIP_DEPS" ]] ; then

@@ -233,7 +233,9 @@ describe "course settings" do
       wait_for_ajaximations
       f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
       wait_for_ajaximations
-      f('.student_view_button').click
+      enter_student_view
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/settings#tab-navigation"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_link("Home")
     end
@@ -298,13 +300,6 @@ describe "course settings" do
   end
 
   context "right sidebar" do
-    it "should allow entering student view from the right sidebar" do
-      @fake_student = @course.student_view_student
-      get "/courses/#{@course.id}/settings"
-      f(".student_view_button").click
-      expect(displayed_username).to include(@fake_student.name)
-    end
-
     it "should allow leaving student view" do
       enter_student_view
       stop_link = f("#masquerade_bar .leave_student_view")

@@ -114,7 +114,10 @@ export default class ExternalToolsTableRow extends React.Component {
 
   handleFavoriteChange = event => {
     const checked = event.target.checked
+    this.changeFavoriteLTI(checked)
+  }
 
+  changeFavoriteLTI = checked => {
     const success = _res => {
       const externalTools = store.getState().externalTools
       externalTools.find(t => t.app_id === this.props.tool.app_id).is_rce_favorite = checked
@@ -130,6 +133,26 @@ export default class ExternalToolsTableRow extends React.Component {
     }
 
     store.setAsFavorite(this.props.tool, checked, success, error)
+  }
+
+  updateTool = tool => {
+    const externalTools = store.getState().externalTools
+    const toolRef = externalTools.find(t => String(t.app_id) === tool.id)
+    if (toolRef) {
+      toolRef.editor_button_settings = tool.editor_button
+      store.setState({externalTools})
+    }
+  }
+
+  validateTool = (r, placement) => {
+    if (placement === 'editor_button') {
+      if (r && !r.editor_button.enabled && this.props.tool.is_rce_favorite) {
+        this.changeFavoriteLTI(false)
+      }
+      store.fetchWithDetails(this.props.tool).then(data => {
+        this.updateTool(data)
+      })
+    }
   }
 
   renderButtons = () => {
@@ -178,7 +201,11 @@ export default class ExternalToolsTableRow extends React.Component {
                 canAddEdit={this.props.canAddEdit && !this.is13Tool}
                 returnFocus={this.returnFocus}
               />
-              <ExternalToolPlacementButton tool={tool} returnFocus={this.returnFocus} />
+              <ExternalToolPlacementButton
+                tool={tool}
+                returnFocus={this.returnFocus}
+                onSuccess={this.validateTool}
+              />
               <ReregisterExternalToolButton
                 tool={tool}
                 canAddEdit={this.props.canAddEdit}
@@ -199,33 +226,40 @@ export default class ExternalToolsTableRow extends React.Component {
     } else {
       return (
         <td className="links text-right e-tool-table-data" nowrap="nowrap">
-          <ExternalToolPlacementButton tool={tool} type="button" returnFocus={this.returnFocus} />
+          <ExternalToolPlacementButton
+            tool={tool}
+            type="button"
+            returnFocus={this.returnFocus}
+            onSuccess={this.validateTool}
+          />
         </td>
       )
     }
   }
 
   render() {
+    const {tool} = this.props
+
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
         <td className="e-tool-table-data center-text">{this.locked()}</td>
         <td
           nowrap="nowrap"
           className={`${this.nameClassNames()} e-tool-table-data`}
-          title={this.props.tool.name}
+          title={tool.name}
         >
-          {this.props.tool.name} {this.disabledFlag()}
+          {tool.name} {this.disabledFlag()}
         </td>
         {this.props.showLTIFavoriteToggles && (
           <td>
-            {canBeRCEFavorite(this.props.tool) ? (
+            {canBeRCEFavorite(tool) ? (
               <Checkbox
                 variant="toggle"
                 label={<ScreenReaderContent>{I18n.t('Favorite')}</ScreenReaderContent>}
-                value={this.props.tool.app_id}
+                value={tool.app_id}
                 onChange={this.handleFavoriteChange}
-                checked={this.props.tool.is_rce_favorite}
-                disabled={!this.props.tool.is_rce_favorite && this.props.favoriteCount === MAX_FAVS}
+                checked={tool.is_rce_favorite}
+                disabled={!tool.is_rce_favorite && this.props.favoriteCount === MAX_FAVS}
               />
             ) : (
               I18n.t('NA')
@@ -242,5 +276,7 @@ export default class ExternalToolsTableRow extends React.Component {
 // it can be an RCE favorite
 // see lib/lti/app_collator.rb#external_tool_definition
 function canBeRCEFavorite(tool) {
-  return 'is_rce_favorite' in tool
+  return (
+    'is_rce_favorite' in tool && tool.editor_button_settings && tool.editor_button_settings.enabled
+  )
 }

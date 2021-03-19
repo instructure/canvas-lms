@@ -21,6 +21,8 @@ import {render, fireEvent, act} from '@testing-library/react'
 import * as mediaUtils from '../../shared/utils/mediaUtils'
 import Attachment from '../Attachment'
 
+jest.useFakeTimers()
+
 describe('Attachment', () => {
   beforeEach(() => {
     mediaUtils.hasMediaFeature = jest.fn(() => true)
@@ -75,5 +77,21 @@ describe('Attachment', () => {
     fireEvent.click(getByText('Use This Photo'))
     expect(getByAltText('Captured Image')).toBeInTheDocument()
     expect(props.setBlob).toHaveBeenCalledWith(mockedBlob)
+  })
+
+  it('focus Use Webcam when remove the picture', async () => {
+    const mockedBlob = jest.mock()
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'toBlob')
+      .mockImplementationOnce(callback => callback(mockedBlob))
+    const props = getProps()
+    const {getByText, getByTestId} = render(<Attachment {...props} />)
+    fireEvent.click(getByText('Use Webcam'))
+    await act(() => mediaUtils.getUserMedia())
+    fireEvent.click(getByText('Take Photo'))
+    fireEvent.click(getByText('Use This Photo'))
+    fireEvent.click(getByTestId('removePhotoButton'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Use Webcam').closest('button')).toHaveFocus()
   })
 })

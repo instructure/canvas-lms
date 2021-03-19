@@ -38,7 +38,7 @@ describe Auditors::Authentication do
     include_examples "cassandra audit logs"
 
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
       @account = Account.default
       user_with_pseudonym(active_all: true)
       @event = Auditors::Authentication.record(@pseudonym, 'login')
@@ -235,10 +235,10 @@ describe Auditors::Authentication do
 
       context "different shard, db auditors" do
         before do
-          allow(Auditors).to receive(:write_to_cassandra?).and_return(false)
-          allow(Auditors).to receive(:write_to_postgres?).and_return(true)
-          allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
-          allow(Auditors).to receive(:read_from_postgres?).and_return(true)
+          allow(Audits).to receive(:write_to_cassandra?).and_return(false)
+          allow(Audits).to receive(:write_to_postgres?).and_return(true)
+          allow(Audits).to receive(:read_from_cassandra?).and_return(false)
+          allow(Audits).to receive(:read_from_postgres?).and_return(true)
           @shard2.activate do
             @account = account_model
             user_with_pseudonym(account: @account, active_all: true)
@@ -265,20 +265,20 @@ describe Auditors::Authentication do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
       @account = Account.default
       user_with_pseudonym(active_all: true)
       @event = Auditors::Authentication.record(@pseudonym, 'login')
     end
 
     it "writes to cassandra" do
-      expect(Auditors.write_to_cassandra?).to eq(true)
+      expect(Audits.write_to_cassandra?).to eq(true)
       expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1)).
         to include(@event)
     end
 
     it "writes to postgres" do
-      expect(Auditors.write_to_postgres?).to eq(true)
+      expect(Audits.write_to_postgres?).to eq(true)
       pg_record = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @event.id).first
       expect(pg_record.pseudonym_id).to eq(@pseudonym.id)
     end
@@ -286,14 +286,14 @@ describe Auditors::Authentication do
 
   describe "with reading from postgres" do
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'active_record'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'active_record'})
       @account = Account.default
       user_with_pseudonym(active_all: true)
       @event = Auditors::Authentication.record(@pseudonym, 'login')
     end
 
     it "can be read from postgres" do
-      expect(Auditors.read_from_postgres?).to eq(true)
+      expect(Audits.read_from_postgres?).to eq(true)
       pg_record = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @event.id).first
       expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1)).to include(pg_record)
     end

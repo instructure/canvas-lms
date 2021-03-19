@@ -32,6 +32,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
+  after_create :clear_descendants_cache
+  after_update :clear_descendants_cache, if: -> { clear_descendants_cache? }
   resolves_root_account through: -> (group) { group.context_id ? group.context.resolved_root_account_id : 0 }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -245,6 +247,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def is_ancestor?(id)
     ancestor_ids.member?(id)
+  end
+
+  def clear_descendants_cache
+    Outcomes::LearningOutcomeGroupChildren.new(context).clear_descendants_cache
+  end
+
+  def clear_descendants_cache?
+    (previous_changes.keys & %w[learning_outcome_group_id workflow_state]).any?
   end
 
   private_class_method def self.title_order_by_clause(table = nil)

@@ -34,112 +34,239 @@ describe "teacher k5 dashboard" do
     course_with_teacher_logged_in(active_all: true, new_user: true, user_name: 'K5Teacher', course_name: @course_name)
   end
 
-  it 'enables homeroom for course' do
-    get "/courses/#{@course.id}/settings"
+  context 'homeroom dashboard standard' do
+    it 'enables homeroom for course' do
+      get "/courses/#{@course.id}/settings"
 
-    check_enable_homeroom_checkbox
-    wait_for_new_page_load { submit_form('#course_form') }
+      check_enable_homeroom_checkbox
+      wait_for_new_page_load { submit_form('#course_form') }
 
-    expect(is_checked(enable_homeroom_checkbox_selector)).to be_truthy
+      expect(is_checked(enable_homeroom_checkbox_selector)).to be_truthy
+    end
+
+    it 'provides the homeroom dashboard tabs on dashboard' do
+      get "/"
+
+      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(homeroom_tab).to be_displayed
+      expect(schedule_tab).to be_displayed
+      expect(grades_tab).to be_displayed
+      expect(resources_tab).to be_displayed
+    end
+
+    it 'saves tab information for refresh' do
+      get "/"
+
+      select_schedule_tab
+      refresh_page
+      wait_for_ajaximations
+
+      expect(driver.current_url).to match(/#schedule/)
+    end
+
+    it 'presents latest homeroom announcements' do
+      @course.homeroom_course = true
+      @course.save!
+      announcement_heading = "K5 Let's do this"
+      announcement_content = "So happy to see all of you."
+      new_announcement(@course, announcement_heading, announcement_content)
+
+      announcement_heading = "Happy Monday!"
+      announcement_content = "Let's get to work"
+      new_announcement(@course, announcement_heading, announcement_content)
+
+      get "/"
+
+      expect(homeroom_course_title_link(@course_name)).to be_displayed
+      expect(announcement_title(announcement_heading)).to be_displayed
+      expect(announcement_content_text(announcement_content)).to be_displayed
+    end
+
+    it 'navigates to homeroom course when homeroom when homeroom title clicked' do
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/"
+
+      click_homeroom_course_title(@course_name)
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@course.id}")
+    end
+
+    it 'navigates to homeroom course announcement edit when announcement button is clicked' do
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/"
+
+      expect(announcement_button).to be_displayed
+      click_announcement_button
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics/new?is_announcement=true")
+    end
+
+    it 'goes to the homeroom announcement for edit when clicked' do
+      @course.homeroom_course = true
+      @course.save!
+      announcement_title = "K5 Let's do this"
+      announcement = new_announcement(@course, announcement_title, "So happy to see all of you.")
+
+      get "/"
+
+      click_announcement_edit_pencil
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics/#{announcement.id}/edit")
+
+    end
+
+    it 'shows two different homeroom course announcements for teacher enrolled in two homerooms' do
+      @course.homeroom_course = true
+      @course.save!
+      first_course = @course
+      first_course_announcement_title = "K5 Latest"
+      announcement_course1 = new_announcement(@course, first_course_announcement_title, "Let's get to work!")
+
+      second_homeroom_course_title = 'Second Teacher Homeroom'
+      course_with_teacher(
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_homeroom_course_title,
+        user: @teacher
+      )
+
+      @course.homeroom_course = true
+      @course.save!
+      second_course_announcement_title = "Homeroom 2"
+      announcement_course2 = new_announcement(@course, second_course_announcement_title, "You got this!")
+
+      get "/"
+
+      expect(homeroom_course_title_link(@course_name)).to be_displayed
+      expect(announcement_title(first_course_announcement_title)).to be_displayed
+      expect(homeroom_course_title_link(second_homeroom_course_title)).to be_displayed
+      expect(announcement_title(second_course_announcement_title)).to be_displayed
+    end
+
+    it 'does not show homeroom course on dashboard' do
+      @course.homeroom_course = true
+      @course.save!
+      subject_course_title = "Social Studies 4"
+      subject_course = Course.create!(name: subject_course_title)
+      subject_course.enroll_teacher(@teacher).accept!
+
+      get "/"
+
+      expect(element_exists?(course_card_selector(@course_name))).to eq(false)
+      expect(element_exists?(course_card_selector(subject_course_title))).to eq(true)
+    end
   end
 
-  it 'provides the homeroom dashboard tabs on dashboard' do
-    get "/"
+  context 'course cards' do
+    it 'shows latest announcement on subject course card' do
+      new_announcement(@course, "K5 Let's do this", "So happy to see all of you.")
+      announcement2 = new_announcement(@course, "K5 Latest", "Let's get to work!")
 
-    expect(retrieve_welcome_text).to match(/Welcome,/)
-    expect(homeroom_tab).to be_displayed
-    expect(schedule_tab).to be_displayed
-    expect(grades_tab).to be_displayed
-    expect(resources_tab).to be_displayed
+      get "/"
+
+      expect(course_card_announcement(announcement2.title)).to be_displayed
+    end
   end
 
-  it 'saves tab information for refresh' do
-    get "/"
+  context 'homeroom dashboard grades panel' do
+    let(:subject_title1) { "Math" }
 
-    select_schedule_tab
-    refresh_page
-    wait_for_ajaximations
+    before :each do
+      @homeroom_course = @course
+      @homeroom_course.update!(homeroom_course: true)
+      course_with_teacher(active_all: true, user: @teacher, course_name: subject_title1)
+      @subject = @course
+    end
+    
+    it 'shows the subjects the teacher is enrolled in' do
+      subject_title2 = "Social Studies"
+      course_with_teacher(active_all: true, user: @teacher, course_name: subject_title2)
 
-    expect(driver.current_url).to match(/#schedule/)
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(subject_grades_title(subject_title2)).to be_displayed
+    end
+
+    it 'provides a button to the gradebook for subject teacher is enrolled in' do
+      get "/#grades"
+
+      expect(view_grades_button(@subject.id)).to be_displayed
+    end
+
+    it 'shows the subjects the TA is enrolled in' do
+      course_with_ta(active_all: true, course: @subject)
+
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(view_grades_button(@subject.id)).to be_displayed
+    end
+
+    it 'show teacher also as student on grades page' do
+      subject_title2 = "Teacher Training"
+      course_with_student(active_all: true, user: @teacher, course_name: subject_title2)
+
+      get "/#grades"
+
+      expect(subject_grades_title(subject_title1)).to be_displayed
+      expect(subject_grades_title(subject_title2)).to be_displayed
+      expect(subject_grade("--")).to be_displayed
+    end
   end
 
-  it 'presents latest homeroom announcements' do
-    @course.homeroom_course = true
-    @course.save!
-    announcement_heading = "K5 Let's do this"
-    announcement_content = "So happy to see all of you."
-    new_announcement(@course, announcement_heading, announcement_content)
+  context 'homeroom dashboard resource panel' do
+    it 'shows the resource panel staff contacts' do
+      @course.homeroom_course = true
+      @course.save!
+      @course.account.save!
 
-    announcement_heading = "Happy Monday!"
-    announcement_content = "Let's get to work"
-    new_announcement(@course, announcement_heading, announcement_content)
+      course_with_ta(
+        course: @course,
+        active_enrollment: 1
+      )
 
-    get "/"
+      @ta.email = 'ta_person@example.com'
+      @ta.save!
 
-    expect(homeroom_course_title_link(@course_name)).to be_displayed
-    expect(announcement_title(announcement_heading)).to be_displayed
-    expect(announcement_content_text(announcement_content)).to be_displayed
-  end
+      get "/"
 
-  it 'navigates to homeroom course when homeroom when homeroom title clicked' do
-    @course.homeroom_course = true
-    @course.save!
+      select_resources_tab
 
-    get "/"
+      expect(staff_heading(@teacher.name)).to be_displayed
+      expect(email_link(@teacher.email)).to be_displayed
+      expect(instructor_role('Teacher')).to be_displayed
 
-    click_homeroom_course_title(@course_name)
-    wait_for_ajaximations
+      expect(staff_heading(@ta.name)).to be_displayed
+      expect(email_link(@ta.email)).to be_displayed
+      expect(instructor_role('Teaching Assistant')).to be_displayed
+    end
 
-    expect(driver.current_url).to include("/courses/#{@course.id}")
-  end
+    it 'shows the bio for a contact if the profiles are enabled' do
+      @course.homeroom_course = true
+      @course.save!
+      @course.account.settings[:enable_profiles] = true
+      @course.account.save!
 
-  it 'navigates to homeroom course announcement edit when announcement button is clicked' do
-    @course.homeroom_course = true
-    @course.save!
+      user_profile = @teacher.profile
 
-    get "/"
+      bio = 'teacher profile bio'
+      title = 'teacher profile title'
 
-    expect(announcement_button).to be_displayed
-    click_announcement_button
-    wait_for_ajaximations
+      user_profile.bio = bio
+      user_profile.title = title
+      user_profile.save!
 
-    expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics/new?is_announcement=true")
-  end
+      get "/#resources"
 
-  it 'does not show homeroom course on dashboard' do
-    @course.homeroom_course = true
-    @course.save!
-    subject_course_title = "Social Studies 4"
-    subject_course = Course.create!(name: subject_course_title)
-    subject_course.enroll_teacher(@teacher).accept!
-
-    get "/"
-
-    expect(element_exists?(course_card_selector(@course_name))).to eq(false)
-    expect(element_exists?(course_card_selector(subject_course_title))).to eq(true)
-  end
-
-  it 'shows latest announcement on subject course card' do
-    new_announcement(@course, "K5 Let's do this", "So happy to see all of you.")
-    announcement2 = new_announcement(@course, "K5 Latest", "Let's get to work!")
-
-    get "/"
-
-    expect(course_card_announcement(announcement2.title)).to be_displayed
-  end
-
-  it 'goes to the homeroom announcement for edit when clicked' do
-    @course.homeroom_course = true
-    @course.save!
-    announcement_title = "K5 Let's do this"
-    announcement = new_announcement(@course, announcement_title, "So happy to see all of you.")
-
-    get "/"
-
-    click_announcement_edit_pencil
-    wait_for_ajaximations
-
-    expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics/#{announcement.id}/edit")
-
+      expect(instructor_bio(bio)).to be_displayed
+    end
   end
 end

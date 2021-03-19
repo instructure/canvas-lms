@@ -66,7 +66,8 @@ export class PlannerApp extends Component {
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
     appRef: func,
-    focusFallback: func
+    focusFallback: func,
+    k5Mode: bool
   }
 
   static defaultProps = {
@@ -79,7 +80,8 @@ export class PlannerApp extends Component {
     responsiveSize: 'large',
     appRef: () => {},
     focusFallback: () => {},
-    isCompletelyEmpty: bool
+    isCompletelyEmpty: bool,
+    k5Mode: false
   }
 
   constructor(props) {
@@ -261,6 +263,7 @@ export class PlannerApp extends Component {
         toggleCompletion={this.props.togglePlannerItemCompletion}
         updateTodo={this.props.updateTodo}
         currentUser={this.props.currentUser}
+        simplifiedControls={this.props.k5Mode}
       />
     )
     workingDay.add(1, 'days')

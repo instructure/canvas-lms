@@ -21,7 +21,7 @@
 <% if !@locked || @locked_reason[:lock_at] %>
   <% if @quiz.description.present? %>
     <h2><%= t 'Instructions' %></h2>
-    <div class="description user_content student-version">
+    <div class="description user_content">
       <%= public_user_content(@quiz.description) %>
     </div>
   <% end %>

@@ -42,6 +42,7 @@ describe Types::LearningOutcomeGroupType do
     @user = @admin
     @outcome1 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "BBBB")
     @outcome2 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "AAAA")
+    Account.default.enable_feature! :improved_outcomes_management
   end
 
   let(:outcome_group_type) { GraphQLTypeTester.new(@outcome_group, current_user: @user) }

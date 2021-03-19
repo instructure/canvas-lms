@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import PropTypes from 'prop-types'
 import React, {Suspense} from 'react'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconTrashLine} from '@instructure/ui-icons'
+import I18n from 'i18n!assignment'
+
 import ErrorBoundary from 'jsx/shared/components/ErrorBoundary'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from 'jsx/shared/components/GenericErrorPage/index'
@@ -24,7 +29,16 @@ import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 
 const FileBrowser = React.lazy(() => import('jsx/shared/rce/FileBrowser'))
 
-export function FileBrowserWrapper(props) {
+const attachmentNameStyle = {
+  display: 'inline-block',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  verticalAlign: 'middle',
+  whiteSpace: 'nowrap',
+  width: '280px'
+}
+
+function FileBrowserWrapper(props) {
   return (
     <ErrorBoundary
       errorComponent={
@@ -39,4 +53,32 @@ export function FileBrowserWrapper(props) {
       </Suspense>
     </ErrorBoundary>
   )
+}
+
+export function AnnotatedDocumentSelector({attachment, onSelect, onRemove}) {
+  return attachment ? (
+    <div>
+      <span style={attachmentNameStyle}>{`${attachment.name}`}</span>
+      <IconButton
+        onClick={() => {
+          onRemove(attachment)
+        }}
+        screenReaderLabel={I18n.t('Remove selected attachment')}
+        size="small"
+      >
+        <IconTrashLine />
+      </IconButton>
+    </div>
+  ) : (
+    <FileBrowserWrapper allowUpload selectFile={onSelect} useContextAssets />
+  )
+}
+
+AnnotatedDocumentSelector.propTypes = {
+  attachment: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string
+  }),
+  onSelect: PropTypes.func,
+  onRemove: PropTypes.func
 }

@@ -1616,7 +1616,7 @@ describe Enrollment do
         @term = @course.enrollment_term
         expect(@term).not_to be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
+        @override = @term.enrollment_dates_overrides.create!(enrollment_type: @enrollment.type, enrollment_term: @term, context: @term.root_account)
         @override.start_at = 2.days.ago
         @override.end_at = 2.days.from_now
         @override.save!
@@ -1831,7 +1831,7 @@ describe Enrollment do
       describe 'enrollment_dates_override dates' do
         before do
           @term = @course.enrollment_term
-          @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
+          @override = @term.enrollment_dates_overrides.create!(enrollment_type: @enrollment.type, enrollment_term: @term, context: @term.root_account)
         end
 
         it "should return active" do

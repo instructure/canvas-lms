@@ -58,7 +58,7 @@ module Factories
       users
 
     if options[:account_associations]
-      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0}})
+      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0, root_account_id: course.root_account_id}})
     end
 
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id

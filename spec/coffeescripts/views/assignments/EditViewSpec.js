@@ -49,7 +49,7 @@ const nameLengthHelper = function (
   const name = 'a'.repeat(length)
   ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
   ENV.MAX_NAME_LENGTH = maxNameLength
-  return view.validateBeforeSave({name, post_to_sis: postToSis, grading_type: gradingType}, [])
+  return view.validateBeforeSave({name, post_to_sis: postToSis, grading_type: gradingType}, {})
 }
 const editView = function (assignmentOpts = {}) {
   const defaultAssignmentOpts = {
@@ -157,21 +157,21 @@ test('renders', function () {
 test('rejects missing group set for group assignment', function () {
   const view = this.editView()
   const data = {group_category_id: 'blank'}
-  const errors = view.validateBeforeSave(data, [])
+  const errors = view.validateBeforeSave(data, {})
   equal(errors.newGroupCategory[0].message, 'Please create a group set')
 })
 
 test('rejects a letter for points_possible', function () {
   const view = this.editView()
   const data = {points_possible: 'a'}
-  const errors = view.validateBeforeSave(data, [])
+  const errors = view.validateBeforeSave(data, {})
   equal(errors.points_possible[0].message, 'Points possible must be a number')
 })
 
 test('validates presence of a final grader', function () {
   const view = this.editView()
   sinon.spy(view, 'validateFinalGrader')
-  view.validateBeforeSave({}, [])
+  view.validateBeforeSave({}, {})
   strictEqual(view.validateFinalGrader.callCount, 1)
   view.validateFinalGrader.restore()
 })
@@ -179,9 +179,17 @@ test('validates presence of a final grader', function () {
 test('validates grader count', function () {
   const view = this.editView()
   sinon.spy(view, 'validateGraderCount')
-  view.validateBeforeSave({}, [])
+  view.validateBeforeSave({}, {})
   strictEqual(view.validateGraderCount.callCount, 1)
   view.validateGraderCount.restore()
+})
+
+test('validates presence of attachment when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  const data = {submission_types: ['annotated_document']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentError = errors['online_submission_types[annotated_document]'][0]
+  strictEqual(annotatedDocumentError.message, 'You must attach a file')
 })
 
 test('does not allow group assignment for large rosters', function () {
@@ -226,7 +234,7 @@ test('does not allow point value of -1 or less if grading type is letter', funct
 test('requires name to save assignment', function () {
   const view = this.editView()
   const data = {name: ''}
-  const errors = view.validateBeforeSave(data, [])
+  const errors = view.validateBeforeSave(data, {})
   ok(errors.name)
   equal(errors.name.length, 1)
   equal(errors.name[0].message, 'Name is required!')
@@ -243,13 +251,13 @@ test('has an error when a name has 257 chars', function () {
 test('allows assignment to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
   const view = this.editView()
   const errors = nameLengthHelper(view, 256, false, 30, '1', 'points')
-  equal(errors.length, 0)
+  notOk(errors.name)
 })
 
 test('allows assignment to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded', function () {
   const view = this.editView()
   const errors = nameLengthHelper(view, 15, true, 10, '1', 'not_graded')
-  equal(errors.length, 0)
+  notOk(errors.name)
 })
 
 test('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and required and post_to_sis is true', function () {
@@ -263,20 +271,20 @@ test('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and required 
 test('allows assignment to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false', function () {
   const view = this.editView()
   const errors = nameLengthHelper(view, 11, true, 10, '0', 'points')
-  equal(errors.length, 0)
+  notOk(errors.name)
 })
 
 test('allows assignment to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true', function () {
   const view = this.editView()
   const errors = nameLengthHelper(view, 10, true, 10, '1', 'points')
-  equal(errors.length, 0)
+  notOk(errors.name)
 })
 
 test("don't validate name if it is frozen", function () {
   const view = this.editView()
   view.model.set('frozen_attributes', ['title'])
 
-  const errors = view.validateBeforeSave({}, [])
+  const errors = view.validateBeforeSave({}, {})
   notOk(errors.name)
 })
 
@@ -1915,7 +1923,12 @@ QUnit.module('EditView annotatable document submission', hooks => {
   let view
 
   hooks.beforeEach(() => {
-    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fixtures.innerHTML = `
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <div id="annotated_document_chooser_container"></div>
+      <input id="annotated_document_id" type="checkbox"></input>
+    `
+
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
@@ -1941,7 +1954,7 @@ QUnit.module('EditView annotatable document submission', hooks => {
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
-    document.getElementById('fixtures').innerHTML = ''
+    fixtures.innerHTML = ''
   })
 
   test('does not render annotatable document option (flag missing)', function () {
@@ -1955,5 +1968,35 @@ QUnit.module('EditView annotatable document submission', hooks => {
     view = editView()
     const label = view.$('#assignment_annotated_document').parent()
     ok(label.text().includes('Annotated Document'))
+  })
+
+  QUnit.module('when Annotated Document is selected', function (contextHooks) {
+    const filename = 'test.pdf'
+    let assignmentOpts
+
+    contextHooks.beforeEach(function () {
+      ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
+      ENV.ANNOTATED_DOCUMENT = {id: 1, display_name: filename}
+      assignmentOpts = {submissionTypes: ['annotated_document']}
+    })
+
+    test('renders the filename if attachment is present', function () {
+      editView(assignmentOpts)
+      const file = document.querySelector('div#annotated_document_chooser_container span')
+      strictEqual(file.textContent, filename)
+    })
+
+    test('renders a remove button if attachment is present', function () {
+      editView(assignmentOpts)
+      const button = document.querySelector('div#annotated_document_chooser_container button')
+      strictEqual(button.textContent, 'Remove selected attachment')
+    })
+
+    test('clicking the remove button de-selects the file', function () {
+      editView(assignmentOpts)
+      document.querySelector('div#annotated_document_chooser_container button').click()
+      const container = document.querySelector('div#annotated_document_chooser_container')
+      notOk(container.textContent.includes(filename))
+    })
   })
 })

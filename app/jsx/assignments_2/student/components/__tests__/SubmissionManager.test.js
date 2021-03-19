@@ -416,8 +416,89 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-
       expect(queryByTestId('set-module-item-completion-button')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('similarity pledge', () => {
+    let props
+
+    beforeEach(async () => {
+      window.ENV.SIMILARITY_PLEDGE = {
+        COMMENTS: 'hi',
+        EULA_URL: 'http://someurl.com',
+        PLEDGE_TEXT: 'some text'
+      }
+
+      props = await mockAssignmentAndSubmission({
+        Assignment: {
+          submissionTypes: ['online_text_entry', 'online_url']
+        },
+        Submission: {
+          submissionDraft: {
+            activeSubmissionType: 'online_text_entry',
+            body: 'some text here',
+            meetsTextEntryCriteria: true,
+            meetsUrlCriteria: true,
+            url: 'http://www.google.com'
+          }
+        }
+      })
+    })
+
+    afterEach(() => {
+      delete window.ENV.SIMILARITY_PLEDGE
+    })
+
+    it('is rendered if pledge settings are provided', () => {
+      const {getByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      const agreementCheckbox = getByRole('checkbox', {name: /I agree to the tool's/})
+      expect(agreementCheckbox).toBeInTheDocument()
+    })
+
+    it('is not rendered if no pledge settings are provided', () => {
+      delete window.ENV.SIMILARITY_PLEDGE
+
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      const agreementCheckbox = queryByRole('checkbox', {name: /I agree to the tool's/})
+      expect(agreementCheckbox).not.toBeInTheDocument()
+    })
+
+    it('disables the "Submit" button if rendered and the user has not agreed to the pledge', () => {
+      const {getByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      const submitButton = getByRole('button', {name: 'Submit'})
+      expect(submitButton).toBeDisabled()
+    })
+
+    it('enables the "Submit" button after the user agrees to the pledge', () => {
+      const {getByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      const agreementCheckbox = getByRole('checkbox', {name: /I agree to the tool's/})
+      act(() => {
+        fireEvent.click(agreementCheckbox)
+      })
+
+      const submitButton = getByRole('button', {name: 'Submit'})
+      expect(submitButton).not.toBeDisabled()
     })
   })
 })

@@ -543,17 +543,25 @@ This text has a http://www.google.com link in it...
       end
 
       it 'can be updated by the teacher who created it' do
-        expect(@submission_comment.grants_any_right?(@teacher, {}, :update)).to be_truthy
+        expect(@submission_comment).to be_grants_any_right(@teacher, :update)
       end
 
       it 'cannot be updated by a different teacher on the same course' do
-        expect(@submission_comment.grants_any_right?(@second_teacher, {}, :update)).to be_falsey
+        expect(@submission_comment).not_to be_grants_any_right(@second_teacher, :update)
       end
 
       it 'cannot be read by a student if it would otherwise be readable by them' do
         @submission_comment.teacher_only_comment = false
 
-        expect(@submission_comment.grants_any_right?(@student, {}, :read)).to be_falsey
+        expect(@submission_comment).not_to be_grants_any_right(@student, :read)
+      end
+
+      it "cannot be read by an observer of the receiving student if it would otherwise be readable by the student" do
+        @submission_comment.teacher_only_comment = false
+
+        observer = User.create!
+        @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student.id)
+        expect(@submission_comment).not_to be_grants_any_right(observer, :read)
       end
     end
 

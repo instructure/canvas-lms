@@ -16,13 +16,58 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Document Previews
-# This API can only be accessed when another endpoint provides a signed URL.
-# It will simply redirect you to the 3rd party document preview..
-#
 class CanvadocSessionsController < ApplicationController
+  include CanvadocsHelper
   include HmacHelper
 
+  def create
+    submission_attempt, submission_id = params.require([:submission_attempt, :submission_id])
+
+    begin
+      submission = Submission.active.find(submission_id)
+    rescue ActiveRecord::RecordNotFound
+      return render_unauthorized_action
+    end
+
+    return render_unauthorized_action unless Account.site_admin.feature_enabled?(:annotated_document_submissions)
+    # Denying graders from this endpoint for now because graders should be
+    # grading in SpeedGrader. This also simplifies the enable_annotations opt now
+    # that we don't have to consider grading roles or peer reviewers.
+    return render_unauthorized_action unless submission.user == @current_user
+    return render_unauthorized_action if submission.assignment.annotatable_attachment_id.blank?
+
+    is_draft = submission_attempt == "draft"
+
+    if is_draft && submission.attempts_left == 0
+      error_message = "There are no more attempts available for this submission"
+      return render json: {error: error_message}, status: :bad_request
+    end
+
+    annotation_context = if is_draft
+                           submission.annotation_context(draft: true)
+                         else
+                           submission.annotation_context(attempt: submission_attempt.to_i)
+                         end
+
+    if annotation_context.nil?
+      return render json: {error: "No annotations associated with that submission_attempt"}, status: :bad_request
+    end
+
+    opts = {
+      annotation_context: annotation_context.launch_id,
+      anonymous_instructor_annotations: submission.assignment.anonymous_instructor_annotations,
+      enable_annotations: true,
+      enrollment_type: canvadocs_user_role(submission.assignment.course, @current_user),
+      moderated_grading_allow_list: submission.moderated_grading_allow_list(@current_user),
+      submission_id: submission.id
+    }
+
+    render json: {canvadocs_session_url: annotation_context.attachment.canvadoc_url(@current_user, opts)}
+  end
+
+  # @API Document Previews
+  # This API can only be accessed when another endpoint provides a signed URL.
+  # It will simply redirect you to the 3rd party document preview.
   def show
     blob = extract_blob(params[:hmac], params[:blob],
                         "user_id" => @current_user.try(:global_id),
@@ -63,6 +108,10 @@ class CanvadocSessionsController < ApplicationController
 
         opts[:audit_url] = submission_docviewer_audit_events_url(submission_id) if assignment.auditable?
         opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
+
+        if blob["annotation_context"].present?
+          opts[:annotation_context] = blob["annotation_context"]
+        end
       end
 
       if @domain_root_account.settings[:canvadocs_prefer_office_online]

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "split": "node bin/cli.js",
-    "test": "jest",
+    "test": "jest --color",
     "lint": "prettier bin/**/*.js lib/**/*.json --write"
   },
   "devDependencies": {

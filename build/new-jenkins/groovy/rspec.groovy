@@ -100,19 +100,18 @@ def _runRspecTestSuite(
       "POSTGRES_PASSWORD=sekret",
       "SELENIUM_VERSION=3.141.59-20201119",
       "PATCHSET_TAG=$patchsetTag",
+      "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
   ]) {
     try {
       cleanAndSetup()
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 15) {
-        sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+        credentials.withStarlordCredentials { ->
+          sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+        }
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
         sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
       }
-    } catch(Exception e) {
-      failureReport.addFailure(prefix, "${BUILD_URL}${prefix}-test-failures")
-
-      throw e
     } finally {
       // copy spec failures to local
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
@@ -127,7 +126,20 @@ def _runRspecTestSuite(
       findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
         // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
         // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
-        failureReport.addFailurePathByCategory(prefix, file.getPath(), file.getPath().split("/")[5])
+
+        def pathCategory = file.getPath().split("/")[5]
+        def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
+        def splitPath = file.getPath().split('/').toList()
+        def specTitle = splitPath.subList(6, splitPath.size() - 1).join('/')
+        def artifactsPath = "../artifact/${file.getPath()}"
+
+        buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
+
+        if(pathCategory == finalCategory) {
+          buildSummaryReport.setFailureCategory(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_NEVER_PASSED)
+        } else {
+          buildSummaryReport.setFailureCategoryUnlessExists(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_PASSED_ON_RETRY)
+        }
       }
 
       // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value

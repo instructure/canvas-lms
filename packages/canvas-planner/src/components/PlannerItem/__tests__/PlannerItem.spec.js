@@ -651,3 +651,23 @@ it('renders media feedback if available', () => {
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
 })
+
+describe('with simplifiedControls', () => {
+  const props = defaultProps({simplifiedControls: true})
+
+  it('renders the title link in licorice', () => {
+    const wrapper = shallow(<PlannerItem {...props} />)
+    const titleLink = wrapper.find('.PlannerItem-styles__title Button')
+    expect(titleLink.prop('theme').linkColor).toBe('#2D3B45')
+  })
+
+  it('does not render the details sub-heading', () => {
+    const wrapper = shallow(<PlannerItem {...props} />)
+    expect(wrapper.find('.PlannerItem-styles__type').length).toBe(0)
+  })
+
+  it('does not render the item type icon in course color', () => {
+    const wrapper = shallow(<PlannerItem {...props} />)
+    expect(wrapper.find('.PlannerItem-styles__icon').prop('style').color).toBe(undefined)
+  })
+})

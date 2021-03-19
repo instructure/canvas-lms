@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import Modal from '../../shared/components/InstuiModal'
-import {useCanvasContext} from '../shared/hooks'
+import useCanvasContext from '../shared/hooks/useCanvasContext'
 import {showFlashAlert} from '../../shared/FlashAlert'
 import {removeOutcomeGroup} from './api'
 
@@ -47,7 +47,11 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
       }
     } catch (err) {
       showFlashAlert({
-        message: I18n.t('An error occurred while making a network request.'),
+        message: err.message
+          ? I18n.t('An error occurred while removing this group: %{message}', {
+              message: err.message
+            })
+          : I18n.t('An error occurred while removing this group.'),
         type: 'error'
       })
     }

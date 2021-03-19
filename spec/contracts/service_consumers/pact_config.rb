@@ -19,42 +19,34 @@
 #
 
 module PactConfig
-  EXTERNAL_BROKER_HOST = 'pact-broker.instructure.com'.freeze
   # These constants ensure we use the correct strings and thus help avoid our
   # accidentally breaking the contract tests
   module Providers
-    CANVAS_LMS_API = 'Canvas LMS API'.freeze
-    CANVAS_API_VERSION = '1.0'.freeze
-    CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
-    OUTCOMES = 'Outcomes'.freeze
-    ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
+    CANVAS_LMS_API = 'Canvas LMS API'
+    CANVAS_API_VERSION = '1.0'
+    CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'
+    OUTCOMES = 'Outcomes'
+    ALL = Providers.constants.map { |c| Providers.const_get(c) }
   end
 
   # Add new API consumers to this module
   module Consumers
     my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
     # common consumer
-    GENERIC_CONSUMER = 'Generic Consumer'.freeze
-    CANVAS_API_VERSION = '1.0'.freeze
-    CANVAS_LMS_API = 'Canvas LMS API'.freeze
-    if my_broker_host.include?(EXTERNAL_BROKER_HOST)
-      # external consumers
-      FIU = 'lmsAPI'.freeze
-    else
-      # internal consumers
-      QUIZ_LTI = 'Quiz LTI'.freeze
-      SISTEMIC = 'Sistemic'.freeze
-      ANDROID = 'android'.freeze
-      CANVAS_IOS = 'canvas-ios'.freeze
-    end
-    ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
+    CANVAS_API_VERSION = '1.0'
+    CANVAS_LMS_API = 'Canvas LMS API'
+    QUIZ_LTI = 'Quiz LTI'
+    SISTEMIC = 'Sistemic'
+    ANDROID = 'android'
+    CANVAS_IOS = 'canvas-ios'
+    ALL = Consumers.constants.map { |c| Consumers.const_get(c) }
   end
 
   # Add new Live Events consumers to this module
   module LiveEventConsumers
-    CATALOG = 'Catalog'.freeze
-    OUTCOMES = 'Outcomes'.freeze
-    QUIZ_LTI = 'Quiz LTI'.freeze
+    CATALOG = 'Catalog'
+    OUTCOMES = 'Outcomes'
+    QUIZ_LTI = 'Quiz LTI'
   end
 
   class << self

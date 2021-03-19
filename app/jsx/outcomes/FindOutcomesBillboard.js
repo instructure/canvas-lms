@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {Billboard} from '@instructure/ui-billboard'
 import {PresentationContent} from '@instructure/ui-a11y'
 import SVGWrapper from '../shared/SVGWrapper'
-import {useCanvasContext} from './shared/hooks'
+import useCanvasContext from './shared/hooks/useCanvasContext'
 
 const FindOutcomesBillboard = () => {
   const {contextType} = useCanvasContext()

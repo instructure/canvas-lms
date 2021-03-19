@@ -295,6 +295,9 @@ class LearningOutcome < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
+    # delete total_outcomes cache for each active learning_outcome_links contexts
+    clear_total_outcomes_cache
+
     # delete any remaining links to the outcome. in case of UI, this was
     # triggered by ContentTag#destroy and the checks have already run, we don't
     # need to do it again. in case of console, we don't care to force the
@@ -447,5 +450,28 @@ class LearningOutcome < ActiveRecord::Base
       new_mastery_type = 'explicit_mastery'
     end
     new_mastery_type
+  end
+
+  def clear_total_outcomes_cache
+    return unless improved_outcomes_management?
+
+    ContentTag.learning_outcome_links.
+      active.
+      distinct.
+      where(content_id: id).
+      select(<<-SQL).
+        root_account_id,
+        (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_type END) context_type,
+        (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
+      SQL
+      map do |ct|
+        Outcomes::LearningOutcomeGroupChildren.new(ct.context).clear_total_outcomes_cache
+      end
+  end
+
+  def improved_outcomes_management?
+    return context.root_account.feature_enabled?(:improved_outcomes_management) if context
+
+    LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
   end
 end

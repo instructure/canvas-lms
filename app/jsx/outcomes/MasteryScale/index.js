@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
+import {useQuery} from 'react-apollo'
 import I18n from 'i18n!MasteryScale'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -27,9 +28,10 @@ import {
   ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
   COURSE_OUTCOME_PROFICIENCY_QUERY
 } from './api'
-import {useQuery} from 'react-apollo'
+import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
 
-const MasteryScale = ({contextType, contextId, onNotifyPendingChanges}) => {
+const MasteryScale = ({onNotifyPendingChanges}) => {
+  const {contextType, contextId} = useCanvasContext()
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
 

@@ -158,9 +158,7 @@ module Turnitin
     end
 
     def submit_homework(attachment)
-      submission = @assignment.submit_homework(@user, attachments: [attachment], submission_type: 'online_upload')
-      submission.submitted_at = turnitin_client.uploaded_at if turnitin_client.uploaded_at
-      submission
+      @assignment.submit_homework(@user, attachments: [attachment], submission_type: 'online_upload', submitted_at: turnitin_client.uploaded_at)
     end
 
   end

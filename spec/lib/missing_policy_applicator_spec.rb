@@ -301,7 +301,7 @@ describe MissingPolicyApplicator do
 
     describe "grade change events" do
       before(:each) do
-        allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+        allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
         late_policy_missing_enabled
         create_recent_assignment
         @assignment = @course.assignments.last

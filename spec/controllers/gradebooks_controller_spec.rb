@@ -639,27 +639,27 @@ describe GradebooksController do
       end
 
       it "renders default gradebook when preferred with 'default'" do
-        @admin.preferences[:gradebook_version] = "default"
+        @admin.set_preference(:gradebook_version, "default")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/gradebook")
       end
 
       it "renders default gradebook when preferred with '2'" do
         # most users will have this set from before New Gradebook existed
-        @admin.preferences[:gradebook_version] = "2"
+        @admin.set_preference(:gradebook_version, "2")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/gradebook")
       end
 
       it "renders screenreader gradebook when preferred with 'individual'" do
-        @admin.preferences[:gradebook_version] = "individual"
+        @admin.set_preference(:gradebook_version, "individual")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/individual")
       end
 
       it "renders screenreader gradebook when preferred with 'srgb'" do
         # most a11y users will have this set from before New Gradebook existed
-        @admin.preferences[:gradebook_version] = "srgb"
+        @admin.set_preference(:gradebook_version, "srgb")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/individual")
       end
@@ -671,7 +671,7 @@ describe GradebooksController do
 
       it "ignores the parameter version when not in development" do
         allow(Rails.env).to receive(:development?).and_return(false)
-        @admin.preferences[:gradebook_version] = "default"
+        @admin.set_preference(:gradebook_version, "default")
         get "show", params: { course_id: @course.id, version: "individual" }
         expect(response).to render_template("gradebooks/gradebook")
       end
@@ -681,7 +681,7 @@ describe GradebooksController do
       before :each do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
-        @admin.preferences[:gradebook_version] = "individual"
+        @admin.set_preference(:gradebook_version, "individual")
         allow(Rails.env).to receive(:development?).and_return(true)
       end
 
@@ -695,7 +695,7 @@ describe GradebooksController do
       before :each do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
-        @admin.preferences[:gradebook_version] = "default"
+        @admin.set_preference(:gradebook_version, "default")
         allow(Rails.env).to receive(:development?).and_return(true)
       end
 
@@ -826,11 +826,11 @@ describe GradebooksController do
             expect(allow_final_grade_override).to eq false
           end
         end
-      end
+      end 
 
       describe "view ungraded as zero" do
         context "when individual gradebook is enabled" do
-          before(:each) { @teacher.preferences[:gradebook_version] = "srgb" }
+          before(:each) { @teacher.set_preference(:gradebook_version, "srgb") }
 
           it "save_view_ungraded_as_zero_to_server is true when the feature is enabled" do
             @course.account.enable_feature!(:view_ungraded_as_zero)
@@ -1192,14 +1192,14 @@ describe GradebooksController do
 
       context "with teacher that prefers Grid View" do
         before do
-          @user.preferences[:gradebook_version] = "2"
+          @user.set_preference(:gradebook_version, "2")
         end
         include_examples "working download"
       end
 
       context "with teacher that prefers Individual View" do
         before do
-          @user.preferences[:gradebook_version] = "srgb"
+          @user.set_preference(:gradebook_version, "srgb")
         end
         include_examples "working download"
       end
@@ -1211,13 +1211,13 @@ describe GradebooksController do
       end
 
       it "redirects to Grid View with a friendly URL" do
-        @teacher.preferences[:gradebook_version] = "2"
+        @teacher.set_preference(:gradebook_version, "2")
         get "show", params: {:course_id => @course.id}
         expect(response).to render_template("gradebook")
       end
 
       it "redirects to Individual View with a friendly URL" do
-        @teacher.preferences[:gradebook_version] = "srgb"
+        @teacher.set_preference(:gradebook_version, "srgb")
         get "show", params: {:course_id => @course.id}
         expect(response).to render_template("gradebooks/individual")
       end
@@ -1352,8 +1352,7 @@ describe GradebooksController do
       end
 
       def update_preferred_gradebook_version!(version)
-        @teacher.preferences[:gradebook_version] = version
-        @teacher.save!
+        @teacher.set_preference(:gradebook_version, version)
         user_session(@teacher)
       end
 

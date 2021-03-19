@@ -310,21 +310,6 @@ class Enrollment < ActiveRecord::Base
     SIS_TYPES.has_key?(type)
   end
 
-  def self.types_with_indefinite_article
-    {
-      'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
-      'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
-      'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
-      'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-      'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
-      'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
-    }
-  end
-
-  def self.type_with_indefinite_article(type)
-    types_with_indefinite_article[type] || types_with_indefinite_article['StudentEnrollment']
-  end
-
   def reload(options = nil)
     @enrollment_dates = nil
     super

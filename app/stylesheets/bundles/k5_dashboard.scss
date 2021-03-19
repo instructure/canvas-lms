@@ -49,7 +49,10 @@
   // See https://developers.google.com/web/updates/2017/09/sticky-headers.
   top: -1px;
   padding-top: 1px;
-  border-bottom: $ic-border-color 1px solid;
+  // These offsets let the sticky header cover content that spills over into the
+  // page padding, otherwise it's still visible behind the sticky header.
+  margin-left: -24px;
+  padding-left: 24px;
   // We need a higher z-index than the planner items, some of which are at 1.
   z-index: 2;
 

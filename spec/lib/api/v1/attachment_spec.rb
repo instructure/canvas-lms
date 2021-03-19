@@ -129,6 +129,21 @@ describe Api::V1::Attachment do
       expect(infer_file_extension(params)).to eq 'jpg'
     end
 
+    it 'return the extension from name attribute when the content_type is not found in mimetype_fu' do
+      params = ActionController::Parameters.new(
+        name: 'name.zip',
+        content_type: 'invalid'
+      )
+
+      expect(infer_file_extension(params)).to eq 'zip'
+    end
+
+    it 'return the extension from content_type attribute when it is given' do
+      params = ActionController::Parameters.new(content_type: 'application/x-zip-compressed')
+
+      expect(infer_file_extension(params)).to eq 'zip'
+    end
+
     it 'return the extension from url attribute even it is an unknown type' do
       params = ActionController::Parameters.new(
         name: 'name',

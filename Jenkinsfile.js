@@ -99,7 +99,9 @@ pipeline {
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
 
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
+                credentials.withStarlordCredentials { ->
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
+                }
               }
             }
 

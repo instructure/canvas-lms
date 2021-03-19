@@ -36,7 +36,7 @@ import {TAB_IDS} from '../DashboardTabs'
 
 import instFSOptimizedImageUrl from 'jsx/shared/helpers/instFSOptimizedImageUrl'
 
-export const CARD_WIDTH_PX = 300
+export const CARD_SIZE_PX = 300
 
 export function DashboardCardHeaderHero({image, backgroundColor, onClick}) {
   return (
@@ -44,12 +44,11 @@ export function DashboardCardHeaderHero({image, backgroundColor, onClick}) {
       style={{
         backgroundColor: !image && backgroundColor,
         backgroundImage:
-          image &&
-          `url(${instFSOptimizedImageUrl(image, {x: CARD_WIDTH_PX, y: CARD_WIDTH_PX / 2})})`,
+          image && `url(${instFSOptimizedImageUrl(image, {x: CARD_SIZE_PX, y: CARD_SIZE_PX / 2})})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
-        height: `${CARD_WIDTH_PX / 2}px`,
+        height: '50%',
         cursor: 'pointer'
       }}
       onClick={onClick}
@@ -183,7 +182,7 @@ const K5DashboardCard = ({
   const assignmentsMissing =
     (k5Context?.assignmentsMissing && k5Context.assignmentsMissing[id]) || 0
   const isStudent = k5Context?.isStudent || false
-  const responsiveWidth = k5Context?.responsiveSize === 'large' ? CARD_WIDTH_PX : '100%'
+  const responsiveWidth = k5Context?.responsiveSize === 'large' ? CARD_SIZE_PX : '100%'
 
   const handleHeaderClick = e => {
     if (e) {
@@ -198,7 +197,12 @@ const K5DashboardCard = ({
   const dashboardCard = (
     <div
       className="ic-DashboardCard"
-      style={{opacity: isDragging ? 0 : 1, transform: 'translate3d(0,0,0)', width: responsiveWidth}}
+      style={{
+        opacity: isDragging ? 0 : 1,
+        transform: 'translate3d(0,0,0)',
+        width: responsiveWidth,
+        height: `${CARD_SIZE_PX}px`
+      }}
       aria-label={originalName}
       data-testid="k5-dashboard-card"
     >
@@ -207,7 +211,7 @@ const K5DashboardCard = ({
         backgroundColor={backgroundColor}
         onClick={handleHeaderClick}
       />
-      <View as="div" height={`${CARD_WIDTH_PX / 2}px`}>
+      <View as="div" height="50%">
         <Heading
           as={headingLevel}
           level="h4"

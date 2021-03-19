@@ -48,12 +48,13 @@ describe 'assignments index menu tool placement' do
   it "should be able to launch the index menu tool via the tray", custom_timeout: 30 do
     visit_assignments_index_page(@course.id)
     course_assignments_settings_button.click
-    expect(course_assignments_settings_menu_items[1].text).to eq "Import Stuff"
+    menu_item = course_assignments_settings_menu_items.find { |item| item.text == "Import Stuff" }
+    expect(menu_item).not_to be_nil
 
-    course_assignments_settings_menu_items[1].click
+    menu_item.click
     wait_for_ajaximations
     expect(tool_dialog_header).to include_text("Import Stuff")
-    
+
     expect(tool_dialog_iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool1.id}")
 
     query_params = Rack::Utils.parse_nested_query(URI.parse(tool_dialog_iframe['src']).query)
@@ -75,13 +76,13 @@ describe 'assignments index menu tool placement' do
     wait_for_ajaximations
     expect(tool_dialog_header).to include_text("Import Stuff Here")
     expect(tool_dialog_iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool1.id}")
-    
+
     query_params = Rack::Utils.parse_nested_query(URI.parse(tool_dialog_iframe['src']).query)
     expect(query_params["launch_type"]).to eq "assignment_group_menu"
     expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
     expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "assignment"
     expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to eq ["assignment"]
-    
+
     group_data = [@agroup2].map{|ag| {"id" => ag.id.to_s, "name" => ag.name}} # just the selected group
     expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(group_data)
   end

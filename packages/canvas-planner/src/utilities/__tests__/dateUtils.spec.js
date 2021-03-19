@@ -73,12 +73,7 @@ describe('getFriendlyDate', () => {
 })
 
 describe('getFullDate', () => {
-  it('returns the day of the week month and day for special days', () => {
-    const date = moment()
-    expect(getFullDate(date)).toEqual(date.format('dddd, MMMM D'))
-  })
-
-  it('returns the format month day year when not a special day', () => {
+  it('returns the format month day year', () => {
     const date = moment().add(3, 'days')
     expect(getFullDate(date)).toEqual(date.format('MMMM D, YYYY'))
   })
@@ -114,74 +109,54 @@ describe('isInFuture', () => {
 
 describe('getFirstLoadedMoment', () => {
   it('returns today when there are no days loaded', () => {
-    const today = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getFirstLoadedMoment([], 'Asia/Tokyo')
+    const today = moment.tz(TZ).startOf('day')
+    const result = getFirstLoadedMoment([], TZ)
     expect(result.isSame(today)).toBeTruthy()
   })
 
   it('returns the dateBucketMoment of the first time of the first day', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
-    const result = getFirstLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment().tz(TZ).startOf('day')
+    const result = getFirstLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('uses the day key if the first day has no items', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
+    const expected = moment().tz(TZ).startOf('day')
     const formattedDate = formatDayKey(expected)
-    const result = getFirstLoadedMoment([[formattedDate, []]], 'Asia/Tokyo')
+    const result = getFirstLoadedMoment([[formattedDate, []]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('returns a clone', () => {
-    const expected = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getFirstLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment.tz(TZ).startOf('day')
+    const result = getFirstLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result === expected).toBeFalsy()
   })
 })
 
 describe('getLastLoadedMoment', () => {
   it('returns today when there are no days loaded', () => {
-    const today = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getLastLoadedMoment([], 'Asia/Tokyo')
+    const today = moment.tz(TZ).startOf('day')
+    const result = getLastLoadedMoment([], TZ)
     expect(result.isSame(today)).toBeTruthy()
   })
 
   it('returns the dateBucketMoment of the first time of the last day', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
-    const result = getLastLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment().tz(TZ).startOf('day')
+    const result = getLastLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('uses the day key if the last day has no items', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
+    const expected = moment().tz(TZ).startOf('day')
     const formattedDate = formatDayKey(expected)
-    const result = getLastLoadedMoment([[formattedDate, []]], 'Asia/Tokyo')
+    const result = getLastLoadedMoment([[formattedDate, []]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('returns a clone', () => {
-    const expected = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getLastLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment.tz(TZ).startOf('day')
+    const result = getLastLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result === expected).toBeFalsy()
   })
 })

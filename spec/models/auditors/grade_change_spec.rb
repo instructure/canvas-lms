@@ -54,7 +54,7 @@ describe Auditors::GradeChange do
   describe "with cassandra backend" do
     include_examples "cassandra audit logs"
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
       Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(submission: @submission) }
     end
 
@@ -340,7 +340,7 @@ describe Auditors::GradeChange do
     end
 
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
     end
 
     it "inserts submission grade change records" do
@@ -493,18 +493,18 @@ describe Auditors::GradeChange do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
     end
 
     it "writes to cassandra" do
       event = Auditors::GradeChange.record(submission: @submission)
-      expect(Auditors.write_to_cassandra?).to eq(true)
+      expect(Audits.write_to_cassandra?).to eq(true)
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(event)
     end
 
     it "writes to postgres" do
       event = Auditors::GradeChange.record(submission: @submission)
-      expect(Auditors.write_to_postgres?).to eq(true)
+      expect(Audits.write_to_postgres?).to eq(true)
       pg_record = Auditors::ActiveRecord::GradeChangeRecord.where(uuid: event.id).first
       expect(pg_record).to_not be_nil
       expect(pg_record.submission_id).to eq(@submission.id)

@@ -157,6 +157,12 @@
       <span class="edit_data"><%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => (@domain_root_account.try(:default_time_zone) || "Mountain Time (US & Canada)") %></span>
     </td>
   </tr>
+  <% if @user.shard.database_server.maintenance_window_start_hour %>
+  <tr>
+    <td></td>
+    <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @user.shard.database_server } %> </td>
+  </tr>
+  <% end %>
   <% if @domain_root_account == Account.default %>
     <tr>
       <td colspan="2">

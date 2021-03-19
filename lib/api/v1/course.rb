@@ -98,6 +98,11 @@ module Api::V1::Course
         precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
+      if includes.include?('grading_periods')
+        hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
+           api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+        end
+      end
       if includes.include?('course_progress')
         hash['course_progress'] = CourseProgress.new(course,
                                                      subject_user,

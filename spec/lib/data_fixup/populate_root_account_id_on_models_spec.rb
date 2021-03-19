@@ -80,46 +80,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with AccessToken' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) do
-          dk = DeveloperKey.create!(account: @course.account)
-          at = dk.access_tokens.create!(user: user_model)
-        end
-        let(:reference_record) { @course }
-      end
-
-      context 'with_sharding' do
-        specs_require_sharding
-
-        context 'with DeveloperKey with root_account_id' do
-          it_behaves_like 'a datafixup that populates root_account_id' do
-            let(:account) { @shard1.activate { account_model } }
-            let(:record) do
-              dk = DeveloperKey.create!(account: account)
-              at = dk.access_tokens.create!(user: user_model)
-            end
-            let(:reference_record) { account }
-          end
-        end
-      end
-    end
-
-    it 'should populate the root_account_id on AccountUser' do
-      au = AccountUser.create!(account: @course.account, user: @user)
-      au.update_columns(root_account_id: nil)
-      expect(au.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(au.reload.root_account_id).to eq @course.root_account_id
-
-      account = account_model(root_account: account_model)
-      au = AccountUser.create!(account: account, user: @user)
-      au.update_columns(root_account_id: nil)
-      expect(au.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(au.reload.root_account_id).to eq account.root_account_id
-    end
-
     it 'should populate root_account_id on AssessmentQuestion' do
       aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
       aq.update_columns(root_account_id: nil)
@@ -141,37 +101,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(aqb.reload.root_account_id).to eq nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(aqb.reload.root_account_id).to eq account.root_account_id
-    end
-
-    it 'should populate the root_account_id on AssetUserAccess with non-user context' do
-      auac = AssetUserAccess.create!(context: @course, user: @user)
-      auac.update_columns(root_account_id: nil)
-      expect(auac.reload.root_account_id).to eq nil
-
-      auaa = AssetUserAccess.create!(context: @course.root_account, user: @user)
-      auaa.update_columns(root_account_id: nil)
-      expect(auaa.reload.root_account_id).to eq nil
-
-      auag = AssetUserAccess.create!(context: group_model(context: @course), user: @user)
-      auag.update_columns(root_account_id: nil)
-      expect(auag.reload.root_account_id).to eq nil
-
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(auac.reload.root_account_id).to eq @course.root_account_id
-      expect(auaa.reload.root_account_id).to eq @course.root_account_id
-      expect(auag.reload.root_account_id).to eq @course.root_account_id
-    end
-
-    it 'should populate the root_account_id on AssetUserAccess with user context' do
-      auac = AssetUserAccess.create!(context: @course, user: @user)
-      auac.update_columns(root_account_id: nil)
-
-      aua = AssetUserAccess.create!(context: @user, user: @user, asset_code: @course.asset_string)
-      aua.update_columns(root_account_id: nil)
-      expect(aua.reload.root_account_id).to eq nil
-
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(aua.reload.root_account_id).to eq @course.root_account_id
     end
 
     it 'should populate the root_account_id on AssignmentGroup' do
@@ -462,19 +391,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { reference_record.context_module_progressions.create!(user: @user) }
         let(:reference_record) { @course.context_modules.create! }
-      end
-    end
-
-    context 'with CourseAccountAssociation' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) do
-          CourseAccountAssociation.create!(
-            course: course_model(account: account_model(root_account_id: nil)),
-            account: reference_record,
-            depth: 1
-          )
-        end
-        let(:reference_record) { account_model(root_account_id: nil) }
       end
     end
 
@@ -785,21 +701,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on UserAccountAssociation' do
-      uaa = UserAccountAssociation.create!(account: @course.root_account, user: user_model)
-      uaa.update_columns(root_account_id: nil)
-      expect(uaa.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(uaa.reload.root_account_id).to eq @course.root_account_id
-
-      account = account_model(root_account: account_model)
-      uaa = UserAccountAssociation.create!(account: account, user: @user)
-      uaa.update_columns(root_account_id: nil)
-      expect(uaa.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(uaa.reload.root_account_id).to eq account.root_account_id
-    end
-
     context 'with Rubric (course-context)' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { rubric_model(context: @course) }
@@ -895,15 +796,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       LearningOutcome.update_all(root_account_ids: nil)
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override).at_least(:once)
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:populate_root_account_ids)
-      DataFixup::PopulateRootAccountIdOnModels.run
-    end
-
-    it 'should create multiple delayed jobs for tables with default and override methods' do
-      ContextModule.delete_all
-      AssetUserAccess.create!(context: @user, asset_code: @course.asset_string)
-      AssetUserAccess.update_all(root_account_id: nil)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids).at_least(:once)
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:populate_root_account_ids_override).at_least(:once)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
   end
@@ -1126,13 +1018,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome, [])).to be true
       LearningOutcome.update_all(root_account_ids: nil)
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(LearningOutcome, [])).to be false
-    end
-
-    it 'should check the whole table if there are non-association dependencies' do
-      AssetUserAccess.create!(context: user_model, asset_code: @course.asset_string, root_account_id: @course.root_account_id)
-      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(AssetUserAccess, [])).to be true
-      AssetUserAccess.update_all(root_account_id: nil)
-      expect(DataFixup::PopulateRootAccountIdOnModels.check_if_table_has_root_account(AssetUserAccess, [])).to be false
     end
   end
 

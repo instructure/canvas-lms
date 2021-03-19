@@ -113,4 +113,13 @@ describe('ManageOutcomeItem', () => {
       'not-allowed'
     )
   })
+
+  it('handles click on individual outcome -> kebab menu -> remove option', () => {
+    const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+    fireEvent.click(getByText('Outcome Menu'))
+    fireEvent.click(getByText('Remove'))
+    expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+    expect(onMenuHandlerMock.mock.calls[0][0]).toBe('1')
+    expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
+  })
 })

@@ -115,6 +115,42 @@ describe "accounts/settings.html.erb" do
     end
   end
 
+  describe "announcements" do
+    shared_examples "account notifications" do |text|
+      before do
+        assign(:account_users, [])
+        assign(:associated_courses_count, 0)
+        assign(:announcements, AccountNotification.none.paginate)
+
+
+        @account = account
+        assign(:account, @account)
+        assign(:root_account, @account)
+      end
+
+      it "renders the appropriate text" do
+        admin = account_admin_user
+        view_context(@account, admin)
+
+        assign(:announcements, [account_notification(account: @account)].paginate)
+        render
+        expect(response).to have_text(text)
+      end
+    end
+
+    describe "Root Account Announcements" do
+      let(:account) { Account.create!(name: "reading_rainbow") }
+
+      include_examples "account notifications", "This is a message from reading_rainbow"
+    end
+
+    describe "Site Admin Announcements" do
+      let(:account) { Account.site_admin }
+
+      include_examples "account notifications", "This is a message from Canvas Administration"
+    end
+  end
+
   describe "SIS Integration Settings" do
     before do
       assign(:account_users, [])

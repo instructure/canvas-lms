@@ -7,7 +7,7 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest --color --runInBand",
     "jest": "jest --runInBand",
     "test:debug": "node --inspect-brk ../../node_modules/.bin/jest --runInBand",
     "build:es": "babel src --out-dir es --ignore '**/__tests__'",
@@ -37,7 +37,7 @@
     "@instructure/ui-elements": "6",
     "@instructure/ui-flex": "6",
     "@instructure/ui-forms": "6",
-    "@instructure/ui-icons": "6",
+    "@instructure/ui-icons": "7",
     "@instructure/ui-heading": "6",
     "@instructure/ui-layout": "6",
     "@instructure/ui-media-player": "^7",

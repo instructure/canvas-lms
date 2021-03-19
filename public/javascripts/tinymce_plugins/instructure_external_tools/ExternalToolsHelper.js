@@ -70,7 +70,7 @@ export default {
       config.cmd = `instructureExternalButton${button.id}`
     }
 
-    if (button.canvas_icon_class) {
+    if (button.canvas_icon_class && typeof button.canvas_icon_class === 'string') {
       config.icon = `hack-to-avoid-mce-prefix ${button.canvas_icon_class}`
     } else {
       // default to image
