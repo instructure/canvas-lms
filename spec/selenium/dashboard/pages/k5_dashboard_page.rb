@@ -120,6 +120,10 @@ module K5PageObject
   def view_grades_button_selector(course_id)
     "a[href = '/courses/#{course_id}/gradebook']"
   end
+
+  def grading_period_dropdown_selector
+    "#grading-period-select"
+  end
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -224,6 +228,10 @@ module K5PageObject
 
   def view_grades_button(course_id)
     f(view_grades_button_selector(course_id))
+  end
+
+  def grading_period_dropdown
+    f(grading_period_dropdown_selector)
   end
 
   #----------------------- Actions & Methods -------------------------

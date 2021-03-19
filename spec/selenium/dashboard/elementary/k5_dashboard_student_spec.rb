@@ -20,11 +20,13 @@
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
 require_relative '../../helpers/k5_common'
+require_relative '../../grades/setup/gradebook_setup'
 
 describe "student k5 dashboard" do
   include_context "in-process server selenium tests"
   include K5PageObject
   include K5Common
+  include GradebookSetup
 
   before :each do
     @account = Account.default
@@ -222,7 +224,7 @@ describe "student k5 dashboard" do
     it 'shows the grades panel with two courses' do
       subject_title2 = "Social Studies"
       course_with_student(active_all: true, user: @student, course_name: subject_title2)
-      
+
       get "/#grades"
 
       expect(subject_grades_title(subject_title1)).to be_displayed
@@ -255,6 +257,20 @@ describe "student k5 dashboard" do
       get "/#grades"
 
       expect(subject_grade(scheme_subject_grade)).to be_displayed
+    end
+
+    it 'shows the grades for a different grading period' do
+      @course = @subject
+      create_grading_periods('Fall Term')
+      associate_course_to_term("Fall Term")
+      @assignment.update!(due_at: 1.week.ago)
+      @assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+
+      get "/#grades"
+
+      click_option(grading_period_dropdown_selector, "GP Ended")
+
+      expect(subject_grade("90%")).to be_displayed
     end
 
     it 'shows two dashes and empty progress bar if no grades are available for a course' do
