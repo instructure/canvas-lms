@@ -3606,6 +3606,7 @@ tr:
       scheduler_explanation_teacher_paragraph_1: "Bu Program Yapma Aracıdır. Bu aracı, öğrencilerinizin katılmak için kayıt yaptırabilecekleri randevu grupları oluşturmak için kullanabilirsiniz."
       scheduler_explanation_teacher_paragraph_2: "Örnek olarak diyelim ki dersinizi alan her bir öğrenci ile ara sınav ödevini görüşmek istediniz. Aracı kullanarak yeni bir randevu grubu oluşturabilir, sizin için uygun olan tarih ve zamanı belirtebilir, araca bu süreyi 15'er dakikalık bloklara böldürüp her zaman bloğu için bir öğrenci ayarlamasını sağlayabilirsiniz."
       scheduler_explanation_teacher_paragraph_3: "Daha sonra öğrenciler bilgilendirilecek ve belirlenmiş zaman bloklarından birine kayıt yaptırmaları gerektiğini görecekler. Öğrenciler kendilerine uygun bir zamanı belirleyebilmeleri için diğer takvimlerin de üstünde bir takvim üzerinde zaman bloklarını görecekler."
+      scheduler_explanation_teacher_paragraph_4: "*Sağ tarafta bulunan \"Randevu grubu oluştur\" butonuna tıklayarak başlayabilirsiniz. *"
       signed_up_for: "Kayıtlı olduğunuz *%{title} randevu grubu*"
       x_groups_have_signed_up: "%{n_participant_count} grup kayıt oldu"
       x_people_have_signed_up: "%{n_participant_count} kişi kayıt oldu"
