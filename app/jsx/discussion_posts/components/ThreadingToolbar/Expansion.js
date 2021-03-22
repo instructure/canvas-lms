@@ -19,12 +19,12 @@
 import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export function Expansion({...props}) {
   return (
-    <Button
+    <CondensedButton
       onClick={props.onClick}
       withBackground={false}
       color="primary"
@@ -36,7 +36,7 @@ export function Expansion({...props}) {
           : I18n.t('Expand discussion thread')}
       </ScreenReaderContent>
       {props.expandText}
-    </Button>
+    </CondensedButton>
   )
 }
 

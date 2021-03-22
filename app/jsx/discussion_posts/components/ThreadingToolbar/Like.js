@@ -19,13 +19,13 @@
 import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 
 export function Like({...props}) {
   return (
-    <Button
+    <CondensedButton
       renderIcon={
         props.isLiked ? (
           <IconLikeSolid data-testid="liked-icon" />
@@ -49,7 +49,7 @@ export function Like({...props}) {
           </ScreenReaderContent>
         </>
       )}
-    </Button>
+    </CondensedButton>
   )
 }
 

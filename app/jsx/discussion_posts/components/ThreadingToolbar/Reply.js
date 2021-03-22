@@ -19,13 +19,13 @@
 import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 
 export function Reply({...props}) {
   return (
-    <Button onClick={props.onClick} withBackground={props.withBackground} color="primary">
+    <CondensedButton onClick={props.onClick} withBackground={props.withBackground} color="primary">
       {I18n.t('Reply')}
-    </Button>
+    </CondensedButton>
   )
 }
 
