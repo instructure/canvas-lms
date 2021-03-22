@@ -621,10 +621,10 @@ class ContentTag < ActiveRecord::Base
     eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
   end
 
-  def visible_to_user?(user, opts=nil)
+  def visible_to_user?(user, opts=nil, session=nil)
     return unless self.context_module
 
-    opts ||= self.context_module.visibility_for_user(user)
+    opts ||= self.context_module.visibility_for_user(user, session)
     return false unless opts[:can_read]
 
     return true if opts[:can_read_as_admin]
