@@ -182,7 +182,8 @@ class UserMerge
 
   def copy_favorites
     from_user.favorites.preload(:context).find_each do |f|
-      target_user.favorites.find_or_create_by!(context: f.context, root_account_id: f.context.root_account_id)
+      fave = target_user.favorites.where(context_type: f.context_type, context_id: f.context_id).take
+      target_user.favorites.create!(context_type: f.context_type, context_id: f.context_id) unless fave
     end
   end
 

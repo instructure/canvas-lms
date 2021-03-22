@@ -820,6 +820,24 @@ describe UserMerge do
       expect(user1.favorites.take.context_id).to eq course.id
     end
 
+    it 'handles duplicate favorites other direction' do
+      user2 = @shard1.activate do
+        user_model
+      end
+      user1 = user_model
+
+      course = course_factory
+      course.enroll_user(user1)
+      course.enroll_user(user2)
+      fav1 = user1.favorites.create!(context: course)
+      fav2 = user2.favorites.create!(context: course)
+
+      @shard1.activate do
+        UserMerge.from(user1).into(user2)
+      end
+      expect(user2.favorites.take.context_id).to eq course.id
+    end
+
     it 'should merge with user_services across shards' do
       user1 = user_model
       @shard1.activate do
