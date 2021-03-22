@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!conversations_2'
+import I18n from 'i18n!discussion_posts'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import React from 'react'
