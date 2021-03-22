@@ -18,6 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 def BLUE_OCEAN_TESTS_TAB = "display/redirect?page=tests"
+def JS_BUILD_IMAGE_STAGE = "Javascript (Build Image)"
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -668,9 +669,7 @@ pipeline {
                         ], true, "", "Vendored Gems")
                     }
 
-                    def jsReady = null
-
-                    buildSummaryReport.extendedStageAndReportIfFailure('Javascript (Build Image)', stages) {
+                    buildSummaryReport.extendedStageAndReportIfFailure(JS_BUILD_IMAGE_STAGE, stages) {
                       credentials.withStarlordCredentials {
                         try {
                           def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
@@ -691,11 +690,7 @@ pipeline {
                             ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
                             ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_BUILDER_PREFIX
                           """
-
-                          jsReady = true
                         } catch(e) {
-                          jsReady = false
-
                           handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
                         }
                       }
@@ -703,9 +698,9 @@ pipeline {
 
                     echo 'adding Javascript (Jest)'
                     extendedStage('Javascript (Jest)', stages) {
-                      waitUntil { jsReady != null }
+                      waitUntil { extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'PENDING' }
 
-                      if(!jsReady) {
+                      if(extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'SUCCESS') {
                         error "image dependency failed to build"
                       }
 
@@ -717,9 +712,9 @@ pipeline {
 
                     echo 'adding Javascript (Coffeescript)'
                     extendedStage('Javascript (Coffeescript)', stages) {
-                      waitUntil { jsReady != null }
+                      waitUntil { extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'PENDING' }
 
-                      if(!jsReady) {
+                      if(extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'SUCCESS') {
                         error "image dependency failed to build"
                       }
 
@@ -731,9 +726,9 @@ pipeline {
 
                     echo 'adding Javascript (Karma)'
                     extendedStage('Javascript (Karma)', stages) {
-                      waitUntil { jsReady != null }
+                      waitUntil { extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'PENDING' }
 
-                      if(!jsReady) {
+                      if(extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'SUCCESS') {
                         error "image dependency failed to build"
                       }
 
