@@ -2020,33 +2020,23 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_or_create_submissions(students, relation = nil)
-    submissions = self.all_submissions.where(user_id: students).order(:user_id)
+    submissions = self.all_submissions.where(user_id: students)
     submissions = submissions.merge(relation) if relation
-    submissions = submissions.to_a
-    submissions_hash = submissions.index_by(&:user_id)
-    # we touch the user in an after_save; the FK causes a read lock
-    # to be taken on the user during submission INSERT, so to avoid
-    # deadlocks, we pre-lock the users
-    needs_lock = false
+    submissions_hash = submissions.to_a.index_by(&:user_id)
+    submissions = []
     students.each do |student|
       submission = submissions_hash[student.id]
       if !submission
         begin
           transaction(requires_new: true) do
-            # lock just one user
-            if needs_lock
-              User.shard(shard).where(id: student).lock.pluck(:id)
-            end
             submission = self.submissions.build(user: student)
             submission.assignment = self
             yield submission if block_given?
-            submission.save! if submission.changed?
-            submissions << submission
+            submission.without_versioning(&:save) if submission.changed?
           end
         rescue ActiveRecord::RecordNotUnique
           submission = self.all_submissions.where(user_id: student).first
           raise unless submission
-          submissions << submission
           submission.assignment = self
           submission.user = student
           yield submission if block_given?
@@ -2056,6 +2046,7 @@ class Assignment < ActiveRecord::Base
         submission.user = student
         yield submission if block_given?
       end
+      submissions << submission
     end
     submissions
   end
@@ -2167,18 +2158,19 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
-    submitted = case opts[:submission_type]
-                when "online_text_entry"
-                  opts[:body].present?
-                when "online_url", "basic_lti_launch"
-                  opts[:url].present?
-                when "online_upload"
-                  opts[:attachments].size > 0
-                else
-                  true
-                end
+
+    homework_attributes = submission_attributes(opts, group)
+    homework_submitted_at = opts[:submitted_at] || Time.zone.now
+
+    # move the following 2 lines out of the trnx
+    # make the trnx simpler. The trnx will have fewer locks and rollbacks.
+    homework_lti_user_id_hash = students.map do |student|
+      [student.global_id, Lti::Asset.opaque_identifier_for(student)]
+    end.to_h
+    submissions = find_or_create_submissions(students, Submission.preload(:grading_period)).sort_by(&:id)
+
     transaction do
-      find_or_create_submissions(students, Submission.preload(:grading_period)) do |homework|
+      submissions.each do |homework|
         homework.require_submission_type_is_valid = opts[:require_submission_type_is_valid].present?
 
         # clear out attributes from prior submissions
@@ -2188,16 +2180,12 @@ class Assignment < ActiveRecord::Base
           homework.seconds_late_override = nil
         end
 
-        student = homework.user
+        student_id = homework.user.global_id
+        is_primary_student = student_id == original_student.global_id
         homework.grade_matches_current_submission = homework.score ? false : true
-        homework.attributes = opts.merge({
-          :attachment => nil,
-          :processed => false,
-          :workflow_state => submitted ? "submitted" : "unsubmitted",
-          :group => group
-        })
-        homework.submitted_at = opts[:submitted_at] || Time.zone.now
-        homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
+        homework.attributes = homework_attributes
+        homework.submitted_at = homework_submitted_at
+        homework.lti_user_id = homework_lti_user_id_hash[student_id]
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
 
@@ -2208,11 +2196,7 @@ class Assignment < ActiveRecord::Base
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             Submission.suspend_callbacks(:delete_submission_drafts!) do
-              if student == original_student
-                homework.broadcast_group_submission
-              else
-                homework.save_without_broadcasting!
-              end
+              is_primary_student ? homework.broadcast_group_submission : homework.save_without_broadcasting!
             end
           else
             homework.save!
@@ -2220,7 +2204,7 @@ class Assignment < ActiveRecord::Base
           end
         end
         homeworks << homework
-        primary_homework = homework if student == original_student
+        primary_homework = homework if is_primary_student
       end
     end
     homeworks.each do |homework|
@@ -2233,6 +2217,26 @@ class Assignment < ActiveRecord::Base
     end
     touch_context
     return primary_homework
+  end
+
+  def submission_attributes(opts, group)
+    submitted = case opts[:submission_type]
+                when "online_text_entry"
+                  opts[:body].present?
+                when "online_url", "basic_lti_launch"
+                  opts[:url].present?
+                when "online_upload"
+                  opts[:attachments].size > 0
+                else
+                  true
+    end
+
+    opts.merge({
+      :attachment => nil,
+      :processed => false,
+      :workflow_state => submitted ? "submitted" : "unsubmitted",
+      :group => group
+    })
   end
 
   def submissions_downloaded?
