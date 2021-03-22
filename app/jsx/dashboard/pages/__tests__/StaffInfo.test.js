@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import StaffInfo from 'jsx/dashboard/pages/StaffInfo'
+import fetchMock from 'fetch-mock'
+
+const CONVERSATIONS_URL = '/api/v1/conversations'
 
 describe('StaffInfo', () => {
   const getProps = (overrides = {}) => ({
@@ -79,5 +82,96 @@ describe('StaffInfo', () => {
   it('still renders name if email and bio are missing', () => {
     const {getByText} = render(<StaffInfo {...getProps({email: null, bio: null})} />)
     expect(getByText('Mrs. Thompson')).toBeInTheDocument()
+  })
+
+  describe('instructor messaging', () => {
+    const openModal = async () => {
+      const wrapper = render(<StaffInfo {...getProps()} />)
+      const button = wrapper.getByText('Send a message to Mrs. Thompson')
+      fireEvent.click(button)
+      await waitFor(() => expect(wrapper.getByText('Message Mrs. Thompson')).toBeInTheDocument())
+      return wrapper
+    }
+
+    it('opens a modal when clicking the button', async () => {
+      const wrapper = await openModal()
+      expect(wrapper.getByLabelText('Message')).toBeInTheDocument()
+    })
+
+    it('closes modal on cancel', async () => {
+      const wrapper = await openModal()
+      const cancel = wrapper.getByText('Cancel')
+      fireEvent.click(cancel)
+      await waitFor(() =>
+        expect(wrapper.queryByText('Message Mrs. Thompson')).not.toBeInTheDocument()
+      )
+    })
+
+    it('disables the send button when no text in message', async () => {
+      const wrapper = await openModal()
+      const messageField = wrapper.getByLabelText('Message')
+      const button = wrapper.getByText('Send').closest('button')
+      expect(button).toBeDisabled()
+      fireEvent.change(messageField, {target: {value: 'hello'}})
+      expect(button).toBeEnabled()
+      fireEvent.change(messageField, {target: {value: ''}})
+      expect(button).toBeDisabled()
+    })
+
+    describe('sending', () => {
+      afterEach(() => {
+        fetchMock.restore()
+      })
+
+      it('shows spinner and disables buttons while sending', async () => {
+        fetchMock.post(
+          CONVERSATIONS_URL,
+          () => new Promise(resolve => setTimeout(() => resolve(200), 1000))
+        )
+        const wrapper = await openModal()
+        fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
+        fireEvent.click(wrapper.getByText('Send'))
+        await waitFor(() => {
+          expect(wrapper.getByText('Sending message')).toBeInTheDocument()
+          expect(wrapper.getByText('Send').closest('button')).toBeDisabled()
+          expect(wrapper.getByText('Cancel').closest('button')).toBeDisabled()
+        })
+      })
+
+      it('shows success message if successful', async () => {
+        fetchMock.post(CONVERSATIONS_URL, 200)
+        const wrapper = await openModal()
+        fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
+        fireEvent.click(wrapper.getByText('Send'))
+        await waitFor(() =>
+          expect(wrapper.getAllByText('Message to Mrs. Thompson sent.')[0]).toBeInTheDocument()
+        )
+      })
+
+      it('shows failure message if failed', async () => {
+        fetchMock.post(CONVERSATIONS_URL, 400)
+        const wrapper = await openModal()
+        fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
+        fireEvent.click(wrapper.getByText('Send'))
+        await waitFor(() =>
+          expect(wrapper.getAllByText('Failed sending message.')[0]).toBeInTheDocument()
+        )
+      })
+
+      it('clears inputs after a successful send', async () => {
+        fetchMock.post(CONVERSATIONS_URL, 200)
+        const wrapper = await openModal()
+        fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
+        fireEvent.click(wrapper.getByText('Send'))
+        await waitFor(() =>
+          expect(wrapper.queryByText('Message Mrs. Thompson')).not.toBeInTheDocument()
+        )
+        fireEvent.click(wrapper.getByText('Send a message to Mrs. Thompson'))
+        await waitFor(() => {
+          expect(wrapper.getByLabelText('Message').closest('textarea').value).toBe('')
+          expect(wrapper.getByLabelText('Subject').closest('input').value).toBe('')
+        })
+      })
+    })
   })
 })

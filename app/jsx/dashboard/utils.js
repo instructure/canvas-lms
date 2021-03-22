@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!k5_dashboard'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+import doFetchApi from 'jsx/shared/effects/doFetchApi'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -116,3 +117,10 @@ export const readableRoleName = role => {
   // Custom roles return as named
   return ROLES[role] || role
 }
+
+export const sendMessage = (recipientId, message, subject) =>
+  doFetchApi({
+    path: '/api/v1/conversations',
+    method: 'POST',
+    body: {recipients: [recipientId], body: message, group_conversation: false, subject}
+  })

@@ -17,25 +17,53 @@
  */
 
 import I18n from 'i18n!k5_dashboard'
-import React from 'react'
+import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconEmailLine} from '@instructure/ui-icons'
-import {PresentationContent} from '@instructure/ui-a11y-content'
+import {IconButton, Button} from '@instructure/ui-buttons'
+import {IconDiscussionLine, IconEmailLine} from '@instructure/ui-icons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
-import {readableRoleName} from 'jsx/dashboard/utils'
+import {readableRoleName, sendMessage} from 'jsx/dashboard/utils'
 import {Avatar} from '@instructure/ui-avatar'
 import PropTypes from 'prop-types'
 import {Heading} from '@instructure/ui-heading'
+import {TextArea} from '@instructure/ui-text-area'
+import Modal from 'jsx/shared/components/InstuiModal'
+import {showFlashError, showFlashSuccess} from 'jsx/shared/FlashAlert'
+import {TextInput} from '@instructure/ui-text-input'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {Spinner} from '@instructure/ui-spinner'
 
 export default function StaffInfo({
+  id,
   name,
   bio,
   email,
   avatarUrl = '/images/messages/avatar-50.png',
   role
 }) {
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [message, setMessage] = useState('')
+  const [subject, setSubject] = useState('')
+  const [isSending, setSending] = useState(false)
+
+  const handleSend = () => {
+    setSending(true)
+    sendMessage(id, message, subject || null)
+      .then(_data => {
+        showFlashSuccess(I18n.t('Message to %{name} sent.', {name}))()
+        setMessage('')
+        setSubject('')
+        setModalOpen(false)
+        setSending(false)
+      })
+      .catch(err => {
+        showFlashError(I18n.t('Failed sending message.'))(err)
+        setSending(false)
+      })
+  }
+
   return (
     <View>
       <Flex>
@@ -66,17 +94,76 @@ export default function StaffInfo({
             </IconButton>
           </Flex.Item>
         )}
+        <Flex.Item>
+          <IconButton
+            screenReaderLabel={I18n.t('Send a message to %{name}', {name})}
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            onClick={() => setModalOpen(true)}
+          >
+            <IconDiscussionLine />
+          </IconButton>
+        </Flex.Item>
       </Flex>
       <PresentationContent>
         <hr style={{margin: '0.8em 0'}} />
       </PresentationContent>
+
+      <Modal
+        label={I18n.t('Message %{name}', {name})}
+        open={isModalOpen}
+        size="small"
+        onDismiss={() => setModalOpen(false)}
+      >
+        <Modal.Body>
+          <FormFieldGroup
+            description={<ScreenReaderContent>{I18n.t('Message Form')}</ScreenReaderContent>}
+            layout="stacked"
+            rowSpacing="medium"
+          >
+            <TextInput
+              renderLabel={I18n.t('Subject')}
+              placeholder={I18n.t('No subject')}
+              value={subject}
+              onChange={e => setSubject(e.target.value)}
+            />
+            <TextArea
+              label={I18n.t('Message')}
+              placeholder={I18n.t('Message')}
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              height="8em"
+              resize="vertical"
+            />
+          </FormFieldGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            color="secondary"
+            onClick={() => setModalOpen(false)}
+            interaction={!isSending ? 'enabled' : 'disabled'}
+          >
+            {I18n.t('Cancel')}
+          </Button>
+          &nbsp;
+          <Button
+            color="primary"
+            onClick={handleSend}
+            interaction={message.length && !isSending ? 'enabled' : 'disabled'}
+          >
+            {I18n.t('Send')}
+          </Button>
+          {isSending && (
+            <Spinner renderTitle={I18n.t('Sending message')} size="x-small" margin="small" />
+          )}
+        </Modal.Footer>
+      </Modal>
     </View>
   )
 }
 
 export const StaffShape = {
-  // id used in StaffContactInfoLayout
-  // eslint-disable-next-line react/no-unused-prop-types
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   bio: PropTypes.string,

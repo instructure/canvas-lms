@@ -24,7 +24,8 @@ import {
   fetchGradesForGradingPeriod,
   fetchLatestAnnouncement,
   readableRoleName,
-  fetchCourseApps
+  fetchCourseApps,
+  sendMessage
 } from 'jsx/dashboard/utils'
 
 const ANNOUNCEMENT_URL =
@@ -37,6 +38,8 @@ const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
 
 const APPS_URL = '/api/v1/courses/test/external_tools/visible_course_nav_tools'
+
+const CONVERSATIONS_URL = '/api/v1/conversations'
 
 afterEach(() => {
   fetchMock.restore()
@@ -238,5 +241,13 @@ describe('fetchCourseApps', () => {
     expect(apps.length).toBe(2)
     expect(apps[0].id).toBe(1)
     expect(apps[1].id).toBe(2)
+  })
+})
+
+describe('sendMessage', () => {
+  it('posts to the conversations endpoint', async () => {
+    fetchMock.post(CONVERSATIONS_URL, 200)
+    const result = await sendMessage(1, 'Hello user #1!', null)
+    expect(result.response.ok).toBeTruthy()
   })
 })
