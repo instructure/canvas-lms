@@ -50,5 +50,10 @@ module Types
     def root_topic
       load_association(:root_topic)
     end
+
+    field :discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true
+    def discussion_entries_connection
+      load_association(:discussion_entries)
+    end
   end
 end

@@ -27,6 +27,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Conversation"
   value "Course"
   value "Discussion"
+  value "DiscussionEntry"
   value "Enrollment"
   value "File"
   value "GradingPeriod"
