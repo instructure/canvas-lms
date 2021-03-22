@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
 import ConnectedK5Dashboard, {K5Dashboard} from '../K5Dashboard'
@@ -185,13 +186,13 @@ beforeAll(() => {
         new_activity: false,
         plannable: {
           created_at: '2021-03-16T17:17:17Z',
-          due_at: '2021-03-14T17:31:51Z',
+          due_at: moment().toISOString(),
           id: '15',
           points_possible: 10,
-          title: 'Assignment 14',
+          title: 'Assignment 15',
           updated_at: '2021-03-16T17:31:52Z'
         },
-        plannable_date: '2021-03-14T17:31:51Z',
+        plannable_date: moment().toISOString(),
         plannable_id: '15',
         plannable_type: 'assignment',
         planner_override: null,
@@ -317,12 +318,12 @@ describe('K-5 Dashboard', () => {
     })
 
     it('displays the planner with a planned item', async () => {
-      const {findByText} = render(
+      const {findAllByText} = render(
         <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      expect(
-        await findByText('Assignment Assignment 14, due Sunday, March 14, 2021 11:31 AM.')
-      ).toBeInTheDocument()
+      expect((await findAllByText('Assignment 15', {exact: false})).length).toBeGreaterThanOrEqual(
+        1
+      )
       // The new weekly planner doesn't display the PlannerEmptyState.
       // This will get addressed one way or another with LS-2042
       // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
