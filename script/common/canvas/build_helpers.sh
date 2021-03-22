@@ -16,7 +16,7 @@ function is_canvas_root {
 
 function compile_assets {
   echo_console_and_log "  Compiling assets (css and js only, no docs or styleguide) ..."
-  _canvas_lms_track_with_log docker-compose run --rm web bundle exec rake canvas:compile_assets_dev
+  _canvas_lms_track_with_log run_command bundle exec rake canvas:compile_assets_dev
 }
 
 function build_images {
@@ -99,12 +99,12 @@ If you want to migrate the existing database, use docker_dev_update
 function bundle_install {
   echo_console_and_log "  Installing gems (bundle install) ..."
   rm -f Gemfile.lock* >/dev/null 2>&1
-  _canvas_lms_track_with_log docker-compose run --rm web bundle install
+  _canvas_lms_track_with_log run_command bundle install
 }
 
 function bundle_install_with_check {
   echo_console_and_log "  Checking your gems (bundle check) ..."
-  if _canvas_lms_track_with_log docker-compose run --rm web bundle check ; then
+  if _canvas_lms_track_with_log run_command bundle check ; then
     echo_console_and_log "  Gems are up to date, no need to bundle install ..."
   else
     bundle_install
@@ -113,14 +113,14 @@ function bundle_install_with_check {
 
 function rake_db_migrate_dev_and_test {
   echo_console_and_log "  Migrating development DB ..."
-  _canvas_lms_track_with_log docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=development
+  _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=development
   echo_console_and_log "  Migrating test DB ..."
-  _canvas_lms_track_with_log docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
+  _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
 }
 
 function install_node_packages {
   echo_console_and_log "  Installing Node packages ..."
-  _canvas_lms_track_with_log docker-compose run --rm web bundle exec rake js:yarn_install
+  _canvas_lms_track_with_log run_command bundle exec rake js:yarn_install
 }
 
 function copy_docker_config {
