@@ -1973,6 +1973,22 @@ describe AssignmentsController do
         expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(false)
       end
     end
+
+    describe 'js_env NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED' do
+      it "should set NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:new_quizzes_assignment_build_button)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to eq(true)
+      end
+
+      it "should set NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:new_quizzes_assignment_build_button)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to eq(false)
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do

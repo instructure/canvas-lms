@@ -273,8 +273,17 @@
         {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
       </button>
     {{/unless}}
-    <button type="submit" class="btn btn-primary">
-      {{#t "buttons.save"}}Save{{/t}}
-    </button>
+    {{#if showBuildButton}}
+      <button type="submit" class="btn btn-default">
+        {{#t "buttons.save"}}Save{{/t}}
+      </button>
+      <button type="button" class="btn btn-primary build_button">
+        {{#t "buttons.build"}}Build{{/t}}
+      </button>
+    {{else}}
+      <button type="submit" class="btn btn-primary">
+        {{#t "buttons.save"}}Save{{/t}}
+      </button>
+    {{/if}}
   </div>
 </div>

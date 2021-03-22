@@ -157,6 +157,7 @@ export default class EditView extends ValidatedFormView
     events = {}
     events["click .cancel_button"] = 'handleCancel'
     events["click .save_and_publish"] = 'saveAndPublish'
+    events["click .build_button"] = 'handleBuild'
     events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
     events["change #{ONLINE_SUBMISSION_TYPES}"] = 'handleOnlineSubmissionTypeChange'
     events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
@@ -703,6 +704,10 @@ export default class EditView extends ValidatedFormView
     @disableWhileLoadingOpts = {buttons: ['.save_and_publish']}
     @submit(event)
 
+  handleBuild: (event) ->
+    @navigateToBuild = true
+    @submit(event)
+
   onSaveFail: (xhr) =>
     response_text = JSON.parse(xhr.responseText)
     if response_text.errors
@@ -897,6 +902,8 @@ export default class EditView extends ValidatedFormView
 
   locationAfterSave: (params) ->
     return params['return_to'] if returnToHelper.isValid(params['return_to'])
+    useCancelLocation = @assignment.isQuizLTIAssignment() && !@navigateToBuild && ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
+    return @locationAfterCancel(deparam()) if useCancelLocation
     @model.get 'html_url'
 
   redirectAfterCancel: ->
@@ -905,6 +912,8 @@ export default class EditView extends ValidatedFormView
 
   locationAfterCancel: (params) ->
     return params['return_to'] if returnToHelper.isValid(params['return_to'])
+    if ENV.CAN_CANCEL_TO && ENV.CAN_CANCEL_TO.includes(document.referrer)
+      return document.referrer
     return ENV.CANCEL_TO if ENV.CANCEL_TO?
     null
 
