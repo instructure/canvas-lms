@@ -501,7 +501,7 @@ pipeline {
                 if (configuration.isChangeMerged()) {
                   buildSummaryReport.extendedStageAndReportIfFailure('Build Docker Image (Pre-Merge)') {
                     timeout(time: 20) {
-                      credentials.withStarlordCredentials({ ->
+                      credentials.withStarlordCredentials {
                         withEnv([
                           "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
                           "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
@@ -531,14 +531,14 @@ pipeline {
                             ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                           """, label: 'upload cache images')
                         }
-                      })
+                      }
                     }
                   }
                 }
 
                 buildSummaryReport.extendedStageAndReportIfFailure('Build Docker Image') {
                   timeout(time: 20) {
-                    credentials.withStarlordCredentials({ ->
+                    credentials.withStarlordCredentials {
                       def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
                       slackSendCacheBuild {
@@ -583,13 +583,13 @@ pipeline {
                         sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
                         sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
                       }
-                    })
+                    }
                   }
                 }
 
                 buildSummaryReport.extendedStageAndReportIfFailure('Run Migrations') {
                   timeout(time: 10) {
-                    credentials.withStarlordCredentials({ ->
+                    credentials.withStarlordCredentials {
                       def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
                       def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
 
@@ -619,7 +619,7 @@ pipeline {
 
                       archiveArtifacts(artifacts: "migrate-*.log", allowEmptyArchive: true)
                       sh 'docker-compose down --remove-orphans'
-                    })
+                    }
                   }
                 }
 
@@ -633,8 +633,8 @@ pipeline {
 
                     if (!configuration.isChangeMerged()) {
                       echo 'adding Linters'
-                      buildSummaryReport.extendedStageAndReportIfFailure('Linters', stages, {
-                        credentials.withStarlordCredentials({ ->
+                      buildSummaryReport.extendedStageAndReportIfFailure('Linters', stages) {
+                        credentials.withStarlordCredentials {
                           credentials.withGerritCredentials {
                             withEnv([
                               "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
@@ -650,28 +650,28 @@ pipeline {
                               sh 'build/new-jenkins/linters/run-master-bouncer.sh'
                             }
                           }
-                        })
-                      })
+                        }
+                      }
                     }
 
                     echo 'adding Consumer Smoke Test'
-                    buildSummaryReport.extendedStageAndReportIfFailure('Consumer Smoke Test', stages, {
+                    buildSummaryReport.extendedStageAndReportIfFailure('Consumer Smoke Test', stages) {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
-                    })
+                    }
 
                     echo 'adding Vendored Gems'
-                    extendedStage('Vendored Gems', stages, {
+                    extendedStage('Vendored Gems', stages) {
                         buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
                           string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                           string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                           string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                         ], true, "", "Vendored Gems")
-                    })
+                    }
 
                     def jsReady = null
 
-                    buildSummaryReport.extendedStageAndReportIfFailure('Javascript (Build Image)', stages, {
-                      credentials.withStarlordCredentials({ ->
+                    buildSummaryReport.extendedStageAndReportIfFailure('Javascript (Build Image)', stages) {
+                      credentials.withStarlordCredentials {
                         try {
                           def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
@@ -698,11 +698,11 @@ pipeline {
 
                           handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
                         }
-                      })
-                    })
+                      }
+                    }
 
                     echo 'adding Javascript (Jest)'
-                    extendedStage('Javascript (Jest)', stages, {
+                    extendedStage('Javascript (Jest)', stages) {
                       waitUntil { jsReady != null }
 
                       if(!jsReady) {
@@ -713,10 +713,10 @@ pipeline {
                         string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                         string(name: 'TEST_SUITE', value: "jest"),
                       ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Jest)")
-                    })
+                    }
 
                     echo 'adding Javascript (Coffeescript)'
-                    extendedStage('Javascript (Coffeescript)', stages, {
+                    extendedStage('Javascript (Coffeescript)', stages) {
                       waitUntil { jsReady != null }
 
                       if(!jsReady) {
@@ -727,10 +727,10 @@ pipeline {
                         string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                         string(name: 'TEST_SUITE', value: "coffee"),
                       ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Coffeescript)")
-                    })
+                    }
 
                     echo 'adding Javascript (Karma)'
-                    extendedStage('Javascript (Karma)', stages, {
+                    extendedStage('Javascript (Karma)', stages) {
                       waitUntil { jsReady != null }
 
                       if(!jsReady) {
@@ -741,24 +741,24 @@ pipeline {
                         string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                         string(name: 'TEST_SUITE', value: "karma"),
                       ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Karma)")
-                    })
+                    }
 
                     echo 'adding Contract Tests'
-                    extendedStage('Contract Tests', stages, {
+                    extendedStage('Contract Tests', stages) {
                       buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                       ], true, "", "Contract Tests")
-                    })
+                    }
 
                     if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                       echo 'adding CDC Schema check'
-                      extendedStage('CDC Schema Check', stages, {
+                      extendedStage('CDC Schema Check', stages) {
                         buildSummaryReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
                           string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
                         ], true, "", "CDC Schema Check")
-                      })
+                      }
                     }
                     else {
                       echo 'no migrations added, skipping CDC Schema check'
@@ -772,13 +772,13 @@ pipeline {
                       )
                     ) {
                       echo 'adding Flakey Spec Catcher'
-                      extendedStage('Flakey Spec Catcher', stages, {
+                      extendedStage('Flakey Spec Catcher', stages) {
                         buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
                           string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                           string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                           string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                         ], configuration.fscPropagate(), "", "Flakey Spec Catcher")
-                      })
+                      }
                     }
 
                     // Flakey spec catcher using the dir step above will create this @tmp file, we need to remove it
@@ -789,13 +789,13 @@ pipeline {
 
                     if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                       echo 'adding Local Docker Dev Build'
-                      extendedStage('Local Docker Dev Build', stages, {
+                      extendedStage('Local Docker Dev Build', stages) {
                         buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "", "Local Docker Dev Build")
-                      })
+                      }
                     }
 
                     if(configuration.isChangeMerged()) {
-                      buildSummaryReport.extendedStageAndReportIfFailure('Dependency Check', stages, {
+                      buildSummaryReport.extendedStageAndReportIfFailure('Dependency Check', stages) {
                         catchError (buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                           try {
                             snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
@@ -808,7 +808,7 @@ pipeline {
                             }
                           }
                         }
-                      })
+                      }
                     }
 
                     def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
