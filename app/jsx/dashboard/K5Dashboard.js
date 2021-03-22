@@ -21,6 +21,7 @@ import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import {
+  createTeacherPreview,
   startLoadingAllOpportunities,
   initializePlanner,
   responsiviser,
@@ -146,6 +147,9 @@ export const K5Dashboard = ({
           />
         )}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
+        {!plannerInitialized &&
+          currentTab === TAB_IDS.SCHEDULE &&
+          createTeacherPreview(env.TIMEZONE)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
         {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
       </K5DashboardContext.Provider>

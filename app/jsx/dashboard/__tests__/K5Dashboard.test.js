@@ -331,12 +331,10 @@ describe('K-5 Dashboard', () => {
     })
 
     it('displays the planner with a planned item', async () => {
-      const {findAllByText} = render(
+      const {findByText} = render(
         <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      expect((await findAllByText('Assignment 15', {exact: false})).length).toBeGreaterThanOrEqual(
-        1
-      )
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
       // The new weekly planner doesn't display the PlannerEmptyState.
       // This will get addressed one way or another with LS-2042
       // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
@@ -362,6 +360,20 @@ describe('K-5 Dashboard', () => {
 
       const header = await findByTestId('WeeklyPlannerHeader')
       expect(header).toBeInTheDocument()
+    })
+
+    it('displays a teacher preview if the user has no student enrollments', async () => {
+      const {findByTestId, getByText} = render(
+        <ConnectedK5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
+      )
+
+      expect(await findByTestId('kinder-panda')).toBeInTheDocument()
+      expect(getByText('Teacher Schedule Preview')).toBeInTheDocument()
+      expect(
+        getByText('Below is an example of how your students will see their schedule')
+      ).toBeInTheDocument()
+      expect(getByText('Social Studies')).toBeInTheDocument()
+      expect(getByText('A great discussion assignment')).toBeInTheDocument()
     })
   })
 

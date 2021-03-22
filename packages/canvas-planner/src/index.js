@@ -38,6 +38,7 @@ import {initializeDateTimeFormatters} from './utilities/dateUtils'
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui'
 import responsiviser from './components/responsiviser'
 
+const TeacherPreview = React.lazy(() => import('./components/TeacherPreview'))
 const ToDoSidebar = React.lazy(() => import('./components/ToDoSidebar'))
 const PlannerApp = React.lazy(() => import('./components/PlannerApp'))
 const PlannerHeader = React.lazy(() => import('./components/PlannerHeader'))
@@ -48,6 +49,14 @@ export * from './components'
 export {startLoadingAllOpportunities}
 
 export {responsiviser}
+
+export function createTeacherPreview(timeZone) {
+  return (
+    <Suspense fallback={loading()}>
+      <TeacherPreview timeZone={timeZone} />
+    </Suspense>
+  )
+}
 
 let externalPlannerActive
 const plannerActive = () => (externalPlannerActive ? externalPlannerActive() : false)
