@@ -319,6 +319,7 @@ extendedStage.setAlwaysAllowStages([
     'Build Docker Image',
     'Run Migrations',
     'Parallel Run Tests',
+    'Waiting',
 ])
 
 pipeline {
@@ -696,30 +697,6 @@ pipeline {
                     }
                   }
 
-                  echo 'adding Javascript (Jest)'
-                  extendedStage.withOptions('Javascript (Jest)', stages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
-                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
-                      string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                      string(name: 'TEST_SUITE', value: "jest"),
-                    ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Jest)")
-                  }
-
-                  echo 'adding Javascript (Coffeescript)'
-                  extendedStage.withOptions('Javascript (Coffeescript)', stages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
-                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
-                      string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                      string(name: 'TEST_SUITE', value: "coffee"),
-                    ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Coffeescript)")
-                  }
-
-                  echo 'adding Javascript (Karma)'
-                  extendedStage.withOptions('Javascript (Karma)', stages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
-                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
-                      string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                      string(name: 'TEST_SUITE', value: "karma"),
-                    ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Karma)")
-                  }
-
                   echo 'adding Contract Tests'
                   extendedStage('Contract Tests', stages) {
                     buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
@@ -798,6 +775,36 @@ pipeline {
                 }
               }
             }
+          }
+
+          extendedStage.withOptions("Waiting for ${JS_BUILD_IMAGE_STAGE}", rootStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE, 'Builder')) {
+            def nestedStages = [:]
+
+            echo 'adding Javascript (Jest)'
+            extendedStage.withOptions('Javascript (Jest)', nestedStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
+              buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
+                string(name: 'TEST_SUITE', value: "jest"),
+              ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Jest)")
+            }
+
+            echo 'adding Javascript (Coffeescript)'
+            extendedStage.withOptions('Javascript (Coffeescript)', nestedStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
+              buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
+                string(name: 'TEST_SUITE', value: "coffee"),
+              ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Coffeescript)")
+            }
+
+            echo 'adding Javascript (Karma)'
+            extendedStage.withOptions('Javascript (Karma)', nestedStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
+              buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
+                string(name: 'TEST_SUITE', value: "karma"),
+              ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Karma)")
+            }
+
+            parallel(nestedStages)
           }
 
           parallel(rootStages)
