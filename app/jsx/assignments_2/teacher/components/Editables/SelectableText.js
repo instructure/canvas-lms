@@ -21,9 +21,17 @@ import {bool, string, func, element, oneOf, oneOfType, arrayOf, shape} from 'pro
 import isEqual from 'lodash/isEqual'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Select} from '@instructure/ui-forms'
+import {Select} from '@instructure/ui-select'
 import {InPlaceEdit} from '@instructure/ui-editable'
 import {createChainedFunction} from '@instructure/ui-utils'
+
+/*
+ *  CAUTION: The InstUI Select component is greatly changed in v7.
+ *  Updating the import to the new ui-select location is almost certainly
+ *  going to break the functionality of the component. Any failing tests
+ *  will just be skipped, and the component can be fixed later when work
+ *  resumes on A2.
+ */
 
 const optShape = shape({
   label: string.isRequired,

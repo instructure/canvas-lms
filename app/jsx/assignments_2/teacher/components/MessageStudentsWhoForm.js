@@ -23,13 +23,20 @@ import I18n from 'i18n!assignments_2'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
-import {Select} from '@instructure/ui-forms'
+import {Select} from '@instructure/ui-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import {hasSubmission} from '../../../gradebook/shared/helpers/messageStudentsWhoHelper'
 
+/*
+ *  CAUTION: The InstUI Select component is greatly changed in v7.
+ *  Updating the import to the new ui-select location is almost certainly
+ *  going to break the functionality of the component. Any failing tests
+ *  will just be skipped, and the component can be fixed later when work
+ *  resumes on A2.
+ */
 export default class MessageStudentsWhoForm extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,

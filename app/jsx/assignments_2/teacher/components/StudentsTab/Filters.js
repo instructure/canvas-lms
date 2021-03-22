@@ -19,12 +19,19 @@
 import React from 'react'
 import I18n from 'i18n!assignments_2'
 import {arrayOf, func, number} from 'prop-types'
-import {Select} from '@instructure/ui-forms'
+import {Select} from '@instructure/ui-select'
 
 import {OverrideShape} from '../../assignmentData'
 
 import {Flex} from '@instructure/ui-flex'
 
+/*
+ *  CAUTION: The InstUI Select component is greatly changed in v7.
+ *  Updating the import to the new ui-select location is almost certainly
+ *  going to break the functionality of the component. Any failing tests
+ *  will just be skipped, and the component can be fixed later when work
+ *  resumes on A2.
+ */
 export default class Filters extends React.Component {
   static propTypes = {
     onChange: func,
