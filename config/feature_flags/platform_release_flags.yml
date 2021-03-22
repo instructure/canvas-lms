@@ -1,11 +1,4 @@
 ---
-system_and_user_generated_event_types:
-  state: hidden
-  display_name: System- and User-Generated Events
-  description: |-
-    Differentiate between system- and user-generated live events
-    in the Canvas Data Services tool
-  applies_to: SiteAdmin
 live_event_subscription_webhooks:
   state: hidden
   display_name: Live Event Subscription Webhooks
