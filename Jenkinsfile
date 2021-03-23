@@ -697,13 +697,7 @@ pipeline {
                   }
 
                   echo 'adding Javascript (Jest)'
-                  extendedStage('Javascript (Jest)', stages) {
-                    waitUntil { extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'PENDING' }
-
-                    if(extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'SUCCESS') {
-                      error "image dependency failed to build"
-                    }
-
+                  extendedStage.withOptions('Javascript (Jest)', stages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
                     buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                       string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                       string(name: 'TEST_SUITE', value: "jest"),
@@ -711,13 +705,7 @@ pipeline {
                   }
 
                   echo 'adding Javascript (Coffeescript)'
-                  extendedStage('Javascript (Coffeescript)', stages) {
-                    waitUntil { extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'PENDING' }
-
-                    if(extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'SUCCESS') {
-                      error "image dependency failed to build"
-                    }
-
+                  extendedStage.withOptions('Javascript (Coffeescript)', stages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
                     buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                       string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                       string(name: 'TEST_SUITE', value: "coffee"),
@@ -725,13 +713,7 @@ pipeline {
                   }
 
                   echo 'adding Javascript (Karma)'
-                  extendedStage('Javascript (Karma)', stages) {
-                    waitUntil { extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'PENDING' }
-
-                    if(extendedStage.getStageStatus(JS_BUILD_IMAGE_STAGE) != 'SUCCESS') {
-                      error "image dependency failed to build"
-                    }
-
+                  extendedStage.withOptions('Javascript (Karma)', stages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
                     buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                       string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                       string(name: 'TEST_SUITE', value: "karma"),
