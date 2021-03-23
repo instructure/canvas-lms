@@ -44,11 +44,6 @@ improved_outcomes_management:
   display_name: Improved Outcomes Management
   description: Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
-inactive_concluded_lmgb_filters:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Student filters in LMGB
-  description: Allow inactive and/or concluded enrollments to be displayed in LMGB
 enable_webcam_submission:
   state: hidden
   applies_to: RootAccount

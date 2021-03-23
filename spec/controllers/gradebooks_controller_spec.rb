@@ -1538,22 +1538,6 @@ describe GradebooksController do
             end
           end
         end
-
-        describe 'inactive_concluded_lmgb_filters' do
-          it 'is false if the feature flag is off' do
-            @course.root_account.disable_feature! :inactive_concluded_lmgb_filters
-            get :show, params: {course_id: @course.id}
-            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:inactive_concluded_lmgb_filters]).to be_falsey
-          end
-
-          it 'is true if the feature flag is on' do
-            @course.root_account.enable_feature! :inactive_concluded_lmgb_filters
-            get :show, params: {course_id: @course.id}
-            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:inactive_concluded_lmgb_filters]).to be_truthy
-          end
-        end
       end
     end
   end

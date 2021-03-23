@@ -69,7 +69,7 @@ const Grid = {
     init() {
       const headers = $('.outcome-gradebook-wrapper .slick-header')
       const headerRows = $('.outcome-gradebook-wrapper .slick-headerrow')
-      return _.each(_.zip(headers, headerRows), function([header, headerRow]) {
+      return _.each(_.zip(headers, headerRows), function ([header, headerRow]) {
         return $(headerRow).insertBefore($(header))
       })
     }
@@ -105,7 +105,7 @@ const Grid = {
     // Returns an array of columns.
     toColumns(outcomes, rollups, options = {}) {
       options = _.extend({}, Grid.Util.COLUMN_OPTIONS, options)
-      const columns = _.map(outcomes, function(outcome) {
+      const columns = _.map(outcomes, function (outcome) {
         return _.extend(
           {
             id: `outcome_${outcome.id}`
@@ -153,18 +153,18 @@ const Grid = {
     // Returns an array of rows.
     toRows(rollups, _options = {}) {
       const user_ids = _.uniq(
-        _.map(rollups, function(r) {
+        _.map(rollups, function (r) {
           return r.links.user
         })
       )
-      const filtered_rollups = _.groupBy(rollups, function(rollup) {
+      const filtered_rollups = _.groupBy(rollups, function (rollup) {
         return rollup.links.user
       })
-      const ordered_rollups = _.map(user_ids, function(u) {
+      const ordered_rollups = _.map(user_ids, function (u) {
         return filtered_rollups[u]
       })
       return _.reject(
-        _.map(ordered_rollups, function(rollup) {
+        _.map(ordered_rollups, function (rollup) {
           return Grid.Util._toRow(rollup)
         }),
         _.isNull
@@ -177,7 +177,7 @@ const Grid = {
     // Returns an object.
     _toRow(rollup) {
       const user = rollup[0].links.user
-      const section_list = _.map(rollup, function(rollup2) {
+      const section_list = _.map(rollup, function (rollup2) {
         return rollup2.links.section
       })
       if (_.isEmpty(section_list)) {
@@ -196,7 +196,7 @@ const Grid = {
           student
         )
       }
-      _.each(rollup[0].scores, function(score) {
+      _.each(rollup[0].scores, function (score) {
         return (row[`outcome_${score.links.outcome}`] = _.pick(score, 'score', 'hide_points'))
       })
       return row
@@ -211,7 +211,7 @@ const Grid = {
       const url = `/${type}s/${id}/outcomes`
       return (Grid.outcomes = _.reduce(
         outcomes,
-        function(result, outcome) {
+        function (result, outcome) {
           outcome.url = url
           result[`outcome_${outcome.id}`] = outcome
           return result
@@ -220,7 +220,7 @@ const Grid = {
       ))
     },
     saveOutcomePaths(outcomePaths) {
-      return outcomePaths.forEach(function(path) {
+      return outcomePaths.forEach(function (path) {
         const pathString = _.pluck(path.parts, 'name').join(' > ')
         return (Grid.outcomes[`outcome_${path.id}`].path = pathString)
       })
@@ -241,7 +241,7 @@ const Grid = {
     saveStudents(students) {
       return (Grid.students = _.reduce(
         students,
-        function(result, student) {
+        function (result, student) {
           result[student.id] = student
           return result
         },
@@ -264,7 +264,7 @@ const Grid = {
     saveSections(sections) {
       return (Grid.sections = _.reduce(
         sections,
-        function(result, section) {
+        function (result, section) {
           result[section.id] = section
           return result
         },
@@ -284,7 +284,7 @@ const Grid = {
     mean(values, round = false) {
       const total = _.reduce(
         values,
-        function(a, b) {
+        function (a, b) {
           return a + b
         },
         0
@@ -369,7 +369,7 @@ const Grid = {
           total_points = outcome.mastery_points
         }
         scaled = total_points === 0 ? score : (score / total_points) * Grid.ratings[0].points
-        idx = Grid.ratings.findIndex(function(r) {
+        idx = Grid.ratings.findIndex(function (r) {
           return scaled >= r.points
         })
         idx = idx === -1 ? Grid.ratings.length - 1 : idx
@@ -400,10 +400,7 @@ const Grid = {
       return ['rating_3', '#EE0612', I18n.t('Well Below Mastery')]
     },
     getColumnResults(data, column) {
-      return _.chain(data)
-        .pluck(column.field)
-        .filter(_.isObject)
-        .value()
+      return _.chain(data).pluck(column.field).filter(_.isObject).value()
     },
     headerRowCell({node, column, grid}, score) {
       if (column.field === 'student') {
@@ -424,15 +421,15 @@ const Grid = {
     redrawHeader(grid, fn = Grid.averageFn) {
       Grid.averageFn = fn
       const cols = grid.getColumns()
-      const dfd = $.getJSON(Grid.View._aggregateUrl(fn)).fail(function(_e) {
+      const dfd = $.getJSON(Grid.View._aggregateUrl(fn)).fail(function (_e) {
         return $.flashError(I18n.t('There was an error fetching course statistics'))
       })
       return dfd.then((response, _status, _xhr) => {
         // do for each column
-        return _.each(cols, function(col) {
+        return _.each(cols, function (col) {
           const header = grid.getHeaderRowColumn(col.id)
           const score = col.outcome
-            ? _.find(response.rollups[0].scores, function(s) {
+            ? _.find(response.rollups[0].scores, function (s) {
                 return s.links.outcome === col.outcome.id
               })
             : undefined
@@ -474,10 +471,8 @@ const Grid = {
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {
       if (column.field === 'student') {
-        if (ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters) {
-          $(node).empty()
-          this.addEnrollmentFilters(node)
-        }
+        $(node).empty()
+        this.addEnrollmentFilters(node)
         return
       }
       const totalsFn = _.partial(Grid.View.calculateRatingsTotals, grid, column)

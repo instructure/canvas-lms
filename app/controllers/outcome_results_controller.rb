@@ -360,18 +360,16 @@ class OutcomeResultsController < ApplicationController
     # which will inflate the pagination total count
     remove_users_with_no_results if excludes.include?('missing_user_rollups') && !aggregate
 
-    if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
-      exclude_concluded = excludes.include? 'concluded_enrollments'
-      exclude_inactive = excludes.include? 'inactive_enrollments'
-      return unless exclude_concluded || exclude_inactive
+    exclude_concluded = excludes.include? 'concluded_enrollments'
+    exclude_inactive = excludes.include? 'inactive_enrollments'
+    return unless exclude_concluded || exclude_inactive
 
-      filters = []
-      filters << 'completed' if exclude_concluded
-      filters << 'inactive' if exclude_inactive
+    filters = []
+    filters << 'completed' if exclude_concluded
+    filters << 'inactive' if exclude_inactive
 
-      ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
-      @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
-    end
+    ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
+    @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
   end
 
   def remove_users_with_no_results
@@ -592,12 +590,7 @@ class OutcomeResultsController < ApplicationController
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
-      @users = if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
-        # include all enrollment types which will be filtered later
-        apply_sort_order(@section.users).to_a
-      else
-        apply_sort_order(@section.students).to_a
-      end
+      @users = apply_sort_order(@section.users).to_a
     end
     @users ||= users_for_outcome_context.to_a
     @users.sort! {|a,b| a.id <=> b.id} unless params[:sort_by]
