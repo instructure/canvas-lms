@@ -3,12 +3,14 @@ set -e
 source script/common/utils/common.sh
 source script/common/canvas/build_helpers.sh
 
-trap '_canvas_lms_telemetry_report_status' ERR EXIT
+trap 'trap_result' ERR EXIT
+trap "printf '\nTerminated\n' && exit 130" SIGINT
+LOG="$(pwd)/log/docker_dev_setup.log"
 SCRIPT_NAME=$0
 OS="$(uname)"
 DOCKER='y'
 
-_canvas_lms_opt_in_telemetry "$SCRIPT_NAME"
+_canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 
 # shellcheck disable=1004
 echo '
@@ -44,6 +46,8 @@ function setup_docker_environment {
   fi
 }
 
+create_log_file
+init_log_file "Docker Dev Setup"
 setup_docker_environment
 message 'Now we can set up Canvas!'
 copy_docker_config

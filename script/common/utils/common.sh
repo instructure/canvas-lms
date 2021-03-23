@@ -1,4 +1,5 @@
 #!/bin/bash
+source script/common/utils/spinner.sh
 
 # This file contains commonly used BASH functions for scripting in canvas-lms,
 # particularly script/canvas_update and script/rebase_canvas_and_plugins . As such,
@@ -22,10 +23,10 @@ function echo_console_and_log {
   echo "$1" |tee -a "$LOG"
 }
 
-function print_results {
+function trap_result {
   exit_code=$?
   set +e
-
+  stop_spinner $exit_code
   if [ "${exit_code}" == "0" ]; then
     echo ""
     echo_console_and_log "  \o/ Success!"
@@ -35,7 +36,6 @@ function print_results {
     echo_console_and_log "  /o\ Something went wrong. Check ${LOG} for details."
     _canvas_lms_telemetry_report_status $exit_code
   fi
-
   exit ${exit_code}
 }
 
@@ -76,8 +76,10 @@ function _canvas_lms_track_with_log {
   command="$@"
   if _canvas_lms_telemetry_enabled; then
     _inst_telemetry_with_log $command
-  else
+  elif [[ -z "${JENKINS}" ]]; then
     $command >> "$LOG" 2>&1
+  else
+    $command
   fi
 }
 
@@ -111,6 +113,7 @@ function _canvas_lms_telemetry_report_status() {
   if [[ ! -z ${1-} ]]; then
     exit_status=$1
   fi
+  stop_spinner $exit_status
   if installed _inst_report_status && _canvas_lms_telemetry_enabled; then
     _inst_report_status $exit_status
   fi
