@@ -265,6 +265,7 @@
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",
+    "msw": "^0.27.2",
     "node-sass": "~4.14.1",
     "nyc": "^13",
     "prettier": "^2.2.1",
