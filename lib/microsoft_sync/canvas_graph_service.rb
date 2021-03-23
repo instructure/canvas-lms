@@ -76,5 +76,14 @@ module MicrosoftSync
         [result['userPrincipalName'], result['id']]
       end.to_h
     end
+
+    def get_group_users_aad_ids(group_id, owners: false)
+      method = owners ? :list_group_owners : :list_group_members
+      [].tap do |aad_ids|
+        graph_service.send(method, group_id, select: ['id']) do |users|
+          aad_ids.concat(users.map{|user| user['id']})
+        end
+      end
+    end
   end
 end

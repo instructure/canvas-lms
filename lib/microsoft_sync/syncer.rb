@@ -37,6 +37,8 @@ module MicrosoftSync
 
       ensure_class_group_exists
       ensure_enrollments_user_mappings_filled
+      diff = generate_diff
+      execute_diff(diff)
 
       group.update_workflow_state_unless_deleted(:completed, last_error: nil)
     rescue => e
@@ -71,7 +73,7 @@ module MicrosoftSync
         # about how their API is supposed to work and 2) decide amongst
         # ourselves if we should start a new delayed job instead of sleeping
         # (even a small amount) in the job
-        sleep 2
+        sleep 3
       end
 
       canvas_graph_service.update_group_with_course_data(new_group_id, course)
@@ -99,12 +101,50 @@ module MicrosoftSync
       end
     end
 
+    # Get group members/owners from the API and local enrollments and calculate
+    # what needs to be done
+    def generate_diff
+      members = canvas_graph_service.get_group_users_aad_ids(group.ms_group_id)
+      owners = canvas_graph_service.get_group_users_aad_ids(group.ms_group_id, owners: true)
+
+      diff = MembershipDiff.new(members, owners)
+      UserMapping.enrollments_and_aads(course).find_each do |enrollment|
+        diff.set_local_member(enrollment.aad_id, enrollment.type)
+      end
+
+      diff
+    end
+
+    # Run the API calls to add/remove users
+    def execute_diff(diff)
+      batch_size = GraphService::GROUP_USERS_ADD_BATCH_SIZE
+      diff.additions_in_slices_of(batch_size) do |members_and_owners|
+        graph_service.add_users_to_group(group.ms_group_id, members_and_owners)
+      end
+
+      # Microsoft will not let you remove the last owner in a group, so it's
+      # slightly safer to remove owners last in case we need to completely
+      # change owners. TODO: A class could still have all of its teacher
+      # enrollments removed, so this could still be a problem.
+      diff.members_to_remove.each do |aad|
+        graph_service.remove_group_member(group.ms_group_id, aad)
+      end
+
+      diff.owners_to_remove.each do |aad|
+        graph_service.remove_group_owner(group.ms_group_id, aad)
+      end
+    end
+
     def tenant
       @tenant ||= group.root_account.settings[:microsoft_sync_tenant]
     end
 
     def canvas_graph_service
       @canvas_graph_service ||= tenant && CanvasGraphService.new(tenant)
+    end
+
+    def graph_service
+      @graph_service ||= canvas_graph_service.graph_service
     end
   end
 end

@@ -79,4 +79,59 @@ describe MicrosoftSync::UserMapping do
         change { described_class.count }.from(0)
     end
   end
+
+  describe '.enrollments_and_aads' do
+    subject { described_class.enrollments_and_aads(course).pluck(:aad_id, :type).sort }
+
+    let(:course) { course_model }
+    let(:example_enrollment_types) { %w[Student Ta Teacher] }
+    let!(:enrollments) do
+      example_enrollment_types.map do |type|
+        create_enrollment(course, user_model, enrollment_type: type + 'Enrollment')
+      end
+    end
+    let!(:user_mappings) do
+      enrollments.map do |e|
+        described_class.create!(
+          root_account: course.root_account, user: e.user, aad_id: e.type.gsub('Enrollment', 'Aad')
+        )
+      end
+    end
+
+    it 'selects at least type and aad_id' do
+      expect(described_class.enrollments_and_aads(course).first.type).to end_with('Enrollment')
+      expect(described_class.enrollments_and_aads(course).first.aad_id).to end_with('Aad')
+    end
+
+    it 'returns a scope with values for "type" and "aad_id"' do
+      expect(subject).to eq([
+        %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
+      ])
+    end
+
+    it 'ignores enrollments of type StudentViewEnrollment' do
+      enrollments.first.update!(type: 'StudentViewEnrollment')
+      expect(subject).to eq([
+        %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
+      ])
+    end
+
+    it 'ignores deleted enrollments' do
+      enrollments[0].destroy
+      expect(subject).to eq([%w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]])
+    end
+
+    it 'ignores enrollments with missing UserMappings' do
+      user_mappings[2].destroy
+      expect(subject).to eq([%w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment]])
+    end
+
+    it 'can be used with find_each on the primary' do
+      res = []
+      described_class.enrollments_and_aads(course).find_each do |e|
+        res << [e.aad_id, e.type]
+      end
+      expect(res.sort).to eq(subject)
+    end
+  end
 end

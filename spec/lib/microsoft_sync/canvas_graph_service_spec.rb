@@ -116,4 +116,24 @@ describe MicrosoftSync::CanvasGraphService do
       end
     end
   end
+
+  describe '#get_group_users_aad_ids' do
+    it 'returns ids of all pages of members' do
+      expect(subject.graph_service).to receive(:list_group_members).once.
+        with('mygroupid', select: ['id']).
+        and_yield([{'id' => 'a'}, {'id' => 'b'}]).
+        and_yield([{'id' => 'c'}])
+      expect(subject.get_group_users_aad_ids('mygroupid')).to eq(%w[a b c])
+    end
+
+    context 'when owners: true is passed in' do
+      it 'returns owners' do
+        expect(subject.graph_service).to receive(:list_group_owners).once.
+          with('mygroupid', select: ['id']).
+          and_yield([{'id' => 'a'}, {'id' => 'b'}]).
+          and_yield([{'id' => 'c'}])
+        expect(subject.get_group_users_aad_ids('mygroupid', owners: true)).to eq(%w[a b c])
+      end
+    end
+  end
 end

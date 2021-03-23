@@ -69,4 +69,18 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     # check after adding and delete what we just added.
     GuardRail.activate(:primary) { insert_all(records) }
   end
+
+  # Find the enrollments for course which have a UserMapping for the user.
+  # Selects "type" (enrollment type) and "aad_id".
+  # Returns a scope that can be used with find_each.
+  def self.enrollments_and_aads(course)
+    Enrollment.
+      active.not_fake.where(course_id: course.id).
+      joins(%{
+        JOIN #{quoted_table_name} AS mappings
+        ON mappings.user_id=enrollments.user_id
+        AND mappings.root_account_id=#{course.root_account_id.to_i}
+      }).
+      select(:id, :type, 'mappings.aad_id as aad_id')
+  end
 end

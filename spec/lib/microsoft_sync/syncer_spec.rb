@@ -23,7 +23,8 @@ describe MicrosoftSync::Syncer do
   let(:syncer) { described_class.new(group) }
   let(:course) { course_model(name: 'sync test course') }
   let(:group) { MicrosoftSync::Group.create(course: course) }
-  let(:canvas_graph_service) { double('CanvasGraphService') }
+  let(:graph_service) { double('GraphService') }
+  let(:canvas_graph_service) { double('CanvasGraphService', graph_service: graph_service) }
   let(:tenant) { 'mytenant123' }
 
   before do
@@ -67,6 +68,9 @@ describe MicrosoftSync::Syncer do
     it 'calls each step and sets workflow_state to completed' do
       expect(syncer).to receive(:ensure_class_group_exists)
       expect(syncer).to receive(:ensure_enrollments_user_mappings_filled)
+      mock_diff = double('diff')
+      expect(syncer).to receive(:generate_diff).and_return(mock_diff)
+      expect(syncer).to receive(:execute_diff).with(mock_diff)
       expect { syncer.sync! }.to \
         change { group.reload.workflow_state }.from('pending').to('completed')
     end
@@ -79,7 +83,7 @@ describe MicrosoftSync::Syncer do
 
       # TODO: we may remove the sleep, or end up keeping/changing it (in which
       # case we should add some expectations around it). See the code.
-      allow(syncer).to receive(:sleep).with(2)
+      allow(syncer).to receive(:sleep).with(3)
     end
 
     shared_examples_for 'a group record which requires a new or updated MS group' do
@@ -216,6 +220,59 @@ describe MicrosoftSync::Syncer do
         expect(upns_looked_up).to_not include("student0@example.com")
         expect(upns_looked_up).to include("student1@example.com")
       end
+    end
+  end
+
+  describe '#generate_diff' do
+    before do
+      course.enrollments.to_a.each_with_index do |enrollment, i|
+        MicrosoftSync::UserMapping.create!(
+          user_id: enrollment.user_id, root_account_id: course.root_account_id, aad_id: i.to_s
+        )
+      end
+
+      group.update!(ms_group_id: 'mygroup')
+    end
+
+    it 'gets members and owners and builds a diff' do
+      expect(canvas_graph_service).to \
+        receive(:get_group_users_aad_ids).with('mygroup').and_return(%w[m1 m2])
+      expect(canvas_graph_service).to \
+        receive(:get_group_users_aad_ids).with('mygroup', owners: true).and_return(%w[o1 o2])
+
+      mc = double('MembershipDiff')
+      expect(MicrosoftSync::MembershipDiff).to \
+        receive(:new).with(%w[m1 m2], %w[o1 o2]).and_return(mc)
+      members_and_enrollment_types = []
+      expect(mc).to receive(:set_local_member) { |*args| members_and_enrollment_types << args }
+
+      expect(syncer.generate_diff).to eq(mc)
+      expect(members_and_enrollment_types).to eq([['0', 'TeacherEnrollment']])
+    end
+  end
+
+  describe '#execute_diff' do
+    before { group.update!(ms_group_id: 'mygroup') }
+
+    it 'adds/removes users based on the diff' do
+      mc = double('MembershipDiff')
+      expect(mc).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
+      expect(mc).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
+      expect(mc).to \
+        receive(:additions_in_slices_of).
+        with(MicrosoftSync::GraphService::GROUP_USERS_ADD_BATCH_SIZE).
+        and_yield(owners: %w[o3], members: %w[o1 o2]).
+        and_yield(members: %w[o3])
+
+      expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm1')
+      expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm2')
+      expect(graph_service).to receive(:remove_group_owner).once.with('mygroup', 'o1')
+      expect(graph_service).to \
+        receive(:add_users_to_group).with('mygroup', owners: %w[o3], members: %w[o1 o2])
+      expect(graph_service).to \
+        receive(:add_users_to_group).with('mygroup', members: %w[o3])
+
+      syncer.execute_diff(mc)
     end
   end
 end
