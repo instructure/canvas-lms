@@ -21,7 +21,7 @@ import React from 'react'
 import $ from 'jquery'
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {PresentationContent} from '@instructure/ui-a11y-content'
@@ -234,18 +234,18 @@ export default class RequiredValues extends React.Component {
             </Grid.Col>
           </Grid.Row>
         </Grid>
-        <Select
-          label={I18n.t('* JWK Method')}
+        <SimpleSelect
+          renderLabel={I18n.t('* JWK Method')}
           onChange={this.handleConfigTypeChange}
-          selectedOption={toolConfiguration.public_jwk_url ? 'public_jwk_url' : 'public_jwk'}
+          value={this.state.jwkConfig}
         >
-          <option key="public_jwk" value="public_jwk">
+          <SimpleSelect.Option id="public_jwk" key="public_jwk" value="public_jwk">
             {I18n.t('Public JWK')}
-          </option>
-          <option key="public_jwk_url" value="public_jwk_url">
+          </SimpleSelect.Option>
+          <SimpleSelect.Option id="public_jwk_url" key="public_jwk_url" value="public_jwk_url">
             {I18n.t('Public JWK URL')}
-          </option>
-        </Select>
+          </SimpleSelect.Option>
+        </SimpleSelect>
         {this.configurationInput(this.state.jwkConfig)}
         <PresentationContent>
           <hr />
@@ -261,7 +261,8 @@ RequiredValues.propTypes = {
     description: PropTypes.string,
     target_link_uri: PropTypes.string,
     oidc_initiation_url: PropTypes.string,
-    public_jwk: PropTypes.object
+    public_jwk: PropTypes.object,
+    public_jwk_url: PropTypes.string
   }),
   flashError: PropTypes.func,
   showMessages: PropTypes.bool
