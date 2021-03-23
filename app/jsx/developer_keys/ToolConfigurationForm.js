@@ -20,9 +20,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Heading} from '@instructure/ui-heading'
-// If we want to upgrade this Select to the new Inst UI Select in ui-select,
-// which is not backwards-compatible, we can use CanvasSelect.
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Grid} from '@instructure/ui-grid'
@@ -118,18 +116,18 @@ export default class ToolConfigurationForm extends React.Component {
 
   renderOptions() {
     return [
-      <option key="manual" value="manual">
+      <SimpleSelect.Option id="manual" key="manual" value="manual">
         {I18n.t('Manual Entry')}
-      </option>,
-      <option key="json" value="json">
+      </SimpleSelect.Option>,
+      <SimpleSelect.Option id="json" key="json" value="json">
         {I18n.t('Paste JSON')}
-      </option>,
+      </SimpleSelect.Option>,
       this.props.editing ? null : (
-        <option key="url" value="url">
+        <SimpleSelect.Option id="url" key="url" value="url">
           {I18n.t('Enter URL')}
-        </option>
+        </SimpleSelect.Option>
       )
-    ].filter(o => !!o)
+    ].filter(o => o !== null)
   }
 
   renderBody() {
@@ -138,13 +136,13 @@ export default class ToolConfigurationForm extends React.Component {
         <Heading level="h2" as="h2" margin="0 0 x-small">
           {I18n.t('Configure')}
         </Heading>
-        <Select
-          label="Method"
+        <SimpleSelect
+          renderLabel={I18n.t('Method')}
           onChange={this.handleConfigTypeChange}
-          selectedOption={this.props.configurationMethod}
+          value={this.props.configurationMethod}
         >
           {this.renderOptions()}
-        </Select>
+        </SimpleSelect>
         <br />
         {this.configurationInput()}
       </View>
