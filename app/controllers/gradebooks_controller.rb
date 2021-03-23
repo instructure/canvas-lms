@@ -870,9 +870,7 @@ class GradebooksController < ApplicationController
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
 
-    @can_reassign_submissions =
-      @context.root_account.feature_enabled?(:reassign_assignments) &&
-      @assignment.can_reassign?(@current_user)
+    @can_reassign_submissions = @assignment.can_reassign?(@current_user)
 
     respond_to do |format|
 
