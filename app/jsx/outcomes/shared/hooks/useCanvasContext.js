@@ -23,9 +23,11 @@ const useCanvasContext = () => {
   const context = useContext(OutcomesContext)
   const contextType = context?.env?.contextType
   const contextId = context?.env?.contextId
+  const useRceEnhancements = context?.env?.useRceEnhancements
   return {
     contextType,
-    contextId
+    contextId,
+    useRceEnhancements
   }
 }
 

@@ -6,6 +6,18 @@ import i18nLolcalize from 'coffeescripts/str/i18nLolcalize'
 import '@instructure/canvas-high-contrast-theme'
 import '@instructure/canvas-theme'
 
+window.ENV ||= {
+  FEATURES: {
+    use_rce_enhancements: true,
+    rce_pretty_html_editor: true,
+    rce_auto_save: true
+  }
+}
+
+window.INST ||= {
+  editorButtons: []
+}
+
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
 }

@@ -28,6 +28,7 @@ import {accountMocks, courseMocks, groupDetailMocks, groupMocks} from './mocks'
 import * as api from '../api'
 import * as FlashAlert from '../../../shared/FlashAlert'
 
+jest.mock('jsx/shared/rce/RichContentEditor')
 jest.useFakeTimers()
 
 describe('OutcomeManagementPanel', () => {

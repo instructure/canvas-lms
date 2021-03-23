@@ -25,16 +25,19 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Mask} from '@instructure/ui-overlays'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from 'jsx/shared/components/InstuiModal'
 import useInput from 'jsx/outcomes/shared/hooks/useInput'
+import useRCE from 'jsx/outcomes/shared/hooks/useRCE'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import {updateOutcome} from 'jsx/outcomes/Management/api'
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
-  const [description, descriptionChangeHandler, descriptionChanged] = useInput(outcome?.description)
-  const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(outcome?.displayName)
-  const outcomeChanged = titleChanged || descriptionChanged || displayNameChanged
+  const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(outcome.displayName)
+  const [description] = useInput(outcome.description)
+  const [setRCERef, getRCECode] = useRCE()
 
   const invalidTitle = !title.trim().length
     ? I18n.t('Cannot be blank')
@@ -47,10 +50,13 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
 
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
+      const descriptionRCE = getRCECode()
       const updatedOutcome = {}
       if (title && titleChanged) updatedOutcome.title = title
-      if (description && descriptionChanged) updatedOutcome.description = description
+      if (descriptionRCE && descriptionRCE !== description)
+        updatedOutcome.description = descriptionRCE
       if (displayName && displayNameChanged) updatedOutcome.display_name = displayName
+
       try {
         const result = await updateOutcome(outcome._id, updatedOutcome)
         if (result?.status === 200) {
@@ -76,66 +82,63 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   }
 
   return (
-    <Modal
-      size="medium"
-      label={I18n.t('Edit Outcome')}
-      open={isOpen}
-      shouldReturnFocus
-      onDismiss={onCloseHandler}
-      shouldCloseOnDocumentClick={false}
-    >
-      <Modal.Body>
-        <Flex as="div" alignItems="start" padding="small 0" height="7rem">
-          <Flex.Item size="50%" padding="0 xx-small 0 0">
-            <TextInput
-              type="text"
+    <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
+      <Modal
+        size="medium"
+        label={I18n.t('Edit Outcome')}
+        open={isOpen}
+        shouldReturnFocus
+        onDismiss={onCloseHandler}
+        shouldCloseOnDocumentClick={false}
+      >
+        <Modal.Body>
+          <Flex as="div" alignItems="start" padding="small 0" height="7rem">
+            <Flex.Item size="50%" padding="0 xx-small 0 0">
+              <TextInput
+                type="text"
+                size="medium"
+                value={title}
+                messages={invalidTitle ? [{text: invalidTitle, type: 'error'}] : []}
+                renderLabel={I18n.t('Name')}
+                onChange={titleChangeHandler}
+              />
+            </Flex.Item>
+            <Flex.Item size="50%" padding="0 0 0 xx-small">
+              <TextInput
+                type="text"
+                size="medium"
+                value={displayName}
+                messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+                renderLabel={I18n.t('Friendly Name')}
+                onChange={displayNameChangeHandler}
+              />
+            </Flex.Item>
+          </Flex>
+          <View as="div" padding="small 0">
+            <TextArea
               size="medium"
-              value={title}
-              messages={invalidTitle ? [{text: invalidTitle, type: 'error'}] : []}
-              renderLabel={I18n.t('Name')}
-              onChange={titleChangeHandler}
+              defaultValue={description}
+              label={I18n.t('Description')}
+              textareaRef={setRCERef}
             />
-          </Flex.Item>
-          <Flex.Item size="50%" padding="0 0 0 xx-small">
-            <TextInput
-              type="text"
-              size="medium"
-              value={displayName}
-              messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
-              renderLabel={I18n.t('Friendly Name')}
-              onChange={displayNameChangeHandler}
-            />
-          </Flex.Item>
-        </Flex>
-        <View as="div" padding="small 0">
-          <TextArea
-            autoGrow
-            size="medium"
-            height="8rem"
-            maxHeight="8rem"
-            value={description}
-            label={I18n.t('Description')}
-            onChange={descriptionChangeHandler}
-          />
-        </View>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button type="button" color="secondary" margin="0 x-small 0 0" onClick={onCloseHandler}>
-          {I18n.t('Cancel')}
-        </Button>
-        <Button
-          type="button"
-          color="primary"
-          margin="0 x-small 0 0"
-          interaction={
-            outcomeChanged && !invalidTitle && !invalidDisplayName ? 'enabled' : 'disabled'
-          }
-          onClick={onUpdateOutcomeHandler}
-        >
-          {I18n.t('Save')}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+          </View>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button type="button" color="secondary" margin="0 x-small 0 0" onClick={onCloseHandler}>
+            {I18n.t('Cancel')}
+          </Button>
+          <Button
+            type="button"
+            color="primary"
+            margin="0 x-small 0 0"
+            interaction={!invalidTitle && !invalidDisplayName ? 'enabled' : 'disabled'}
+            onClick={onUpdateOutcomeHandler}
+          >
+            {I18n.t('Save')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </ApplyTheme>
   )
 }
 

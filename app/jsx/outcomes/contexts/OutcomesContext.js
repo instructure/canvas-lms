@@ -23,10 +23,12 @@ const OutcomesContext = createContext({})
 export const getContext = () => {
   const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
   const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
+  const useRceEnhancements = ENV.use_rce_enhancements
   return {
     env: {
       contextType,
-      contextId
+      contextId,
+      useRceEnhancements
     }
   }
 }

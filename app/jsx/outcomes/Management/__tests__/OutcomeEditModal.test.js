@@ -19,11 +19,13 @@
 import React from 'react'
 import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import {within} from '@testing-library/dom'
-import OutcomeEditModal from '../OutcomeEditModal'
-import {updateOutcome} from '../api'
-import * as FlashAlert from '../../../shared/FlashAlert'
+import OutcomeEditModal from 'jsx/outcomes/Management/OutcomeEditModal'
+import {updateOutcome} from 'jsx/outcomes/Management/api'
+import * as FlashAlert from 'jsx/shared/FlashAlert'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 
-jest.mock('../api')
+jest.mock('jsx/outcomes/Management/api')
+jest.mock('jsx/shared/rce/RichContentEditor')
 jest.useFakeTimers()
 
 describe('OutcomeEditModal', () => {
@@ -42,6 +44,7 @@ describe('OutcomeEditModal', () => {
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
+    RichContentEditor.callOnRCE = jest.fn()
   })
 
   afterEach(() => {
@@ -56,11 +59,6 @@ describe('OutcomeEditModal', () => {
   it('does not show modal if isOpen prop false', () => {
     const {queryByText} = render(<OutcomeEditModal {...defaultProps({isOpen: false})} />)
     expect(queryByText('Edit Outcome')).not.toBeInTheDocument()
-  })
-
-  it('disables Save button if content not changed', () => {
-    const {getByText} = render(<OutcomeEditModal {...defaultProps()} />)
-    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
   })
 
   it('calls onCloseHandler on Save button click', () => {
@@ -82,28 +80,32 @@ describe('OutcomeEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('shows error message below Name field if no name', () => {
+  it('shows error message below Name field if no name and disables Save button', () => {
     const {getByText, getByLabelText} = render(<OutcomeEditModal {...defaultProps()} />)
     fireEvent.change(getByLabelText('Name'), {target: {value: ''}})
+    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
     expect(getByText('Cannot be blank')).toBeInTheDocument()
   })
 
-  it('shows error message below Name field if name includes only spaces', () => {
+  it('shows error message below Name field if name includes only spaces and disables Save button', () => {
     const {getByText, getByLabelText} = render(<OutcomeEditModal {...defaultProps()} />)
     fireEvent.change(getByLabelText('Name'), {target: {value: '  '}})
+    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
     expect(getByText('Cannot be blank')).toBeInTheDocument()
   })
 
-  it('shows error message below Name field if name > 255 characters', () => {
+  it('shows error message below Name field if name > 255 characters and disables Save button', () => {
     const {getByText, getByLabelText} = render(<OutcomeEditModal {...defaultProps()} />)
     fireEvent.change(getByLabelText('Name'), {target: {value: 'a'.repeat(256)}})
     expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
   })
 
-  it('shows error message below displayName field if displayName > 255 characters', () => {
+  it('shows error message below displayName field if displayName > 255 characters and disables Save button', () => {
     const {getByText, getByLabelText} = render(<OutcomeEditModal {...defaultProps()} />)
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'a'.repeat(256)}})
     expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
   })
 
   it('updates only outcome name if only name is changed', async () => {
@@ -117,8 +119,8 @@ describe('OutcomeEditModal', () => {
 
   it('updates only outcome description if only description is changed', async () => {
     updateOutcome.mockReturnValue(Promise.resolve({status: 200}))
-    const {getByText, getByLabelText} = render(<OutcomeEditModal {...defaultProps()} />)
-    fireEvent.change(getByLabelText('Description'), {target: {value: 'Updated description'}})
+    RichContentEditor.callOnRCE.mockReturnValue('Updated description')
+    const {getByText} = render(<OutcomeEditModal {...defaultProps()} />)
     fireEvent.click(getByText('Save'))
     await act(async () => jest.runAllTimers())
     expect(updateOutcome).toHaveBeenCalledWith('1', {description: 'Updated description'})
