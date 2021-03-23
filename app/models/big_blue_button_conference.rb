@@ -42,6 +42,14 @@ class BigBlueButtonConference < WebConference
     visible: false
   }
 
+  user_setting_field :create_time, {
+    name: ->{ t('create_time', 'Create Time') },
+    description: ->{ t('Security setting to restrict join URLs to a conference') },
+    type: :integer,
+    default: false,
+    visible: false
+  }
+
   def initiate_conference
     return conference_key if conference_key && !retouch?
     unless self.conference_key
@@ -57,7 +65,7 @@ class BigBlueButtonConference < WebConference
     settings[:record] &&= config[:recording_enabled]
     settings[:domain] ||= config[:domain] # save the domain
     current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
-    send_request(:create, {
+    response = send_request(:create, {
       :meetingID => conference_key,
       :name => title,
       :voiceBridge => format("%020d", self.global_id),
@@ -70,6 +78,7 @@ class BigBlueButtonConference < WebConference
       "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
     }) or return nil
     @conference_active = true
+    settings[:create_time] = response[:createTime] if response.present?
     save
     conference_key
   end
@@ -204,7 +213,8 @@ class BigBlueButtonConference < WebConference
       :fullName => user.short_name,
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
-      :userID => user.id
+      :userID => user.id,
+      :createTime => settings[:create_time]
   end
 
   def end_meeting
