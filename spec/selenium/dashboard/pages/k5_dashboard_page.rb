@@ -124,6 +124,23 @@ module K5PageObject
   def grading_period_dropdown_selector
     "#grading-period-select"
   end
+
+  def week_date_selector
+    "h2 div"
+  end
+
+  def previous_week_button_selector
+    "//button[.//span[. = 'View previous week']]"
+  end
+
+  def next_week_button_selector
+    "//button[.//span[. = 'View next week']]"
+  end
+
+  def today_button_selector
+    "//button[.//span[. = 'Today']]"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -234,6 +251,26 @@ module K5PageObject
     f(grading_period_dropdown_selector)
   end
 
+  def beginning_of_week_date
+    ff(week_date_selector)[0]
+  end
+
+  def end_of_week_date
+    ff(week_date_selector).last
+  end
+
+  def previous_week_button
+    fxpath(previous_week_button_selector)
+  end
+
+  def next_week_button
+    fxpath(next_week_button_selector)
+  end
+
+  def today_button
+    fxpath(today_button_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def check_enable_homeroom_checkbox
@@ -282,5 +319,25 @@ module K5PageObject
 
   def click_announcement_edit_pencil
     announcement_edit_pencil.click
+  end
+
+  def click_previous_week_button
+    previous_week_button.click
+  end
+
+  def click_next_week_button
+    next_week_button.click
+  end
+
+  def click_today_button
+    today_button.click
+  end
+
+  def beginning_weekday_calculation(current_date)
+    (current_date.beginning_of_week - 1.day).strftime("%B %-d")
+  end
+
+  def ending_weekday_calculation(current_date)
+    (current_date.end_of_week - 1.day).strftime("%B %-d")
   end
 end

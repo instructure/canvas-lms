@@ -43,7 +43,7 @@ describe "student k5 dashboard" do
   end
 
   context 'homeroom dashboard standard' do
-    it 'provides the homeroom dashboard tabs on dashboard', ignore_js_errors: true do
+    it 'provides the homeroom dashboard tabs on dashboard' do
       get "/"
 
       expect(retrieve_welcome_text).to match(/Welcome,/)
@@ -53,23 +53,7 @@ describe "student k5 dashboard" do
       expect(resources_tab).to be_displayed
     end
 
-    it 'navigates to planner when Schedule is clicked', ignore_js_errors: true do
-      @course.assignments.create!(
-        title: 'assignment three',
-        grading_type: 'points',
-        points_possible: 10,
-        due_at: Time.zone.today,
-        submission_types: 'online_text_entry'
-      )
-      get "/"
-
-      select_schedule_tab
-      wait_for_ajaximations
-
-      expect(today_header).to be_displayed
-    end
-
-    it 'presents latest homeroom announcements', ignore_js_errors: true do
+    it 'presents latest homeroom announcements' do
       @course.homeroom_course = true
       @course.save!
       announcement_heading = "K5 Let's do this"
@@ -87,18 +71,30 @@ describe "student k5 dashboard" do
       expect(announcement_content_text(announcement_content)).to be_displayed
     end
 
-    it 'shows no announcement creation button when there are no announcements', ignore_js_errors: true do
-      @course.homeroom_course = true
-      @course.save!
+    it 'shows no announcement creation button when there are no announcements' do
+      @course.update!(homeroom_course: true)
 
       get "/"
 
       expect(announcement_button_exists?).to be_falsey
     end
 
+    it 'dashboard tabs are sticky when scrolling down on homeroom view' do
+      @course.update!(homeroom_course: true)
 
+      create_courses(10,enroll_user: @student, return_type: :record)
 
-    it 'shows 1 assignment due today', ignore_js_errors: true do
+      get "/"
+      wait_for_ajaximations
+
+      driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+      wait_for_ajaximations
+
+      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(homeroom_tab).to be_displayed
+    end
+
+    it 'shows 1 assignment due today' do
       @course.assignments.create!(
         title: 'assignment three',
         grading_type: 'points',
@@ -112,7 +108,7 @@ describe "student k5 dashboard" do
       expect(subject_items_due(@course_name, '1 due today')).to be_displayed
     end
 
-    it 'shows 1 assignment missing today', ignore_js_errors: true do
+    it 'shows 1 assignment missing today' do
       @course.assignments.create!(
         title: 'assignment three',
         grading_type: 'points',
@@ -127,7 +123,7 @@ describe "student k5 dashboard" do
   end
 
   context 'schedule tab' do
-    it 'dashboard tabs are sticky when scrolling down on planner view', ignore_js_errors: true do
+    it 'dashboard tabs are sticky when scrolling down on planner view' do
       5.times do
         @course.assignments.create!(
           title: 'old assignment',
@@ -151,7 +147,7 @@ describe "student k5 dashboard" do
   end
 
   context 'course cards' do
-    it 'shows subject course on dashboard', ignore_js_errors: true do
+    it 'shows subject course on dashboard' do
       @course.homeroom_course = true
       @course.save!
       subject_course_title = "Social Studies 4"
@@ -163,7 +159,7 @@ describe "student k5 dashboard" do
       expect(element_exists?(course_card_selector(subject_course_title))).to eq(true)
     end
 
-    it 'shows latest announcement on subject course card', ignore_js_errors: true do
+    it 'shows latest announcement on subject course card' do
       new_announcement(@course, "K5 Let's do this", "So happy to see all of you.")
       announcement2 = new_announcement(@course, "K5 Latest", "Let's get to work!")
 
@@ -172,7 +168,7 @@ describe "student k5 dashboard" do
       expect(course_card_announcement(announcement2.title)).to be_displayed
     end
 
-    it 'navigates to subject when subject card title is clicked', ignore_js_errors: true do
+    it 'navigates to subject when subject card title is clicked' do
       @course.homeroom_course = true
       @course.save!
       subject_title = "Math Level 1"
@@ -187,7 +183,7 @@ describe "student k5 dashboard" do
       expect(driver.current_url).to eq(subject_href)
     end
 
-    it 'shows no assignments due today', ignore_js_errors: true do
+    it 'shows no assignments due today' do
       @course.assignments.create!(
         title: 'assignment three',
         grading_type: 'points',
