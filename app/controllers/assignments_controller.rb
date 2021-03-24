@@ -711,6 +711,8 @@ class AssignmentsController < ApplicationController
         if Account.site_admin.feature_enabled?(:annotated_document_submissions)
           hash[:ANNOTATED_DOCUMENT] = {
             display_name: @assignment.annotatable_attachment.display_name,
+            context_type: @assignment.annotatable_attachment.context_type,
+            context_id: @assignment.annotatable_attachment.context_id,
             id: @assignment.annotatable_attachment.id
           }
         end

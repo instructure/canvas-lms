@@ -110,7 +110,11 @@ function disableCheckbox(id) {
 
 QUnit.module('EditView', {
   setup() {
-    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fixtures.innerHTML = `
+        <span data-component="ModeratedGradingFormFieldGroup"></span>
+        <input id="annotated_document_id" type="hidden" />
+        <div id="annotated_document_usage_rights_container"></div>
+    `
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
@@ -120,7 +124,8 @@ QUnit.module('EditView', {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
-      COURSE_ID: 1
+      COURSE_ID: 1,
+      ANNOTATED_DOCUMENT_SUBMISSIONS: true
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -190,6 +195,48 @@ test('validates presence of attachment when assignment has type annotatable_atta
   const errors = view.validateBeforeSave(data, {})
   const annotatedDocumentError = errors['online_submission_types[annotated_document]'][0]
   strictEqual(annotatedDocumentError.message, 'You must attach a file')
+})
+
+test('validates presence of attachment use justification when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+  view.renderAnnotatedDocumentUsageRightsSelectBox()
+  view.$('#usageRightSelector').val('choose')
+  const data = {submission_types: ['annotated_document']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
+  strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
+})
+
+test('validates presence of attachment legal copyright when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+  view.renderAnnotatedDocumentUsageRightsSelectBox()
+  view.$('#copyrightHolder').val('')
+  const data = {submission_types: ['annotated_document']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
+  strictEqual(
+    annotatedDocumentLegalCopyrightError.message,
+    'You must set document copyright holder'
+  )
+})
+
+test('validates presence of attachment use justification and legal copyright when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+  view.renderAnnotatedDocumentUsageRightsSelectBox()
+  view.$('#usageRightSelector').val('choose')
+  view.$('#copyrightHolder').val('')
+  const data = {submission_types: ['annotated_document']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
+  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
+  strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
+  strictEqual(
+    annotatedDocumentLegalCopyrightError.message,
+    'You must set document copyright holder'
+  )
 })
 
 test('does not allow group assignment for large rosters', function () {
@@ -1962,6 +2009,7 @@ QUnit.module('EditView annotatable document submission', hooks => {
       <span data-component="ModeratedGradingFormFieldGroup"></span>
       <div id="annotated_document_chooser_container"></div>
       <input id="annotated_document_id" type="checkbox"></input>
+      <div id="annotated_document_usage_rights_container"></div>
     `
 
     fakeENV.setup({
@@ -2007,12 +2055,28 @@ QUnit.module('EditView annotatable document submission', hooks => {
 
   QUnit.module('when Annotated Document is selected', function (contextHooks) {
     const filename = 'test.pdf'
+    const serverResponse200 = data => [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(data)
+    ]
     let assignmentOpts
 
     contextHooks.beforeEach(function () {
       ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
-      ENV.ANNOTATED_DOCUMENT = {id: 1, display_name: filename}
+      ENV.ANNOTATED_DOCUMENT = {
+        id: '1',
+        display_name: filename,
+        context_type: 'Course',
+        context_id: '1'
+      }
+      ENV.context_asset_string = 'course_1'
       assignmentOpts = {submissionTypes: ['annotated_document']}
+      server = sinon.fakeServer.create()
+    })
+
+    contextHooks.afterEach(() => {
+      server.restore()
     })
 
     test('renders the filename if attachment is present', function () {
@@ -2032,6 +2096,58 @@ QUnit.module('EditView annotatable document submission', hooks => {
       document.querySelector('div#annotated_document_chooser_container button').click()
       const container = document.querySelector('div#annotated_document_chooser_container')
       notOk(container.textContent.includes(filename))
+    })
+
+    test('renders the usage rights container properly', function () {
+      const defaultCourseUrl = '/api/v1/files/1?include%5B%5D=usage_rights'
+      const contentLicensesUrl = '/api/v1/courses/1/content_licenses'
+      const fileData = {
+        usage_rights: {
+          use_justification: 'creative_commons',
+          license: 'cc_by',
+          legal_copyright: 'Test copyright'
+        }
+      }
+      const licensesData = [
+        {
+          id: 'public_domain',
+          name: 'Public Domain',
+          url: 'http://en.wikipedia.org/wiki/Public_domain'
+        },
+        {
+          id: 'cc_by',
+          name: 'CC Attribution',
+          url: 'http://creativecommons.org/licenses/by/4.0'
+        },
+        {
+          id: 'cc_by_sa',
+          name: 'CC Attribution Share Alike',
+          url: 'http://creativecommons.org/licenses/by-sa/4.0'
+        }
+      ]
+      server.respondWith('GET', defaultCourseUrl, serverResponse200(fileData))
+      server.respondWith('GET', contentLicensesUrl, serverResponse200(licensesData))
+      editView(assignmentOpts)
+      server.respond()
+      const usageRightSelector = document.querySelector('#usageRightSelector')
+      const creativeCommonsSelection = document.querySelector('#creativeCommonsSelection')
+      const copyrightHolder = document.querySelector('#copyrightHolder')
+      strictEqual(
+        usageRightSelector.options[usageRightSelector.selectedIndex].text,
+        'The material is licensed under Creative Commons'
+      )
+      strictEqual(
+        creativeCommonsSelection.options[creativeCommonsSelection.selectedIndex].text,
+        'CC Attribution'
+      )
+      strictEqual(copyrightHolder.value, 'Test copyright')
+    })
+
+    test('clicking the remove button unmount usage rights container properly', function () {
+      editView(assignmentOpts)
+      document.querySelector('div#annotated_document_chooser_container button').click()
+      const container = document.querySelector('#annotated_document_usage_rights_container')
+      strictEqual(container.innerHTML, '')
     })
   })
 })

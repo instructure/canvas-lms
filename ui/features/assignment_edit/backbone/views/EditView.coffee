@@ -21,7 +21,8 @@ import INST from 'browser-sniffer'
 import I18n from 'i18n!assignment_editview'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import _ from 'underscore'
-import $ from 'jquery'
+import $, {param} from 'jquery'
+import pluralize from 'str-pluralize'
 import numberHelper from '@canvas/i18n/numberHelper'
 import round from 'round'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -30,6 +31,7 @@ import EditViewTemplate from '../../jst/EditView.handlebars'
 import userSettings from '@canvas/user-settings'
 import TurnitinSettings from '@canvas/assignments/TurnitinSettings.coffee'
 import VeriCiteSettings from '@canvas/assignments/VeriCiteSettings.coffee'
+import File from '@canvas/files/backbone/models/File.coffee'
 import TurnitinSettingsDialog from './TurnitinSettingsDialog.coffee'
 import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialogView.coffee'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector.coffee'
@@ -43,9 +45,11 @@ import SimilarityDetectionTools from '../../react/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from '../../react/ModeratedGradingFormFieldGroup'
 import AllowedAttemptsWithState from '../../react/allowed_attempts/AllowedAttemptsWithState'
 import DefaultToolForm from '../../react/DefaultToolForm'
+import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
+import setUsageRights from '@canvas/files/util/setUsageRights'
 import 'jqueryui/dialog'
 import '@canvas/util/toJSON'
 import '@canvas/rails-flash-notifications'
@@ -107,6 +111,10 @@ export default class EditView extends ValidatedFormView
   SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
   ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
   ASSIGNMENT_EXTERNAL_TOOLS = '#assignment_external_tools'
+  USAGE_RIGHTS_CONTAINER = '#annotated_document_usage_rights_container'
+  USAGE_RIGHTS_SELECTOR = '#usageRightSelector'
+  COPYRIGHT_HOLDER = '#copyrightHolder'
+  CREATIVE_COMMONS_SELECTION = '#creativeCommonsSelection'
 
   LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_connect_assessment'
 
@@ -186,7 +194,24 @@ export default class EditView extends ValidatedFormView
     @assignment = @model
     @setDefaultsIfNew()
     @dueDateOverrideView = options.views['js-assignment-overrides']
-    @on 'success', @redirectAfterSave
+    @on 'success', () =>
+      annotatedDocument = @getAnnotatedDocument()
+      if !!annotatedDocument and @assignment.get("submission_types")?.includes('annotated_document')
+        usageRights = @getAnnotatedDocumentUsageRights()
+        annotatedDocumentModel = new File(annotatedDocument, { parse: true })
+        setUsageRights(
+          [annotatedDocumentModel],
+          usageRights,
+          (->),
+          annotatedDocument.contextId,
+          annotatedDocument.contextType
+        ).always(() =>
+          @unwatchUnload()
+          @redirectAfterSave()
+        )
+      else
+        @unwatchUnload()
+        @redirectAfterSave()
     @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
     if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       @gradingTypeSelector.on 'change:gradingType', @onChange
@@ -334,8 +359,10 @@ export default class EditView extends ValidatedFormView
 
     if @$allowAnnotatedDocument.prop('checked')
       @renderAnnotatedDocumentSelector()
+      @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
     else
       @unmountAnnotatedDocumentSelector()
+      @unmountAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
 
   getAnnotatedDocumentContainer: =>
     return document.querySelector('#annotated_document_chooser_container')
@@ -361,12 +388,20 @@ export default class EditView extends ValidatedFormView
         )
         @setAnnotatedDocument(null)
         @renderAnnotatedDocumentSelector()
+        @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
       onSelect: (fileInfo) =>
         $.screenReaderFlashMessageExclusive(
           I18n.t('selected %{filename}', {filename: fileInfo.name})
         )
-        @setAnnotatedDocument({id: fileInfo.id, name: fileInfo.name})
+        match = fileInfo.src.match(/\/(\w+)\/(\d+)\/files\/.*/)
+        @setAnnotatedDocument({
+          id: fileInfo.id,
+          name: fileInfo.name,
+          contextType: match[1],
+          contextId: match[2]
+        })
         @renderAnnotatedDocumentSelector()
+        @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
     }
 
     element = React.createElement(AnnotatedDocumentSelector, props)
@@ -375,6 +410,62 @@ export default class EditView extends ValidatedFormView
   unmountAnnotatedDocumentSelector: () =>
     ReactDOM.unmountComponentAtNode(@getAnnotatedDocumentContainer())
     @setAnnotatedDocument(null)
+
+  shouldRenderUsageRights: =>
+    ENV?.ANNOTATED_DOCUMENT_SUBMISSIONS
+
+  setAnnotatedDocumentUsageRights:(usageRights) =>
+    @annotatedDocumentUsageRights = usageRights
+    if @annotatedDocumentUsageRights == null
+      return
+    $(USAGE_RIGHTS_SELECTOR).val(@annotatedDocumentUsageRights.use_justification).trigger('change')
+    # WORKAROUND: Used for trigger React's select onChange SyntheticEvent
+    $(USAGE_RIGHTS_SELECTOR).get(0).dispatchEvent(new Event('change', { bubbles: true }))
+    if ($(CREATIVE_COMMONS_SELECTION).length)
+      $(CREATIVE_COMMONS_SELECTION).val(@annotatedDocumentUsageRights.license)
+    $(COPYRIGHT_HOLDER).val(@annotatedDocumentUsageRights.legal_copyright)
+
+  getAnnotatedDocumentUsageRights: () =>
+    useJustification = $(USAGE_RIGHTS_SELECTOR).val()
+    annotatedDocumentUsageRights = {}
+    annotatedDocumentUsageRights.use_justification = useJustification
+    @$creativeCommonsSelection = $("#{CREATIVE_COMMONS_SELECTION}")
+    if useJustification == 'creative_commons' && @$creativeCommonsSelection.length
+      annotatedDocumentUsageRights.license = @$creativeCommonsSelection.val()
+    annotatedDocumentUsageRights.legal_copyright = $(COPYRIGHT_HOLDER).val()
+    annotatedDocumentUsageRights
+
+  fetchAttachmentFile:(fileId, callback, errorCallback) =>
+    baseUrl = "/api/v1/files/#{fileId}"
+    params = { include: ['usage_rights'] }
+    url = "#{baseUrl}?#{param(params)}"
+    $.getJSON(url)
+      .pipe((response) -> callback(response))
+      .fail(() -> errorCallback())
+
+  renderAnnotatedDocumentUsageRightsSelectBox:() =>
+    annotatedDocument = @getAnnotatedDocument()
+    if annotatedDocument
+      { contextType, contextId } = annotatedDocument
+      ReactDOM.render(
+        React.createElement(UsageRightsSelectBox, { contextType, contextId }),
+        document.querySelector(USAGE_RIGHTS_CONTAINER)
+      )
+      $("#{USAGE_RIGHTS_CONTAINER} .UsageRightsSelectBox__container").addClass("edit-view")
+      self = @
+      @fetchAttachmentFile(annotatedDocument.id,
+        (document) -> self.setAnnotatedDocumentUsageRights(document.usage_rights),
+        () ->
+          message = I18n.t("Failed to load annotated document file data.")
+          $.flashError(message)
+          $.screenReaderFlashMessage(message)
+      )
+    else
+      @unmountAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
+
+  unmountAnnotatedDocumentUsageRightsSelectBox: () =>
+    ReactDOM.unmountComponentAtNode(document.querySelector(USAGE_RIGHTS_CONTAINER))
+    @setAnnotatedDocumentUsageRights(null)
 
   toggleAdvancedTurnitinSettings: (ev) =>
     ev.preventDefault()
@@ -549,8 +640,14 @@ export default class EditView extends ValidatedFormView
     @handleAnonymousGradingChange()
 
     if ENV.ANNOTATED_DOCUMENT_SUBMISSIONS && ENV.ANNOTATED_DOCUMENT
-      @setAnnotatedDocument({id: ENV.ANNOTATED_DOCUMENT.id, name: ENV.ANNOTATED_DOCUMENT.display_name})
+      @setAnnotatedDocument({
+        id: ENV.ANNOTATED_DOCUMENT.id,
+        name: ENV.ANNOTATED_DOCUMENT.display_name,
+        contextType: pluralize(ENV.ANNOTATED_DOCUMENT.context_type).toLowerCase(),
+        contextId: ENV.ANNOTATED_DOCUMENT.context_id,
+      })
       @renderAnnotatedDocumentSelector()
+      @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
 
     if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       @conditionalReleaseEditor = ConditionalRelease.attach(
@@ -752,7 +849,9 @@ export default class EditView extends ValidatedFormView
   fieldSelectors: _.extend(
     AssignmentGroupSelector::fieldSelectors,
     GroupCategorySelector::fieldSelectors,
-    {grader_count: "#grader_count"}
+    {grader_count: "#grader_count"},
+    {usage_rights_use_justification: USAGE_RIGHTS_SELECTOR},
+    {usage_rights_legal_copyright: COPYRIGHT_HOLDER}
   )
 
   showErrors: (errors) ->
@@ -845,6 +944,12 @@ export default class EditView extends ValidatedFormView
         ]
     else if !@getAnnotatedDocument() && data.submission_types?.includes('annotated_document')
       errors["online_submission_types[annotated_document]"] = [message: I18n.t('You must attach a file')]
+    else if @getAnnotatedDocument() and data.submission_types?.includes('annotated_document') and @shouldRenderUsageRights()
+      annotatedDocumentUsageRights = @getAnnotatedDocumentUsageRights()
+      if annotatedDocumentUsageRights.use_justification == 'choose'
+        errors['usage_rights_use_justification'] = [{message: I18n.t('You must set document usage rights')}]
+      if annotatedDocumentUsageRights.legal_copyright == ''
+        errors['usage_rights_legal_copyright'] = [{message: I18n.t('You must set document copyright holder')}]
 
     errors
 

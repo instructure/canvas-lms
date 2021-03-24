@@ -1956,6 +1956,16 @@ describe AssignmentsController do
         get :edit, params: {course_id: @course.id, id: @assignment.id}
         expect(assigns[:js_env][:ANNOTATED_DOCUMENT][:display_name]).to eq @attachment.display_name
       end
+
+      it 'contains the attachment context_type when the assignment is annotatable' do
+        get :edit, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT][:context_type]).to eq @attachment.context_type
+      end
+
+      it 'contains the attachment context_id when the assignment is annotatable' do
+        get :edit, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT][:context_id]).to eq @attachment.context_id
+      end
     end
 
     describe 'js_env ANNOTATED_DOCUMENT_SUBMISSIONS' do
