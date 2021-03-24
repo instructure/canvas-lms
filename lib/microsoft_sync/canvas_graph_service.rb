@@ -26,6 +26,8 @@ module MicrosoftSync
   class CanvasGraphService
     attr_reader :graph_service
 
+    MAX_MAIL_NICKNAME_LENGTH = 64
+
     def initialize(tenant)
       @graph_service = GraphService.new(tenant)
     end
@@ -42,7 +44,7 @@ module MicrosoftSync
         externalId: course.uuid,
         externalName: course.name,
         externalSource: 'manual',
-        mailNickname: "Course_#{course.uuid}",
+        mailNickname: mail_nickname_for(course)
       )
     end
 
@@ -84,6 +86,19 @@ module MicrosoftSync
           aad_ids.concat(users.map{|user| user['id']})
         end
       end
+    end
+
+    private
+
+    def mail_nickname_for(course)
+      prefix = "Course_"
+      postfix = "-#{course.uuid.first(13)}"
+
+      safe_course_code = course.course_code.strip.parameterize.underscore.first(
+        MAX_MAIL_NICKNAME_LENGTH - (postfix.length + prefix.length)
+      )
+
+      "#{prefix}#{safe_course_code}#{postfix}"
     end
   end
 end

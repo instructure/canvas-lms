@@ -40,6 +40,8 @@ describe MicrosoftSync::CanvasGraphService do
   end
 
   describe '#create_education_class' do
+    let(:course) { @course }
+
     it 'maps course fields to Microsoft education class fields' do
       course_model(public_description: 'great class', name: 'math 101')
       expect(graph_service).to receive(:create_education_class).with(
@@ -48,11 +50,93 @@ describe MicrosoftSync::CanvasGraphService do
         externalId: @course.uuid,
         externalName: 'math 101',
         externalSource: 'manual',
-        mailNickname: "Course_#{@course.uuid}",
+        mailNickname: "Course_math_101-#{@course.uuid.first(13)}",
       ).and_return('foo')
 
 
       expect(subject.create_education_class(@course)).to eq('foo')
+    end
+
+    context 'when the course code contains special characters' do
+      let(:course_code) { '{{math🔥一241!&?' }
+
+      before do
+        course_model(public_description: 'great class', name: 'Linear Algebra', course_code: course_code)
+      end
+
+      it 'removes the special characters' do
+        expect(graph_service).to receive(:create_education_class).with(
+          description: 'great class',
+          displayName: course.name,
+          externalId: course.uuid,
+          externalName: course.name,
+          externalSource: 'manual',
+          mailNickname: "Course_math_241-#{course.uuid.first(13)}",
+        ).and_return('foo')
+
+        subject.create_education_class(course)
+      end
+    end
+
+    context 'when the course code contains invalid characters' do
+      let(:course_code) { '@Math<>()\[];:"帆布' }
+
+      before do
+        course_model(public_description: 'great class', name: 'Linear Algebra', course_code: course_code)
+      end
+
+      it 'removes the invalid characters' do
+        expect(graph_service).to receive(:create_education_class).with(
+          description: 'great class',
+          displayName: course.name,
+          externalId: course.uuid,
+          externalName: course.name,
+          externalSource: 'manual',
+          mailNickname: "Course_math-#{course.uuid.first(13)}",
+        ).and_return('foo')
+
+        subject.create_education_class(course)
+      end
+    end
+
+    context 'when the course name begins or ends with whitespace' do
+      let(:course_code) { " math 101    \n\n" }
+
+      before do
+        course_model(public_description: 'great class', name: 'Linear Algebra', course_code: course_code)
+      end
+
+      it 'removes the whitespace' do
+        expect(graph_service).to receive(:create_education_class).with(
+          description: 'great class',
+          displayName: course.name,
+          externalId: course.uuid,
+          externalName: course.name,
+          externalSource: 'manual',
+          mailNickname: "Course_math_101-#{course.uuid.first(13)}",
+        ).and_return('foo')
+
+        subject.create_education_class(course)
+      end
+    end
+
+    context 'when the course name is too long' do
+      let(:name) { 'c' * 128}
+
+      before { course_model(public_description: 'great class', name: name) }
+
+      it 'shortens the mailNickname' do
+        expect(graph_service).to receive(:create_education_class).with(
+          description: 'great class',
+          displayName: name,
+          externalId: @course.uuid,
+          externalName: name,
+          externalSource: 'manual',
+          mailNickname: "Course_#{@course.name.first(43)}-#{@course.uuid.first(13)}"
+        ).and_return('foo')
+
+        subject.create_education_class(@course)
+      end
     end
   end
 
