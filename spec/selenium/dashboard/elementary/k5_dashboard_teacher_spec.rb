@@ -184,7 +184,7 @@ describe "teacher k5 dashboard" do
       course_with_teacher(active_all: true, user: @teacher, course_name: subject_title1)
       @subject = @course
     end
-    
+
     it 'shows the subjects the teacher is enrolled in' do
       subject_title2 = "Social Studies"
       course_with_teacher(active_all: true, user: @teacher, course_name: subject_title2)
@@ -233,19 +233,14 @@ describe "teacher k5 dashboard" do
         active_enrollment: 1
       )
 
-      @ta.email = 'ta_person@example.com'
-      @ta.save!
-
       get "/"
 
       select_resources_tab
 
       expect(staff_heading(@teacher.name)).to be_displayed
-      expect(email_link(@teacher.email)).to be_displayed
       expect(instructor_role('Teacher')).to be_displayed
 
       expect(staff_heading(@ta.name)).to be_displayed
-      expect(email_link(@ta.email)).to be_displayed
       expect(instructor_role('Teaching Assistant')).to be_displayed
     end
 

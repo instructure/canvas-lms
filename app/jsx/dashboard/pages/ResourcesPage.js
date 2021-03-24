@@ -34,7 +34,6 @@ const fetchStaff = cards =>
             id: instructor.id,
             name: instructor.short_name,
             bio: instructor.bio,
-            email: instructor.email,
             avatarUrl: instructor.avatar_url || undefined,
             role: instructor.enrollments[0].role
           })

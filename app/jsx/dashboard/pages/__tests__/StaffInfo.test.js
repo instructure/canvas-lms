@@ -28,7 +28,6 @@ describe('StaffInfo', () => {
     id: '1',
     name: 'Mrs. Thompson',
     bio: 'Office Hours: 9-10am MWF',
-    email: 'thompson@abc.edu',
     avatarUrl: '/avatar1.png',
     role: 'TeacherEnrollment',
     ...overrides
@@ -46,13 +45,6 @@ describe('StaffInfo', () => {
     const image = getByAltText('Avatar for Mrs. Thompson')
     expect(image).toBeInTheDocument()
     expect(image.src).toContain('/avatar1.png')
-  })
-
-  it('renders an email button with correct email', () => {
-    const {getByText} = render(<StaffInfo {...getProps()} />)
-    const button = getByText('Email Mrs. Thompson')
-    expect(button).toBeInTheDocument()
-    expect(button.closest('a').href).toBe('mailto:thompson@abc.edu')
   })
 
   it('renders custom role names', () => {
@@ -73,14 +65,8 @@ describe('StaffInfo', () => {
     expect(getByText('Teacher')).toBeInTheDocument()
   })
 
-  it('still renders name and bio if email is missing', () => {
-    const {getByText} = render(<StaffInfo {...getProps({email: null})} />)
-    expect(getByText('Mrs. Thompson')).toBeInTheDocument()
-    expect(getByText('Office Hours: 9-10am MWF')).toBeInTheDocument()
-  })
-
-  it('still renders name if email and bio are missing', () => {
-    const {getByText} = render(<StaffInfo {...getProps({email: null, bio: null})} />)
+  it('still renders name if bio is missing', () => {
+    const {getByText} = render(<StaffInfo {...getProps({bio: null})} />)
     expect(getByText('Mrs. Thompson')).toBeInTheDocument()
   })
 

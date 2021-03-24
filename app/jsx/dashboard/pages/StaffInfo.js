@@ -21,7 +21,7 @@ import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton, Button} from '@instructure/ui-buttons'
-import {IconDiscussionLine, IconEmailLine} from '@instructure/ui-icons'
+import {IconEmailLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {readableRoleName, sendMessage} from 'jsx/dashboard/utils'
@@ -39,7 +39,6 @@ export default function StaffInfo({
   id,
   name,
   bio,
-  email,
   avatarUrl = '/images/messages/avatar-50.png',
   role
 }) {
@@ -81,19 +80,6 @@ export default function StaffInfo({
             </Text>
           )}
         </Flex.Item>
-        {email && (
-          <Flex.Item>
-            <IconButton
-              screenReaderLabel={I18n.t('Email %{name}', {name})}
-              size="small"
-              withBackground={false}
-              withBorder={false}
-              href={`mailto:${email}`}
-            >
-              <IconEmailLine />
-            </IconButton>
-          </Flex.Item>
-        )}
         <Flex.Item>
           <IconButton
             screenReaderLabel={I18n.t('Send a message to %{name}', {name})}
@@ -102,7 +88,7 @@ export default function StaffInfo({
             withBorder={false}
             onClick={() => setModalOpen(true)}
           >
-            <IconDiscussionLine />
+            <IconEmailLine />
           </IconButton>
         </Flex.Item>
       </Flex>
@@ -167,7 +153,6 @@ export const StaffShape = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   bio: PropTypes.string,
-  email: PropTypes.string,
   avatarUrl: PropTypes.string,
   role: PropTypes.string.isRequired
 }

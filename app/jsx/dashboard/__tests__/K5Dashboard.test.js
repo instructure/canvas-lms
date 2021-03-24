@@ -127,7 +127,6 @@ const staff = [
     id: '1',
     short_name: 'Mrs. Thompson',
     bio: 'Office Hours: 1-3pm W',
-    email: 't@abc.edu',
     avatar_url: '/images/avatar1.png',
     enrollments: [
       {
@@ -139,7 +138,6 @@ const staff = [
     id: '2',
     short_name: 'Tommy the TA',
     bio: 'Office Hours: 1-3pm F',
-    email: 'tommy@abc.edu',
     avatar_url: '/images/avatar2.png',
     enrollments: [
       {
