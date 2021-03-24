@@ -162,6 +162,30 @@ describe "teacher k5 dashboard" do
       expect(element_exists?(course_card_selector(@course_name))).to eq(false)
       expect(element_exists?(course_card_selector(subject_course_title))).to eq(true)
     end
+
+    context 'announcement attachments with the better file downloading and previewing flags on' do
+      before :each do
+        Account.site_admin.enable_feature!(:rce_better_file_downloading)
+        Account.site_admin.enable_feature!(:rce_better_file_previewing)
+
+        @course.homeroom_course = true
+        @course.save!
+        attachment_model(uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
+        @course.announcements.create!(title: "Welcome to class", message: "Hello!", attachment: @attachment)
+      end
+
+      it 'shows download button next to homeroom announcement attachment', custom_timeout: 30 do
+        get "/"
+        wait_for(method: nil, timeout: 20) { f('span.instructure_file_holder').displayed? }
+        expect(f("a.file_download_btn")).to be_displayed
+      end
+
+      it 'opens preview overlay when clicking on homeroom announcement attachment' do
+        get "/"
+        f("a.preview_in_overlay").click
+        expect(f("iframe.ef-file-preview-frame")).to be_displayed
+      end
+    end
   end
 
   context 'course cards' do

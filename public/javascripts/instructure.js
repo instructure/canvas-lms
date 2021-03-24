@@ -225,7 +225,7 @@ export function enhanceUserContent() {
           '/download'
         )}?${qs}`
         $download_btn = $(
-          `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px;" href="${htmlEscape(
+          `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px; text-decoration: none;" href="${htmlEscape(
             download_url
           )}">
               <img style="width:16px; height:16px" src="/images/svg-icons/svg_icon_download.svg" alt="" role="presentation"/>
