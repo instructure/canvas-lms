@@ -301,7 +301,9 @@ class Attachment < ActiveRecord::Base
   def clone_for(context, dup=nil, options={})
     if !self.cloned_item && !self.new_record?
       self.cloned_item = ClonedItem.create(:original_item => self) # do we even use this for anything?
-      Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
+      self.shard.activate do
+        Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
+      end
     end
     existing = context.attachments.active.find_by_id(self)
 
