@@ -41,6 +41,11 @@ module Types
     field :sort_by_rating, Boolean, null: true
     field :is_section_specific, Boolean, null: true
 
+    field :published, Boolean, null: false
+    def published
+      object.published?
+    end
+
     field :assignment, Types::AssignmentType, null: true
     def assignment
       load_association(:assignment)

@@ -61,6 +61,7 @@ class DiscussionTopic < ActiveRecord::Base
     Arel.sql('COALESCE(parent_id, 0)'), Arel.sql('COALESCE(rating_sum, 0) DESC'), :created_at) }, class_name: 'DiscussionEntry'
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
   has_one :external_feed_entry, :as => :asset
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :external_feed
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :attachment
