@@ -39,6 +39,12 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     RESTRICT_PAST: 'course_restrict_student_past_view'
   }
 
+  const TERM_DATES = {
+    START_DATE:
+      window.ENV.STUDENTS_ENROLLMENT_DATES?.start_at || window.ENV.DEFAULT_TERM_DATES?.start_at,
+    END_DATE: window.ENV.STUDENTS_ENROLLMENT_DATES?.end_at || window.ENV.DEFAULT_TERM_DATES?.end_at
+  }
+
   const setFormValue = (id, value) => {
     const field = document.getElementById(id)
     field.value = value
@@ -60,9 +66,10 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     getFormValue(FORM_IDS.RESTRICT_PAST) === 'true'
   )
 
-  const formatDate = date => tz.format(date, '%b %-d, %Y at %-l:%M%P %Z')
+  const datesInteraction = () =>
+    canManage && selectedApplicabilityValue === 'course' ? 'enabled' : 'disabled'
 
-  const canInteract = () => (canManage ? 'enabled' : 'disabled')
+  const formatDate = date => tz.format(date, '%b %-d, %Y at %-l:%M%P %Z')
 
   const participationExplanationText = () => {
     return selectedApplicabilityValue === 'term'
@@ -75,6 +82,15 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
             wrappers: [`<strong>$1</strong>`]
           }
         )
+  }
+
+  const resetTmpChanges = () => {
+    const oldCourseStartDate = window.ENV.COURSE_DATES.start_at
+    const oldCourseEndDate = window.ENV.COURSE_DATES.end_at
+    setFormValue(FORM_IDS.START_DATE, oldCourseStartDate)
+    setStartDate(oldCourseStartDate)
+    setFormValue(FORM_IDS.END_DATE, oldCourseEndDate)
+    setEndDate(oldCourseEndDate)
   }
 
   return (
@@ -94,10 +110,15 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
               {I18n.t('Limit course participation to term or custom course dates?')}
             </ScreenReaderContent>
           }
-          interaction={canInteract()}
+          interaction={canManage ? 'enabled' : 'disabled'}
           isInline
           value={selectedApplicabilityValue}
           onChange={(e, {value}) => {
+            if (value !== 'course') {
+              // Discard unsubmitted course dates, if they are removed from the Date inputs when Participation is different to course,
+              // in order to avoid saving these changes if they are not on the screen at the moment of submitting the form
+              resetTmpChanges()
+            }
             setFormValue(FORM_IDS.RESTRICT_ENROLLMENTS, value === 'course')
             setSelectedApplicabilityValue(value)
           }}
@@ -116,58 +137,60 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           dangerouslySetInnerHTML={{__html: participationExplanationText()}}
         />
 
-        {selectedApplicabilityValue === 'course' && (
-          <>
-            <Flex direction="column" display="inline-flex">
-              <Flex.Item padding="xx-small">
-                <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
-                <CanvasDateInput
-                  renderLabel={I18n.t('Start')}
-                  formatDate={formatDate}
-                  interaction={canInteract()}
-                  width="16rem"
-                  selectedDate={startDate}
-                  onSelectedDateChange={value => {
-                    const start = moment(value).toISOString()
-                    setFormValue(FORM_IDS.START_DATE, start)
-                    setStartDate(start)
-                  }}
-                />
+        <>
+          <Flex direction="column" display="inline-flex">
+            <Flex.Item padding="xx-small">
+              <ScreenReaderContent>{I18n.t('Course Start Date')}</ScreenReaderContent>
+              <CanvasDateInput
+                renderLabel={I18n.t('Start')}
+                formatDate={formatDate}
+                interaction={datesInteraction()}
+                width="16rem"
+                selectedDate={
+                  selectedApplicabilityValue === 'course' ? startDate : TERM_DATES.START_DATE
+                }
+                onSelectedDateChange={value => {
+                  const start = moment(value).toISOString()
+                  setFormValue(FORM_IDS.START_DATE, start)
+                  setStartDate(start)
+                }}
+              />
+            </Flex.Item>
+            <Flex.Item padding="xx-small">
+              <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
+              <CanvasDateInput
+                renderLabel={I18n.t('End')}
+                formatDate={formatDate}
+                interaction={datesInteraction()}
+                width="16rem"
+                selectedDate={
+                  selectedApplicabilityValue === 'course' ? endDate : TERM_DATES.END_DATE
+                }
+                onSelectedDateChange={value => {
+                  const end = moment(value).toISOString()
+                  setFormValue(FORM_IDS.END_DATE, end)
+                  setEndDate(end)
+                }}
+              />
+            </Flex.Item>
+          </Flex>
+          {tz.isMidnight(endDate) && selectedApplicabilityValue === 'course' && (
+            <Flex>
+              <Flex.Item margin="xx-small small xx-small 0" align="start">
+                <AccessibleContent alt={I18n.t('Warning')}>
+                  <IconWarningSolid size="x-small" color="warning" />
+                </AccessibleContent>
               </Flex.Item>
-              <Flex.Item padding="xx-small">
-                <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
-                <CanvasDateInput
-                  renderLabel={I18n.t('End')}
-                  formatDate={formatDate}
-                  interaction={canInteract()}
-                  width="16rem"
-                  selectedDate={endDate}
-                  onSelectedDateChange={value => {
-                    const end = moment(value).toISOString()
-                    setFormValue(FORM_IDS.END_DATE, end)
-                    setEndDate(end)
-                  }}
-                />
+              <Flex.Item>
+                <Text size="small">
+                  {I18n.t(
+                    'Course participation is set to expire at midnight, so the previous day is the last day this course will be active.'
+                  )}
+                </Text>
               </Flex.Item>
             </Flex>
-            {tz.isMidnight(endDate) && (
-              <Flex>
-                <Flex.Item margin="xx-small small xx-small 0" align="start">
-                  <AccessibleContent alt={I18n.t('Warning')}>
-                    <IconWarningSolid size="x-small" color="warning" />
-                  </AccessibleContent>
-                </Flex.Item>
-                <Flex.Item>
-                  <Text size="small">
-                    {I18n.t(
-                      'Course participation is set to expire at midnight, so the previous day is the last day this course will be active.'
-                    )}
-                  </Text>
-                </Flex.Item>
-              </Flex>
-            )}
-          </>
-        )}
+          )}
+        </>
 
         <Checkbox
           label={
