@@ -2029,9 +2029,9 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = 'errored'
       case e
       when CanvasHttp::TooManyRedirectsError
-        self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
+        self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects for %{url}", url: url
       when CanvasHttp::InvalidResponseCodeError
-        self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
+        self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", :code => e.code, url: url
         Canvas::Errors.capture(e, clone_url_error_info(e, url))
       when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url

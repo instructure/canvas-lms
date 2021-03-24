@@ -268,7 +268,7 @@ shared_examples_for "file uploads api" do
     run_download_job
     json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
     expect(json['workflow_state']).to eq 'failed'
-    expect(json['message']).to eq  "Invalid response code, expected 200 got 404"
+    expect(json['message']).to include  "Invalid response code, expected 200 got 404"
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
@@ -311,7 +311,7 @@ shared_examples_for "file uploads api" do
     run_download_job
     json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
     expect(json['workflow_state']).to eq 'failed'
-    expect(json['message']).to eq "Too many redirects"
+    expect(json['message']).to include "Too many redirects"
     expect(attachment.reload.file_state).to eq 'errored'
   end
 

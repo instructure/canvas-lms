@@ -2264,10 +2264,11 @@ describe Attachment do
             error, attachment.clone_url_error_info(error, url)
           )
           subject
+          expect(attachment.upload_error_message).to include(url)
         end
       end
 
-      context 'and the error was unkown' do
+      context 'and the error was unknown' do
         let(:error) { StandardError }
 
         it 'captures the error' do
@@ -2275,6 +2276,7 @@ describe Attachment do
             error, attachment.clone_url_error_info(error, url)
           )
           subject
+          expect(attachment.upload_error_message).to include(url)
         end
       end
     end
