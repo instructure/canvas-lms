@@ -25,7 +25,8 @@ module Canvadocs
     def canvadocs_session_url(opts = {})
       user = opts.delete(:user)
       enable_annotations = opts.delete(:enable_annotations)
-      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations)
+      read_only = opts.delete(:read_only) || false
+      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations, read_only)
       opts[:url] = attachment.public_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
 
@@ -40,9 +41,9 @@ module Canvadocs
     end
     private :canvadocs_api
 
-    def canvadoc_permissions_for_user(user, enable_annotations)
+    def canvadoc_permissions_for_user(user, enable_annotations, read_only = false)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)
-      opts = canvadocs_default_options_for_user(user)
+      opts = canvadocs_default_options_for_user(user, read_only)
       return opts if submissions.empty?
 
       if submissions.any? { |s| s.user_can_read_grade?(user) }
@@ -88,7 +89,8 @@ module Canvadocs
     end
     private :canvadocs_annotation_context
 
-    def canvadocs_permissions(user)
+    def canvadocs_permissions(user, read_only)
+      return 'read' if read_only
       return 'readwrite' if submissions.empty?
       return 'readwritemanage' if managing?(user)
       return 'read' if observing?(user)
@@ -96,10 +98,10 @@ module Canvadocs
     end
     private :canvadocs_permissions
 
-    def canvadocs_default_options_for_user(user)
+    def canvadocs_default_options_for_user(user, read_only)
       opts = {
         annotation_context: canvadocs_annotation_context,
-        permissions: canvadocs_permissions(user),
+        permissions: canvadocs_permissions(user, read_only),
         user_id: canvadocs_user_id(user),
         user_name: canvadocs_user_name(user),
         user_filter: canvadocs_user_id(user),
