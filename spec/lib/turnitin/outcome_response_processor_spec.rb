@@ -79,18 +79,26 @@ module Turnitin
         submission = lti_assignment.submissions.first
         expect(submission.attempt).to eq 1
       end
+
+      it 'does not create a new submission version if processed twice' do
+        subject.process
+        submission = lti_assignment.submissions.first
+        subject.process
+        expect(submission.versions.count).to eq 1
+      end
     end
 
     describe "#process with request errors" do
       context 'when it is not the last attempt' do
         it 'does not create an error attachment' do
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
-          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
           expect { subject.process }.to raise_error(Faraday::TimeoutError)
           expect(lti_assignment.attachments.count).to eq 0
         end
 
         it 'creates a new job' do
+          allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:uploaded_at).and_return(tii_response['meta']['date_uploaded'])
           time = Time.now.utc
           attempt_number = subject.class.max_attempts-1
           original_submission_response = double('original_submission_mock')
@@ -103,7 +111,7 @@ module Turnitin
               priority: Delayed::LOW_PRIORITY,
               attempts: attempt_number,
               run_at: time + (attempt_number ** 4) + 5).and_return(mock)
-          expect(mock).to receive(:process)
+          expect(mock).to receive(:new_submission)
           Timecop.freeze(time) do
             subject.process
           end
@@ -111,6 +119,12 @@ module Turnitin
       end
 
       context 'when it is the last attempt' do
+        before(:each) do
+          response_response = double('response_mock')
+          allow(response_response).to receive(:body).and_return(tii_response)
+          allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_return(response_response)
+        end
+
         it 'creates an attachment for "Errors::ScoreStillPendingError"' do
           allow(subject.class).to receive(:max_attempts).and_return(1)
           original_submission_response = double('original_submission_mock')
