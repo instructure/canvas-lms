@@ -74,6 +74,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
+  field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

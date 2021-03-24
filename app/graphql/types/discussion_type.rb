@@ -60,5 +60,12 @@ module Types
     def discussion_entries_connection
       load_association(:discussion_entries)
     end
+
+    field :subscribed, Boolean, null: false
+    def subscribed
+      load_association(:discussion_topic_participants).then do
+        object.subscribed?(current_user)
+      end
+    end
   end
 end
