@@ -22,10 +22,17 @@
     # fire off these `fetch` requests now so they are ready sooner
     six_months_ago = Time.now.utc.at_beginning_of_day.months_ago(6).iso8601(3)
     beginning_of_day = Time.zone.now.at_beginning_of_day.utc.iso8601(3)
+    next_year = Time.zone.now.utc.at_beginning_of_day.years_since(1).iso8601
+    last_year = Time.zone.now.utc.at_beginning_of_day.years_ago(1).iso8601
+    if @k5_mode
 %>
-  <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&filter=new_activity&order=asc") %>
-  <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&order=desc&per_page=1") %>
-  <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}") %>
+      <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&order=asc&per_page=1") %>
+      <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&order=desc&per_page=1") %>
+  <% else %>
+    <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&filter=new_activity&order=asc") %>
+    <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&order=desc&per_page=1") %>
+    <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}") %>
+  <% end %>
   <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable') %>
 <% end %>
 

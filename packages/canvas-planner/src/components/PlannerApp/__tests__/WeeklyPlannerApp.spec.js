@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -7,7 +7,7 @@
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
  *
- * Canvas is distributed in the hope that they will be useful, but WITHOUT ANY
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
@@ -51,6 +52,8 @@ const getDefaultValues = overrides => {
       weekStart: thisWeekStart,
       weekEnd: thisWeekEnd
     },
+    loadingOpportunities: false,
+    opportunityCount: 0,
     ...overrides
   }
 }
@@ -68,7 +71,7 @@ describe('Weekly PlannerApp', () => {
   it('renders empty component with no assignments', () => {
     const opts = getDefaultValues()
     const {getByText} = render(<PlannerApp {...opts} />)
-    expect(getByText('Nothing More To Do')).toBeInTheDocument()
+    expect(getByText('Nothing Due This Week')).toBeInTheDocument()
   })
 
   it('displays the whole week if there are any items', () => {
@@ -129,7 +132,7 @@ describe('Weekly PlannerApp', () => {
 
 describe('mapStateToProps', () => {
   it('maps thisWeek from the weeklyDashboard', () => {
-    const initProps = getDefaultValues()
+    const initProps = getDefaultValues({opportunityCount: 1})
     const state = {
       loading: {
         isLoading: false,
@@ -139,7 +142,10 @@ describe('mapStateToProps', () => {
         partialWeekDays: []
       },
       days: [],
-      weeklyDashboard: initProps.weeklyDashboard
+      weeklyDashboard: initProps.weeklyDashboard,
+      opportunities: {
+        items: [{foo: 1}]
+      }
     }
     const props = mapStateToProps(state)
     expect(props).toMatchObject({thisWeek: initProps.thisWeek})

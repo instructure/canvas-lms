@@ -41,7 +41,7 @@ import {
 } from '../../actions'
 import {notifier} from '../../dynamic-ui'
 import {daysToDaysHash} from '../../utilities/daysUtils'
-import {formatDayKey} from '../../utilities/dateUtils'
+import {formatDayKey, isThisWeek} from '../../utilities/dateUtils'
 import {Animator} from '../../dynamic-ui/animator'
 import responsiviser from '../responsiviser'
 
@@ -196,6 +196,7 @@ export class PlannerApp extends Component {
 
   renderLoadingPast() {
     if (this.props.isLoading) return
+    if (this.props.isWeekly) return
     return (
       <LoadingPastIndicator
         loadingPast={this.props.loadingPast}
@@ -237,12 +238,22 @@ export class PlannerApp extends Component {
   }
 
   renderNoAssignments() {
+    if (
+      this.props.isWeekly &&
+      (this.props.opportunityCount || this.props.loadingOpportunities) &&
+      isThisWeek(this.props.thisWeek.weekStart)
+    ) {
+      const today = moment.tz(this.props.timeZone).startOf('day')
+      return this.renderOneDay(today, formatDayKey(today), [], 0)
+    }
+
     return (
       <PlannerEmptyState
         changeDashboardView={this.props.changeDashboardView}
         isCompletelyEmpty={this.props.isCompletelyEmpty}
         onAddToDo={this.onAddToDo}
         responsiveSize={this.props.responsiveSize}
+        isWeekly={this.props.isWeekly}
       />
     )
   }
@@ -426,7 +437,11 @@ export class PlannerApp extends Component {
   }
 
   renderBody(children, classes) {
-    const loading = this.props.loadingPast || this.props.loadingFuture || this.props.isLoading
+    const loading =
+      this.props.loadingPast ||
+      this.props.loadingFuture ||
+      this.props.loadingWeek ||
+      this.props.isLoading
     if (children.length === 0 && !loading) {
       return (
         <div className={classes} data-testid="PlannerApp">
@@ -480,7 +495,9 @@ export const mapStateToProps = state => {
     thisWeek: state.weeklyDashboard && {
       weekStart: state.weeklyDashboard.weekStart,
       weekEnd: state.weeklyDashboard.weekEnd
-    }
+    },
+    loadingOpportunities: !!state.loading.loadingOpportunities,
+    opportunityCount: state.opportunities?.items?.length || 0
   }
 }
 

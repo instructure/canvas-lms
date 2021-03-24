@@ -82,3 +82,15 @@ it('adds new week data to state', () => {
     [newState.weekStart.format()]: ['next week data']
   })
 })
+
+it('sets way past date', () => {
+  const initState = initialState()
+  const newState = weeklyReducer(initState, Actions.gotWayPastItemDate('2000-01-01'))
+  expect(newState.wayPastItemDate).toEqual('2000-01-01')
+})
+
+it('sets way future date', () => {
+  const initState = initialState()
+  const newState = weeklyReducer(initState, Actions.gotWayPastItemDate('3000-01-01'))
+  expect(newState.wayPastItemDate).toEqual('3000-01-01')
+})

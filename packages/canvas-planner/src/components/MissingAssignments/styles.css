@@ -3,7 +3,6 @@
   align-items: center;
   position: relative;
   margin-top: var(--toggleMarginTop);
-  margin-inline-start: 12rem;
 
   & > :last-child {
     width: 100%;
@@ -24,7 +23,8 @@
   left: 0;
 }
 
-.medium, .small {
+.medium,
+.small {
   &.root {
     margin-inline-start: 0;
   }

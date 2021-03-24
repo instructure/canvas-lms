@@ -46,6 +46,16 @@ export default handleActions(
       newState.weeks = {...state.weeks}
       newState.weeks[state.weekStart.format()] = action.payload
       return newState
+    },
+    GOT_WAY_PAST_ITEM_DATE: (state, action) => {
+      const newState = {...state}
+      newState.wayPastItemDate = action.payload
+      return newState
+    },
+    GOT_WAY_FUTURE_ITEM_DATE: (state, action) => {
+      const newState = {...state}
+      newState.wayFutureItemDate = action.payload
+      return newState
     }
   },
   null

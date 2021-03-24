@@ -7,7 +7,7 @@
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
  *
- * Canvas is distributed in the hope that they will be useful, but WITHOUT ANY
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -23,6 +24,7 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {loadNextWeekItems, loadPastWeekItems, loadThisWeekItems, scrollToToday} from '../../actions'
+import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
 
 import theme from './theme'
@@ -47,7 +49,8 @@ export class WeeklyPlannerHeader extends Component {
     scrollToToday: PropTypes.func.isRequired,
     loading: PropTypes.shape({
       isLoading: PropTypes.bool,
-      loadingWeek: PropTypes.bool
+      loadingWeek: PropTypes.bool,
+      loadingError: PropTypes.string
     }).isRequired,
     visible: PropTypes.bool
   }
@@ -99,12 +102,22 @@ export class WeeklyPlannerHeader extends Component {
           top: `${this.state.stickyOffset}px`
         }}
       >
+        {this.props.loading.loadingError && (
+          <div className={styles.errorbox}>
+            <ErrorAlert error={this.props.loading.loadingError} margin="xx-small">
+              {formatMessage('Error loading items')}
+            </ErrorAlert>
+          </div>
+        )}
         <View as="div" textAlign="end" padding="xx-small 0 xx-small xx-small" background="primary">
           <IconButton
             onClick={_event => {
               this.props.loadPastWeekItems()
             }}
             screenReaderLabel={formatMessage('View previous week')}
+            interaction={
+              this.props.wayPastItemDate < this.props.weekStartDate ? 'enabled' : 'disabled'
+            }
           >
             <IconArrowOpenStartLine />
           </IconButton>
@@ -114,6 +127,9 @@ export class WeeklyPlannerHeader extends Component {
           <IconButton
             onClick={() => this.props.loadNextWeekItems({loadMoreButtonClicked: true})}
             screenReaderLabel={formatMessage('View next week')}
+            interaction={
+              this.props.wayFutureItemDate > this.props.weekEndDate ? 'enabled' : 'disabled'
+            }
           >
             <IconArrowOpenEndLine />
           </IconButton>
@@ -127,7 +143,11 @@ export const ThemedWeeklyPlannerHeader = themeable(theme, styles)(WeeklyPlannerH
 
 const mapStateToProps = state => {
   return {
-    loading: state.loading
+    loading: state.loading,
+    weekStartDate: state.weeklyDashboard.weekStart.format(),
+    weekEndDate: state.weeklyDashboard.weekEnd.format(),
+    wayPastItemDate: state.weeklyDashboard.wayPastItemDate,
+    wayFutureItemDate: state.weeklyDashboard.wayFutureItemDate
   }
 }
 

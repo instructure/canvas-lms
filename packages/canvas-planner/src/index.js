@@ -233,7 +233,7 @@ export function createPlannerApp() {
 
     store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
   } else {
-    store.dispatch(getWeeklyPlannerItems())
+    store.dispatch(getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
   }
 
   return (

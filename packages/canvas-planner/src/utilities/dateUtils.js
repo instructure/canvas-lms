@@ -55,6 +55,13 @@ export function isDay(date, target) {
   const momentizedTarget = new moment(target)
   return momentizedDate.isSame(momentizedTarget, 'day')
 }
+
+export function isThisWeek(day) {
+  const thisWeekStart = new moment().startOf('week')
+  const thisWeekEnd = new moment().endOf('week')
+  return isInMomentRange(new moment(day), thisWeekStart, thisWeekEnd)
+}
+
 // determines if the checkMoment falls on or inbetween the firstMoment and the lastMoment
 export function isInMomentRange(checkMoment, firstMoment, lastMoment) {
   const isOnOrAfterFirst = checkMoment.isAfter(firstMoment) || checkMoment.isSame(firstMoment)

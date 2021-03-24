@@ -17,6 +17,7 @@
  */
 import moxios from 'moxios'
 import moment from 'moment-timezone'
+import MockDate from 'mockdate'
 import {moxiosWait, moxiosRespond} from 'jest-moxios-utils'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
@@ -246,18 +247,41 @@ describe('api actions', () => {
   describe('weekly planner', () => {
     let mockDispatch
     let weeklyState
+    beforeAll(() => {
+      MockDate.set('2017-04-19') // a Wednesday
+    })
+
+    afterAll(() => {
+      MockDate.reset()
+    })
+
     beforeEach(() => {
+      moxios.install()
       mockDispatch = jest.fn()
       weeklyState = getBasicState().weeklyDashboard
     })
 
     afterEach(() => {
+      moxios.uninstall()
       mockDispatch.mockReset()
     })
 
     describe('getWeeklyPlannerItems', () => {
-      it('dispatches START_LOADING_ITEMS, gettingWeekItems, and starts the saga', () => {
-        Actions.getWeeklyPlannerItems()(mockDispatch, getBasicState)
+      it('dispatches START_LOADING_ITEMS, gettingWeekItems, and starts the saga', async () => {
+        const today = moment.tz('UTC').startOf('day')
+        // the future request
+        moxios.stubRequest(/\/api\/v1\/planner\/items\?end_date=/, {
+          status: 200,
+          response: [{plannable: {due_at: '2017-05-01T:00:00:00Z'}}]
+        })
+        // the past request
+        moxios.stubRequest(/\/api\/v1\/planner\/items\?start_date=/, {
+          status: 200,
+          response: [{plannable: {due_at: '2017-01-01T:00:00:00Z'}}]
+        })
+
+        Actions.getWeeklyPlannerItems(today)(mockDispatch, getBasicState)
+
         expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingItems())
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(weeklyState))
         expect(mockDispatch).toHaveBeenCalledWith(
@@ -266,6 +290,23 @@ describe('api actions', () => {
             weekEnd: weeklyState.weekEnd
           })
         )
+        const getWayFutureItemThunk = mockDispatch.mock.calls[2][0] // the function returned by getWayFutureItem()
+        expect(typeof getWayFutureItemThunk).toBe('function')
+        const futurePromise = getWayFutureItemThunk(mockDispatch, getBasicState).then(response => {
+          expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'GOT_WAY_FUTURE_ITEM_DATE',
+            payload: '2017-05-01T:00:00:00Z'
+          })
+        })
+        const getWayPastItemThunk = mockDispatch.mock.calls[3][0]
+        expect(typeof getWayPastItemThunk).toBe('function')
+        const pastPromise = getWayPastItemThunk(mockDispatch, getBasicState).then(response => {
+          expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'GOT_WAY_PAST_ITEM_DATE',
+            payload: '2017-01-01T:00:00:00Z'
+          })
+        })
+        return Promise.all([futurePromise, pastPromise])
       })
     })
 

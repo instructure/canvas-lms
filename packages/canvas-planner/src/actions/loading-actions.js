@@ -46,7 +46,9 @@ export const {
   startLoadingWeekSaga,
   weekLoaded,
   allWeekItemsLoaded,
-  jumpToWeek
+  jumpToWeek,
+  gotWayPastItemDate,
+  gotWayFutureItemDate
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -68,7 +70,9 @@ export const {
   'START_LOADING_WEEK_SAGA',
   'WEEK_LOADED',
   'ALL_WEEK_ITEMS_LOADED',
-  'JUMP_TO_WEEK'
+  'JUMP_TO_WEEK',
+  'GOT_WAY_FUTURE_ITEM_DATE',
+  'GOT_WAY_PAST_ITEM_DATE'
 )
 
 export const gettingPastItems = createAction(
@@ -183,11 +187,13 @@ export const loadPastUntilToday = () => (dispatch, getState) => {
 
 // ----------- week at a time -------------------
 // k5 week-at-a-time initial load
-export function getWeeklyPlannerItems() {
+export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
     dispatch(startLoadingItems())
     const weeklyState = getState().weeklyDashboard
     dispatch(gettingWeekItems(weeklyState))
+    dispatch(getWayFutureItem(fromMoment))
+    dispatch(getWayPastItem(fromMoment))
     loadWeekItems(dispatch, getState)
   }
 }
@@ -242,6 +248,42 @@ export function loadThisWeekItems() {
 function loadWeekItems(dispatch, getState) {
   const weekly = getState().weeklyDashboard
   dispatch(startLoadingWeekSaga({weekStart: weekly.weekStart, weekEnd: weekly.weekEnd}))
+}
+
+function getWayFutureItem(fromMoment) {
+  // We are requesting desc order and only grabbing the
+  // first item so we know what the most distant item is
+  return (dispatch, getState) => {
+    const futureMoment = fromMoment.clone().add(1, 'year')
+    const url = `/api/v1/planner/items?end_date=${futureMoment.format()}&order=desc&per_page=1`
+    const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
+
+    return request
+      .then(response => {
+        if (response.data.length) {
+          const wayFutureItemDate = response.data[0].plannable.due_at
+          dispatch(gotWayFutureItemDate(wayFutureItemDate))
+        }
+      })
+      .catch(() => alert(formatMessage('Failed peeking into your future'), true))
+  }
+}
+
+function getWayPastItem(fromMoment) {
+  return (dispatch, getState) => {
+    const pastMoment = fromMoment.clone().add(-1, 'year')
+    const url = `/api/v1/planner/items?start_date=${pastMoment.format()}&order=asc&per_page=1`
+    const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
+
+    return request
+      .then(response => {
+        if (response.data.length) {
+          const wayPastItemDate = response.data[0].plannable.due_at
+          dispatch(gotWayPastItemDate(wayPastItemDate))
+        }
+      })
+      .catch(() => alert(formatMessage('Failed peeking into your past'), true))
+  }
 }
 // --------------------------------------------
 export function sendFetchRequest(loadingOptions) {

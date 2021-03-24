@@ -146,6 +146,15 @@ describe('with mock api', () => {
   })
 
   describe('renderWeeklyPlannerHeader', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES.canvas_for_elementary = true
+    })
+    beforeEach(() => {
+      const opts = defaultPlannerOptions()
+      opts.env.K5_MODE = true
+      initializePlanner(opts)
+    })
+
     it('renders the WeeklyPlannerHeader', async () => {
       const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
 
