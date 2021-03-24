@@ -44,8 +44,3 @@ improved_outcomes_management:
   display_name: Improved Outcomes Management
   description: Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
-enable_webcam_submission:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Enable Webcam on Submissions
-  description: Allow students to submit photo using their webcam.
