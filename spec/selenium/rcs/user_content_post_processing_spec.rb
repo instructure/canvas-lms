@@ -31,7 +31,7 @@ describe 'user_content post processing' do
         uploaded_data: fixture_file_upload('files/a_file.txt', 'text/plain')
       )
     @file.save!
-    @file_url = "/users/#{@teacher.id}/files/#{@file.id}"
+    @file_url = "http://#{HostUrl.default_host}/users/#{@teacher.id}/files/#{@file.id}"
   end
 
   def create_wiki_page_with_content(page_title, page_content)
@@ -122,6 +122,21 @@ describe 'user_content post processing' do
       # the link has an external-link button
       expect(f('.ui-icon-extlink')).to be_displayed
       expect(f('#link1')).not_to contain_css('.file_download_btn')
+    end
+
+    it 'omits download button if internal link' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='link1' class='instructure_file_link'
+          href='/courses/#{@course.id}/pages/other-page'>internal link</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      # look up the link by the data-api-endpoint
+      # because this is how we determine to hide the download button for internal links
+      data_api_endpoint = "http://#{HostUrl.default_host}/api/v1/courses/#{@course.id}/pages/other-page"
+      expect(fj("a[data-api-endpoint='#{data_api_endpoint}']")).to be_displayed
+      expect(f('body')).not_to contain_css('a.file_download_btn')
     end
   end
 
