@@ -2687,7 +2687,7 @@ ar:
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "قام بالفعل مستخدم موجود بـ Canvas بمعرف SIS %{user_id} بالمطالبة بمعلومات تسجيل الدخول المطلوبة الخاصة بمعرف user_id لـ %{other_user_id}، متجاوزًا"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "مستخدم Canvas حال بمعرف SIS %{user_id} أو يوجد تسجيل دخول لـ %{login} بالفعل، تخطي"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "قام بالفعل مستخدم موجود بـ Canvas بمعرف %{user_id} بالمطالبة بمعلومات تسجيل الدخول المطلوبة الخاصة بمعرف user_id لـ %{other_user_id}، متجاوزًا"
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "قام بالفعل مستخدم موجود بـ Canvas بمعرف %{user_id} بالمطالبة بمعرف التكامل الخاص بـ %{other_user_id}، متجاوزًا"
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "قام بالفعل مستخدم موجود بـ Canvas بمعرف %{user_id} بالمطالبة بمعرintegration_id بـ %{other_user_id}، متجاوزًا"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "مستخدم حال لا يتطابق مع معرفات المستخدم الحالية المتوفرة لتسجيل الدخول بمعرف SIS %{user_id}، تخطي"
   an_export_is_already_in_progress_54270f01: "يوجد تصدير قيد التقدم بالفعل."
   an_internal_error_occurred_83b8a685: "حدث خطأ داخلي"
@@ -4200,9 +4200,9 @@ ar:
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest تم الإرسال إلى IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse من IdP"
   author_215203d2: المؤلف
-  author_id_570d3131: معرف_المؤلف
+  author_id_570d3131: author_id
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} وضع لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{submission_submittor} ل %{assignment}"
-  author_name_12d871ff: اسم_المؤلف
+  author_name_12d871ff: author_name
   author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "وضع %{author_name} لتوه تعليقًا توضيحياً جديدًا على الإرسال الخاص بـ %{user_name} لـ %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "وضع %{author_name} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user_name} لـ %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "وضع %{author_name} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user_name} لـ %{assignment_title}."
@@ -4912,7 +4912,7 @@ ar:
     errors: 
       duplicate_child_event_contexts: "سياقات حدث فرعية متكررة"
       invalid_child_event_context: "سياق حدث فرعي غير صالح"
-      no_updating_user: "يتعذر تحديث الأحداث الفرعية ما لم يتم إعادة ضبط تحديث المستخدم"
+      no_updating_user: "يتعذر تحديث الأحداث الفرعية ما لم يتم إعادة ضبط updating_user"
     feed_item_title: "أحداث التقويم: %{event_title}"
     feed_item_title_with_context: "أحداث التقويم، %{course_or_account_name}: %{event_title}"
     see_assignment: "ارجع إلى %{assignment_name}"
@@ -5913,7 +5913,7 @@ ar:
     angel_exporter: 
       content: المحتوى
       options: خيارات
-    bad_migration_type: "نوع ترحيل غير صالح"
+    bad_migration_type: "migration_type غير صالح"
     blackboard_export: 
       content: المحتوى
       options: خيارات
@@ -6035,7 +6035,7 @@ ar:
       select_content_checkbox: 
         select_all_content: "كل المحتوى"
         select_specific_content: "تحديد محتوى معين"
-    unsupported_migration_type: "نوع الترحيل غير مدعوم للسياق"
+    unsupported_migration_type: "migration_type غير مدعوم للسياق"
     upload_warning: "سيؤدي التنقل خارجًا من هذه الصفحة إلى إلغاء عملية التحميل."
     uploading: "جارٍ التحميل..."
     web_ct: 
@@ -8043,7 +8043,7 @@ ar:
   created_58b8a75a: "تم الإنشاء"
   created_6ee36dff: "تاريخ الإنشاء:"
   created_ascending_cff48774: "تاريخ الإنشاء: تصاعديًا"
-  created_at_6373bbea: تم_الإنشاء_في
+  created_at_6373bbea: created_at
   created_at_73839757: "تم الإنشاء في"
   created_by_b39b9c8b: "تم الإنشاء من قِبَل"
   created_by_sis_93fbb66b: created_by_sis
@@ -9921,9 +9921,9 @@ ar:
     click_through: "انقر لعرض محتوى الصفحة"
     default_content: "لم تتم إضافة محتوى بعد"
     default_name: "اسم الصفحة"
-  eportfolio_id_c69233c1: "معرف_المستعرضة الإلكترونية"
+  eportfolio_id_c69233c1: eportfolio_id
   eportfolio_moderation_feb0ffd3: "الإشراف على المحفظة الإلكترونية"
-  eportfolio_name_fd4b9e13: "اسم_المستعرضة الإلكترونية"
+  eportfolio_name_fd4b9e13: eportfolio_name
   eportfolio_report_140b417f: "تقرير المستعرضة الإلكترونية"
   eportfolio_settings_75ba1f9a: "إعدادات ePortfolio"
   eportfolios: 
@@ -10707,7 +10707,7 @@ ar:
   file_tree_expanded_a1d20c4a: "تم توسيع شجرة الملف"
   file_upload_9cae6da5: "تحميل ملف"
   file_upload_failed_af22dd91: "فشل تحميل الملف"
-  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "مطلوب تحميل ملف أو عنوان URL للملف أو content_export_id"
+  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "مطلوب تحميل ملف أو file_url أو content_export_id"
   file_upload_submission_740711f: "إرسال تحميل ملف"
   file_uploading_56c9c0c8: "جارٍ تحميل الملف"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "تم نشر %{filename} بحق الاستخدام التالي: %{usage_right}"
@@ -13400,7 +13400,7 @@ ar:
   ireland_353_3cd32cc0: "أيرلندا (+353)"
   ireland_f7bb9899: أيرلندا
   irish_567e109f: الأيرلندية
-  is_public_ca8561e8: هو_عام
+  is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " يستخدم إصدارًا مجانيًا لـ BigBlueButton الذي يوفر 10 مؤتمرات فيديو متزامنة، كل منها بمضيف واحد وحتى 24 من الحضور. يتم فرز التسجيلات لمدة 7 أيام."
   israel_681bc5a5: إسرائيل
   israel_972_e671df75: "إسرائيل (+972)"
@@ -23538,7 +23538,7 @@ ar:
       n_correct: "الرقم صحيح"
       n_incorrect: "الرقم غير صحيح"
       name: الاسم
-      root_account: "الحساب الجذري"
+      root_account: root_account
       score: النقاط
       section: القسم
       section_id: section_id
@@ -24370,7 +24370,7 @@ ar:
   the_question_text_for_the_question_question_name_w_3a68a2c7: "نص السؤال \"%{question_name}\" كان طويل جدًا."
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "يجب تمكين خيار ميزة تدقيق سجل الاختبار الموجز في إعدادات المساق."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "يجب أن يكون اسم الاختبار الموجز أقل من %{length} حرف"
-  the_roles_api_refers_to_this_permission_as_become__bededd25: "تشير واجهة برمجة تطبيقات الأدوار إلى هذا الإذن في صورة كن_مستخدمًا."
+  the_roles_api_refers_to_this_permission_as_become__bededd25: "تشير واجهة برمجة تطبيقات الأدوار إلى هذا الإذن في صورة become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "أدوار المستخدم الذي يقوم بالإبلاغ (طالب، معلم، مسؤول، إلخ)"
   the_salesforce_account_id_if_it_exists_e7949706: "معرف حساب Salesforce (حال وجوده)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "تسمح لك أداة الجدولة بإعداد الفترات الزمنية التي يستطيع الطلبة (أو مجموعات الطلاب) تسجيل المشاركة فيها. للبدء، انقر فوق الزر أدناه."
@@ -25720,7 +25720,7 @@ ar:
   update_tool_7d48ef2a: "تحديث %{tool}"
   update_your_notification_settings_ed9564f3: "تحديث إعدادات الإعلام"
   updated_2c1e8615: محدّث
-  updated_at_ab9f625d: تم_التحديث_في
+  updated_at_ab9f625d: updated_at
   updated_current_grade_to_be_empty_c2ce1d13: "الدرجة الحالية المحدّثة التي ستكون فارغة"
   updated_current_grade_to_currentgrade_bfe2ea14: "درجة حالية محدّثة لـ %{currentGrade}"
   updated_group_group_name_727b1d98: "تم تحديث المجموعة %{group_name}"
@@ -26836,7 +26836,7 @@ ar:
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "عذرًا... يبدو أنه لا يوجد شيء هنا!"
   work_and_create_together_c65f358b: "العمل والإنشاء سويًا"
-  workflow_state_3a5c99d2: "حالة_سير العمل"
+  workflow_state_3a5c99d2: workflow_state
   working_b1f63edf: "جارٍ العمل..."
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "هل تريد قبول أو رفض هذا التحديث؟"
   would_you_like_to_enable_this_app_ccdf735d: "هل ترغب في تمكين هذا التطبيق؟"
