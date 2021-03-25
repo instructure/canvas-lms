@@ -6733,7 +6733,7 @@ zh-Hant:
   count_submissions_need_grading_d34bae25: 
     one: "%{count} 個提交件需要評分"
     other: "%{count} 個提交件需要評分"
-  count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} 將被刪除，並超過設定閾值%{change_threshold}%"
+  count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} 將被刪除，並超過設定閾值 %{change_threshold}%"
   count_unread_cff5855: "%{count} 條未讀。"
   count_unread_messages_99d6bf17: 
     one: "%{count} 條未讀訊息"
@@ -12815,8 +12815,8 @@ zh-Hant:
   invalid_date_or_time_333acd43: 無效的日期或時間
   invalid_date_time_3ae423f5: 無效的日期時間
   invalid_dates_were_found_please_correct_them_and_t_4140b318: 找到無效日期。請更正日期並重試。
-  invalid_datetime_for_graded_since_884cce5: 的無效日期時間graded_since
-  invalid_datetime_for_submitted_since_a238f3a6: " 的無效日期時間submitted_since"
+  invalid_datetime_for_graded_since_884cce5: "的無效日期時間 graded_since"
+  invalid_datetime_for_submitted_since_a238f3a6: " 的無效日期時間 submitted_since"
   invalid_domain_e810c1d: 無效的網域
   invalid_field_type_61d31870: "無效的 %{field}：\"%{type}\""
   invalid_fields_after_ratings_fields_815ff223: "評級後無效的欄位：%{fields}"
@@ -23260,7 +23260,7 @@ zh-Hant:
       timespan: "%{start_at} * 至 * %{end_at}"
   terms_35d91184: "學期： "
   terms_4d979628: 條款
-  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: 找不到學期。學期必須包括在multi_term_batch_mode
+  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "找不到學期。學期必須包括在 multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: 服務條款屬性無效
   terms_of_service_bedefcaf: 服務條款
   terms_of_service_f183ff7f: 服務條款
