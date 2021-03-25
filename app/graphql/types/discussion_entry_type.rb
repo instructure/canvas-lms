@@ -31,7 +31,7 @@ module Types
     field :rating, Boolean, null: true
     def rating
       Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do |deps|
-        deps.find_by(user: current_user).rating.present?
+        deps.find_by(user: current_user)&.rating.present?
       end
     end
 

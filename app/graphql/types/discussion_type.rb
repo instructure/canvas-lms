@@ -40,6 +40,7 @@ module Types
     field :only_graders_can_rate, Boolean, null: true
     field :sort_by_rating, Boolean, null: true
     field :is_section_specific, Boolean, null: true
+    field :require_initial_post, Boolean, null: true
 
     field :published, Boolean, null: false
     def published
@@ -61,11 +62,26 @@ module Types
       load_association(:discussion_entries)
     end
 
+    field :root_discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true
+    def root_discussion_entries_connection
+      load_association(:root_discussion_entries)
+    end
+
     field :subscribed, Boolean, null: false
     def subscribed
       load_association(:discussion_topic_participants).then do
         object.subscribed?(current_user)
       end
+    end
+
+    field :author, Types::UserType, null: false
+    def author
+      load_association(:user)
+    end
+
+    field :editor, Types::UserType, null: true
+    def editor
+      load_association(:editor)
     end
   end
 end

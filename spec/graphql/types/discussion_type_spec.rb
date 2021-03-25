@@ -47,6 +47,15 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
   end
 
+  it 'allows querying root discussion entries' do
+    de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
+
+    result = discussion_type.resolve('rootDiscussionEntriesConnection { nodes { message } }')
+    expect(result.count).to be 1
+    expect(result[0]).to eq de.message
+  end
+
   it "has modules" do
     module1 = discussion.course.context_modules.create!(name: 'Module 1')
     module2 = discussion.course.context_modules.create!(name: 'Module 2')
