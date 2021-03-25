@@ -5786,7 +5786,7 @@ es:
     angel_exporter: 
       content: Contenido
       options: Opciones
-    bad_migration_type: "Tipo de migración inválido"
+    bad_migration_type: "migration_type inválido"
     blackboard_export: 
       content: Contenido
       options: Opciones
