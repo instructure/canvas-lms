@@ -2635,7 +2635,7 @@ nb:
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "En eksisterende lerretbruker med SIS ID %{user_id} har allerede gjort krav på %{other_user_id}'s user_id den forespurte påloggingsinformasjonen, hopper over"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "En eksisterende Canvas bruker med SIS-ID %{user_id} eller brukernavn %{login} eksisterer allerede, hopper over."
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "En eksisterende lerretbruker med %{user_id} har allerede gjort krav %{other_user_id}på user_id den forespurte påloggingsinformasjonen, hopper over"
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "En eksisterende Canvas-bruker med %{user_id} har allerede etterspurt %{other_user_id} sin forespørsel for integrerings_ID, hopper over"
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "En eksisterende Canvas-bruker med %{user_id} har allerede etterspurt %{other_user_id} sin forespørsel for integration_id, hopper over"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "En eksisterende bruker passer ikke eksisterende bruker ID-er gitt til innlogging med SIS-ID %{user_id}, hopper over."
   an_export_is_already_in_progress_54270f01: "En eksport er allerede startet."
   an_internal_error_occurred_83b8a685: "Det oppstod en intern feil"
@@ -10263,7 +10263,7 @@ nb:
   file_tree_expanded_a1d20c4a: "Filtreet ble utvidet"
   file_upload_9cae6da5: Filopplasting
   file_upload_failed_af22dd91: "Filopplasting mislyktes"
-  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Filopplasting, filens URL, eller content_export_id kreves"
+  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Filopplasting, file_url, eller content_export_id kreves"
   file_upload_submission_740711f: Filopplastingsinnlevering
   file_uploading_56c9c0c8: "Fil lastes opp"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} har blitt publisert med følgende bruksrett: %{usage_right}"
@@ -23454,7 +23454,7 @@ nb:
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Spørsmålsteksten til spørsmålet \"%{question_name}\", var for lang."
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "Alternativet for 'Revisjonsfunksjon for testlogg' må være aktivert i emneinnstillinger."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "Quiz-navnet må være under %{length} tegn"
-  the_roles_api_refers_to_this_permission_as_become__bededd25: "Roller-API-en refererer til denne tillatelsen som bli_bruker."
+  the_roles_api_refers_to_this_permission_as_become__bededd25: "Roller-API-en refererer til denne tillatelsen som become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollene til den rapporterende brukeren (student, lærer, admin, osv.)"
   the_salesforce_account_id_if_it_exists_e7949706: "Salesforce Account ID (hvis den finnes)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet lar deg sette opp timeavtale som studenter (eller studentgrupper) kan melde seg på. For å komme i gang klikk på knappen nedenfor"
