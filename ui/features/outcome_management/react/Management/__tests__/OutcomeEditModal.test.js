@@ -169,10 +169,10 @@ describe('OutcomeEditModal', () => {
     it('displays flash confirmation with proper message if update request succeeds', async () => {
       RichContentEditor.callOnRCE.mockReturnValue('Updated description')
       const {getByText, getByLabelText} = renderWithProvider()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.click(getByText('Save'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This outcome was successfully updated.',
         type: 'success'
@@ -184,10 +184,10 @@ describe('OutcomeEditModal', () => {
       const {getByText, getByLabelText} = renderWithProvider({
         overrides: {outcome: {...outcome, _id: '2'}}
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.click(getByText('Save'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: "An error occurred while updating this outcome: GraphQL error: can't be blank.",
         type: 'error'
@@ -202,7 +202,7 @@ describe('OutcomeEditModal', () => {
         target: {value: 'Updated alternate description'}
       })
       fireEvent.click(getByText('Save'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This outcome was successfully updated.',
         type: 'success'
@@ -215,7 +215,7 @@ describe('OutcomeEditModal', () => {
         target: {value: 'Updated alternate description'}
       })
       fireEvent.click(getByText('Save'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while updating this outcome: GraphQL error: mutation failed.',
         type: 'error'
