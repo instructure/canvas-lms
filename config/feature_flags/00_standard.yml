@@ -366,6 +366,8 @@ rce_enhancements:
   environments:
     production:
       state: hidden
+    development:
+      state: on
 new_features_ui:
   state: hidden
   applies_to: SiteAdmin
