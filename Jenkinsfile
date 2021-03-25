@@ -299,16 +299,6 @@ def handleDockerBuildFailure(imagePrefix, e) {
   throw e
 }
 
-def rebaseHelper(branch, commitHistory = 100) {
-  git.fetch(branch, commitHistory)
-  if (!git.hasCommonAncestor(branch)) {
-    error "Error: your branch is over ${commitHistory} commits behind $GERRIT_BRANCH, please rebase your branch manually."
-  }
-  if (!git.rebase(branch)) {
-    error "Error: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-  }
-}
-
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary("local-lib", "build/new-jenkins/library")
 
@@ -490,9 +480,6 @@ pipeline {
                 buildSummaryReport.extendedStageAndReportIfFailure('Rebase') {
                   timeout(time: 2) {
                     rebaseHelper(GERRIT_BRANCH)
-                    if ( GERRIT_BRANCH ==~ /dev\/.*/ ) {
-                      rebaseHelper("master")
-                    }
 
                     if(!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(jenkinsFiles, 'origin/master')) {
                       error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
