@@ -4943,7 +4943,7 @@ zh-Hans:
   cannot_save_new_assignment_3bda0792: 无法保存新作业
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: 置换项的截止日期处在关闭评分周期内时，无法设置为只对置换项可见
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: 无法把置换项截止日期设置为关闭评分周期内的日期
-  cannot_set_sis_account_id_on_a_root_account_dc7a969e: "无法设置 sis_account_idroot_account."
+  cannot_set_sis_account_id_on_a_root_account_dc7a969e: "无法设置 sis_account_id root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: 无法把截止日期设置为关闭评分周期内的日期
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: 在取消禁用评分前，无法查看匿名作业的详细报告。
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: 在发布评分前，无法查看匿名作业的详细报告。
@@ -8917,7 +8917,7 @@ zh-Hans:
   download_course_content_7f66edc9: 下载课程内容
   download_course_roster_csv_86b3d192: "下载课程学生名册 CSV"
   download_epub_757cf0af: " 下载 ePub"
-  download_errors_attchment_82ffea3f: 下载errors_attchment
+  download_errors_attchment_82ffea3f: "下载 errors_attchment"
   download_item_analysis_report_statuslabel_8c9387ec: "下载项目分析报告 %{statusLabel}"
   download_report_77164f62: 下载报告
   download_scores_generated_on_date_ff5b9cd2: "于%{date}下载生成的分数"
@@ -12805,8 +12805,8 @@ zh-Hans:
   invalid_date_or_time_333acd43: 日期或时间无效
   invalid_date_time_3ae423f5: 日期-时间无效
   invalid_dates_were_found_please_correct_them_and_t_4140b318: 找到无效的日期。请更正并重试。
-  invalid_datetime_for_graded_since_884cce5: 无效的日期时间graded_since
-  invalid_datetime_for_submitted_since_a238f3a6: 无效的日期时间submitted_since
+  invalid_datetime_for_graded_since_884cce5: "无效的日期时间 graded_since"
+  invalid_datetime_for_submitted_since_a238f3a6: "无效的日期时间 submitted_since"
   invalid_domain_e810c1d: 域无效
   invalid_field_type_61d31870: "无效的%{field}：“%{type}”"
   invalid_fields_after_ratings_fields_815ff223: "评级后字段无效：%{fields}"
@@ -23253,7 +23253,7 @@ zh-Hans:
       timespan: "%{start_at} *至* %{end_at}"
   terms_35d91184: "学期: "
   terms_4d979628: 学期
-  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: 找不到学期。学期必须包括multi_term_batch_mode
+  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "找不到学期。学期必须包括 multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: 服务条款属性无效
   terms_of_service_bedefcaf: 服务条款
   terms_of_service_f183ff7f: 服务条款
