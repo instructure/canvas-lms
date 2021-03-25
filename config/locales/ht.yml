@@ -2548,7 +2548,7 @@ ht:
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Yon itilizatè Canvas ak ID SIS %{user_id} la gentan reklame demann enfòmasyon koneksyon %{other_user_id}, user_id sote"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Yon itilizatè Canvas ki gen ID SIS %{user_id} oswa non koneksyon %{login} egziste deja, sote"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Yon itilizatè Canvas ak %{user_id} la gentan reklame demann enfòmasyon koneksyon %{other_user_id}, user_id sote"
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Yon ansyen itilizatè Canvas ak %{user_id} te gentan reklameintegration_id %{other_user_id}te mande a, sote"
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Yon ansyen itilizatè Canvas ak %{user_id} te gentan reklame integration_id %{other_user_id} te mande a, sote"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Yon itilizatè ki egziste pa koresponn a ID itilizatè yo bay pou koneksyon ak ID SIS %{user_id}la, sote"
   an_export_is_already_in_progress_54270f01: "Gen yon ekspòtasyon ki kòmanse deja."
   an_internal_error_occurred_83b8a685: "Yon erè entèn fèt"
@@ -5486,7 +5486,7 @@ ht:
     angel_exporter: 
       content: Kontni
       options: Opsyon
-    bad_migration_type: "Migration_type envalid"
+    bad_migration_type: "migration_type envalid"
     blackboard_export: 
       content: Kontni
       options: Opsyon
@@ -5607,7 +5607,7 @@ ht:
       select_content_checkbox: 
         select_all_content: "Tout kontni"
         select_specific_content: "Chwazi Kontni patikilye"
-    unsupported_migration_type: "Migration_type pou kontèks pa sipòte"
+    unsupported_migration_type: "migration_type pou kontèks pa sipòte"
     upload_warning: "Si w soti nan paj sa a pwosesis transfè a ap anile."
     uploading: Chajman...
     web_ct: 
