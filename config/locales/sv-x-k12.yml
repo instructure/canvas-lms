@@ -5176,7 +5176,7 @@ sv-x-k12:
     angel_exporter: 
       content: Innehåll
       options: Alternativ
-    bad_migration_type: "Ogiltig migrationstyp"
+    bad_migration_type: "Ogiltig migration_type"
     blackboard_export: 
       content: Innehåll
       options: Alternativ
@@ -22519,7 +22519,7 @@ sv-x-k12:
   you_can_review_the_submission_details_using_the_li_c25dd615: "Du kan granska inlämningsuppgifterna via länken nedan."
   you_can_review_the_submission_details_using_this_l_c7f51917: "Du kan granska inlämningsuppgifterna med den här länken: %{link}."
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Du kan se information om den här gruppen genom att klicka på den här länken: %{link}."
-  you_can_t_delete_a_root_account_5673c62d: "Du kan inte ta bort ett rotkonto."
+  you_can_t_delete_a_root_account_5673c62d: "Du kan inte ta bort ett root_account."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Du kan inte radera ett underkonto som redan har kurser."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Du kan inte ta bort ett underkonto som har tillhörande underkonton."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Du kan inte ta bort %{account_name} eftersom det finns kurser där."
