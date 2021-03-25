@@ -2637,7 +2637,7 @@ pt:
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Um utilizador Canvas existente com a ID SIS %{user_id} já reivindicou a informação de login solicitada de %{other_user_id} user_id, a ignorar"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Um utilizador existente do Canvas com o ID do SIS %{user_id} ou login de %{login} já existe, saltar"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Um utilizador Canvas existente com a %{user_id} já reivindicou a informação de login solicitada de %{other_user_id} user_id, a ignorar"
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Um utilizador do Canvas existente com o %{user_id} já solicitado claim_id de integração %{other_user_id}, ignorando"
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Um utilizador do Canvas existente com o %{user_id} já reivindicou a integration_id solicitada de %{other_user_id}, a ignorar"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Um utilizador existente não corresponde aos IDs de utilizador existentes fornecidos para o login com o ID do SIS %{user_id}, saltar"
   an_export_is_already_in_progress_54270f01: "Uma exportação já está em andamento."
   an_internal_error_occurred_83b8a685: "Ocorreu um erro interno"
@@ -4931,7 +4931,7 @@ pt:
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "não pode estar ausente quando a account_id está ausente"
   cannot_be_nil_when_course_id_is_nil_f539388: "não pode estar ausente quando a course_id está ausente"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "não pode estar presente quando a account_id está presente"
-  cannot_be_present_when_course_id_is_present_785e6a59: "não pode estar presente quando a couse_id está presente"
+  cannot_be_present_when_course_id_is_present_785e6a59: "não pode estar presente quando a course_id está presente"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Não é possível alterar uma data de vencimento de substituição para uma data dentro de um período de classificação fechado"
   cannot_change_locked_status_on_granular_permission_6f13bf4f: "Não é possível alterar o estado bloqueado na permissão granular"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Não é possível alterar o nome da função para %{label}: já em uso"
@@ -5780,7 +5780,7 @@ pt:
   content_migration: 
     bad_attachment: "O ficheiro não foi carregado com sucesso."
     errors: 
-      cannot_shift_and_remove: "não é possível especificar mudar_datas e remover_datas simultaneamente"
+      cannot_shift_and_remove: "não é possível especificar shift_dates e remove_dates simultaneamente"
       import_error: "Erro de importação:"
     missing_content_links_message: "Não foi possível resolver as seguintes referências:"
     missing_content_links_title: "Foram encontradas ligações em falta no conteúdo importado"
@@ -5793,7 +5793,7 @@ pt:
     angel_exporter: 
       content: Conteúdo
       options: Opções
-    bad_migration_type: "Tipo de migração inválido"
+    bad_migration_type: "migration_type inválido"
     blackboard_export: 
       content: Conteúdo
       options: Opções
@@ -5915,7 +5915,7 @@ pt:
       select_content_checkbox: 
         select_all_content: "Todo o conteúdo"
         select_specific_content: "Selecionar conteúdo específico"
-    unsupported_migration_type: "Tipo de migração não suportado para o contexto"
+    unsupported_migration_type: "migration_type não suportado para o contexto"
     upload_warning: "A saída desta página irá cancelar o processo de carregamento."
     uploading: "A carregar..."
     web_ct: 
@@ -7004,7 +7004,7 @@ pt:
       sis_source_id: "ID de origem SIS"
       start_at: "Início em"
       storage_quota: "Quota de armazenamento"
-      syllabus_body: corpo_programa
+      syllabus_body: syllabus_body
       tab_configuration: "Configuração de separador"
       template_course_id: "ID de modelo de disciplina"
       turnitin_comments: "Comentários do Turnitin"
@@ -12847,7 +12847,7 @@ pt:
   invalid_fields_fields_8698284: "Campos inválidos: %{fields}"
   invalid_fields_for_a_group_invalid_f440b733: "Campos inválidos para um grupo: %{invalid}"
   invalid_file_type_881cc9b2: "Tipo de ficheiro inválido"
-  invalid_grade_passback_setting_a1d209d1: "Grade_passback_setting inválido"
+  invalid_grade_passback_setting_a1d209d1: "grade_passback_setting inválido"
   invalid_hexcode_9124519f: "Código hexcode inválido"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Código hexcode inválido. Introduza aqui um código hexcode válido para usar uma cor personalizada."
   invalid_or_missing_session_for_oauth_3ce4b605: "Sessão inválida ou em falta para oauth"
@@ -22675,7 +22675,7 @@ pt:
       n_correct: "n corretas"
       n_incorrect: "n incorretas"
       name: nome
-      root_account: conta_raiz
+      root_account: root_account
       score: pontuação
       section: secção
       section_id: section_id
@@ -23697,7 +23697,7 @@ pt:
   this_field_name_is_required_b9196401: "O campo \"nome\" é obrigatório."
   this_file_16b24f02: "este ficheiro"
   this_file_9443cda1: "Este ficheiro"
-  this_file_must_have_usage_rights_set_before_it_can_55aba559: "Este ficheiro tem de ter direitos de utilização definidos para poder ser publicado."
+  this_file_must_have_usage_rights_set_before_it_can_55aba559: "Este ficheiro tem de ter usage_rights definidos para poder ser publicado."
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Este sinalizador não causará nenhuma alteração no comportamento."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Esta pasta está bloqueada e não está disponível para visualização."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Esta nota é diferente da vista do estudante porque algumas tarefas foram alteradas"
