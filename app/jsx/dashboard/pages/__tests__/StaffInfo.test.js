@@ -79,6 +79,13 @@ describe('StaffInfo', () => {
       return wrapper
     }
 
+    it('does not render messaging button for own user', () => {
+      global.ENV = {current_user_id: '1'}
+      const {queryByText} = render(<StaffInfo {...getProps()} />)
+      expect(queryByText('Send a message to Mrs. Thompson')).not.toBeInTheDocument()
+      global.ENV = {}
+    })
+
     it('opens a modal when clicking the button', async () => {
       const wrapper = await openModal()
       expect(wrapper.getByLabelText('Message')).toBeInTheDocument()

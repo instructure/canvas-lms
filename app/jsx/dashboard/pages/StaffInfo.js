@@ -63,6 +63,8 @@ export default function StaffInfo({
       })
   }
 
+  const allowMessaging = () => ENV.current_user_id !== id
+
   return (
     <View>
       <Flex>
@@ -80,71 +82,75 @@ export default function StaffInfo({
             </Text>
           )}
         </Flex.Item>
-        <Flex.Item>
-          <IconButton
-            screenReaderLabel={I18n.t('Send a message to %{name}', {name})}
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            onClick={() => setModalOpen(true)}
-          >
-            <IconEmailLine />
-          </IconButton>
-        </Flex.Item>
+        {allowMessaging() && (
+          <Flex.Item>
+            <IconButton
+              screenReaderLabel={I18n.t('Send a message to %{name}', {name})}
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              onClick={() => setModalOpen(true)}
+            >
+              <IconEmailLine />
+            </IconButton>
+          </Flex.Item>
+        )}
       </Flex>
       <PresentationContent>
         <hr style={{margin: '0.8em 0'}} />
       </PresentationContent>
 
-      <Modal
-        label={I18n.t('Message %{name}', {name})}
-        open={isModalOpen}
-        size="small"
-        onDismiss={() => setModalOpen(false)}
-      >
-        <Modal.Body>
-          <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t('Message Form')}</ScreenReaderContent>}
-            layout="stacked"
-            rowSpacing="medium"
-          >
-            <TextInput
-              renderLabel={I18n.t('Subject')}
-              placeholder={I18n.t('No subject')}
-              value={subject}
-              onChange={e => setSubject(e.target.value)}
-            />
-            <TextArea
-              label={I18n.t('Message')}
-              placeholder={I18n.t('Message')}
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              height="8em"
-              resize="vertical"
-            />
-          </FormFieldGroup>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            color="secondary"
-            onClick={() => setModalOpen(false)}
-            interaction={!isSending ? 'enabled' : 'disabled'}
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          &nbsp;
-          <Button
-            color="primary"
-            onClick={handleSend}
-            interaction={message.length && !isSending ? 'enabled' : 'disabled'}
-          >
-            {I18n.t('Send')}
-          </Button>
-          {isSending && (
-            <Spinner renderTitle={I18n.t('Sending message')} size="x-small" margin="small" />
-          )}
-        </Modal.Footer>
-      </Modal>
+      {allowMessaging() && (
+        <Modal
+          label={I18n.t('Message %{name}', {name})}
+          open={isModalOpen}
+          size="small"
+          onDismiss={() => setModalOpen(false)}
+        >
+          <Modal.Body>
+            <FormFieldGroup
+              description={<ScreenReaderContent>{I18n.t('Message Form')}</ScreenReaderContent>}
+              layout="stacked"
+              rowSpacing="medium"
+            >
+              <TextInput
+                renderLabel={I18n.t('Subject')}
+                placeholder={I18n.t('No subject')}
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+              />
+              <TextArea
+                label={I18n.t('Message')}
+                placeholder={I18n.t('Message')}
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                height="8em"
+                resize="vertical"
+              />
+            </FormFieldGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              color="secondary"
+              onClick={() => setModalOpen(false)}
+              interaction={!isSending ? 'enabled' : 'disabled'}
+            >
+              {I18n.t('Cancel')}
+            </Button>
+            &nbsp;
+            <Button
+              color="primary"
+              onClick={handleSend}
+              interaction={message.length && !isSending ? 'enabled' : 'disabled'}
+            >
+              {I18n.t('Send')}
+            </Button>
+            {isSending && (
+              <Spinner renderTitle={I18n.t('Sending message')} size="x-small" margin="small" />
+            )}
+          </Modal.Footer>
+        </Modal>
+      )}
     </View>
   )
 }
