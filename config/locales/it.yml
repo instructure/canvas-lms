@@ -2481,7 +2481,7 @@ it:
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Un utente Canvas esistente con ID SIS %{user_id} ha già richiesto le informazioni di accesso necessarie user_id di %{other_user_id}. Verrà ignorato"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Esiste già un utente Canvas esistente con l’ID SIS %{user_id} o login di %{login} già esistente: verrà ignorato"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Un utente Canvas esistente con %{user_id} ha già richiesto le informazioni di accesso necessarie user_id di %{other_user_id}. Verrà ignorato"
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Un utente Canvas esistente con %{user_id} ha già reclamato l'ID di integrazione richiesto di %{other_user_id}. Verrà ignorato"
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Un utente Canvas esistente con %{user_id} ha già reclamato l'integration_id richiesto di %{other_user_id}. Verrà ignorato"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Un utente esistente non corrisponde agli ID degli utenti esistenti per il login con ID SIS %{user_id}: verrà ignorato"
   an_export_is_already_in_progress_54270f01: "Un'esportazione è già in corso."
   an_internal_error_occurred_83b8a685: "Si è verificato un errore interno"
@@ -8640,7 +8640,7 @@ it:
     click_through: "Fai clic per visualizzare il contenuto della pagina"
     default_content: "Ancora nessun contenuto aggiunto"
     default_name: "Nome pagina"
-  eportfolio_id_c69233c1: id_eportfolio
+  eportfolio_id_c69233c1: eportfolio_id
   eportfolio_moderation_feb0ffd3: "Moderazione ePortfolio"
   eportfolio_name_fd4b9e13: eportfolio_name
   eportfolio_report_140b417f: "Report Eportfolio"
@@ -20743,7 +20743,7 @@ it:
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Il testo della domanda per la domanda \"%{question_name}\" era troppo lungo."
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "La funzione Controllo log quiz deve essere abilitata in Impostazioni corso."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "Il nome del quiz deve contenere meno di %{length} caratteri"
-  the_roles_api_refers_to_this_permission_as_become__bededd25: "L'API Roles fa riferimento a questa autorizzazione come diventa_utente."
+  the_roles_api_refers_to_this_permission_as_become__bededd25: "L'API Roles fa riferimento a questa autorizzazione come become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "i ruoli detenuti dall'utente segnalante (studente, insegnante, amministratore e così via)"
   the_salesforce_account_id_if_it_exists_e7949706: "ID account Salesforce (se esiste)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "L'Utilità di pianificazione ti consente di impostare le fasce orarie a cui gli studenti (o gruppi di studenti) possono registrarsi. Per iniziare, fai clic sul pulsante riportato di seguito."
