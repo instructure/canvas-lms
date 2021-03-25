@@ -56,6 +56,21 @@ it('indicates if a course is a blueprint course', () => {
   ).toBe(true)
 })
 
+it('indicates if a course is a course template', () => {
+  const tooltip = 'Tooltip[tip="This is a course template"] IconCollectionSolid'
+  expect(
+    shallow(<CoursesListRow {...props} />)
+      .find(tooltip)
+      .exists()
+  ).toBe(false)
+
+  expect(
+    shallow(<CoursesListRow {...props} template />)
+      .find(tooltip)
+      .exists()
+  ).toBe(true)
+})
+
 it('shows add-enrollment if it makes sense', () => {
   const tooltip = 'Tooltip[tip="Add Users to A"] IconPlusLine'
   expect(
@@ -84,6 +99,12 @@ it('does not show add-enrollment when not allowed', () => {
     shallow(
       <CoursesListRow {...props} can_create_enrollments workflow_state="completed" concluded />
     )
+      .find(tooltip)
+      .exists()
+  ).toBe(false)
+
+  expect(
+    shallow(<CoursesListRow {...props} can_create_enrollments template />)
       .find(tooltip)
       .exists()
   ).toBe(false)

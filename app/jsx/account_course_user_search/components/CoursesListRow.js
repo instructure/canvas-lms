@@ -24,6 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconBlueprintLine,
+  IconCollectionSolid,
   IconPlusLine,
   IconSettingsLine,
   IconStatsLine,
@@ -58,6 +59,7 @@ export default class CoursesListRow extends React.Component {
     showSISIds: bool,
     can_create_enrollments: bool,
     blueprint: bool,
+    template: bool,
     concluded: bool
   }
 
@@ -139,7 +141,7 @@ export default class CoursesListRow extends React.Component {
   }
 
   allowAddingEnrollments() {
-    return this.props.can_create_enrollments && !this.props.concluded
+    return this.props.can_create_enrollments && !this.props.concluded && !this.props.template
   }
 
   renderAddEnrollments() {
@@ -168,7 +170,8 @@ export default class CoursesListRow extends React.Component {
       subaccount_name,
       showSISIds,
       term,
-      blueprint
+      blueprint,
+      template
     } = this.props
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
@@ -177,6 +180,7 @@ export default class CoursesListRow extends React.Component {
     const blueprintTip = I18n.t('This is a blueprint course')
     const statsTip = I18n.t('Statistics for %{name}', {name})
     const settingsTip = I18n.t('Settings for %{name}', {name})
+    const templateTip = I18n.t('This is a course template')
 
     return (
       <Table.Row>
@@ -194,17 +198,23 @@ export default class CoursesListRow extends React.Component {
         </Table.RowHeader>
         <Table.Cell>
           <a href={url}>
-            {name}
+            <span style={{paddingRight: '0.5em'}}>{name}</span>
             {blueprint && (
               <Tooltip tip={blueprintTip}>
                 <IconBlueprintLine />
                 <ScreenReaderContent>{blueprintTip}</ScreenReaderContent>
               </Tooltip>
             )}
+            {template && (
+              <Tooltip tip={templateTip}>
+                <IconCollectionSolid />
+                <ScreenReaderContent>{templateTip}</ScreenReaderContent>
+              </Tooltip>
+            )}
           </a>
         </Table.Cell>
         {showSISIds && <Table.Cell>{sis_course_id}</Table.Cell>}
-        <Table.Cell>{term.name}</Table.Cell>
+        <Table.Cell>{template ? '\u2014' : term.name}</Table.Cell>
         <Table.Cell>
           {(teachersToShow || []).map(teacher => (
             <div key={teacher.id}>
@@ -225,7 +235,9 @@ export default class CoursesListRow extends React.Component {
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </Table.Cell>
         <Table.Cell>{subaccount_name}</Table.Cell>
-        <Table.Cell>{I18n.n(total_students + newlyEnrolledStudents)}</Table.Cell>
+        <Table.Cell>
+          {template ? '\u2014' : I18n.n(total_students + newlyEnrolledStudents)}
+        </Table.Cell>
         <Table.Cell textAlign="end">
           {this.renderAddEnrollments()}
           <Tooltip tip={statsTip}>
