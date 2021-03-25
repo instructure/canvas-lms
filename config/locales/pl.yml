@@ -2659,10 +2659,10 @@ pl:
   an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Wystąpił błąd podczas wczytywania niezsynchronizowanych zmian"
   an_error_ocurred_while_publishing_course_3760cf04: "Wystąpił błąd podczas publikowania kursu"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Wystąpił błąd podczas zapisywania grupy przydziałów"
-  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Istniejący użytkownik Canvas z SIS ID %{user_id} odebrał już żądane dane logowania %{other_user_id}user_id, pomijając"
+  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Istniejący użytkownik Canvas z SIS ID %{user_id} odebrał już żądane dane logowania %{other_user_id} user_id, pomijając"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Istniejący użytkownik Canvas z identyfikatorem systemu SIS %{user_id} lub loginem %{login} już istnieje, trwa pomijanie"
-  an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Istniejący użytkownik Canvas z %{user_id} odebrał już żądane dane logowania %{other_user_id}user_id, pomijając"
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Istniejący użytkownik Canvas z %{user_id} odebrał już żądany identyfikator integracji %{other_user_id}, pomijając"
+  an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Istniejący użytkownik Canvas z %{user_id} odebrał już żądane dane logowania %{other_user_id} user_id, pomijając"
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Istniejący użytkownik Canvas z %{user_id} odebrał już żądany integration_id %{other_user_id}, pomijając"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Istniejący użytkownik nie odpowiada istniejącym nazwom użytkownika do logowania za pomocą identyfikatora systemu SIS %{user_id}, trwa pomijanie"
   an_export_is_already_in_progress_54270f01: "Eksportowanie w toku."
   an_internal_error_occurred_83b8a685: "Wystąpił błąd wewnętrzny"
@@ -4989,10 +4989,10 @@ pl:
   cannot_be_changed_because_this_assignment_is_due_i_a529873f: "nie można zmienić, ponieważ termin tego zadania przypada na zamknięty okres oceniania"
   cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: "Nie można edytować w przypadku zadań, które przypadają na zamknięty okres oceniania"
   cannot_be_empty_when_course_id_is_nil_and_account__ca96a97e: "nie może być puste gdy ID_kursu i ID_konta jest zerowe"
-  cannot_be_nil_when_account_id_is_nil_be6d1d60: "nie może wynosić zero gdy ID_konta wynosi zero"
-  cannot_be_nil_when_course_id_is_nil_f539388: "nie może wynosić zero gdy ID_kursu wynosi zero"
-  cannot_be_present_when_account_id_is_present_f7d9b51f: "nie może być obecny gdy ID_konta jest obecne"
-  cannot_be_present_when_course_id_is_present_785e6a59: "nie może być obecny gdy ID_kursu jest obecne"
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: "nie może wynosić zero gdy account_id wynosi zero"
+  cannot_be_nil_when_course_id_is_nil_f539388: "nie może wynosić zero gdy course_id wynosi zero"
+  cannot_be_present_when_account_id_is_present_f7d9b51f: "nie może być obecny gdy account_id jest obecne"
+  cannot_be_present_when_course_id_is_present_785e6a59: "nie może być obecny gdy course_id jest obecne"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Nie można zmienić zastępowanego terminu na datę w zamkniętym okresie oceniania"
   cannot_change_locked_status_on_granular_permission_6f13bf4f: "Nie można zmienić statusu blokady przy uprawnieniach szczegółowych"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Nie można zmienić nazwy roli na %{label}: już w użyciu"
@@ -5842,7 +5842,7 @@ pl:
   content_migration: 
     bad_attachment: "Przekazywanie pliku nie powiodło się."
     errors: 
-      cannot_shift_and_remove: "nie można jednocześnie określić wartości zmień_daty oraz usuń_daty"
+      cannot_shift_and_remove: "nie można jednocześnie określić wartości shift_dates oraz remove_dates"
       import_error: "Błąd importowania:"
     missing_content_links_message: "Nie można rozpoznać następujących odwołań:"
     missing_content_links_title: "Brakujące łącza znaleziono w zaimportowanej zawartości"
@@ -5855,7 +5855,7 @@ pl:
     angel_exporter: 
       content: Zawartość
       options: Opcje
-    bad_migration_type: "Nieprawidłowy typ_migracji"
+    bad_migration_type: "Nieprawidłowy migration_type"
     blackboard_export: 
       content: Zawartość
       options: Opcje
@@ -5977,7 +5977,7 @@ pl:
       select_content_checkbox: 
         select_all_content: "Cała zawartość"
         select_specific_content: "Wybierz określoną treść"
-    unsupported_migration_type: "Nieobsługiwany typ_migracji dla kontekstu"
+    unsupported_migration_type: "Nieobsługiwany migration_type dla kontekstu"
     upload_warning: "Przejście do innej strony spowoduje anulowanie procesu aktualizacji."
     uploading: "Trwa przekazywanie..."
     web_ct: 
@@ -7150,7 +7150,7 @@ pl:
       sis_source_id: "Identyfikator danych źródłowych SIS"
       start_at: "Rozpoczęto o"
       storage_quota: "Przydział magazynowania"
-      syllabus_body: "treść_programu kursu"
+      syllabus_body: syllabus_body
       tab_configuration: "Konfiguracja karty"
       template_course_id: "Identyfikator szablonu kursu"
       turnitin_comments: "Komentarze programu Turnitin"
@@ -7896,7 +7896,7 @@ pl:
   created_at_6373bbea: created_at
   created_at_73839757: "Utworzono o:"
   created_by_b39b9c8b: "Stworzone przez"
-  created_by_sis_93fbb66b: utworzone_przez_sis
+  created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Utworzone przez SIS"
   created_created_at_37c0ec3b: "Utworzono: %{created_at}"
   created_created_bf5714b8: "Utworzono %{created}"
@@ -10485,7 +10485,7 @@ pl:
   file_tree_expanded_a1d20c4a: "Rozwinięte drzewo plików"
   file_upload_9cae6da5: "Prześlij plik"
   file_upload_failed_af22dd91: "Niepowodzenie przesyłania pliku."
-  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Przekazanie pliku, adresu URL lub content_export_id jest wymagane"
+  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Przekazanie pliku, adresu file_url lub content_export_id jest wymagane"
   file_upload_submission_740711f: "Przesłane zadanie w formie pliku"
   file_uploading_56c9c0c8: "Przesyłanie pliku"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} został opublikowany z następującym prawem użytkowania: %{usage_right}"
@@ -12780,7 +12780,7 @@ pl:
   image_c1c98202: zdjęcie
   image_id_is_not_a_valid_id_7dd6bad6: "Identyfikator image_id jest nieprawidłowy"
   image_search_b0944fc2: "Wyszukiwanie obrazów"
-  image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url i  image_id nie mogą być ustawione jednocześnie."
+  image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url i image_id nie mogą być ustawione jednocześnie."
   image_url_is_not_a_valid_url_4e31c8b0: "image_url jest nieprawidłowym adresem URL"
   images: 
     error_checking_color: "Błąd w trakcie sprawdzania koloru obrazu"
@@ -23086,11 +23086,11 @@ pl:
       n_correct: "n poprawnych"
       n_incorrect: "n niepoprawnych"
       name: nazwa
-      root_account: konto_źródłowe
+      root_account: root_account
       score: "wynik punktowy"
       section: sekcja
-      section_id: sekcja_id
-      section_sis_id: sekcja_sis_id
+      section_id: section_id
+      section_sis_id: section_sis_id
       sis_id: sis_id
       submitted: przesłano
     exact_answer: "%{exact_value} +/- %{margin}"
