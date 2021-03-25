@@ -23659,7 +23659,7 @@ fr:
   this_field_name_is_required_b9196401: "Le champ « nom » est obligatoire."
   this_file_16b24f02: "ce fichier"
   this_file_9443cda1: "Ce fichier"
-  this_file_must_have_usage_rights_set_before_it_can_55aba559: "Ce fichier ne peut pas être publié tant que ses droits d’utilisation ne sont pas définis."
+  this_file_must_have_usage_rights_set_before_it_can_55aba559: "Ce fichier ne peut pas être publié tant que ses usage_rights ne sont pas définis."
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Ce drapeau ne modifiera aucun comportement."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ce dossier est actuellement verrouillé et non consultable."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Cette note est différente de celle visible par l'étudiant car certaines évaluations sont masquées."
