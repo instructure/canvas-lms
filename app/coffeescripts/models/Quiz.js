@@ -90,6 +90,7 @@ export default class Quiz extends Backbone.Model {
       this.set('url', this.url())
       this.set('edit_url', this.edit_url())
       this.set('publish_url', this.publish_url())
+      this.set('deletion_url', this.deletion_url())
       this.set('unpublish_url', this.unpublish_url())
     }
   }
@@ -156,6 +157,14 @@ export default class Quiz extends Backbone.Model {
     return `${this.get('base_url')}/${this.get('id')}/edit${query_string}`
   }
 
+  deletion_url() {
+    if (this.isQuizzesNext()) {
+      return `${this.get('base_url')}/${this.get('id')}`
+    }
+
+    return this.get('url')
+  }
+
   initAllDates() {
     let allDates
     if ((allDates = this.get('all_dates')) != null) {
@@ -217,7 +226,7 @@ export default class Quiz extends Backbone.Model {
 
   destroy(options) {
     const opts = {
-      url: this.htmlUrl(),
+      url: this.get('deletion_url'),
       ...options
     }
     Backbone.Model.prototype.destroy.call(this, opts)
