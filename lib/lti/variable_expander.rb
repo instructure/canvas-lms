@@ -90,8 +90,9 @@ module Lti
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
     ORIGINALITY_REPORT_ATTACHMENT_GUARD = -> { @originality_report&.attachment.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
-    EDITOR_CONTENTS_GAURD = -> { @editor_contents.present? }
-    EDITOR_SELECTION_GAURD = -> { @editor_contents.present? }
+    EDITOR_CONTENTS_GUARD = -> { @editor_contents.present? }
+    EDITOR_SELECTION_GUARD = -> { @editor_contents.present? }
+    STUDENT_ASSIGNMENT_GUARD = -> { @context.is_a?(Course) && @context.user_is_student?(@current_user) && @assignment }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -211,9 +212,9 @@ module Lti
     #   "This text was in the editor"
     #   ```
     register_expansion 'com.instructure.Editor.contents', [],
-                      -> { @editor_contents},
-                      EDITOR_CONTENTS_GAURD,
-                      default_name: 'com_instructure_editor_contents'
+                       -> { @editor_contents},
+                       EDITOR_CONTENTS_GUARD,
+                       default_name: 'com_instructure_editor_contents'
 
     # The contents the user has selected in the text editor associated
     # with the content item launch.
@@ -223,9 +224,9 @@ module Lti
     #   "this text was selected by the user"
     #   ```
     register_expansion 'com.instructure.Editor.selection', [],
-                      -> { @editor_selection },
-                      EDITOR_SELECTION_GAURD,
-                      default_name: 'com_instructure_editor_selection'
+                       -> { @editor_selection },
+                       EDITOR_SELECTION_GUARD,
+                       default_name: 'com_instructure_editor_selection'
 
     # A token that can be used for frontend communication between an LTI tool
     # and Canvas via the Window.postMessage API
@@ -1282,6 +1283,26 @@ module Lti
     register_expansion 'Canvas.assignment.lockdownEnabled', [],
                        -> { @assignment.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false },
                        ASSIGNMENT_GUARD
+
+    # Returns the allowed number of submission attempts.
+    #
+    # @example
+    #   ```
+    #   5
+    #   ```
+    register_expansion 'Canvas.assignment.allowedAttempts', [],
+                       -> { @assignment.allowed_attempts },
+                       ASSIGNMENT_GUARD
+
+    # Returns the number of submission attempts which the student did.
+    #
+    # @example
+    #   ```
+    #   2
+    #   ```
+    register_expansion 'Canvas.assignment.submission.studentAttempts', [],
+                       -> { @assignment.submissions&.find_by(user: @current_user)&.attempt },
+                       STUDENT_ASSIGNMENT_GUARD
 
     # Returns the endpoint url for accessing link-level tool settings
     # Only available for LTI 2.0

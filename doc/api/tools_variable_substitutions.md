@@ -1174,6 +1174,24 @@ Only available when launched as an assignment.
 ```
 true
 ```
+## Canvas.assignment.allowedAttempts
+Returns the allowed number of submission attempts.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+5
+```
+## Canvas.assignment.submission.studentAttempts
+Returns the number of submission attempts which the student did.
+
+**Availability**: *when launched as an assignment by a student*  
+
+
+```
+2
+```
 ## LtiLink.custom.url
 Returns the endpoint url for accessing link-level tool settings
 Only available for LTI 2.0.
