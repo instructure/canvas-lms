@@ -47,6 +47,7 @@ import styles from './styles.css'
 import theme from './theme'
 import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../plannerPropTypes'
 import {showPillForOverdueStatus} from '../../utilities/statusUtils'
+import {assignmentType as getAssignmentType} from '../../utilities/contentUtils'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
 
@@ -169,26 +170,7 @@ export class PlannerItem extends Component {
   }
 
   assignmentType() {
-    switch (this.props.associated_item) {
-      case 'Quiz':
-        return formatMessage('Quiz')
-      case 'Discussion':
-        return formatMessage('Discussion')
-      case 'Assignment':
-        return formatMessage('Assignment')
-      case 'Page':
-        return formatMessage('Page')
-      case 'Announcement':
-        return formatMessage('Announcement')
-      case 'To Do':
-        return formatMessage('To Do')
-      case 'Calendar Event':
-        return formatMessage('Calendar Event')
-      case 'Peer Review':
-        return formatMessage('Peer Review')
-      default:
-        return formatMessage('Task')
-    }
+    return getAssignmentType(this.props.associated_item)
   }
 
   renderDateField = () => {

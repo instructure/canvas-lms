@@ -137,6 +137,7 @@ export class MissingAssignments extends PureComponent {
           </div>
         )}
         <ToggleDetails
+          id="MissingAssignments"
           expanded={this.state.expanded}
           data-testid="missing-item-info"
           fluidWidth

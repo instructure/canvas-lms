@@ -21,35 +21,39 @@ import formatMessage from '../../format-message'
 import Animation from '../animation'
 import {loadPastUntilToday} from '../../actions/loading-actions'
 import {alert} from '../../utilities/alertUtils'
+import {isToday} from '../../utilities/dateUtils'
+import {handleNothingToday} from '../util'
 
 export class ScrollToToday extends Animation {
   uiDidUpdate() {
-    const t = this.document().querySelector('.planner-today h2')
-    if (t) {
-      scrollAndFocusTodayItem(this.manager(), t)
-    } else {
-      this.animator().scrollToTop()
-      this.store().dispatch(loadPastUntilToday())
-    }
+    const action = this.acceptedAction('SCROLL_TO_TODAY')
+    const isWeekly = !!action.payload?.isWeekly
+    const todayElem = this.document().querySelector('.planner-today h2')
+    scrollAndFocusTodayItem(this.manager(), todayElem, isWeekly)
   }
 }
 
-export function scrollAndFocusTodayItem(manager, todayElem) {
-  const {component, when} = findTodayOrNearest(
-    manager.getRegistry(),
-    manager.getStore().getState().timeZone
-  )
-  if (component) {
-    if (component.getScrollable()) {
-      // scroll Today into view
-      manager.getAnimator().forceScrollTo(todayElem, manager.totalOffset(), () => {
-        // then, if necessary, scroll today's or next todo item into view but not all the way to the top
-        manager
-          .getAnimator()
-          .scrollTo(
-            component.getScrollable(),
-            manager.totalOffset() + todayElem.offsetHeight,
-            () => {
+export class JumpScrollToToday extends Animation {
+  uiDidUpdate() {
+    const isWeekly = true // jump_to_this_week on only fired in the weekly planner
+    const todayElem = this.document().querySelector('.planner-today h2')
+    scrollAndFocusTodayItem(this.manager(), todayElem, isWeekly)
+  }
+}
+
+export function scrollAndFocusTodayItem(manager, todayElem, isWeekly) {
+  if (todayElem) {
+    const {component, when} = findTodayOrNearest(
+      manager.getRegistry(),
+      manager.getStore().getState().timeZone
+    )
+    if (component) {
+      if (isToday(component.props.date) || !isWeekly) {
+        if (component.getScrollable()) {
+          // scroll Today into view
+          manager.getAnimator().forceScrollTo(todayElem, manager.totalOffset(), () => {
+            // then, if necessary, scroll today's or next todo item into view but not all the way to the top
+            manager.getAnimator().scrollTo(component.getScrollable(), manager.totalOffset(), () => {
               if (when === 'after') {
                 // tell the user where we wound up
                 alert(formatMessage('Nothing planned today. Selecting next item.'))
@@ -60,13 +64,19 @@ export function scrollAndFocusTodayItem(manager, todayElem) {
               if (component.getFocusable()) {
                 manager.getAnimator().focusElement(component.getFocusable())
               }
-            }
-          )
-      })
+            })
+          })
+        }
+      } else {
+        handleNothingToday(manager, todayElem)
+      }
+    } else {
+      // there's nothing to focus. leave focus where it is
+      handleNothingToday(manager, todayElem)
     }
   } else {
-    // there's nothing to focus. leave focus on Today button
-    manager.getAnimator().forceScrollTo(todayElem, manager.totalOffset())
+    manager.getAnimator().scrollToTop()
+    if (!isWeekly) manager.getStore().dispatch(loadPastUntilToday())
   }
 }
 
@@ -75,9 +85,7 @@ export function scrollAndFocusTodayItem(manager, todayElem) {
 // 2. the next item due after today, and if there isn't one
 // 3. the most recent item still due from the past
 function findTodayOrNearest(registry, tz) {
-  const today = moment()
-    .tz(tz)
-    .startOf('day')
+  const today = moment().tz(tz).startOf('day')
   const allItems = registry.getAllItemsSorted()
   let lastInPast = null
   let firstInFuture = null

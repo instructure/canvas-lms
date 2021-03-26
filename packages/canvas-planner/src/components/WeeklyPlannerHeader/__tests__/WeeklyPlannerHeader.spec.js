@@ -31,6 +31,7 @@ function defaultProps(options) {
       isLoading: false,
       loadingWeek: false
     },
+    today: '2021-03-21T13:00:00Z',
     visible: true,
     weekStartDate: '2021-03-21',
     weekEndDate: '2021-03-27',

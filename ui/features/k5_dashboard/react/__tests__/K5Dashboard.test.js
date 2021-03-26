@@ -351,12 +351,14 @@ describe('K-5 Dashboard', () => {
       const {findByTestId} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-
-      const planner = await findByTestId('PlannerApp')
+      const planner = await findByTestId('PlannerApp', {timeout: 4000}) // give it some more time
       expect(planner).toBeInTheDocument()
 
       const header = await findByTestId('WeeklyPlannerHeader')
       expect(header).toBeInTheDocument()
+
+      const footer = await findByTestId('WeeklyPlannerFooter')
+      expect(footer).toBeInTheDocument()
     })
 
     it('displays a teacher preview if the user has no student enrollments', async () => {

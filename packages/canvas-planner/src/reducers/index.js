@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment-timezone'
 import {combineReducers} from 'redux'
 import {handleAction} from 'redux-actions'
 import days from './days-reducer'
@@ -43,6 +44,14 @@ const timeZone = handleAction(
     return action.payload.env.TIMEZONE
   },
   'UTC'
+)
+
+const today = handleAction(
+  'INITIAL_OPTIONS',
+  (state, action) => {
+    return moment.tz(action.payload.env.TIMEZONE).startOf('day')
+  },
+  moment().startOf('day')
 )
 
 const currentUser = handleAction(
@@ -83,6 +92,7 @@ const combinedReducers = combineReducers({
   groups,
   locale,
   timeZone,
+  today,
   currentUser,
   days,
   loading,

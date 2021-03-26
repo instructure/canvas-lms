@@ -41,6 +41,7 @@ const SchedulePage = ({visible = false}) => {
     >
       {renderWeeklyPlannerHeader({visible})}
       {isPlannerCreated && plannerApp.current}
+      {isPlannerCreated && renderWeeklyPlannerHeader({visible, isFooter: true})}
     </section>
   )
 }

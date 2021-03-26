@@ -41,6 +41,7 @@ const getDefaultValues = overrides => {
     timeZone: TZ,
     isWeekly: true,
     changeDashboardView() {},
+    scrollToToday() {},
     isCompletelyEmpty: false,
     weeklyDashboard: {
       weekStart: thisWeekStart,
@@ -68,10 +69,41 @@ afterAll(() => {
 })
 
 describe('Weekly PlannerApp', () => {
-  it('renders empty component with no assignments', () => {
+  it('renders empty days with no assignments this week', () => {
     const opts = getDefaultValues()
-    const {getByText} = render(<PlannerApp {...opts} />)
-    expect(getByText('Nothing Due This Week')).toBeInTheDocument()
+    const {queryAllByText} = render(<PlannerApp {...opts} />)
+    expect(queryAllByText('Nothing Planned Yet').length).toEqual(7)
+    const d = opts.thisWeek.weekStart.clone()
+    for (let i = 0; i < 7; ++i) {
+      const dstr = d.format('MMMM D')
+      expect(queryAllByText(dstr, {exact: false})[0]).toBeInTheDocument()
+      d.add(1, 'day')
+    }
+  })
+
+  it('renders empty days with no assignments some other week', () => {
+    const nextWeekStart = moment.tz(TZ).startOf('week').add(7, 'days')
+    const nextWeekEnd = moment.tz(TZ).endOf('week').add(7, 'days')
+    const opts = getDefaultValues({
+      weeklyDashboard: {
+        weekStart: nextWeekStart,
+        weekEnd: nextWeekEnd,
+        thisWeek: nextWeekStart,
+        weeks: {}
+      },
+      thisWeek: {
+        weekStart: nextWeekStart,
+        weekEnd: nextWeekEnd
+      }
+    })
+    const {queryAllByText} = render(<PlannerApp {...opts} />)
+    expect(queryAllByText('Nothing Planned Yet').length).toEqual(7)
+    const d = opts.thisWeek.weekStart.clone()
+    for (let i = 0; i < 7; ++i) {
+      const dstr = d.format('MMMM D')
+      expect(queryAllByText(dstr, {exact: false})[0]).toBeInTheDocument()
+      d.add(1, 'day')
+    }
   })
 
   it('displays the whole week if there are any items', () => {
@@ -93,41 +125,16 @@ describe('Weekly PlannerApp', () => {
     expect(getByText('Loading planner items')).toBeInTheDocument()
   })
 
-  // NOTE: leaving these here as a guide for specs I may need when
-  //       we add focus management and fancy scrolling
-
-  // it('notifies the UI to perform dynamic updates', () => {
-  //   const mockUpdate = jest.fn()
-  //   const wrapper = shallow(
-  //     <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />,
-  //     {disableLifecycleMethods: false}
-  //   ) // so componentDidUpdate gets called on setProps
-  //   wrapper.setProps({isLoading: false})
-  //   expect(mockUpdate).toHaveBeenCalledTimes(1)
-  // })
-
-  // describe('focus handling', () => {
-  //   const dae = document.activeElement
-  //   afterEach(() => {
-  //     if (dae) dae.focus() // else ?
-  //   })
-
-  //   it('calls fallbackFocus when the load prior focus button disappears', () => {
-  //     const focusFallback = jest.fn()
-  //     const wrapper = mount(
-  //       <PlannerApp
-  //         {...getDefaultValues()}
-  //         days={[]}
-  //         allPastItemsLoaded={false}
-  //         focusFallback={focusFallback}
-  //       />
-  //     )
-  //     const button = wrapper.find('ShowOnFocusButton button')
-  //     button.getDOMNode().focus()
-  //     wrapper.setProps({allPastItemsLoaded: true})
-  //     expect(focusFallback).toHaveBeenCalled()
-  //   })
-  // })
+  it('notifies the UI to perform dynamic updates', () => {
+    const mockUpdate = jest.fn()
+    const {rerender} = render(
+      <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />
+    )
+    rerender(
+      <PlannerApp {...getDefaultValues({isLoading: false})} triggerDynamicUiUpdates={mockUpdate} />
+    )
+    expect(mockUpdate).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('mapStateToProps', () => {

@@ -37,7 +37,8 @@ import {
   loadPastButtonClicked,
   loadPastUntilNewActivity,
   togglePlannerItemCompletion,
-  updateTodo
+  updateTodo,
+  scrollToToday
 } from '../../actions'
 import {notifier} from '../../dynamic-ui'
 import {daysToDaysHash} from '../../utilities/daysUtils'
@@ -62,6 +63,7 @@ export class PlannerApp extends Component {
     changeDashboardView: func,
     togglePlannerItemCompletion: func,
     updateTodo: func,
+    scrollToToday: func,
     triggerDynamicUiUpdates: func,
     preTriggerDynamicUiUpdates: func,
     plannerActive: func,
@@ -123,6 +125,9 @@ export class PlannerApp extends Component {
     this.props.triggerDynamicUiUpdates()
     if (this.props.responsiveSize !== prevProps.responsiveSize) {
       this.afterLayoutChange()
+    }
+    if (!this.props.isLoading && prevProps.isLoading) {
+      this.props.scrollToToday({isWeekly: this.props.isWeekly})
     }
   }
 
@@ -402,6 +407,18 @@ export class PlannerApp extends Component {
   //    if we find a string of 3 or more empty days, emit an <EmptyDays> for the interval
   renderDays() {
     const children = []
+    const dayHash = daysToDaysHash(this.props.days)
+    let dayIndex = 1
+
+    if (this.props.isWeekly) {
+      return this.renderPresent(
+        this.props.thisWeek.weekStart.clone(),
+        this.props.thisWeek.weekEnd.clone(),
+        dayHash,
+        dayIndex
+      )
+    }
+
     const today = moment.tz(this.props.timeZone).startOf('day')
     let workingDay = moment.tz(this.props.days[0][0], this.props.timeZone)
     if (workingDay.isAfter(today)) workingDay = today.clone()
@@ -412,34 +429,24 @@ export class PlannerApp extends Component {
     // We don't want to render an empty tomorrow if we don't know it's actually empty.
     // It might just not be loaded yet. If so, sneak it back to today so it isn't displayed.
     if (tomorrow.isAfter(lastDay)) tomorrow = today.clone()
-    const dayHash = daysToDaysHash(this.props.days)
-    let dayIndex = 1
 
-    if (this.props.isWeekly) {
-      children.push(
-        this.renderPresent(
-          this.props.thisWeek.weekStart.clone(),
-          this.props.thisWeek.weekEnd.clone(),
-          dayHash,
-          dayIndex
-        )
-      )
-    } else {
-      const pastChildren = this.renderPast(workingDay, dayBeforeYesterday, dayHash, dayIndex)
-      dayIndex += pastChildren.length
-      children.splice(children.length, 0, ...pastChildren)
+    const pastChildren = this.renderPast(workingDay, dayBeforeYesterday, dayHash, dayIndex)
+    dayIndex += pastChildren.length
+    children.splice(children.length, 0, ...pastChildren)
 
-      const presentChildren = this.renderPresent(workingDay, tomorrow, dayHash, dayIndex)
-      dayIndex += presentChildren.length
-      children.splice(children.length, 0, ...presentChildren)
+    const presentChildren = this.renderPresent(workingDay, tomorrow, dayHash, dayIndex)
+    dayIndex += presentChildren.length
+    children.splice(children.length, 0, ...presentChildren)
 
-      const futureChildren = this.renderFuture(workingDay, lastDay, dayHash, dayIndex)
-      children.splice(children.length, 0, ...futureChildren)
-    }
+    const futureChildren = this.renderFuture(workingDay, lastDay, dayHash, dayIndex)
+    children.splice(children.length, 0, ...futureChildren)
+
     return children
   }
 
-  renderBody(children, classes) {
+  renderBody(children) {
+    if (this.props.isWeekly) return children
+
     const loading =
       this.props.loadingPast ||
       this.props.loadingFuture ||
@@ -447,21 +454,21 @@ export class PlannerApp extends Component {
       this.props.isLoading
     if (children.length === 0 && !loading) {
       return (
-        <div className={classes} data-testid="PlannerApp">
+        <>
           {this.renderLoadPastButton()}
           {this.renderNoAssignments()}
-        </div>
+        </>
       )
     }
 
     return (
-      <div className={classes} ref={el => (this._plannerElem = el)} data-testid="PlannerApp">
+      <>
         {this.renderLoadPastButton()}
         {this.renderLoadingPast()}
         {children}
         <div id="planner-app-fixed-element" ref={this.fixedElementRef} />
         {this.renderLoadMore()}
-      </div>
+      </>
     )
   }
 
@@ -470,10 +477,15 @@ export class PlannerApp extends Component {
     let children = []
     if (this.props.isLoading || this.props.loadingWeek) {
       children = [this.renderLoading()]
-    } else if (this.props.days.length > 0) {
+    } else if (this.props.days.length > 0 || this.props.isWeekly) {
       children = this.renderDays()
     }
-    return this.renderBody(children, clazz)
+    children = this.renderBody(children)
+    return (
+      <div className={clazz} ref={el => (this._plannerElem = el)} data-testid="PlannerApp">
+        {children}
+      </div>
+    )
   }
 }
 
@@ -511,6 +523,7 @@ const mapDispatchToProps = {
   loadPastButtonClicked,
   loadPastUntilNewActivity,
   togglePlannerItemCompletion,
-  updateTodo
+  updateTodo,
+  scrollToToday
 }
 export default notifier(connect(mapStateToProps, mapDispatchToProps)(ResponsivePlannerApp))

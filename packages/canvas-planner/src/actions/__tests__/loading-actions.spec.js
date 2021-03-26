@@ -282,7 +282,7 @@ describe('api actions', () => {
         Actions.getWeeklyPlannerItems(today)(mockDispatch, getBasicState)
 
         expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingItems())
-        expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(weeklyState))
+        expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingInitWeekItems(weeklyState))
         expect(mockDispatch).toHaveBeenCalledWith(
           Actions.startLoadingWeekSaga({
             weekStart: weeklyState.weekStart,
@@ -347,7 +347,7 @@ describe('api actions', () => {
         })
         Actions.loadPastWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(lastWeek))
-        expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek(lastWeekItems))
+        expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek({weekDays: lastWeekItems}))
       })
     })
 
@@ -389,7 +389,31 @@ describe('api actions', () => {
         })
         Actions.loadNextWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(nextWeek))
-        expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek(nextWeekItems))
+        expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek({weekDays: nextWeekItems}))
+      })
+    })
+
+    describe('loadThisWeekItems', () => {
+      it('jump to this week', () => {
+        const thisWeek = {
+          weekStart: weeklyState.weekStart.clone(),
+          weekEnd: weeklyState.weekEnd.clone()
+        }
+        const getStateMock = jest.fn().mockImplementation(() => {
+          const state = getBasicState()
+          state.weeklyDashboard = {
+            weekStart: thisWeek.weekStart,
+            weekEnd: thisWeek.weekEnd,
+            thisWeek: thisWeek.weekStart,
+            weeks: {
+              [thisWeek.weekStart.format()]: thisWeek
+            }
+          }
+          return state
+        })
+        Actions.loadThisWeekItems()(mockDispatch, getStateMock)
+        expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(thisWeek))
+        expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToThisWeek({weekDays: thisWeek}))
       })
     })
 

@@ -16,6 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import formatMessage from '../format-message'
+import {srAlert} from '../utilities/alertUtils'
+
 export function specialFallbackFocusId(type) {
   return `~~~${type}-fallback-focus~~~`
+}
+
+export function handleNothingToday(manager, todayElem) {
+  srAlert(formatMessage('There is nothing planned for today.'))
+
+  // In the weekly planner the missing assignments will be under Today
+  // if there are any.
+  const target =
+    manager.getDocument().getElementById('MissingAssignments') ||
+    manager.getDocument().getElementById('weekly-header-active-button')
+  if (target) {
+    manager.getAnimator().focusElement(target)
+  }
+
+  if (todayElem) {
+    manager.getAnimator().forceScrollTo(todayElem, manager.totalOffset())
+  } else {
+    manager.getAnimator().scrollToTop()
+  }
 }

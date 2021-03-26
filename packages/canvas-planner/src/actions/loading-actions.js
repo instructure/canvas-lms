@@ -42,11 +42,13 @@ export const {
   startLoadingPastUntilTodaySaga,
   peekIntoPastSaga,
   peekedIntoPast,
+  gettingInitWeekItems,
   gettingWeekItems,
   startLoadingWeekSaga,
   weekLoaded,
   allWeekItemsLoaded,
   jumpToWeek,
+  jumpToThisWeek,
   gotWayPastItemDate,
   gotWayFutureItemDate
 } = createActions(
@@ -66,11 +68,13 @@ export const {
   'START_LOADING_PAST_UNTIL_TODAY_SAGA',
   'PEEK_INTO_PAST_SAGA',
   'PEEKED_INTO_PAST',
+  'GETTING_INIT_WEEK_ITEMS',
   'GETTING_WEEK_ITEMS',
   'START_LOADING_WEEK_SAGA',
   'WEEK_LOADED',
   'ALL_WEEK_ITEMS_LOADED',
   'JUMP_TO_WEEK',
+  'JUMP_TO_THIS_WEEK',
   'GOT_WAY_FUTURE_ITEM_DATE',
   'GOT_WAY_PAST_ITEM_DATE'
 )
@@ -191,7 +195,7 @@ export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
     dispatch(startLoadingItems())
     const weeklyState = getState().weeklyDashboard
-    dispatch(gettingWeekItems(weeklyState))
+    dispatch(gettingInitWeekItems(weeklyState))
     dispatch(getWayFutureItem(fromMoment))
     dispatch(getWayPastItem(fromMoment))
     loadWeekItems(dispatch, getState)
@@ -209,7 +213,7 @@ export function loadPastWeekItems() {
     const weekEnd = weekly.weekEnd.clone().add(-7, 'days')
     dispatch(gettingWeekItems({weekStart, weekEnd}))
     if (weekStart.format() in weekly.weeks) {
-      dispatch(jumpToWeek(weekly.weeks[weekStart.format()]))
+      dispatch(jumpToWeek({weekDays: weekly.weeks[weekStart.format()]}))
     } else {
       loadWeekItems(dispatch, getState)
     }
@@ -223,7 +227,7 @@ export function loadNextWeekItems() {
     const weekEnd = weekly.weekEnd.clone().add(7, 'days')
     dispatch(gettingWeekItems({weekStart, weekEnd}))
     if (weekStart.format() in weekly.weeks) {
-      dispatch(jumpToWeek(weekly.weeks[weekStart.format()]))
+      dispatch(jumpToWeek({weekDays: weekly.weeks[weekStart.format()]}))
     } else {
       loadWeekItems(dispatch, getState)
     }
@@ -234,10 +238,10 @@ export function loadThisWeekItems() {
   return (dispatch, getState) => {
     const weekly = getState().weeklyDashboard
     const weekStart = weekly.thisWeek.clone()
-    const weekEnd = weekStart.clone().add(7, 'days')
+    const weekEnd = weekStart.clone().add(6, 'days').endOf('day')
     dispatch(gettingWeekItems({weekStart, weekEnd}))
     if (weekStart.format() in weekly.weeks) {
-      dispatch(jumpToWeek(weekly.weeks[weekStart.format()]))
+      dispatch(jumpToThisWeek({weekDays: weekly.weeks[weekStart.format()]}))
     } else {
       // should never get here since this week is loaded on load
       loadWeekItems(dispatch, getState)
