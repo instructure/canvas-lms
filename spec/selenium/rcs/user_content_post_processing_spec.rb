@@ -48,7 +48,9 @@ describe 'user_content post processing' do
         "<a id='link1' class='instructure_file_link instructure_scribd_file'
           href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file link w/o download</a>
         <a id='link2' class='instructure_file_link instructure_scribd_file'
-          href='#{@file_url}/download?wrap=1&verifier=#{@file.uuid}'>file link with download</a>"
+          href='#{@file_url}/download?wrap=1&verifier=#{@file.uuid}'>file link with download</a>
+        <a id='link3' class='instructure_file_link instructure_scribd_file'
+          href='#{@file_url}/preview?wrap=1&verifier=#{@file.uuid}'>file link with preview</a>"
       )
       get "/courses/#{@course.id}/pages/page"
 
@@ -68,21 +70,27 @@ describe 'user_content post processing' do
       # the file inline preview buttons
       expect(ff('a.file_preview_link')[0]).to be_displayed
       expect(ff('a.file_preview_link')[1]).to be_displayed
+      expect(ff('a.file_preview_link')[2]).to be_displayed
 
       # the file download buttons
       # href includes 1 and only 1 /download
       download_btn = ff('a.file_download_btn')
       expect(download_btn[0]).to be_displayed
       expect(download_btn[1]).to be_displayed
+      expect(download_btn[2]).to be_displayed
       expect(
         download_btn[0].attribute('href')
       ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
       expect(
         download_btn[1].attribute('href')
       ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
+      expect(
+        download_btn[2].attribute('href')
+      ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
 
       expect(download_btn[0]).to have_attribute('download')
       expect(download_btn[1]).to have_attribute('download')
+      expect(download_btn[2]).to have_attribute('download')
     end
 
     it 'omits preview button is requested' do
@@ -132,10 +140,9 @@ describe 'user_content post processing' do
       )
       get "/courses/#{@course.id}/pages/page"
 
-      # look up the link by the data-api-endpoint
+      # look up the link by the data-api-returntype
       # because this is how we determine to hide the download button for internal links
-      data_api_endpoint = "http://#{HostUrl.default_host}/api/v1/courses/#{@course.id}/pages/other-page"
-      expect(fj("a[data-api-endpoint='#{data_api_endpoint}']")).to be_displayed
+      expect(f("a[data-api-returntype='Page']")).to be_displayed
       expect(f('body')).not_to contain_css('a.file_download_btn')
     end
   end

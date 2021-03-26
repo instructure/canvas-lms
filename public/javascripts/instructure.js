@@ -205,7 +205,9 @@ export function enhanceUserContent() {
   $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
     const $link = $(this)
     $('.user_content.unenhanced:visible')
-    if ($link.find('.ui-icon-extlink').length || $link.data('api-endpoint') != null) {
+    const apiReturnType = $link.data('api-returntype')
+    const isFile = apiReturnType == null || apiReturnType === 'File'
+    if ($link.find('.ui-icon-extlink').length || !isFile) {
       // a bug in the new RCE added instructure_file_link class name to external and internal links for a while
       return
     }
@@ -221,7 +223,7 @@ export function enhanceUserContent() {
         qs.delete('wrap')
         qs.append('download_frd', '1')
         const download_url = `${href.origin}${href.pathname.replace(
-          /(?:\/download)?$/,
+          /(?:\/(download|preview))?$/,
           '/download'
         )}?${qs}`
         $download_btn = $(
