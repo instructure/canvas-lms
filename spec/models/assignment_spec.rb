@@ -5934,7 +5934,7 @@ describe Assignment do
       @attachment.content_type = "foo/bar"
       @attachment.size = 10
       @attachment.save!
-
+      
       @submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [@attachment]
     end
 
@@ -5954,6 +5954,20 @@ describe Assignment do
         :display_name => @attachment.display_name
       })
       expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
+    end
+
+    it "should not ignore file when anonymous grading is enabled" do
+      create_and_submit
+      @assignment.update!(anonymous_grading: true)
+
+      filename = ['LATE', 'anon', @submission.anonymous_id, @attachment.id, @attachment.display_name].join("_")
+
+      expect(@assignment.send(:infer_comment_context_from_filename, filename)).to eq({
+        :user => @user,
+        :submission => @submission,
+        :filename => filename,
+        :display_name => @attachment.display_name
+      })
     end
 
     it "should ignore when assignment.id does not belog to the user" do

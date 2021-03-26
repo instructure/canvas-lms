@@ -2970,7 +2970,7 @@ class Assignment < ActiveRecord::Base
   # Infers the user, submission, and attachment from a filename
   def infer_comment_context_from_filename(fullpath)
     filename = File.basename(fullpath)
-    split_filename = filename.split('_')
+    split_filename = filename.split('_') - ['LATE']
     # If the filename is like Richards_David_2_link.html, then there is no
     # useful attachment here.  The assignment was submitted as a URL and the
     # teacher commented directly with the gradebook.  Otherwise, grab that
