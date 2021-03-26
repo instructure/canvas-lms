@@ -64,6 +64,11 @@ export class RetrievingContent extends React.Component {
   }
 
   parentWindow() {
+    // respect windows created using window.open() as well as windows in iframes
+    if (window.opener) {
+      return window.opener
+    }
+
     let parentWindow = window.parent
     while (parentWindow && parentWindow.parent !== window.parent) {
       parentWindow = parentWindow.parent

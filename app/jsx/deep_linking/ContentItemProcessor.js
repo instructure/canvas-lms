@@ -21,6 +21,7 @@ import LinkContentItem from './models/LinkContentItem'
 import ResourceLinkContentItem from './models/ResourceLinkContentItem'
 import ImageContentItem from './models/ImageContentItem'
 import HtmlFragmentContentItem from './models/HtmlFragmentContentItem'
+import {ltiState} from '../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class ContentItemProcessor {
   constructor(contentItems, messages, logs, ltiEndpoint, processHandler) {
@@ -69,6 +70,10 @@ export default class ContentItemProcessor {
   }
 
   process() {
+    // close any new tabs/popups that were created by a full window launch
+    if (ltiState?.fullWindowProxy) {
+      ltiState.fullWindowProxy.close()
+    }
     return this.processHandler(...arguments)
   }
 

@@ -20,26 +20,90 @@ import handler from '../requestFullWindowLaunch'
 
 describe('requestFullWindowLaunch', () => {
   const {assign} = window.location
+  const open = window.open
 
   beforeEach(() => {
+    delete window.open
     delete window.location
     window.location = {assign: jest.fn(), origin: 'http://localhost'}
+    window.open = jest.fn()
+    ENV.context_asset_string = 'account_1'
   })
 
   afterEach(() => {
     window.location.assign = assign
+    window.open = open
   })
 
-  it('opens new window on requestFullWindowLaunch', () => {
-    ENV.context_asset_string = 'account_1'
-    handler('http://localhost/test')
-    expect(window.location.assign).toHaveBeenCalled()
+  describe('with string provided', () => {
+    it('uses launch type same_window', () => {
+      handler('http://localhost/test')
+      expect(window.location.assign).toHaveBeenCalled()
+    })
+
+    it('pulls out client_id if provided', () => {
+      handler('http://localhost/test?client_id=hello')
+      const launch_url = new URL(window.location.assign.mock.calls[0][0])
+      expect(launch_url.searchParams.get('client_id')).toEqual('hello')
+    })
   })
 
-  it('pulls out client_id if provided', () => {
-    ENV.context_asset_string = 'account_1'
-    handler('http://localhost/test?client_id=hello')
-    const launch_url = new URL(window.location.assign.mock.calls[0][0])
-    expect(launch_url.searchParams.get('client_id')).toEqual('hello')
+  describe('with object provided', () => {
+    it('must contain a `url` property', () => {
+      expect(() => handler({foo: 'bar'})).toThrow('message must contain a `url` property')
+    })
+
+    it('uses launch type same_window by default', () => {
+      handler({url: 'http://localhost/test'})
+      expect(window.location.assign).toHaveBeenCalled()
+    })
+
+    it('opens launch type new_window in a new tab', () => {
+      handler({url: 'http://localhost/test', launchType: 'new_window'})
+      expect(window.open).toHaveBeenCalled()
+    })
+
+    it('opens launch type popup in a popup window', () => {
+      handler({url: 'http://localhost/test', launchType: 'popup'})
+      expect(window.open).toHaveBeenCalledWith(
+        expect.any(String),
+        'popupLaunch',
+        expect.stringMatching(/toolbar/)
+      )
+    })
+
+    it('errors on unknown launch type', () => {
+      expect(() => handler({url: 'http://localhost/test', launchType: 'fake'})).toThrow(
+        "unknown launchType, must be 'popup', 'new_window', 'same_window'"
+      )
+    })
+
+    it('uses placement to add to launch url', () => {
+      handler({url: 'http://localhost/test', placement: 'course_navigation'})
+      expect(window.location.assign).toHaveBeenCalledWith(
+        expect.stringContaining('&placement=course_navigation')
+      )
+    })
+
+    it('uses launchOptions to add width and height to popup', () => {
+      handler({
+        url: 'http://localhost/test',
+        launchType: 'popup',
+        launchOptions: {width: 420, height: 400}
+      })
+      expect(window.open).toHaveBeenCalledWith(
+        expect.any(String),
+        'popupLaunch',
+        expect.stringContaining('width=420,height=400')
+      )
+    })
+  })
+
+  describe('with anything other than a string or object provided', () => {
+    it('errors', () => {
+      expect(() => handler(['foo', 'bar'])).toThrow(
+        'message contents must either be a string or an object'
+      )
+    })
   })
 })

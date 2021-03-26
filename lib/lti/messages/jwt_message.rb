@@ -71,6 +71,7 @@ module Lti::Messages
       add_custom_params_claims! if include_claims?(:custom_params)
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
       add_lti11_legacy_user_id!
+      add_extension("placement", @opts[:resource_type])
 
       @expander.expand_variables!(@message.extensions)
       @message.validate! if validate_launch

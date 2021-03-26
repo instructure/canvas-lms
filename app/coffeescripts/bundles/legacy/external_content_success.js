@@ -28,7 +28,7 @@ const {lti_response_messages} = ENV
 const {service_id} = ENV
 const data = ENV.retrieved_data
 const callback = ENV.service
-let parentWindow = window.parent
+let parentWindow = window.parent || window.opener
 
 ExternalContentSuccess.getIFrameSrc = function() {
   let src = parentWindow
