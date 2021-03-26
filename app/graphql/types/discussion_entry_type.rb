@@ -66,5 +66,10 @@ module Types
     def discussion_topic
       load_association(:discussion_topic)
     end
+
+    field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true
+    def discussion_subentries_connection
+      load_association(:discussion_subentries)
+    end
   end
 end

@@ -42,3 +42,25 @@ export const DISCUSSION_QUERY = gql`
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
 `
+
+export const DISCUSSION_SUBENTRIES_QUERY = gql`
+  query GetDiscussionSubentriesQuery($discussionEntryID: ID!, $page: String, $perPage: Int) {
+    legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
+      ... on DiscussionEntry {
+        ...DiscussionEntry
+        discussionSubentriesConnection(after: $page, first: $perPage) {
+          nodes {
+            ...DiscussionEntry
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
+            hasPreviousPage
+            startCursor
+          }
+        }
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+`

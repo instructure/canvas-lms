@@ -41,6 +41,14 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve("discussionTopic { _id }")).to eq discussion_entry.discussion_topic.id.to_s
   end
 
+  it 'allows querying for discussion subentries' do
+    de = discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: discussion_entry.id)
+
+    result = discussion_entry_type.resolve('discussionSubentriesConnection { nodes { message } }')
+    expect(result.count).to be 1
+    expect(result[0]).to eq de.message
+  end
+
   it 'returns a null message when entry is marked as deleted' do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil
