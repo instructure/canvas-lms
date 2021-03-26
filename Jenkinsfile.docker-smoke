@@ -58,10 +58,25 @@ EOF
             }
 
             stage('Copy Canvas Config') {
-              sh 'cp -vr docker-compose/config/*.yml config/'
-              sh 'cp -vr config/docker-compose.override.yml.example docker-compose.override.yml'
-              sh 'echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.jenkins.yml" > .env'
+              sh '''#!/bin/bash
+                cp -vr docker-compose/config/*.yml config/
+                cp -vr config/docker-compose.override.yml.example docker-compose.override.yml
+                sed -i "/- .:\\/usr\\/src\\/app/d" ./docker-compose.override.yml
+                sed -i "s/instructure\\/ruby-passenger/local\\/ruby-passenger/g" ./Dockerfile
+                echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.local.jenkins.yml" > .env
+              '''
             }
+
+             stage('Copy App Directory') {
+               sh """#!/bin/bash
+                 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.getString('ruby')})"
+                 docker cp ./ "\$CONTAINER:/usr/src/app/"
+                 docker start \$CONTAINER
+                 docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
+                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.getString('ruby')}"
+               """
+             }
 
             stage('Build Canvas') {
               sh '''#!/bin/bash
