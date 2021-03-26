@@ -28,3 +28,16 @@
 #assignments_2 {
     max-width: 1000px;
 }
+
+#assignments-student-footer {
+  position: fixed;
+  bottom: 0;
+  #{direction(right)}: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: .75rem;
+  border-top: 1px solid gray;
+  text-align: #{direction(right)};
+  z-index: 999;
+  background: blue;
+}

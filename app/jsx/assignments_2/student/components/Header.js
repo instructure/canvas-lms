@@ -20,7 +20,6 @@ import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptSelect from './AttemptSelect'
 import AssignmentDetails from './AssignmentDetails'
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import GradeDisplay from './GradeDisplay'
 import {Heading} from '@instructure/ui-heading'
@@ -29,7 +28,6 @@ import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import {number, arrayOf, func} from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import StepContainer from './StepContainer'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
@@ -95,7 +93,7 @@ class Header extends React.Component {
   renderLatestGrade = () => (
     <StudentViewContext.Consumer>
       {context => {
-        const submission = context.latestSubmission || {grade: null, gradingStatus: null}
+        const submission = context.lastSubmittedSubmission || {grade: null, gradingStatus: null}
         return (
           <GradeDisplay
             gradingStatus={submission.gradingStatus}
@@ -104,38 +102,6 @@ class Header extends React.Component {
             pointsPossible={this.props.assignment.pointsPossible}
           />
         )
-      }}
-    </StudentViewContext.Consumer>
-  )
-
-  shouldRenderNewAttempt(context) {
-    const {assignment, submission} = this.props
-    return (
-      !assignment.lockInfo.isLocked &&
-      (submission.state === 'graded' || submission.state === 'submitted') &&
-      submission.gradingStatus !== 'excused' &&
-      context.isLatestAttempt &&
-      context.allowChangesToSubmission &&
-      (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
-    )
-  }
-
-  renderNewAttemptButton = () => (
-    <StudentViewContext.Consumer>
-      {context => {
-        if (this.shouldRenderNewAttempt(context)) {
-          return (
-            <Button
-              data-testid="new-attempt-button"
-              color="primary"
-              margin="small xxx-small"
-              onClick={context.startNewAttemptAction}
-            >
-              {I18n.t('New Attempt')}
-            </Button>
-          )
-        }
-        return null
       }}
     </StudentViewContext.Consumer>
   )
@@ -196,9 +162,6 @@ class Header extends React.Component {
                       <SubmissionStatusPill
                         submissionStatus={this.props.submission.submissionStatus}
                       />
-                    </Flex.Item>
-                    <Flex.Item grow>
-                      {!this.state.isSticky && this.renderNewAttemptButton()}
                     </Flex.Item>
                   </Flex>
                 </Flex.Item>

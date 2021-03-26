@@ -27,7 +27,6 @@ import {
   SET_MODULE_ITEM_COMPLETION
 } from '../graphqlData/Mutations'
 import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
-import {Flex} from '@instructure/ui-flex'
 import {IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
@@ -36,6 +35,7 @@ import {Mutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import SimilarityPledge from './SimilarityPledge'
+import StudentFooter from './StudentFooter'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
@@ -223,6 +223,7 @@ export default class SubmissionManager extends Component {
       !this.state.uploadingFiles &&
       !this.state.editingDraft &&
       context.isLatestAttempt &&
+      context.allowChangesToSubmission &&
       !this.props.assignment.lockInfo.isLocked
     )
   }
@@ -270,17 +271,19 @@ export default class SubmissionManager extends Component {
         update={this.updateSubmissionDraftCache}
       >
         {createSubmissionDraft => (
-          <AttemptTab
-            activeSubmissionType={this.state.activeSubmissionType}
-            assignment={this.props.assignment}
-            createSubmissionDraft={createSubmissionDraft}
-            editingDraft={this.state.editingDraft}
-            submission={this.props.submission}
-            updateActiveSubmissionType={this.updateActiveSubmissionType}
-            updateEditingDraft={this.updateEditingDraft}
-            updateUploadingFiles={this.updateUploadingFiles}
-            uploadingFiles={this.state.uploadingFiles}
-          />
+          <View as="div" margin="auto auto large">
+            <AttemptTab
+              activeSubmissionType={this.state.activeSubmissionType}
+              assignment={this.props.assignment}
+              createSubmissionDraft={createSubmissionDraft}
+              editingDraft={this.state.editingDraft}
+              submission={this.props.submission}
+              updateActiveSubmissionType={this.updateActiveSubmissionType}
+              updateEditingDraft={this.updateEditingDraft}
+              updateUploadingFiles={this.updateUploadingFiles}
+              uploadingFiles={this.state.uploadingFiles}
+            />
+          </View>
         )}
       </Mutation>
     )
@@ -318,7 +321,6 @@ export default class SubmissionManager extends Component {
             </Button>
             <Button
               data-testid="confirm-submit"
-              margin="x-small 0 0 0"
               onClick={() => this.handleSubmitConfirmation(submitMutation)}
               variant="primary"
             >
@@ -330,8 +332,11 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  renderSimilarityPledge() {
+  renderSimilarityPledge(context) {
     const {SIMILARITY_PLEDGE: pledgeSettings} = window.ENV
+    if (pledgeSettings == null || !this.shouldRenderSubmit(context)) {
+      return null
+    }
 
     return (
       <SimilarityPledge
@@ -348,25 +353,52 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  renderActions(context) {
-    const shouldRenderMarkAsDone = window.ENV.CONTEXT_MODULE_ITEM != null
-    const shouldRenderSubmit = this.shouldRenderSubmit(context)
-    const showSimilarityPledge = shouldRenderSubmit && window.ENV.SIMILARITY_PLEDGE != null
+  footerButtons() {
+    return [
+      {
+        key: 'new-attempt',
+        shouldRender: context => {
+          const {assignment, submission} = this.props
 
-    if (shouldRenderMarkAsDone || shouldRenderSubmit) {
-      return (
-        <View>
-          {showSimilarityPledge && this.renderSimilarityPledge()}
+          return (
+            context.allowChangesToSubmission &&
+            !assignment.lockInfo.isLocked &&
+            (submission.state === 'graded' || submission.state === 'submitted') &&
+            submission.gradingStatus !== 'excused' &&
+            context.latestSubmission.state !== 'unsubmitted' &&
+            (assignment.allowedAttempts == null || submission.attempt < assignment.allowedAttempts)
+          )
+        },
+        render: context => {
+          return (
+            <Button color="primary" onClick={context.startNewAttemptAction}>
+              {I18n.t('Try Again')}
+            </Button>
+          )
+        }
+      },
+      {
+        key: 'mark-as-done',
+        shouldRender: _context => window.ENV.CONTEXT_MODULE_ITEM != null,
+        render: _context => this.renderMarkAsDoneButton()
+      },
+      {
+        key: 'submit',
+        shouldRender: context => this.shouldRenderSubmit(context),
+        render: _context => this.renderSubmitButton()
+      }
+    ]
+  }
 
-          <Flex as="div" direction="row-reverse" margin="small" padding="small">
-            {shouldRenderSubmit && (
-              <Flex.Item margin="0 0 0 small">{this.renderSubmitButton()}</Flex.Item>
-            )}
-            {shouldRenderMarkAsDone && <Flex.Item>{this.renderMarkAsDoneButton()}</Flex.Item>}
-          </Flex>
-        </View>
-      )
-    }
+  renderFooter(context) {
+    const buttons = this.footerButtons()
+      .filter(button => button.shouldRender(context))
+      .map(button => ({
+        element: button.render(context),
+        key: button.key
+      }))
+
+    return buttons.length > 0 ? <StudentFooter buttons={buttons} /> : null
   }
 
   renderSubmitButton() {
@@ -395,11 +427,11 @@ export default class SubmissionManager extends Component {
               id="submit-button"
               data-testid="submit-button"
               disabled={this.state.submittingAssignment || mustAgreeToPledge}
-              variant="primary"
-              margin="xx-small 0"
+              color="primary"
+              margin="auto auto auto small"
               onClick={() => this.handleSubmitButton(submitMutation)}
             >
-              {I18n.t('Submit')}
+              {I18n.t('Submit Assignment')}
             </Button>
             {this.state.openSubmitModal && this.renderSubmitConfirmation(submitMutation)}
           </>
@@ -442,7 +474,12 @@ export default class SubmissionManager extends Component {
       <>
         {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
         <StudentViewContext.Consumer>
-          {context => context.allowChangesToSubmission && this.renderActions(context)}
+          {context => (
+            <>
+              {this.renderSimilarityPledge(context)}
+              {this.renderFooter(context)}
+            </>
+          )}
         </StudentViewContext.Consumer>
         {this.state.showConfetti ? <Confetti /> : null}
       </>

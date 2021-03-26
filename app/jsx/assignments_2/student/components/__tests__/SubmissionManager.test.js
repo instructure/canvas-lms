@@ -47,7 +47,7 @@ describe('SubmissionManager', () => {
       </MockedProvider>
     )
 
-    expect(queryByText('Submit')).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   it('renders a submit button when the draft criteria is met for the active type', async () => {
@@ -60,7 +60,7 @@ describe('SubmissionManager', () => {
       </MockedProvider>
     )
 
-    expect(getByText('Submit')).toBeInTheDocument()
+    expect(getByText('Submit Assignment')).toBeInTheDocument()
   })
 
   it('does not render the submit button if the draft criteria is not met for the active type', async () => {
@@ -78,7 +78,7 @@ describe('SubmissionManager', () => {
       </MockedProvider>
     )
 
-    expect(queryByText('Submit')).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   it('does not render the submit button if we are not on the latest submission', async () => {
@@ -93,7 +93,7 @@ describe('SubmissionManager', () => {
       </StudentViewContext.Provider>
     )
 
-    expect(queryByText('Submit')).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   it('does not render the submit button if the assignment is locked', async () => {
@@ -107,7 +107,7 @@ describe('SubmissionManager', () => {
       </MockedProvider>
     )
 
-    expect(queryByText('Submit')).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   it('does not render the submit button if the submission cannot be modified', async () => {
@@ -123,7 +123,7 @@ describe('SubmissionManager', () => {
       </StudentViewContext.Provider>
     )
 
-    expect(queryByText('Submit')).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
@@ -182,9 +182,13 @@ describe('SubmissionManager', () => {
           </AlertManagerContext.Provider>
         )
 
-        const submitButton = getByRole('button', {name: 'Submit'})
-        fireEvent.click(submitButton)
-        await waitFor(() => expect(getByRole('button', {name: 'Submit'})).not.toBeDisabled())
+        act(() => {
+          const submitButton = getByRole('button', {name: 'Submit Assignment'})
+          fireEvent.click(submitButton)
+        })
+        await waitFor(() =>
+          expect(getByRole('button', {name: 'Submit Assignment'})).not.toBeDisabled()
+        )
         if (inDocument) {
           expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
         } else {
@@ -246,9 +250,9 @@ describe('SubmissionManager', () => {
       </AlertManagerContext.Provider>
     )
 
-    const submitButton = getByText('Submit')
+    const submitButton = getByText('Submit Assignment')
     fireEvent.click(submitButton)
-    expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
+    expect(getByText('Submit Assignment').closest('button')).toHaveAttribute('disabled')
   })
 
   describe('with multiple submission types drafted', () => {
@@ -274,7 +278,7 @@ describe('SubmissionManager', () => {
         </MockedProvider>
       )
 
-      const submitButton = getByText('Submit')
+      const submitButton = getByText('Submit Assignment')
       fireEvent.click(submitButton)
 
       expect(getByTestId('submission-confirmation-modal')).toBeInTheDocument()
@@ -436,6 +440,116 @@ describe('SubmissionManager', () => {
     })
   })
 
+  describe('"Try Again" button', () => {
+    describe('if submitted and there are more attempts', () => {
+      it('is rendered if changes can be made to the submission', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {...SubmissionMocks.submitted}
+        })
+
+        const {getByRole} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        expect(getByRole('button', {name: 'Try Again'})).toBeInTheDocument()
+      })
+
+      it('is not rendered if changes cannot be made to the submission', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Submission: {...SubmissionMocks.submitted}
+        })
+        const {queryByRole} = render(
+          <StudentViewContext.Provider
+            value={{allowChangesToSubmission: false, latestSubmission: {}}}
+          >
+            <SubmissionManager {...props} />
+          </StudentViewContext.Provider>
+        )
+        expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
+      })
+    })
+
+    it('is not rendered if nothing has been submitted', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered if excused', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.excused}
+      })
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered if the assignment is locked', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {lockInfo: {isLocked: true}},
+        Submission: {...SubmissionMocks.submitted}
+      })
+      const {queryByRole} = render(<SubmissionManager {...props} />)
+      expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered if there are no more attempts', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: 1},
+        Submission: {...SubmissionMocks.submitted}
+      })
+      const {queryByRole} = render(<SubmissionManager {...props} />)
+      expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('footer', () => {
+    it('is rendered if at least one button can be shown', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          submissionTypes: ['online_text_entry']
+        },
+        Submission: {...SubmissionMocks.submitted}
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      expect(getByTestId('student-footer')).toBeInTheDocument()
+    })
+
+    it('is not rendered if no buttons can be shown', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted}
+      })
+
+      const {queryByTestId} = render(
+        <StudentViewContext.Provider
+          value={{allowChangesToSubmission: false, latestSubmission: {}}}
+        >
+          <SubmissionManager {...props} />
+        </StudentViewContext.Provider>
+      )
+
+      expect(queryByTestId('student-footer')).not.toBeInTheDocument()
+    })
+  })
+
   describe('similarity pledge', () => {
     let props
 
@@ -497,7 +611,7 @@ describe('SubmissionManager', () => {
         </MockedProvider>
       )
 
-      const submitButton = getByRole('button', {name: 'Submit'})
+      const submitButton = getByRole('button', {name: 'Submit Assignment'})
       expect(submitButton).toBeDisabled()
     })
 
@@ -513,7 +627,7 @@ describe('SubmissionManager', () => {
         fireEvent.click(agreementCheckbox)
       })
 
-      const submitButton = getByRole('button', {name: 'Submit'})
+      const submitButton = getByRole('button', {name: 'Submit Assignment'})
       expect(submitButton).not.toBeDisabled()
     })
   })

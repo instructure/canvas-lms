@@ -191,14 +191,10 @@ class ViewManager extends React.Component {
         const opts = {state, props}
         const submission = this.getDisplayedSubmission(opts)
 
-        // Can only create a new dummy submission if we are on the newest submission
-        // and a dummy doesn't already exist, either because this was already called
-        // or because it was created for a submission draft.
-        if (
-          state.dummyNextSubmission ||
-          submission !== this.getLatestSubmission(opts) ||
-          submission.submissionDraft
-        ) {
+        // Can only create a new dummy submission if a dummy doesn't already
+        // exist, either because this was already called or because it was
+        // created for a submission draft.
+        if (state.dummyNextSubmission || submission.submissionDraft) {
           return null
         }
 
@@ -209,7 +205,7 @@ class ViewManager extends React.Component {
         // Once the user does make a frd submission draft, the dummy submission in
         // the state will be set back to null, and a new dummy submission will be
         // created from that submission draft instead. See getDerivedStateFromProps.
-        const dummyNextSubmission = makeDummyNextSubmission(submission)
+        const dummyNextSubmission = makeDummyNextSubmission(this.getLatestSubmission(opts))
         return {
           dummyNextSubmission,
           displayedAttempt: dummyNextSubmission.attempt
@@ -231,8 +227,9 @@ class ViewManager extends React.Component {
       <StudentViewContext.Provider
         value={{
           allowChangesToSubmission: ENV.enrollment_state === 'active',
-          latestSubmission: getInitialSubmission(this.props.initialQueryData),
           isLatestAttempt: !this.hasNextSubmission(),
+          lastSubmittedSubmission: getInitialSubmission(this.props.initialQueryData),
+          latestSubmission: this.getLatestSubmission(),
           startNewAttemptAction: this.onStartNewAttempt
         }}
       >

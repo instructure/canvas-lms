@@ -60,7 +60,7 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async 
 })
 
 it('will render the latest grade instead of the displayed submissions grade', async () => {
-  const latestSubmission = await mockSubmission({
+  const lastSubmittedSubmission = await mockSubmission({
     Submission: {
       ...SubmissionMocks.graded,
       grade: '147',
@@ -78,7 +78,7 @@ it('will render the latest grade instead of the displayed submissions grade', as
   })
 
   const {queryByText, queryAllByText} = render(
-    <StudentViewContext.Provider value={{latestSubmission}}>
+    <StudentViewContext.Provider value={{lastSubmittedSubmission}}>
       <Header {...props} />
     </StudentViewContext.Provider>
   )
@@ -87,8 +87,8 @@ it('will render the latest grade instead of the displayed submissions grade', as
   expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })
 
-it('will not render the grade if the latest submission is excused', async () => {
-  const latestSubmission = await mockSubmission({
+it('will not render the grade if the last submitted submission is excused', async () => {
+  const lastSubmittedSubmission = await mockSubmission({
     Submission: {
       ...SubmissionMocks.excused,
       grade: '147',
@@ -106,7 +106,7 @@ it('will not render the grade if the latest submission is excused', async () => 
   })
 
   const {getByTestId} = render(
-    <StudentViewContext.Provider value={{latestSubmission}}>
+    <StudentViewContext.Provider value={{lastSubmittedSubmission}}>
       <Header {...props} />
     </StudentViewContext.Provider>
   )
@@ -150,28 +150,6 @@ describe('submission workflow tracker', () => {
   })
 })
 
-describe('if submitted and there are more attempts', () => {
-  it('will render a New Attempt button if changes can be made to the submission', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {...SubmissionMocks.submitted}
-    })
-    const {queryByTestId} = render(<Header {...props} />)
-    expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
-  })
-
-  it('will not render a New Attempt button if changes cannot be made to the submission', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {...SubmissionMocks.submitted}
-    })
-    const {queryByTestId} = render(
-      <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
-        <Header {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
-  })
-})
-
 it('renders the attempt select', async () => {
   const props = await mockAssignmentAndSubmission({
     Submission: {...SubmissionMocks.submitted}
@@ -194,36 +172,4 @@ it('does not render the attempt select if allSubmissions is not provided', async
   })
   const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
-})
-
-it('will not render a New Attempt button if not submitted', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
-})
-
-it('will not render a New Attempt button if excused', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Submission: {...SubmissionMocks.excused}
-  })
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
-})
-
-it('will not render a New Attempt button if the assignment is locked', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Assignment: {lockInfo: {isLocked: true}},
-    Submission: {...SubmissionMocks.submitted}
-  })
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
-})
-
-it('will not render a New Attempt button if there are no more attempts', async () => {
-  const props = await mockAssignmentAndSubmission({
-    Assignment: {allowedAttempts: 1},
-    Submission: {...SubmissionMocks.submitted}
-  })
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
 })

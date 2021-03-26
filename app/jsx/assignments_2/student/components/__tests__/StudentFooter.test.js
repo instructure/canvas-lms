@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,16 +17,18 @@
  */
 
 import React from 'react'
+import {render} from '@testing-library/react'
+import StudentFooter from '../StudentFooter'
 
-export const StudentViewContextDefaults = {
-  allowChangesToSubmission: true,
-  allowNewAttempt: true,
-  isLatestAttempt: true,
-  startNewAttemptAction: () => {},
-  latestSubmission: {},
-  lastSubmittedSubmission: {}
-}
+it('renders passed-in elements in order', async () => {
+  const buttons = [
+    {key: 'item1', element: <div data-testid="child-item">item 1</div>},
+    {key: 'item2', element: <div data-testid="child-item">item 2</div>}
+  ]
 
-const StudentViewContext = React.createContext(StudentViewContextDefaults)
-
-export default StudentViewContext
+  const {getAllByTestId} = render(<StudentFooter buttons={buttons} />)
+  expect(getAllByTestId('child-item').map(element => element.innerHTML)).toEqual([
+    'item 1',
+    'item 2'
+  ])
+})
