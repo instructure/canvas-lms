@@ -65,7 +65,7 @@ describe "blueprint courses quizzes" do
         expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
         run_master_course_migration(@master)
         get "/courses/#{@minion.id}/quizzes/#{@copy_quiz.id}/edit"
-        expect(f('#quiz_options_form')).to contain_css('.mce-tinymce.mce-container.mce-panel')
+        expect(f('#quiz_options_form')).to contain_css('.tox.tox-tinymce')
         expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
         expect(f("#due_at")).to have_attribute('readonly', 'true')
         expect(f("#unlock_at")).to have_attribute('readonly', 'true')

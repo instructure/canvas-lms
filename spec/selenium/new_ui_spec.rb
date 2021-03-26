@@ -19,10 +19,12 @@
 
 require_relative 'common'
 require_relative 'helpers/files_common'
+require_relative 'rcs/pages/rce_next_page'
 
 describe 'new ui' do
   include_context "in-process server selenium tests"
   include FilesCommon
+  include RCENextPage
 
   context 'as teacher' do
 
@@ -144,7 +146,7 @@ describe 'new ui' do
     it 'should not break equation editor css', priority: "2", test_id: 273600 do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_tiny(f('#assignment_description'))
-      f('div#mceu_20.mce-widget.mce-btn').click
+      select_math_equation_from_toolbar
       wait_for_ajaximations
       expect(f('.mathquill-toolbar-panes, .mathquill-tab-bar')).to be_displayed
     end

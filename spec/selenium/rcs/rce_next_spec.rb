@@ -676,13 +676,11 @@ describe 'RCE next tests', ignore_js_errors: true do
         click_images_toolbar_menu_button
         click_course_images
         wait_for_ajaximations
-
         expect(image_links.count).to eq(2)
 
         enter_search_data('ico')
 
         expect(image_links.count).to eq(1)
-
         click_image_link(title2)
 
         in_frame tiny_rce_ifr_id do

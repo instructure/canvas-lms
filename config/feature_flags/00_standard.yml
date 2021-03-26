@@ -368,6 +368,8 @@ rce_enhancements:
       state: hidden
     development:
       state: on
+    ci:
+      state: on
 new_features_ui:
   state: hidden
   applies_to: SiteAdmin

@@ -111,9 +111,17 @@ class StudentAssignmentPageV2
       f('.mce-container iframe')['id']
     end
 
+    def tiny_rce_ifr_id
+      f('.tox-editor-container iframe')['id']
+    end
+
+    def wiki_body
+      f('#tinymce')
+    end
+
     def text_draft_contents
-      in_frame mce_iframe_id do
-        f('.mce-content-body').text
+      in_frame tiny_rce_ifr_id do
+        wiki_body.text
       end
     end
 
@@ -137,7 +145,7 @@ class StudentAssignmentPageV2
     def create_text_entry_draft(text)
       start_text_entry_button.click
       wait_for_tiny(text_entry_area)
-      text_entry_area.send_keys(text)
+      type_in_tiny('textarea', text)
       save_text_entry_button.click
     end
 
