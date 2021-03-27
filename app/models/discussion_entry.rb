@@ -39,6 +39,7 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
+  belongs_to :root_account, class_name: 'Account'
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
