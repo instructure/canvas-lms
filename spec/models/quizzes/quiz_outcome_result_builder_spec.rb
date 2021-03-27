@@ -166,6 +166,53 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
   end
 
+  describe "quiz level learning outcome results from out of order submission" do
+    def submission
+      sub = @quiz.generate_submission(@user)
+      sub.submission_data = {}
+      sub
+    end
+
+    def answer_and_grade(sub, correct = false)
+      answer_a_question(@q1, sub)
+      answer_a_question(@q2, sub, correct: correct)
+      Quizzes::SubmissionGrader.new(sub).grade_submission
+    end
+
+    before :once do
+      build_course_quiz_questions_and_a_bank
+      @quiz.generate_quiz_data(:persist => true)
+      @sub1 = submission
+      @sub2 = submission
+      # 2nd attempt: both questions answered correctly
+      answer_and_grade(@sub2, true)
+      # align a second outcome in-between attempts
+      @outcome2 = @course.created_learning_outcomes.create!(:short_description => 'another outcome')
+      @bank = @q1.assessment_question.assessment_question_bank
+      @outcome2.align(@bank, @bank.context, :mastery_score => 0.7)
+      # 1st attempt: only one question answered correctly
+      answer_and_grade(@sub1)
+      @quiz_results = @outcome.reload.learning_outcome_results.active.where(user_id: @user).to_a
+      @quiz_results2 = @outcome2.reload.learning_outcome_results.active.where(user_id: @user).to_a
+    end
+
+    it 'first attempt should not override results from second attempt' do
+      expect(@quiz_results.size).to eq 1
+      expect(@quiz_results.first.attempt).to eq 2
+      # full score since all questions answered correctly on second attempt
+      expect(@quiz_results.first.score).to eq 2.0
+      expect(@quiz_results.first.possible).to eq 2.0
+    end
+
+    it 'first attempt should generate a valid result' do
+      expect(@quiz_results2.size).to eq 1
+      expect(@quiz_results2.first.attempt).to eq 1
+      # partial score since the first and only attempt answered only one question correctly
+      expect(@quiz_results2.first.score).to eq 1.0
+      expect(@quiz_results2.first.possible).to eq 2.0
+    end
+  end
+
   describe "question level learning outcomes" do
     it "should create learning outcome results when aligned to assessment questions" do
       build_course_quiz_questions_and_a_bank
