@@ -74,6 +74,7 @@
     name="question_<%= question[:id] %>[]"
     value="<%= attachment_id_for(question) %>"/>
   <% end %>
+  <input type="hidden" id="fileupload_in_progress" value="false"/>
 <% end %>
 
 </div>
