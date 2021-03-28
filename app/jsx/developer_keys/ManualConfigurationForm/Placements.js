@@ -19,8 +19,7 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {Select} from '@instructure/ui-forms'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
+import CanvasMultiSelect from 'jsx/shared/components/CanvasMultiSelect'
 import {capitalizeFirstLetter} from '@instructure/ui-utils'
 import difference from 'lodash/difference'
 import filter from 'lodash/filter'
@@ -53,9 +52,8 @@ export default class Placements extends React.Component {
       .join(' ')
   }
 
-  handlePlacementSelect = (_, opts) => {
+  handlePlacementSelect = selected => {
     const {placements} = this.state
-    const selected = opts.map(o => o.id)
     const removed = difference(this.placements(placements), selected)
     const added = difference(selected, this.placements(placements))
     removed.forEach(p => delete this.placementRefs[`${p}Ref`])
@@ -89,26 +87,22 @@ export default class Placements extends React.Component {
 
     return (
       <>
-        <Select
+        <CanvasMultiSelect
           label={I18n.t('Placements')}
-          editable
-          formatSelectedOption={tag => (
-            <AccessibleContent alt={I18n.t('Remove %{placement}', {placement: tag.label})}>
-              {tag.label}
-            </AccessibleContent>
+          assistiveText={I18n.t(
+            'Select Placements. Type or use arrow keys to navigate. Multiple selections are allowed.'
           )}
-          multiple
-          selectedOption={this.placements(placements)}
+          selectedOptionIds={this.placements(placements)}
           onChange={this.handlePlacementSelect}
         >
           {validPlacements.map(p => {
             return (
-              <option value={p} key={p}>
+              <CanvasMultiSelect.Option id={p} value={p} key={p}>
                 {this.placementDisplayName(p)}
-              </option>
+              </CanvasMultiSelect.Option>
             )
           })}
-        </Select>
+        </CanvasMultiSelect>
         {placements.map(p => (
           <Placement
             ref={this.setPlacementRef(p.placement)}
