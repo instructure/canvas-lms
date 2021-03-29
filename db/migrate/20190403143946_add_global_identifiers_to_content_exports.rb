@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddGlobalIdentifiersToContentExports < ActiveRecord::Migration[5.1]
   tag :predeploy
   disable_ddl_transaction!

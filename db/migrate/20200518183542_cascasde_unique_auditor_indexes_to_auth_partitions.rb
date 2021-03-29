@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CascasdeUniqueAuditorIndexesToAuthPartitions < CanvasPartman::Migration
   disable_ddl_transaction!
   tag :postdeploy

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddUniqueIndexToRoleOverrides < ActiveRecord::Migration[5.1]
   tag :postdeploy
   disable_ddl_transaction!

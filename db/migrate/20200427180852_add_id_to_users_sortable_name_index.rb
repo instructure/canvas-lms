@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIdToUsersSortableNameIndex < ActiveRecord::Migration[5.2]
   tag :postdeploy
   disable_ddl_transaction!
@@ -13,7 +15,7 @@ class AddIdToUsersSortableNameIndex < ActiveRecord::Migration[5.2]
       else
         "CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea)"
       end
-    columns << ", id" if dir == :up
+    columns += ", id" if dir == :up
     execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (#{columns})")
     remove_index :users, name: :index_users_on_sortable_name_old, if_exists: true
   end
