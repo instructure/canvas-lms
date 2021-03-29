@@ -451,4 +451,30 @@ module ActiveRecord
 
     end
   end
+
+  describe 'with_statement_timeout' do
+    it 'stops long-running queries' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout(1_000) do
+          ActiveRecord::Base.connection.execute("SELECT pg_sleep(3)")
+        end
+      }.to raise_error(ActiveRecord::QueryTimeout)
+    end
+
+    it 'only accepts an integer timeout' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout("1_000") do
+          ActiveRecord::Base.connection.execute("SELECT pg_sleep(3)")
+        end
+      }.to raise_error(ArgumentError)
+    end
+
+    it 're-raises other errors' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout(1_000) do
+          ActiveRecord::Base.connection.execute("bad sql")
+        end
+      }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
 end
