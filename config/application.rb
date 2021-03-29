@@ -391,6 +391,8 @@ module CanvasRails
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: :load_config_initializers) do |app|
       app.config.middleware.insert_before(config.session_store, LoadAccount)
+      app.config.middleware.insert_before(LoadAccount, AbortOnDisconnect)
+      app.config.middleware.insert_before(AbortOnDisconnect, ClientDisconnect)
       app.config.middleware.swap(ActionDispatch::RequestId, RequestContext::Generator)
       app.config.middleware.insert_after(config.session_store, RequestContext::Session)
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
