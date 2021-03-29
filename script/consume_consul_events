@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # check if the bundle installed gems somewhere besides the system, and if it
 # did manually add that path to the GEM_PATH. all without actually loading the
