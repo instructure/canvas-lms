@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -134,7 +136,7 @@ class DiscussionTopicPresenter
       if student_enrollment
         attrs[:"data-student_id"] = student_enrollment.user_id
         attrs[:"data-course_id"] = student_enrollment.course_id
-        attrs[:class] << " student_context_card_trigger"
+        attrs[:class] = "author student_context_card_trigger"
       end
     end
 
