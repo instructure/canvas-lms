@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :css do
   desc "Generate styleguide"
   task :styleguide do

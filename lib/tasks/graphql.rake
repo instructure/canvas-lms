@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :graphql do
   desc "Dump GraphQL schema and fragment types"
   task schema: :environment do
