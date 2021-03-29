@@ -808,17 +808,19 @@ acknowledge that you have read and agreed to the
             <legend><%= t(:create_courses_title, "Who Can Create New Courses") %></legend>
             <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
             <%= f.fields_for :settings do |settings| %>
-              <div>
-                <%= settings.check_box :teachers_can_create_courses, :checked => @account.teachers_can_create_courses? %>
-                <%= settings.label :teachers_can_create_courses, :en => "Teachers" %>
-              </div>
+              <% if !@account.root_account.feature_enabled?(:granular_permissions_manage_courses) %>
+                <div>
+                  <%= settings.check_box :teachers_can_create_courses, :checked => @account.teachers_can_create_courses? %>
+                  <%= settings.label :teachers_can_create_courses, :en => "Teachers" %>
+                </div>
+                <div>
+                  <%= settings.check_box :students_can_create_courses, :checked => @account.students_can_create_courses? %>
+                  <%= settings.label :students_can_create_courses, :en => "Students" %>
+                </div>
+              <% end %>
               <div>
                 <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.no_enrollments_can_create_courses? %>
                 <%= settings.label :no_enrollments_can_create_courses, :en => "Users with no enrollments" %>
-              </div>
-              <div>
-                <%= settings.check_box :students_can_create_courses, :checked => @account.students_can_create_courses? %>
-                <%= settings.label :students_can_create_courses, :en => "Students" %>
               </div>
             <% end %>
           </fieldset>

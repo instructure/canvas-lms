@@ -85,7 +85,7 @@ export default class DashboardCard extends Component {
     enrollmentType: PropTypes.string,
     observee: PropTypes.string,
     published: PropTypes.bool,
-    canChangeCourseState: PropTypes.bool,
+    canChangeCoursePublishState: PropTypes.bool,
     defaultView: PropTypes.string,
     pagesUrl: PropTypes.string,
     frontPageTitle: PropTypes.string
@@ -105,7 +105,7 @@ export default class DashboardCard extends Component {
     totalCards: 0,
     position: 0,
     published: false,
-    canChangeCourseState: false
+    canChangeCoursePublishState: false
   }
 
   constructor(props) {
@@ -377,7 +377,7 @@ export default class DashboardCard extends Component {
           </a>
           {window.ENV?.FEATURES?.unpublished_courses &&
             !this.props.published &&
-            this.props.canChangeCourseState && (
+            this.props.canChangeCoursePublishState && (
               <PublishButton
                 courseNickname={this.state.nicknameInfo.nickname}
                 defaultView={this.props.defaultView}

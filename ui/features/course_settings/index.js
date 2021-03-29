@@ -106,7 +106,7 @@ if (availabilityOptionsContainer) {
     <Suspense fallback={<Loading />}>
       <CourseAvailabilityOptions
         canManage={
-          ENV.PERMISSIONS.manage_courses ||
+          ENV.PERMISSIONS.can_manage_courses ||
           (ENV.PERMISSIONS.manage && !ENV.PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS)
         }
         viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
