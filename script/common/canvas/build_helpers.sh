@@ -86,13 +86,14 @@ If you want to migrate the existing database, use docker_dev_update
   message "Creating new database"
   _canvas_lms_track docker-compose run --rm web \
     bundle exec rake db:create
-  # initial_setup runs db:migrate for development
-  _canvas_lms_track docker-compose run -e TELEMETRY_OPT_IN --rm web \
-    bundle exec rake db:initial_setup
   # Rails db:migrate only runs on development by default
   # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
   _canvas_lms_track docker-compose run --rm web \
+    bundle exec rake db:migrate RAILS_ENV=development
+  _canvas_lms_track docker-compose run --rm web \
     bundle exec rake db:migrate RAILS_ENV=test
+  _canvas_lms_track docker-compose run -e TELEMETRY_OPT_IN --rm web \
+    bundle exec rake db:initial_setup
 }
 
 
