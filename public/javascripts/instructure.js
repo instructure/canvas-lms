@@ -541,7 +541,7 @@ $(function () {
       $.ajaxJSON(
         $link
           .attr('href')
-          .replace(/\/download/, '') // download as part of the path
+          .replace(/\/(download|preview)/, '') // download as part of the path
           .replace(/wrap=1&?/, '') // wrap=1 as part of the query_string
           .replace(/[?&]$/, ''), // any trailing chars if wrap=1 was at the end
         'GET',

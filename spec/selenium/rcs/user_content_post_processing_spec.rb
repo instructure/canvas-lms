@@ -208,6 +208,25 @@ describe 'user_content post processing' do
       expect(f('iframe', preview_container)).to be_displayed
     end
 
+    it 'legacy inline-able file link shows preview when clicked' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='thelink' class='instructure_file_link instructure_scribd_file'
+          href='#{@file_url}/preview'>file</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a#thelink')
+      expect(file_link.attribute('class')).to include('file_preview_link')
+      expect(f('.instructure_file_holder')).not_to contain_css('img[alt="Preview the document"]')
+
+      file_link.click
+      expect(f('.loading_image_holder')).to be_displayed
+      preview_container = f('#preview_1[role="region"]')
+      expect(f('.hide_file_preview_link', preview_container)).to be_displayed
+      expect(f('iframe', preview_container)).to be_displayed
+    end
+
     it 'performs the browser default action if inline preview link is clicked with a modifier key pressed' do
       create_wiki_page_with_content(
         'page',
