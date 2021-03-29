@@ -48,7 +48,9 @@
       var c = e.target
       while (c && c.ownerDocument) {
         if (c.getAttribute('href') == '#' || c.getAttribute('data-method')) {
-          e.preventDefault()
+          if (!e.defaultPrevented) {
+            e.preventDefault()
+          }
           (_earlyClick.clicks = _earlyClick.clicks || []).push(c)
           break
         }
