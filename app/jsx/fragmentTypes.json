@@ -84,6 +84,9 @@
             "name": "Discussion"
           },
           {
+            "name": "DiscussionEntry"
+          },
+          {
             "name": "Enrollment"
           },
           {
@@ -276,6 +279,9 @@
             "name": "Discussion"
           },
           {
+            "name": "DiscussionEntry"
+          },
+          {
             "name": "Enrollment"
           },
           {
@@ -412,6 +418,9 @@
           },
           {
             "name": "Discussion"
+          },
+          {
+            "name": "DiscussionEntry"
           },
           {
             "name": "Enrollment"

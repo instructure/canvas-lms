@@ -26,19 +26,21 @@ import {Flex} from '@instructure/ui-flex'
 
 export function Alert({...props}) {
   return (
-    <Flex>
+    <Flex data-testid="graded-discussion-info">
       <Flex.Item padding="x-small" align="start">
-        <Text color="primary">{props.contextDisplayText}</Text>
+        <Text weight="light" size="small">
+          {props.contextDisplayText}
+        </Text>
       </Flex.Item>
       <Flex.Item padding="x-small" shouldGrow align="start">
-        <Text color="primary">
+        <Text weight="light" size="small">
           {I18n.t('This is a graded discussion: %{pointsPossible} points possible', {
             pointsPossible: props.pointsPossible
           })}
         </Text>
       </Flex.Item>
       <Flex.Item padding="x-small" align="end">
-        <Text color="primary">
+        <Text weight="light" size="small">
           {I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
         </Text>
       </Flex.Item>
