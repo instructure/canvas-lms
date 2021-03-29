@@ -460,6 +460,7 @@ describe ContentMigration do
       @copy_from.is_public_to_auth_users = true
       @copy_from.syllabus_course_summary = false
       @copy_from.homeroom_course = true
+      @copy_from.course_color = '#123456'
       @copy_from.save!
 
       @copy_from.lti_resource_links.create!(
@@ -484,6 +485,7 @@ describe ContentMigration do
       expect(@copy_to.course_code).to eq "tocourse"
       expect(@copy_to.syllabus_course_summary).to eq false
       expect(@copy_to.homeroom_course).to eq true
+      expect(@copy_to.course_color).to eq "#123456"
       # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS

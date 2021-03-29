@@ -2440,7 +2440,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course
+      :homeroom_course, :course_color
     ]
   end
 
@@ -3106,7 +3106,8 @@ class Course < ActiveRecord::Base
 
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
-    add_setting :homeroom_course, :boolean => true, :default => false
+  add_setting :homeroom_course, :boolean => true, :default => false
+  add_setting :course_color
 
   def elementary_enabled?
     root_account&.feature_enabled?(:canvas_for_elementary) && account.enable_as_k5_account?

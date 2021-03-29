@@ -860,7 +860,8 @@ describe CoursesController, type: :request do
           'workflow_state' => 'available',
           'default_view' => 'modules',
           'storage_quota_mb' => @account.default_storage_quota_mb,
-          'homeroom_course' => false
+          'homeroom_course' => false,
+          'course_color' => nil
         })
         expect(Auditors::Course).to receive(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
@@ -941,7 +942,8 @@ describe CoursesController, type: :request do
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
           'uuid' => new_course.uuid,
           'blueprint' => false,
-          'homeroom_course' => false
+          'homeroom_course' => false,
+          'course_color' => nil
         )
         expect(json).to eql course_response
       end
@@ -3540,6 +3542,7 @@ describe CoursesController, type: :request do
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Los_Angeles',
         'homeroom_course' => false,
+        'course_color' => nil,
         'uuid' => @course1.uuid,
         'blueprint' => false,
         'license' => nil
@@ -3812,6 +3815,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'course_color' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3851,6 +3855,7 @@ describe CoursesController, type: :request do
           :allow_student_forum_attachments => true,
           :allow_student_discussion_editing => false,
           :allow_student_organized_groups => false,
+          :course_color => '#AABBCC',
           :filter_speed_grader_by_student_group => true,
           :hide_distribution_graphs => true,
           :hide_sections_on_course_users_page => true,
@@ -3869,6 +3874,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => false,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => false,
+          'course_color' => '#AABBCC',
           'filter_speed_grader_by_student_group' => true,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3895,6 +3901,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_forum_attachments).to eq true
         expect(@course.allow_student_discussion_editing).to eq false
         expect(@course.allow_student_organized_groups).to eq false
+        expect(@course.course_color).to eq '#AABBCC'
         expect(@course.hide_distribution_graphs).to eq true
         expect(@course.hide_sections_on_course_users_page).to be true
         expect(@course.hide_final_grades).to eq true
@@ -3924,6 +3931,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'course_color' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,

@@ -21,6 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import NavigationView from 'compiled/views/course_settings/NavigationView'
 import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
+import CourseColorSelector from '../course_settings/components/CourseColorSelector'
 import CourseImageSelector from '../course_settings/components/CourseImageSelector'
 import BlueprintLockOptions from '../blueprint_courses/components/BlueprintLockOptions'
 import CourseAvailabilityOptions from '../course_settings/components/CourseAvailabilityOptions'
@@ -79,4 +80,14 @@ if (availabilityOptionsContainer) {
     />,
     availabilityOptionsContainer
   )
+}
+
+if (ENV.COURSE_COLORS_ENABLED) {
+  const courseColorPickerContainer = document.getElementById('course_color_picker_container')
+  if (courseColorPickerContainer) {
+    ReactDOM.render(
+      <CourseColorSelector courseColor={ENV.COURSE_COLOR} />,
+      courseColorPickerContainer
+    )
+  }
 }

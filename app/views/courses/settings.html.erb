@@ -99,6 +99,14 @@
         </div>
       </div>
       <% end %>
+      <% if @context.elementary_enabled? %>
+        <div class="form-row">
+          <div class="form-label nobr"><%= f.blabel :course_color, :en => "Color" %></div>
+          <div>
+            <div id="course_color_picker_container"></div>
+          </div>
+        </div>
+      <% end %>
       <div class="form-row">
         <div class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></div>
         <div>
@@ -482,7 +490,7 @@
           </div>
         </div>
       <% end %>
-      <% if @context.root_account.feature_enabled?(:canvas_for_elementary) %>
+      <% if @context.elementary_enabled? %>
         <div class="form-row">
           <div class="form-label nobr"><%= f.blabel :homeroom_course_header, :en => "Homeroom Course" %></div>
           <div class="nobr">

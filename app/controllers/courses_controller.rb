@@ -349,6 +349,7 @@ require 'securerandom'
 class CoursesController < ApplicationController
   include SearchHelper
   include ContextExternalToolsHelper
+  include CustomColorHelper
   include CustomSidebarLinksHelper
   include SyllabusHelper
   include WebZipExportHelper
@@ -1445,7 +1446,9 @@ class CoursesController < ApplicationController
         TOOL_CONFIGURATION_SHOW_URL: course_show_tool_configuration_url(course_id: @context.id, developer_key_id: ':developer_key_id'),
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
+        COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
         PUBLISHING_ENABLED: @publishing_enabled,
+        COURSE_COLORS_ENABLED: @context.elementary_enabled?,
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
@@ -1597,7 +1600,8 @@ class CoursesController < ApplicationController
       :show_announcements_on_home_page,
       :syllabus_course_summary,
       :home_page_announcement_limit,
-      :homeroom_course
+      :homeroom_course,
+      :course_color
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY).
@@ -2650,10 +2654,14 @@ class CoursesController < ApplicationController
   #
   # @argument course[homeroom_course] [Boolean]
   #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
-  #   is enabled in the course's account.
+  #   is enabled and the course is associated with a K-5-enabled account.
   #
   # @argument course[template] [Boolean]
   #   Enable or disable the course as a template that can be selected by an account
+  #
+  # @argument course[course_color] [String]
+  #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the
+  #   Canvas for Elementary feature is enabled and the course is associated with a K-5-enabled account.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2809,6 +2817,15 @@ class CoursesController < ApplicationController
         unless process_course_event
           render_update_failure
           return
+        end
+      end
+
+      if params[:course][:course_color]
+        if valid_hexcode?(params[:course][:course_color])
+          @course.course_color = normalize_hexcode(params[:course][:course_color])
+          params_for_update.delete :course_color
+        else
+          @course.errors.add(:course_color, t("Invalid hexcode provided"))
         end
       end
 
@@ -3529,7 +3546,7 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template
+      :template, :course_color
     )
   end
 end

@@ -748,6 +748,29 @@ describe CoursesController do
       expect(controller.js_env[:PERMISSIONS]).to be_nil
     end
 
+    it "should only set course color js_env vars for elementary courses" do
+      @course.root_account.enable_feature!(:canvas_for_elementary)
+      @course.account.settings[:enable_as_k5_account] = {value: true}
+      @course.account.save!
+      @course.course_color = "#BAD"
+      @course.save!
+
+      user_session(@teacher)
+      get 'settings', params: {:course_id => @course.id}
+      expect(controller.js_env[:COURSE_COLOR]).to eq "#BAD"
+      expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be true
+    end
+
+    it "should not set course color js_env vars for non-elementary courses" do
+      @course.course_color = "#BAD"
+      @course.save!
+
+      user_session(@teacher)
+      get 'settings', params: {:course_id => @course.id}
+      expect(controller.js_env[:COURSE_COLOR]).to be_falsy
+      expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be false
+    end
+
     it "should require authorization" do
       get 'settings', params: {:course_id => @course.id}
       assert_unauthorized
@@ -2164,6 +2187,32 @@ describe CoursesController do
         @course.reload
         expect(@course.settings[:image_id]).to eq ''
         expect(@course.settings[:image_url]).to eq ''
+      end
+    end
+
+    describe 'course colors' do
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "should allow valid hexcodes" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#112233" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to eq '#112233'
+      end
+
+      it "should reject invalid hexcodes" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#NOOOO" }}
+        put 'update', params: {:id => @course.id, :course => { :course_color => "1" }}
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#1a2b3c4e5f6" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to be_nil
+      end
+
+      it "should normalize hexcodes without a leading #" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "123456" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to eq '#123456'
       end
     end
 
