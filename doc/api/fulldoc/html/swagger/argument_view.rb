@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ class ArgumentView < HashView
   include CanvasAPI::Deprecatable
 
   attr_reader :line, :http_verb, :path_variables, :effective_date, :notice_date
-  attr_reader :name, :type, :desc
+  attr_reader :type
 
   DEFAULT_TYPE = "[String]"
   DEFAULT_DESC = "no description"
@@ -49,11 +51,9 @@ class ArgumentView < HashView
 
     name, remaining = (name_and_remaining || "").split(/\s/, 2)
     raise(ArgumentError, "param name missing:\n#{line}") unless name
-    name.strip!
+
     type, desc = split_type_desc(remaining || "")
-    type.strip!
-    desc.strip!
-    [line, name, type, desc]
+    [line, name.strip, type.strip, desc.strip]
   end
 
   def split_type_desc(str)
