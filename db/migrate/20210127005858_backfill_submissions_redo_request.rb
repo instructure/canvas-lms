@@ -17,21 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class AddRedoRequestToSubmissions < ActiveRecord::Migration[5.2]
-  tag :predeploy
+class BackfillSubmissionsRedoRequest < ActiveRecord::Migration[5.2]
+  tag :postdeploy
+  disable_ddl_transaction!
+
+  def self.runnable?
+    connection.postgresql_version < 110000
+  end
 
   def up
-    if connection.postgresql_version >= 110000
-      remove_column :submissions, :redo_request, if_exists: true
-      add_column :submissions, :redo_request, :boolean, default: false, null: false
-    else
-      # backfill and default will come in a postdeploy
-      add_column :submissions, :redo_request, :boolean
-      change_column_default(:submissions, :redo_request, false)
+    if Submission.columns.detect{|c| c.name == "redo_request"}&.null
+      DataFixup::BackfillNulls.run(Submission, :redo_request, default_value: false)
+      change_column_null(:submissions, :redo_request, false)
     end
   end
 
   def down
-    remove_column :submissions, :redo_request, if_exists: true
+    change_column_null(:submissions, :redo_request, true)
   end
 end
