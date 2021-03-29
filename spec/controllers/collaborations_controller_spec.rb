@@ -292,6 +292,7 @@ describe CollaborationsController do
     end
 
     it "should fail with invalid collaboration type" do
+      skip 'VICE-1273 03/29/2021'
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :collaboration => {:title => "My Collab"}}
       assert_status(500)
