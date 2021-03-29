@@ -43,18 +43,6 @@ function TrayContent(props) {
     )
   }
 
-  if (props.submission.gradeHidden) {
-    return (
-      <SVGWithTextPlaceholder
-        text={I18n.t(
-          'You may not see all comments right now because the assignment is currently being graded.'
-        )}
-        url={ClosedDiscussionSVG}
-        addMargin
-      />
-    )
-  }
-
   return (
     <Suspense fallback={<LoadingIndicator />}>
       <CommentsTrayBody assignment={props.assignment} submission={props.submission} />

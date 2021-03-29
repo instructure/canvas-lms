@@ -93,13 +93,4 @@ describe('CommentsTray', () => {
     const message = getByText('You cannot leave comments until you submit the assignment.')
     expect(message).toBeInTheDocument()
   })
-
-  it('shows a message in the tray when the grade is hidden', async () => {
-    props.submission.gradeHidden = true
-    const {getByText} = renderComponent()
-    const message = getByText(
-      'You may not see all comments right now because the assignment is currently being graded.'
-    )
-    expect(message).toBeInTheDocument()
-  })
 })

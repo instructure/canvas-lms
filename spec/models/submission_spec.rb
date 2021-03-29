@@ -2201,6 +2201,27 @@ describe Submission do
     end
   end
 
+  describe "#can_read_submission_user_name?" do
+    before(:once) do
+      @course = Course.create!
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+      assignment = @course.assignments.create!(anonymous_grading: true)
+      @submission = assignment.submissions.find_by(user: @student)
+    end
+
+    context "anonymous assignments" do
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false when the user is not the submission's owner" do
+        teacher = User.create!
+        @course.enroll_teacher(teacher, enrollment_state: :active)
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
+      end
+    end
+  end
+
   describe "#user_can_read_grade?" do
     before(:once) do
       @course = Course.create!

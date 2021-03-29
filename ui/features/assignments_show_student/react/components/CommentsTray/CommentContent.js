@@ -135,7 +135,7 @@ export default function CommentContent(props) {
 
   return (
     <>
-      {!props.comments.length && (
+      {!props.submission.gradeHidden && !props.comments.length && (
         <SVGWithTextPlaceholder
           text={I18n.t('Send a comment to your instructor about this assignment.')}
           url={noComments}

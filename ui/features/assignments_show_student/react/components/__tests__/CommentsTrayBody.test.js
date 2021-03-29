@@ -101,6 +101,59 @@ describe('CommentsTrayBody', () => {
     mockedSetOnSuccess = jest.fn().mockResolvedValue({})
   })
 
+  describe('hidden submissions', () => {
+    it('does not render a "Send a comment" message when no comments', async () => {
+      const submission = await mockSubmission()
+      submission.gradeHidden = true
+      const {queryByText} = render(
+        mockContext(<CommentContent comments={[]} submission={submission} />)
+      )
+
+      expect(queryByText('Send a comment to your instructor about this assignment.')).toBeNull()
+    })
+
+    it('renders a message with image if there are no comments', async () => {
+      const mocks = [await mockSubmissionCommentQuery()]
+      const props = await mockAssignmentAndSubmission()
+      props.submission.gradeHidden = true
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>
+      )
+
+      await waitFor(() =>
+        expect(
+          getByText('You may not see all comments for this assignment until grades are posted.')
+        ).toBeInTheDocument()
+      )
+      expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
+    })
+
+    it('renders a message (no image) if there are comments', async () => {
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{_id: '1'}, {_id: '2'}]
+        }
+      }
+      const mocks = [await mockSubmissionCommentQuery(overrides)]
+      const props = await mockAssignmentAndSubmission()
+      props.submission.gradeHidden = true
+      const {getByText, queryByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>
+      )
+
+      await waitFor(() =>
+        expect(
+          getByText('You may not see all comments for this assignment until grades are posted.')
+        ).toBeInTheDocument()
+      )
+      expect(queryByTestId('svg-placeholder-container')).toBeNull()
+    })
+  })
+
   // https://instructure.atlassian.net/browse/USERS-379
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders error alert when data returned from mutation fails', async () => {

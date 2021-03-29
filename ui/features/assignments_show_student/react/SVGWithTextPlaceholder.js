@@ -45,7 +45,7 @@ TextPlaceholder.propTypes = {
 
 export default function SVGWithTextPlaceholder(props) {
   return (
-    <div className="svg-placeholder-container">
+    <div data-testid="svg-placeholder-container" className="svg-placeholder-container">
       <img alt="" src={props.url} style={{width: '200px'}} />
       <TextPlaceholder addMargin={props.addMargin} text={props.text} />
     </div>

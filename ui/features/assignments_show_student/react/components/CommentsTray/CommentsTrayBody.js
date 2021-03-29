@@ -21,8 +21,11 @@ import CommentTextArea from './CommentTextArea'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
+import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-layout'
 import React, {useContext, useState} from 'react'
@@ -78,6 +81,10 @@ export default function CommentsTrayBody(props) {
     )
   }
 
+  const comments = data.submissionComments.commentsConnection.nodes
+  const hiddenCommentsMessage = I18n.t(
+    'You may not see all comments for this assignment until grades are posted.'
+  )
   return (
     <ErrorBoundary
       errorComponent={
@@ -89,6 +96,20 @@ export default function CommentsTrayBody(props) {
     >
       <Flex as="div" direction="column" height="100%" data-testid="comments-container">
         <Flex.Item grow>
+          {props.submission.gradeHidden && comments.length === 0 && (
+            <SVGWithTextPlaceholder
+              text={hiddenCommentsMessage}
+              url={ClosedDiscussionSVG}
+              addMargin
+            />
+          )}
+
+          {props.submission.gradeHidden && comments.length > 0 && (
+            <Alert variant="info" margin="small small x-large">
+              {hiddenCommentsMessage}
+            </Alert>
+          )}
+
           <div className="load-more-comments-button-container">
             {isFetchingMoreComments && <LoadingIndicator />}
             {data.submissionComments.commentsConnection.pageInfo.hasPreviousPage &&
@@ -98,10 +119,8 @@ export default function CommentsTrayBody(props) {
                 </Button>
               )}
           </div>
-          <CommentContent
-            comments={data.submissionComments.commentsConnection.nodes}
-            submission={props.submission}
-          />
+
+          <CommentContent comments={comments} submission={props.submission} />
         </Flex.Item>
 
         {allowChangesToSubmission && (
