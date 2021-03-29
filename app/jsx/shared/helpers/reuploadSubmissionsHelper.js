@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!assignment'
+import I18n from 'i18n!assignment!reupload_submissions_helper'
 import 'jquery.instructure_forms' // brings in $.fn.formSubmit
 
 const formId = 're_upload_submissions_form'

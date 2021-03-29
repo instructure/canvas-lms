@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Select} from '@instructure/ui-forms'
+import CanvasMultiSelect from 'jsx/shared/components/CanvasMultiSelect'
 import {View} from '@instructure/ui-view'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import $ from 'jquery'
 import I18n from 'i18n!sections_autocomplete'
@@ -68,7 +67,7 @@ export default class SectionsAutocomplete extends React.Component {
     messages: []
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.updateDiscussionOptions()
   }
 
@@ -79,35 +78,33 @@ export default class SectionsAutocomplete extends React.Component {
   announceSectionDifference(newValues) {
     // going to assume we only add or remove one at a time. "All Sections"
     // complicates it a bit, but this still announces the right thing
-    const addedValue = setDiff(newValues, this.state.selectedSectionsValue)[0]
-    const removedValue = setDiff(this.state.selectedSectionsValue, newValues)[0]
-    const changedValue = addedValue || removedValue
-    const changedValueName = this.state.sections.find(section => section.id === changedValue).name
-    if (addedValue) {
-      this.props.flashMessage(I18n.t('%{section} added', {section: changedValueName}))
-    } else if (removedValue) {
-      this.props.flashMessage(I18n.t('%{section} removed', {section: changedValueName}))
+    const addedId = setDiff(newValues, this.state.selectedSectionsValue)[0]
+    const removedId = setDiff(this.state.selectedSectionsValue, newValues)[0]
+    const changedId = addedId || removedId
+    const changedValue = this.state.sections.find(section => section.id === changedId)
+    if (addedId) {
+      this.props.flashMessage(I18n.t('%{section} added', {section: changedValue.name}))
+    } else if (removedId) {
+      this.props.flashMessage(I18n.t('%{section} removed', {section: changedValue.name}))
     }
   }
 
-  onAutocompleteChange = (_, value) => {
-    this.announceSectionDifference(extractIds(value))
-    if (!value.length) {
+  onAutocompleteChange = values => {
+    this.announceSectionDifference(values)
+    if (values.length === 0) {
       this.setState({
         selectedSectionsValue: [],
         messages: [{text: I18n.t('A section is required'), type: 'error'}]
       })
     } else if (this.state.selectedSectionsValue.includes(ALL_SECTIONS_OBJ.id)) {
       this.setState({
-        selectedSectionsValue: extractIds(
-          value.filter(section => section.id !== ALL_SECTIONS_OBJ.id)
-        ),
+        selectedSectionsValue: values.filter(id => id !== ALL_SECTIONS_OBJ.id),
         messages: []
       })
-    } else if (extractIds(value).includes(ALL_SECTIONS_OBJ.id)) {
+    } else if (values.includes(ALL_SECTIONS_OBJ.id)) {
       this.setState({selectedSectionsValue: [ALL_SECTIONS_OBJ.id], messages: []})
     } else {
-      this.setState({selectedSectionsValue: extractIds(value), messages: []})
+      this.setState({selectedSectionsValue: values, messages: []})
     }
   }
 
@@ -135,26 +132,19 @@ export default class SectionsAutocomplete extends React.Component {
     return (
       <View display="block" margin="0 0 large 0">
         <input name="specific_sections" type="hidden" value={this.state.selectedSectionsValue} />
-        <Select
-          editable
+        <CanvasMultiSelect
           label={I18n.t('Post to')}
-          selectedOption={this.state.selectedSectionsValue}
+          selectedOptionIds={this.state.selectedSectionsValue}
           messages={this.state.messages}
-          multiple
           disabled={this.props.disabled}
           onChange={this.onAutocompleteChange}
-          formatSelectedOption={tag => (
-            <AccessibleContent alt={I18n.t(`Remove %{label}`, {label: tag.label})}>
-              {tag.label}
-            </AccessibleContent>
-          )}
         >
           {this.state.sections.map(section => (
-            <option key={section.id} value={section.id}>
+            <CanvasMultiSelect.Option id={section.id} key={section.id} value={section.id}>
               {section.name}
-            </option>
+            </CanvasMultiSelect.Option>
           ))}
-        </Select>
+        </CanvasMultiSelect>
       </View>
     )
   }

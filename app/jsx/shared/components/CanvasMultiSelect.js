@@ -21,7 +21,7 @@ import I18n from 'i18n!app_shared_components'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
 import {Tag} from '@instructure/ui-tag'
-import {func, string, node, arrayOf, oneOfType} from 'prop-types'
+import {func, string, node, arrayOf, oneOfType, bool} from 'prop-types'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
@@ -52,6 +52,7 @@ function CanvasMultiSelect(props) {
     children,
     selectedOptionIds,
     noOptionsLabel,
+    disabled,
     ...otherProps
   } = props
 
@@ -228,6 +229,7 @@ function CanvasMultiSelect(props) {
 
   const selectProps = {
     id: selectId,
+    disabled,
     renderLabel,
     inputValue,
     inputRef: ref => {
@@ -261,6 +263,7 @@ function CanvasMultiSelect(props) {
 
 CanvasMultiSelect.propTypes = {
   id: string,
+  disabled: bool,
   label: oneOfType([node, func]).isRequired,
   onChange: func.isRequired,
   children: node,
@@ -270,7 +273,8 @@ CanvasMultiSelect.propTypes = {
 
 CanvasMultiSelect.defaultProps = {
   noOptionsLabel: '---',
-  selectedOptionIds: []
+  selectedOptionIds: [],
+  disabled: false
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption

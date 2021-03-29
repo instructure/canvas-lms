@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import 'grading_standards'
+import ready from '@instructure/ready'
 import DiscussionTopic from 'compiled/models/DiscussionTopic'
 import Announcement from 'compiled/models/Announcement'
 import DueDateList from 'compiled/models/DueDateList'
@@ -125,7 +125,7 @@ if (
   view.assignmentGroupCollection = agc
 }
 
-$(() => {
+ready(() => {
   view.render().$el.appendTo('#content')
   document.querySelector('#discussion-title').focus()
 
