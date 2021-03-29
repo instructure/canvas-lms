@@ -69,6 +69,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   scope :active, -> { where("workflow_state='active' OR workflow_state IS NULL") }
   scope :generated, -> { where(workflow_state: 'generated') }
+  scope :not_deleted, -> { where.not(workflow_state: 'deleted').or(where(workflow_state: nil)) }
 
   def infer_defaults
     if !self.position && self.quiz

@@ -455,6 +455,69 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_groups.to_a).to eq [qgroup2_to]
     end
 
+    it 'should sync deleted quiz groups linked to question banks after the quiz has been published and submitted' do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      student = user_factory(active_all: true)
+      @copy_to.enroll_student(student, enrollment_state: 'active')
+
+      quiz = @copy_from.quizzes.create!
+      bank = @copy_from.assessment_question_banks.create!(:title=>'Test Bank')
+      bank.assessment_questions.create!(question_data: {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      bank.assessment_questions.create!(question_data: {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
+      qgroup1.assessment_question_bank = bank
+      qgroup1.save
+      @template.content_tag_for(quiz).update_attribute(:restrictions, {content: true})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(migration_id: mig_id(qgroup1.asset_string)).first
+
+      Timecop.freeze(4.minutes.from_now) do
+        quiz_to.publish!
+        quiz_to.generate_submission(student)
+      end
+
+      Timecop.freeze(2.minutes.from_now) do
+        qgroup1.destroy
+      end
+      run_master_migration
+
+      expect(quiz_to.reload.quiz_groups.to_a).to eq []
+    end
+
+    it 'should sync deleted quiz groups with quiz questions after the quiz has been published and submitted' do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      student = user_factory(active_all: true)
+      @copy_to.enroll_student(student, enrollment_state: 'active')
+
+      quiz = @copy_from.quizzes.create!
+      qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
+      qq1 = qgroup1.quiz_questions.create!(quiz: quiz, question_data: {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      qgroup1.save
+      Timecop.freeze(2.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(migration_id: mig_id(qgroup1.asset_string)).first
+
+      Timecop.freeze(4.minutes.from_now) do
+        quiz_to.publish!
+        quiz_to.generate_submission(student)
+      end
+
+      Timecop.freeze(2.minutes.from_now) do
+        qgroup1.destroy
+      end
+      run_master_migration
+
+      expect(quiz_to.reload.quiz_groups.to_a).to eq []
+    end
+
     it "should sync deleted assessment bank questions (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
