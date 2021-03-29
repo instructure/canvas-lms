@@ -38,9 +38,9 @@ describe SisApiController do
       expect(parsed_json['code']).to  eq 'not_enabled'
     end
 
-    context 'with bulk_sis_grade_export enabled' do
+    context 'with post_grades enabled' do
       before do
-        account.enable_feature!(:bulk_sis_grade_export)
+        course.enable_feature!(:post_grades)
       end
 
       it 'responds with 200' do

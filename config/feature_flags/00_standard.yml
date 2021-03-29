@@ -181,13 +181,6 @@ new_sis_integrations:
   applies_to: Account
   root_opt_in: true
   beta: true
-bulk_sis_grade_export:
-  state: hidden
-  display_name: Allow Bulk Grade Export to SIS
-  description: Allows teachers to mark grade data to be exported in bulk to SIS integrations.
-  applies_to: RootAccount
-  root_opt_in: true
-  beta: true
 notification_service:
   state: hidden
   display_name: Use remote service for notifications
