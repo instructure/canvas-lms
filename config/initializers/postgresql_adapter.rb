@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@ module PostgreSQLAdapterExtensions
     keys = records.first.keys
     quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
     execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-    raw_connection.put_copy_data records.inject(''){ |result, record|
+    raw_connection.put_copy_data records.inject(+''){ |result, record|
                                    result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
                                  }
     ActiveRecord::Base.connection.clear_query_cache

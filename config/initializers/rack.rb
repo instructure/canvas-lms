@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #encoding:ASCII-8BIT
 #
 # Copyright (C) 2012 - present Instructure, Inc.

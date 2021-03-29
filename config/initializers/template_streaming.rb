@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MarkTemplateStreaming
   def render_to_body(options={})
     @streaming_template = true if options[:stream]

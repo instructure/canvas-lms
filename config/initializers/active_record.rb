@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -470,7 +472,7 @@ class ActiveRecord::Base
   end
 
   def self.rank_sql(ary, col)
-    sql = ary.each_with_index.inject('CASE '){ |string, (values, i)|
+    sql = ary.each_with_index.inject(+'CASE '){ |string, (values, i)|
       string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
     } << "ELSE #{ary.size} END"
     Arel.sql(sql)
@@ -487,7 +489,7 @@ class ActiveRecord::Base
     column = column.to_s
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      sql = ''
+      sql = +''
       sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
       sql << <<~SQL
         WITH RECURSIVE t AS (
@@ -1113,14 +1115,10 @@ ActiveRecord::Relation.class_eval do
 
     relation = clone
     old_select = relation.select_values
-    relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
+    relation.select_values = [+"DISTINCT ON (#{args.join(', ')}) "]
     relation.distinct_value = false
 
-    if old_select.empty?
-      relation.select_values.first << "*"
-    else
-      relation.select_values.first << old_select.uniq.join(', ')
-    end
+    relation.select_values.first << (old_select.empty? ? "*" : old_select.uniq.join(', '))
 
     relation
   end
@@ -1254,7 +1252,7 @@ module UpdateAndDeleteWithJoins
   def delete_all
     return super if joins_values.empty?
 
-    sql = "DELETE FROM #{quoted_table_name} "
+    sql = +"DELETE FROM #{quoted_table_name} "
 
     join_sql = arel.join_sources.map(&:to_sql).join(" ")
     tables, join_conditions = deconstruct_joins(join_sql)
