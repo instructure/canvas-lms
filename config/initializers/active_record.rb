@@ -746,6 +746,23 @@ class ActiveRecord::Base
     end
     changes_applied
   end
+
+  def self.with_statement_timeout(timeout = 30_000)
+    raise ArgumentError.new("timeout must be an integer") unless timeout.is_a? Integer
+
+    transaction do
+      connection.execute "SET LOCAL statement_timeout = #{timeout}"
+      yield
+    rescue ActiveRecord::StatementInvalid => e
+      raise ActiveRecord::QueryTimeout if e.cause.is_a? PG::QueryCanceled
+
+      raise e
+    end
+  end
+end
+
+module ActiveRecord
+  class QueryTimeout < ActiveRecord::StatementInvalid; end
 end
 
 module UsefulFindInBatches

@@ -260,32 +260,36 @@ module Lti
         # content migrations that directly or indirectly provided content to
         # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
-        results = Course.from("(WITH RECURSIVE all_contexts AS (
-            SELECT context_id, source_course_id
-            FROM #{ContentMigration.quoted_table_name}
-            WHERE context_id=#{@context.id}
-            UNION
-            SELECT content_migrations.context_id, content_migrations.source_course_id
-            FROM #{ContentMigration.quoted_table_name}
-              INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
-          )
-          SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
-          FROM #{Course.quoted_table_name}
-          INNER JOIN #{ContentMigration.quoted_table_name} ct
-          ON ct.source_course_id = courses.id
-          AND ct.workflow_state = 'imported'
-          AND (ct.context_id IN (
-            SELECT x.context_id
-            FROM all_contexts x))
-          ORDER BY courses.lti_context_id, ct.finished_at DESC
-          ) as courses").
-          where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
+        results = ActiveRecord::Base.with_statement_timeout do
+          Course.from("(WITH RECURSIVE all_contexts AS (
+              SELECT context_id, source_course_id
+              FROM #{ContentMigration.quoted_table_name}
+              WHERE context_id=#{@context.id}
+              UNION
+              SELECT content_migrations.context_id, content_migrations.source_course_id
+              FROM #{ContentMigration.quoted_table_name}
+                INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
+            )
+            SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
+            FROM #{Course.quoted_table_name}
+            INNER JOIN #{ContentMigration.quoted_table_name} ct
+            ON ct.source_course_id = courses.id
+            AND ct.workflow_state = 'imported'
+            AND (ct.context_id IN (
+              SELECT x.context_id
+              FROM all_contexts x))
+            ORDER BY courses.lti_context_id, ct.finished_at DESC
+            ) as courses").
+            where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
+        end
 
         # We discovered that at around 3000 lti_context_ids, the form data gets too
         # big and breaks the LTI launch. We decided to truncate after 1000 and note
         # it in the launch as "truncated"
         results = results.first(limit) << 'truncated' if results.length > limit
         results.join(',')
+      rescue ActiveRecord::QueryTimeout
+        "timed out"
       end
     end
 
