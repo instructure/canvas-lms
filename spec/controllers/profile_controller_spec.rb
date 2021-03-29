@@ -178,21 +178,6 @@ describe ProfileController do
     end
   end
 
-  describe "GET 'communication'" do
-    it "should not fail when a user has a notification policy with no notification" do
-      # A user might have a NotificationPolicy with no Notification if the policy was created
-      # as part of throttling a user's "immediate" messages. Eventually we should fix how that
-      # works, but for now we just make sure that that state does not cause an error for the
-      # user when they go to their notification preferences.
-      user_session(@user)
-      cc = communication_channel(@user, {username: 'user@example.com', active_cc: true})
-      cc.notification_policies.create!(:notification => nil, :frequency => 'daily')
-
-      get 'communication'
-      expect(response).to be_successful
-    end
-  end
-
   describe "update_profile" do
     before :once do
       user_with_pseudonym

@@ -232,50 +232,17 @@ class ProfileController < ApplicationController
     @context = @user.profile
     set_active_tab 'notifications'
 
-    # Render updated UI if feature flag is enabled
-    if Account.site_admin.feature_enabled?(:notification_update_account_ui)
-      add_crumb(@current_user.short_name, profile_path)
-      add_crumb(t("Account Notification Settings"))
-      js_env NOTIFICATION_PREFERENCES_OPTIONS: {
-        allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
-        allowed_push_categories: Notification.categories_to_send_in_push,
-        send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
-        read_privacy_info: @user.preferences[:read_notification_privacy_info],
-        account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
-      }
-      js_bundle :account_notification_settings_show
-      render html: '', layout: true
-      return
-    end
-
-    # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
-    full_category_list = Notification.dashboard_categories(@user)
-    categories = full_category_list.map do |category|
-      category.as_json(only: %w{id name workflow_state user_id}, include_root: false).tap do |json|
-        # Add custom method result entries to the json
-        json[:category]             = category.category.underscore.gsub(/\s/, '_')
-        json[:display_name]         = category.category_display_name
-        json[:category_description] = category.category_description
-        json[:option]               = category.related_user_setting(@user, @domain_root_account)
-      end
-    end
-
-    channels = @user.communication_channels.all_ordered_for_display(@user).reject{|c|
-      !@domain_root_account.enable_push_notifications? && c.path_type == "push"
-    }.map { |c|
-      communication_channel_json(c, @user, session)
+    add_crumb(@current_user.short_name, profile_path)
+    add_crumb(t("Account Notification Settings"))
+    js_env NOTIFICATION_PREFERENCES_OPTIONS: {
+      allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
+      allowed_push_categories: Notification.categories_to_send_in_push,
+      send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
+      read_privacy_info: @user.preferences[:read_notification_privacy_info],
+      account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
     }
-
-    js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
-      :channels => channels,
-      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
-      :categories => categories,
-      :allowed_sms_categories => Notification.categories_to_send_in_sms(@domain_root_account),
-      :update_url => communication_update_profile_path,
-      :show_observed_names => @user.observer_enrollments.any? || @user.as_observer_observation_links.any? ? @user.send_observed_names_in_notifications? : nil
-      },
-      :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],
-      :ACCOUNT_PRIVACY_NOTICE => @domain_root_account.settings[:external_notification_warning]
+    js_bundle :account_notification_settings_show
+    render html: '', layout: true
   end
 
   def communication_update
