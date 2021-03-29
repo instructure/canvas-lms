@@ -738,6 +738,70 @@ describe Canvadocs do
             end
           end
         end
+
+        context 'for an Annotated Document assignment' do
+          before(:each) do
+            assignment.update!(submission_types: 'annotated_document', annotatable_attachment: attachment)
+            assignment.submit_homework(
+              submission.user,
+              submission_type: 'annotated_document',
+              annotated_document_id: attachment.id
+            )
+            submission.reload
+          end
+
+          context 'when the student is viewing' do
+            before(:each) do
+              @current_user = student
+            end
+
+            it 'sets the user_filter to empty if submission is posted' do
+              expect(user_filter).to be_empty
+            end
+
+            it 'sets restrict_annotations_to_user_filter to false if submission is posted' do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be false
+            end
+
+            it 'sets the user_filter to just the student if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+
+              aggregate_failures do
+                expect(user_filter.length).to be 1
+                expect(user_filter.dig(0, :id)).to eq student.global_id.to_s
+              end
+            end
+
+            it 'sets restrict_annotations_to_user_filter to true if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+          end
+
+          context 'when an instructor is viewing' do
+            before(:each) do
+              @current_user = teacher
+            end
+
+            it 'sets the user_filter to empty if submission is posted' do
+              expect(user_filter).to be_empty
+            end
+
+            it 'sets restrict_annotations_to_user_filter to false if submission is posted' do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be false
+            end
+
+            it 'sets the user_filter to empty if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(user_filter).to be_empty
+            end
+
+            it 'sets restrict_annotations_to_user_filter to false if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(session_params[:restrict_annotations_to_user_filter]).to be false
+            end
+          end
+        end
       end
     end
   end
