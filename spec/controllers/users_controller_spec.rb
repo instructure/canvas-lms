@@ -2338,6 +2338,7 @@ describe UsersController do
 
       new_user1 = User.where(:name => 'example1@example.com').first
       new_user2 = User.where(:name => 'Hurp Durp').first
+      expect([new_user1, new_user2].map(&:root_account_ids)).to match_array([[@course.root_account_id], [@course.root_account_id]])
       expect(json['invited_users'].map{|u| u['id']}).to match_array([new_user1.id, new_user2.id])
       expect(json['invited_users'].map{|u| u['user_token']}).to match_array([new_user1.token, new_user2.token])
     end

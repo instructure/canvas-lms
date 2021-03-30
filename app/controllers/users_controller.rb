@@ -2388,6 +2388,7 @@ class UsersController < ApplicationController
       user = User.new(:name => user_hash[:name] || email)
       cc = user.communication_channels.build(:path => email, :path_type => 'email')
       cc.user = user
+      user.root_account_ids = [@context.root_account.id]
       user.workflow_state = 'creation_pending'
 
       # check just in case
