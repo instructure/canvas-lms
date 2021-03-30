@@ -55,6 +55,67 @@ describe('Assignment Student Content View', () => {
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })
 
+  describe('when the assignment does not expect digital submissions', () => {
+    let props
+    let oldEnv
+
+    beforeEach(async () => {
+      oldEnv = window.ENV
+      window.ENV = {...window.ENV}
+
+      props = await mockAssignmentAndSubmission({
+        Assignment: {description: 'this is my assignment', nonDigitalSubmission: true},
+        Submission: {}
+      })
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders the assignment details', async () => {
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByText(/this is my assignment/)).toBeInTheDocument()
+    })
+
+    it('does not render the interface for submitting to the assignment', async () => {
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('assignment-2-student-content-tabs')).not.toBeInTheDocument()
+    })
+
+    it('renders a "Mark as Done" button if the assignment is part of a module with a mark-as-done requirement', async () => {
+      window.ENV.CONTEXT_MODULE_ITEM = {
+        done: false,
+        id: '123',
+        module_id: '456'
+      }
+
+      const {getByRole} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(getByRole('button', {name: 'Mark as done'})).toBeInTheDocument()
+    })
+
+    it('does not render a "Mark as Done" button if the assignment lacks mark-as-done requirements', async () => {
+      const {queryByRole} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
+    })
+  })
+
   describe('when the comments tray is opened', () => {
     const makeMocks = async () => {
       const variables = {submissionAttempt: 0, submissionId: '1'}

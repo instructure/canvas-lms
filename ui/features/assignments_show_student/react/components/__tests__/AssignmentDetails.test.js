@@ -115,3 +115,12 @@ it('renders the number of attempts with multiple attempt', async () => {
   const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
   expect(queryAllByText('3 Attempts')).toHaveLength(1)
 })
+
+it('does not render the number of attempts if the assignment does not invovle digital submissions', async () => {
+  const assignment = await mockAssignment({
+    Assignment: {allowedAttempts: 3, nonDigitalSubmission: true}
+  })
+
+  const {queryByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
+  expect(queryByText('3 Attempts')).not.toBeInTheDocument()
+})

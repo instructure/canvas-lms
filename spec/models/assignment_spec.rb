@@ -7343,18 +7343,14 @@ describe Assignment do
       allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { false }
       assignment.submission_types = 'online_text_entry'
 
-      expect(assignment.a2_enabled?).to be(false)
+      expect(assignment).not_to be_a2_enabled
     end
 
     [
       'discussion_topic',
       'external_tool',
-      'on_paper',
       'online_quiz',
-      'none',
-      'not_graded',
-      'wiki_page',
-      ''
+      'wiki_page'
     ].each do |type|
       it "returns false if submission type is set to #{type}" do
         assignment.build_wiki_page
@@ -7362,18 +7358,22 @@ describe Assignment do
         assignment.build_quiz
         assignment.submission_types = type
 
-        expect(assignment.a2_enabled?).to be(false)
+        expect(assignment).not_to be_a2_enabled
       end
     end
 
     [
       'online_text_entry',
       'online_upload',
-      'online_url'
+      'online_url',
+      'on_paper',
+      'none',
+      'not_graded',
+      ''
     ].each do |type|
       it "returns true if the flag is on and the submission type is #{type}" do
         assignment.submission_types = type
-        expect(assignment.a2_enabled?).to be(true)
+        expect(assignment).to be_a2_enabled
       end
     end
   end

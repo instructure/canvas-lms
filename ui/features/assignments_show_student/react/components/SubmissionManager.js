@@ -23,42 +23,25 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import Confetti from '@canvas/confetti/react/Confetti'
 import {
   CREATE_SUBMISSION,
-  CREATE_SUBMISSION_DRAFT,
-  SET_MODULE_ITEM_COMPLETION
+  CREATE_SUBMISSION_DRAFT
 } from '@canvas/assignments/graphql/student/Mutations'
 import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
-import {IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '@canvas/loading-indicator'
+import MarkAsDoneButton from './MarkAsDoneButton'
 import {Modal} from '@instructure/ui-modal'
 import {Mutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import SimilarityPledge from './SimilarityPledge'
 import StudentFooter from './StudentFooter'
-import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {
+  STUDENT_VIEW_QUERY,
+  SUBMISSION_HISTORIES_QUERY
+} from '@canvas/assignments/graphql/student/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {View} from '@instructure/ui-view'
-
-function MarkAsDoneButton({done, onToggle}) {
-  return (
-    <Button
-      color={done ? 'success' : 'secondary'}
-      data-testid="set-module-item-completion-button"
-      id="set-module-item-completion-button"
-      onClick={onToggle}
-      renderIcon={done ? IconCompleteLine : IconEmptyLine}
-    >
-      {done ? I18n.t('Done') : I18n.t('Mark as done')}
-    </Button>
-  )
-}
-
-MarkAsDoneButton.propTypes = {
-  done: PropTypes.bool.isRequired,
-  onToggle: PropTypes.func.isRequired
-}
 
 export default class SubmissionManager extends Component {
   static propTypes = {
@@ -72,7 +55,6 @@ export default class SubmissionManager extends Component {
 
   state = {
     editingDraft: false,
-    moduleItemDone: false,
     openSubmitModal: false,
     similarityPledgeChecked: false,
     showConfetti: false,
@@ -82,8 +64,7 @@ export default class SubmissionManager extends Component {
 
   componentDidMount() {
     this.setState({
-      activeSubmissionType: this.getActiveSubmissionTypeFromProps(),
-      moduleItemDone: !!window.ENV.CONTEXT_MODULE_ITEM?.done
+      activeSubmissionType: this.getActiveSubmissionTypeFromProps()
     })
   }
 
@@ -456,30 +437,18 @@ export default class SubmissionManager extends Component {
 
   renderMarkAsDoneButton() {
     const errorMessage = I18n.t('Error updating status of module item')
-    const updateDoneStatus = () => {
-      this.setState(state => ({
-        moduleItemDone: !state.moduleItemDone
-      }))
-    }
 
-    const {id: itemId, module_id: moduleId} = window.ENV.CONTEXT_MODULE_ITEM
-    const {moduleItemDone} = this.state
+    const {done, id: itemId, module_id: moduleId} = window.ENV.CONTEXT_MODULE_ITEM
 
     return (
-      <Mutation
-        mutation={SET_MODULE_ITEM_COMPLETION}
-        onCompleted={data => {
-          data.setModuleItemCompletion.errors
-            ? this.context.setOnFailure(errorMessage)
-            : updateDoneStatus()
-        }}
+      <MarkAsDoneButton
+        done={!!done}
+        itemId={itemId}
+        moduleId={moduleId}
         onError={() => {
           this.context.setOnFailure(errorMessage)
         }}
-        variables={{itemId, moduleId, done: !moduleItemDone}}
-      >
-        {mutation => <MarkAsDoneButton done={moduleItemDone} onToggle={mutation} />}
-      </Mutation>
+      />
     )
   }
 

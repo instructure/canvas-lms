@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, number, shape, string} from 'prop-types'
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
 
 import {AssignmentGroup} from './AssignmentGroup'
@@ -45,6 +45,7 @@ export const Assignment = {
         ...Module
       }
       name
+      nonDigitalSubmission
       pointsPossible
       submissionTypes
       unlockAt
@@ -66,6 +67,7 @@ export const Assignment = {
     lockInfo: LockInfo.shape,
     modules: arrayOf(Module.shape),
     name: string.isRequired,
+    nonDigitalSubmission: bool.isRequired,
     pointsPossible: number.isRequired,
     submissionTypes: arrayOf(string.isRequired),
     unlockAt: string
@@ -100,6 +102,7 @@ export const DefaultMocks = {
     allowedAttempts: null,
     allowedExtensions: [],
     gradingType: 'points',
+    nonDigitalSubmission: false,
     pointsPossible: 10,
     rubric: null,
     submissionsConnection: {

@@ -186,3 +186,12 @@ it('does not render the attempt select if allSubmissions is not provided', async
   const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
 })
+
+it('does not render the attempt select if the assignment has non-digital submissions', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {nonDigitalSubmission: true},
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+})

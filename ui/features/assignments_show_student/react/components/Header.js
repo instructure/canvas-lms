@@ -208,7 +208,7 @@ class Header extends React.Component {
               )}
             </Flex.Item>
           </Flex>
-          {this.props.submission && (
+          {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
             <Flex alignItems="center">
               <Flex.Item grow>
                 <Flex>

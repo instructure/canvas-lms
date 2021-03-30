@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
+import MarkAsDoneButton from './MarkAsDoneButton'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
-import React, {Suspense, lazy} from 'react'
+import React, {Suspense, lazy, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import StudentFooter from './StudentFooter'
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
@@ -44,12 +47,42 @@ function EnrollmentConcludedNotice() {
   )
 }
 
-function renderContentBaseOnAvailability({assignment, submission}) {
+function renderSubmissionlessAssignment({assignment}, alertContext) {
+  const buttons = []
+
+  const moduleItem = window.ENV.CONTEXT_MODULE_ITEM
+  if (moduleItem != null) {
+    buttons.push({
+      element: (
+        <MarkAsDoneButton
+          done={moduleItem.done}
+          itemId={moduleItem.id}
+          moduleId={moduleItem.module_id}
+          onError={() => {
+            alertContext.setOnFailure(I18n.t('Error updating status of module item'))
+          }}
+        />
+      ),
+      key: 'mark-as-done'
+    })
+  }
+
+  return (
+    <>
+      <AssignmentToggleDetails description={assignment.description} />
+      {buttons.length > 0 && <StudentFooter buttons={buttons} />}
+    </>
+  )
+}
+
+function renderContentBaseOnAvailability({assignment, submission}, alertContext) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
   } else if (assignment.env.unlockDate) {
     return <DateLocked date={assignment.env.unlockDate} type="assignment" />
+  } else if (assignment.nonDigitalSubmission) {
+    return renderSubmissionlessAssignment({assignment}, alertContext)
   } else if (submission === null) {
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
@@ -74,6 +107,8 @@ function renderContentBaseOnAvailability({assignment, submission}) {
 }
 
 function StudentContent(props) {
+  const alertContext = useContext(AlertManagerContext)
+
   // TODO: Move the button provider up one level
   return (
     <div data-testid="assignments-2-student-view">
@@ -84,7 +119,7 @@ function StudentContent(props) {
         scrollThreshold={150}
         submission={props.submission}
       />
-      {renderContentBaseOnAvailability(props)}
+      {renderContentBaseOnAvailability(props, alertContext)}
     </div>
   )
 }

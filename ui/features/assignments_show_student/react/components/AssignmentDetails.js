@@ -45,14 +45,16 @@ export default function AssignmentDetails({assignment, isSticky}) {
           />
         </Text>
       )}
-      <div>
-        <Text size="large">
-          {I18n.t(
-            {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
-            {count: assignment.allowedAttempts || 0}
-          )}
-        </Text>
-      </div>
+      {!assignment.nonDigitalSubmission && (
+        <div>
+          <Text size="large">
+            {I18n.t(
+              {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
+              {count: assignment.allowedAttempts || 0}
+            )}
+          </Text>
+        </div>
+      )}
       {!isSticky && (
         <div>
           <Text size="small">
