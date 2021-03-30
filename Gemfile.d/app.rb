@@ -106,7 +106,7 @@ gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.3'
 gem 'rack-brotli', '1.0.0'
 gem 'rack-test', '1.1.0'
-gem 'rake', '13.0.1'
+gem 'rake', '13.0.3'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.10', require: false
 gem 'redcarpet', '3.5.0', require: false
