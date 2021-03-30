@@ -84,9 +84,9 @@ module Api::V1::User
       if user.pronouns
         json[:pronouns] = user.pronouns
       end
-
-      if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
-        json[:avatar_url] = avatar_url_for_user(user)
+      if user.account.service_enabled?(:avatars)
+        json[:avatar_url] = avatar_url_for_user(user) if includes.include?('avatar_url')
+        json[:avatar_state] = user.avatar_state if includes.include?('avatar_state')
       end
       if enrollments
         json[:enrollments] = enrollments.map do |e|

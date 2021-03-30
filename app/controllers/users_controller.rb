@@ -1255,7 +1255,7 @@ class UsersController < ApplicationController
   def api_show
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
-      includes = %w{locale avatar_url permissions email effective_locale}
+      includes = %w{locale avatar_url avatar_state permissions email effective_locale}
       includes += Array.wrap(params[:include]) & ['uuid', 'last_login']
 
       # would've preferred to pass User.with_last_login as the collection to
@@ -1830,6 +1830,9 @@ class UsersController < ApplicationController
   #   token and instead pass the url here. Warning: For maximum compatibility,
   #   please use 128 px square images.
   #
+  # @argument user[avatar][state] [String, "none", "submitted", "approved", "locked", "reported", "re_reported"]
+  #   To set the state of user's avatar. Only valid for account administrator.
+  #
   # @argument user[title] [String]
   #   Sets a title on the user profile. (See {api:ProfileController#settings Get user profile}.)
   #   Profiles must be enabled on the root account.
@@ -1892,6 +1895,7 @@ class UsersController < ApplicationController
       user_params.delete(:avatar_image)
 
       managed_attributes << :avatar_image
+      user_params[:avatar_image] = {}
       if (token = avatar.try(:[], :token))
         if (av_json = avatar_for_token(@user, token))
           user_params[:avatar_image] = { :type => av_json['type'],
@@ -1900,6 +1904,7 @@ class UsersController < ApplicationController
       elsif (url = avatar.try(:[], :url))
         user_params[:avatar_image] = { :url => url }
       end
+      user_params[:avatar_image][:state] = avatar.try(:[], :state)
     end
 
     if managed_attributes.empty? || !user_params.except(*managed_attributes).empty?
@@ -1914,7 +1919,7 @@ class UsersController < ApplicationController
       @user.grants_right?(@current_user, :update_avatar) &&
       @user.grants_right?(@current_user, :manage_user_details)
 
-    includes = %w{locale avatar_url email time_zone}
+    includes = %w{locale avatar_url avatar_state email time_zone}
     if title = user_params.delete(:title)
       @user.profile.title = title
       includes << "title"
@@ -1945,7 +1950,10 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.update(user_params)
-        @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
+        if admin_avatar_update
+          avatar_state = old_avatar_state == :locked ? old_avatar_state : 'approved'
+          @user.avatar_state = user_params[:avatar_image][:state] || avatar_state
+        end
         @user.profile.save if @user.profile.changed?
         @user.save if admin_avatar_update || update_email
         # User.email= causes a reload to the user object. The saves need to

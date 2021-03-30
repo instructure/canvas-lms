@@ -1829,6 +1829,21 @@ describe "Users API", type: :request do
         expect(user.avatar_state).to eql :locked
       end
 
+      it "should set avatar state manually by an admin" do
+        @student.avatar_state = 'approved'
+        @student.save!
+
+        json = api_call(:put, @path, @path_options, {
+          :user => {
+            :avatar => {
+              :avatar_state => 'lock'
+            }
+          }
+        })
+        user = User.find(json['id'])
+        expect(user.avatar_state).to eql :locked
+      end
+
       it "should not allow the user's avatar to be set to an external url" do
         url_to_set = 'https://www.instructure.example.com/image.jpg'
         json = api_call(:put, @path, @path_options, {
