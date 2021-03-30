@@ -1203,7 +1203,7 @@ describe Canvas::LiveEvents do
   describe '.content_migration_completed' do
     let(:course) { course_factory() }
     let(:source_course) { course_factory() }
-    let(:migration) { ContentMigration.create(context: course, source_course: source_course) }
+    let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: 'some_type') }
 
     before do
       migration.migration_settings[:import_quizzes_next] = true
@@ -1222,7 +1222,8 @@ describe Canvas::LiveEvents do
           import_quizzes_next: true,
           domain: course.root_account.domain,
           source_course_lti_id: migration.source_course.lti_context_id,
-          destination_course_lti_id: course.lti_context_id
+          destination_course_lti_id: course.lti_context_id,
+          migration_type: migration.migration_type
         ),
         hash_including(
           context_type: course.class.to_s,
