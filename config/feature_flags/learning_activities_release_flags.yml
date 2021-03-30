@@ -41,20 +41,6 @@ new_math_equation_handling:
     with a MathJax processed version. This change provides better accessibility
     and many options for the reader to interact with the equation on the page.
   applies_to: RootAccount
-new_file_url_rewriting:
-  state: hidden
-  display_name: Update file links to prefer preview, not download
-  description: |-
-    Canvas rewrites file URLs in user generated content. In the process, it
-    often added "/download" where it was not wanted and inappropriate. This
-    setting updates how URL rewriting takes place to facilitate previewing
-    files within Canvas and not downloading.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: on
-    ci:
-      state: on
 inline_math_everywhere:
   state: hidden
   display_name: "Math: Support LaTex math equations almost everywhere"

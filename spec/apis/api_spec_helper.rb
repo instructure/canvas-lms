@@ -151,11 +151,7 @@ def check_document(html, course, attachment, include_verifiers)
   expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
   img3 = doc.at_css('img#3')
   expect(img3).to be_present
-  if Account.site_admin.feature_enabled?(:new_file_url_rewriting)
-    expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
-  else
-    expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
-  end
+  expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
   video = doc.at_css('video')
   expect(video).to be_present
   expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
