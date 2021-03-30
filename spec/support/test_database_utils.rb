@@ -131,7 +131,7 @@ module TestDatabaseUtils
         sequences = get_sequences(connection)
         sequences.each do |sequence|
           # stable random-ish number <= 2**20 so that we don't overflow pre-migrated Version partitions
-          new_val = Digest::MD5.hexdigest("#{seed}#{i}#{sequence}")[0...5].to_i(16) + 1
+          new_val = Digest::SHA256.hexdigest("#{seed}#{i}#{sequence}")[0...5].to_i(16) + 1
           connection.execute("ALTER SEQUENCE #{connection.quote_table_name(sequence)} RESTART WITH #{new_val}")
         end
       end
