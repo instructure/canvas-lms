@@ -252,11 +252,12 @@ module K5PageObject
   end
 
   def beginning_of_week_date
-    ff(week_date_selector)[0]
+    date_block = ff(week_date_selector)
+    date_block[0].text == 'Today' ? date_block[1].text : date_block[0].text
   end
 
   def end_of_week_date
-    ff(week_date_selector).last
+    ff(week_date_selector).last.text
   end
 
   def previous_week_button
@@ -334,10 +335,10 @@ module K5PageObject
   end
 
   def beginning_weekday_calculation(current_date)
-    (current_date.beginning_of_week - 1.day).strftime("%B %-d")
+    (current_date.beginning_of_week(:sunday)).strftime("%B %-d")
   end
 
   def ending_weekday_calculation(current_date)
-    (current_date.end_of_week - 1.day).strftime("%B %-d")
+    (current_date.end_of_week(:sunday)).strftime("%B %-d")
   end
 end

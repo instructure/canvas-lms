@@ -75,9 +75,9 @@ describe "student k5 dashboard schedule" do
       get "/#schedule"
       wait_for_ajaximations
 
-      expect(beginning_of_week_date.text).to include(beginning_weekday_calculation(@now))
+      expect(beginning_of_week_date).to include(beginning_weekday_calculation(@now))
       # These expects will be uncommented when a week ending issue is resolved.  LS-2042
-      # expect(end_of_week_date.text).to include(ending_weekday_calculation(@now))
+      # expect(end_of_week_date).to include(ending_weekday_calculation(@now))
     end
 
     it 'navigates to previous week with previous button' do
@@ -87,8 +87,8 @@ describe "student k5 dashboard schedule" do
       click_previous_week_button
       wait_for_ajaximations
 
-      expect(beginning_of_week_date.text).to include(beginning_weekday_calculation(1.week.ago(@now)))
-      # expect(end_of_week_date.text).to include(ending_weekday_calculation(1.week.ago(@now)))
+      expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.ago(@now)))
+      # expect(end_of_week_date).to include(ending_weekday_calculation(1.week.ago(@now)))
     end
 
     it 'navigates to next week with the forward button' do
@@ -98,8 +98,8 @@ describe "student k5 dashboard schedule" do
       click_next_week_button
       wait_for_ajaximations
 
-      expect(beginning_of_week_date.text).to include(beginning_weekday_calculation(1.week.from_now(@now)))
-      # expect(end_of_week_date.text).to include(ending_weekday_calculation(1.week.from_now(@now)))
+      expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.from_now(@now)))
+      # expect(end_of_week_date).to include(ending_weekday_calculation(1.week.from_now(@now)))
     end
 
     it 'navigates back to current week with today button' do
@@ -108,13 +108,13 @@ describe "student k5 dashboard schedule" do
 
       click_previous_week_button
       wait_for_ajaximations
-      expect(beginning_of_week_date.text).to include(beginning_weekday_calculation(1.week.ago(@now)))
+      expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.ago(@now)))
 
       click_today_button
       wait_for_ajaximations
 
-      expect(beginning_of_week_date.text).to include(beginning_weekday_calculation(@now))
-      # expect(end_of_week_date.text).to include(ending_weekday_calculation(@now))
+      expect(beginning_of_week_date).to include(beginning_weekday_calculation(@now))
+      # expect(end_of_week_date).to include(ending_weekday_calculation(@now))
     end
   end
 end
