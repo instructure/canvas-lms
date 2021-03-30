@@ -472,7 +472,7 @@ module ApplicationHelper
 
   def safe_cache_key(*args)
     key = args.cache_key
-    key = Digest::MD5.hexdigest(key) if key.length > 200
+    key = Digest::SHA256.hexdigest(key) if key.length > 200
     key
   end
 
@@ -908,7 +908,7 @@ module ApplicationHelper
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
     keys = collection.map(&:cache_key)
-    Digest::MD5.hexdigest(keys.join("/"))
+    Digest::SHA256.hexdigest(keys.join("/"))
   end
 
   def add_uri_scheme_name(uri)

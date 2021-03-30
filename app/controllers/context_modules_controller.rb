@@ -49,7 +49,7 @@ class ContextModulesController < ApplicationController
       @modules_cache_key ||= begin
         visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
         cache_key_items = [@context.cache_key, @can_view, @can_add, @can_edit, @can_delete, @is_student, @can_view_unpublished, "all_context_modules_draft_10",
-                           collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
+                           collection_cache_key(@modules), Time.zone, Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join("/")
         cache_key = add_menu_tools_to_cache_key(cache_key)
         add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
@@ -405,7 +405,7 @@ class ContextModulesController < ApplicationController
       end
 
       submitted_assignment_ids = if @current_user && assignment_ids.any?
-                                   assignments_key = Digest::MD5.hexdigest(assignment_ids.sort.join(","))
+                                   assignments_key = Digest::SHA256.hexdigest(assignment_ids.sort.join(","))
                                    Rails.cache.fetch_with_batched_keys("submitted_assignment_ids/#{assignments_key}",
                                                                        batch_object: @current_user, batched_keys: :submissions) do
                                      @current_user.submissions.shard(@context.shard)

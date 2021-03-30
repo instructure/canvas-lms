@@ -887,7 +887,7 @@ class MessageableUser
             methods.each do |method|
               canonical = send(method).cache_key
               shard_key << method
-              shard_key << Digest::MD5.hexdigest(canonical)
+              shard_key << Digest::SHA256.hexdigest(canonical)
             end
             by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, expires_in: 1.day, &block)
           end
