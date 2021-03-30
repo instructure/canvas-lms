@@ -452,7 +452,7 @@ function initDropdown() {
 
     $menu
       .insertBefore($selectmenu_list)
-      .bind('mouseenter mouseleave', function(event) {
+      .bind('mouseenter mouseleave', function (event) {
         $(this)
           .toggleClass(
             'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
@@ -464,7 +464,7 @@ function initDropdown() {
       .find('ul')
       .hide()
       .menu()
-      .delegate('a', 'click mousedown', function() {
+      .delegate('a', 'click mousedown', function () {
         EG.changeToSection($(this).data('section-id'))
       })
 
@@ -690,9 +690,7 @@ function initCommentBox() {
         'create',
         'any',
         (id, type) => {
-          $('#media_media_recording')
-            .data('comment_id', id)
-            .data('comment_type', type)
+          $('#media_media_recording').data('comment_id', id).data('comment_type', type)
           EG.addSubmissionComment()
         },
         () => {
@@ -748,9 +746,7 @@ function initCommentBox() {
             text: I18n.t('buttons.dialog_buttons', 'Cancel'),
             click() {
               recognition.stop()
-              $(this)
-                .dialog('close')
-                .remove()
+              $(this).dialog('close').remove()
             }
           },
           {
@@ -767,19 +763,15 @@ function initCommentBox() {
         ],
         close() {
           recognition.stop()
-          $(this)
-            .dialog('close')
-            .remove()
+          $(this).dialog('close').remove()
         }
       })
       return false
     })
     // show the div that contains the button because it is hidden from browsers that dont support speech
-    $('.speech_recognition_link')
-      .closest('div.speech-recognition')
-      .show()
+    $('.speech_recognition_link').closest('div.speech-recognition').show()
 
-    var processSpeech = function($this) {
+    var processSpeech = function ($this) {
       if ($('#record_button').attr('recording') == 'true') {
         recognition.stop()
         const current_comment = $('#final_results').html() + $('#interim_results').html()
@@ -791,7 +783,7 @@ function initCommentBox() {
       }
     }
 
-    var formatComment = function(current_comment) {
+    var formatComment = function (current_comment) {
       return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
     }
 
@@ -800,14 +792,14 @@ function initCommentBox() {
       recognition.interimResults = true
       let final_transcript = ''
 
-      recognition.onstart = function() {
+      recognition.onstart = function () {
         $('#dialog_message').text(messages.recording)
         $('#record_button')
           .attr('recording', true)
           .attr('aria-label', I18n.t('dialog_button.aria_stop', 'Hit "Stop" to end recording.'))
       }
 
-      recognition.onresult = function(event) {
+      recognition.onresult = function (event) {
         let interim_transcript = ''
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
@@ -820,21 +812,21 @@ function initCommentBox() {
         }
       }
 
-      recognition.onaudiostart = function(event) {
+      recognition.onaudiostart = function (event) {
         // this call is required for onaudioend event to trigger
       }
 
-      recognition.onaudioend = function(event) {
+      recognition.onaudioend = function (event) {
         if ($('#final_results').text() != '' || $('#interim_results').text() != '') {
           $('#dialog_message').text(messages.recording_expired)
         }
       }
 
-      recognition.onend = function(event) {
+      recognition.onend = function (event) {
         final_transcript = ''
       }
 
-      recognition.onerror = function(event) {
+      recognition.onerror = function (event) {
         if (event.error == 'not-allowed') {
           $('#dialog_message').text(messages.mic_blocked)
         } else if ((event.error = 'no-speech')) {
@@ -847,19 +839,14 @@ function initCommentBox() {
 
       // xsslint safeString.function linebreak
       function linebreak(transcript) {
-        return htmlEscape(transcript)
-          .replace(/\n\n/g, '<p></p>')
-          .replace(/\n/g, '<br>')
+        return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')
       }
     }
   }
 }
 
 function hideMediaRecorderContainer() {
-  $('#media_media_recording')
-    .hide()
-    .removeData('comment_id')
-    .removeData('comment_type')
+  $('#media_media_recording').hide().removeData('comment_id').removeData('comment_type')
 }
 
 function isAssessmentEditableByMe(assessment) {
@@ -957,10 +944,8 @@ function initRubricStuff() {
     }
   })
 
-  $('.save_rubric_button').click(function() {
-    const $rubric = $(this)
-      .parents('#rubric_holder')
-      .find('.rubric')
+  $('.save_rubric_button').click(function () {
+    const $rubric = $(this).parents('#rubric_holder').find('.rubric')
     const data = rubricAssessment.assessmentData($rubric)
     if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
       data.provisional = '1'
@@ -1126,7 +1111,7 @@ function renderSubmissionCommentsDownloadLink(submission) {
 function renderDeleteAttachmentLink($submission_file, attachment) {
   if (ENV.can_delete_attachments) {
     const $delete_link = $submission_file.find('a.submission-file-delete')
-    $delete_link.click(function(event) {
+    $delete_link.click(function (event) {
       event.preventDefault()
       const url = $(this).attr('href')
       if (
@@ -1181,7 +1166,7 @@ EG = {
       $resize_overlay.hide()
     })
     // it should disappear before it's clickable, but just in case...
-    $resize_overlay.click(function(event) {
+    $resize_overlay.click(function (event) {
       $(this).hide()
     })
     $width_resizer
@@ -1220,13 +1205,13 @@ EG = {
           $resize_overlay.hide()
         }
       })
-      .click(function(event) {
+      .click(function (event) {
         event.preventDefault()
         if ($full_width_container.hasClass('full_width')) {
           $full_width_container.removeClass('full_width')
         } else {
           makeFullWidth()
-          $(this).addClass('highlight', 100, function() {
+          $(this).addClass('highlight', 100, function () {
             $(this).removeClass('highlight', 4000)
           })
         }
@@ -1252,11 +1237,9 @@ EG = {
     header.init()
     initKeyCodes()
 
-    $('.dismiss_alert').click(function(e) {
+    $('.dismiss_alert').click(function (e) {
       e.preventDefault()
-      $(this)
-        .closest('.alert')
-        .hide()
+      $(this).closest('.alert').hide()
     })
 
     $('#eg_sort_by').val(userSettings.get('eg_sort_by'))
@@ -1401,9 +1384,7 @@ EG = {
     }
 
     if (rubricFull.filter(':visible').length || force === 'close') {
-      $('#grading')
-        .show()
-        .height('auto')
+      $('#grading').show().height('auto')
       rubricFull.fadeOut()
       $('.toggle_full_rubric').focus()
     } else {
@@ -1980,11 +1961,9 @@ EG = {
           $assignment_submission_resubmit_to_vericite_url.attr('href'),
           {user_id: submission[anonymizableUserId]}
         )
-        $vericiteInfo.find('.vericite_resubmit_button').click(function(event) {
+        $vericiteInfo.find('.vericite_resubmit_button').click(function (event) {
           event.preventDefault()
-          $(this)
-            .attr('disabled', true)
-            .text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
+          $(this).attr('disabled', true).text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
 
           $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
             SpeedgraderHelpers.reloadPage()
@@ -2146,13 +2125,13 @@ EG = {
         .appendTo($submission_files_list)
         .find('a.display_name')
         .data('attachment', attachment)
-        .click(function(event) {
+        .click(function (event) {
           event.preventDefault()
           EG.loadSubmissionPreview($(this).data('attachment'), null)
         })
         .end()
         .find('a.submission-file-download')
-        .bind('dragstart', function(event) {
+        .bind('dragstart', function (event) {
           // check that event dataTransfer exists
           event.originalEvent.dataTransfer &&
             // handle dragging out of the browser window only if it is supported.
@@ -2213,10 +2192,7 @@ EG = {
 
     // if there is any submissions after this one, show a notice that they are not looking at the newest
     $submission_not_newest_notice.showIf(
-      $submission_to_view
-        .filter(':visible')
-        .find(':selected')
-        .nextAll().length
+      $submission_to_view.filter(':visible').find(':selected').nextAll().length
     )
 
     $submission_late_notice.showIf(submission.late)
@@ -2391,14 +2367,14 @@ EG = {
     if (scores.length) {
       // if there are some submissions that have been graded.
       $average_score_wrapper.show()
-      const avg = function(arr) {
+      const avg = function (arr) {
         let sum = 0
         for (let i = 0, j = arr.length; i < j; i++) {
           sum += arr[i]
         }
         return sum / arr.length
       }
-      const roundWithPrecision = function(number, precision) {
+      const roundWithPrecision = function (number, precision) {
         precision = Math.abs(parseInt(precision, 10)) || 0
         const coefficient = 10 ** precision
         return Math.round(number * coefficient) / coefficient
@@ -2457,11 +2433,7 @@ EG = {
     } else if (attachment) {
       this.renderAttachment(attachment)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
-      this.renderLtiLaunch(
-        $iframe_holder,
-        ENV.lti_retrieve_url,
-        submission
-      )
+      this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
     } else {
       this.renderSubmissionPreview()
     }
@@ -2735,7 +2707,7 @@ EG = {
 
     commentElement
       .find('.delete_comment_link')
-      .click(function(_event) {
+      .click(function (_event) {
         $(this)
           .parents('.comment')
           .confirmDelete({
@@ -2761,7 +2733,7 @@ EG = {
               }
 
               // and also remove it from the DOM
-              $(this).slideUp(function() {
+              $(this).slideUp(function () {
                 $(this).remove()
               })
             }
@@ -2780,7 +2752,7 @@ EG = {
         let updateUrl = ''
         let updateData = {}
         let updateAjaxOptions = {}
-        const commentUpdateSucceeded = function(data) {
+        const commentUpdateSucceeded = function (data) {
           let updatedComments = []
           const $replacementComment = that.renderComment(data.submission_comment)
           $replacementComment.show()
@@ -2798,7 +2770,7 @@ EG = {
 
           that.currentStudent.submission.submission_comments = updatedComments
         }
-        const commentUpdateFailed = function(_jqXHR, _textStatus) {
+        const commentUpdateFailed = function (_jqXHR, _textStatus) {
           $.flashError(I18n.t('Failed to submit draft comment'))
         }
         const confirmed = confirm(I18n.t('Are you sure you want to submit this comment?'))
@@ -2808,9 +2780,7 @@ EG = {
           updateData = {submission_comment: {draft: 'false'}}
           updateAjaxOptions = {url: updateUrl, data: updateData, dataType: 'json', type: 'PATCH'}
 
-          $.ajax(updateAjaxOptions)
-            .done(commentUpdateSucceeded)
-            .fail(commentUpdateFailed)
+          $.ajax(updateAjaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed)
         }
       })
       .showIf(comment.publishable && !isConcluded)
@@ -2883,17 +2853,11 @@ EG = {
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)
 
     if (comment.avatar_path && !hideStudentName) {
-      commentElement
-        .find('.avatar')
-        .attr('src', comment.avatar_path)
-        .show()
+      commentElement.find('.avatar').attr('src', comment.avatar_path).show()
     }
 
     if (comment.media_comment_type && comment.media_comment_id) {
-      commentElement
-        .find('.play_comment_link')
-        .data(comment)
-        .show()
+      commentElement.find('.play_comment_link').data(comment).show()
     }
 
     // TODO: Move attachment handling into a separate function
@@ -3071,7 +3035,7 @@ EG = {
     }
 
     function formSuccess(submissions) {
-      $.each(submissions, function() {
+      $.each(submissions, function () {
         EG.setOrUpdateSubmission(this.submission)
       })
       EG.revertFromFormSubmit({draftComment})
@@ -3208,7 +3172,7 @@ EG = {
         }
       }
 
-      $.each(submissions, function() {
+      $.each(submissions, function () {
         // setOrUpdateSubmission returns the student it just updated.
         // This is only operating on a subset of people, so it should
         // be fairly fast to call updateSelectMenuStatus for each one.
@@ -3398,13 +3362,11 @@ EG = {
       fileIndex++
       $('#comment_attachments').append($attachment.show())
     })
-    $comment_attachment_input_blank.find('a').click(function(event) {
+    $comment_attachment_input_blank.find('a').click(function (event) {
       event.preventDefault()
-      $(this)
-        .parents('.comment_attachment_input')
-        .remove()
+      $(this).parents('.comment_attachment_input').remove()
     })
-    $right_side.delegate('.play_comment_link', 'click', function() {
+    $right_side.delegate('.play_comment_link', 'click', function () {
       if ($(this).data('media_comment_id')) {
         $(this)
           .parents('.comment')
@@ -3435,7 +3397,7 @@ EG = {
   compareStudentsBy(f) {
     const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
 
-    return function(studentA, studentB) {
+    return function (studentA, studentB) {
       const a = f(studentA)
       const b = f(studentB)
 
@@ -3767,13 +3729,9 @@ function setupSelectors() {
   $avatar_image = $('#avatar_image')
   $average_score = $('#average_score')
   $average_score_wrapper = $('#average-score-wrapper')
-  $comment_attachment_blank = $('#comment_attachment_blank')
-    .removeAttr('id')
-    .detach()
+  $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach()
   $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach()
-  $comment_blank = $('#comment_blank')
-    .removeAttr('id')
-    .detach()
+  $comment_blank = $('#comment_blank').removeAttr('id').detach()
   $comment_saved = $('#comment_saved')
   $comment_saved_message = $('#comment_saved_message')
   $comment_submitted = $('#comment_submitted')
@@ -3805,9 +3763,7 @@ function setupSelectors() {
   $selectmenu = null
   $submission_attachment_viewed_at = $('#submission_attachment_viewed_at_container')
   $submission_details = $('#submission_details')
-  $submission_file_hidden = $('#submission_file_hidden')
-    .removeAttr('id')
-    .detach()
+  $submission_file_hidden = $('#submission_file_hidden').removeAttr('id').detach()
   $submission_files_container = $('#submission_files_container')
   $submission_files_list = $('#submission_files_list')
   $submission_late_notice = $('#submission_late_notice')
