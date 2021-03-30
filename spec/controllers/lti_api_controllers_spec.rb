@@ -619,6 +619,15 @@ to because the assignment has no points possible.
     check_failure('failure', 'Course is invalid')
   end
 
+  it "fails if course is concluded" do
+    opts = {'body' => replace_result(score: '0.6')}
+    @course.soft_conclude!
+    @course.save
+    make_call(opts)
+
+    check_failure('failure', 'Course is concluded')
+  end
+
   it "fails if assignment is deleted" do
     opts = {'body' => replace_result(score: '0.6')}
     @assignment.destroy

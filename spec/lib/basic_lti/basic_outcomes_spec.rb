@@ -145,6 +145,13 @@ describe BasicLTI::BasicOutcomes do
         to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is invalid')
     end
 
+    it 'throws Invalid sourcedid if course is concluded' do
+      @course.soft_conclude!
+      @course.save!
+      expect{described_class.decode_source_id(tool, source_id)}.
+        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is concluded')
+    end
+
     it "throws User is no longer in course isuser enrollment is missing" do
       @user.enrollments.destroy_all
       expect{described_class.decode_source_id(tool, source_id)}.
