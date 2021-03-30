@@ -16,6 +16,7 @@
 /.ruby-version
 /app/views/info/styleguide.html.erb
 /config/*.yml
+!/config/credentials.test.yml
 /config/environments/*-local.rb
 /config/locales/generated/
 /config/RAILS6_0
@@ -91,3 +92,6 @@ coverage-karma
 
 # generated graphql schema
 schema.graphql
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key

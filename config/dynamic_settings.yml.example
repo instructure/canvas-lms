@@ -96,6 +96,12 @@ development:
       # csp_logging.yml: |
       #   host: https://csplogging.inscloudgate.net/
       #   shared_secret: s00p3r_s3cr3t
+      # To work with the release notes UI, uncomment this and ensure you have vault_contents.yml
+      # with the example contents.  Also see docker-compose/dynamodb.override.yml
+      # release_notes.yml: |
+      #  ddb_endpoint: 'http://dynamo:8000/'
+      #  ddb_table_name: 'canvas-release-notes'
+      #  vault_credential_path: 'sts/testaccount/sts/canvas-release-notes'
   store:
     canvas:
       lti-keys:

@@ -10,6 +10,10 @@ development:
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
+  'sts/testaccount/sts/canvas-release-notes':
+    access_key: 'fake-access-key'
+    secret_key: 'fake-secret-key'
+    security_token: 'fake-security-token'
 #  'app-canvas/data/secrets':
 #    data:
 #      raven_dsn: garbage-dsn-here
