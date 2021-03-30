@@ -39,7 +39,7 @@ describe FileAuthenticator do
 
   describe "fingerprint" do
     it "should be a hexdigest string" do
-      expect(@authenticator.fingerprint).to match(/^\h{32}$/)
+      expect(@authenticator.fingerprint).to match(/^\h{64}$/)
     end
 
     it "should be stable across instances with the same parameters" do

@@ -50,7 +50,7 @@ class FileAuthenticator
     # putting the user object in the cache key would, because this fingerprint
     # is not intended to differentiate caches of information _about_ the user.
     # just to differentiate caches _across_ user identities.
-    Digest::MD5.hexdigest("#{@user&.global_id}|#{@acting_as&.global_id}|#{@oauth_host}")
+    Digest::SHA256.hexdigest("#{@user&.global_id}|#{@acting_as&.global_id}|#{@oauth_host}")
   end
 
   def instfs_bearer_token

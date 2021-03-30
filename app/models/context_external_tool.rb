@@ -1148,7 +1148,7 @@ end
   end
 
   def self.key_for_granted_permissions(granted_permissions)
-    Digest::MD5.hexdigest(granted_permissions.sort_by{|k, v| k.to_s}.flatten.join(",")) # for consistency's sake
+    Digest::SHA256.hexdigest(granted_permissions.sort_by{|k, v| k.to_s}.flatten.join(",")) # for consistency's sake
   end
 
   # returns a key composed of the updated_at times for all the tools visible to someone with the granted_permissions
@@ -1164,7 +1164,7 @@ end
     # (which was fine when we only had two visibility settings but not when an infinite combination of permissions is in play)
     Rails.cache.fetch_with_batched_keys(compiled_key, batch_object: root_account, batched_keys: :global_navigation) do
       tools = self.filtered_global_navigation_tools(root_account, granted_permissions)
-      Digest::MD5.hexdigest(tools.sort.map(&:cache_key).join('/'))
+      Digest::SHA256.hexdigest(tools.sort.map(&:cache_key).join('/'))
     end
   end
 
