@@ -2316,7 +2316,7 @@ class ApplicationController < ActionController::Base
 
   def temporary_user_code(generate = true)
     if generate
-      session[:temporary_user_code] ||= "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
+      session[:temporary_user_code] ||= "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
     else
       session[:temporary_user_code]
     end
