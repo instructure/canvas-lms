@@ -1193,7 +1193,7 @@ import './vendor/ui.selectmenu'
     },
 
     getAccommodations: function() {
-      var accommodationsPayload =  $.getJSON("/" + this.currentStudent.id + "/accommodations");
+      var accommodationsPayload =  $.getJSON("/users/" + this.currentStudent.id + "/accommodations");
       if (accommodationsPayload.accommodations) {
         this.currentStudent.settings.accommodations = accommodationsPayload.accommodations;
       }
