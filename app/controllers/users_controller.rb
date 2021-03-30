@@ -2818,7 +2818,8 @@ class UsersController < ApplicationController
                                'pending_approval'
                              else
                                'pre_registered'
-                             end
+      end
+      @user.root_account_ids = [@domain_root_account.id]
     end
     @recaptcha_errors = nil
     if force_validations || !manage_user_logins

@@ -741,6 +741,15 @@ describe UsersController do
           expect(response).to be_successful
         end
 
+        it "should set root_account_ids" do
+          post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' },
+                                   user: { name: 'happy gilmore', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code + ' ', initial_enrollment_type: 'student' },
+                                   self_enrollment: '1' }
+          expect(response).to be_successful
+          u = User.where(name: 'happy gilmore').take
+          expect(u.root_account_ids).to eq [Account.default.id]
+        end
+
         it "should ignore the password if self enrolling with an email pseudonym" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'}
           expect(response).to be_successful
