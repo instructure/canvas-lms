@@ -1982,7 +1982,7 @@ class CoursesController < ApplicationController
         id = split.pop
         (types[split.join("_")] ||= []) << id
       end
-      locks_hash = Rails.cache.fetch(["locked_for_results", @current_user, Digest::MD5.hexdigest(params[:assets])].cache_key) do
+      locks_hash = Rails.cache.fetch(["locked_for_results", @current_user, Digest::SHA256.hexdigest(params[:assets])].cache_key) do
         locks = {}
         types.each do |type, ids|
           case type

@@ -513,7 +513,7 @@ describe ApplicationHelper do
       key2 = collection_cache_key(collection)
       expect(key1).to eq key2
       # verify it's not overly long
-      expect(key1.length).to be <= 40
+      expect(key1.length).to be <= 128
 
       User.where(id: collection[1]).update_all(updated_at: 1.hour.ago)
       collection[1].reload

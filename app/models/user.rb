@@ -1749,7 +1749,7 @@ class User < ActiveRecord::Base
 
   def course_nickname_hash
     if preferences[:course_nicknames].present?
-      @nickname_hash ||= Digest::MD5.hexdigest(user_preference_values.where(key: :course_nicknames).pluck(:sub_key, :value).sort.join(","))
+      @nickname_hash ||= Digest::SHA256.hexdigest(user_preference_values.where(key: :course_nicknames).pluck(:sub_key, :value).sort.join(","))
     else
       "default"
     end
@@ -2229,7 +2229,7 @@ class User < ActiveRecord::Base
     return [] unless course_ids.present?
 
     shard.activate do
-      ids_hash = Digest::MD5.hexdigest(course_ids.sort.join(","))
+      ids_hash = Digest::SHA256.hexdigest(course_ids.sort.join(","))
       Rails.cache.fetch_with_batched_keys(["submissions_for_course_ids", ids_hash, start_at, limit].cache_key, expires_in: 1.day, batch_object: self, batched_keys: :submissions) do
         start_at ||= 4.weeks.ago
 
