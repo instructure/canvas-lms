@@ -23,13 +23,15 @@
  * mode is enabled, it should ideally be captured here.
  */
 import canvas from '@instructure/canvas-theme'
+import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
 
 import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
 
-const {variables} = canvas
+const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
+const {variables} = baseTheme
 const {borders, colors, typography} = variables
 
 /**
@@ -81,6 +83,6 @@ export const theme = {
 }
 
 export default {
-  use: () => canvas.use({overrides: base}),
+  use: () => baseTheme.use({overrides: base}),
   variables: mergeDeep(variables, base)
 }
