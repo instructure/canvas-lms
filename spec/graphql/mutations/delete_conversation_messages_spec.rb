@@ -51,6 +51,7 @@ describe Mutations::DeleteConversationMessages do
   end
 
   it "removes the message from the participant's view" do
+    message.root_account_ids = [sender.account.id]
     query = <<~QUERY
       ids: [#{message.id}]
     QUERY
@@ -85,6 +86,8 @@ describe Mutations::DeleteConversationMessages do
       let(:message2) {ConversationParticipant.find_by(user: sender, conversation: conv).add_message('test')}
 
       it "removes messages from the view" do
+        message.root_account_ids = [sender.account.id]
+        message2.root_account_ids = [sender.account.id]
         query = <<~QUERY
           ids: [#{message.id}, #{message2.id}]
         QUERY
