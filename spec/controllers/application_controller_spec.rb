@@ -319,18 +319,6 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_truthy
         end
       end
-
-      context "rce_lti_favorites" do
-        it 'is false if the feature flag is off' do
-          Account.site_admin.disable_feature!(:rce_lti_favorites)
-          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.site_admin.enable_feature!(:rce_lti_favorites)
-          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_truthy
-        end
-      end
     end
 
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do

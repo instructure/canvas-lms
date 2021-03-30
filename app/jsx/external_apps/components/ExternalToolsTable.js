@@ -111,7 +111,6 @@ export default class ExternalToolsTable extends React.Component {
     const show_lti_favorite_toggles =
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
-      ENV.FEATURES?.rce_lti_favorites &&
       this.props.canAddEdit
 
     return (
