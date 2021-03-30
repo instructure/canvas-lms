@@ -48,11 +48,6 @@ autocreate_attachment_from_media_object:
     Creates file objects (initially hidden to students if in a Course) after
     media is uploaded or recorded through the RCE.
   applies_to: RootAccount
-enhanced_grade_change_query:
-  state: hidden
-  display_name: Enhanced grade change auditing
-  description: Allow searching grade change audit logs by multiple criteria
-  applies_to: SiteAdmin
 new_file_url_rewriting:
   state: hidden
   display_name: Update file links to prefer preview, not download
