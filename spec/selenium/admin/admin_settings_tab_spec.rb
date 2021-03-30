@@ -352,6 +352,7 @@ describe "admin settings tab" do
 
   context "who can create new courses" do
     before :each do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
       get "/accounts/#{Account.default.id}/settings"
     end
 
@@ -360,6 +361,11 @@ describe "admin settings tab" do
     end
 
     it "should check on users with no enrollments" do
+      check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
+    end
+
+    it "should check on users with no enrollments (granular permissions)" do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
       check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
     end
 

@@ -853,8 +853,10 @@ describe Account do
     end
   end
 
+  # TODO: deprecated; need to look into removing this setting
   it "should allow no_enrollments_can_create_courses correctly" do
     a = Account.default
+    a.disable_feature!(:granular_permissions_manage_courses)
     a.settings = { :no_enrollments_can_create_courses => true }
     a.save!
 
@@ -2224,6 +2226,7 @@ describe Account do
     let(:account) { account_model }
 
     it 'returns expected roles with the given permission' do
+      account.disable_feature!(:granular_permissions_manage_courses)
       role = account.roles.create :name => 'AssistantGrader'
       role.base_role_type = 'TaEnrollment'
       role.workflow_state = 'active'
@@ -2237,6 +2240,50 @@ describe Account do
       expect(
         account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
       ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
+    end
+
+    it 'returns expected roles with the given permission (granular permissions)' do
+      account.enable_feature!(:granular_permissions_manage_courses)
+      role = account.roles.create :name => 'TeacherAdmin'
+      role.base_role_type = 'TeacherEnrollment'
+      role.workflow_state = 'active'
+      role.save!
+      RoleOverride.create!(
+        context: account,
+        permission: 'manage_courses_add',
+        role: role,
+        enabled: true
+      )
+      RoleOverride.create!(
+        context: account,
+        permission: 'manage_courses_publish',
+        role: role,
+        enabled: true
+      )
+      RoleOverride.create!(
+        context: account,
+        permission: 'manage_courses_conclude',
+        role: role,
+        enabled: true
+      )
+      RoleOverride.create!(
+        context: account,
+        permission: 'manage_courses_delete',
+        role: role,
+        enabled: true
+      )
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_add).map(&:name).sort
+      ).to eq %w[AccountAdmin TeacherAdmin]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_publish).map(&:name).sort
+      ).to eq %w[AccountAdmin DesignerEnrollment TeacherAdmin TeacherEnrollment]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_conclude).map(&:name).sort
+      ).to eq %w[AccountAdmin DesignerEnrollment TeacherAdmin TeacherEnrollment]
+      expect(
+        account.roles_with_enabled_permission(:manage_courses_delete).map(&:name).sort
+      ).to eq %w[AccountAdmin TeacherAdmin]
     end
   end
 
@@ -2281,7 +2328,7 @@ describe Account do
 
     it "returns an explicit template" do
       sub_account.update!(course_template: template)
-      expect(sub_account.effective_course_template).to eq template            
+      expect(sub_account.effective_course_template).to eq template
     end
 
     it "inherits a template" do

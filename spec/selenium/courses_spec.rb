@@ -105,6 +105,7 @@ describe "courses" do
       end
 
       it "should allow publishing/unpublishing with only change_course_state permission" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         @course.account.role_overrides.create!(:permission => :manage_course_content, :role => teacher_role, :enabled => false)
         @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
 
@@ -115,8 +116,41 @@ describe "courses" do
         validate_action_button(:last, 'Published')
       end
 
+      it "should allow publishing/unpublishing with only manage_courses_publish permission (granular permissions)" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+        @course.account.role_overrides.create!(
+          permission: :manage_course_content,
+          role: teacher_role,
+          enabled: false
+        )
+        @course.account.role_overrides.create!(
+          permission: :manage_courses_publish,
+          role: teacher_role,
+          enabled: true
+        )
+
+        get "/courses/#{@course.id}"
+        expect_new_page_load { ff('#course_status_actions button').first.click }
+        validate_action_button(:first, 'Unpublished')
+        expect_new_page_load { ff('#course_status_actions button').last.click }
+        validate_action_button(:last, 'Published')
+      end
+
       it "should not allow publishing/unpublishing without change_course_state permission" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         @course.account.role_overrides.create!(:permission => :change_course_state, :role => teacher_role, :enabled => false)
+
+        get "/courses/#{@course.id}"
+        expect(f("#content")).not_to contain_css('#course_status_actions')
+      end
+
+      it "should not allow publishing/unpublishing without manage_courses_publish permission (granular permissions)" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+        @course.account.role_overrides.create!(
+          permission: :manage_courses_publish,
+          role: teacher_role,
+          enabled: false
+        )
 
         get "/courses/#{@course.id}"
         expect(f("#content")).not_to contain_css('#course_status_actions')

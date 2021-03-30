@@ -8,7 +8,7 @@ granular_permissions_manage_courses:
   state: hidden
   applies_to: RootAccount
   display_name: Granular permissions for managing courses
-  description: Add granularity to permissions around managing courses i.e. Add / Edit / Delete
+  description: Add granularity to permissions around managing courses i.e. Add / Publish / Conclude / Delete
 granular_permissions_manage_users:
   state: hidden
   applies_to: RootAccount

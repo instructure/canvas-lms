@@ -696,7 +696,7 @@ describe "security" do
     end
 
     describe 'course' do
-      before (:each) do
+      before(:each) do
         course_factory(active_all: true)
         Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
       end
@@ -846,6 +846,7 @@ describe "security" do
       end
 
       it 'read_course_content' do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         @course.assignments.create!
         @course.wiki.set_front_page_url!("front-page")
         @course.wiki.front_page.save!
@@ -979,6 +980,147 @@ describe "security" do
         expect(@course.reload).to be_deleted
       end
 
+      it 'read_course_content (granular permissions)' do
+        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+        @course.assignments.create!
+        @course.wiki.set_front_page_url!("front-page")
+        @course.wiki.front_page.save!
+        @course.quizzes.create!
+        @course.attachments.create!(:uploaded_data => default_uploaded_data)
+
+        get "/courses/#{@course.id}"
+        expect(response).to be_redirect
+
+        get "/courses/#{@course.id}/assignments"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/assignments/syllabus"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/wiki"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/quizzes"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/discussion_topics"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/files"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/copy"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/content_exports"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_successful
+        html = Nokogiri::HTML5(response.body)
+        expect(html.css('.section .assignments')).to be_empty
+        expect(html.css('.section .syllabus')).to be_empty
+        expect(html.css('.section .pages')).to be_empty
+        expect(html.css('.section .quizzes')).to be_empty
+        expect(html.css('.section .discussions')).to be_empty
+        expect(html.css('.section .files')).to be_empty
+        expect(response.body).not_to match /Copy this Course/
+        expect(response.body).not_to match /Import Course Content/
+        expect(response.body).not_to match /Export this Course/
+
+        add_permission :read_course_content
+        add_permission :read_roster
+        add_permission :read_forum
+
+        get "/courses/#{@course.id}"
+        expect(response).to be_successful
+        expect(response.body).to match /People/
+
+        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.save!
+
+        get "/courses/#{@course.id}/assignments"
+        expect(response).to be_successful
+        expect(response.body).to match /People/ # still has read_as_admin rights
+
+        get "/courses/#{@course.id}/assignments/syllabus"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/wiki"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/quizzes"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/discussion_topics"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/files"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/copy"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/content_exports"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_successful
+        html = Nokogiri::HTML5(response.body)
+        expect(html.css('.section .assignments')).not_to be_empty
+        expect(html.css('.section .syllabus')).not_to be_empty
+        expect(html.css('.section .pages')).not_to be_empty
+        expect(html.css('.section .quizzes')).not_to be_empty
+        expect(html.css('.section .discussions')).not_to be_empty
+        expect(html.css('.section .files')).not_to be_empty
+        expect(response.body).not_to match /Copy this Course/
+        expect(response.body).not_to match /Import Course Content/
+        expect(response.body).to match /Export Course Content/
+        expect(response.body).not_to match /Delete this Course/
+        expect(response.body).not_to match /End this Course/
+        expect(html.css('input#course_account_id')).to be_empty
+        expect(html.css('input#course_enrollment_term_id')).to be_empty
+
+        delete "/courses/#{@course.id}"
+        assert_status(401)
+
+        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        assert_status(401)
+
+        add_permission :manage_courses_add
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_successful
+        expect(response.body).to match /Copy this Course/
+        expect(response.body).not_to match /Import Course Content/
+        expect(response.body).to match /Export Course Content/
+        expect(response.body).to_not match /Delete this Course/
+
+        add_permission :manage_courses_admin
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_successful
+        expect(response.body).to_not match /Delete this Course/
+
+        html = Nokogiri::HTML5(response.body)
+        expect(html.css('#course_account_id')).not_to be_empty
+        expect(html.css('#course_enrollment_term_id')).not_to be_empty
+
+        get "/courses/#{@course.id}/copy"
+        expect(response).to be_successful
+
+        add_permission :manage_courses_delete
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_successful
+        expect(response.body).to match /Delete this Course/
+
+        delete "/courses/#{@course.id}", params: {:event => 'delete'}
+        expect(response).to be_redirect
+
+        expect(@course.reload).to be_deleted
+      end
+
       it 'manage_content' do
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
@@ -1039,6 +1181,7 @@ describe "security" do
 
       it 'change_course_state' do
         course_with_teacher_logged_in(:active_all => 1)
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         remove_permission(:change_course_state, teacher_role)
 
         get "/courses/#{@course.id}/settings"
@@ -1046,6 +1189,18 @@ describe "security" do
         expect(response.body).not_to match 'End this Course'
 
         delete "/courses/#{@course.id}", params: {:event => 'conclude'}
+        assert_status(401)
+      end
+
+      it 'change_course_state :delete (granular permissions)' do
+        course_with_teacher_logged_in(:active_all => 1)
+        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+
+        get "/courses/#{@course.id}/settings"
+        expect(response).to be_successful
+        expect(response.body).not_to match(/Delete this Course/)
+
+        delete "/courses/#{@course.id}", params: {:event => 'delete'}
         assert_status(401)
       end
 
