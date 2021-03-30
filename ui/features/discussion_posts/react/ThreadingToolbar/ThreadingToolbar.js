@@ -27,7 +27,7 @@ export function ThreadingToolbar({...props}) {
   return (
     <InlineList delimiter="pipe">
       {React.Children.map(props.children, c => (
-        <InlineList.Item>{c}</InlineList.Item>
+        <InlineList.Item key={c.props.key}>{c}</InlineList.Item>
       ))}
     </InlineList>
   )

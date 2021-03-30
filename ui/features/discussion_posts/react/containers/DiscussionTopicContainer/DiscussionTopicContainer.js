@@ -18,12 +18,12 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {PostMessage} from '../PostMessage/PostMessage'
-import DiscussionPostToolbar from '../DiscussionResponseToolbar/DiscussionPostToolbar'
-import {PostToolbar} from '../PostToolbar/PostToolbar'
+import {PostMessage} from '../../PostMessage/PostMessage'
+import DiscussionPostToolbar from '../../DiscussionResponseToolbar/DiscussionPostToolbar'
+import {PostToolbar} from '../../PostToolbar/PostToolbar'
 import I18n from 'i18n!discussion_posts'
 import {Button} from '@instructure/ui-buttons'
-import {Alert} from '../Alert/Alert'
+import {Alert} from '../../Alert/Alert'
 import PropTypes from 'prop-types'
 
 const DiscussionTopicContainer = props => {

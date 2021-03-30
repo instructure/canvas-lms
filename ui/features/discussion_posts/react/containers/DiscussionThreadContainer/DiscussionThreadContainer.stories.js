@@ -16,27 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!discussion_posts'
-import PropTypes from 'prop-types'
 import React from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
 
-export function CollapseReplies({...props}) {
-  return (
-    <CondensedButton
-      onClick={props.onClick}
-      withBackground={false}
-      color="primary"
-      data-testid="collapse-replies"
-    >
-      {I18n.t('Collapse replies')}
-    </CondensedButton>
-  )
+import {DiscussionThreadContainer, mockThreads} from './DiscussionThreadContainer'
+
+export default {
+  title: 'Examples/Discussion Posts/Containers/DiscussionThreadContainer',
+  component: DiscussionThreadContainer,
+  argTypes: {}
 }
 
-CollapseReplies.propTypes = {
-  /**
-   * Behavior when clicking the expansion button
-   */
-  onClick: PropTypes.func.isRequired
+const Template = args => <DiscussionThreadContainer threads={mockThreads} {...args} />
+
+export const Default = Template.bind({})
+Default.args = {}
+
+export const Empty = Template.bind({})
+Empty.args = {
+  threads: null
 }

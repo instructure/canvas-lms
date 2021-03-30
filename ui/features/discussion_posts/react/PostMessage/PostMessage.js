@@ -49,18 +49,25 @@ export function PostMessage({...props}) {
         </>
       }
       alignContent="top"
+      margin="0 0 medium 0"
     >
-      {props.isUnread ? (
-        <Badge
-          type="notification"
-          placement="start center"
-          formatOutput={() => <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>}
+      {props.isUnread && (
+        <div
+          style={{
+            float: 'left',
+            'margin-left': '-24px',
+            'margin-top': '13px'
+          }}
         >
-          <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 small" />
-        </Badge>
-      ) : (
-        <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 small" />
+          <Badge
+            type="notification"
+            placement="start center"
+            standalone
+            formatOutput={() => <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>}
+          />
+        </div>
       )}
+      <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 0" />
     </Byline>
   )
 }

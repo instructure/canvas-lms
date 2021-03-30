@@ -34,24 +34,31 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 
-export function ThreadActions({...props}) {
-  return (
-    <Menu
-      placement="bottom"
-      trigger={
-        <IconButton
-          size="small"
-          screenReaderLabel={I18n.t('Manage Discussion')}
-          renderIcon={IconMoreLine}
-          withBackground={false}
-          withBorder={false}
-          data-testid="thread-actions-menu"
-        />
-      }
-    >
-      {getMenuConfigs(props).map(config => renderMenuItem({...config}))}
-    </Menu>
-  )
+// Reason: <Menu> in v6 of InstUI requires a ref to bind too or errors
+// are produced by the menu causing the page to scroll all over the place
+// eslint-disable-next-line react/prefer-stateless-function
+export class ThreadActions extends React.Component {
+  render() {
+    const {...props} = this.props
+    return (
+      <Menu
+        placement="bottom"
+        key={`threadActionMenu-${props.id}`}
+        trigger={
+          <IconButton
+            size="small"
+            screenReaderLabel={I18n.t('Manage Discussion')}
+            renderIcon={IconMoreLine}
+            withBackground={false}
+            withBorder={false}
+            data-testid="thread-actions-menu"
+          />
+        }
+      >
+        {getMenuConfigs(props).map(config => renderMenuItem({...config}, props.id))}
+      </Menu>
+    )
+  }
 }
 
 const getMenuConfigs = props => {
@@ -106,8 +113,8 @@ const getMenuConfigs = props => {
   return options
 }
 
-const renderMenuItem = ({selectionCallback, icon, label, key}) => (
-  <Menu.Item key={key} onSelect={selectionCallback} data-testid={key}>
+const renderMenuItem = ({selectionCallback, icon, label, key}, id) => (
+  <Menu.Item key={`${key}-${id}`} onSelect={selectionCallback} data-testid={key}>
     <Flex>
       <Flex.Item>{icon}</Flex.Item>
       <Flex.Item padding="0 0 0 xx-small">
@@ -118,6 +125,7 @@ const renderMenuItem = ({selectionCallback, icon, label, key}) => (
 )
 
 ThreadActions.propTypes = {
+  id: PropTypes.string.isRequired,
   markAsUnread: PropTypes.func.isRequired,
   goToTopic: PropTypes.func,
   goToParent: PropTypes.func,
