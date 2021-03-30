@@ -135,12 +135,7 @@ class DueDateCacher
     executing_user = inst_jobs_opts.delete(:executing_user) || self.current_executing_user
     due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
 
-    run_immediately = inst_jobs_opts.delete(:run_immediately) || false
-    if run_immediately
-      due_date_cacher.recompute
-    else
-      due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
-    end
+    due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
   end
 
   def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
