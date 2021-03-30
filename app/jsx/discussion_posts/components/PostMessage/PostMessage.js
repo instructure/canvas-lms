@@ -40,7 +40,14 @@ export function PostMessage({...props}) {
           {props.pillText && <Pill data-testid="post-pill">{props.pillText}</Pill>}
         </>
       }
-      description={props.message}
+      description={
+        <>
+          {props.message}
+          <View display="block" margin="small none none none">
+            {props.children}
+          </View>
+        </>
+      }
       alignContent="top"
     >
       {props.isUnread ? (
@@ -67,6 +74,10 @@ PostMessage.propTypes = {
    * Source url for the user's avatar
    */
   avatarUrl: PropTypes.string,
+  /**
+   * Children to be directly rendered below the PostMessage
+   */
+  children: PropTypes.node,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a
