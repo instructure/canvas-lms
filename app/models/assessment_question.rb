@@ -345,7 +345,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def self.variable_id(variable)
-    Digest::MD5.hexdigest(["dropdown", variable, "instructure-key"].join(","))
+    Digest::SHA256.hexdigest(["dropdown", variable, "instructure-key"].join(","))
   end
 
   def clone_for(question_bank, dup=nil, options={})
