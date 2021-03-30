@@ -1192,11 +1192,19 @@ import './vendor/ui.selectmenu'
       }
     },
 
+    getAccommodations: function() {
+      var accommodationsPayload =  $.getJSON("/" + this.currentStudent.id + "/accommodations");
+      if (accommodationsPayload.accommodations) {
+        this.currentStudent.settings.accommodations = accommodationsPayload.accommodations;
+      }
+    },
+
     showStudent: function(){
       $rightside_inner.scrollTo(0);
       var student_name = this.currentStudent.name;
       $('#submission_details_student_accommodations').empty();
       $('#submission_details_student_name').text(this.currentStudent.name);
+      this.getAccommodations();
       if (this.currentStudent.settings && this.currentStudent.settings.accommodations) {
         $.each(this.currentStudent.settings.accommodations, function (i, accommodation) {
           $('#submission_details_student_accommodations').append('<span class="accommodations">' + accommodation + '</span>')
