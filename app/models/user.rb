@@ -3301,7 +3301,7 @@ class User < ActiveRecord::Base
 
   # user tokens are returned by UserListV2 and used to bulk-enroll users using information that isn't easy to guess
   def self.token(id, uuid)
-    "#{id}_#{Digest::MD5.hexdigest(uuid)}"
+    "#{id}_#{Digest::SHA256.hexdigest(uuid)}"
   end
 
   def token

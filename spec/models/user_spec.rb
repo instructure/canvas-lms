@@ -3828,9 +3828,9 @@ describe User do
     let(:users) { [User.create!, @shard1.activate { User.create! }] }
     let(:tokens) { users.map(&:token) }
 
-    it "generates tokens made of id/md5(uuid) pairs" do
+    it "generates tokens made of id/hash(uuid) pairs" do
       tokens.each_with_index do |token, i|
-        expect(token).to eq "#{users[i].id}_#{Digest::MD5.hexdigest(users[i].uuid)}"
+        expect(token).to eq "#{users[i].id}_#{Digest::SHA256.hexdigest(users[i].uuid)}"
       end
     end
 
