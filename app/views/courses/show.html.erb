@@ -215,6 +215,9 @@
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'k5_dashboard' %>
     <div id="course-dashboard-container"></div>
+    <div id="k5-modules-container" style="display: none; padding-top: 17px;">
+      <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
+    </div>
   <% else %>
     <%= render :partial => 'shared/dashboard_messages' %>
     <%= render :partial => 'shared/recent_activity' %>

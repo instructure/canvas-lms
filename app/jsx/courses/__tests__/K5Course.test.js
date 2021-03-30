@@ -18,8 +18,8 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {render} from '@testing-library/react'
-import K5Course from '../K5Course'
+import {render, waitFor} from '@testing-library/react'
+import {K5Course} from '../K5Course'
 
 const currentUser = {
   id: '1',
@@ -94,6 +94,18 @@ describe('K-5 Subject Course', () => {
     it('defaults to the Overview tab', () => {
       const {getByRole} = render(<K5Course {...defaultProps} />)
       expect(getByRole('tab', {name: 'Overview', selected: true})).toBeInTheDocument()
+    })
+  })
+
+  describe('modules tab', () => {
+    it('only shows modules container on modules tab', () => {
+      const modulesContainer = document.createElement('div')
+      modulesContainer.setAttribute('id', 'k5-modules-container')
+      modulesContainer.style.display = 'none'
+      const {getByRole} = render(<K5Course {...defaultProps} />)
+      expect(modulesContainer.style.display).toBe('none')
+      getByRole('tab', {name: 'Modules'}).click()
+      waitFor(() => expect(modulesContainer.style.display).toBe('block'))
     })
   })
 })

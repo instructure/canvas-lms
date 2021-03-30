@@ -1554,6 +1554,16 @@ describe CoursesController do
         expect(assigns[:js_env][:K5_MODE]).to be_truthy
       end
 
+      it "registers module-related js and css bundles and sets CONTEXT_MODULE_ASSIGNMENT_INFO_URL in js_env" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_bundles].flatten).to include :context_modules
+        expect(assigns[:css_bundles].flatten).to include :content_next
+        expect(assigns[:css_bundles].flatten).to include :context_modules2
+        expect(assigns[:js_env][:CONTEXT_MODULE_ASSIGNMENT_INFO_URL]).to be_truthy
+      end
+
       it "does not render the sidebar navigation or breadcrumbs" do
         user_session(@student)
 

@@ -2310,8 +2310,8 @@ function itemContentKey(model) {
 
 const setExpandAllButton = function() {
   let someVisible = false
-  $('.context_module').each(function() {
-    if ($(this).find('.content:visible').length > 0) {
+  $('#context_modules .context_module .content').each(function() {
+    if ($(this).css('display') === 'block') {
       someVisible = true
     }
   })

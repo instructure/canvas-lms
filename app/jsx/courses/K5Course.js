@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
 import PropTypes from 'prop-types'
@@ -127,6 +127,17 @@ export function K5Course({
     focusFallback: tabsRef,
     callback: () => loadAllOpportunities()
   })
+
+  const modulesRef = useRef(null)
+  useEffect(() => {
+    modulesRef.current = document.getElementById('k5-modules-container')
+  }, [])
+
+  useEffect(() => {
+    if (modulesRef.current) {
+      modulesRef.current.style.display = currentTab === TAB_IDS.MODULES ? 'block' : 'none'
+    }
+  }, [currentTab])
 
   return (
     <K5DashboardContext.Provider

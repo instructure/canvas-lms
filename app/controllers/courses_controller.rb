@@ -2129,7 +2129,7 @@ class CoursesController < ApplicationController
           ).to_a
           @syllabus_body = syllabus_user_content
         when 'k5_dashboard'
-          # don't do any of this stuff for now
+          load_modules # hidden until the modules tab of the k5 course is active
         when 'announcements'
           add_crumb(t('Announcements'))
           set_active_tab 'announcements'
@@ -2176,9 +2176,10 @@ class CoursesController < ApplicationController
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
           js_env(STUDENT_PLANNER_ENABLED: planner_enabled?)
+          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
 
-          js_bundle :k5_course
-          css_bundle :k5_dashboard
+          js_bundle :k5_course, :context_modules
+          css_bundle :k5_dashboard, :content_next, :context_modules2
         when 'announcements'
           js_bundle :announcements_index_v2
           css_bundle :announcements_index
