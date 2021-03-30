@@ -27,12 +27,6 @@ submission_type_tool_placement:
   description: |-
     If an LTI tool configured with the placement is installed, will show a new entry in the
     assignment submission type dropdown to quickly configure the assignment for the tool
-enable_fullstory:
-  state: hidden
-  display_name: Enable fullstory
-  description: |-
-    Include FullStory recording of the user's session
-  applies_to: SiteAdmin
 new_math_equation_handling:
   state: hidden
   display_name: "Math: Updated equation handling"
