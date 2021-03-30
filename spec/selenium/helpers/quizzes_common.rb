@@ -452,7 +452,7 @@ module QuizzesCommon
   end
 
   def set_answer_comment(answer_num, text)
-    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .comment_focus').click()")
+    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comments').click()")
     wait_for_ajaximations
     type_in_tiny(".question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comments textarea", text)
   end

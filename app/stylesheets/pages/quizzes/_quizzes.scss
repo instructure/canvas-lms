@@ -1032,6 +1032,7 @@ form.question_form {
       margin-#{direction(left)}: 30px;
       padding: 10px 5px;
       margin-top: 5px;
+      cursor: pointer;
       .answer_comment_box {
         height: 2.5em;
       }

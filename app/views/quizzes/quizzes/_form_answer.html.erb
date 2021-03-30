@@ -104,15 +104,15 @@
     </tr>
     <tr>
       <td colspan="3">
-       <div class="answer_comments comment empty">
+       <div class="answer_comments comment empty" tabindex="0">
         <div class="comment_top"></div>
          <% edit_comment_text = t("Click to enter comments, if the student chooses this answer") %>
-         <a href="#" class="comment_focus" title="<%= edit_comment_text %>">
+         <span class="comment_focus" title="<%= edit_comment_text %>" tabindex="-1">
            <span class="ellipsis" aria-hidden="true">...</span>
            <i class="icon-edit standalone-icon"></i>
            <span class="commentAnswerId screenreader-only"></span>
            <span class="screenreader-only"><%= edit_comment_text %></span>
-         </a>
+         </span>
           <span id="comments_header" class="details"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
           <input type="hidden" name="answer_comment_html" />
           <div class="answer_comment_html comment_html"></div>
@@ -121,4 +121,3 @@
     </tr>
   </table>
 </div>
-
