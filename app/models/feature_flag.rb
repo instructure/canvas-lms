@@ -21,6 +21,8 @@
 class FeatureFlag < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course, :user]
 
+  self.ignored_columns = %i[visibility manipulate]
+
   validate :valid_state, :feature_applies
   before_save :check_cache
   before_destroy :clear_cache
