@@ -54,12 +54,11 @@ export default class EditEventDetailsDialog {
     // Set up the tabbed view of the dialog
     const tabs = dialog.find('#edit_event_tabs')
 
-    tabs.tabs().bind('tabsselect', (event, ui) =>
-      $(ui.panel)
-        .closest('.tab_holder')
-        .data('form-widget')
-        .activate()
-    )
+    tabs
+      .tabs()
+      .bind('tabsselect', (event, ui) =>
+        $(ui.panel).closest('.tab_holder').data('form-widget').activate()
+      )
 
     // note: tabs should be removed in descending order, so numbers don't shift
     // from the indexes of the tabs in app/views/jst/calendar/editEvent.handlebars
@@ -104,22 +103,9 @@ export default class EditEventDetailsDialog {
 
       // don't show To Do tab if the planner isn't enabled or a user
       // managed calendar isn't selected
-      const managedContexts = ENV.CALENDAR.MANAGE_CONTEXTS ? ENV.CALENDAR.MANAGE_CONTEXTS : []
-
-      const selectedContexts = []
-      const resp = await $.ajaxJSON('/api/v1/calendar_events/visible_contexts', 'GET')
-      resp.contexts.forEach(context => {
-        if (context.selected) selectedContexts.push(context.asset_string)
-      })
-
       let shouldRenderTODO = false
-      for (let i = 0; i < selectedContexts.length; i++) {
-        for (let j = 0; j < managedContexts.length; j++) {
-          shouldRenderTODO = selectedContexts[i] === managedContexts[j]
-          if (shouldRenderTODO) break
-        }
-        if (shouldRenderTODO) break
-      }
+      const plannerNoteContexts = this.event.plannerNoteContexts()
+      shouldRenderTODO = plannerNoteContexts && plannerNoteContexts.length
 
       if (!ENV.STUDENT_PLANNER_ENABLED || !shouldRenderTODO) {
         tabs.tabs('remove', 2)

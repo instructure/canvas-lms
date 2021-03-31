@@ -75,6 +75,7 @@ class Assignment < ActiveRecord::Base
   has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
   has_many :observer_alerts, through: :all_submissions
   has_many :provisional_grades, :through => :submissions
+  belongs_to :annotatable_attachment, class_name: 'Attachment'
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :assignment_student_visibilities
   has_one :quiz, class_name: 'Quizzes::Quiz'
@@ -1418,7 +1419,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if uses_grading_standard && standard_based_score = grading_standard_or_default.grade_to_score(grade)
-        (points_possible || 0.0) * standard_based_score / 100.0
+        ((points_possible || 0.0).to_d * standard_based_score.to_d / 100.0.to_d).to_f
       else
         nil
       end
@@ -3075,7 +3076,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates?
-    new_record? || id_before_last_save.nil? ||
+    new_record? || just_created ||
       will_save_change_to_due_at? || saved_change_to_due_at? ||
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||

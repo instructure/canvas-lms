@@ -446,6 +446,7 @@ $icon-size: 1.4rem;
 }
 #comments {
   overflow-y: auto;
+  word-break: break-word;
   .comment {
     .avatar {
       flex-grow: 0;

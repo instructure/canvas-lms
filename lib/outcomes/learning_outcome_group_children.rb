@@ -19,7 +19,7 @@
 #
 
 module Outcomes
-    class LearningOutcomeGroupChildren
+  class LearningOutcomeGroupChildren
     attr_reader :context
 
     def initialize(context = nil)
@@ -27,30 +27,48 @@ module Outcomes
     end
 
     def total_subgroups(learning_outcome_group_id)
+      return 0 unless improved_outcomes_management?
+
       children_ids(learning_outcome_group_id).length
     end
 
     def total_outcomes(learning_outcome_group_id)
-      ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+      return 0 unless improved_outcomes_management?
 
-      ContentTag.active.learning_outcome_links.
-        where(associated_asset_id: ids).
-        joins(:learning_outcome_content).
-        select(:content_id).
-        distinct.
-        count
+      cache_key = total_outcomes_cache_key(learning_outcome_group_id)
+      Rails.cache.fetch(cache_key) do
+        learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+        ContentTag.active.learning_outcome_links.
+          where(associated_asset_id: learning_outcome_groups_ids).
+          joins(:learning_outcome_content).
+          select(:content_id).
+          distinct.
+          count
+      end
     end
 
     def suboutcomes_by_group_id(learning_outcome_group_id)
-      ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+      return unless improved_outcomes_management?
 
+      learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
       ContentTag.active.learning_outcome_links.
-        where(associated_asset_id: ids).
+        where(associated_asset_id: learning_outcome_groups_ids).
         joins(:learning_outcome_content).
-        joins("INNER JOIN  #{LearningOutcomeGroup.quoted_table_name} AS logs
-              on logs.id = content_tags.associated_asset_id").
+        joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
+              ON logs.id = content_tags.associated_asset_id").
         order(LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
               LearningOutcome.best_unicode_collation_key('short_description'))
+    end
+
+    def clear_descendants_cache
+      return unless improved_outcomes_management?
+
+      Rails.cache.delete(descendants_cache_key)
+      clear_total_outcomes_cache
+    end
+
+    def clear_total_outcomes_cache
+      Rails.cache.delete(context_timestamp_cache_key) if improved_outcomes_management?
     end
 
     private
@@ -61,19 +79,56 @@ module Outcomes
     end
 
     def data
-      @data ||= begin
-        LearningOutcomeGroup.connection.execute(<<-SQL).as_json
-          WITH RECURSIVE levels AS (
-            SELECT id, learning_outcome_group_id AS parent_id
-              FROM (#{LearningOutcomeGroup.active.where(context: @context).to_sql}) AS data
-            UNION ALL
-            SELECT child.id AS id, parent.parent_id AS parent_id
-              FROM #{LearningOutcomeGroup.quoted_table_name} child
-              INNER JOIN levels parent ON parent.id = child.learning_outcome_group_id
-              WHERE child.workflow_state <> 'deleted'
-          )
-          SELECT parent_id, array_agg(id) AS descendant_ids FROM levels WHERE parent_id IS NOT NULL GROUP BY parent_id
-        SQL
+      Rails.cache.fetch(descendants_cache_key) do
+        LearningOutcomeGroup.connection.execute(learning_outcome_group_descendants_query).as_json
+      end
+    end
+
+    def learning_outcome_group_descendants_query
+      <<-SQL
+        WITH RECURSIVE levels AS (
+          SELECT id, learning_outcome_group_id AS parent_id
+            FROM (#{LearningOutcomeGroup.active.where(context: context).to_sql}) AS data
+          UNION ALL
+          SELECT child.id AS id, parent.parent_id AS parent_id
+            FROM #{LearningOutcomeGroup.quoted_table_name} child
+            INNER JOIN levels parent ON parent.id = child.learning_outcome_group_id
+            WHERE child.workflow_state <> 'deleted'
+        )
+        SELECT parent_id, array_agg(id) AS descendant_ids FROM levels WHERE parent_id IS NOT NULL GROUP BY parent_id
+      SQL
+    end
+
+    def context_timestamp_cache
+      Rails.cache.fetch(context_timestamp_cache_key) do
+        (Time.zone.now.to_f * 1000).to_i
+      end
+    end
+
+    def descendants_cache_key
+      ['learning_outcome_group_descendants', context_asset_string].cache_key
+    end
+
+    def total_outcomes_cache_key(learning_outcome_group_id = nil)
+      ['learning_outcome_group_total_outcomes',
+       context_asset_string,
+       context_timestamp_cache,
+       learning_outcome_group_id].cache_key
+    end
+
+    def context_timestamp_cache_key
+      ['learning_outcome_group_context_timestamp', context_asset_string].cache_key
+    end
+
+    def context_asset_string
+      (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
+    end
+
+    def improved_outcomes_management?
+      @improved_outcomes_management ||= begin
+        return context.root_account.feature_enabled?(:improved_outcomes_management) if context
+
+        LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
       end
     end
   end

@@ -30,7 +30,7 @@ import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
 import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from './shared/treeBrowser'
-import {useCanvasContext} from './shared/hooks'
+import useCanvasContext from './shared/hooks/useCanvasContext'
 import useGroupDetail from './shared/hooks/useGroupDetail'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {

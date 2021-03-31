@@ -42,16 +42,7 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
   constructor(selector, event, contextChangeCB, closeCB) {
     super({
       title: event.title,
-      contexts: event.possibleContexts().filter(
-        context =>
-          // to avoid confusion over the audience of the planner note,
-          // don't offer to create new planner notes linked to courses the user teaches
-          context &&
-          context.asset_string &&
-          (context.asset_string === event.contextCode() ||
-            context.asset_string.startsWith('user_') ||
-            ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(context.asset_string) < 0)
-      ),
+      contexts: event.plannerNoteContexts(),
       date: event.startDate(),
       details: htmlEscape(event.description)
     })
@@ -108,10 +99,7 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
   }
 
   setContext(newContext) {
-    this.$el
-      .find('select.context_id')
-      .val(newContext)
-      .triggerHandler('change', false)
+    this.$el.find('select.context_id').val(newContext).triggerHandler('change', false)
   }
 
   contextChange(jsEvent, propagate) {

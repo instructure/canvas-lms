@@ -107,6 +107,8 @@ module Api
           context.course
         when DiscussionEntry
           context.discussion_topic.course
+        when Message
+          context.media_context
         when Group
           context.context
         when WikiPage

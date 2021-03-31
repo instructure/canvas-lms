@@ -102,10 +102,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :update_materialized_view_if_changed
   after_save :recalculate_progressions_if_sections_changed
   after_save :sync_attachment_with_publish_state
-  after_update :clear_streams_if_not_published
-  after_update :clear_non_applicable_stream_items_for_sections
-  after_update :clear_non_applicable_stream_items_for_delayed_posts
-  after_update :clear_non_applicable_stream_items_for_locked_modules
+  after_update :clear_non_applicable_stream_items
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -947,12 +944,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def clear_streams_if_not_published
-    unless self.published?
-      self.clear_stream_items
-    end
-  end
-
   def in_unpublished_module?
     return true if ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "unpublished").exists?
     ContextModule.joins(:content_tags).where(content_tags: { content_type: "DiscussionTopic", content_id: self }, workflow_state: 'unpublished').exists?
@@ -963,55 +954,38 @@ class DiscussionTopic < ActiveRecord::Base
     ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "active").all? { |tag| tag.context_module.unlock_at&.future? }
   end
 
-  def clear_non_applicable_stream_items_for_sections
-    # either changed sections or made section specificness
-    return unless self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
-
-    delay_if_production.clear_stream_items_for_sections
+  def should_clear_all_stream_items?
+    !self.published? && self.saved_change_to_attribute?(:workflow_state) ||
+      self.is_announcement && self.not_available_yet? && self.saved_change_to_attribute?(:delayed_post_at)
   end
 
-  def clear_stream_items_for_sections
-    remaining_participants = participants
+  def clear_non_applicable_stream_items
+    return self.clear_stream_items if should_clear_all_stream_items?
+
+    section = self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
+    lock = self.locked_by_module?
+
+    if lock || section
+      delay_if_production.partially_clear_stream_items(locked_by_module: lock, section_specific: section)
+    end
+  end
+
+  def partially_clear_stream_items(locked_by_module: false, section_specific: false)
+    remaining_participants = participants if section_specific
     user_ids = []
-    stream_item&.stream_item_instances&.find_each do |item|
-      applicable = remaining_participants.any? { |p| p.id == item.user_id }
-      unless applicable
-        user_ids.push(item.user_id)
-        item.destroy
+    stream_item&.stream_item_instances&.shard(stream_item)&.find_each do |item|
+      if locked_by_module && self.locked_by_module_item?(item.user)
+        destroy_item_and_track(item, user_ids)
+      elsif section_specific && remaining_participants.none? { |p| p.id == item.user_id }
+        destroy_item_and_track(item, user_ids)
       end
     end
     self.clear_stream_item_cache_for(user_ids)
   end
 
-  def clear_non_applicable_stream_items_for_delayed_posts
-    if self.is_announcement && self.delayed_post_at? && @delayed_post_at_changed && self.delayed_post_at > Time.now
-      delay_if_production.clear_stream_items_for_delayed_posts
-    end
-  end
-
-  def clear_stream_items_for_delayed_posts
-    user_ids = []
-    stream_item&.stream_item_instances&.find_each do |item|
-      user_ids.push(item.user_id)
-      item.destroy
-    end
-    self.clear_stream_item_cache_for(user_ids)
-  end
-
-  def clear_non_applicable_stream_items_for_locked_modules
-    return unless self.locked_by_module?
-    delay_if_production.clear_stream_items_for_locked_modules
-  end
-
-  def clear_stream_items_for_locked_modules
-    user_ids = []
-    stream_item&.stream_item_instances&.find_each do |item|
-      if self.locked_by_module_item?(item.user)
-        user_ids.push(item.user_id)
-        item.destroy
-      end
-    end
-    self.clear_stream_item_cache_for(user_ids)
+  def destroy_item_and_track(item, user_ids)
+    user_ids.push(item.user_id)
+    item.destroy
   end
 
   def clear_stream_item_cache_for(user_ids)

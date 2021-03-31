@@ -19,4 +19,16 @@
 import {createContext} from 'react'
 
 const OutcomesContext = createContext({})
+
+export const getContext = () => {
+  const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
+  const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
+  return {
+    env: {
+      contextType,
+      contextId
+    }
+  }
+}
+
 export default OutcomesContext

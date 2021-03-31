@@ -16,13 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * This file defines all the global and component-specific overrides of the default
+ * canvas theme that implement the visual differences between K-5 mode and regular
+ * canvas. If there is anything that should look universally different when K-5
+ * mode is enabled, it should ideally be captured here.
+ */
 import canvas from '@instructure/canvas-theme'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
 
+import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
+
 const {variables} = canvas
-const {typography} = variables
+const {borders, colors, typography} = variables
 
 /**
  * These are the base defaults used to generate component-specific theme
@@ -58,6 +66,17 @@ export const theme = {
   },
   [Tabs.Tab.theme]: {
     fontSize: '1.25rem'
+  },
+  [Grouping.theme]: {
+    borderTopWidth: borders.widthMedium,
+    heroPadding: '0.125rem'
+  },
+  [Day.theme]: {
+    secondaryFontSize: '1rem'
+  },
+  [PlannerItem.theme]: {
+    iconColor: colors.licorice,
+    secondaryColor: colors.licorice
   }
 }
 

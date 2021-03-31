@@ -66,18 +66,13 @@ describe DiscussionTopicPresenter do
 
   describe "#has_attached_rubric?" do
     it "returns true if assignment has a rubric association with a rubric" do
-      expect(assignment).to receive(:rubric_association).
-        and_return double(:try => double(:rubric => double))
+      expect(assignment).to receive(:rubric).
+        and_return double
       expect(presenter.has_attached_rubric?).to eq true
     end
 
     it "returns false if assignment has nil rubric association" do
-      expect(assignment).to receive(:rubric_association).and_return nil
-      expect(presenter.has_attached_rubric?).to eq false
-    end
-
-    it "returns false if assignment has a rubric association but no rubric" do
-      expect(assignment).to receive(:rubric_association).and_return double(:rubric => nil)
+      expect(assignment).to receive(:rubric).and_return nil
       expect(presenter.has_attached_rubric?).to eq false
     end
   end
@@ -89,13 +84,13 @@ describe DiscussionTopicPresenter do
         ).should_show_rubric?(user)).to eq false
     end
 
-    it "returns true if has_attached_rubric? is false" do
-      expect(assignment).to receive(:rubric_association).and_return double(:rubric => double)
+    it "returns true if has_attached_rubric? is true" do
+      expect(assignment).to receive(:rubric).and_return double
       expect(presenter.should_show_rubric?(user)).to eq true
     end
 
     context "no rubric association or rubric for the topic's assignment" do
-      before { allow(assignment).to receive(:rubric_association).and_return nil }
+      before { allow(assignment).to receive(:rubric).and_return nil }
 
       it "returns true when the assignment grants the user update privs" do
         expect(assignment).to receive(:grants_right?).with(user, :update).and_return true

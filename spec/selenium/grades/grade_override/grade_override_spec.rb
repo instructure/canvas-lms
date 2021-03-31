@@ -32,7 +32,7 @@ describe 'Final Grade Override' do
 
   before(:each) do
     # needed until Jenkins starts using active record and cassandra is killed
-    allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+    allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
 
     course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Teacher Boss1",active_user: true)

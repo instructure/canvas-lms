@@ -73,6 +73,10 @@ test('#initialize should set unpublish_url from html url', function() {
   equal(this.quiz.get('unpublish_url'), 'http://localhost:3000/courses/1/quizzes/unpublish')
 })
 
+test('#initialize should set deletion_url from html url', function() {
+  equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/quizzes/1')
+})
+
 test('#initialize should set title_label from title', function() {
   this.quiz = new Quiz({
     title: 'My Quiz!',
@@ -217,6 +221,10 @@ test('#initialize should set unpublish_url from html url', function() {
     this.quiz.get('unpublish_url'),
     'http://localhost:3000/courses/1/assignments/unpublish/quiz'
   )
+})
+
+test('#initialize should set deletion_url from html url', function() {
+  equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/assignments/7')
 })
 
 QUnit.module('Quiz.Next with manage and new_quizzes_modules_support enabled', {

@@ -3120,6 +3120,108 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.submission_types).to eq 'not_graded'
     end
 
+    describe "annotatable attachment" do
+      before(:once) do
+        @assignment = @course.assignments.create!(name: "Some Assignment")
+        @attachment = attachment_model(content_type: "application/pdf", context: @course)
+      end
+
+      let(:endpoint_params) do
+        {
+          action: :update,
+          controller: :assignments_api,
+          course_id: @course.id,
+          format: :json,
+          id: @assignment.id
+        }
+      end
+
+      it "sets the assignment's annotatable_attachment_id when id is present and type is annotated_document" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotated_document_id: @attachment.id, submission_types: ["annotated_document"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be @attachment.id
+      end
+
+      it "does not set the assignment's annotatable_attachment_id when type is not annotated_document" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotated_document_id: @attachment.id, submission_types: ["online_text_entry"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "returns bad_request when the user did not include an attachment id for an annotated_document type" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { submission_types: ["annotated_document"] } }
+        )
+
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "returns bad_request when the user doesn't have read access to the attachment" do
+        second_course = Course.create!
+        attachment_attrs = valid_attachment_attributes.merge(context: second_course)
+        second_attachment = Attachment.create!(attachment_attrs)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotated_document_id: second_attachment.id, submission_types: ["annotated_document"] } }
+        )
+
+        aggregate_failures do
+          expect(response).to have_http_status(:bad_request)
+          expect(@assignment.reload.annotatable_attachment_id).to be_nil
+        end
+      end
+
+      it "returns bad_request when the attachment doesn't exist" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotated_document_id: Attachment.last.id + 1, submission_types: ["annotated_document"] } }
+        )
+
+        aggregate_failures do
+          expect(response).to have_http_status(:bad_request)
+          expect(@assignment.reload.annotatable_attachment_id).to be_nil
+        end
+      end
+
+      it "removes the assignment's annotatable_attachment_id when an empty string is passed" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotated_document_id: "" } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "removes the assignment's annotatable_attachment_id when the type is not annotated_document" do
+        @assignment.update!(annotatable_attachment: @attachment)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotated_document_id: @attachment.id, submission_types: ["online_text_entry"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+    end
+
     describe 'final_grader_id' do
       before(:once) do
         course_with_teacher(active_all: true)

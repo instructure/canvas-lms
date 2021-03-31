@@ -132,7 +132,7 @@ it('does not render a CompletedItemsFacade when showCompletedItems state is true
   const wrapper = shallow(<Grouping {...props} />)
 
   wrapper.setState({showCompletedItems: true})
-  expect(wrapper.find('CompletedItemsFacade')).toHaveLength(0)
+  expect(wrapper.find('Animatable(CompletedItemsFacade)')).toHaveLength(0)
 })
 
 it('renders an activity notification when there is new activity', () => {
@@ -195,6 +195,15 @@ it('does not render an activity badge when things have no new activity', () => {
   expect(wrapper.find('Badge')).toHaveLength(0)
 })
 
+it('does not render activity badge or colored completed items facade when using simplifiedControls', () => {
+  const props = getDefaultProps()
+  props.items[0].completed = true
+  const wrapper = shallow(<Grouping {...props} simplifiedControls />)
+
+  expect(wrapper.find('Badge')).toHaveLength(0)
+  expect(wrapper.find('Animatable(CompletedItemsFacade)').prop('theme').labelColor).toBeUndefined()
+})
+
 describe('handleFacadeClick', () => {
   it('sets focus to the groupingLink when called', () => {
     const wrapper = mount(<Grouping {...getDefaultProps()} />)
@@ -217,10 +226,7 @@ describe('toggleCompletion', () => {
     const mock = jest.fn()
     const props = getDefaultProps()
     const wrapper = mount(<Grouping {...props} toggleCompletion={mock} />)
-    wrapper
-      .find('input')
-      .first()
-      .simulate('change')
+    wrapper.find('input').first().simulate('change')
     expect(mock).toHaveBeenCalledWith(props.items[0])
   })
 })

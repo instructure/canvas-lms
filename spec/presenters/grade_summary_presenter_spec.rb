@@ -645,13 +645,13 @@ describe GradeSummaryPresenter do
     end
   end
 
-  describe "#hidden_submissions?" do
+  describe "#hidden_submissions_for_published_assignments?" do
     let_once(:course) { Course.create! }
     let_once(:student) { course.enroll_student(User.create!, enrollment_state: :active).user }
     let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: :active).user }
 
-    let_once(:assignment1) { course.assignments.create!(title: "a1") }
-    let_once(:assignment2) { course.assignments.create!(title: "a2") }
+    let_once(:assignment1) { course.assignments.create!(title: "a1", workflow_state: "published") }
+    let_once(:assignment2) { course.assignments.create!(title: "a2", workflow_state: "published") }
 
     let_once(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
 
@@ -660,21 +660,69 @@ describe GradeSummaryPresenter do
       assignment2.ensure_post_policy(post_manually: false)
     end
 
-    it "returns true if any of the student's submissions in the course are graded and unposted" do
-      assignment1.grade_student(student, grader: teacher, score: 1)
+    context "when the assignment posts manually" do
+      it "returns true if any of the student's submissions are unposted and published assignment" do
+        assignment1.grade_student(student, grader: teacher, score: 1)
+        assignment1.hide_submissions
 
-      expect(presenter).to be_hidden_submissions
+        expect(presenter).to be_hidden_submissions_for_published_assignments
+      end
+
+      it "returns false if any of the student's submissions are unposted and unpublished assignment" do
+        assignment1.hide_submissions
+        assignment1.unpublish
+
+        expect(presenter).not_to be_hidden_submissions_for_published_assignments
+      end
+
+      it "returns false if any of the student's submissions are posted and published assignment" do
+        assignment1.post_submissions
+        assignment2.post_submissions
+
+        expect(presenter).not_to be_hidden_submissions_for_published_assignments
+      end
     end
 
-    it "returns true if any of the student's submissions are unposted and assignment posts manually" do
-      expect(presenter).to be_hidden_submissions
-    end
+    context "when the assignment posts automatically" do
+      it "returns true if any of the student's submissions are graded, unposted and published assignment" do
+        assignment1.ensure_post_policy(post_manually: false)
+        assignment1.grade_student(student, grader: teacher, score: 1)
+        assignment1.hide_submissions
 
-    it "returns false if all of the student's submissions in the course are posted" do
-      assignment1.post_submissions
-      assignment2.post_submissions
+        expect(presenter).to be_hidden_submissions_for_published_assignments
+      end
 
-      expect(presenter).not_to be_hidden_submissions
+      it "returns false if any of the student's submissions are ungraded, unposted and published assignment" do
+        assignment1.ensure_post_policy(post_manually: false)
+        assignment1.hide_submissions
+
+        expect(presenter).not_to be_hidden_submissions_for_published_assignments
+      end
+
+      it "returns false if any of the student's submissions are ungraded, posted and published assignment" do
+        assignment1.ensure_post_policy(post_manually: false)
+        assignment1.grade_student(student, grader: teacher, score: 1)
+        assignment1.post_submissions
+
+        expect(presenter).not_to be_hidden_submissions_for_published_assignments
+      end
+
+      it "returns false if any of the student's submissions are graded, posted and unpublished assignment" do
+        assignment1.ensure_post_policy(post_manually: false)
+        assignment1.grade_student(student, grader: teacher, score: 1)
+        assignment1.hide_submissions
+        assignment1.unpublish
+
+        expect(presenter).not_to be_hidden_submissions_for_published_assignments
+      end
+
+      it "returns false if any of the student's submissions are ungraded, posted and unpublished assignment" do
+        assignment1.ensure_post_policy(post_manually: false)
+        assignment1.post_submissions
+        assignment1.unpublish
+
+        expect(presenter).not_to be_hidden_submissions_for_published_assignments
+      end
     end
   end
 

@@ -177,7 +177,7 @@ module Api::V1::Attachment
   def infer_file_extension(params)
     mime_type = infer_upload_content_type(params)
 
-    return File.mime_types[mime_type] if mime_type
+    return File.mime_types[mime_type] if mime_type && File.mime_types[mime_type]
 
     filenames_with_extension = filenames(params).select{ |item| item.include?('.') }
     filenames_with_extension&.first&.split('.')&.last&.downcase

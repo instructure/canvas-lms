@@ -26,6 +26,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   # rubocop:disable RSpec/LetSetup
   let!(:context) { Account.default }
   let!(:global_group) { LearningOutcomeGroup.create(title: 'global') }
+  let!(:global_group_subgroup) { global_group.child_outcome_groups.build(title: 'global subgroup') }
   let!(:global_outcome1) { outcome_model(outcome_group: global_group, title: 'G Outcome 1') }
   let!(:global_outcome2) { outcome_model(outcome_group: global_group, title: 'G Outcome 2') }
   let!(:g0) { context.root_outcome_group }
@@ -75,9 +76,9 @@ describe Outcomes::LearningOutcomeGroupChildren do
   #      g5: Group 3
   #         o8: Outcome 6
 
-
   before do
     Rails.cache.clear
+    context.root_account.enable_feature! :improved_outcomes_management
   end
 
   describe '#total_subgroups' do
@@ -106,10 +107,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     context 'when context is nil' do
-      subject { described_class.new(nil) }
+      subject { described_class.new }
 
       it 'returns global outcome groups' do
-        expect(subject.total_subgroups(global_group.id)).to eq 0
+        expect(subject.total_subgroups(global_group.id)).to eq 1
+      end
+    end
+
+    it 'caches the total subgroups' do
+      enable_cache do
+        expect(LearningOutcomeGroup.connection).to receive(:execute).and_call_original.once
+        expect(subject.total_subgroups(g0.id)).to eq 6
+        expect(subject.total_subgroups(g0.id)).to eq 6
+        expect(described_class.new(context).total_subgroups(g0.id)).to eq 6
       end
     end
   end
@@ -125,10 +135,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
       expect(subject.total_outcomes(g6.id)).to eq 3
     end
 
+    it 'caches the total outcomes' do
+      enable_cache do
+        expect(ContentTag).to receive(:active).and_call_original.once
+        expect(subject.total_outcomes(g0.id)).to eq 12
+        expect(subject.total_outcomes(g0.id)).to eq 12
+        expect(described_class.new(context).total_outcomes(g0.id)).to eq 12
+      end
+    end
+
     context 'when outcome is deleted' do
       before { o4.destroy }
 
-      it 'returns the total sugroups for a learning outcome group without the deleted groups' do
+      it 'returns the total outcomes for a learning outcome group without the deleted outcomes' do
         expect(subject.total_outcomes(g0.id)).to eq 11
         expect(subject.total_outcomes(g1.id)).to eq 8
         expect(subject.total_outcomes(g2.id)).to eq 2
@@ -140,7 +159,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     context 'when context is nil' do
-      subject { described_class.new(nil) }
+      subject { described_class.new }
 
       it 'returns global outcomes' do
         expect(subject.total_outcomes(global_group.id)).to eq 2
@@ -211,11 +230,168 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     context 'when context is nil' do
-      subject { described_class.new(nil) }
+      subject { described_class.new }
 
       it 'returns global outcomes' do
         outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
+      end
+    end
+  end
+
+  describe '#clear_descendants_cache' do
+    it 'clears the cache' do
+      enable_cache do
+        expect(LearningOutcomeGroup.connection).to receive(:execute).and_call_original.twice
+        expect(ContentTag).to receive(:active).and_call_original.exactly(4).times
+        expect(subject.total_subgroups(g0.id)).to eq 6
+        expect(subject.total_outcomes(g0.id)).to eq 12
+        expect(subject.total_outcomes(g1.id)).to eq 9
+        subject.clear_descendants_cache
+        instance = described_class.new(context)
+        expect(instance.total_subgroups(g0.id)).to eq 6
+        expect(instance.total_outcomes(g0.id)).to eq 12
+        expect(instance.total_outcomes(g1.id)).to eq 9
+      end
+    end
+  end
+
+  describe '#clear_total_outcomes_cache' do
+    it 'clears the cache' do
+      enable_cache do
+        expect(ContentTag).to receive(:active).and_call_original.twice
+        expect(subject.total_outcomes(g0.id)).to eq 12
+        subject.clear_total_outcomes_cache
+        instance = described_class.new(context)
+        expect(instance.total_outcomes(g0.id)).to eq 12
+      end
+    end
+  end
+
+  context 'learning outcome groups and learning outcomes events' do
+    context 'when a group is destroyed' do
+      it 'clears the cache' do
+        enable_cache do
+          expect(subject.total_subgroups(g0.id)).to eq 6
+          g6.destroy
+          expect(described_class.new(context).total_subgroups(g0.id)).to eq 5
+        end
+      end
+    end
+
+    context 'when a group is added' do
+      it 'clears the cache' do
+        enable_cache do
+          expect(subject.total_subgroups(g0.id)).to eq 6
+          outcome_group_model(context: context, outcome_group_id: g0)
+          expect(described_class.new(context).total_subgroups(g0.id)).to eq 7
+        end
+      end
+
+      context 'when a global group is added' do
+        it 'clears the cache for total_subgroups and total_outcomes' do
+          enable_cache do
+            expect(subject.total_subgroups(g0.id)).to eq 6
+            expect(subject.total_outcomes(g0.id)).to eq 12
+            g0.add_outcome_group(global_group)
+            expect(described_class.new(context).total_subgroups(g0.id)).to eq 8
+            expect(described_class.new(context).total_outcomes(g0.id)).to eq 14
+          end
+        end
+      end
+    end
+
+    context 'when a group is adopted' do
+      it 'clears the cache' do
+        enable_cache do
+          expect(subject.total_subgroups(g0.id)).to eq 6
+          outcome_group = outcome_group_model(context: context)
+          g1.adopt_outcome_group(outcome_group)
+          expect(described_class.new(context).total_subgroups(g0.id)).to eq 7
+        end
+      end
+    end
+
+    context 'when a group is edited' do
+      it 'does not clear the cache' do
+        enable_cache do
+          # rubocop:disable RSpec/AnyInstance
+          expect_any_instance_of(Outcomes::LearningOutcomeGroupChildren).not_to receive(:clear_descendants_cache)
+          # rubocop:enable RSpec/AnyInstance
+          expect(subject.total_subgroups(g0.id)).to eq 6
+          g1.update(title: 'title edited')
+          expect(described_class.new(context).total_subgroups(g0.id)).to eq 6
+        end
+      end
+    end
+
+    context 'when an outcome is added' do
+      it 'clears the cache' do
+        enable_cache do
+          expect(subject.total_outcomes(g1.id)).to eq 9
+          outcome = LearningOutcome.create!(title: 'test outcome', context: context)
+          g1.add_outcome(outcome)
+          expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
+        end
+      end
+    end
+
+    context 'when an outcome is destroyed' do
+      it 'clears the cache' do
+        enable_cache do
+          outcome = LearningOutcome.create!(title: 'test outcome', context: context)
+          g1.add_outcome(outcome)
+          expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
+          outcome.destroy
+          expect(described_class.new(context).total_outcomes(g1.id)).to eq 9
+        end
+      end
+
+      context 'when the outcome belongs to a global group' do
+        it 'clears the cache' do
+          enable_cache do
+            expect(described_class.new.total_outcomes(global_group.id)).to eq 2
+            global_outcome1.destroy
+            expect(described_class.new.total_outcomes(global_group.id)).to eq 1
+          end
+        end
+      end
+
+      context 'when the outcome belongs to different contexts' do
+        it 'clears the cache on each context' do
+          enable_cache do
+            g1.add_outcome(global_outcome1)
+            expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
+            expect(described_class.new.total_outcomes(global_group.id)).to eq 2
+            global_outcome1.destroy
+            expect(described_class.new(context).total_outcomes(g1.id)).to eq 9
+            expect(described_class.new.total_outcomes(global_group.id)).to eq 1
+          end
+        end
+      end
+    end
+
+    context 'when a child_outcome_link is destroyed' do
+      it 'clears the cache' do
+        enable_cache do
+          outcome = LearningOutcome.create!(title: 'test outcome', context: context)
+          child_outcome_link = g1.add_outcome(outcome)
+          expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
+          child_outcome_link.destroy
+          expect(described_class.new(context).total_outcomes(g1.id)).to eq 9
+        end
+      end
+
+      context 'when the child_outcome_link belongs to global learning outcome group' do
+        it 'clears the cache' do
+          enable_cache do
+            outcome = LearningOutcome.create!(title: 'test outcome')
+            child_outcome_link = global_group.add_outcome(outcome)
+            expect(described_class.new.total_outcomes(global_group.id)).to eq 3
+            child_outcome_link.destroy
+            expect(described_class.new.total_outcomes(global_group.id)).to eq 2
+          end
+        end
       end
     end
   end

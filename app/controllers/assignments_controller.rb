@@ -61,7 +61,7 @@ class AssignmentsController < ApplicationController
 
         set_js_assignment_data
         set_tutorial_js_env
-        set_section_list_js_env if @domain_root_account.feature_enabled?(:assignment_bulk_edit)
+        set_section_list_js_env
         hash = {
           WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
           POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
@@ -126,6 +126,16 @@ class AssignmentsController < ApplicationController
           module_id: mark_done_presenter.module.id
         }
       })
+    end
+
+    if @assignment.turnitin_enabled? || @assignment.vericite_enabled?
+      similarity_pledge = {
+        EULA_URL: tool_eula_url,
+        COMMENTS: plagiarism_comments,
+        PLEDGE_TEXT: pledge_text,
+      }
+
+      js_env({SIMILARITY_PLEDGE: similarity_pledge})
     end
 
     js_env({
@@ -686,6 +696,16 @@ class AssignmentsController < ApplicationController
         hash[:allow_self_signup] = true # for group creation
         hash[:group_user_type] = 'student'
       end
+
+      if @assignment.annotatable_attachment_id.present?
+        if Account.site_admin.feature_enabled?(:annotated_document_submissions)
+          hash[:ANNOTATED_DOCUMENT] = {
+            display_name: @assignment.annotatable_attachment.display_name,
+            id: @assignment.annotatable_attachment.id
+          }
+        end
+      end
+
       js_env(hash)
       conditional_release_js_env(@assignment)
       set_master_course_js_env_data(@assignment, @context)
@@ -853,6 +873,14 @@ class AssignmentsController < ApplicationController
     pledge ||= @context.vericite_pledge.presence || closest_pledge if @assignment.vericite_enabled?
 
     pledge || (@assignment.course.account.closest_turnitin_pledge if @assignment.tool_settings_tool.present?)
+  end
+
+  def plagiarism_comments
+    if @assignment.turnitin_enabled?
+      @context.all_turnitin_comments
+    elsif @assignment.vericite_enabled?
+      @context.vericite_comments
+    end
   end
 
   def quiz_lti_tool_enabled?

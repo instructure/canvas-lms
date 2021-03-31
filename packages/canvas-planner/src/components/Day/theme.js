@@ -24,6 +24,10 @@ export default function generator({colors, typography, spacing}) {
     fontWeight: typography.fontWeightNormal,
     lineHeight: typography.lineHeightCondensed,
 
+    secondaryFontSize: typography.fontSizeMedium,
+    secondaryFontWeight: typography.fontWeightBold,
+    secondaryLineHeight: typography.lineHeightCondensed,
+
     color: colors.oxford,
     background: colors.white,
 

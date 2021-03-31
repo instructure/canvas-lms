@@ -32,14 +32,6 @@ function getTodaysDetails() {
   return {today, yesterday, tomorrow}
 }
 
-function isSpecialDay(date) {
-  const {today, yesterday, tomorrow} = getTodaysDetails()
-  const momentizedDate = new moment(date)
-
-  const specialDates = [today, yesterday, tomorrow]
-  return specialDates.some(sd => sd.isSame(momentizedDate, 'day'))
-}
-
 export function isToday(date, today = moment()) {
   const momentizedDate = new moment(date)
   return today.isSame(momentizedDate, 'day')
@@ -86,11 +78,7 @@ export function getFriendlyDate(date) {
 }
 
 export function getFullDate(date) {
-  if (isSpecialDay(date)) {
-    return moment(date).format('dddd, MMMM D')
-  } else {
-    return moment(date).format('MMMM D, YYYY')
-  }
+  return moment(date).format('MMMM D, YYYY')
 }
 
 export function getShortDate(date) {
@@ -160,10 +148,7 @@ export function formatDayKey(date) {
 }
 
 export function getFirstLoadedMoment(days, timeZone) {
-  if (!days.length)
-    return moment()
-      .tz(timeZone)
-      .startOf('day')
+  if (!days.length) return moment().tz(timeZone).startOf('day')
   const firstLoadedDay = days[0]
   const firstLoadedItem = firstLoadedDay[1][0]
   if (firstLoadedItem) return firstLoadedItem.dateBucketMoment.clone()
@@ -171,10 +156,7 @@ export function getFirstLoadedMoment(days, timeZone) {
 }
 
 export function getLastLoadedMoment(days, timeZone) {
-  if (!days.length)
-    return moment()
-      .tz(timeZone)
-      .startOf('day')
+  if (!days.length) return moment().tz(timeZone).startOf('day')
   const lastLoadedDay = days[days.length - 1]
   const loadedItem = lastLoadedDay[1][0]
   if (loadedItem) return loadedItem.dateBucketMoment.clone()

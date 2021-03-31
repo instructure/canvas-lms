@@ -22,7 +22,7 @@
 <% end %>
 
 <%
-  if @context.syllabus_course_summary? || !Account.site_admin.feature_enabled?(:syllabus_course_summary_option)
+  if @context.syllabus_course_summary?
     js_env :SYLLABUS_PER_PAGE => Setting.get('syllabus_per_page', Setting.get('api_max_per_page', '50'))
     js_bundle :syllabus
   else

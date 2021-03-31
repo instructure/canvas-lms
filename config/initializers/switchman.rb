@@ -142,6 +142,43 @@ Rails.application.config.after_initialize do
       @in_current_region
     end
 
+    def next_maintenance_window
+      return nil unless maintenance_window_start_hour
+
+      start_day = DateTime.now
+      # This array is effectively 1 indexed
+      relevant_weeks = maintenance_window_weeks_of_month.map { |i| WeekOfMonth::Constant::WEEKS_IN_SEQUENCE[i] }
+      maintenance_days = relevant_weeks.map do |ordinal|
+        Time.zone.local_to_utc(start_day.send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase))
+      end + relevant_weeks.map do |ordinal|
+        Time.zone.local_to_utc((start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase))
+      end 
+
+      next_day = maintenance_days.find { |d| d.future? }
+      # Time offsets are strange
+      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours
+      end_at = start_at + maintenance_window_duration
+
+      [start_at, end_at]
+    end
+
+    def maintenance_window_start_hour
+      Setting.get('maintenance_window_start_hour', nil)&.to_i
+    end
+
+    def maintenance_window_duration
+      # ISO 8601 duration
+      ActiveSupport::Duration.parse(Setting.get('maintenance_window_duration', "PT2H"))
+    end
+
+    def maintenance_window_weekday
+      Setting.get('maintenance_window_weekday', 'thursday').downcase
+    end
+
+    def maintenance_window_weeks_of_month
+      Setting.get('maintenance_window_weeks_of_month', "1,3").split(',').map(&:to_i)
+    end
+
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
       run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
 

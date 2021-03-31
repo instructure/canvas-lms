@@ -17,6 +17,7 @@
  */
 import React, {Component} from 'react'
 import classnames from 'classnames'
+import {colors} from '@instructure/canvas-theme'
 import {themeable, ApplyTheme} from '@instructure/ui-themeable'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
@@ -81,13 +82,15 @@ export class PlannerItem extends Component {
     feedback: shape(feedbackShape),
     location: string,
     endTime: momentObj,
-    timeZone: string.isRequired
+    timeZone: string.isRequired,
+    simplifiedControls: bool
   }
 
   static defaultProps = {
     badges: [],
     responsiveSize: 'large',
-    allDay: false
+    allDay: false,
+    simplifiedControls: false
   }
 
   constructor(props) {
@@ -331,7 +334,12 @@ export class PlannerItem extends Component {
       <div className={styles.title} style={{position: 'relative'}}>
         <Button
           variant="link"
-          theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          theme={{
+            mediumPadding: '0',
+            mediumHeight: 'normal',
+            linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
+            linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined
+          }}
           buttonRef={link => {
             this.itemLink = link
           }}
@@ -362,12 +370,10 @@ export class PlannerItem extends Component {
     if (this.props.points) {
       return (
         <div className={styles.score}>
-          <Text color="secondary">
-            <Text size="large">{this.props.points}</Text>
-            <Text size="x-small">
-              &nbsp;
-              {formatMessage('pts')}
-            </Text>
+          <Text size="large">{this.props.points}</Text>
+          <Text size="x-small">
+            &nbsp;
+            {formatMessage('pts')}
           </Text>
         </div>
       )
@@ -377,7 +383,9 @@ export class PlannerItem extends Component {
         <div className={styles.editButton}>
           <ApplyTheme
             theme={{
-              [Button.theme]: {iconColor: this.props.color}
+              [Button.theme]: {
+                iconColor: this.props.simplifiedControls ? undefined : this.props.color
+              }
             }}
           >
             <Button variant="icon" icon={IconEditLine} onClick={this.toDoLinkClick}>
@@ -402,7 +410,7 @@ export class PlannerItem extends Component {
         <div className={metricsClasses}>
           {this.renderItemSubMetric()}
           <div className={styles.due}>
-            <Text color="secondary" size="x-small">
+            <Text size="x-small">
               <PresentationContent>{this.renderDateField()}</PresentationContent>
             </Text>
           </div>
@@ -424,11 +432,13 @@ export class PlannerItem extends Component {
       <div
         className={classnames(styles.details, !this.hasBadges() ? styles.details_no_badges : '')}
       >
-        <div className={styles.type}>
-          <Text size="x-small" color="secondary">
-            {this.renderType()}
-          </Text>
-        </div>
+        {!this.props.simplifiedControls && (
+          <div className={styles.type}>
+            <Text size="x-small" color="secondary">
+              {this.renderType()}
+            </Text>
+          </div>
+        )}
         {this.renderTitle()}
       </div>
     )
@@ -467,12 +477,14 @@ export class PlannerItem extends Component {
   }
 
   getCheckboxTheme = () => {
-    return {
-      checkedBackground: this.props.color,
-      checkedBorderColor: this.props.color,
-      borderColor: this.props.color,
-      hoverBorderColor: this.props.color
-    }
+    return this.props.simplifiedControls
+      ? {}
+      : {
+          checkedBackground: this.props.color,
+          checkedBorderColor: this.props.color,
+          borderColor: this.props.color,
+          hoverBorderColor: this.props.color
+        }
   }
 
   renderExtraInfo() {
@@ -501,7 +513,7 @@ export class PlannerItem extends Component {
     if (location) {
       return (
         <div className={styles.location}>
-          <Text color="secondary">{location}</Text>
+          <Text>{location}</Text>
         </div>
       )
     }
@@ -543,7 +555,7 @@ export class PlannerItem extends Component {
         </div>
         <div
           className={this.props.associated_item === 'To Do' ? styles.avatar : styles.icon}
-          style={{color: this.props.color}}
+          style={{color: this.props.simplifiedControls ? undefined : this.props.color}}
           aria-hidden="true"
         >
           {this.renderIcon()}
@@ -561,4 +573,7 @@ export class PlannerItem extends Component {
 }
 
 const ResponsivePlannerItem = responsiviser()(PlannerItem)
-export default animatable(themeable(theme, styles)(ResponsivePlannerItem))
+const ThemeablePlannerItem = themeable(theme, styles)(ResponsivePlannerItem)
+const AnimatablePlannerItem = animatable(ThemeablePlannerItem)
+AnimatablePlannerItem.theme = ThemeablePlannerItem.theme
+export default AnimatablePlannerItem

@@ -29,7 +29,8 @@ const tools = [
     context_id: 1,
     description: 'This is tool 1',
     name: 'Tool 1',
-    is_rce_favorite: false
+    is_rce_favorite: false,
+    editor_button_settings: {enabled: true}
   },
   {
     app_id: 2,
@@ -37,7 +38,8 @@ const tools = [
     context_id: 1,
     description: 'This is tool 2',
     name: 'Tool 2',
-    is_rce_favorite: true
+    is_rce_favorite: true,
+    editor_button_settings: {enabled: true}
   },
   {
     app_id: 3,
@@ -45,6 +47,15 @@ const tools = [
     context_id: 1,
     description: 'This is tool 3',
     name: 'Tool 3'
+  },
+  {
+    app_id: 4,
+    context: 'Account',
+    context_id: 1,
+    description: 'This is tool 4',
+    name: 'Tool 4',
+    is_rce_favorite: true,
+    editor_button_settings: {enabled: false}
   }
 ]
 
@@ -91,14 +102,14 @@ describe('ExternalToolsTableRow', () => {
   })
 
   describe('with the lti_favorites', () => {
-    it('shows toggle with current tool favorite state when false', () => {
+    it('shows toggle with current tool favorite state when false and Editor placement is active', () => {
       const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
       expect(getByLabelText('Favorite')).toBeInTheDocument()
       const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
       expect(checkbox.checked).toBe(false)
     })
 
-    it('shows toggle with current tool favorite state when true', () => {
+    it('shows toggle with current tool favorite state when true and Editor placement is active', () => {
       const {getByLabelText} = renderRow({tool: tools[1], showLTIFavoriteToggles: true})
       expect(getByLabelText('Favorite')).toBeInTheDocument()
       const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
@@ -108,6 +119,15 @@ describe('ExternalToolsTableRow', () => {
     it('does not show the toggle when tool cannot be a favorite', () => {
       const {getByText, queryByLabelText} = renderRow({
         tool: tools[2],
+        showLTIFavoriteToggles: true
+      })
+      expect(queryByLabelText('Favorite')).not.toBeInTheDocument()
+      expect(getByText('NA')).toBeInTheDocument()
+    })
+
+    it('does not show the toggle when Editor button placement is inactive', () => {
+      const {getByText, queryByLabelText} = renderRow({
+        tool: tools[3],
         showLTIFavoriteToggles: true
       })
       expect(queryByLabelText('Favorite')).not.toBeInTheDocument()

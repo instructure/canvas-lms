@@ -28,6 +28,7 @@ module CanvasHttp
     attr_reader :body
 
     def initialize(body = nil)
+      super
       @body = body
     end
   end

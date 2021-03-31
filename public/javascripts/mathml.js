@@ -229,6 +229,7 @@ const mathImageHelper = {
           if (equation_text) {
             const mathtex = document.createElement('span')
             mathtex.setAttribute('class', 'math_equation_latex')
+            mathtex.setAttribute('style', img.getAttribute('style'))
             mathtex.textContent = `\\(${equation_text}\\)`
             if (img.nextSibling) {
               img.parentElement.insertBefore(mathtex, img.nextSibling)

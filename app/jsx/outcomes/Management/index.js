@@ -30,13 +30,17 @@ import ManageOutcomesFooter from './ManageOutcomesFooter'
 import useSearch from 'jsx/shared/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
-import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
+import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
 import useModal from '../../shared/hooks/useModal'
-import OutcomeMoveModal from './OutcomeMoveModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
+import MoveModal from './MoveModal'
+import EditGroupModal from './EditGroupModal'
 import GroupRemoveModal from './GroupRemoveModal'
+import OutcomeRemoveModal from './OutcomeRemoveModal'
+import useModalWithData from 'jsx/outcomes/shared/hooks/useModalWithData'
 
-const NoOutcomesBillboard = ({contextType}) => {
+const NoOutcomesBillboard = () => {
+  const {contextType} = useCanvasContext()
   const isCourse = contextType === 'Course'
 
   return (
@@ -87,15 +91,26 @@ const OutcomeManagementPanel = () => {
     selectedGroupId
   } = useManageOutcomes()
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
-  
+
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
+  const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
+  const [
+    outcomeRemoveModalData,
+    openOutcomeRemoveModal,
+    closeOutcomeRemoveModal
+  ] = useModalWithData()
   const groupMenuHandler = (_, action) => {
     if (action === 'move') {
       openMoveGroupModal()
     } else if (action === 'remove') {
       openGroupRemoveModal()
+    } else if (action === 'edit') {
+      openEditGroupModal()
     }
+  }
+  const outcomeMenuHandler = (id, action) => {
+    if (action === 'remove') openOutcomeRemoveModal({id})
   }
 
   if (isLoading) {
@@ -124,7 +139,7 @@ const OutcomeManagementPanel = () => {
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
       {!hasOutcomes ? (
-        <NoOutcomesBillboard contextType={contextType} />
+        <NoOutcomesBillboard />
       ) : (
         <>
           <Flex>
@@ -175,7 +190,7 @@ const OutcomeManagementPanel = () => {
                     searchString={searchString}
                     onSelectOutcomesHandler={onSelectOutcomesHandler}
                     onOutcomeGroupMenuHandler={groupMenuHandler}
-                    onOutcomeMenuHandler={noop}
+                    onOutcomeMenuHandler={outcomeMenuHandler}
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
@@ -188,7 +203,7 @@ const OutcomeManagementPanel = () => {
           {selectedGroupId && (
             <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
           )}
-          <OutcomeMoveModal
+          <MoveModal
             title={group ? group.title : ''}
             type="group"
             isOpen={isMoveGroupModalOpen}
@@ -199,6 +214,21 @@ const OutcomeManagementPanel = () => {
               groupId={selectedGroupId}
               isOpen={isGroupRemoveModalOpen}
               onCloseHandler={closeGroupRemoveModal}
+            />
+          )}
+          {selectedGroupId && outcomeRemoveModalData?.id && (
+            <OutcomeRemoveModal
+              groupId={selectedGroupId}
+              outcomeId={outcomeRemoveModalData?.id}
+              isOpen={outcomeRemoveModalData?.open}
+              onCloseHandler={closeOutcomeRemoveModal}
+            />
+          )}
+          {group && (
+            <EditGroupModal
+              outcomeGroup={group}
+              isOpen={isEditGroupModalOpen}
+              onCloseHandler={closeEditGroupModal}
             />
           )}
         </>

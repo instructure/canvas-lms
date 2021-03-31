@@ -20,8 +20,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -29,16 +32,18 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!k5_dashboard'
 import instFSOptimizedImageUrl from 'jsx/shared/helpers/instFSOptimizedImageUrl'
 import k5Theme from 'jsx/dashboard/k5-theme'
-import {Link} from '@instructure/ui-link'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 
 const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
-const DEFAULT_SIZE = 120
+const DEFAULT_SIZE = 100
 
 const GradeSummaryShape = {
   courseId: PropTypes.string.isRequired,
   courseName: PropTypes.string.isRequired,
+  enrollmentType: PropTypes.string.isRequired,
   courseColor: PropTypes.string,
   courseImage: PropTypes.string,
+  currentGradingPeriodId: PropTypes.string,
   grade: PropTypes.string,
   score: PropTypes.number
 }
@@ -82,6 +87,8 @@ export const GradeSummaryLine = ({
   courseImage,
   courseColor,
   courseName,
+  currentGradingPeriodId,
+  enrollmentType,
   grade,
   score
 }) => {
@@ -94,7 +101,7 @@ export const GradeSummaryLine = ({
       })
       isPercentage = true
     } else {
-      gradeText = I18n.t('Not Graded')
+      gradeText = currentGradingPeriodId ? I18n.t('Not Graded') : '--'
       score = 0
     }
   }
@@ -143,27 +150,40 @@ export const GradeSummaryLine = ({
                 </Link>
               </Heading>
             </Text>
-            <ProgressBar
-              screenReaderLabel={I18n.t('Grade for %{course}', {course: courseName})}
-              formatScreenReaderValue={() =>
-                isPercentage
-                  ? I18n.t('%{percent} of points possible', {percent: gradeText})
-                  : gradeText
-              }
-              renderValue={() => (
-                <View display="inline-block" width="6.5rem" margin="0 0 0 small">
-                  <Text weight="bold">{gradeText}</Text>
-                </View>
-              )}
-              size="small"
-              valueNow={score}
-              valueMax={100}
-              margin="small 0"
-            />
+            {['student', 'observer'].includes(enrollmentType) && (
+              <>
+                <ProgressBar
+                  screenReaderLabel={I18n.t('Grade for %{course}', {course: courseName})}
+                  formatScreenReaderValue={() =>
+                    isPercentage
+                      ? I18n.t('%{percent} of points possible', {percent: gradeText})
+                      : gradeText
+                  }
+                  size="small"
+                  valueNow={score}
+                  valueMax={100}
+                  margin="small 0"
+                />
+                <PresentationContent>
+                  <Text weight="bold" data-automation="course_grade">{gradeText}</Text>
+                </PresentationContent>
+              </>
+            )}
+            {['ta', 'teacher'].includes(enrollmentType) && (
+              <Button
+                renderIcon={IconExternalLinkLine}
+                href={`/courses/${courseId}/gradebook`}
+                target="_blank"
+              >
+                View Gradebook
+              </Button>
+            )}
           </View>
         </Flex.Item>
       </Flex>
-      <hr />
+      <PresentationContent>
+        <hr />
+      </PresentationContent>
     </View>
   )
 }
@@ -172,7 +192,13 @@ GradeSummaryLine.displayName = 'GradeSummaryLine'
 GradeSummaryLine.propTypes = GradeSummaryShape
 
 const GradesSummary = ({courses}) => {
-  return courses.map(course => <GradeSummaryLine key={course.courseId} {...course} />)
+  return (
+    <View as="div" margin="medium 0">
+      {courses.map(course => (
+        <GradeSummaryLine key={course.courseId} {...course} />
+      ))}
+    </View>
+  )
 }
 
 GradesSummary.displayName = 'GradesSummary'

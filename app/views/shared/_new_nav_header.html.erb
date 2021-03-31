@@ -161,7 +161,7 @@
               </div>
             </a>
           </li>
-          <% if PageView.page_views_enabled? && @domain_root_account.feature_enabled?(:recent_history) %>
+          <% if PageView.page_views_enabled? %>
             <li class="menu-item ic-app-header__menu-list-item" <%= ' ic-app-header__menu-list-item--active' if active_path?('/history') %>>
               <button id="global_nav_history_link" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">

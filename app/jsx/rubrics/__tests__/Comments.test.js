@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import sinon from 'sinon'
 import React from 'react'
 import {shallow} from 'enzyme'
 import Comments from '../Comments'
@@ -28,19 +27,13 @@ describe('The Comments component', () => {
     assessment: assessments.freeForm.data[1],
     savedComments: ['I award you no points', 'May god have mercy on your soul'],
     saveLater: false,
-    setComments: sinon.spy(),
-    setSaveLater: sinon.spy()
+    setComments: jest.fn(),
+    setSaveLater: jest.fn()
   }
 
   const component = mods => shallow(<Comments {...{...props, ...mods}} />)
-  const editor = mods =>
-    component(mods)
-      .find('FreeFormComments')
-      .shallow()
-  const rating = mods =>
-    component(mods)
-      .find('CommentText')
-      .shallow()
+  const editor = mods => component(mods).find('FreeFormComments').shallow()
+  const rating = mods => component(mods).find('CommentText').shallow()
 
   it('renders the root component as expected when editing', () => {
     expect(component()).toMatchSnapshot()
@@ -58,37 +51,33 @@ describe('The Comments component', () => {
   })
 
   it('shows no selector when no comments are presented', () => {
-    expect(component({savedComments: []}).find('Select')).toHaveLength(0)
+    expect(component({savedComments: []}).find('SimpleSelect')).toHaveLength(0)
   })
 
   it('can used saved comments from before', () => {
-    const setComments = sinon.spy()
+    const setComments = jest.fn()
     const el = editor({setComments})
-    const option = el.find('option').last()
-    el.find('Select').prop('onChange')(null, {value: option.prop('value')})
+    const select = el.find('SimpleSelect')
+    const option = select.children().last()
+    select.prop('onChange')(null, {value: option.prop('value')})
 
-    expect(setComments.args).toEqual([[option.text()]])
+    const selectedText = props.savedComments[option.prop('value')]
+    expect(setComments.mock.calls[0][0]).toEqual(selectedText)
   })
 
   it('truncates long saved comments', () => {
-    const long = `
-    this is the song that never ends, yes it goes on and on my friends
-    some people started singing it not knowing what it was
-    and they'll continue singing it forever just because
-    `
-      .trim()
-      .repeat(50)
+    const long = 'this is the song that never ends, yes it goes on and on my friends-'.repeat(50)
     const el = editor({savedComments: [long]})
-    const option = el.find('option').last()
-    expect(option.text()).toHaveLength(100) // includes the trailing '…'
+    const option = el.find('Option').last()
+    expect(option.props().children).toHaveLength(100) // includes the trailing '…'
   })
 
   it('can check / uncheck save for later', () => {
-    const setSaveLater = sinon.spy()
+    const setSaveLater = jest.fn()
     const el = editor({setSaveLater})
     el.find('Checkbox').prop('onChange')({target: {checked: true}})
 
-    expect(setSaveLater.args).toEqual([[true]])
+    expect(setSaveLater.mock.calls[0][0]).toBe(true)
   })
 
   it('can disable save later checkbox', () => {

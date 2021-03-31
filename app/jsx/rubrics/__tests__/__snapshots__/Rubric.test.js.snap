@@ -19,6 +19,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -27,6 +28,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -35,6 +37,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -45,6 +48,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           colSpan={3}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -55,6 +59,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -63,6 +68,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -71,6 +77,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -229,6 +236,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -237,6 +245,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -245,6 +254,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -255,6 +265,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           colSpan={3}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -265,6 +276,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -273,6 +285,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -281,6 +294,7 @@ exports[`the Rubric component points column does have a points column if points 
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -439,6 +453,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -447,6 +462,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -457,6 +473,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           colSpan={2}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -467,6 +484,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -475,6 +493,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -633,6 +652,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -641,6 +661,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -651,6 +672,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           colSpan={2}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -661,6 +683,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -669,6 +692,7 @@ exports[`the Rubric component points column does not have a points column if poi
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -823,6 +847,7 @@ exports[`the Rubric component points column does not have a points column in sum
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -831,6 +856,7 @@ exports[`the Rubric component points column does not have a points column in sum
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -841,6 +867,7 @@ exports[`the Rubric component points column does not have a points column in sum
         <ColHeader
           colSpan={2}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -851,6 +878,7 @@ exports[`the Rubric component points column does not have a points column in sum
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -859,6 +887,7 @@ exports[`the Rubric component points column does not have a points column in sum
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1043,6 +1072,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1051,6 +1081,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1059,6 +1090,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1069,6 +1101,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           colSpan={3}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1079,6 +1112,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1087,6 +1121,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1095,6 +1130,7 @@ exports[`the Rubric component points column has a points column if points visibl
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1279,6 +1315,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1287,6 +1324,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1295,6 +1333,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1305,6 +1344,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           colSpan={3}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1315,6 +1355,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1323,6 +1364,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1331,6 +1373,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1515,6 +1558,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1523,6 +1567,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1531,6 +1576,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1541,6 +1587,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           colSpan={3}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1551,6 +1598,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1559,6 +1607,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1567,6 +1616,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1720,6 +1770,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1728,6 +1779,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1736,6 +1788,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1746,6 +1799,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           colSpan={3}
           id="rubric-title"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1756,6 +1810,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           id="table-heading-criteria"
           key="TableHeadingCriteria"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1764,6 +1819,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           id="table-heading-ratings"
           key="TableHeadingRatings"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >
@@ -1772,6 +1828,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <ColHeader
           id="table-heading-points"
           key="TableHeadingPoints"
+          scope="col"
           sortDirection="none"
           textAlign="start"
         >

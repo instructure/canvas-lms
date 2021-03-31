@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import classSet from '../../../shared/util/class_set'
 import I18n from 'i18n!quiz_log_auditing.event_stream'
 import K from '../../constants'
 import React from 'react'
@@ -32,14 +31,9 @@ class Event extends React.Component {
 
   render() {
     const e = this.props
-    const className = classSet({
-      'ic-ActionLog__Entry': true,
-      'is-warning': e.flag === K.EVT_FLAG_WARNING,
-      'is-ok': e.flag === K.EVT_FLAG_OK,
-      'is-neutral': !e.flag
-    })
+
     return (
-      <li className={className} key={'event-' + e.id}>
+      <li className="ic-ActionLog__Entry" key={'event-' + e.id}>
         {this.renderRow(e)}
       </li>
     )
@@ -63,11 +57,11 @@ class Event extends React.Component {
 
   renderFlag(flag) {
     if (flag === K.EVT_FLAG_WARNING) {
-      return <IconTroubleLine />
+      return <IconTroubleLine color="warning" />
     } else if (flag === K.EVT_FLAG_OK) {
-      return <IconCompleteLine />
+      return <IconCompleteLine color="success" />
     } else {
-      return <IconEmptyLine />
+      return <IconEmptyLine color="secondary"/>
     }
   }
 
@@ -77,7 +71,7 @@ class Event extends React.Component {
         return I18n.t('session_started', 'Session started')
 
       case K.EVT_QUESTION_ANSWERED: {
-        let valid_answers = event.data.filter(function(i) {
+        const valid_answers = event.data.filter(function(i) {
           return i.answer != null
         })
 

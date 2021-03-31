@@ -41,6 +41,10 @@ describe "discussions" do
                                      assignment: assignment)
   end
 
+  before(:once) do
+    Account.default.enable_feature!(:rce_enhancements)
+  end
+
   context "on the edit page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/edit" }
 
@@ -49,6 +53,7 @@ describe "discussions" do
 
       before(:each) do
         user_session(teacher)
+        stub_rcs_config
       end
 
       context "graded" do
@@ -204,8 +209,6 @@ describe "discussions" do
         confirm(:off)
         toggle(:on)
         confirm(:on)
-        toggle(:off)
-        confirm(:off)
       end
 
       it "should show correct date when saving" do

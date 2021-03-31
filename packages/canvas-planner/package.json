@@ -20,7 +20,7 @@
     "build:canvas": "yarn build",
     "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir es --ignore '**/__tests__'",
     "build:watch": "yarn run build:dev --watch",
-    "test": "jest --runInBand",
+    "test": "jest --color --runInBand",
     "test:coverage": "yarn test --coverage",
     "test:watch": "yarn test --watch",
     "test:update": "yarn test --updateSnapshot",

@@ -17,12 +17,15 @@
  */
 
 import React from 'react'
-import {render, waitFor, fireEvent} from '@testing-library/react'
+import {render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import moxios from 'moxios'
+import OutcomesContext from '../../contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '../api'
 import MasteryScale from '../index'
-import {masteryScalesGraphqlMocks as mocks} from '../../__tests__/mocks'
+import {masteryScalesGraphqlMocks} from '../../__tests__/mocks'
+
+jest.useFakeTimers()
 
 describe('MasteryScale', () => {
   beforeEach(() => {
@@ -53,32 +56,34 @@ describe('MasteryScale', () => {
     window.ENV = null
   })
 
-  it('loads proficiency data', async () => {
-    const {getByText, getByDisplayValue} = render(
-      <MockedProvider mocks={mocks}>
-        <MasteryScale contextType="Account" contextId="11" />
-      </MockedProvider>
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '11', mocks = masteryScalesGraphqlMocks} = {}
+  ) => {
+    return rtlRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        <MockedProvider mocks={mocks}>{children}</MockedProvider>
+      </OutcomesContext.Provider>
     )
+  }
+
+  it('loads proficiency data', async () => {
+    const {getByText, getByDisplayValue} = render(<MasteryScale />)
     expect(getByText('Loading')).toBeInTheDocument()
     await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads proficiency data to Course', async () => {
     const {getByText, getByDisplayValue} = render(
-      <MockedProvider mocks={mocks}>
-        <MasteryScale contextType="Course" contextId="12" />
-      </MockedProvider>
+      <MasteryScale contextType="Course" contextId="12" />,
+      {contextType: 'Course', contextId: '12'}
     )
     expect(getByText('Loading')).toBeInTheDocument()
     await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads role list', async () => {
-    const {getByText, getAllByText} = render(
-      <MockedProvider mocks={mocks}>
-        <MasteryScale contextType="Account" contextId="11" />
-      </MockedProvider>
-    )
+    const {getByText, getAllByText} = render(<MasteryScale />)
     expect(getByText('Loading')).toBeInTheDocument()
     await waitFor(() => {
       expect(
@@ -93,11 +98,7 @@ describe('MasteryScale', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(
-      <MockedProvider mocks={[]}>
-        <MasteryScale contextType="Account" contextId="11" />
-      </MockedProvider>
-    )
+    const {getByText} = render(<MasteryScale />, {mocks: []})
     await waitFor(() => expect(getByText(/An error occurred/)).toBeInTheDocument())
   })
 
@@ -120,11 +121,7 @@ describe('MasteryScale', () => {
         }
       }
     ]
-    const {getByText} = render(
-      <MockedProvider mocks={emptyMocks}>
-        <MasteryScale contextType="Account" contextId="11" />
-      </MockedProvider>
-    )
+    const {getByText} = render(<MasteryScale />, {mocks: emptyMocks})
     await waitFor(() => expect(getByText('Mastery')).not.toBeNull())
   })
 
@@ -137,11 +134,7 @@ describe('MasteryScale', () => {
     })
 
     it('submits a request when ratings are saved', async () => {
-      const {findAllByLabelText, getByText} = render(
-        <MockedProvider mocks={mocks}>
-          <MasteryScale contextType="Account" contextId="11" />
-        </MockedProvider>
-      )
+      const {findAllByLabelText, getByText} = render(<MasteryScale />)
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
       fireEvent.change(pointsInput, {target: {value: '100'}})
       fireEvent.click(getByText('Save Mastery Scale'))
@@ -167,11 +160,7 @@ describe('MasteryScale', () => {
     })
 
     it('hides mastery info', async () => {
-      const {getByText, queryByText} = render(
-        <MockedProvider mocks={mocks}>
-          <MasteryScale contextType="Account" contextId="11" />
-        </MockedProvider>
-      )
+      const {getByText, queryByText} = render(<MasteryScale />)
       expect(getByText('Loading')).toBeInTheDocument()
       await waitFor(() =>
         expect(

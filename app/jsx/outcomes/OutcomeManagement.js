@@ -21,7 +21,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from 'jsx/outcomes/MasteryScale'
 import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
-import OutcomesContext from './contexts/OutcomesContext'
+import OutcomesContext, {getContext} from './contexts/OutcomesContext'
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management'
 
@@ -88,35 +88,18 @@ export const OutcomeManagementWithoutGraphql = () => {
     }
   }, [hasUnsavedChangesRef])
 
-  const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
-  const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
-  const contextStore = {
-    env: {
-      contextType,
-      contextId
-    }
-  }
-
   return (
-    <OutcomesContext.Provider value={contextStore}>
+    <OutcomesContext.Provider value={getContext()}>
       {improvedManagement && <ManagementHeader />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
           {improvedManagement ? <OutcomeManagementPanel /> : <OutcomePanel />}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
-          <MasteryScale
-            onNotifyPendingChanges={setHasUnsavedChanges}
-            contextType={contextType}
-            contextId={contextId}
-          />
+          <MasteryScale onNotifyPendingChanges={setHasUnsavedChanges} />
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Calculation')} isSelected={selectedIndex === 2}>
-          <MasteryCalculation
-            onNotifyPendingChanges={setHasUnsavedChanges}
-            contextType={contextType}
-            contextId={contextId}
-          />
+          <MasteryCalculation onNotifyPendingChanges={setHasUnsavedChanges} />
         </Tabs.Panel>
       </Tabs>
     </OutcomesContext.Provider>

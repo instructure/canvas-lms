@@ -1,8 +1,33 @@
 #!/bin/bash
 
 set -e
+source script/common.sh
+source script/common/canvas/build_helpers.sh
 
-source build/common_docker_build_steps.sh
+trap '_canvas_lms_telemetry_report_status' ERR EXIT
+SCRIPT_NAME=$0
+
+function installed {
+  type "$@" &> /dev/null
+}
+
+function _canvas_lms_telemetry_report_status() {
+  exit_status=$?
+  if installed _inst_report_status && _canvas_lms_telemetry_enabled; then
+    _inst_report_status $exit_status
+  fi
+}
+
+function _canvas_lms_opt_in_telemetry() {
+  if installed _canvas_lms_activate_telemetry; then
+    _canvas_lms_activate_telemetry
+    if installed _inst_setup_telemetry && _inst_setup_telemetry "canvas-lms:$SCRIPT_NAME"; then
+        _inst_track_os
+    fi
+  fi
+}
+
+_canvas_lms_opt_in_telemetry
 
 # shellcheck disable=1004
 echo '
@@ -35,18 +60,15 @@ DINGHY_CPUS='4'
 DINGHY_DISK='150'
 # docker-compose version 1.20.0 introduced build-arg that we use for linux
 DOCKER_COMPOSE_MIN_VERSION='1.20.0'
-
-function installed {
-  type "$@" &> /dev/null
-}
+DOCKER='y'
 
 if [[ $OS == 'Darwin' ]]; then
   #docker-compose is checked separately
   dependencies='docker docker-machine dinghy'
-elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
-  echo 'This script only supports Debian-based Linux'
-  exit 1
 elif [[ $OS == 'Linux' ]]; then
+  if [ ! -f "/etc/debian_version" ]; then
+    echo "Running this script on a non Debian distro may or may not work and is not officially supported"
+  fi
   #when more dependencies get added, modify Linux install output below
   #docker-compose is checked separately
   dependencies='dory'
@@ -138,7 +160,7 @@ function create_dinghy_vm {
   prompt "How big should the VM's disk be (in GB)? [$DINGHY_DISK]" disk
 
   message "OK let's do this."
-  dinghy create \
+  _canvas_lms_track dinghy create \
     --provider=virtualbox \
     --memory "${memory:-$DINGHY_MEMORY}" \
     --cpus "${cpus:-$DINGHY_CPUS}" \
@@ -147,7 +169,7 @@ function create_dinghy_vm {
 
 function start_dinghy_vm {
   if dinghy status | grep -q 'stopped'; then
-    dinghy up
+    _canvas_lms_track dinghy up
   else
     message 'Looks like the dinghy VM is already running. Moving on...'
   fi
@@ -203,34 +225,6 @@ function setup_docker_environment {
     setup_docker_as_nonroot
     [[ ${skip_dory:-n} != 'y' ]] && start_dory
   fi
-  if [ -f "docker-compose.override.yml" ]; then
-    message "docker-compose.override.yml exists, skipping copy of default configuration"
-  else
-    message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-    cp config/docker-compose.override.yml.example docker-compose.override.yml
-  fi
-
-  if [ -f ".env" ]; then
-    prompt '.env file exists, would you like to reset it to default? [y/n]' confirm
-    [[ ${confirm:-n} == 'y' ]] || return 0
-  fi
-  message "Setting up default .env configuration"
-  echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env
-}
-
-function copy_docker_config {
-  message 'Copying Canvas docker configuration...'
-  # Only copy yamls, not contents of new-jenkins folder
-  confirm_command 'cp docker-compose/config/*.yml config/' || true
-}
-
-function setup_canvas {
-  message 'Now we can set up Canvas!'
-  copy_docker_config
-  build_images
-  check_gemfile
-  build_assets
-  create_db
 }
 
 function display_next_steps {
@@ -295,6 +289,13 @@ function display_next_steps {
   "
 }
 
+
 setup_docker_environment
-setup_canvas
+message 'Now we can set up Canvas!'
+copy_docker_config
+setup_docker_compose_override
+build_images
+check_gemfile
+build_assets
+create_db
 display_next_steps

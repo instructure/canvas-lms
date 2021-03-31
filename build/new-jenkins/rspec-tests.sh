@@ -16,7 +16,7 @@ fi
 
 # we want actual globbing of individual elements for passing argument literals
 # shellcheck disable=SC2068
-PARALLEL_INDEX=$parallel_index RAILS_DB_NAME_TEST="canvas_test_$parallel_index" bundle exec parallel_rspec . \
+PARALLEL_INDEX=$parallel_index RAILS_DB_NAME_TEST="canvas_test_$parallel_index" bin/parallel_rspec . \
   --pattern "$TEST_PATTERN" \
   --exclude-pattern "$EXCLUDE_TESTS" \
   -n "$max" \

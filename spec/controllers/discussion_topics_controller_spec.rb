@@ -163,6 +163,28 @@ describe DiscussionTopicsController do
     context "cross-sharding" do
       specs_require_sharding
 
+      it "should mark as read when viewed" do
+        @shard1.activate do
+          account = Account.create!(name: 'Shard2 account')
+          @course = account.courses.create!(name: 'new_course', workflow_state: 'available')
+          # @student is defined outside and lives on the default shard.
+          @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
+          user_session(@student)
+          course_topic(:skip_set_user => true)
+          @topic.publish!
+
+          expect(@student.stream_item_instances.count).to eq 1
+          sii = @student.stream_item_instances.take
+          expect(sii.workflow_state).to eq 'unread'
+          expect(@topic.read_state(@student)).to eq 'unread'
+
+          get 'show', params: { course_id: @course.id, id: @topic.id }
+
+          expect(sii.reload.workflow_state).to eq 'read'
+          expect(@topic.reload.read_state(@student)).to eq 'read'
+        end
+      end
+
       it 'returns the topic across shards' do
         @topic = @course.discussion_topics.create!(title: 'student topic', message: 'Hello', user: @student)
         user_session(@student)

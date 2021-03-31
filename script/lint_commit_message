@@ -129,3 +129,8 @@ has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
 end
+
+skip_eslint_flag = commit_message.include? '[skip-eslint]'
+if skip_eslint_flag
+  comment "error", 1, "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"
+end

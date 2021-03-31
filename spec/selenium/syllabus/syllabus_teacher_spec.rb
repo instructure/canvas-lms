@@ -37,81 +37,60 @@ describe "course syllabus" do
       @assignment1 = @course1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
     end
 
-    context "with feature off" do
-      before :each do
-        user_session @teacher1
-      end
-
-      it "does not show the option" do
-        visit_syllabus_page(@course1.id)
-        edit_syllabus_button.click
-        wait_for_dom_ready
-
-        expect(page_main_content).not_to contain_css(show_summary_chkbox_css)
-      end
+    before :each do
+      user_session @teacher1
     end
 
-    context "with feature on" do
-      before :once do
-        Account.site_admin.enable_feature! :syllabus_course_summary_option
-      end
+    it "shows course-summary-option checkbox that is pre-checked" do
+      visit_syllabus_page(@course1.id)
 
-      before :each do
-        user_session @teacher1
-      end
+      edit_syllabus_button.click
+      wait_for_dom_ready
+      # ensure the checkbox is checked
+      expect(is_checked(show_course_summary_checkbox)).to be true
+      update_syllabus_button.click
 
-      it "shows course-summary-option checkbox that is pre-checked" do
-        visit_syllabus_page(@course1.id)
+      expect(page_main_content).to contain_css(syllabus_container_css)
+      expect(page_main_content).to contain_css(mini_calendar_css)
+    end
 
-        edit_syllabus_button.click
-        wait_for_dom_ready
-        # ensure the checkbox is checked
-        expect(is_checked(show_course_summary_checkbox)).to be true
-        update_syllabus_button.click
-        
-        expect(page_main_content).to contain_css(syllabus_container_css)
-        expect(page_main_content).to contain_css(mini_calendar_css)
-      end
+    it "hides course summary when course-summary-option checkbox is toggled off" do
+      visit_syllabus_page(@course1.id)
+      expect(page_main_content).to contain_css(syllabus_container_css)
 
-      it "hides course summary when course-summary-option checkbox is toggled off" do
-        visit_syllabus_page(@course1.id)
-        expect(page_main_content).to contain_css(syllabus_container_css)
+      edit_syllabus_button.click
+      wait_for_dom_ready
+      expect(is_checked(show_course_summary_checkbox)).to be true
+      # uncheck the show-course-summary checkbox
+      show_course_summary_input.click
+      update_syllabus_button.click
 
-        edit_syllabus_button.click
-        wait_for_dom_ready
-        expect(is_checked(show_course_summary_checkbox)).to be true
-        # uncheck the show-course-summary checkbox
-        show_course_summary_input.click
-        update_syllabus_button.click
+      expect(page_main_content).not_to contain_css(syllabus_container_css)
+      expect(page_main_content).not_to contain_css(mini_calendar_css)
+    end
 
-        expect(page_main_content).not_to contain_css(syllabus_container_css)
-        expect(page_main_content).not_to contain_css(mini_calendar_css)
-      end
+    it "unhides course summary when course-summary-option checkbox is toggled on", custom_timeout: 20 do
+      @course1.syllabus_course_summary = false
+      @course1.save!
+      visit_syllabus_page(@course1.id)
+      expect(page_main_content).not_to contain_css(syllabus_container_css)
 
-      it "unhides course summary when course-summary-option checkbox is toggled on", custom_timeout: 20 do
-        @course1.syllabus_course_summary = false
-        @course1.save!
-        visit_syllabus_page(@course1.id)
-        expect(page_main_content).not_to contain_css(syllabus_container_css)
+      edit_syllabus_button.click
+      wait_for_dom_ready
+      expect(is_checked(show_course_summary_checkbox)).to be false
+      # enable the show-course-summary checkbox
+      show_course_summary_input.click
+      update_syllabus_button.click
 
-        edit_syllabus_button.click
-        wait_for_dom_ready
-        expect(is_checked(show_course_summary_checkbox)).to be false
-        # enable the show-course-summary checkbox
-        show_course_summary_input.click
-        update_syllabus_button.click
-
-        expect(page_main_content).to contain_css(syllabus_container_css)
-        expect(page_main_content).to contain_css(mini_calendar_css)
-      end
+      expect(page_main_content).to contain_css(syllabus_container_css)
+      expect(page_main_content).to contain_css(mini_calendar_css)
     end
   end
 
-  context "with syllabus course summary for public course" do
+  context "in a public course" do
     include_context "public course as a logged out user"
-    
+
     before :once do
-      Account.site_admin.enable_feature! :syllabus_course_summary_option
       @course = public_course
     end
 
@@ -120,7 +99,7 @@ describe "course syllabus" do
       @course.syllabus_course_summary = false
       @course.save!
       visit_syllabus_page(@course.id)
-      
+
       expect(page_main_content).not_to contain_css(syllabus_container_css)
     end
   end

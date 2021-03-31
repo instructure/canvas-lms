@@ -17,82 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'audits'
 
 module Auditors
-  class << self
-    def stream(&block)
-      ::EventStream::Stream.new(&block).tap do |stream|
-        stream.raise_on_error = Rails.env.test?
-
-        stream.on_insert do |record|
-          EventStream::Logger.info('AUDITOR', identifier, 'insert', record.to_json)
-        end
-
-        stream.on_error do |operation, record, exception|
-          next unless Auditors.configured?
-          EventStream::Logger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
-        end
-      end
-    end
-
-    def logger
-      Rails.logger
-    end
-
-    def read_stream_options(options)
-      return { backend_strategy: :cassandra }.merge(options) if Auditors.read_from_cassandra?
-      return { backend_strategy: :active_record }.merge(options) if Auditors.read_from_postgres?
-      # Assume cassandra by default until transition complete
-      { backend_strategy: :cassandra }.merge(options)
-    end
-
-    def backend_strategy
-      strategy_value = :cassandra
-      strategy_value = :active_record if read_from_postgres?
-      strategy_value
-    end
-
-    def configured?
-      strategy = backend_strategy
-      if strategy == :cassandra
-        return Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
-      elsif strategy == :active_record
-        return Rails.configuration.database_configuration[Rails.env].present?
-      end
-      raise ArgumentError, "Unknown Auditors Backend Strategy: #{strategy}"
-    end
-
-    def write_to_cassandra?
-      write_paths.include?('cassandra')
-    end
-
-    def write_to_postgres?
-      write_paths.include?('active_record')
-    end
-
-    def read_from_cassandra?
-      read_path == 'cassandra'
-    end
-
-    def read_from_postgres?
-      read_path == 'active_record'
-    end
-
-    def read_path
-      config&.[]('read_path') || 'cassandra'
-    end
-
-    def write_paths
-      paths = [config&.[]('write_paths')].flatten.compact
-      # default to both for now.
-      # after a year we will have hit our retention period
-      # and can safely de-comission all auditors cassandra code.
-      paths.empty? ? ['cassandra', 'active_record'] : paths
-    end
-
-    def config(shard=::Switchman::Shard.current)
-      settings = Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
-      YAML.safe_load(settings['auditors.yml'] || '{}')
-    end
+  # TODO: this module is currently being extracted to the
+  # audits engine.  This module shim is remaining in place
+  # to ease the transition and prevent surprise breakages. Once all callsites are patched,
+  # remove this shim entirely.
+  def self.method_missing(message, *args, &block)
+    Rails.logger.warn("[DEPRECATION] The Auditors module is being relocated, change callsites to use the 'Audits' module")
+    Audits.send(message, *args, &block)
   end
 end

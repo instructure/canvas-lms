@@ -33,6 +33,7 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import CalculationMethodContent from 'compiled/models/grade_summary/CalculationMethodContent'
 import ConfirmMasteryModal from 'jsx/outcomes/ConfirmMasteryModal'
+import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
 
 const validInt = (method, value) => {
   if (method.validRange) {
@@ -185,9 +186,9 @@ const ProficiencyCalculation = ({
   update,
   updateError,
   canManage,
-  contextType,
   onNotifyPendingChanges
 }) => {
+  const {contextType} = useCanvasContext()
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
 
   const [calculationMethodKey, setCalculationMethodKey] = useState(initialMethodKey)
@@ -299,8 +300,7 @@ ProficiencyCalculation.propTypes = {
   canManage: PropTypes.bool,
   update: PropTypes.func.isRequired,
   onNotifyPendingChanges: PropTypes.func,
-  updateError: PropTypes.string,
-  contextType: PropTypes.string.isRequired
+  updateError: PropTypes.string
 }
 
 ProficiencyCalculation.defaultProps = {

@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# This config file is used for switching environment variables
+# that need to be set before rails initialization even starts.
+# That's why it is required directly from the Gemfile.
+
 # You can disable the Rails 6.0 support by either defining a
 # CANVAS_RAILS6_0=0 env var, creating an empty RAILS5_2 file in the canvas config dir,
 # or setting `private/canvas/rails6.0` to `false` in a locally accessible consul

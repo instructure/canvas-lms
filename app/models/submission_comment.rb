@@ -240,9 +240,10 @@ class SubmissionComment < ActiveRecord::Base
       end
     end
 
-    # The student who owns the submission can't see drafts or hidden comments (or,
-    # generally, any instructor comments if the assignment is muted)
-    if submission.user_id == user.id
+    # The student who owns the submission can't see draft or hidden comments (or,
+    # generally, any instructor comments if the assignment is muted); the same
+    # holds for anyone observing the student
+    if submission.user_id == user.id || User.observing_students_in_course(submission.user, assignment.context).include?(user)
       return false if draft? || hidden? || !submission.posted?
 
       # Generally the student should see only non-provisional comments--but they should

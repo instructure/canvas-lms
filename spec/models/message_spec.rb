@@ -336,7 +336,10 @@ describe Message do
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
@@ -346,19 +349,14 @@ describe Message do
         expect(ne).to receive(:destroy).never
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
-      context 'with the reduce_push_notifications feature enabled' do
-        before :each do
-          Account.site_admin.enable_feature!(:reduce_push_notifications)
-        end
-
-        after :each do
-          Account.site_admin.disable_feature!(:reduce_push_notifications)
-        end
-
+      context 'with the reduce_push_notifications settings' do
         it "allows whitelisted notification types" do
           message_model(
             dispatch_at: Time.now,
@@ -753,11 +751,18 @@ describe Message do
       expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
     end
 
-    it "doesnt break when there is an invalid avatar_image_url url" do
-      user.avatar_image_url = "An invalid url"
+    it "encodes a user's avatar_url when just a path" do
+      user.avatar_image_url = "path with spaces"
       user.save!
       message = Message.new(context: convo_message)
-      expect(message.author_avatar_url).to be_nil
+      expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}/path%20with%20spaces"
+    end
+
+    it "encodes a user's avatar_url when a url" do
+      user.avatar_image_url = "http://localhost/path with spaces"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to eq "http://localhost/path%20with%20spaces"
     end
 
     describe 'author_account' do

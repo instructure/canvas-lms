@@ -4948,51 +4948,6 @@ describe Course do
     end
   end
 
-  describe "groups_visible_to" do
-    before :once do
-      @course = course_model
-      @user = user_model
-      @group = @course.groups.create!
-    end
-
-    it "should restrict to groups the user is in without course-wide permissions" do
-      expect(@course.groups_visible_to(@user)).to be_empty
-      @group.add_user(@user)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-    end
-
-    it "should allow course-wide visibility regardless of membership given :manage_groups permission" do
-      expect(@course.groups_visible_to(@user)).to be_empty
-      expect(@course).to receive(:grants_any_right?).and_return(true)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-    end
-
-    it "should allow course-wide visibility regardless of membership given :view_group_pages permission" do
-      expect(@course.groups_visible_to(@user)).to be_empty
-      expect(@course).to receive(:grants_any_right?).and_return(true)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-    end
-
-    it "should default to active groups only" do
-      expect(@course).to receive(:grants_any_right?).and_return(true).at_least(:once)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-      @group.destroy
-      expect(@course.reload.groups_visible_to(@user)).to be_empty
-    end
-
-    it "should allow overriding the scope" do
-      expect(@course).to receive(:grants_any_right?).and_return(true).at_least(:once)
-      @group.destroy
-      expect(@course.groups_visible_to(@user)).to be_empty
-      expect(@course.groups_visible_to(@user, @course.groups)).to eq [@group]
-    end
-
-    it "should return a scope" do
-      # can't use "should respond_to", because that delegates to the instantiated Array
-      expect{ @course.groups_visible_to(@user).all }.not_to raise_exception
-    end
-  end
-
   describe 'permission policies' do
     before :once do
       @course = course_model

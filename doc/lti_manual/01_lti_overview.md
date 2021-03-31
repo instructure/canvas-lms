@@ -27,6 +27,12 @@ The original LTI standard. LTI 1.0 was originally released in 2010 and provided 
 - [LTI 1.1 Specification](https://www.imsglobal.org/specs/ltiv1p1/implementation-guide)
 - [More information about LIS](https://www.imsglobal.org/activity/onerosterlis)
 
+#### General Implementation Notes
+
+LTI 1.0 was the first version of LTI implemented in Canvas. Much of its implementation is found in various models, controllers, and helpers in Canvas.
+
+Some of its implementation is also located in the "LTI Outbound" gem, which serves as a data format translation layer (See "LTI 1.1 Launches" in [the LTI Launches document](./03_lti_launches.md) for more details).
+
 ### LTI 2.0
 
 **Status: Deprecated**
@@ -40,11 +46,19 @@ You may be wondering why 2.0 comes before 1.3, and why it's deprecated - time fo
 
 There are a _lot_ of new concepts in this standard, and they are best defined in the spec [here](http://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-4).
 
+#### General Implementation Notes
+
+For the the most case, LTI 2.0 implementation in Canvas is completely separate from the LTI 1.1 implementation. The team made a clean break when implementing 2.0 (with some exceptions, see [LTI Launches](./03_lti_launches.md) for more details).
+
+One of the downfalls of this decision was that LTI 2.0 never reached feature parity with LTI 1.1 in Canvas. Because of this (and the general complexity of LTI 2.0), it was rarely used in Canvas.
+
+At the time of writing, the [plagiarism detection platform](./04_plagiarism_detection_platform.md) is the last valid reason to use LTI 2.0.
+
 ### LTI 1.3
 
 **Status: Current**
 
-The advent of LTI 1.3 in 2019 promised all the same functionality as previous versions, a brand new security model, and many more services that allowed greater communication between Tool and Platform. It is the current and long-term LTI Core version, and most of the tools installed in Canvas use this. The largest change was to move to **OpenID Connect** and **OAuth 2** workflows for authentication, and data is sent to the tool in a signed **JWT** instead of in the request body. This means that instead of the simple one-request flow of 1.1, a couple of additional redirects/requests are needed. In addition, 3 new services for sending data from Tool to Platform were standardized under the **LTI Advantage** umbrella, which will be talked about in detail later. This is the most important version to understand, since all new LTI development in Canvas falls under this category.
+The advent of LTI 1.3 in 2019 promised all the same functionality as previous versions, a brand new security model, and many more services that allowed greater communication between Tool and Platform. It is the current and long-term LTI Core version. The largest change was to move to **OpenID Connect** and **OAuth 2** workflows for authentication, and data is sent to the tool in a signed **JWT** instead of in the request body. This means that instead of the simple one-request flow of 1.1, a couple of additional redirects/requests are needed. In addition, 3 new services for sending data from Tool to Platform were standardized under the **LTI Advantage** umbrella, which will be talked about in detail later. This is the most important version to understand, since all new LTI development in Canvas falls under this category.
 
 - [LTI 1.3 Specification](http://www.imsglobal.org/spec/lti/v1p3)
 - [LTI Advantage Overview](http://www.imsglobal.org/spec/lti/v1p3/impl)
@@ -62,3 +76,10 @@ The advent of LTI 1.3 in 2019 promised all the same functionality as previous ve
 - **Service**: One of the two main integrations between Platform and Tool. A Service allows a Tool to directly communicate with a Platform. The LTI Advantage services are an example of this integration type.
 
 More information about these are found in the spec [here](http://www.imsglobal.org/spec/lti/v1p3/#key-concepts-and-elements).
+
+#### General Implementation Notes
+
+Rather than making a clean break in implementation as we did with LTI 2.0, the team decided to piggy-back on as much existing LTI 1.1 code as we could to quickly reach feature parity.
+
+This worked very well in general, although some code may feel initially confusing without knowing it serves LTI 1.1 and LTI 1.3. More details on the LTI launch code can be found [here](./03_lti_launches).
+

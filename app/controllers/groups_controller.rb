@@ -206,6 +206,7 @@ class GroupsController < ApplicationController
   #
   # @returns [Group]
   def index
+
     return context_index if @context
     includes = {:include => params[:include]}
     groups_scope = @current_user.current_groups
@@ -293,7 +294,9 @@ class GroupsController < ApplicationController
 
           js_env group_categories: categories_json,
                  group_user_type: @group_user_type,
-                 allow_self_signup: @allow_self_signup
+                 allow_self_signup: @allow_self_signup,
+                 context_class_name: @context.class.name
+
           if @context.is_a?(Course)
             # get number of sections with students in them so we can enforce a min group size for random assignment on sections
             js_env(:student_section_count => @context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id))

@@ -83,6 +83,10 @@ module DrDiff
 
     def file_line?(line)
       line =~ /^\+\+\+ b\//
+    rescue ArgumentError => e
+      puts("UNABLE TO DIGEST THIS LINE: |#{line}|")
+      puts(e)
+      raise
     end
 
     def line_range?(line)

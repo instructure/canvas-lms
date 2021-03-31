@@ -113,6 +113,7 @@
 
 .due,
 .score {
+  color: var(--secondaryColor);
   box-sizing: border-box;
   text-transform: uppercase;
   letter-spacing: 0.0625rem;
@@ -154,7 +155,7 @@
 .small {
   padding-left: 0;
   padding-right: 0;
-  
+
   .completed {
     margin-inline-start: 6px;
   }
@@ -188,6 +189,11 @@
     display: none;
   }
   .location {
+    color: var(--secondaryColor);
     margin-inline-start: 1rem;
   }
+}
+
+:global(.k5) .type {
+  display: none;
 }

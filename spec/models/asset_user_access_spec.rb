@@ -141,8 +141,8 @@ describe AssetUserAccess do
       @asset.save!
     end
 
-    it "does NOT try to pick a root account id" do
-      expect(@asset.root_account_id).to be_nil
+    it "sets root account id to 0" do
+      expect(@asset.root_account_id).to eq(0)
     end
 
     it "can load by user context" do

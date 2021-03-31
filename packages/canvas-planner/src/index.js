@@ -35,6 +35,8 @@ const ToDoSidebar = React.lazy(() => import('./components/ToDoSidebar'))
 const PlannerApp = React.lazy(() => import('./components/PlannerApp'))
 const PlannerHeader = React.lazy(() => import('./components/PlannerHeader'))
 
+export * from './components'
+
 export {responsiviser}
 
 let externalPlannerActive
@@ -220,6 +222,7 @@ export function createPlannerApp() {
             plannerActive={plannerActive}
             currentUser={store.getState().currentUser}
             focusFallback={() => dynamicUiManager.focusFallback('item')}
+            k5Mode={initializedOptions.env.K5_MODE}
           />
         </Suspense>
       </Provider>

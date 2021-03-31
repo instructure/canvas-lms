@@ -25,6 +25,7 @@ describe "threaded discussions" do
   include DiscussionsCommon
 
   before :once do
+    Account.default.enable_feature!(:rce_enhancements)
     course_with_teacher(active_course: true, active_all: true, name: 'teacher')
     @topic_title = 'threaded discussion topic'
     @topic = create_discussion(@topic_title, 'threaded')
@@ -33,6 +34,7 @@ describe "threaded discussions" do
 
   before(:each) do
     user_session(@teacher)
+    stub_rcs_config
   end
 
   it "should create a threaded discussion", priority: "1", test_id: 150511 do
@@ -50,6 +52,20 @@ describe "threaded discussions" do
     expect(get_all_replies.count).to eq 1
     expect(@last_entry.find_element(:css, '.message').text).to eq entry_text
     expect(last_entry.depth).to eq 1
+  end
+
+  it "should reply with iframe element" do
+    entry_text = "<iframe src='https://example.com'></iframe>"
+    Discussion.visit(@course, @topic)
+    f('#discussion_topic').find_element(:css, '.discussion-reply-action').click
+    wait_for_ajaximations
+    f('[data-btn-id="rce-edit-btn"]').click
+    wait_for_ajaximations
+    f("textarea[data-rich_text='true']").send_keys entry_text
+    fj("button:contains('Post Reply')").click
+    wait_for_ajaximations
+    expect(get_all_replies.count).to eq 1
+    expect(f("iframe[src='https://example.com']")).to be_present
   end
 
   it "should allow replies more than 2 levels deep", priority: "1", test_id: 150512 do

@@ -1120,8 +1120,8 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_version
-    @current_user.preferences[:gradebook_version] = params[:version]
-    @current_user.save!
+    @current_user.migrate_preferences_if_needed
+    @current_user.set_preference(:gradebook_version, params[:version])
     redirect_to polymorphic_url([@context, 'gradebook'])
   end
 

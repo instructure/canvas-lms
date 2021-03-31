@@ -791,6 +791,14 @@ module Api::V1::Assignment
       end
     end
 
+    if update_params[:submission_types]&.include?('annotated_document')
+      if assignment_params.key?(:annotated_document_id)
+        assignment.annotatable_attachment_id = assignment_params.delete(:annotated_document_id)
+      end
+    else
+      assignment.annotatable_attachment_id = nil
+    end
+
     if update_lockdown_browser?(assignment_params)
       update_lockdown_browser_settings(assignment, assignment_params)
     end
@@ -911,7 +919,7 @@ module Api::V1::Assignment
     apply_external_tool_settings(assignment, assignment_params)
     overrides = pull_overrides_from_params(assignment_params)
     invalid = { valid: false }
-    return invalid unless update_parameters_valid?(assignment, assignment_params, overrides)
+    return invalid unless update_parameters_valid?(assignment, assignment_params, user, overrides)
 
     updated_assignment = update_from_params(assignment, assignment_params, user, context)
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
@@ -972,11 +980,19 @@ module Api::V1::Assignment
     overrides
   end
 
-  def update_parameters_valid?(assignment, assignment_params, overrides)
+  def update_parameters_valid?(assignment, assignment_params, user, overrides)
     return false unless !overrides || overrides.is_a?(Array)
     return false unless assignment_group_id_valid?(assignment, assignment_params)
     return false unless assignment_dates_valid?(assignment, assignment_params)
     return false unless submission_types_valid?(assignment, assignment_params)
+
+    if assignment_params[:submission_types]&.include?("annotated_document")
+      return false unless assignment_params.key?(:annotated_document_id)
+
+      attachment = Attachment.find_by(id: assignment_params[:annotated_document_id])
+      return false unless attachment&.grants_right?(user, :read)
+    end
+
     true
   end
 

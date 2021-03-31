@@ -589,6 +589,21 @@ describe SectionsController, type: :request do
         expect(@section.name).to eq 'New Name'
         expect(@section.sis_source_id).to eq 'NEWSIS'
       end
+
+      it "should throw error when integration_id is not unique" do
+        @course.course_sections.create!(name: "Test Section", integration_id: 'taken')
+        CourseSection.where(id: @section)
+        api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param),
+                 { course_section: { integration_id: 'taken' } })
+        expect(response).to be_bad_request
+      end
+      it "should throw error when sis_id is not unique" do
+        @course.course_sections.create!(name: "Test Section", sis_source_id: 'taken')
+        CourseSection.where(id: @section)
+        api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param),
+                 { course_section: { sis_section_id: 'taken' } })
+        expect(response).to be_bad_request
+      end
     end
 
     context "as teacher having manage_sections_edit permission" do

@@ -39,11 +39,6 @@ Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
 
     honours_pact_with consumer do
       pact_uri PactConfig.pact_uri(pact_path: pact_path)
-
-      if !PactConfig.jenkins_build? && consumer == 'Generic Consumer'
-        pact_uri 'pacts/generic_consumer-canvas_lms_api.json'
-      end
-
       app_version PactConfig::Providers::CANVAS_API_VERSION
       publish_verification_results true
     end

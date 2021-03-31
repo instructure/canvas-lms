@@ -19,13 +19,18 @@
 import fetchMock from 'fetch-mock'
 
 import {
-  fetchLatestAnnouncement,
   fetchCourseInstructors,
+  fetchGrades,
+  fetchGradesForGradingPeriod,
+  fetchLatestAnnouncement,
   readableRoleName
 } from 'jsx/dashboard/utils'
 
 const ANNOUNCEMENT_URL =
   '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
+
+const GRADES_URL = /\/api\/v1\/users\/self\/courses\?.*/
+const GRADING_PERIODS_URL = /\/api\/v1\/users\/self\/enrollments\?.*/
 
 const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
@@ -97,5 +102,118 @@ describe('readableRoleName', () => {
   it('returns correct role name for custom role', () => {
     const customName = 'Super Cool Teacher'
     expect(readableRoleName(customName)).toBe(customName)
+  })
+})
+
+describe('fetchGrades', () => {
+  const defaultCourse = {
+    id: '1',
+    name: 'Intro to Everything',
+    image_download_url: 'https://course.img',
+    has_grading_periods: true,
+    homeroom_course: false,
+    enrollments: [
+      {
+        current_grading_period_id: '1',
+        current_grading_period_title: 'The first one',
+        current_period_computed_current_score: 80,
+        current_period_computed_current_grade: 'B-',
+        computed_current_score: 89,
+        computed_current_grade: 'B+'
+      }
+    ],
+    grading_periods: [
+      {
+        id: '1',
+        title: 'The first one'
+      },
+      {
+        id: '2',
+        title: 'The second one'
+      }
+    ]
+  }
+
+  it('translates courses to just course and grade-relevant properties', async () => {
+    fetchMock.get(GRADES_URL, JSON.stringify([defaultCourse]))
+    const courseGrades = await fetchGrades()
+    expect(courseGrades).toEqual([
+      {
+        courseId: '1',
+        courseName: 'Intro to Everything',
+        courseImage: 'https://course.img',
+        currentGradingPeriodId: '1',
+        currentGradingPeriodTitle: 'The first one',
+        gradingPeriods: [
+          {
+            id: '1',
+            title: 'The first one'
+          },
+          {
+            id: '2',
+            title: 'The second one'
+          }
+        ],
+        hasGradingPeriods: true,
+        score: 80,
+        grade: 'B-',
+        isHomeroom: false
+      }
+    ])
+  })
+
+  it("doesn't use current period score if the course has only one grading period", async () => {
+    fetchMock.get(GRADES_URL, JSON.stringify([{...defaultCourse, has_grading_periods: false}]))
+    const courseGrades = await fetchGrades()
+    expect(courseGrades).toEqual([
+      {
+        courseId: '1',
+        courseName: 'Intro to Everything',
+        courseImage: 'https://course.img',
+        currentGradingPeriodId: '1',
+        currentGradingPeriodTitle: 'The first one',
+        gradingPeriods: [],
+        hasGradingPeriods: false,
+        score: 89,
+        grade: 'B+',
+        isHomeroom: false
+      }
+    ])
+  })
+})
+
+describe('fetchGradesForGradingPeriod', () => {
+  const defaultEnrollment = {
+    course_id: '1',
+    grades: {
+      current_score: 76,
+      current_grade: 'C'
+    },
+    role: 'StudentEnrollment',
+    root_account_id: '1'
+  }
+
+  it('translates grading period grades to just the ones we care about', async () => {
+    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([defaultEnrollment]))
+    const enrollments = await fetchGradesForGradingPeriod(12)
+    expect(enrollments).toEqual([
+      {
+        courseId: '1',
+        score: 76,
+        grade: 'C'
+      }
+    ])
+  })
+
+  it("doesn't include score and grade if the grades object is missing", async () => {
+    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([{...defaultEnrollment, grades: undefined}]))
+    const enrollments = await fetchGradesForGradingPeriod(12)
+    expect(enrollments).toEqual([
+      {
+        courseId: '1',
+        score: undefined,
+        grade: undefined
+      }
+    ])
   })
 })

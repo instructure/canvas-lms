@@ -722,6 +722,51 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ]
     },
+
+    # Course Template account permissions
+    add_course_template: {
+      label: lambda { t("Create Course Templates") },
+      label_v2: lambda { t("Create Course Templates") },
+      available_to: [
+        "AccountMembership"
+      ],
+      true_for: [
+        "AccountAdmin"
+      ],
+      group: "manage_course_templates",
+      group_label: -> { t("Courses - Course Templates") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
+      account_only: true
+    },
+    edit_course_template: {
+      label: lambda { t("Edit Course Templates") },
+      label_v2: lambda { t("Edit Course Templates") },
+      available_to: [
+        "AccountMembership"
+      ],
+      true_for: [
+        "AccountAdmin"
+      ],
+      group: "manage_course_templates",
+      group_label: -> { t("Courses - Course Templates") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
+      account_only: true
+    },
+    delete_course_template: {
+      label: lambda { t("Delete Course Templates") },
+      label_v2: lambda { t("Delete Course Templates") },
+      available_to: [
+        "AccountMembership"
+      ],
+      true_for: [
+        "AccountAdmin"
+      ],
+      group: "manage_course_templates",
+      group_label: -> { t("Courses - Course Templates") },
+      account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
+      account_only: true
+    },
+
     # legacy :manage_files permission bundle
     manage_files: {
       label: -> { t('Manage (add / edit / delete) course files') },

@@ -22,8 +22,8 @@ import I18n from 'i18n!OutcomeManagement'
 import 'compiled/jquery.rails_flash_notifications'
 import {CHILD_GROUPS_QUERY} from '../Management/api'
 import {FIND_GROUPS_QUERY} from '../api'
-import {useCanvasContext} from './hooks'
 import useSearch from '../../shared/hooks/useSearch'
+import useCanvasContext from './hooks/useCanvasContext'
 
 export const ROOT_ID = 0
 export const ACCOUNT_FOLDER_ID = -1
@@ -307,5 +307,59 @@ export const useFindOutcomeModal = open => {
     searchString,
     updateSearch,
     clearSearch
+  }
+}
+
+export const useGroupMoveModal = () => {
+  const {contextId, contextType} = useCanvasContext()
+
+  const client = useApolloClient()
+  const {
+    collections,
+    setCollections,
+    queryCollections: treeBrowserQueryCollection,
+    error,
+    setError,
+    isLoading,
+    setIsLoading
+  } = useTreeBrowser()
+
+  const queryCollections = ({id}) => {
+    treeBrowserQueryCollection({id})
+  }
+
+  useEffect(() => {
+    client
+      .query({
+        query: CHILD_GROUPS_QUERY,
+        variables: {
+          id: contextId,
+          type: contextType
+        }
+      })
+      .then(({data}) => {
+        setCollections(
+          mergeCollections(
+            data?.context?.rootOutcomeGroup?.childGroups?.nodes,
+            collections,
+            ROOT_ID
+          )
+        )
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+      .catch(err => {
+        setError(err)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return {
+    error,
+    isLoading,
+    collections,
+    queryCollections,
+    rootId: ROOT_ID
   }
 }

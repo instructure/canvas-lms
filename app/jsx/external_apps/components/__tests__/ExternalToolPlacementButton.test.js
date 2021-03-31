@@ -39,7 +39,12 @@ describe('ExternalToolPlacementButton', () => {
       ...overrides
     }
     wrapper = mount(
-      <ExternalToolPlacementButton type="button" tool={tool} returnFocus={() => {}} />
+      <ExternalToolPlacementButton
+        type="button"
+        tool={tool}
+        returnFocus={() => {}}
+        onSuccess={jest.fn()}
+      />
     )
     instance = wrapper.instance()
   }
@@ -71,6 +76,14 @@ describe('ExternalToolPlacementButton', () => {
       store.togglePlacement.mockImplementation(({onError}) => onError())
       instance.handleTogglePlacement('editor_button')
       expect(instance.state.tool.editor_button.enabled).toBeTruthy()
+    })
+
+    it('executes onSuccess callback from props on api success', () => {
+      store.togglePlacement.mockImplementation(({onSuccess}) => onSuccess())
+
+      instance.handleTogglePlacement('editor_button')
+      expect(store.togglePlacement).toHaveBeenCalled()
+      expect(instance.props.onSuccess).toHaveBeenCalled()
     })
   })
 

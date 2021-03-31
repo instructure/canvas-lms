@@ -26,6 +26,7 @@ exports[`FileBrowser renders 1`] = `
         }
       }
       defaultExpanded={Array []}
+      getItemProps={[Function]}
       itemIcon={[Function]}
       items={Object {}}
       onCollectionClick={[Function]}

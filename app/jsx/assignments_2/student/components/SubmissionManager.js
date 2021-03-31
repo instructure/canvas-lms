@@ -35,9 +35,11 @@ import {Modal} from '@instructure/ui-overlays'
 import {Mutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
+import SimilarityPledge from './SimilarityPledge'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
+import {View} from '@instructure/ui-view'
 
 function MarkAsDoneButton({done, onToggle}) {
   return (
@@ -72,6 +74,7 @@ export default class SubmissionManager extends Component {
     editingDraft: false,
     moduleItemDone: false,
     openSubmitModal: false,
+    similarityPledgeChecked: false,
     showConfetti: false,
     submittingAssignment: false,
     uploadingFiles: false
@@ -327,23 +330,49 @@ export default class SubmissionManager extends Component {
     )
   }
 
+  renderSimilarityPledge() {
+    const {SIMILARITY_PLEDGE: pledgeSettings} = window.ENV
+
+    return (
+      <SimilarityPledge
+        eulaUrl={pledgeSettings.EULA_URL}
+        checked={this.state.similarityPledgeChecked}
+        comments={pledgeSettings.COMMENTS}
+        onChange={() => {
+          this.setState(oldState => ({
+            similarityPledgeChecked: !oldState.similarityPledgeChecked
+          }))
+        }}
+        pledgeText={pledgeSettings.PLEDGE_TEXT}
+      />
+    )
+  }
+
   renderActions(context) {
     const shouldRenderMarkAsDone = window.ENV.CONTEXT_MODULE_ITEM != null
     const shouldRenderSubmit = this.shouldRenderSubmit(context)
+    const showSimilarityPledge = shouldRenderSubmit && window.ENV.SIMILARITY_PLEDGE != null
 
     if (shouldRenderMarkAsDone || shouldRenderSubmit) {
       return (
-        <Flex as="div" direction="row-reverse" margin="small" padding="small">
-          {shouldRenderSubmit && (
-            <Flex.Item margin="0 0 0 small">{this.renderSubmitButton()}</Flex.Item>
-          )}
-          {shouldRenderMarkAsDone && <Flex.Item>{this.renderMarkAsDoneButton()}</Flex.Item>}
-        </Flex>
+        <View>
+          {showSimilarityPledge && this.renderSimilarityPledge()}
+
+          <Flex as="div" direction="row-reverse" margin="small" padding="small">
+            {shouldRenderSubmit && (
+              <Flex.Item margin="0 0 0 small">{this.renderSubmitButton()}</Flex.Item>
+            )}
+            {shouldRenderMarkAsDone && <Flex.Item>{this.renderMarkAsDoneButton()}</Flex.Item>}
+          </Flex>
+        </View>
       )
     }
   }
 
   renderSubmitButton() {
+    const mustAgreeToPledge =
+      window.ENV.SIMILARITY_PLEDGE != null && !this.state.similarityPledgeChecked
+
     return (
       <Mutation
         mutation={CREATE_SUBMISSION}
@@ -365,7 +394,7 @@ export default class SubmissionManager extends Component {
             <Button
               id="submit-button"
               data-testid="submit-button"
-              disabled={this.state.submittingAssignment}
+              disabled={this.state.submittingAssignment || mustAgreeToPledge}
               variant="primary"
               margin="xx-small 0"
               onClick={() => this.handleSubmitButton(submitMutation)}

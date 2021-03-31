@@ -157,7 +157,9 @@ class ErrorReport < ActiveRecord::Base
         ErrorReport.log_captured(type, exception, error_report_info)
       end
     else
-      ErrorReport.log_captured(type, exception, error_report_info)
+      (exception.try(:current_shard) || Shard.current).activate do
+        ErrorReport.log_captured(type, exception, error_report_info)
+      end
     end
   end
 

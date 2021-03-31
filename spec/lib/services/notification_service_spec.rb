@@ -122,7 +122,7 @@ module Services
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: 'token')
-        @message.path_type = "push"
+        Message.where(id: @message.id).update_all(path_type: "push", notification_name: 'Assignment Created')
         @message.deliver
         expect{@message.deliver}.not_to raise_error
       end

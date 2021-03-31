@@ -61,10 +61,22 @@ module Api
           expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
         end
 
-        it "can produce a redirect route for announcements" do
+        it "has media redirect for messages" do
           course = course_model
+          topic = course.discussion_topics.create!
+          entry = DiscussionEntry.new
+          entry.id = 1
+          entry.discussion_topic = topic
+          notification = Notification.find_or_create_by(name: "New Discussion Entry", category: "DiscussionEntry")
+          message = Message.create(context: entry, user: User.create!(name: 'help'), notification: notification)
+          proxy = UrlProxy.new(StubUrlHelper.new, message, "example.com", "http")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
+        end
+
+        it "can produce a redirect route for announcements" do
           announcement = Announcement.new
           announcement.id = 1
+          course = course_model
           announcement.context = course
           proxy = UrlProxy.new(StubUrlHelper.new, announcement, "example.com", "http")
           expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")

@@ -283,9 +283,16 @@ class Message < ActiveRecord::Base
 
   def author_avatar_url
     url = author.try(:avatar_url)
-    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
-  rescue URI::InvalidURIError
-    nil
+    # The User model currently supports storing either a path or full
+    # URL for an avatar. Because of this, alternatives to URI.encode
+    # such as CGI.escape end up escaping too much for full URLs. In
+    # order to escape just the path, we'd need to utilize URI.parse
+    # which can't handle URLs with spaces. As that is the root cause
+    # of this change, we'll just use the deprecated URI.encode method.
+    #
+    # rubocop:disable Lint/UriEscapeUnescape
+    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", URI.encode(url)).to_s if url
+    # rubocop:enable Lint/UriEscapeUnescape
   end
 
   def author_short_name
@@ -672,12 +679,8 @@ class Message < ActiveRecord::Base
       end
     end
 
-    if path_type == "push" && !check_acct.enable_push_notifications?
-      return skip_and_cancel
-    end
-
-    if path_type == 'push' && Account.site_admin.feature_enabled?(:reduce_push_notifications)
-      if Notification.types_to_send_in_push.exclude?(notification_name)
+    if path_type == "push"
+      if Notification.types_to_send_in_push.exclude?(notification_name) || !check_acct.enable_push_notifications?
         return skip_and_cancel
       end
     end
@@ -854,6 +857,14 @@ class Message < ActiveRecord::Base
 
       current_context
     end
+  end
+
+  def media_context
+    context = self.context
+    context = context.context if context.respond_to?(:context)
+    return context if context.is_a?(Course)
+    context = (context.respond_to?(:course) && context.course) ? context.course : link_root_account
+    context
   end
 
   def notification_service_id

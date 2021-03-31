@@ -94,10 +94,7 @@ const smsNotificationCategoryDeprecated = category => {
 }
 
 const pushNotificationCategoryRestricted = category => {
-  return (
-    ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.reduce_push_enabled &&
-    !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_push_categories.includes(category)
-  )
+  return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_push_categories.includes(category)
 }
 
 const menuShouldBeDisabled = (category, pathType) => {

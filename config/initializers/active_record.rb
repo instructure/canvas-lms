@@ -1377,20 +1377,10 @@ ActiveRecord::Associations::HasOneAssociation.class_eval do
 end
 
 class ActiveRecord::Migration
-  VALID_TAGS = [:predeploy, :postdeploy, :cassandra, :dynamodb]
   # at least one of these tags is required
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
   class << self
-    def tag(*tags)
-      raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
-      (@tags ||= []).concat(tags).uniq!
-    end
-
-    def tags
-      @tags ||= []
-    end
-
     def is_postgres?
       connection.adapter_name == 'PostgreSQL'
     end
@@ -1414,7 +1404,7 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :tags, :cassandra_cluster, to: :migration
+  delegate :connection, :cassandra_cluster, to: :migration
 
   def initialize(*)
     super
@@ -1538,9 +1528,16 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     execute schema_creation.accept(at)
   end
 
-  def add_replica_identity(table_string, column_name, default_value)
-    klass = table_string.constantize
-    DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
+  def add_replica_identity(model_name, column_name, default_value)
+    klass = model_name.constantize
+    # when a batch of migrations includes both adding the `column_name` and
+    # calling this method (e.g. when migrating a newly created db), the cached
+    # column information can be stale, so we have to explicitly reset it here
+    # to avoid a NoMethodError
+    klass.reset_column_information
+    if klass.columns_hash[column_name.to_s].null
+      DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
+    end
     change_column_null klass.table_name, column_name, false
     primary_column = klass.primary_key
     index_name = "index_#{klass.table_name}_replica_identity"
@@ -1548,8 +1545,8 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY USING INDEX #{index_name}])
   end
 
-  def remove_replica_identity(table_string)
-    klass = table_string.constantize
+  def remove_replica_identity(model_name)
+    klass = model_name.constantize
     execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY DEFAULT])
     remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
   end

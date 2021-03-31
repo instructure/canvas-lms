@@ -40,7 +40,7 @@ def appendStagesAsBuildNodes(nodes,
     // we cant use String.format, so... yea
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
-    timedStage(stage_name, nodes, {
+    buildSummaryReport.timedStageAndReportIfFailure(stage_name, nodes, {
       protectedNode("canvas-docker") {
         echo "Running on node ${env.NODE_NAME}"
         def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()

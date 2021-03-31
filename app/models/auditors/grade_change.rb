@@ -223,9 +223,9 @@ class Auditors::GradeChange
   end
 
   # rubocop:disable Metrics/BlockLength
-  Stream = Auditors.stream do
+  Stream = Audits.stream do
     grades_ar_type = Auditors::ActiveRecord::GradeChangeRecord
-    backend_strategy -> { Auditors.backend_strategy }
+    backend_strategy -> { Audits.backend_strategy }
     active_record_type grades_ar_type
     database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
@@ -376,32 +376,32 @@ class Auditors::GradeChange
   end
 
   def self.insert_record(event_record)
-    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Auditors.write_to_cassandra?
-    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :active_record}) if Auditors.write_to_postgres?
+    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Audits.write_to_cassandra?
+    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :active_record}) if Audits.write_to_postgres?
   end
   private_class_method :insert_record
 
   def self.for_root_account_student(account, student, options={})
     account.shard.activate do
-      Auditors::GradeChange::Stream.for_root_account_student(account, student, Auditors.read_stream_options(options))
+      Auditors::GradeChange::Stream.for_root_account_student(account, student, Audits.read_stream_options(options))
     end
   end
 
   def self.for_course(course, options={})
     course.shard.activate do
-      Auditors::GradeChange::Stream.for_course(course, Auditors.read_stream_options(options))
+      Auditors::GradeChange::Stream.for_course(course, Audits.read_stream_options(options))
     end
   end
 
   def self.for_root_account_grader(account, grader, options={})
     account.shard.activate do
-      Auditors::GradeChange::Stream.for_root_account_grader(account, grader, Auditors.read_stream_options(options))
+      Auditors::GradeChange::Stream.for_root_account_grader(account, grader, Audits.read_stream_options(options))
     end
   end
 
   def self.for_assignment(assignment, options={})
     assignment.shard.activate do
-      Auditors::GradeChange::Stream.for_assignment(assignment, Auditors.read_stream_options(options))
+      Auditors::GradeChange::Stream.for_assignment(assignment, Audits.read_stream_options(options))
     end
   end
 
@@ -414,7 +414,7 @@ class Auditors::GradeChange
   # course grader student
   # course student
   def self.for_course_and_other_arguments(course, arguments, options={})
-    options = Auditors.read_stream_options(options)
+    options = Audits.read_stream_options(options)
     course.shard.activate do
       if arguments[:assignment] && arguments[:grader] && arguments[:student]
         Auditors::GradeChange::Stream.for_course_assignment_grader_student(course,
