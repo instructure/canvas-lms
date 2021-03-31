@@ -346,7 +346,6 @@ import './vendor/ui.selectmenu'
       this.muted = this.elements.mute.link.data('muted');
       this.addEvents();
       this.createModals();
-      EG.getAccommodations();
       return this;
     },
     addEvents: function(){
@@ -1141,6 +1140,7 @@ import './vendor/ui.selectmenu'
 
       var id = $selectmenu.jquerySelectMenu().val();
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
+      this.getAccommodations();
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
           "student_id": this.currentStudent.id
       }));
@@ -1194,11 +1194,10 @@ import './vendor/ui.selectmenu'
     },
 
     getAccommodations: function() {
-      var studentID = JSON.parse(decodeURIComponent(document.location.hash.substr(1)))['student_id']
       var self = this;
-      $.getJSON("/users/" + studentID + "/special_programs", function(accommodationsPayload) {
+      $.getJSON("/users/" + self.currentStudent.id + "/special_programs", function(accommodationsPayload) {
         if (accommodationsPayload.accommodations) {
-          self.accommodations = accommodationsPayload.accommodations;
+          self.currentStudent.settings.accommodations = accommodationsPayload.accommodations;
         }
       });
     },
@@ -1208,9 +1207,8 @@ import './vendor/ui.selectmenu'
       var student_name = this.currentStudent.name;
       $('#submission_details_student_accommodations').empty();
       $('#submission_details_student_name').text(this.currentStudent.name);
-      this.getAccommodations();
-      if (this.accommodations) {
-        $.each(this.accommodations, function (i, accommodation) {
+      if (this.currentStudent.settings && this.currentStudent.settings.accommodations) {
+        $.each(this.currentStudent.settings.accommodations, function (i, accommodation) {
           $('#submission_details_student_accommodations').append('<span class="accommodations">' + accommodation + '</span>')
         })
     }
