@@ -356,21 +356,25 @@ describe Canvadocs do
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'excludes graders if grades are not published' do
+            it 'excludes graders if the submission is not posted' do
               expect(user_filter).not_to include(hash_including(role: 'teacher'))
             end
 
-            it 'includes the selected grader if grades are published' do
+            it 'includes the selected grader if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'excludes graders that were not selected if grades are published' do
+            it 'excludes graders that were not selected if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).not_to include(final_grader_real_data)
             end
 
@@ -630,21 +634,25 @@ describe Canvadocs do
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'excludes graders if grades are not published' do
+            it 'excludes graders if the submission is not posted' do
               expect(user_filter).not_to include(hash_including(role: 'teacher'))
             end
 
-            it 'includes the selected grader if grades are published' do
+            it 'includes the selected grader if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'excludes graders that were not selected if grades are published' do
+            it 'excludes graders that were not selected if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).not_to include(final_grader_real_data)
             end
 
