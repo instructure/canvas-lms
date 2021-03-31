@@ -1255,8 +1255,7 @@ class UsersController < ApplicationController
   def api_show
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
-      includes = %w{locale avatar_url permissions email effective_locale}
-      includes += Array.wrap(params[:include]) & ['uuid', 'last_login']
+      includes = api_show_includes
 
       # would've preferred to pass User.with_last_login as the collection to
       # api_find but the implementation of that scope appears to be incompatible
@@ -2702,6 +2701,12 @@ class UsersController < ApplicationController
       }
     end
     grading_periods
+  end
+
+  def api_show_includes
+    includes = %w{locale avatar_url permissions email effective_locale}
+    includes += Array.wrap(params[:include]) & ['uuid', 'last_login']
+    includes
   end
 
   def create_user
