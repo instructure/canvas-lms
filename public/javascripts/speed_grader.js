@@ -346,7 +346,7 @@ import './vendor/ui.selectmenu'
       this.muted = this.elements.mute.link.data('muted');
       this.addEvents();
       this.createModals();
-      this.getAccommodations();
+      EG.getAccommodations();
       return this;
     },
     addEvents: function(){
