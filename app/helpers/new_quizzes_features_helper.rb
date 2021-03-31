@@ -20,19 +20,19 @@
 
 module NewQuizzesFeaturesHelper
   def new_quizzes_import_enabled?
-      @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:import_to_quizzes_next)
+    @context.instance_of?(Course) && @context.feature_allowed?(:quizzes_next)
   end
 
   def new_quizzes_migration_enabled?
-      @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration)
+    @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration)
   end
 
   def new_quizzes_import_third_party?
-      @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_third_party_imports)
+    @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_third_party_imports)
   end
 
   def new_quizzes_migration_default
-      @context.root_account.feature_enabled?(:migrate_to_new_quizzes_by_default) || new_quizzes_require_migration?
+    @context.root_account.feature_enabled?(:migrate_to_new_quizzes_by_default) || new_quizzes_require_migration?
   end
 
   module_function
