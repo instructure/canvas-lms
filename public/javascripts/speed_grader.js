@@ -2711,7 +2711,6 @@ import './vendor/ui.selectmenu'
 
     window.jsonData = speedGraderJSON;
     EG.jsonReady();
-    EG.getAccommodations();
   }
 
   function speedGraderJSONErrorFn (data, _xhr, _textStatus, _errorThrown) {
