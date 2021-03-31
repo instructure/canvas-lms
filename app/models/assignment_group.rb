@@ -163,7 +163,7 @@ class AssignmentGroup < ActiveRecord::Base
   scope :include_active_assignments, -> { preload(:active_assignments) }
   scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
-  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
+  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).ordered }
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
 
   def course_grading_change

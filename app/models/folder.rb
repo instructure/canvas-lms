@@ -147,7 +147,7 @@ class Folder < ActiveRecord::Base
   scope :not_hidden, -> { where("folders.workflow_state<>'hidden'") }
   scope :not_locked, -> { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc) }
-  scope :by_position, -> { order(:position) }
+  scope :by_position, -> { ordered }
   scope :by_name, -> { order(name_order_by_clause('folders')) }
 
   def display_name

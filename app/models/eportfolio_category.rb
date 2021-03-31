@@ -21,7 +21,7 @@
 class EportfolioCategory < ActiveRecord::Base
   attr_readonly :eportfolio_id
 
-  has_many :eportfolio_entries, -> { order(:position) }, dependent: :destroy
+  has_many :eportfolio_entries, -> { ordered }, dependent: :destroy
   belongs_to :eportfolio
 
   before_save :infer_unique_slug

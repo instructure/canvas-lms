@@ -95,7 +95,7 @@ class UserMerge
     move_observees
 
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
-      max_position = Pseudonym.where(user_id: target_user).order(:position).last.try(:position) || 0
+      max_position = Pseudonym.where(user_id: target_user).ordered.last.try(:position) || 0
       pseudonyms_to_move = Pseudonym.where(user_id: from_user)
       merge_data.add_more_data(pseudonyms_to_move)
       pseudonyms_to_move.update_all(["user_id=?, position=position+?", target_user, max_position])

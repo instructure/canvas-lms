@@ -71,7 +71,7 @@ class Account < ActiveRecord::Base
   has_many :developer_keys
   has_many :developer_key_account_bindings, inverse_of: :account, dependent: :destroy
   has_many :authentication_providers,
-           -> { order(:position) },
+           -> { ordered },
            inverse_of: :account,
            extend: AuthenticationProvider::FindWithType
 

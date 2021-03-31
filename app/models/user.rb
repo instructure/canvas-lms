@@ -63,7 +63,7 @@ class User < ActiveRecord::Base
   has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy, inverse_of: :user
   has_many :notification_policies, through: :communication_channels
   has_many :notification_policy_overrides, through: :communication_channels
-  has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
+  has_one :communication_channel, -> { where("workflow_state<>'retired'").ordered }
   has_many :ignores
   has_many :planner_notes, :dependent => :destroy
   has_many :viewed_submission_comments, :dependent => :destroy
@@ -119,10 +119,10 @@ class User < ActiveRecord::Base
   has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
   has_many :all_submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, class_name: 'Submission', dependent: :destroy
   has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order('submissions.updated_at DESC') }
-  has_many :pseudonyms, -> { order(:position) }, dependent: :destroy
+  has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
-  has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").order(:position) }
+  has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").ordered }
   has_many :attachments, :as => 'context', :dependent => :destroy
   has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'

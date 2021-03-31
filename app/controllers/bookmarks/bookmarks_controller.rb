@@ -60,7 +60,7 @@ class Bookmarks::BookmarksController < ApplicationController
   #
   # @returns [Bookmark]
   def index
-    @bookmarks = Bookmarks::Bookmark.where(user_id: user_id).order(:position)
+    @bookmarks = Bookmarks::Bookmark.where(user_id: user_id).ordered
     @bookmarks = Api.paginate(@bookmarks, self, api_v1_bookmarks_url)
     render json: @bookmarks.as_json
   end

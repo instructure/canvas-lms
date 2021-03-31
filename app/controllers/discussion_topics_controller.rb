@@ -324,7 +324,7 @@ class DiscussionTopicsController < ApplicationController
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
             elsif params[:order_by] == 'title'
-              scope.order(DiscussionTopic.best_unicode_collation_key("discussion_topics.title")).order(:position, :id)
+              scope.order(DiscussionTopic.best_unicode_collation_key("discussion_topics.title")).ordered
             elsif params[:only_announcements]
               scope.by_posted_at
             else

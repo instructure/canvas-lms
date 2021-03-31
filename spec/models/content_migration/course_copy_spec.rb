@@ -231,11 +231,11 @@ describe ContentMigration do
       ['A', 'B'].map { |name| @copy_to.context_modules.create!(:name => name) }
       ['C', 'D'].map { |name| @copy_from.context_modules.create!(:name => name) }
       run_course_copy
-      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+      expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(['A', 'B', 'C', 'D'])
 
       @copy_to.context_modules.where(name: ['C', 'D']).map(&:destroy)
       run_course_copy
-      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+      expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(['A', 'B', 'C', 'D'])
     end
 
     it "should be able to copy links to files in folders with html entities and unicode in path" do

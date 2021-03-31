@@ -518,6 +518,7 @@ class ActiveRecord::Base
                elsif first_or_last == :last && direction == :desc
                  " NULLS LAST"
                end
+      
       Arel.sql("#{column} #{direction.to_s.upcase}#{clause}".strip)
     else
       Arel.sql("#{column} IS#{" NOT" unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip)
