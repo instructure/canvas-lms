@@ -72,6 +72,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
   field :delete_conversations, mutation: Mutations::DeleteConversations
   field :delete_discussion_entries, mutation: Mutations::DeleteDiscussionEntries
+  field :delete_discussion_topic, mutation: Mutations::DeleteDiscussionTopic
   field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
