@@ -96,15 +96,24 @@ If you want to migrate the existing database, use docker_dev_update
     bundle exec rake db:initial_setup
 }
 
+function sync_bundler_version {
+  expected_version=$(run_command bash -c "echo \$BUNDLER_VERSION")
+  actual_version=$(eval run_command bundler --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+  if [[ "$actual_version" != "$expected_version" ]]; then
+    echo_console_and_log "  Wrong version of bundler installed, installing correct version..."
+    run_command bash -c "gem uninstall --all --ignore-dependencies --force bundler && gem install bundler --no-document -v $expected_version" >>"$LOG" 2>&1
+  fi
+}
 
 function bundle_install {
   echo_console_and_log "  Installing gems (bundle install) ..."
-  rm -f Gemfile.lock* >/dev/null 2>&1
+  run_command bash -c 'rm -f Gemfile.lock* >/dev/null 2>&1'
   _canvas_lms_track_with_log run_command bundle install
 }
 
 function bundle_install_with_check {
   echo_console_and_log "  Checking your gems (bundle check) ..."
+  sync_bundler_version
   if _canvas_lms_track_with_log run_command bundle check ; then
     echo_console_and_log "  Gems are up to date, no need to bundle install ..."
   else
