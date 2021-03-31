@@ -346,6 +346,7 @@ import './vendor/ui.selectmenu'
       this.muted = this.elements.mute.link.data('muted');
       this.addEvents();
       this.createModals();
+      this.getAccommodations();
       return this;
     },
     addEvents: function(){
@@ -1123,10 +1124,6 @@ import './vendor/ui.selectmenu'
         } else {
           $avatar_image.hide();
         }
-
-        if (this.currentStudent) {
-          this.getAccommodations();
-        }
       }
     },
 
@@ -1197,10 +1194,11 @@ import './vendor/ui.selectmenu'
     },
 
     getAccommodations: function() {
+      var studentID = JSON.parse(decodeURIComponent(document.location.hash.substr(1)))['student_id']
       var self = this;
-      $.getJSON("/users/" + self.currentStudent.id + "/special_programs", function(accommodationsPayload) {
+      $.getJSON("/users/" + studentID + "/special_programs", function(accommodationsPayload) {
         if (accommodationsPayload.accommodations) {
-          self.currentStudent.settings.accommodations = accommodationsPayload.accommodations;
+          self.accommodations = accommodationsPayload.accommodations;
         }
       });
     },
@@ -1210,9 +1208,9 @@ import './vendor/ui.selectmenu'
       var student_name = this.currentStudent.name;
       $('#submission_details_student_accommodations').empty();
       $('#submission_details_student_name').text(this.currentStudent.name);
-      //this.getAccommodations();
-      if (this.currentStudent.settings && this.currentStudent.settings.accommodations) {
-        $.each(this.currentStudent.settings.accommodations, function (i, accommodation) {
+      this.getAccommodations();
+      if (this.accommodations) {
+        $.each(this.accommodations, function (i, accommodation) {
           $('#submission_details_student_accommodations').append('<span class="accommodations">' + accommodation + '</span>')
         })
     }
