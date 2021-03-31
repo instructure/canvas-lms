@@ -69,8 +69,15 @@ if ! docker info &> /dev/null; then
   exit 1
 fi
 
-if [[ "$(docker-compose top | wc -l)" -gt 0 ]] ; then
-  echo "You should probably stop docker containers before running this command"
+if [ -f "docker-compose.override.yml" ]; then
+  echo "docker-compose.override.yml exists, skipping copy of default configuration"
+else
+  echo "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
+  cp config/docker-compose.override.yml.example docker-compose.override.yml
+fi
+
+if [[ -n "$UPDATE_CODE" ]] && [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then
+  echo "You should probably stop docker containers before rebasing code"
   prompt "Would you like to attempt to stop containers with docker-compose stop? [y/n]" stop
   if [[ ${stop:-n} == 'y' ]]; then
     docker-compose stop
@@ -78,19 +85,13 @@ if [[ "$(docker-compose top | wc -l)" -gt 0 ]] ; then
     echo "Continuing with docker containers running, this may cause errors."
   fi
 fi
-
-if [ -f "docker-compose.override.yml" ]; then
-  echo "docker-compose.override.yml exists, skipping copy of default configuration"
-else
-  echo "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-  cp config/docker-compose.override.yml.example docker-compose.override.yml
-fi
 echo ""
 
 create_log_file
 message "Bringing Canvas up to date ..."
 init_log_file "Docker Dev Update"
 [[ -n "$UPDATE_CODE" ]] && ./script/rebase_canvas_and_plugins.sh "${params[@]}"
+docker_compose_up
 bundle_install_with_check
 install_node_packages
 compile_assets

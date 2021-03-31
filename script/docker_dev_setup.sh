@@ -54,6 +54,7 @@ copy_docker_config
 setup_docker_compose_override
 build_images
 check_gemfile
+docker_compose_up
 build_assets
 create_db
 display_next_steps

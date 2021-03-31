@@ -56,8 +56,10 @@ function init_log_file {
 
 # If DOCKER var set true, run with docker-compose
 function run_command {
-  if [ "${DOCKER:-}" == 'y' ]; then
-    docker-compose run --rm web "$@"
+  if [[ -n "${JENKINS}" ]]; then
+    docker-compose exec -T web "$@"
+  elif [ "${DOCKER:-}" == 'y' ]; then
+    docker-compose exec -e TELEMETRY_OPT_IN web "$@"
   else
     "$@"
   fi
@@ -134,6 +136,11 @@ function confirm_command {
     [[ ${confirm:-n} == 'y' ]] || return 1
   fi
   eval "$*"
+}
+
+function docker_compose_up {
+  message "Starting docker containers..."
+  _canvas_lms_track_with_log docker-compose up -d web
 }
 
 function check_dependencies {
