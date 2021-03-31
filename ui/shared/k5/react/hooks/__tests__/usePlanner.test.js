@@ -39,7 +39,8 @@ const PLANNER_CONFIG_KEYS = [
   'convertApiUserContent',
   'dateTimeFormatters',
   'externalFallbackFocusable',
-  'env'
+  'env',
+  'singleCourse'
 ]
 
 const defaults = {plannerEnabled: true, isPlannerActive: () => {}}

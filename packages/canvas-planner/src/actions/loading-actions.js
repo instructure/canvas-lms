@@ -20,7 +20,7 @@ import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
 import buildURL from 'axios/lib/helpers/buildURL'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
-import {transformApiToInternalItem} from '../utilities/apiUtils'
+import {getContextCodesFromState, transformApiToInternalItem} from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 import {itemsToDays} from '../utilities/daysUtils'
@@ -125,7 +125,7 @@ export function getFirstNewActivityDate(fromMoment) {
 
 // this is the initial load
 export function getPlannerItems(fromMoment) {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch(startLoadingItems())
     dispatch(continueLoadingInitialItems()) // a start counts as a continue for the ContinueInitialLoad animation
     dispatch(getFirstNewActivityDate(fromMoment))
@@ -165,7 +165,7 @@ export function loadPastButtonClicked() {
   return loadPastItems(false)
 }
 
-export const loadPastUntilNewActivity = () => (dispatch, getState) => {
+export const loadPastUntilNewActivity = () => dispatch => {
   dispatch(
     gettingPastItems({
       seekingNewActivity: true
@@ -175,7 +175,7 @@ export const loadPastUntilNewActivity = () => (dispatch, getState) => {
   return 'loadPastUntilNewActivity' // for testing
 }
 
-export const loadPastUntilToday = () => (dispatch, getState) => {
+export const loadPastUntilToday = () => dispatch => {
   dispatch(
     gettingPastItems({
       seekingNewActivity: false
@@ -254,8 +254,15 @@ function getWayFutureItem(fromMoment) {
   // We are requesting desc order and only grabbing the
   // first item so we know what the most distant item is
   return (dispatch, getState) => {
+    const state = getState()
+    const context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
     const futureMoment = fromMoment.clone().add(1, 'year')
-    const url = `/api/v1/planner/items?end_date=${futureMoment.format()}&order=desc&per_page=1`
+    const url = buildURL('/api/v1/planner/items', {
+      context_codes,
+      end_date: futureMoment.format(),
+      order: 'desc',
+      per_page: 1
+    })
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
 
     return request
@@ -271,8 +278,15 @@ function getWayFutureItem(fromMoment) {
 
 function getWayPastItem(fromMoment) {
   return (dispatch, getState) => {
+    const state = getState()
+    const context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
     const pastMoment = fromMoment.clone().add(-1, 'year')
-    const url = `/api/v1/planner/items?start_date=${pastMoment.format()}&order=asc&per_page=1`
+    const url = buildURL('/api/v1/planner/items', {
+      context_codes,
+      start_date: pastMoment.format(),
+      order: 'asc',
+      per_page: 1
+    })
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
 
     return request
@@ -286,6 +300,11 @@ function getWayPastItem(fromMoment) {
   }
 }
 // --------------------------------------------
+export function sendBasicFetchRequest(baseUrl, params = {}) {
+  const url = buildURL(baseUrl, params)
+  return asAxios(getPrefetchedXHR(url)) || axios.get(url)
+}
+
 export function sendFetchRequest(loadingOptions) {
   const [urlPrefix, {params}] = fetchParams(loadingOptions)
   const url = buildURL(urlPrefix, params)

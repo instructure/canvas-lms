@@ -51,14 +51,16 @@ export class Grouping extends Component {
     deregisterAnimatable: func,
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
-    simplifiedControls: bool
+    simplifiedControls: bool,
+    singleCourseView: bool
   }
 
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
     responsiveSize: 'large',
-    simplifiedControls: false
+    simplifiedControls: false,
+    singleCourseView: false
   }
 
   constructor(props) {
@@ -277,6 +279,7 @@ export class Grouping extends Component {
   }
 
   renderGroupLink() {
+    if (this.props.singleCourseView) return null
     if (!this.props.title) {
       return (
         <span className={styles.hero} ref={elt => (this.plannerNoteHero = elt)}>

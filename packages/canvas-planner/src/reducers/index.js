@@ -64,6 +64,12 @@ const currentUser = handleAction(
   {}
 )
 
+const singleCourse = handleAction(
+  'INITIAL_OPTIONS',
+  (state, action) => action.payload.singleCourse || false,
+  false
+)
+
 const firstNewActivityDate = handleAction(
   'FOUND_FIRST_NEW_ACTIVITY_DATE',
   (state, action) => {
@@ -82,6 +88,7 @@ const combinedReducers = combineReducers({
   loading,
   firstNewActivityDate,
   opportunities,
+  singleCourse,
   todo,
   ui,
   sidebar,

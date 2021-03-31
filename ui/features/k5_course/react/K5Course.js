@@ -125,7 +125,8 @@ export function K5Course({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
-    callback: () => loadAllOpportunities()
+    callback: () => loadAllOpportunities(),
+    singleCourse: true
   })
 
   const modulesRef = useRef(null)

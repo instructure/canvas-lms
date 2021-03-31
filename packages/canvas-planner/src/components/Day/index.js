@@ -45,12 +45,14 @@ export class Day extends Component {
     deregisterAnimatable: func.isRequired,
     currentUser: shape(userShape),
     simplifiedControls: bool,
+    singleCourseView: bool,
     showMissingAssignments: bool
   }
 
   static defaultProps = {
     animatableIndex: 0,
     simplifiedControls: false,
+    singleCourseView: false,
     showMissingAssignments: false
   }
 
@@ -111,6 +113,7 @@ export class Day extends Component {
         toggleCompletion={this.props.toggleCompletion}
         currentUser={this.props.currentUser}
         simplifiedControls={this.props.simplifiedControls}
+        singleCourseView={this.props.singleCourseView}
       />
     )
   }

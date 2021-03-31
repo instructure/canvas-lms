@@ -21,8 +21,11 @@ import MockDate from 'mockdate'
 import {moxiosWait, moxiosRespond} from 'jest-moxios-utils'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
+import configureStore from '../../store/configureStore'
 
 jest.mock('../../utilities/apiUtils', () => ({
+  getContextCodesFromState: jest.requireActual('../../utilities/apiUtils').getContextCodesFromState,
+  findNextLink: jest.fn(),
   transformApiToInternalItem: jest.fn(response => ({
     ...response,
     newActivity: response.new_activity,
@@ -42,10 +45,6 @@ const getBasicState = () => ({
   loading: {
     futureNextUrl: null,
     pastNextUrl: null
-  },
-  pendingItems: {
-    past: [],
-    future: []
   },
   weeklyDashboard: {
     // copied from weekly-reducers INITIAL_OPTIONS
@@ -146,7 +145,7 @@ describe('api actions', () => {
       expect(typeof getFirstNewActivityDateThunk).toBe('function')
       const mockMoment = moment()
       const newActivityPromise = getFirstNewActivityDateThunk(mockDispatch, getBasicState)
-      return moxiosRespond([{dateBucketMoment: mockMoment}], newActivityPromise).then(result => {
+      return moxiosRespond([{dateBucketMoment: mockMoment}], newActivityPromise).then(() => {
         expect(mockDispatch).toHaveBeenCalledWith(
           expect.objectContaining({
             type: 'FOUND_FIRST_NEW_ACTIVITY_DATE'
@@ -178,7 +177,7 @@ describe('api actions', () => {
       const mockDispatch = jest.fn()
       const mockMoment = moment.tz('Asia/Tokyo').startOf('day')
       const promise = Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, promise, {status: 500}).then(result => {
+      return moxiosRespond({some: 'response data'}, promise, {status: 500}).then(() => {
         expect(fakeAlert).toHaveBeenCalled()
       })
     })
@@ -292,7 +291,7 @@ describe('api actions', () => {
         )
         const getWayFutureItemThunk = mockDispatch.mock.calls[2][0] // the function returned by getWayFutureItem()
         expect(typeof getWayFutureItemThunk).toBe('function')
-        const futurePromise = getWayFutureItemThunk(mockDispatch, getBasicState).then(response => {
+        const futurePromise = getWayFutureItemThunk(mockDispatch, getBasicState).then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
             type: 'GOT_WAY_FUTURE_ITEM_DATE',
             payload: '2017-05-01T:00:00:00Z'
@@ -300,7 +299,7 @@ describe('api actions', () => {
         })
         const getWayPastItemThunk = mockDispatch.mock.calls[3][0]
         expect(typeof getWayPastItemThunk).toBe('function')
-        const pastPromise = getWayPastItemThunk(mockDispatch, getBasicState).then(response => {
+        const pastPromise = getWayPastItemThunk(mockDispatch, getBasicState).then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
             type: 'GOT_WAY_PAST_ITEM_DATE',
             payload: '2017-01-01T:00:00:00Z'
@@ -391,6 +390,38 @@ describe('api actions', () => {
         Actions.loadNextWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(nextWeek))
         expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek(nextWeekItems))
+      })
+    })
+
+    it('filters requests to specific contexts if in singleCourse mode', async done => {
+      const today = moment.tz('UTC').startOf('day')
+      moxios.stubRequest(/\/api\/v1\/planner\/items/, {
+        status: 200,
+        response: [{plannable: {due_at: '2017-05-01T:00:00:00Z'}}]
+      })
+
+      const mockCourses = [{id: 7}]
+      const mockUiManager = {
+        setStore: jest.fn(),
+        handleAction: jest.fn(),
+        uiStateUnchanged: jest.fn()
+      }
+
+      const store = configureStore(mockUiManager, {
+        ...getBasicState(),
+        courses: mockCourses,
+        singleCourse: true
+      })
+      store.dispatch(Actions.getWeeklyPlannerItems(today))
+
+      const expectedContextCodes = /context_codes\[]=course_7/
+      moxios.wait(() => {
+        // Fetching current week, far future date, and far past date should all be filtered by context_codes
+        expect(moxios.requests.count()).toBe(3)
+        expect(moxios.requests.at(0).url).toMatch(expectedContextCodes)
+        expect(moxios.requests.at(1).url).toMatch(expectedContextCodes)
+        expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
+        done()
       })
     })
   })

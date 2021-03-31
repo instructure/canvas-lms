@@ -79,7 +79,8 @@ export class PlannerApp extends Component {
     thisWeek: shape({
       weekStart: momentObj,
       weekEnd: momentObj
-    })
+    }),
+    singleCourseView: bool
   }
 
   static defaultProps = {
@@ -93,7 +94,8 @@ export class PlannerApp extends Component {
     appRef: () => {},
     focusFallback: () => {},
     isCompletelyEmpty: bool,
-    k5Mode: false
+    k5Mode: false,
+    singleCourseView: false
   }
 
   constructor(props) {
@@ -289,6 +291,7 @@ export class PlannerApp extends Component {
         updateTodo={this.props.updateTodo}
         currentUser={this.props.currentUser}
         simplifiedControls={this.props.k5Mode}
+        singleCourseView={this.props.singleCourseView}
         showMissingAssignments={this.props.k5Mode}
       />
     )
@@ -497,7 +500,8 @@ export const mapStateToProps = state => {
       weekEnd: state.weeklyDashboard.weekEnd
     },
     loadingOpportunities: !!state.loading.loadingOpportunities,
-    opportunityCount: state.opportunities?.items?.length || 0
+    opportunityCount: state.opportunities?.items?.length || 0,
+    singleCourseView: state.singleCourse
   }
 }
 

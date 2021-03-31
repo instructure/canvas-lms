@@ -20,11 +20,17 @@ import axios from 'axios'
 import parseLinkHeader from 'parse-link-header'
 import {put, select, call, all, takeEvery} from 'redux-saga/effects'
 import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
-import {transformApiToInternalGrade} from '../utilities/apiUtils'
+import {getContextCodesFromState, transformApiToInternalGrade} from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 
-import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from './loading-actions'
+import {
+  gotItemsError,
+  sendBasicFetchRequest,
+  sendFetchRequest,
+  gotGradesSuccess,
+  gotGradesError
+} from './loading-actions'
 import {addOpportunities, allOpportunitiesLoaded} from './index'
 
 import {
@@ -65,13 +71,19 @@ function* watchForSagas() {
 //        false if the new items did not meet the conditions and we should load more items
 // opts: for sendFetchRequest
 //   intoThePast
-function* loadingLoop(fromMomentFunction, actionCreator, opts) {
+function* loadingLoop(fromMomentFunction, actionCreator, opts = {}) {
   try {
     let currentState = null
     const getState = () => currentState // don't want create a new function inside a loop
     let continueLoading = true
     while (continueLoading) {
       currentState = yield select()
+      if (currentState.singleCourse) {
+        const context_codes = getContextCodesFromState(currentState)
+        if (context_codes) {
+          opts.extraParams = {...(opts.extraParams || {}), context_codes}
+        }
+      }
       const fromMoment = fromMomentFunction(currentState)
       const loadingOptions = {fromMoment, getState, ...opts}
       const {transformedItems, response} = yield call(sendFetchRequest, loadingOptions)
@@ -140,9 +152,14 @@ export function* loadAllOpportunitiesSaga() {
   try {
     let loadingUrl = '/api/v1/users/self/missing_submissions'
     const items = []
+    const {courses, singleCourse} = yield select()
+    const course_ids = singleCourse ? courses.map(({id}) => id) : undefined
     while (loadingUrl != null) {
-      const response = yield call(axios.get, loadingUrl, {
-        params: {include: ['planner_overrides'], filter: ['submittable'], per_page: MAX_PAGE_SIZE}
+      const response = yield call(sendBasicFetchRequest, loadingUrl, {
+        course_ids,
+        include: ['planner_overrides'],
+        filter: ['submittable'],
+        per_page: MAX_PAGE_SIZE
       })
       items.push(...response.data)
 
@@ -164,7 +181,7 @@ export function* loadWeekSaga({payload}) {
   yield* loadingLoop(() => payload.weekStart, mergeWeekItems, {
     mode: 'week',
     extraParams: {
-      end_date: payload.weekEnd.format(),
+      end_date: payload.weekEnd.toISOString(),
       per_page: MAX_PAGE_SIZE
     }
   })

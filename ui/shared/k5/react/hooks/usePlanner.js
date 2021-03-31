@@ -40,6 +40,7 @@ import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
  * @param {function} [config.callback] - Passed-in function that is triggered when the
  *        planner has finished initializing. Receives an object containing the full
  *        set of initialized configuration that the planner is using.
+ * @param {boolean} singleCourse - Whether or not to render the planner in single-course mode.
  * @returns {(boolean|Object)} - Returns an object containing the initialized configuration
  *        information, or false if the planner has not been initialized yet.
  */
@@ -47,7 +48,8 @@ export default function usePlanner({
   plannerEnabled,
   isPlannerActive,
   focusFallback,
-  callback = () => {}
+  callback = () => {},
+  singleCourse = false
 }) {
   const [plannerInitialized, setPlannerInitialized] = useState(false)
 
@@ -65,7 +67,8 @@ export default function usePlanner({
           datetimeString: $.datetimeString
         },
         externalFallbackFocusable: focusFallback,
-        env: window.ENV
+        env: window.ENV,
+        singleCourse
       })
         .then(setPlannerInitialized)
         .then(callback)
