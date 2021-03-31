@@ -1123,6 +1123,10 @@ import './vendor/ui.selectmenu'
         } else {
           $avatar_image.hide();
         }
+
+        if (this.currentStudent) {
+          this.getAccommodations();
+        }
       }
     },
 
@@ -1206,7 +1210,7 @@ import './vendor/ui.selectmenu'
       var student_name = this.currentStudent.name;
       $('#submission_details_student_accommodations').empty();
       $('#submission_details_student_name').text(this.currentStudent.name);
-      this.getAccommodations();
+      //this.getAccommodations();
       if (this.currentStudent.settings && this.currentStudent.settings.accommodations) {
         $.each(this.currentStudent.settings.accommodations, function (i, accommodation) {
           $('#submission_details_student_accommodations').append('<span class="accommodations">' + accommodation + '</span>')
