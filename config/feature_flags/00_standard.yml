@@ -308,12 +308,6 @@ quizzes_next_submission_history:
     separately.
   applies_to: RootAccount
   root_opt_in: true
-import_to_quizzes_next:
-  state: allowed
-  display_name: New Quizzes Importing
-  description: Allow importing of QTI and Common Cartridge into New Quizzes.
-  applies_to: RootAccount
-  root_opt_in: true
 newquizzes_on_quiz_page:
   state: hidden
   display_name: New Quizzes on the Quizzes page

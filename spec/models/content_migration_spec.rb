@@ -768,9 +768,9 @@ describe ContentMigration do
 
   context 'Quizzes.Next CC import' do
     before do
-      allow(@cm.root_account).
+      allow(@cm.context).
         to receive(:feature_enabled?).
-        with(:import_to_quizzes_next).
+        with(:quizzes_next).
         and_return(true)
       allow(@cm.migration_settings).
         to receive(:[]).
