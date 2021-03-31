@@ -1193,10 +1193,12 @@ import './vendor/ui.selectmenu'
     },
 
     getAccommodations: function() {
-      var accommodationsPayload =  $.getJSON("/users/" + this.currentStudent.id + "/special_programs");
-      if (accommodationsPayload.accommodations) {
-        this.currentStudent.settings.accommodations = accommodationsPayload.accommodations;
-      }
+      var self = this;
+      $.getJSON("/users/" + self.currentStudent.id + "/special_programs", function(accommodationsPayload) {
+        if (accommodationsPayload.accommodations) {
+          self.currentStudent.settings.accommodations = accommodationsPayload.accommodations;
+        }
+      });
     },
 
     showStudent: function(){
