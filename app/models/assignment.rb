@@ -695,7 +695,7 @@ class Assignment < ActiveRecord::Base
     true
   end
 
-  def update_student_submissions
+  def update_student_submissions(updating_user)
     graded_at = Time.zone.now
     submissions.graded.preload(:user).find_each do |s|
       if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
@@ -705,8 +705,8 @@ class Assignment < ActiveRecord::Base
       s.graded_at = graded_at
       s.assignment = self
       s.assignment_changed_not_sub = true
-      s.grade_change_event_author_id = @updating_user&.id
-      s.grader = @updating_user if @updating_user
+      s.grade_change_event_author_id = updating_user&.id
+      s.grader = updating_user if updating_user
 
       # Skip the grade calculation for now. We'll do it at the end.
       s.skip_grade_calc = true
@@ -730,7 +730,7 @@ class Assignment < ActiveRecord::Base
   # reflect the changes
   def update_submissions_and_grades_if_details_changed
     if needs_to_update_submissions?
-      delay_if_production.update_student_submissions
+      delay_if_production.update_student_submissions(@updating_user)
     else
       update_grades_if_details_changed
     end

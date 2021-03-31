@@ -6291,12 +6291,10 @@ describe Assignment do
       end
 
       it "triggers a grade change event with the grader_id as the updating_user" do
-        @assignment.updating_user = @assistant
-
         expect(Auditors::GradeChange).to receive(:record).once do |args|
           expect(args.fetch(:submission).grader_id).to eq @assistant.id
         end
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@assistant)
       end
 
       it "triggers a grade change event using the grader_id on the submission if no updating_user is present" do
@@ -6304,7 +6302,7 @@ describe Assignment do
           expect(args.fetch(:submission).grader_id).to eq @teacher.id
         end
 
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(nil)
       end
     end
 
@@ -6348,7 +6346,7 @@ describe Assignment do
       it "preserves pass/fail grade when changing from 0 to positive points possible" do
         @assignment.grade_student(@user, grade: 'pass', grader: @teacher)
         @assignment.points_possible = 1.0
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@teacher)
 
         submission.reload
         expect(submission.grade).to eql('complete')
@@ -6357,7 +6355,7 @@ describe Assignment do
       it "changes the score of 'complete' pass/fail submissions to match the assignment's possible points" do
         @assignment.grade_student(@user, grade: 'pass', grader: @teacher)
         @assignment.points_possible = 3.0
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@teacher)
 
         submission.reload
         expect(submission.score).to eql(3.0)
@@ -6366,7 +6364,7 @@ describe Assignment do
       it "does not change the score of 'incomplete' pass/fail submissions if assignment points possible has changed" do
         @assignment.grade_student(@user, grade: 'fail', grader: @teacher)
         @assignment.points_possible = 2.0
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@teacher)
 
         submission.reload
         expect(submission.score).to eql(0.0)
