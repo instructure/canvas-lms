@@ -25,7 +25,7 @@ describe NewQuizzesFeaturesHelper do
 
   before :once do
     course_with_student(active_all: true)
-    @context = @course.account
+    @context = @course
   end
 
   describe '#new_quizzes_import_enabled?' do
@@ -38,14 +38,13 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_import_enabled?).to eq false
     end
 
-    it 'should be false when new_quizzes disabled, but importing enabled' do
-      @context.root_account.enable_feature!(:import_to_quizzes_next)
+    it 'should be false when new_quizzes disabled' do
+      @context.root_account.enable_feature!(:quizzes_next)
       expect(new_quizzes_import_enabled?).to eq false
     end
 
-    it 'should be true when new_quizzes enabled, and importing enabled' do
-      allow(@context.root_account).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
-      @context.root_account.enable_feature!(:import_to_quizzes_next)
+    it 'should be true when new_quizzes enabled' do
+      allow(@course).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
       expect(new_quizzes_import_enabled?).to eq true
     end
   end
