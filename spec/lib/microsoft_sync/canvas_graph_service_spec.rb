@@ -53,8 +53,19 @@ describe MicrosoftSync::CanvasGraphService do
         mailNickname: "Course_math_101-#{@course.uuid.first(13)}",
       ).and_return('foo')
 
-
       expect(subject.create_education_class(@course)).to eq('foo')
+    end
+
+    context 'when the course has a empty string for a description' do
+      # Microsoft API seems to have a problem with description being an empty
+      # string
+      it 'sends nil instead of the empty string' do
+        course_model(public_description: '', name: 'math 101')
+        expect(graph_service).to receive(:create_education_class).with(
+          hash_including(description: nil)
+        ).and_return('foo')
+        subject.create_education_class(@course)
+      end
     end
 
     context 'when the course code contains special characters' do

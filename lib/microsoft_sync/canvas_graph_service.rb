@@ -39,7 +39,7 @@ module MicrosoftSync
     # Returns the hash of the new course, including the 'id' key
     def create_education_class(course)
       graph_service.create_education_class(
-        description: course.public_description,
+        description: course.public_description.presence,
         displayName: course.name,
         externalId: course.uuid,
         externalName: course.name,
