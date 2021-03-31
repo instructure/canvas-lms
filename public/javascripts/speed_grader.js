@@ -21,8 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {TextArea} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextArea} from '@instructure/ui-text-area'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
@@ -41,13 +41,13 @@ import {isGraded, isPostable, similarityIcon} from 'jsx/grading/helpers/Submissi
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconUploadLine,
   IconWarningLine,
   IconCheckMarkIndeterminateLine
 } from '@instructure/ui-icons'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
