@@ -141,6 +141,22 @@ module K5PageObject
     "//button[.//span[. = 'Today']]"
   end
 
+  def missing_dropdown_selector
+    "[data-testid = 'missing-item-info']"
+  end
+
+  def missing_data_selector
+    "[data-testid = 'missing-data']"
+  end
+
+  def missing_assignments_selector
+    ".MissingAssignments-styles__root .PlannerItem-styles__title"
+  end
+
+  def assignment_url_selector(course_id, assignment_id)
+    "a[href = '/courses/#{course_id}/assignments/#{assignment_id}']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -272,6 +288,30 @@ module K5PageObject
     fxpath(today_button_selector)
   end
 
+  def items_missing
+    f(missing_dropdown_selector)
+  end
+
+  def items_missing_exists?
+    element_exists?(missing_dropdown_selector)
+  end
+
+  def missing_data
+    f(missing_data_selector)
+  end
+
+  def missing_data_exists?
+    element_exists?(missing_data_selector)
+  end
+
+  def missing_assignments
+    ff(missing_assignments_selector)
+  end
+
+  def assignment_url(assignment_title)
+    fj(assignment_url_selector(assignment_title))
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def check_enable_homeroom_checkbox
@@ -340,5 +380,27 @@ module K5PageObject
 
   def ending_weekday_calculation(current_date)
     (current_date.end_of_week(:sunday)).strftime("%B %-d")
+  end
+
+  def click_missing_items
+    items_missing.click
+  end
+
+  def assignment_link_exists?(course_id, assignment_id)
+    element_exists?(assignment_url_selector(course_id, assignment_id))
+  end
+
+  def missing_assignments_exist?
+    element_exists?(missing_assignments_selector)
+  end
+
+  def create_dated_assignment(assignment_title, assignment_due_at)
+    @course.assignments.create!(
+      title: assignment_title,
+      grading_type: 'points',
+      points_possible: 100,
+      due_at: assignment_due_at,
+      submission_types: 'online_text_entry'
+    )
   end
 end

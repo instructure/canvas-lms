@@ -168,10 +168,11 @@ export class MissingAssignments extends PureComponent {
         )}
         <ToggleDetails
           expanded={this.state.expanded}
+          data-testid="missing-item-info"
           fluidWidth
           onToggle={(_, expanded) => this.setState({expanded})}
           summary={
-            <View margin="0 0 0 x-small">
+            <View data-testid="missing-data" margin="0 0 0 x-small">
               {getMissingItemsText(this.state.expanded, items.length)}
             </View>
           }
