@@ -45,13 +45,26 @@ describe MicrosoftSync::GraphService do
 
   # http_method, url, with_params, and reponse_body will be defined with let()s below
 
-  shared_examples_for 'a graph service endpoint' do
+  shared_examples_for 'a graph service endpoint' do |opts={}|
+    unless opts[:ignore_404]
+      context 'with a 404 status code' do
+        let(:response) { json_response(404, error: {message: 'uh-oh!'}) }
+
+        it 'raises an HTTPNotFound error' do
+          expect { subject }.to raise_error(
+            MicrosoftSync::Errors::HTTPNotFound,
+            /Graph service returned 404 for tenant mytenant.*uh-oh!/
+          )
+        end
+      end
+    end
+
     context 'with a non-200 status code' do
       let(:response) { json_response(403, error: {message: 'uh-oh!'}) }
 
-      it 'raises an InvalidStatusCodewith the code and message' do
+      it 'raises an HTTPInvalidStatus with the code and message' do
         expect { subject }.to raise_error(
-          MicrosoftSync::Errors::InvalidStatusCode,
+          MicrosoftSync::Errors::HTTPInvalidStatus,
           /Graph service returned 403 for tenant mytenant.*uh-oh!/
         )
       end
@@ -290,14 +303,6 @@ describe MicrosoftSync::GraphService do
     it_behaves_like 'a paginated list endpoint'
   end
 
-  describe '#list_users' do
-    let(:url) { 'https://graph.microsoft.com/v1.0/users' }
-    let(:method_name) { :list_users }
-    let(:method_args) { [] }
-
-    it_behaves_like 'a paginated list endpoint'
-  end
-
   describe '#remove_group_member' do
     subject { service.remove_group_member('mygroup', 'myuser') }
 
@@ -320,5 +325,83 @@ describe MicrosoftSync::GraphService do
     it { is_expected.to eq(nil) }
 
     it_behaves_like 'a graph service endpoint'
+  end
+
+  describe '#get_team' do
+    subject { service.get_team('mygroupid') }
+
+    let(:http_method) { :get }
+    let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
+    let(:response_body) { {'foo' => 'bar'} }
+
+    it { is_expected.to eq('foo' => 'bar') }
+
+    it_behaves_like 'a graph service endpoint'
+  end
+
+  describe '#team_exists?' do
+    subject { service.team_exists?('mygroupid') }
+
+    let(:http_method) { :get }
+    let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
+
+    context 'when the team exists' do
+      let(:response_body) { {'foo' => 'bar'} }
+
+      it { is_expected.to eq(true) }
+
+      it_behaves_like 'a graph service endpoint', ignore_404: true
+    end
+
+    context "when the team doesn't exist" do
+      let(:response) { json_response(404, error: {code: 'NotFound', message: 'Does not exist'}) }
+
+      it { is_expected.to eq(false) }
+
+      it_behaves_like 'a graph service endpoint', ignore_404: true
+    end
+  end
+
+  describe '#create_education_class_team' do
+    subject { service.create_education_class_team("Evan's group id") }
+
+    let(:http_method) { :post }
+    let(:url) { 'https://graph.microsoft.com/v1.0/teams' }
+    let(:req_body) do
+      {
+        "template@odata.bind" =>
+          "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
+        "group@odata.bind" => "https://graph.microsoft.com/v1.0/groups('Evan''s group id')"
+      }
+    end
+    let(:with_params) { {body: req_body} }
+    let(:response) { {status: 204, body: ''} }
+
+    it { is_expected.to eq(nil) }
+
+    it_behaves_like 'a graph service endpoint'
+
+    context 'when Microsoft returns a 400 saying "must have one or more owners"' do
+      let(:response) do
+        {
+          status: 400,
+          # this is an actual error from them (ids changed)
+          body: "{\r\n  \"error\": {\r\n    \"code\": \"BadRequest\",\r\n    \"message\": \"Failed to execute Templates backend request CreateTeamFromGroupWithTemplateRequest. Request Url: https://teams.microsoft.com/fabric/amer/templates/api/groups/abcdef01-1212-1212-1212-121212121212/team, Request Method: PUT, Response Status Code: BadRequest, Response Headers: Strict-Transport-Security: max-age=2592000\\r\\nx-operationid: 23457812489473234789372498732493\\r\\nx-telemetryid: 00-31424324322423432143421433242344-4324324234123412-43\\r\\nX-MSEdge-Ref: Ref A: 34213432213432413243422134344322 Ref B: DM1EDGE1111 Ref C: 2021-04-01T20:11:11Z\\r\\nDate: Thu, 01 Apr 2021 20:11:11 GMT\\r\\n, ErrorMessage : {\\\"errors\\\":[{\\\"message\\\":\\\"Group abcdef01-1212-1212-1212-12121212121 must have one or more owners in order to create a Team.\\\",\\\"errorCode\\\":\\\"Unknown\\\"}],\\\"operationId\\\":\\\"23457812489473234789372498732493\\\"}\",\r\n    \"innerError\": {\r\n      \"date\": \"2021-04-01T20:11:11\",\r\n      \"request-id\": \"11111111-1111-1111-1111-111111111111\",\r\n      \"client-request-id\": \"11111111-1111-1111-1111-111111111111\"\r\n    }\r\n  }\r\n}"
+        }
+      end
+
+      it 'raises a GroupHasNoOwners error' do
+        expect { subject }.to raise_error(MicrosoftSync::Errors::GroupHasNoOwners)
+      end
+    end
+  end
+
+  describe '#list_users' do
+    let(:http_method) { :get }
+    let(:url) { 'https://graph.microsoft.com/v1.0/users' }
+    let(:method_name) { :list_users }
+    let(:method_args) { [] }
+
+    it_behaves_like 'a paginated list endpoint'
   end
 end

@@ -43,21 +43,22 @@ describe MicrosoftSync::Errors do
     end
   end
 
-  describe described_class::InvalidStatusCode do
+  describe described_class::HTTPInvalidStatus do
     subject do
-      described_class.new(
-        service: 'my api', response: double(code: 404, body: body), tenant: 'mytenant'
+      described_class.for(
+        service: 'my api', response: double(code: code, body: body), tenant: 'mytenant'
       )
     end
 
+    let(:code) { 422 }
     let(:body) { 'abc' }
 
     it 'gives a public message with the service name, status code, and tenant' do
-      expect(subject.public_message).to eq('My api service returned 404 for tenant mytenant')
+      expect(subject.public_message).to eq('My api service returned 422 for tenant mytenant')
     end
 
     it 'gives an internal message with the public message plus full response body' do
-      expect(subject.message).to eq('My api service returned 404 for tenant mytenant, full body: "abc"')
+      expect(subject.message).to eq('My api service returned 422 for tenant mytenant, full body: "abc"')
     end
 
     context 'when the body is very long' do
@@ -74,7 +75,22 @@ describe MicrosoftSync::Errors do
 
       it 'gives a message showing a nil body' do
         expect(subject.message).to \
-          eq('My api service returned 404 for tenant mytenant, full body: nil')
+          eq('My api service returned 422 for tenant mytenant, full body: nil')
+      end
+    end
+
+    describe '.for' do
+      {
+        400 => MicrosoftSync::Errors::HTTPBadRequest,
+        404 => MicrosoftSync::Errors::HTTPNotFound
+      }.each do |status_code, error_class|
+        context "when the response status code is #{status_code}" do
+          let(:code) { status_code }
+
+          it "returns a #{error_class}" do
+            expect(subject).to be_a(error_class)
+          end
+        end
       end
     end
   end
