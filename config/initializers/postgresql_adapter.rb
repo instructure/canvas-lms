@@ -397,52 +397,62 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def column_definitions(table_name)
+  %w{column_definitions primary_keys indexes}.each do |method|
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{method}(table_name)
+        # migrations need to see any interstitial states; also, we don't
+        # want to pollute the cache with an interstitial state
+        return super if ActiveRecord::Base.in_migration
+
+        # be wary of error reporting inside of MultiCache triggering a
+        # separate model access
+        return super if @nested_#{method}
+
+        @nested_#{method} = true
+        begin
+          got_inside = false
+          MultiCache.fetch(["schema/#{method}", table_name]) do
+            got_inside = true
+            super
+          end
+        rescue
+          raise if got_inside
+
+          # we never got inside, so something is wrong with the cache,
+          # just ignore it
+          super
+        ensure
+          @nested_#{method} = false
+        end
+      end
+    RUBY
+  end
+
+  # same as above, but no arguments
+  def data_sources
     # migrations need to see any interstitial states; also, we don't
     # want to pollute the cache with an interstitial state
     return super if ActiveRecord::Base.in_migration
 
     # be wary of error reporting inside of MultiCache triggering a
     # separate model access
-    return super if @nested_column_definitions
-    @nested_column_definitions = true
+    return super if @nested_data_sources
+
+    @nested_data_sources = true
     begin
       got_inside = false
-      MultiCache.fetch(["schema", table_name]) do
+      MultiCache.fetch(["schema/data_sources"]) do
         got_inside = true
         super
       end
     rescue
       raise if got_inside
+
       # we never got inside, so something is wrong with the cache,
       # just ignore it
       super
     ensure
-      @nested_column_definitions = false
-    end
-  end
-
-  def primary_keys(table_name)
-    # shamelessly copied from column_definitions
-    return super if ActiveRecord::Base.in_migration
-
-    # be wary of error reporting inside of MultiCache triggering a
-    # separate model access
-    return super if @nested_primary_keys
-    @nested_primary_keys = true
-    begin
-      got_inside = false
-      MultiCache.fetch(["primary_keys", table_name]) do
-        got_inside = true
-        super
-      end
-    rescue
-      raise if got_inside
-      # we never got inside, so something is wrong with the cache,
-      # just ignore it
-      super
-    ensure
-      @nested_primary_keys = false
+      @nested_data_sources = false
     end
   end
 
