@@ -1728,7 +1728,7 @@ module TableRename
 
   def columns(table_name)
     if (old_name = RENAMES[table_name])
-      table_name = old_name if connection.table_exists?(old_name)
+      table_name = old_name if data_source_exists?(old_name)
     end
     super
   end
