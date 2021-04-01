@@ -22,11 +22,12 @@ import {Button} from '@instructure/ui-buttons'
 import {IconImportLine, IconPlusSolid, IconSearchLine} from '@instructure/ui-icons'
 import {showImportOutcomesModal} from './ImportOutcomesModal'
 import FindOutcomesModal from './FindOutcomesModal'
+import CreateOutcomeModal from './CreateOutcomeModal'
 import useModal from '../shared/hooks/useModal'
 
 const ManagementHeader = () => {
-  const [showFindModal, onOpenFindModalHandler, onCloseFindModalHandler] = useModal()
-  const noop = () => {}
+  const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
+  const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
 
   return (
     <div className="management-header" data-testid="managementHeader">
@@ -37,14 +38,18 @@ const ManagementHeader = () => {
         <Button onClick={showImportOutcomesModal} renderIcon={IconImportLine} margin="x-small">
           {I18n.t('Import')}
         </Button>
-        <Button onClick={noop} renderIcon={IconPlusSolid} margin="x-small">
+        <Button onClick={openCreateOutcomeModal} renderIcon={IconPlusSolid} margin="x-small">
           {I18n.t('Create')}
         </Button>
-        <Button onClick={onOpenFindModalHandler} renderIcon={IconSearchLine} margin="x-small">
+        <Button onClick={openFindOutcomeModal} renderIcon={IconSearchLine} margin="x-small">
           {I18n.t('Find')}
         </Button>
       </View>
-      <FindOutcomesModal open={showFindModal} onCloseHandler={onCloseFindModalHandler} />
+      <FindOutcomesModal open={isFindOutcomeModalOpen} onCloseHandler={closeFindOutcomeModal} />
+      <CreateOutcomeModal
+        isOpen={isCreateOutcomeModalOpen}
+        onCloseHandler={closeCreateOutcomeModal}
+      />
     </div>
   )
 }

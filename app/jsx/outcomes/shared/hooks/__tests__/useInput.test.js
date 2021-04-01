@@ -53,4 +53,10 @@ describe('useInput', () => {
     act(() => result.current[1](event))
     expect(result.current[2]).toBe(false)
   })
+
+  test('should set state to value when value is provided to changeValue fn', () => {
+    const {result} = renderHook(() => useInput())
+    act(() => result.current[1]('2'))
+    expect(result.current[0]).toBe('2')
+  })
 })

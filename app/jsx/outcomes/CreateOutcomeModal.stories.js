@@ -16,20 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState} from 'react'
+import React from 'react'
+import CreateOutcomeModal from 'jsx/outcomes/CreateOutcomeModal'
 
-const useInput = (initialValue = '') => {
-  const [value, setValue] = useState(initialValue)
-  const changeValue = arg => {
-    if (typeof arg === 'object' && arg.target?.value !== undefined) {
-      setValue(arg.target.value)
-    } else {
-      setValue(arg)
-    }
+export default {
+  title: 'Examples/Outcomes/CreateOutcomeModal',
+  component: CreateOutcomeModal,
+  args: {
+    isOpen: true,
+    onCloseHandler: () => {}
   }
-  const valueChanged = value.length !== initialValue.length || value !== initialValue
-
-  return [value, changeValue, valueChanged]
 }
 
-export default useInput
+const Template = args => <CreateOutcomeModal {...args} />
+export const Default = Template.bind({})

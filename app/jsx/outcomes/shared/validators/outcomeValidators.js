@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
+
  *
  * This file is part of Canvas.
  *
@@ -16,20 +17,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState} from 'react'
+import I18n from 'i18n!OutcomeManagement'
 
-const useInput = (initialValue = '') => {
-  const [value, setValue] = useState(initialValue)
-  const changeValue = arg => {
-    if (typeof arg === 'object' && arg.target?.value !== undefined) {
-      setValue(arg.target.value)
-    } else {
-      setValue(arg)
-    }
-  }
-  const valueChanged = value.length !== initialValue.length || value !== initialValue
+export const titleValidator = title =>
+  !title.trim().length
+    ? I18n.t('Cannot be blank')
+    : title.length > 255
+    ? I18n.t('Must be 255 characters or less')
+    : ''
 
-  return [value, changeValue, valueChanged]
-}
-
-export default useInput
+export const displayNameValidator = displayName =>
+  displayName.length > 255 ? I18n.t('Must be 255 characters or less') : ''

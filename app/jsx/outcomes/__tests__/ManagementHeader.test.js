@@ -22,6 +22,7 @@ import ManagementHeader from '../ManagementHeader'
 import {showImportOutcomesModal} from '../ImportOutcomesModal'
 import {MockedProvider} from '@apollo/react-testing'
 
+jest.mock('jsx/shared/rce/RichContentEditor')
 jest.mock('../ImportOutcomesModal')
 jest.useFakeTimers()
 
@@ -44,16 +45,21 @@ describe('ManagementHeader', () => {
 
   it('calls showImportOutcomesModal when click on Import', () => {
     const {getByText} = render(<ManagementHeader />)
-    const importButton = getByText('Import')
-    fireEvent.click(importButton)
+    fireEvent.click(getByText('Import'))
     expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
   })
 
   it('opens FindOutcomesModal when Find button is clicked', async () => {
     const {getByText} = render(<ManagementHeader />)
-    const findButton = getByText('Find')
-    fireEvent.click(findButton)
+    fireEvent.click(getByText('Find'))
     await act(async () => jest.runAllTimers())
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
+  })
+
+  it('opens CreateOutcomeModal when Create button is clicked', async () => {
+    const {getByText} = render(<ManagementHeader />)
+    fireEvent.click(getByText('Create'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Create Outcome')).toBeInTheDocument()
   })
 })
