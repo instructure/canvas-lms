@@ -72,6 +72,15 @@ describe('The Comments component', () => {
     expect(option.props().children).toHaveLength(100) // includes the trailing '…'
   })
 
+  it('avoids creating illegal DOM ids', () => {
+    const el = editor({savedComments: ['this is bad comment 3"', 'this is bad comment 2\n']})
+    const options = el.find('Option')
+    let optProps = options.at(1).props()
+    expect(optProps.id).toBe(`mment3_${optProps.value}`)
+    optProps = options.at(2).props()
+    expect(optProps.id).toBe(`mment2_${optProps.value}`)
+  })
+
   it('can check / uncheck save for later', () => {
     const setSaveLater = jest.fn()
     const el = editor({setSaveLater})
