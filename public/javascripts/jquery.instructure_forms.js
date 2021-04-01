@@ -1094,7 +1094,16 @@ $.fn.formErrors = function(data_errors, options) {
         .filter(':not(:visible)')
         .first()
       if ($hiddenInput && $hiddenInput.length > 0) {
-        $obj = $hiddenInput.prev()
+        if (
+          $hiddenInput[0].tagName === 'TEXTAREA' &&
+          $hiddenInput.data('remoteEditor') &&
+          ENV.use_rce_enhancements
+        ) {
+          // this textarea is tied to the new rce
+          $obj = $hiddenInput.next()
+        } else {
+          $obj = $hiddenInput.prev()
+        }
       }
     }
     if (!$obj || $obj.length === 0 || name == 'general') {
