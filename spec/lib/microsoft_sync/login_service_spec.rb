@@ -81,9 +81,9 @@ describe MicrosoftSync::LoginService do
         let(:response_status) { 401 }
         let(:response_body) { {} }
 
-        it 'raises an InvalidStatusCode' do
+        it 'raises an HTTPInvalidStatus' do
           expect { subject }.to raise_error(
-            MicrosoftSync::Errors::InvalidStatusCode,
+            MicrosoftSync::Errors::HTTPInvalidStatus,
             /Login service returned 401 for tenant mytenant/
           )
         end

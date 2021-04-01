@@ -56,7 +56,7 @@ module MicrosoftSync
         unless (200..299).cover?(response.code)
           # Probably the key itself is bad. As of 3/2021, it seems like if the tenant
           # hasn't granted permission, we get a token but then a 401 from the Graph API
-          raise MicrosoftSync::Errors::InvalidStatusCode.new(
+          raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
             service: 'login', tenant: tenant, response: response
           )
         end

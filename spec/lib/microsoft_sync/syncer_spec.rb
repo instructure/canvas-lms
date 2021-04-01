@@ -71,6 +71,8 @@ describe MicrosoftSync::Syncer do
       mock_diff = double('diff')
       expect(syncer).to receive(:generate_diff).and_return(mock_diff)
       expect(syncer).to receive(:execute_diff).with(mock_diff)
+      expect(syncer).to receive(:sleep).with(15)
+      expect(syncer).to receive(:ensure_team_exists)
       expect { syncer.sync! }.to \
         change { group.reload.workflow_state }.from('pending').to('completed')
     end
@@ -273,6 +275,64 @@ describe MicrosoftSync::Syncer do
         receive(:add_users_to_group).with('mygroup', members: %w[o3])
 
       syncer.execute_diff(mc)
+    end
+  end
+
+  describe '#ensure_team_exists' do
+    subject { syncer.ensure_team_exists }
+
+    before { group.update!(ms_group_id: 'mygroupid') }
+
+    context 'when there are no teacher/ta/designer enrollments' do
+      it "doesn't create a team" do
+        course.enrollments.to_a.each do |e|
+          e.destroy if e.type =~ /^Teacher|Ta|Designer/
+        end
+        expect(graph_service).to_not receive(:team_exists?)
+        expect(graph_service).to_not receive(:create_team)
+        subject
+      end
+    end
+
+    context 'when the team already exists' do
+      it "doesn't create a team" do
+        expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(true)
+        expect(graph_service).to_not receive(:create_team)
+        subject
+      end
+    end
+
+    context "when the team doesn't exist" do
+      before do
+        allow(graph_service).to receive(:team_exists?).with('mygroupid').and_return(false)
+      end
+
+      it 'creates the team' do
+        expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
+        subject
+      end
+
+      context 'when the Microsoft API errors with "group has no owners"' do
+        it "doesn't raise an error" do
+          expect(graph_service).to receive(:create_education_class_team).with('mygroupid').
+            and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
+          subject
+        end
+      end
+
+      context 'when the Microsoft API errors with some other error' do
+        it "bubbles up the error" do
+          expect(graph_service).to \
+            receive(:create_education_class_team).with('mygroupid').
+            and_raise(
+              # if we need to do lots of this, we can make a spec helper to make errors
+              MicrosoftSync::Errors::HTTPBadRequest.new(
+                response: double(code: 400, body: ''), tenant: '', service: ''
+              )
+            )
+          expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
+        end
+      end
     end
   end
 end

@@ -39,6 +39,8 @@ module MicrosoftSync
       ensure_enrollments_user_mappings_filled
       diff = generate_diff
       execute_diff(diff)
+      sleep 15
+      ensure_team_exists
 
       group.update_workflow_state_unless_deleted(:completed, last_error: nil)
     rescue => e
@@ -133,6 +135,21 @@ module MicrosoftSync
       diff.owners_to_remove.each do |aad|
         graph_service.remove_group_owner(group.ms_group_id, aad)
       end
+    end
+
+    def ensure_team_exists
+      return unless course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any?
+      return if graph_service.team_exists?(group.ms_group_id)
+
+      graph_service.create_education_class_team(group.ms_group_id)
+    rescue MicrosoftSync::Errors::GroupHasNoOwners
+      # It's possible (though unlikely) for the course to have owners (as found
+      # by the guard above) but they are not synced to Microsoft yet. Ignore
+      # this case, as we will retry when we sync again.
+      # It may also be possible for the group to have owners on the MS side but
+      # it isn't consistent yet, although I haven't seen that behavior. When
+      # implementing retry or a team_exists on the field, we can change it to
+      # retry once here.
     end
 
     def tenant

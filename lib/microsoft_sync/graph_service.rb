@@ -97,6 +97,34 @@ module MicrosoftSync
       request(:delete, "groups/#{group_id}/owners/#{user_aad_id}/$ref")
     end
 
+    # === Teams ===
+    def get_team(team_id, options={})
+      request(:get, "teams/#{team_id}", query: expand_options(**options))
+    end
+
+    def team_exists?(team_id)
+      get_team(team_id)
+      true
+    rescue MicrosoftSync::Errors::HTTPNotFound
+      false
+    end
+
+    def create_education_class_team(group_id)
+      body = {
+        "template@odata.bind" =>
+          "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
+        "group@odata.bind" =>
+          "https://graph.microsoft.com/v1.0/groups(#{quote_value(group_id)})"
+      }
+      request(:post, 'teams', body: body)
+    rescue MicrosoftSync::Errors::HTTPBadRequest => e
+      if e.response_body =~ /must have one or more owners in order to create a Team/
+        raise MicrosoftSync::Errors::GroupHasNoOwners
+      end
+
+      raise
+    end
+
     # === Users ===
 
     def list_users(options={}, &blk)
@@ -121,7 +149,7 @@ module MicrosoftSync
       end
 
       unless (200..299).cover?(response.code)
-        raise MicrosoftSync::Errors::InvalidStatusCode.new(
+        raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
           service: 'graph', tenant: tenant, response: response
         )
       end
@@ -160,15 +188,15 @@ module MicrosoftSync
     def filter_clause(filter)
       filter.map do |filter_key, filter_value|
         if filter_value.is_a?(Array)
-          quoted_values = filter_value.map{|v| filter_quote_value(v)}
+          quoted_values = filter_value.map{|v| quote_value(v)}
           "#{filter_key} in (#{quoted_values.join(', ')})"
         else
-          "#{filter_key} eq #{filter_quote_value(filter_value)}"
+          "#{filter_key} eq #{quote_value(filter_value)}"
         end
       end.join(' and ')
     end
 
-    def filter_quote_value(str)
+    def quote_value(str)
       "'#{str.gsub("'", "''")}'"
     end
   end
