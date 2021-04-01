@@ -53,19 +53,33 @@ const mathml = {
         url: `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=${configFile}&locale=${locale}`,
         cache: true,
         success: () => {
-          window.MathJax.Hub.Register.StartupHook('MathMenu Ready', function() {
+          window.MathJax.Hub.Register.StartupHook('MathMenu Ready', function () {
             // get the mathjax context menu above the rce's equation editor
             window.MathJax.Menu.BGSTYLE['z-index'] = 2000
           })
-          window.MathJax.Hub.Register.StartupHook('End Config', function() {
+          window.MathJax.Hub.Register.StartupHook('End Config', function () {
             // wait until MathJAx is configured before calling the callback
             cb?.()
           })
           if (ENV?.FEATURES?.new_math_equation_handling) {
-            window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
+            window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function (message) {
               mathImageHelper.catchEquationImages(message[1])
             })
-            window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+            window.MathJax.Hub.Register.MessageHook('Math Processing Error', function (message) {
+              const elem = message[1]
+              // ".math_equation_latex" is the elem we added for MathJax to typeset the image equation
+              if (elem.parentElement?.classList.contains('math_equation_latex')) {
+                // The equation we image we were trying to replace and failed is up 1 and back 1.
+                // If we remove its "mathjaxified" attribute, the "End Math" handler
+                // won't remove it from the DOM.
+                if (elem.parentElement.previousElementSibling?.hasAttribute('mathjaxified')) {
+                  elem.parentElement.previousElementSibling.removeAttribute('mathjaxified')
+                }
+                // remove the "math processing error" mathjax output.
+                elem.parentElement.remove()
+              }
+            })
+            window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
               mathImageHelper.removeStrayEquationImages(message[1])
               message[1]
                 .querySelectorAll('.math_equation_latex')
@@ -80,7 +94,7 @@ const mathml = {
             // to add an ignoreClass config prop to the mml2jax processor, but it's not available.
             // Since we want to ignore <math> in .hidden-readable spans, let's remove the MathJunk™
             // right after MathJax adds it.
-            window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+            window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
               $(message[1])
                 .find('.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]')
                 .remove()
@@ -149,24 +163,33 @@ const mathml = {
     return false
   },
 
+  mathJaxGenerated: /^MathJax|MJX/,
+  // elements to ignore selector
+  ignore_list: '#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat',
+
   isMathJaxIgnored(elem) {
     if (!elem) return true
 
     // ignore disconnected elements
     if (!document.body.contains(elem)) return true
 
-    // elements to ignore selector
-    const ignore_list =
-      '.MJX_Assistive_MathML,#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat'
-
     // check if elem is in the ignore list
-    if (elem.parentElement?.querySelector(ignore_list) === elem) {
+    if (elem.parentElement?.querySelector(this.ignore_list) === elem) {
       return true
     }
 
-    // check if elem is a child of .mathjax_ignore
+    // check if elem is a child of something we're ignoring
     while (elem !== document.body) {
+      // child of .mathjax_ignore?
       if (elem.classList.contains('mathjax_ignore')) {
+        return true
+      }
+
+      // child of MathJax generated element?
+      if (
+        this.mathJaxGenerated.test(elem.id) ||
+        this.mathJaxGenerated.test(elem.getAttribute('class'))
+      ) {
         return true
       }
       elem = elem.parentElement
