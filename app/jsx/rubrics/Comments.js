@@ -31,6 +31,8 @@ const ellipsis = () => I18n.t('…')
 
 const truncate = comment => (comment.length > 100 ? comment.slice(0, 99) + ellipsis() : comment)
 
+const slug = str => str.replace(/\W/g, '')
+
 const FreeFormComments = props => {
   const {allowSaving, savedComments, comments, large, saveLater, setComments, setSaveLater} = props
   const first = (
@@ -41,8 +43,8 @@ const FreeFormComments = props => {
 
   const options = savedComments.map((comment, ix) => (
     <SimpleSelect.Option
-      key={comment.slice(-8)}
-      id={`${comment.slice(-4)}_${ix}`}
+      key={slug(comment).slice(-8)}
+      id={`${slug(comment).slice(-6)}_${ix}`}
       value={ix.toString()}
       label={comment}
     >
