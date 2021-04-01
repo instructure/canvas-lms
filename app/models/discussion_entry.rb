@@ -357,6 +357,8 @@ class DiscussionEntry < ActiveRecord::Base
   end
   protected :context_module_action_later
 
+  # If this discussion topic is part of an assignment this method is what
+  # submits the assignment or updates the submission for the user
   def context_module_action
     if self.discussion_topic && self.user
       action = self.deleted? ? :deleted : :contributed

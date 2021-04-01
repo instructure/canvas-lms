@@ -77,6 +77,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
   field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
   field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
+  field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

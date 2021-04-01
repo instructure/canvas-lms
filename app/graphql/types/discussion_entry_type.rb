@@ -52,7 +52,7 @@ module Types
       load_association(:user)
     end
 
-    field :deleted, Boolean, null:true
+    field :deleted, Boolean, null: true
     def deleted
       object.deleted?
     end
@@ -62,7 +62,7 @@ module Types
       load_association(:editor)
     end
 
-    field :discussion_topic, Types::DiscussionType, null:false
+    field :discussion_topic, Types::DiscussionType, null: false
     def discussion_topic
       load_association(:discussion_topic)
     end
@@ -70,6 +70,16 @@ module Types
     field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true
     def discussion_subentries_connection
       load_association(:discussion_subentries)
+    end
+
+    field :parent, Types::DiscussionEntryType, null: true
+    def parent
+      Loaders::IDLoader.for(DiscussionEntry).load(object.parent_id)
+    end
+
+    field :attachment, Types::FileType, null: true
+    def attachment
+      load_association(:attachment)
     end
   end
 end
