@@ -23,6 +23,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::BaseMutation
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionTopic')
   argument :published, Boolean, required: false
+  argument :locked, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
@@ -31,6 +32,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::BaseMutation
 
     unless input[:published].nil?
       input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
+    end
+
+    unless input[:locked].nil?
+      input[:locked] ? discussion_topic.lock! : discussion_topic.unlock!
     end
 
     {

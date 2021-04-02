@@ -31,6 +31,7 @@ module Types
     field :title, String, null: true
     field :delayed_post_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
+    field :locked, Boolean, null: false
     field :last_reply_at, Types::DateTimeType, null: true
     field :posted_at, Types::DateTimeType, null: true
     field :podcast_has_student_posts, Boolean, null: true
