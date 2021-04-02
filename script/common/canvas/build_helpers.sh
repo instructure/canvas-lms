@@ -101,7 +101,7 @@ function sync_bundler_version {
   actual_version=$(eval run_command bundler --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
   if [ "$actual_version" != "$expected_version" ]; then
     echo_console_and_log "  Wrong version of bundler installed, installing correct version..."
-    run_command bash -c "gem uninstall --all --ignore-dependencies --force bundler && gem install bundler --no-document -v $expected_version" >>"$LOG" 2>&1
+    run_command bash -c "gem uninstall --all --ignore-dependencies --force --executables bundler && gem install bundler --no-document -v $expected_version" >>"$LOG" 2>&1
   fi
 }
 
