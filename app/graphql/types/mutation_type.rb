@@ -81,6 +81,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
   field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
+  field :import_outcomes, mutation: Mutations::ImportOutcomes
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.
