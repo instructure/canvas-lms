@@ -185,13 +185,13 @@ const mathml = {
         return true
       }
 
-      // child of MathJax generated element?
-      if (
-        this.mathJaxGenerated.test(elem.id) ||
-        this.mathJaxGenerated.test(elem.getAttribute('class'))
-      ) {
-        return true
-      }
+      // // child of MathJax generated element?
+      // if (
+      //   this.mathJaxGenerated.test(elem.id) ||
+      //   this.mathJaxGenerated.test(elem.getAttribute('class'))
+      // ) {
+      //   return true
+      // }
       elem = elem.parentElement
     }
     return false
