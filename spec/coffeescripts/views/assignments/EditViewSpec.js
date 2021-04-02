@@ -1438,6 +1438,7 @@ test('shows the build button', function () {
 })
 
 test('save routes to cancelLocation', function () {
+  this.view.preventBuildNavigation = true
   equal(this.view.locationAfterSave({}), currentOrigin + '/cancel')
 })
 

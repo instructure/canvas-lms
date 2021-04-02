@@ -165,7 +165,7 @@ export default class EditView extends ValidatedFormView
     events = {}
     events["click .cancel_button"] = 'handleCancel'
     events["click .save_and_publish"] = 'saveAndPublish'
-    events["click .build_button"] = 'handleBuild'
+    events["click .save_button"] = 'handleSave'
     events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
     events["change #{ONLINE_SUBMISSION_TYPES}"] = 'handleOnlineSubmissionTypeChange'
     events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
@@ -802,10 +802,11 @@ export default class EditView extends ValidatedFormView
   saveAndPublish: (event) ->
     @shouldPublish = true
     @disableWhileLoadingOpts = {buttons: ['.save_and_publish']}
+    @preventBuildNavigation = true
     @submit(event)
 
-  handleBuild: (event) ->
-    @navigateToBuild = true
+  handleSave: (event) =>
+    @preventBuildNavigation = true
     @submit(event)
 
   onSaveFail: (xhr) =>
@@ -1010,7 +1011,7 @@ export default class EditView extends ValidatedFormView
 
   locationAfterSave: (params) ->
     return params['return_to'] if returnToHelper.isValid(params['return_to'])
-    useCancelLocation = @assignment.isQuizLTIAssignment() && !@navigateToBuild && ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
+    useCancelLocation = @assignment.showBuildButton() && @preventBuildNavigation
     return @locationAfterCancel(deparam()) if useCancelLocation
     @model.get 'html_url'
 
