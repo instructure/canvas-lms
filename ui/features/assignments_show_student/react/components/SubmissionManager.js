@@ -356,6 +356,20 @@ export default class SubmissionManager extends Component {
   footerButtons() {
     return [
       {
+        key: 'back-to-draft',
+        shouldRender: context =>
+          this.props.submission !== context.latestSubmission &&
+          context.latestSubmission.state === 'unsubmitted',
+        render: context => {
+          const {attempt} = context.latestSubmission
+          return (
+            <Button color="primary" onClick={context.showDraftAction}>
+              {I18n.t('Back to Attempt %{attempt}', {attempt})}
+            </Button>
+          )
+        }
+      },
+      {
         key: 'new-attempt',
         shouldRender: context => {
           const {assignment, submission} = this.props

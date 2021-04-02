@@ -228,8 +228,11 @@ class ViewManager extends React.Component {
         value={{
           allowChangesToSubmission: ENV.enrollment_state === 'active',
           isLatestAttempt: !this.hasNextSubmission(),
-          lastSubmittedSubmission: getInitialSubmission(this.props.initialQueryData),
           latestSubmission: this.getLatestSubmission(),
+          lastSubmittedSubmission: getInitialSubmission(this.props.initialQueryData),
+          showDraftAction: () => {
+            this.onChangeSubmission(this.getLatestSubmission().attempt)
+          },
           startNewAttemptAction: this.onStartNewAttempt
         }}
       >

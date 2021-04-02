@@ -23,9 +23,17 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
-import StudentViewContext from '../Context'
+import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+
+function renderInContext(overrides = {}, children) {
+  const contextProps = {...StudentViewContextDefaults, ...overrides}
+
+  return render(
+    <StudentViewContext.Provider value={contextProps}>{children}</StudentViewContext.Provider>
+  )
+}
 
 describe('SubmissionManager', () => {
   it('renders the AttemptTab', async () => {
@@ -83,16 +91,11 @@ describe('SubmissionManager', () => {
 
   it('does not render the submit button if we are not on the latest submission', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.graded
     })
-    const {queryByText} = render(
-      <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
-        <MockedProvider>
-          <SubmissionManager {...props} />
-        </MockedProvider>
-      </StudentViewContext.Provider>
-    )
+    const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
+    const {queryByText} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
@@ -115,14 +118,12 @@ describe('SubmissionManager', () => {
       Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
 
-    const {queryByText} = render(
-      <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
-        <MockedProvider>
-          <SubmissionManager {...props} />
-        </MockedProvider>
-      </StudentViewContext.Provider>
+    const {queryByText} = renderInContext(
+      {allowChangesToSubmission: false},
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
     )
-
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
@@ -463,12 +464,9 @@ describe('SubmissionManager', () => {
         const props = await mockAssignmentAndSubmission({
           Submission: {...SubmissionMocks.submitted}
         })
-        const {queryByRole} = render(
-          <StudentViewContext.Provider
-            value={{allowChangesToSubmission: false, latestSubmission: {}}}
-          >
-            <SubmissionManager {...props} />
-          </StudentViewContext.Provider>
+        const {queryByRole} = renderInContext(
+          {allowChangesToSubmission: false},
+          <SubmissionManager {...props} />
         )
         expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
       })
@@ -512,6 +510,76 @@ describe('SubmissionManager', () => {
       })
       const {queryByRole} = render(<SubmissionManager {...props} />)
       expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('"Back to Attempt" button', () => {
+    it('is rendered if a draft exists and a previous attempt is shown', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted}
+      })
+      const latestSubmission = {attempt: 2, state: 'unsubmitted'}
+
+      const {getByRole} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+
+      expect(getByRole('button', {name: /Back to Attempt/})).toBeInTheDocument()
+    })
+
+    it('includes the current attempt number', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted}
+      })
+      const latestSubmission = {attempt: 2, state: 'unsubmitted'}
+
+      const {getByRole} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      const button = getByRole('button', {name: /Back to Attempt/})
+      expect(button).toHaveTextContent('Back to Attempt 2')
+    })
+
+    it('is not rendered if no current draft exists', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted}
+      })
+
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', {name: /Back to Attempt/})).not.toBeInTheDocument()
+    })
+
+    it('is not rendered if the current draft is selected', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted}
+      })
+      const latestSubmission = props.submission
+
+      const {queryByRole} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      expect(queryByRole('button', {name: /Back to Attempt/})).not.toBeInTheDocument()
+    })
+
+    it('calls the showDraftAction function supplied by the context when clicked', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted}
+      })
+
+      const latestSubmission = {
+        activeSubmissionType: 'online_text_entry',
+        attempt: 2,
+        state: 'unsubmitted'
+      }
+      const showDraftAction = jest.fn()
+
+      const {getByRole} = renderInContext(
+        {latestSubmission, showDraftAction},
+        <SubmissionManager {...props} />
+      )
+
+      act(() => {
+        fireEvent.click(getByRole('button', {name: /Back to Attempt/}))
+      })
+      expect(showDraftAction).toHaveBeenCalled()
     })
   })
 
