@@ -30,6 +30,7 @@ import initialState from './react/store/initialState'
 import './jquery/index'
 import '@canvas/grading-standards'
 import FeatureFlags from '@canvas/feature-flags'
+import Integrations from '@canvas/integrations/react/Integrations'
 
 const blueprint = document.getElementById('blueprint_menu')
 if (blueprint) {
@@ -90,4 +91,9 @@ if (ENV.COURSE_COLORS_ENABLED) {
       courseColorPickerContainer
     )
   }
+}
+
+const integrationsContainer = document.getElementById('tab-integrations')
+if (integrationsContainer) {
+  ReactDOM.render(<Integrations />, integrationsContainer)
 }

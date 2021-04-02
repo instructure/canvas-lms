@@ -57,6 +57,19 @@ describe "course settings" do
 
   end
 
+  describe('Integrations tab') do
+    let(:course) { @course }
+
+    context 'with the MSFT sync flag on' do
+      before { course.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+
+      it 'displays the course settings tab' do
+        get "/courses/#{course.id}/settings"
+        expect(f('#integrations_tab')).to be_displayed
+      end
+    end
+  end
+
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
