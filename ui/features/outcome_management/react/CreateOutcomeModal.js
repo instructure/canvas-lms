@@ -24,7 +24,9 @@ import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
 import {Mask} from '@instructure/ui-overlays'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -34,13 +36,26 @@ import {
   titleValidator,
   displayNameValidator
 } from '../validators/outcomeValidators'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {createOutcome} from '@canvas/outcomes/graphql/Management'
+import TreeBrowser from './Management/TreeBrowser'
+import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
+  const {contextType, contextId} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
-  const [description] = useInput()
-  const [setRCERef] = useRCE()
+  const [setRCERef, getRCECode, setRCECode] = useRCE()
   const [showTitleError, setShowTitleError] = useState(false)
+  const {
+    error,
+    isLoading,
+    collections,
+    queryCollections,
+    rootId,
+    selectedGroupId
+  } = useManageOutcomes()
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -54,10 +69,35 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     setShowTitleError(false)
     titleChangeHandler('')
     displayNameChangeHandler('')
+    setRCECode('')
     onCloseHandler()
   }
 
-  const onCreateOutcomeHandler = () => closeModal()
+  const onCreateOutcomeHandler = () => {
+    ;(async () => {
+      try {
+        await createOutcome(contextType, contextId, selectedGroupId, {
+          title,
+          description: getRCECode(),
+          display_name: displayName
+        })
+        showFlashAlert({
+          message: I18n.t('Outcome "%{title}" was successfully created', {title}),
+          type: 'success'
+        })
+      } catch (err) {
+        showFlashAlert({
+          message: err.message
+            ? I18n.t('An error occurred while creating this outcome: %{message}', {
+                message: err.message
+              })
+            : I18n.t('An error occurred while creating this outcome.'),
+          type: 'error'
+        })
+      }
+    })()
+    closeModal()
+  }
 
   return (
     <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
@@ -96,13 +136,39 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
               />
             </Flex.Item>
           </Flex>
-          <View as="div" padding="small 0">
-            <TextArea
-              size="medium"
-              defaultValue={description}
-              label={I18n.t('Description')}
-              textareaRef={setRCERef}
-            />
+          <View as="div" padding="small 0 0">
+            <TextArea size="medium" label={I18n.t('Description')} textareaRef={setRCERef} />
+          </View>
+          <View as="div" padding="x-small 0 0">
+            <Text size="medium" weight="bold">
+              {I18n.t('Location')}
+            </Text>
+            <View as="div" padding="small 0">
+              {isLoading ? (
+                <View
+                  as="div"
+                  textAlign="center"
+                  padding="medium 0"
+                  margin="0 auto"
+                  data-testid="loading"
+                >
+                  <Spinner renderTitle={I18n.t('Loading')} size="medium" />
+                </View>
+              ) : error ? (
+                <Text color="danger">
+                  {contextType === 'Course'
+                    ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
+                    : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}
+                </Text>
+              ) : (
+                <TreeBrowser
+                  selectionType="single"
+                  onCollectionToggle={queryCollections}
+                  collections={collections}
+                  rootId={rootId}
+                />
+              )}
+            </View>
           </View>
         </Modal.Body>
         <Modal.Footer>
@@ -113,7 +179,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             type="button"
             color="primary"
             margin="0 x-small 0 0"
-            interaction={!invalidTitle && !invalidDisplayName ? 'enabled' : 'disabled'}
+            interaction={
+              !invalidTitle && !invalidDisplayName && selectedGroupId ? 'enabled' : 'disabled'
+            }
             onClick={onCreateOutcomeHandler}
           >
             {I18n.t('Create')}

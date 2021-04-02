@@ -66,8 +66,12 @@ const useRCE = (height = 256, customOptions = {}) => {
   }, [elemRef])
 
   const getCode = useCallback(() => RichContentEditor.callOnRCE(elemRef, 'get_code'), [elemRef])
+  const setCode = useCallback(
+    content => RichContentEditor.callOnRCE(elemRef, 'set_code', content),
+    [elemRef]
+  )
 
-  return [setElemRef, getCode]
+  return [setElemRef, getCode, setCode]
 }
 
 export default useRCE

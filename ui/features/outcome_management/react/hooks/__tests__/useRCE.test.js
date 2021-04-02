@@ -103,4 +103,12 @@ describe('useRCE', () => {
     expect(RichContentEditor.callOnRCE).toHaveBeenCalledTimes(1)
     expect(RichContentEditor.callOnRCE.mock.calls[0][1]).toEqual('get_code')
   })
+
+  test('should call RCE.callOnRCE when setCode is called', () => {
+    const {result} = renderHook(() => useRCE())
+    act(() => result.current[0]('elemRef'))
+    act(() => result.current[2](''))
+    expect(RichContentEditor.callOnRCE).toHaveBeenCalledTimes(1)
+    expect(RichContentEditor.callOnRCE.mock.calls[0][1]).toEqual('set_code')
+  })
 })

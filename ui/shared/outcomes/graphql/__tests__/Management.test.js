@@ -17,9 +17,15 @@
  */
 
 import axios from '@canvas/axios'
-import {removeOutcomeGroup, removeOutcome, moveOutcomeGroup, updateOutcome} from '../Management'
+import {
+  removeOutcomeGroup,
+  removeOutcome,
+  moveOutcomeGroup,
+  updateOutcome,
+  createOutcome
+} from '../Management'
 
-jest.mock('axios')
+jest.mock('@canvas/axios')
 
 describe('api', () => {
   afterEach(() => {
@@ -71,6 +77,26 @@ describe('api', () => {
       expect(axios.put).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2', {
         parent_outcome_group_id: '3'
       })
+    })
+  })
+
+  describe('createOutcome', () => {
+    const outcome = {title: 'Outcome', description: 'Description', display_name: 'Display name'}
+
+    it('provides correct arguments to API request to create outcome within account context', () => {
+      createOutcome('Account', '1', '2', outcome)
+      expect(axios.post).toHaveBeenCalledWith(
+        '/api/v1/accounts/1/outcome_groups/2/outcomes',
+        outcome
+      )
+    })
+
+    it('provides correct arguments to API request to create outcome within course context', () => {
+      createOutcome('Course', '2', '2', outcome)
+      expect(axios.post).toHaveBeenCalledWith(
+        '/api/v1/courses/2/outcome_groups/2/outcomes',
+        outcome
+      )
     })
   })
 })

@@ -17,7 +17,11 @@
  */
 
 import React from 'react'
+import {MockedProvider} from '@apollo/react-testing'
+import {createCache} from '@canvas/apollo'
 import CreateOutcomeModal from './CreateOutcomeModal'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
 
 export default {
   title: 'Examples/Outcomes/CreateOutcomeModal',
@@ -28,5 +32,14 @@ export default {
   }
 }
 
-const Template = args => <CreateOutcomeModal {...args} />
+const Template = args => {
+  return (
+    <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+      <MockedProvider cache={createCache()} mocks={smallOutcomeTree('Account')}>
+        <CreateOutcomeModal {...args} />
+      </MockedProvider>
+    </OutcomesContext.Provider>
+  )
+}
+
 export const Default = Template.bind({})
