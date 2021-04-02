@@ -104,7 +104,7 @@ describe MicrosoftSync::Group do
 
   describe '#update_workflow_state_unless_deleted' do
     def run_method!
-      subject.update_workflow_state_unless_deleted('errored', last_error: 'abc')
+      subject.update_workflow_state_unless_deleted('errored', job_state: {abc: true})
     end
 
     context 'when state is deleted in the database' do
@@ -150,12 +150,12 @@ describe MicrosoftSync::Group do
 
       it 'updates the extra attributes in the DB' do
         expect { run_method! }.to change {
-          described_class.find(subject.id).last_error
-        }.from(nil).to('abc')
+          described_class.find(subject.id).job_state
+        }.from(nil).to(abc: true)
       end
 
       it 'updates the extra attributes on the object' do
-        expect { run_method! }.to change { subject.last_error }.from(nil).to('abc')
+        expect { run_method! }.to change { subject.job_state }.from(nil).to(abc: true)
       end
 
       it 'can be called without extra attributes' do
@@ -163,6 +163,25 @@ describe MicrosoftSync::Group do
           described_class.find(subject.id).workflow_state
         }.from('pending').to('errored')
       end
+    end
+  end
+
+  describe '#job_state' do
+    it 'serializes TimeWithZone objects, symbols, and complex data structures' do
+      time = 1.minute.from_now
+      subject.job_state = {a: {'b' => time}}
+      subject.save
+      expect(described_class.find(subject.id).job_state).to eq(a: {'b' => time})
+    end
+  end
+
+  describe '#syncer_job' do
+    it 'creates a StateMachineJob with Syncer as the steps' do
+      syncer_job = subject.syncer_job
+      expect(syncer_job).to be_a(MicrosoftSync::StateMachineJob)
+      expect(syncer_job.job_state_record).to eq(subject)
+      expect(syncer_job.steps_object).to be_a(MicrosoftSync::Syncer)
+      expect(syncer_job.steps_object.group).to eq(subject)
     end
   end
 end

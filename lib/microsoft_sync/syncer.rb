@@ -19,11 +19,23 @@
 #
 
 #
-# Job which syncs course enrollments to Microsoft groups/teams
+# Code which syncs course enrollments to Microsoft groups/teams
 # See also MicrosoftSync::Group model
 #
+# This ideally shouldn't contain much job plumbing, but focus on the business
+# logic about what to do in each step of a sync. For job plumbing, see
+# StateMachineJob. This should normally be used by creating a StateMachineJob;
+# see MicrosoftSync::Group#syncer_job
+#   group.syncer_job.run_later
+#   group.syncer_job.run_synchronously # e.g. manually in a console
+#
 module MicrosoftSync
+  # TODO: rename this to SyncerSteps in next commit (keep this commit small)
   class Syncer
+    # Database batch size for users without AAD ids. Should be an even multiple of
+    # CanvasGraphService::USERS_UPNS_TO_AADS_BATCH_SIZE:
+    ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
+
     attr_reader :group
     delegate :course, to: :group
 
@@ -31,33 +43,42 @@ module MicrosoftSync
       @group = group
     end
 
-    def sync!
-      return unless tenant
-      return unless group&.update_workflow_state_unless_deleted(:running) # quits now if deleted
-
-      ensure_class_group_exists
-      ensure_enrollments_user_mappings_filled
-      diff = generate_diff
-      execute_diff(diff)
-      sleep 15
-      ensure_team_exists
-
-      group.update_workflow_state_unless_deleted(:completed, last_error: nil)
-    rescue => e
-      error_msg = MicrosoftSync::Errors.user_facing_message(e)
-      group&.update_workflow_state_unless_deleted(:errored, last_error: error_msg)
-      raise
+    def initial_step
+      :step_ensure_class_group_exists
     end
 
-    def ensure_class_group_exists
+    def max_retries
+      4
+    end
+
+    def restart_job_after_inactivity
+      6.hours
+    end
+
+    def cleanup_after_failure
+      # We can clean up here e.g. (MicrosoftSync::GroupMember.delete_all)
+      # when we have retry in getting owners & executing diff
+    end
+
+    # This is semi-expected (user disables sync on account-level when jobs are
+    # running), so we raise this which will cleanup_after_failure but not
+    # produce a failed job.
+    class TenantMissingOrSyncDisabled < StandardError
+      include StateMachineJob::GracefulCancelErrorMixin
+    end
+
+    # First step of a full sync. Create group on the Microsoft side.
+    def step_ensure_class_group_exists(_mem_data, _job_state_data)
       # TODO: as we continue building the job we could possibly just use the
       # group.ms_group_id and if we get an error know we have to create it.
       # That will save us a API call. But we won't be able to detect if there
-      # are multiple
+      # are multiple; and it makes handling the 404s soon after a creation trickier.
       remote_ids = canvas_graph_service.list_education_classes_for_course(course).map{|c| c['id']}
 
       # If we've created the group previously, we're good to go
-      return if group.ms_group_id && remote_ids == [group.ms_group_id]
+      if group.ms_group_id && remote_ids == [group.ms_group_id]
+        return StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
+      end
 
       if remote_ids.length > 1
         raise MicrosoftSync::Errors::InvalidRemoteState, \
@@ -71,24 +92,25 @@ module MicrosoftSync
 
       unless new_group_id
         new_group_id = canvas_graph_service.create_education_class(course)['id']
-        # TODO: this sleep is temporary until we can 1) talk with Microsoft
-        # about how their API is supposed to work and 2) decide amongst
-        # ourselves if we should start a new delayed job instead of sleeping
-        # (even a small amount) in the job
-        sleep 3
       end
 
-      canvas_graph_service.update_group_with_course_data(new_group_id, course)
-      group.update! ms_group_id: new_group_id
+      StateMachineJob::NextStep.new(:step_update_group_with_course_data, new_group_id)
     end
 
-    ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
+    def step_update_group_with_course_data(group_id_from_mem, group_id_from_state)
+      group_id = group_id_from_mem || group_id_from_state
+      canvas_graph_service.update_group_with_course_data(group_id, course)
+      group.update! ms_group_id: group_id
+      StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
+    rescue Errors::HTTPNotFound => e
+      StateMachineJob::Retry.new(error: e, delay_amount: 45.seconds, job_state_data: group_id)
+    end
 
     # Gets users enrolled in course, get UPNs (e.g. email addresses) for them,
     # looks up the AADs from Microsoft, and writes the User->AAD mapping into
     # the UserMapping table.  If a user doesn't have a UPN or Microsoft doesn't
     # have an AAD for them, skips that user.
-    def ensure_enrollments_user_mappings_filled
+    def step_ensure_enrollments_user_mappings_filled(_mem_data, _job_state_data)
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
         course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
       ) do |user_ids|
@@ -101,11 +123,14 @@ module MicrosoftSync
           UserMapping.bulk_insert_for_root_account_id(course.root_account_id, user_id_to_aad)
         end
       end
+
+      StateMachineJob::NextStep.new(:step_generate_diff)
     end
 
     # Get group members/owners from the API and local enrollments and calculate
-    # what needs to be done
-    def generate_diff
+    # what needs to be done. This could also be combined with execute_diff()
+    # but is conceptually different and makes testing easier.
+    def step_generate_diff(_mem_data, _job_state_data)
       members = canvas_graph_service.get_group_users_aad_ids(group.ms_group_id)
       owners = canvas_graph_service.get_group_users_aad_ids(group.ms_group_id, owners: true)
 
@@ -114,11 +139,11 @@ module MicrosoftSync
         diff.set_local_member(enrollment.aad_id, enrollment.type)
       end
 
-      diff
+      StateMachineJob::NextStep.new(:step_execute_diff, diff)
     end
 
-    # Run the API calls to add/remove users
-    def execute_diff(diff)
+    # Run the API calls to add/remove users.
+    def step_execute_diff(diff, _job_state_data)
       batch_size = GraphService::GROUP_USERS_ADD_BATCH_SIZE
       diff.additions_in_slices_of(batch_size) do |members_and_owners|
         graph_service.add_users_to_group(group.ms_group_id, members_and_owners)
@@ -127,7 +152,8 @@ module MicrosoftSync
       # Microsoft will not let you remove the last owner in a group, so it's
       # slightly safer to remove owners last in case we need to completely
       # change owners. TODO: A class could still have all of its teacher
-      # enrollments removed, so this could still be a problem.
+      # enrollments removed, need to remove the group when this happens
+      # (INTEROP-6672)
       diff.members_to_remove.each do |aad|
         graph_service.remove_group_member(group.ms_group_id, aad)
       end
@@ -135,25 +161,31 @@ module MicrosoftSync
       diff.owners_to_remove.each do |aad|
         graph_service.remove_group_owner(group.ms_group_id, aad)
       end
+
+      StateMachineJob::NextStep.new(:step_ensure_team_exists)
     end
 
-    def ensure_team_exists
-      return unless course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any?
-      return if graph_service.team_exists?(group.ms_group_id)
+    def step_ensure_team_exists(_mem_data, _job_state_data)
+      if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? \
+        && !graph_service.team_exists?(group.ms_group_id)
+        graph_service.create_education_class_team(group.ms_group_id)
+      end
 
-      graph_service.create_education_class_team(group.ms_group_id)
-    rescue MicrosoftSync::Errors::GroupHasNoOwners
-      # It's possible (though unlikely) for the course to have owners (as found
-      # by the guard above) but they are not synced to Microsoft yet. Ignore
-      # this case, as we will retry when we sync again.
-      # It may also be possible for the group to have owners on the MS side but
-      # it isn't consistent yet, although I haven't seen that behavior. When
-      # implementing retry or a team_exists on the field, we can change it to
-      # retry once here.
+      StateMachineJob::COMPLETE
+    rescue MicrosoftSync::Errors::GroupHasNoOwners, MicrosoftSync::Errors::HTTPNotFound => e
+      # API is eventually consistent: We often have to wait a couple minutes
+      # after creating the group and adding owners for the Teams API to see the
+      # group and owners.
+      # It's also possible for the course to have added owners (so the
+      # enrollments are in the DB) since we last calculated the diff added them
+      # in the generate_diff step. This is rare, but we can also sleep in that
+      # case.
+      StateMachineJob::Retry.new(error: e, delay_amount: 1.minute)
     end
 
     def tenant
-      @tenant ||= group.root_account.settings[:microsoft_sync_tenant]
+      @tenant ||= group.root_account.settings[:microsoft_sync_tenant] or
+        raise TenantMissingOrSyncDisabled
     end
 
     def canvas_graph_service
