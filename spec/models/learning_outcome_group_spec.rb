@@ -35,6 +35,11 @@ describe LearningOutcomeGroup do
     text
   end
 
+  describe 'associations' do
+    it { is_expected.to belong_to(:source_outcome_group).class_name('LearningOutcomeGroup').inverse_of(:destination_outcome_groups) }
+    it { is_expected.to have_many(:destination_outcome_groups).class_name('LearningOutcomeGroup').inverse_of(:source_outcome_group).dependent(:nullify) }
+  end
+
   context 'object creation' do
     it "does not create multiple default groups" do
       group = @course.root_outcome_group
