@@ -103,9 +103,6 @@ Style/MethodCallWithoutArgsParentheses:
   Enabled: false
 Style/MethodCallWithArgsParentheses:
   Enabled: false
-Layout/DotPosition:
-  Enabled: true
-  EnforcedStyle: trailing
 Layout/AlignHash:
   Enabled: false
 Style/Lambda:

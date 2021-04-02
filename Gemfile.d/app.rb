@@ -24,6 +24,7 @@ if CANVAS_RAILS6_0
 else
   gem 'rails', '6.1.3'
 end
+  gem 'irb', '1.3.5'
 
 gem 'academic_benchmarks', '1.1.0', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
