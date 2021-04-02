@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/AssignmentDetailsDialog",
   "i18nScope": "assignment_details_dialog"
 }

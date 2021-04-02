@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PopulateRootAccountIdOnUserObservers < ActiveRecord::Migration[5.0]
   tag :predeploy
 

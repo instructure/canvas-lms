@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import {combineReducers} from 'redux'
 import {handleAction} from 'redux-actions'
 import days from './days-reducer'
@@ -26,6 +27,7 @@ import todo from './todo-reducer'
 import ui from './ui-reducer'
 import savePlannerItem from './save-item-reducer'
 import sidebar from './sidebar-reducer'
+import weeklyDashboard from './weekly-reducer'
 
 const locale = handleAction(
   'INITIAL_OPTIONS',
@@ -82,7 +84,8 @@ const combinedReducers = combineReducers({
   opportunities,
   todo,
   ui,
-  sidebar
+  sidebar,
+  weeklyDashboard
 })
 
 export default function finalReducer(state, action) {

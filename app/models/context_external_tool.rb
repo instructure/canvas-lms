@@ -168,6 +168,10 @@ class ContextExternalTool < ActiveRecord::Base
 
     # on deactivation, make sure placement data is kept
     if settings[type].key?(:enabled) && !settings[type][:enabled]
+      # resource_selection is a default placement, which can only be overridden
+      # by not_selectable, see scope :placements on line 826
+      self.not_selectable = true if type == :resource_selection
+
       settings[:inactive_placements] ||= {}.with_indifferent_access
       settings[:inactive_placements][type] ||= {}.with_indifferent_access
       settings[:inactive_placements][type].merge!(settings[type])
@@ -177,6 +181,10 @@ class ContextExternalTool < ActiveRecord::Base
 
     # on reactivation, use the old placement data
     if settings[type][:enabled] && settings.dig(:inactive_placements, type)
+      # resource_selection is a default placement, which can only be overridden
+      # by not_selectable, see scope :placements on line 826
+      self.not_selectable = false if type == :resource_selection
+
       settings[type] = settings.dig(:inactive_placements, type).merge(settings[type])
       settings[:inactive_placements].delete(type)
       settings.delete(:inactive_placements) if settings[:inactive_placements].empty?

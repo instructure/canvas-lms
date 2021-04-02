@@ -1700,6 +1700,25 @@ describe "Module Items API", type: :request do
                         {},
                         {:expected_status => 401})
       end
+
+      context 'in a course that is public to auth users' do
+        before :once do
+          course_factory(account: @account, active_all: true)
+          @course.is_public_to_auth_users = true
+          @course.save!
+        end
+
+        it 'should allow viewing module items' do
+          module_with_page = @course.context_modules.create!(name: "new module")
+          page = @course.wiki_pages.create!(title: "some page", workflow_state: 'published')
+          item = module_with_page.add_item(id: page.id, type: 'wiki_page')
+          api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module_with_page.id}/items/#{item.id}",
+                   { controller: "context_module_items_api", action: 'show', format: 'json',
+                     course_id: @course.id, module_id: module_with_page.id, id: item.id },
+                   {}, {},
+                   {expected_status: 200})
+        end
+      end
     end
   end
 

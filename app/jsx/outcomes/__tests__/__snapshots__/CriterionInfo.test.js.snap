@@ -92,7 +92,6 @@ exports[`The CriterionInfo component renders the root component as expected 2`] 
       <Heading
         border="none"
         color="inherit"
-        ellipsis={false}
         level="h2"
       >
         Criterion Ratings

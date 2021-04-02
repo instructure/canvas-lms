@@ -24,9 +24,10 @@ import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 
-import {View} from '@instructure/ui-layout'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Heading, Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 
 import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'

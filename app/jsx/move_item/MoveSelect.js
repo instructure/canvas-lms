@@ -24,8 +24,8 @@ import SelectPosition, {RenderSelect} from '../shared/helpers/SelectPosition'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 export default class MoveSelect extends React.Component {
   static propTypes = {

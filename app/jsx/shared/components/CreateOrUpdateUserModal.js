@@ -18,9 +18,10 @@
 
 import React from 'react'
 import {bool, func, shape, string, element, oneOf} from 'prop-types'
-import {Avatar} from '@instructure/ui-elements'
+import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox, TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 
 import update from 'immutability-helper'

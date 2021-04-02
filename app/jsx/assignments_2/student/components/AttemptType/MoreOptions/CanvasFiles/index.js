@@ -28,11 +28,11 @@ import parseLinkHeader from '../../../../../../shared/parseLinkHeader'
 import React from 'react'
 
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 class CanvasFiles extends React.Component {
   state = {
-    loadedFolders: {'0': {id: '0', name: I18n.t('Root'), subFileIDs: [], subFolderIDs: []}},
+    loadedFolders: {0: {id: '0', name: I18n.t('Root'), subFileIDs: [], subFolderIDs: []}},
     loadedFiles: {},
     error: null,
     pendingAPIRequests: 0,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -122,6 +124,8 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when launched in a course"
       when 'TERM_START_DATE_GUARD'
         "when launched in a course that has a term with a start date"
+      when 'STUDENT_ASSIGNMENT_GUARD'
+        "when launched as an assignment by a student"
       end
     end.compact
     "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size

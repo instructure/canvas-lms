@@ -18,18 +18,18 @@
 
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Flex} from '@instructure/ui-flex'
+import {InlineList} from '@instructure/ui-list'
 import {Reply} from './Reply'
 import {Like} from './Like'
 import {Expansion} from './Expansion'
 
 export function ThreadingToolbar({...props}) {
   return (
-    <Flex>
+    <InlineList delimiter="pipe">
       {React.Children.map(props.children, c => (
-        <Flex.Item margin="0 xx-small">{c}</Flex.Item>
+        <InlineList.Item>{c}</InlineList.Item>
       ))}
-    </Flex>
+    </InlineList>
   )
 }
 

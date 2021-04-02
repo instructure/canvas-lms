@@ -510,6 +510,7 @@ describe "student planner" do
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
       wait_for_spinner
 

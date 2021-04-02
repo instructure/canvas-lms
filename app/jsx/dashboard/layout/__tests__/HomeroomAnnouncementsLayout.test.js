@@ -85,7 +85,7 @@ describe('HomeroomAnnouncementsLayout', () => {
       />
     )
     expect(
-      await findByText('Every new announcement shows up in this area. Create your first one now.')
+      await findByText('New announcements show up in this area. Create a new announcement now.')
     ).toBeInTheDocument()
     expect(await findByText('Announcement')).toBeInTheDocument()
   })
@@ -107,7 +107,7 @@ describe('HomeroomAnnouncementsLayout', () => {
     )
     expect(queryByText('New Homeroom')).not.toBeInTheDocument()
     expect(
-      queryByText('Every new announcement shows up in this area. Create your first one now.')
+      queryByText('New announcements show up in this area. Create a new announcement now.')
     ).not.toBeInTheDocument()
     expect(queryByText('Announcement')).not.toBeInTheDocument()
   })

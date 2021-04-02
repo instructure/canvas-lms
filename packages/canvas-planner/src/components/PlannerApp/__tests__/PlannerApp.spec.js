@@ -220,7 +220,8 @@ describe('mapStateToProps', () => {
         isLoading: true,
         hasSomeItems: false,
         partialPastDays: [],
-        partialFutureDays: []
+        partialFutureDays: [],
+        partialWeekDays: []
       },
       days: []
     }
@@ -234,7 +235,8 @@ describe('mapStateToProps', () => {
         isLoading: false,
         hasSomeItems: null,
         partialPastDays: [],
-        partialFutureDays: []
+        partialFutureDays: [],
+        partialWeekDays: []
       },
       days: []
     }
@@ -248,7 +250,8 @@ describe('mapStateToProps', () => {
         isLoading: false,
         hasSomeItems: false,
         partialPastDays: [],
-        partialFutureDays: []
+        partialFutureDays: [],
+        partialWeekDays: []
       },
       days: []
     }

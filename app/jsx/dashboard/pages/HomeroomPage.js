@@ -17,18 +17,15 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!k5_dashboard'
-import moment from 'moment-timezone'
 
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
-import K5DashboardContext from '../K5DashboardContext'
 import K5DashboardCard from '../cards/K5DashboardCard'
 import {createDashboardCards} from 'jsx/bundles/dashboard_card'
-import {countByCourseId, fetchLatestAnnouncement, fetchMissingAssignments} from '../utils'
+import {fetchLatestAnnouncement} from '../utils'
 import HomeroomAnnouncementsLayout from 'jsx/dashboard/layout/HomeroomAnnouncementsLayout'
 
 export const fetchHomeroomAnnouncements = cards =>
@@ -70,7 +67,7 @@ export const fetchHomeroomAnnouncements = cards =>
   ).then(announcements => announcements.filter(a => a))
 
 export const HomeroomPage = props => {
-  const {assignmentsDueToday, cards, isStudent, requestTabChange, responsiveSize, visible} = props
+  const {cards, requestTabChange, visible} = props
   const [dashboardCards] = useState(() =>
     createDashboardCards(
       cards.filter(c => !c.isHomeroom),
@@ -82,11 +79,9 @@ export const HomeroomPage = props => {
     )
   )
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
-  const [assignmentsMissing, setAssignmentsMissing] = useState([])
 
   useEffect(() => {
     fetchHomeroomAnnouncements(cards).then(setHomeroomAnnouncements)
-    fetchMissingAssignments().then(countByCourseId).then(setAssignmentsMissing)
     // Cards are only ever loaded once on the page, so this only runs on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -107,11 +102,7 @@ export const HomeroomPage = props => {
           <Heading level="h2" margin="medium 0 0 0">
             {I18n.t('My Subjects')}
           </Heading>
-          <K5DashboardContext.Provider
-            value={{assignmentsDueToday, assignmentsMissing, isStudent, responsiveSize}}
-          >
-            {dashboardCards}
-          </K5DashboardContext.Provider>
+          {dashboardCards}
         </View>
       )}
     </section>
@@ -119,24 +110,9 @@ export const HomeroomPage = props => {
 }
 
 HomeroomPage.propTypes = {
-  assignmentsDueToday: PropTypes.object.isRequired,
   cards: PropTypes.array.isRequired,
-  isStudent: PropTypes.bool.isRequired,
   requestTabChange: PropTypes.func.isRequired,
-  responsiveSize: PropTypes.string.isRequired,
   visible: PropTypes.bool.isRequired
 }
 
-export const mapStateToProps = ({days, timeZone}) => {
-  const todaysDate = moment.tz(timeZone).format('YYYY-MM-DD')
-  const today = days?.length > 0 && days.find(([date]) => date === todaysDate)
-  if (today?.length === 2 && today[1]?.length > 0) {
-    const assignmentsDueToday = countByCourseId(
-      today[1].filter(({status, type}) => type === 'Assignment' && !status.submitted)
-    )
-    return {assignmentsDueToday}
-  }
-  return {assignmentsDueToday: {}}
-}
-
-export default connect(mapStateToProps)(HomeroomPage)
+export default HomeroomPage

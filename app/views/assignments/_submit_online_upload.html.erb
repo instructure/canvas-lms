@@ -34,10 +34,7 @@
             <%= t 'links.add_another_file', "Add Another File" %>
           </button>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none; margin-bottom: 1em;">
-            <% if @domain_root_account.feature_enabled?(:enable_webcam_submission) && (
-              @assignment.allowed_extensions.blank? || @assignment.allowed_extensions.include?("png")
-            )
-            %>
+            <% if @assignment.allowed_extensions.blank? || @assignment.allowed_extensions.include?("png") %>
               <div class="attachment_wrapper" style="display: inline-block;"></div>
             <% else %>
               <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>

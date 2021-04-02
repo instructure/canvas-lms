@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func, string} from 'prop-types'
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!SpeedGraderSettingsMenu'
 
 // We're foregoing the use of InstUI buttons or instructure-icons icons here to be consistent
@@ -112,6 +112,6 @@ SpeedGraderSettingsMenu.defaultProps = {
   onMenuShow() {}
 }
 
-SpeedGraderSettingsMenu.setURL = function(url) {
+SpeedGraderSettingsMenu.setURL = function (url) {
   window.location.href = url
 }

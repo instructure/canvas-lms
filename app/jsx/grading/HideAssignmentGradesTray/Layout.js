@@ -19,12 +19,14 @@
 import React from 'react'
 import {any, arrayOf, bool, shape, string} from 'prop-types'
 
-import {AccessibleContent} from '@instructure/ui-a11y'
-import {Badge, Text, Heading} from '@instructure/ui-elements'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {Badge} from '@instructure/ui-badge'
 import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 import I18n from 'i18n!hide_assignment_grades_tray'
 

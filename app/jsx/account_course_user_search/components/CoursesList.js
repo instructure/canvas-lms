@@ -22,7 +22,7 @@ import I18n from 'i18n!account_course_user_search'
 import CoursesListRow from './CoursesListRow'
 import CoursesListHeader from './CoursesListHeader'
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function CoursesList(props) {
   // The 'sis_course_id' field is only included in the api response if the user has

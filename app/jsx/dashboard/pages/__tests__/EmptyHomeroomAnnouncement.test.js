@@ -37,7 +37,7 @@ describe('EmptyHomeroomAnnouncement', () => {
   it('shows some helpful text', async () => {
     const {findByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
     expect(
-      await findByText('Every new announcement shows up in this area. Create your first one now.')
+      await findByText('New announcements show up in this area. Create a new announcement now.')
     ).toBeInTheDocument()
   })
 

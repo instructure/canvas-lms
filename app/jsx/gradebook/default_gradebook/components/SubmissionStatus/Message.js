@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {oneOf, string} from 'prop-types'
-import {Grid} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Grid} from '@instructure/ui-grid'
+import {Text} from '@instructure/ui-text'
 import {IconInfoLine, IconWarningLine} from '@instructure/ui-icons'
 
 const VARIANT_MAP = {

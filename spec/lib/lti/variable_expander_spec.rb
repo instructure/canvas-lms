@@ -1442,6 +1442,39 @@ module Lti
           end
         end
 
+        it 'has substitution for $Canvas.assignment.allowedAttempts' do
+          assignment.allowed_attempts = 5
+          exp_hash = {allowed_attempts: '$Canvas.assignment.allowedAttempts'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:allowed_attempts]).to eq 5
+        end
+
+        context '#$Canvas.assignment.submission.studentAttempts' do
+          before do
+            user.save
+            course.save
+            assignment.context = course
+            assignment.save
+            submission = submission_model(user: user, assignment: assignment)
+            submission.attempt = 2
+            submission.save
+          end
+
+          it 'does not have a substitution when the user is not a student' do
+            allow(course).to receive(:user_is_student?).and_return(false)
+            exp_hash = {attempts: '$Canvas.assignment.submission.studentAttempts'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:attempts]).to eq '$Canvas.assignment.submission.studentAttempts'
+          end
+
+          it 'has substitution when the user is a student' do
+            allow(course).to receive(:user_is_student?).and_return(true)
+            exp_hash = {attempts: '$Canvas.assignment.submission.studentAttempts'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:attempts]).to eq 2
+          end
+        end
+
         context 'iso8601' do
           it 'has substitution for $Canvas.assignment.unlockAt.iso8601' do
             allow(assignment).to receive(:unlock_at).and_return(right_now)

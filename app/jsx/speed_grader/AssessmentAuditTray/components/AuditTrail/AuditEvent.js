@@ -17,11 +17,14 @@
  */
 
 import React, {PureComponent} from 'react'
-import {Badge, TruncateText, Text} from '@instructure/ui-elements'
-import {Flex, View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Badge} from '@instructure/ui-badge'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {Focusable, FocusableView} from '@instructure/ui-focusable'
 
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import I18n from 'i18n!speed_grader'
 

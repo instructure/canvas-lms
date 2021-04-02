@@ -17,10 +17,10 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {TabList} from '@instructure/ui-tabs'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'

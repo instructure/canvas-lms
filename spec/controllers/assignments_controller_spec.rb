@@ -587,14 +587,21 @@ describe AssignmentsController do
       expect(assigns[:js_env][:media_comment_asset_string]).to eq @student.asset_string
     end
 
-    it "does not show direct share options when disabled" do
-      user_session(@teacher)
-      get 'show', params: {course_id: @course.id, id: @assignment.id}
-      expect(assigns[:can_direct_share]).to eq false
+    it "renders student-specific js_env" do
+      user_session(@student)
+      a = @course.assignments.create(title: "some assignment")
+      get 'show', params: {course_id: @course.id, id: a.id}
+      expect(assigns[:js_env][:SUBMISSION_ID]).to eq a.submissions.find_by(user: @student).id
     end
 
-    it "shows direct share options when enabled" do
-      Account.default.enable_feature!(:direct_share)
+    it "renders teacher-specific js_env" do
+      user_session(@teacher)
+      a = @course.assignments.create(title: "some assignment")
+      get 'show', params: {course_id: @course.id, id: a.id}
+      expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
+    end
+
+    it "shows direct share options" do
       user_session(@teacher)
       get 'show', params: {course_id: @course.id, id: @assignment.id}
       expect(assigns[:can_direct_share]).to eq true
@@ -1964,6 +1971,22 @@ describe AssignmentsController do
         Account.site_admin.disable_feature!(:annotated_document_submissions)
         get 'edit', params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(false)
+      end
+    end
+
+    describe 'js_env NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED' do
+      it "should set NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:new_quizzes_assignment_build_button)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to eq(true)
+      end
+
+      it "should set NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:new_quizzes_assignment_build_button)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to eq(false)
       end
     end
   end

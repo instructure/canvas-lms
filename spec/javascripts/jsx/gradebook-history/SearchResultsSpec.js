@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {SearchResultsComponent} from 'jsx/gradebook-history/SearchResults'
@@ -78,11 +78,11 @@ test('does not show a Table/Spinner if no historyItems passed', () => {
   notOk(wrapper.find(Table).exists())
 })
 
-test('shows a Table if there are historyItems passed', function() {
+test('shows a Table if there are historyItems passed', function () {
   ok(this.wrapper.find(Table).exists())
 })
 
-test('Table is passed the label and caption props', function() {
+test('Table is passed the label and caption props', function () {
   const table = this.wrapper.find(Table)
   equal(table.props().caption, 'search results caption')
 })
@@ -117,7 +117,7 @@ test('Table displays the formatted historyItems passed it', () => {
   tableBody.unmount()
 })
 
-test('does not show a Spinner if requestingResults false', function() {
+test('does not show a Spinner if requestingResults false', function () {
   notOk(this.wrapper.find(Spinner).exists())
 })
 
@@ -140,7 +140,7 @@ test('shows text indicating that the end of results was reached', () => {
   const historyItems = defaultHistoryItems()
   const props = {...defaultProps(), nextPage: '', requestingResults: false, historyItems}
   const wrapper = mount(<SearchResultsComponent {...props} />)
-  const textBox = wrapper.find(Text)
+  const textBox = wrapper.find(Text).last()
   ok(textBox.exists())
   equal(textBox.text(), 'No more results to load.')
   wrapper.unmount()

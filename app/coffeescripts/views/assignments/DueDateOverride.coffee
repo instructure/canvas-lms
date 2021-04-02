@@ -17,7 +17,6 @@
 
 import $ from 'jquery'
 import Backbone from 'Backbone'
-import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DueDateOverride from 'jst/assignments/DueDateOverride'
@@ -93,29 +92,27 @@ export default class DueDateOverrideView extends Backbone.View
     @clearExistingDueDateErrors(data)
     checkedRows = []
     dateValidator = new DateValidator({
-      date_range: _.extend({}, ENV.VALID_DATE_RANGE)
+      date_range: Object.assign({}, ENV.VALID_DATE_RANGE)
       hasGradingPeriods: @hasGradingPeriods
       gradingPeriods: @gradingPeriods
-      userIsAdmin: _.includes(ENV.current_user_roles, "admin"),
+      userIsAdmin: (ENV.current_user_roles || []).includes("admin"),
       postToSIS: @postToSIS(data)
     })
     for override in data.assignment_overrides
       # Don't validate duplicates
-      continue if _.includes(checkedRows, override.rowKey)
+      continue if (checkedRows || []).includes(override.rowKey)
       rowErrors = dateValidator.validateDatetimes(override)
-      _.keys(rowErrors).forEach((key, val) =>
-        rowErrors[key] = {message: rowErrors[key]}
-      )
-      errors = _.extend(errors, rowErrors)
+      Object.keys(rowErrors).forEach((key) -> rowErrors[key] = {message: rowErrors[key]})
+      errors = Object.assign(errors, rowErrors)
       for own element, msg of rowErrors
         $dateInput = $('[data-date-type="'+element+'"][data-row-key="'+override.rowKey+'"]')
         $dateInput.attr('data-error-type', element)
-        msg = _.extend(msg, { element: $dateInput, showError: @showError })
+        msg = Object.assign(msg, { element: $dateInput, showError: @showError })
       checkedRows.push(override.rowKey)
     errors
 
   validateTokenInput: (data, errors) =>
-    validRowKeys = _.pluck(data.assignment_overrides, "rowKey")
+    validRowKeys = (data.assignment_overrides || []).map((e) -> e.rowKey)
     blankOverrideMsg = I18n.t('You must have a student or section selected')
     for row in $('.Container__DueDateRow-item')
       rowKey = "#{$(row).attr('data-row-key')}"
@@ -123,8 +120,8 @@ export default class DueDateOverrideView extends Backbone.View
       $inputWrapper = $('[data-row-identifier="'+identifier+'"]')[0]
       $nameInput = $($inputWrapper).find("input")
       $nameInput.removeAttr('data-error-type')
-      continue if _.includes(validRowKeys, rowKey)
-      errors = _.extend(errors, { blankOverrides: {message: blankOverrideMsg, element: $nameInput, showError: @showError} })
+      continue if (validRowKeys || []).includes(rowKey)
+      errors = Object.assign(errors, { blankOverrides: {message: blankOverrideMsg, element: $nameInput, showError: @showError} })
       $nameInput.attr('data-error-type', "blankOverrides")
     errors
 
@@ -136,19 +133,17 @@ export default class DueDateOverrideView extends Backbone.View
     return errors unless StudentGroupStore.fetchComplete()
 
     validGroups = StudentGroupStore.groupsFilteredForSelectedSet()
-    validGroupIds = _.pluck(validGroups, "id")
-    groupOverrides = _.filter(data.assignment_overrides, (ao) -> !!ao.group_id)
-    invalidGroupOverrides = _.filter(groupOverrides, (ao) ->
-      ao.group_id not in validGroupIds
-    )
-    invalidGroupOverrideRowKeys = _.pluck(invalidGroupOverrides, "rowKey")
+    validGroupIds = (validGroups || []).map((e) -> e.id)
+    groupOverrides = data.assignment_overrides.filter((ao) -> !!ao.group_id)
+    invalidGroupOverrides = groupOverrides.filter((ao) -> ao.group_id not in validGroupIds)
+    invalidGroupOverrideRowKeys = (invalidGroupOverrides || []).map((e) -> e.rowKey)
     invalidGroupOverrideMessage = I18n.t("You cannot assign to a group outside of the assignment's group set")
     for row in $('.Container__DueDateRow-item')
       rowKey = "#{$(row).attr('data-row-key')}"
-      continue unless _.includes(invalidGroupOverrideRowKeys, rowKey)
+      continue unless (invalidGroupOverrideRowKeys || []).includes(rowKey)
       identifier = 'tokenInputFor' + rowKey
       $nameInput = $('[data-row-identifier="'+identifier+'"]').find("input")
-      errors = _.extend(errors, { invalidGroupOverride: {message: invalidGroupOverrideMessage, element: $nameInput, showError: @showError} })
+      errors = Object.assign(errors, { invalidGroupOverride: {message: invalidGroupOverrideMessage, element: $nameInput, showError: @showError} })
     errors
 
   showError: (element, message) =>

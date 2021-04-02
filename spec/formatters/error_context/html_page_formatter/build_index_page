@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # rather than do this in the formatter via dump_summary, it's a separate
 # thing after the fact because:

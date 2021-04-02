@@ -45,6 +45,7 @@ module Quizzes
         where(user_id: @qs.user.id).
         first_or_initialize
 
+      quiz_result.workflow_state = :active
       quiz_result.user_uuid = @qs.user.uuid
 
       # get data from quiz submission's question result to ensure result should be generated
@@ -96,6 +97,9 @@ module Quizzes
           where(user_id: @qs.user.id).
           first_or_initialize
 
+        next if !result.new_record? && result.attempt.to_i > @qs.attempt.to_i
+
+        result.workflow_state = :active
         result.user_uuid = @qs.user.uuid
 
         result.artifact = @qs

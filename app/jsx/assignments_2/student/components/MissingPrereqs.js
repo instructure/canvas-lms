@@ -20,9 +20,9 @@ import React from 'react'
 import {string} from 'prop-types'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 import locked1SVG from '../SVG/Locked1.svg'
 

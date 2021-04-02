@@ -84,12 +84,27 @@ const getCombinedChecksums = obj =>
     return accumulator
   }, {})
 
-const buildCssReference = name => {
-  const bundle = `jst/${name}`
+// inject the template with the css file specified in the "brandableCSSBundle"
+// property of the accompanying .json metadata file, if any
+const buildCssReference = (path, name) => {
+  let bundle
+
+  try {
+    bundle = require(`${path}.json`).brandableCSSBundle
+  }
+  catch (_) {
+    bundle = null
+  }
+
+  if (!bundle) {
+    // no css file specified in json, just return a blank string
+    return ''
+  }
+
   const cached = allFingerprintsFor(`${bundle}.scss`)
   const firstVariant = Object.keys(cached)[0]
+
   if (!firstVariant) {
-    // no matching css file, just return a blank string
     return ''
   }
 
@@ -152,7 +167,7 @@ function i18nLinerHandlebarsLoader(source) {
 
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  const cssRegistration = buildCssReference(name)
+  const cssRegistration = buildCssReference(this.resourcePath, name)
 
   const partials = findReferencedPartials(source)
   const partialRequirements = buildPartialRequirements(partials)

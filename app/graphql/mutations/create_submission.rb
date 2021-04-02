@@ -19,7 +19,7 @@
 #
 
 class OnlineSubmissionType < Types::BaseEnum
-  VALID_SUBMISSION_TYPES = %w[media_recording online_text_entry online_upload online_url].freeze
+  VALID_SUBMISSION_TYPES = %w[annotated_document media_recording online_text_entry online_upload online_url].freeze
 
   graphql_name 'OnlineSubmissionType'
   description 'Types that can be submitted online'
@@ -30,6 +30,10 @@ end
 class Mutations::CreateSubmission < Mutations::BaseMutation
   graphql_name 'CreateSubmission'
 
+  argument :annotated_document_id,
+           ID,
+           required: false,
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Attachment')
   argument :assignment_id,
            ID,
            required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Assignment')
@@ -53,6 +57,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
 
     submission_type = input[:submission_type]
     submission_params = {
+      annotated_document_id: input[:annotated_document_id],
       attachments: [],
       body: '',
       require_submission_type_is_valid: true,
@@ -61,6 +66,10 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     }
 
     case submission_type
+    when 'annotated_document'
+      if input[:annotated_document_id].blank?
+        return validation_error(I18n.t('Annotated Document submissions require an annotated_document_id to submit'))
+      end
     when 'media_recording'
       unless input[:media_id]
         return(

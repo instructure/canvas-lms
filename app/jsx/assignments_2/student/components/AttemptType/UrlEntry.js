@@ -26,10 +26,12 @@ import {Submission} from '../../graphqlData/Submission'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {IconEyeLine, IconExternalLinkLine, IconLinkLine} from '@instructure/ui-icons'
-import {Link, Text} from '@instructure/ui-elements'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 
 const ERROR_MESSAGE = [

@@ -11,6 +11,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -38,6 +39,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     day="2017-04-24"
     itemsForDay={Array []}
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -46,6 +48,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     day="2017-04-25"
     itemsForDay={Array []}
     key="2017-04-25"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -68,6 +71,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
       ]
     }
     key="2017-04-29"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -94,6 +98,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -127,6 +132,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
       ]
     }
     key="2017-04-19"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -135,6 +141,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     day="2017-04-23"
     itemsForDay={Array []}
     key="2017-04-23"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -143,6 +150,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     day="2017-04-24"
     itemsForDay={Array []}
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -151,6 +159,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     day="2017-04-25"
     itemsForDay={Array []}
     key="2017-04-25"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -173,6 +182,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
       ]
     }
     key="2017-04-29"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -199,6 +209,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -232,6 +243,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
       ]
     }
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -258,6 +270,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -291,6 +304,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
       ]
     }
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -305,6 +319,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
       ]
     }
     key="2017-04-25"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -327,6 +342,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
       ]
     }
     key="2017-04-29"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -353,6 +369,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -386,6 +403,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
       ]
     }
     key="2017-04-18"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -400,6 +418,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
       ]
     }
     key="2017-04-20"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -408,6 +427,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     day="2017-04-23"
     itemsForDay={Array []}
     key="2017-04-23"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -416,6 +436,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     day="2017-04-24"
     itemsForDay={Array []}
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -442,6 +463,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -475,6 +497,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
       ]
     }
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -489,6 +512,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
       ]
     }
     key="2017-04-25"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -497,6 +521,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     day="2017-04-26"
     itemsForDay={Array []}
     key="2017-04-26"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -505,6 +530,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     day="2017-04-27"
     itemsForDay={Array []}
     key="2017-04-27"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -519,6 +545,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
       ]
     }
     key="2017-04-28"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -545,6 +572,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -578,6 +606,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
       ]
     }
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -604,6 +633,7 @@ exports[`PlannerApp renders base component 1`] = `
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -637,6 +667,7 @@ exports[`PlannerApp renders base component 1`] = `
       ]
     }
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -651,6 +682,7 @@ exports[`PlannerApp renders base component 1`] = `
       ]
     }
     key="2017-04-25"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -665,6 +697,7 @@ exports[`PlannerApp renders base component 1`] = `
       ]
     }
     key="2017-04-26"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -691,6 +724,7 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -729,6 +763,7 @@ exports[`PlannerApp renders loading past spinner when loading past and there are
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -768,6 +803,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -791,6 +827,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
     display="block"
     focusColor="info"
     focusPosition="offset"
+    key="spinner"
     overflowX="visible"
     overflowY="visible"
     padding="xx-large medium"
@@ -823,6 +860,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     display="auto"
     focusColor="info"
     focusPosition="offset"
+    margin="x-small 0 0 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
@@ -856,6 +894,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
       ]
     }
     key="2017-04-24"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -870,6 +909,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
       ]
     }
     key="2017-04-25"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />
@@ -884,6 +924,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
       ]
     }
     key="2017-04-26"
+    showMissingAssignments={false}
     simplifiedControls={false}
     timeZone="Asia/Tokyo"
   />

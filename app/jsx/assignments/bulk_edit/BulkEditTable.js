@@ -22,7 +22,7 @@ import {arrayOf, func} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Responsive} from '@instructure/ui-layout'
+import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
@@ -126,9 +126,9 @@ export default function BulkEditTable({
     return (
       <View
         as="div"
-        minWidth={`${DATE_COLUMN_WIDTH_REMS * 3 +
-          ACTION_COLUMN_WIDTH_REMS +
-          NOTE_COLUMN_WIDTH_REMS}rem`}
+        minWidth={`${
+          DATE_COLUMN_WIDTH_REMS * 3 + ACTION_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS
+        }rem`}
       >
         <Text size="medium" fontStyle="italic">
           {hasTooManyDates
@@ -206,9 +206,7 @@ export default function BulkEditTable({
     if (baseOverride) {
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
-          <Table.Cell>
-            {renderAssignmentCheckbox(assignment)}
-          </Table.Cell>
+          <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'unlock_at', baseOverride)}</Table.Cell>
@@ -221,9 +219,7 @@ export default function BulkEditTable({
       // Need all Table.Cells or you get weird borders on this row
       return (
         <Table.Row key={`assignment_${assignment.id}`}>
-          <Table.Cell>
-            {renderAssignmentCheckbox(assignment)}
-          </Table.Cell>
+          <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
           <Table.Cell>
             {renderNoDefaultDates(assignment.hasOwnProperty('all_dates_count'))}
@@ -358,9 +354,9 @@ export default function BulkEditTable({
         match="media"
         query={{
           small: {
-            maxWidth: `${5 * DATE_COLUMN_WIDTH_REMS +
-              ACTION_COLUMN_WIDTH_REMS +
-              NOTE_COLUMN_WIDTH_REMS}rem`
+            maxWidth: `${
+              5 * DATE_COLUMN_WIDTH_REMS + ACTION_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS
+            }rem`
           }
         }}
         render={renderTable}

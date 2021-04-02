@@ -99,6 +99,7 @@
         <xs:element name="organize_epub_by_content_type" type="xs:boolean" minOccurs="0"/>
         <xs:element name="enable_offline_web_export" type="xs:boolean" minOccurs="0"/>
         <xs:element name="homeroom_course" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="course_color" type="xs:string" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">

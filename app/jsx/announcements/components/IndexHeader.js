@@ -24,7 +24,8 @@ import I18n from 'i18n!announcements_v2'
 import React, {Component} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {
   IconLockLine,
   IconPlusLine,
@@ -32,8 +33,8 @@ import {
   IconTrashLine,
   IconUnlockLine
 } from '@instructure/ui-icons'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {TextInput} from '@instructure/ui-forms'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextInput} from '@instructure/ui-text-input'
 
 import actions from '../actions'
 import ExternalFeedsTray from './ExternalFeedsTray'
@@ -236,7 +237,4 @@ const selectedActions = [
   'deleteSelectedAnnouncements'
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(
-  connectState,
-  connectActions
-)(IndexHeader)
+export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

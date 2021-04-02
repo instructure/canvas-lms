@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -192,7 +194,7 @@ class OutcomeGroupsApiController < ApplicationController
 
     unless params["outcome_style"] == "abbrev"
       outcome_ids = links.map(&:content_id)
-      ret = LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+      ret = LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
       # ret is now a list of outcomes that have been assessed
       outcome_params[:assessed_outcomes] = ret
     end

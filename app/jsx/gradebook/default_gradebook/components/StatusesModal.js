@@ -23,7 +23,7 @@ import update from 'immutability-helper'
 import I18n from 'i18n!gradebook'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '../../../shared/components/InstuiModal'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {statuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 

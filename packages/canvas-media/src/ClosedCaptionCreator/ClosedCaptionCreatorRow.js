@@ -22,8 +22,8 @@ import formatMessage from 'format-message'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import CanvasSelect from '../shared/CanvasSelect'
@@ -49,6 +49,7 @@ export default class ClosedCaptionCreatorRow extends Component {
   }
 
   _langSelectRef = React.createRef()
+
   _deleteCCBtnRef = React.createRef()
 
   handleLanguageChange = (event, selectedLang) => {

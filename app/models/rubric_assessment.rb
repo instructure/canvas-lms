@@ -83,6 +83,7 @@ class RubricAssessment < ActiveRecord::Base
       where(user_id: user.id).
       first_or_initialize
 
+    result.workflow_state = :active
     result.user_uuid = user.uuid
 
     # force the context and artifact

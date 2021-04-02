@@ -36,6 +36,7 @@ export const {
   initialOptions,
   addOpportunities,
   startLoadingOpportunities,
+  startLoadingAllOpportunities,
   startDismissingOpportunity,
   allOpportunitiesLoaded,
   savingPlannerItem,
@@ -53,6 +54,7 @@ export const {
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
   'START_LOADING_OPPORTUNITIES',
+  'START_LOADING_ALL_OPPORTUNITIES',
   'START_DISMISSING_OPPORTUNITY',
   'ALL_OPPORTUNITIES_LOADED',
   'SAVING_PLANNER_ITEM',
@@ -133,7 +135,7 @@ export const getInitialOpportunities = () => {
 }
 
 export const dismissOpportunity = (id, plannerOverride) => {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch(startDismissingOpportunity(id))
     const apiOverride = {...plannerOverride}
     apiOverride.dismissed = true
@@ -146,7 +148,7 @@ export const dismissOpportunity = (id, plannerOverride) => {
       .then(response => {
         dispatch(dismissedOpportunity(response.data))
       })
-      .catch(error => {
+      .catch(() => {
         alert(formatMessage('An error occurred attempting to dismiss the opportunity.'), true)
       })
     return promise
@@ -158,11 +160,11 @@ export const savePlannerItem = plannerItem => {
     const isNewItem = !plannerItem.id
     const overrideData = getOverrideDataOnItem(plannerItem)
     dispatch(savingPlannerItem({item: plannerItem, isNewItem}))
-    const apiItem = transformInternalToApiItem(plannerItem)
+    let apiItem = transformInternalToApiItem(plannerItem)
     let promise = isNewItem ? saveNewPlannerItem(apiItem) : saveExistingPlannerItem(apiItem)
     promise = promise
       .then(response => {
-        const apiItem = transformPlannerNoteApiToInternalItem(
+        apiItem = transformPlannerNoteApiToInternalItem(
           response.data,
           getState().courses,
           getState().timeZone
@@ -204,7 +206,7 @@ export const deletePlannerItem = plannerItem => {
 export const canceledEditingPlannerItem = createAction('CANCELED_EDITING_PLANNER_ITEM')
 
 export const cancelEditingPlannerItem = () => {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch(clearUpdateTodo())
     dispatch(canceledEditingPlannerItem())
   }
@@ -241,7 +243,7 @@ export const togglePlannerItemCompletion = plannerItem => {
         isNewItem: false,
         wasToggled: true
       }))
-      .catch(response => {
+      .catch(() => {
         alert(formatMessage('Unable to mark as complete.'), true)
         return {
           item: plannerItem,

@@ -20,9 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import get from 'lodash/get'
 
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import RequiredValues from './RequiredValues'
 import Services from './Services'

@@ -19,10 +19,11 @@
 import React, {Component} from 'react'
 import {func, instanceOf} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
-import {Heading} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 
 import I18n from 'i18n!speed_grader'
 

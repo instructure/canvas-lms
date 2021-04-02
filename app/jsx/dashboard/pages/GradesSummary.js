@@ -165,7 +165,9 @@ export const GradeSummaryLine = ({
                   margin="small 0"
                 />
                 <PresentationContent>
-                  <Text weight="bold" data-automation="course_grade">{gradeText}</Text>
+                  <Text weight="bold" data-automation="course_grade">
+                    {gradeText}
+                  </Text>
                 </PresentationContent>
               </>
             )}
@@ -175,7 +177,7 @@ export const GradeSummaryLine = ({
                 href={`/courses/${courseId}/gradebook`}
                 target="_blank"
               >
-                View Gradebook
+                {I18n.t('View Gradebook')}
               </Button>
             )}
           </View>

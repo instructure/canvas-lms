@@ -21,10 +21,11 @@ import {bool, func, string, shape} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {Mask, Modal} from '@instructure/ui-overlays'
-import {View} from '@instructure/ui-layout'
+import {Mask} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
+import {View} from '@instructure/ui-view'
 
 export default class ConfirmDialog extends React.Component {
   static propTypes = {

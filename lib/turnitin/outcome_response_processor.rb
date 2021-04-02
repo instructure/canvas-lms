@@ -35,6 +35,11 @@ module Turnitin
     end
 
     def process
+      submission = @assignment.submissions.find_by(user: @user, submitted_at: (turnitin_client.uploaded_at || Time.zone.now))
+      submission.nil? ? new_submission : submission.retrieve_lti_tii_score
+    end
+
+    def new_submission
       # Create an attachment for the file submitted via the TII tool.
       # If the score is still pending, this will raise
       # `Errors::ScoreStillPendingError`
@@ -58,10 +63,6 @@ module Turnitin
       # will terminate and retry up to
       # the max_attempts limit
       #
-      # TODO: This job does not use any kind of
-      # exponential backoff. We should add
-      # one to give TII more time to process
-      # attachments.
       stash_turnitin_client do
         delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
       end
@@ -76,7 +77,7 @@ module Turnitin
             priority: Delayed::LOW_PRIORITY,
             attempts: attempt_number,
             run_at: Time.now.utc + (attempt_number ** 4) + 5).
-            process
+            new_submission
         end
       end
     rescue StandardError
@@ -137,10 +138,10 @@ module Turnitin
     # serialize the object for job processing (a turnitin client
     # will be created in the job when necessary).
     def stash_turnitin_client
-      old_turnit_client = @_turnitin_client
+      old_turnitin_client = @_turnitin_client
       @_turnitin_client = nil
       result = yield
-      @_turnitin_client = old_turnit_client
+      @_turnitin_client = old_turnitin_client
       result
     end
 

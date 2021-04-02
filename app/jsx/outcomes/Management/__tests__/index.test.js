@@ -18,12 +18,15 @@
 import $ from 'jquery'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
+import {within} from '@testing-library/dom'
 import 'compiled/jquery.rails_flash_notifications'
 import React from 'react'
 import {createCache} from 'jsx/canvas-apollo'
 import OutcomeManagementPanel from '../index'
 import OutcomesContext from 'jsx/outcomes/contexts/OutcomesContext'
 import {accountMocks, courseMocks, groupDetailMocks, groupMocks} from './mocks'
+import * as api from '../api'
+import * as FlashAlert from '../../../shared/FlashAlert'
 
 jest.useFakeTimers()
 
@@ -33,6 +36,16 @@ describe('OutcomeManagementPanel', () => {
   beforeEach(() => {
     cache = createCache()
   })
+
+  const groupDetailDefaultProps = {
+    contextType: 'Course',
+    contextId: '2',
+    mocks: [
+      ...courseMocks({childGroupsCount: 2}),
+      ...groupMocks({groupId: 200}),
+      ...groupDetailMocks({groupId: 200})
+    ]
+  }
 
   const render = (
     children,
@@ -47,15 +60,25 @@ describe('OutcomeManagementPanel', () => {
     )
   }
 
-  it('renders the empty billboard for accounts without child outcomes', async () => {
-    const {getByText} = render(<OutcomeManagementPanel contextType="Account" contextId="1" />)
+  const renderWithGroupDetail = children =>
+    render(children, {
+      contextType: 'Course',
+      contextId: '2',
+      mocks: [
+        ...courseMocks({childGroupsCount: 2}),
+        ...groupMocks({groupId: 200}),
+        ...groupDetailMocks({groupId: 200})
+      ]
+    })
 
+  it('renders the empty billboard for accounts without child outcomes', async () => {
+    const {getByText} = render(<OutcomeManagementPanel />)
     await act(async () => jest.runAllTimers())
     expect(getByText(/Outcomes have not been added to this account yet/)).not.toBeNull()
   })
 
   it('renders the empty billboard for courses without child outcomes', async () => {
-    const {getByText} = render(<OutcomeManagementPanel contextType="Course" contextId="2" />, {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
       contextId: '2',
       mocks: courseMocks({childGroupsCount: 0})
@@ -65,12 +88,9 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('loads outcome group data for Account', async () => {
-    const {getByText, getAllByText} = render(
-      <OutcomeManagementPanel contextType="Account" contextId="1" />,
-      {
-        mocks: accountMocks({childGroupsCount: 2})
-      }
-    )
+    const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+      mocks: accountMocks({childGroupsCount: 2})
+    })
     await act(async () => jest.runAllTimers())
     expect(getByText(/Outcome Groups/)).toBeInTheDocument()
     expect(getByText('Account folder 0')).toBeInTheDocument()
@@ -92,8 +112,12 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('loads nested groups', async () => {
-    const {getByText} = render(<OutcomeManagementPanel contextType="Account" contextId="1" />, {
-      mocks: [...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]
+    const {getByText} = render(<OutcomeManagementPanel />, {
+      mocks: [
+        ...accountMocks({childGroupsCount: 2}),
+        ...groupMocks({groupId: 100}),
+        ...groupDetailMocks({groupId: 100})
+      ]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
@@ -103,8 +127,9 @@ describe('OutcomeManagementPanel', () => {
 
   it('displays an error on failed request for course outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<OutcomeManagementPanel contextType="Course" contextId="2" />, {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
+      contextId: '2',
       mocks: []
     })
     await act(async () => jest.runAllTimers())
@@ -114,7 +139,7 @@ describe('OutcomeManagementPanel', () => {
 
   it('displays an error on failed request for account outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<OutcomeManagementPanel contextType="Account" contextId="1" />, {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
@@ -123,14 +148,8 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('loads group detail data correctly', async () => {
-    const {getByText} = render(<OutcomeManagementPanel contextType="Course" contextId="2" />, {
-      contextType: 'Course',
-      contextId: '2',
-      mocks: [
-        ...courseMocks({childGroupsCount: 2}),
-        ...groupMocks({groupId: 200}),
-        ...groupDetailMocks({groupId: 200})
-      ]
+    const {getByText} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
@@ -141,40 +160,99 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('shows remove group modal if remove option from group menu is selected', async () => {
-    const {getByText, getAllByText} = render(
-      <OutcomeManagementPanel contextType="Course" contextId="2" />,
-      {
-        contextType: 'Course',
-        contextId: '2',
-        mocks: [
-          ...courseMocks({childGroupsCount: 2}),
-          ...groupMocks({groupId: 200}),
-          ...groupDetailMocks({groupId: 200})
-        ]
-      }
-    )
+    const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Outcome Group Menu'))
-    fireEvent.click(getAllByText('Remove')[getAllByText('Remove').length - 1])
+    fireEvent.click(within(getByRole('menu')).getByText('Remove'))
     await act(async () => jest.runAllTimers())
     expect(getByText('Remove Group?')).toBeInTheDocument()
   })
 
+  describe('Moving a group', () => {
+    it('shows move group modal if move option from group menu is selected', async () => {
+      const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(getAllByText('Move')[getAllByText('Move').length - 1])
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
+    })
+
+    it('shows successful flash message when moving a group succeeds', async () => {
+      // Flash alert & API mocks
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      jest.spyOn(api, 'moveOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
+
+      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runAllTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runAllTimers())
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      await act(async () => jest.runAllTimers())
+      // Move Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runAllTimers())
+      // moveOutcomeGroup API call & success flash alert
+      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', 200, 201)
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: '"Group 200" has been moved to "Course folder 1".',
+        type: 'success'
+      })
+    })
+
+    it('shows error flash message when moving a group fails', async () => {
+      // Flash alert & API mocks
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      jest
+        .spyOn(api, 'moveOutcomeGroup')
+        .mockImplementation(() => Promise.reject(new Error('Network error')))
+
+      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runAllTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runAllTimers())
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      await act(async () => jest.runAllTimers())
+      // Move Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runAllTimers())
+      // moveOutcomeGroup API call & error flash alert
+      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', 200, 201)
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'An error occurred moving group "Group 200": Network error',
+        type: 'error'
+      })
+    })
+  })
+
   it('selects/unselects outcome via checkbox', async () => {
-    const {getByText, getAllByText} = render(
-      <OutcomeManagementPanel contextType="Course" contextId="2" />,
-      {
-        contextType: 'Course',
-        contextId: '2',
-        mocks: [
-          ...courseMocks({childGroupsCount: 2}),
-          ...groupMocks({groupId: 200}),
-          ...groupDetailMocks({groupId: 200})
-        ]
-      }
-    )
+    const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
@@ -185,24 +263,56 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('shows remove outcome modal if remove option from individual outcome menu is selected', async () => {
-    const {getByText, getAllByText} = render(
-      <OutcomeManagementPanel contextType="Course" contextId="2" />,
-      {
-        contextType: 'Course',
-        contextId: '2',
-        mocks: [
-          ...courseMocks({childGroupsCount: 2}),
-          ...groupMocks({groupId: 200}),
-          ...groupDetailMocks({groupId: 200})
-        ]
-      }
+    const {getByText, getAllByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Remove'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Remove Outcome?')).toBeInTheDocument()
+  })
+
+  it('shows edit outcome modal if edit option from individual outcome menu is selected', async () => {
+    const {getByText, getAllByText, getByRole} = renderWithGroupDetail(
+      <OutcomeManagementPanel contextType="Course" contextId="2" />
     )
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getAllByText('Outcome Menu')[getAllByText('Outcome Menu').length - 1])
-    fireEvent.click(getAllByText('Remove')[getAllByText('Remove').length - 1])
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('Remove Outcome?')).toBeInTheDocument()
+    expect(getByText('Edit Outcome')).toBeInTheDocument()
+  })
+
+  it('clears selected outcome when edit outcome modal is closed', async () => {
+    const {getByText, getAllByText, queryByText, getByRole} = renderWithGroupDetail(
+      <OutcomeManagementPanel contextType="Course" contextId="2" />
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Cancel'))
+    expect(queryByText('Edit Outcome')).not.toBeInTheDocument()
+  })
+
+  it('clears selected outcome when remove outcome modal is closed', async () => {
+    const {getByText, getAllByText, queryByText, getByRole} = renderWithGroupDetail(
+      <OutcomeManagementPanel contextType="Course" contextId="2" />
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Remove'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Cancel'))
+    expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
   })
 })

@@ -80,15 +80,15 @@ module BasicLTI
       end
 
       def sourcedid
-        @lti_request.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
+        @lti_request&.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
       end
 
       def message_ref_identifier
-        @lti_request.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
+        @lti_request&.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
       end
 
       def operation_ref_identifier
-        tag = @lti_request.at_css('imsx_POXBody *:first').try(:name)
+        tag = @lti_request&.at_css('imsx_POXBody *:first').try(:name)
         tag && tag.sub(%r{Request$}, '')
       end
 
@@ -308,7 +308,7 @@ to because the assignment has no points possible.
         end
 
         if new_score || raw_score
-          submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
+          submission_hash[:grade] = (new_score > 0 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
           submission_hash[:grader_id] = -tool.id
           @submission = assignment.grade_student(user, submission_hash).first
           if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?

@@ -18,7 +18,7 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import {bool} from 'prop-types'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!assignments_2_logged_out_tabs'
 import LoginActionPrompt from './LoginActionPrompt'
 import React, {useState} from 'react'

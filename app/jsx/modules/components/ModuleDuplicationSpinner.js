@@ -19,8 +19,8 @@
 import I18n from 'i18n!modules'
 
 import React from 'react'
-import {Grid} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Grid} from '@instructure/ui-grid'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
 export default function ModuleDuplicationSpinner(_props) {

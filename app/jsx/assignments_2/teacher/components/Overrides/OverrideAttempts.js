@@ -19,14 +19,22 @@ import React from 'react'
 import {bool, oneOf, number} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {requiredIfDetail} from '../../assignmentData'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {NumberInput} from '@instructure/ui-number-input'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Select} from '@instructure/ui-forms'
-import {Text} from '@instructure/ui-elements'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Select} from '@instructure/ui-select'
+import {Text} from '@instructure/ui-text'
 
 import NumberHelper from '../../../../shared/helpers/numberHelper'
 
+/*
+ *  CAUTION: The InstUI Select component is greatly changed in v7.
+ *  Updating the import to the new ui-select location is almost certainly
+ *  going to break the functionality of the component. Any failing tests
+ *  will just be skipped, and the component can be fixed later when work
+ *  resumes on A2.
+ */
 export default class OverrideAttempts extends React.Component {
   static propTypes = {
     allowedAttempts: number,
@@ -45,8 +53,8 @@ export default class OverrideAttempts extends React.Component {
   }
 
   /* eslint-disable no-restricted-globals */
-  onChangeAttemptLimit = (_event, number) => {
-    const value = NumberHelper.parse(number)
+  onChangeAttemptLimit = (_event, numValue) => {
+    const value = NumberHelper.parse(numValue)
     if (isNaN(value)) {
       return
     }

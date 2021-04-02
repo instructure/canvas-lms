@@ -195,6 +195,11 @@
                     </td>
                   </tr>
                   <tr>
+                    <td colspan="2"><%= settings.check_box :prevent_course_availability_editing_by_teachers, :checked => @account.settings[:prevent_course_availability_editing_by_teachers] %>
+                    <%= settings.label :prevent_course_availability_editing_by_teachers, :en => "Don't let teachers modify course availability dates" %>
+                    </td>
+                  </tr>
+                  <tr>
                     <td colspan="2"><%= settings.check_box :allow_sending_scores_in_emails, :checked => @account.settings[:allow_sending_scores_in_emails] != false %>
                     <%= settings.label :allow_sending_scores_in_emails, :en => "Students can opt-in to receiving scores in email notifications" %>
                     </td>

@@ -77,9 +77,14 @@ export default function HomeroomAnnouncement({
         />
         {attachment && (
           <Text size="small">
-            <Link href={attachment.url} isWithinText={false} title={attachment.filename}>
+            <a
+              href={attachment.url}
+              title={attachment.filename}
+              /* classes request download button and preview overlay in instructure.js's postprocessing */
+              className="instructure_file_link preview_in_overlay"
+            >
               {attachment.display_name}
-            </Link>
+            </a>
           </Text>
         )}
       </View>

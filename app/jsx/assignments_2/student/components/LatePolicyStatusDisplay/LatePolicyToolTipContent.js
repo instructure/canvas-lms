@@ -18,8 +18,8 @@
 import I18n from 'i18n!a2LatePolicyToolTipContent'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Text} from '@instructure/ui-elements'
-import {Flex} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 import AccessibleTipContent from './AccessibleTipContent'
 
@@ -98,4 +98,3 @@ LatePolicyToolTipContent.propTypes = {
   pointsDeducted: PropTypes.number.isRequired,
   pointsPossible: PropTypes.number.isRequired
 }
-

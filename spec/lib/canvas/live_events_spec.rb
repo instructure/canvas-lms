@@ -1203,7 +1203,7 @@ describe Canvas::LiveEvents do
   describe '.content_migration_completed' do
     let(:course) { course_factory() }
     let(:source_course) { course_factory() }
-    let(:migration) { ContentMigration.create(context: course, source_course: source_course) }
+    let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: 'some_type') }
 
     before do
       migration.migration_settings[:import_quizzes_next] = true
@@ -1222,7 +1222,8 @@ describe Canvas::LiveEvents do
           import_quizzes_next: true,
           domain: course.root_account.domain,
           source_course_lti_id: migration.source_course.lti_context_id,
-          destination_course_lti_id: course.lti_context_id
+          destination_course_lti_id: course.lti_context_id,
+          migration_type: migration.migration_type
         ),
         hash_including(
           context_type: course.class.to_s,
@@ -1612,7 +1613,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
@@ -1635,7 +1637,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)

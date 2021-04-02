@@ -19,8 +19,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-elements'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Link} from '@instructure/ui-link'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class Header extends React.Component {
   focus = () => {

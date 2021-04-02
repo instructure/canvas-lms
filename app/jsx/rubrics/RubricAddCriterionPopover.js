@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!RubricAddCriterionPopover'
 import $ from 'jquery'
 
@@ -33,7 +33,7 @@ class RubricAddCriterionPopover extends React.Component {
     const {rubric, duplicateFunction} = this.props
     const rubric_data = rubric
       .find('.criterion:not(.blank)')
-      .map(function(i) {
+      .map(function (i) {
         const $criterion = $(this)
         const vals = $criterion.getTemplateData({textValues: ['description']})
         return {index: i, description: vals.description}

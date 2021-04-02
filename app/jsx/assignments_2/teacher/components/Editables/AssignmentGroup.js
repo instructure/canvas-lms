@@ -22,7 +22,7 @@ import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
 import {Query} from 'react-apollo'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import SelectableText from './SelectableText'
 import {
   AssignmentGroupShape,
@@ -130,7 +130,7 @@ class AssignmentGroupUI extends React.Component {
     )
   }
 }
-const AssignmentGroup = function(props) {
+const AssignmentGroup = function (props) {
   const q =
     props.mode === 'edit' ? COURSE_ASSIGNMENT_GROUPS_QUERY : COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL
   let groups = []

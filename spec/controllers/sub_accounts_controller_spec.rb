@@ -43,7 +43,7 @@ describe SubAccountsController do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
-      
+
       sub_account = root_account.sub_accounts.create(:name => 'sub account')
 
       post 'create', params: {:account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }}
@@ -217,7 +217,7 @@ describe SubAccountsController do
       names.each {|name| Account.create!(name: name, parent_account: @sub_account)}
       get 'show', params: {account_id: @root_account, id: @sub_account}
       expect(response.status).to eq 200
-      json = JSON.parse(response.body.sub("while(1)\;",''))
+      json = JSON.parse(response.body)
       expect(json["account"]["sub_accounts"].map{|sub| sub["account"]["name"]}).to eq names.sort
     end
   end

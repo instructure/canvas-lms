@@ -214,12 +214,20 @@ describe('Editor/Sidebar bridge', () => {
         expect(insertLinkSpy).toHaveBeenCalled()
       })
 
-      it('embeds an image', () => {
+      it('embeds an image if it is browser supported', () => {
         const insertLinkSpy = jest.spyOn(Bridge, 'insertLink')
         const insertImageSpy = jest.spyOn(Bridge, 'insertImage')
         Bridge.insertFileLink({content_type: 'image/png'})
         expect(insertLinkSpy).not.toHaveBeenCalled()
         expect(insertImageSpy).toHaveBeenCalled()
+      })
+
+      it('inserts link if the file is not browser supported', () => {
+        const insertLinkSpy = jest.spyOn(Bridge, 'insertLink')
+        const insertImageSpy = jest.spyOn(Bridge, 'insertImage')
+        Bridge.insertFileLink({content_type: 'image/vnd.dxf'})
+        expect(insertLinkSpy).toHaveBeenCalled()
+        expect(insertImageSpy).not.toHaveBeenCalled()
       })
 
       it('embeds media', () => {
@@ -245,7 +253,7 @@ describe('Editor/Sidebar bridge', () => {
 
       it('inserts video when media is video', () => {
         jest.spyOn(Bridge, 'insertVideo')
-        const theMedia = {type: 'video'}
+        const theMedia = {type: 'video', content_type: 'video/mp4'}
         Bridge.embedMedia(theMedia)
         expect(Bridge.insertVideo).toHaveBeenCalledWith(theMedia)
         expect(editor.insertVideo).toHaveBeenCalledWith(theMedia)
@@ -254,7 +262,7 @@ describe('Editor/Sidebar bridge', () => {
 
       it('inserts audio when media is audio', () => {
         jest.spyOn(Bridge, 'insertAudio')
-        const theMedia = {type: 'audio'}
+        const theMedia = {type: 'audio', content_type: 'audio/mpeg'}
         Bridge.embedMedia(theMedia)
         expect(Bridge.insertAudio).toHaveBeenCalledWith(theMedia)
         expect(editor.insertAudio).toHaveBeenCalledWith(theMedia)

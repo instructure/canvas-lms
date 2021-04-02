@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, element, instanceOf, oneOf, number, shape, string} from 'prop-types'
-import {TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import {hasGradeChanged, parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
 

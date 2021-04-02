@@ -34,6 +34,7 @@ RSpec.describe Mutations::CreateSubmission do
   end
 
   def mutation_str(
+    annotated_document_id: nil,
     assignment_id: @assignment.id,
     submission_type: 'online_upload',
     body: nil,
@@ -44,6 +45,7 @@ RSpec.describe Mutations::CreateSubmission do
     <<~GQL
       mutation {
         createSubmission(input: {
+          #{"annotatedDocumentId: \"#{annotated_document_id}\"" if annotated_document_id}
           assignmentId: "#{assignment_id}"
           submissionType: #{submission_type}
           #{"body: \"#{body}\"" if body}
@@ -105,6 +107,27 @@ RSpec.describe Mutations::CreateSubmission do
       @assignment.update!(lock_at: 1.day.ago)
       result = run_mutation
       expect(result.dig(:errors, 0, :message)).to eq 'not found'
+    end
+  end
+
+  context 'when the submission_type is annotated_document' do
+    it 'requires annotated_document_id to be present' do
+      result = run_mutation(submission_type: 'annotated_document')
+      error_message = 'Annotated Document submissions require an annotated_document_id to submit'
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq error_message
+    end
+
+    it 'changes a CanvadocsAnnotationContext from draft attempt to the current attempt' do
+      @assignment.update!(annotatable_attachment: @attachment, submission_types: 'annotated_document')
+      submission = @assignment.submissions.find_by(user: @student)
+      submission.update!(attempt: 7)
+      annotation_context = submission.annotation_context(draft: true)
+      result = run_mutation(annotated_document_id: @attachment.id, submission_type: 'annotated_document')
+
+      aggregate_failures do
+        expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to be_nil
+        expect(annotation_context.reload.submission_attempt).to be 8
+      end
     end
   end
 

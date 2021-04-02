@@ -68,6 +68,12 @@ describe Types::LearningOutcomeGroupType do
     ])
   end
 
+  it "accepts search_query in outcomes" do
+    expect(outcome_group_type.resolve("outcomes(searchQuery: \"BBBB\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
+      @outcome1.id.to_s
+    ])
+  end
+
   context "when doesn't have edit permission" do
     before(:once) do
       RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", :override => false)
@@ -120,6 +126,10 @@ describe Types::LearningOutcomeGroupType do
   describe '#outcomes_count' do
     it 'returns the total outcomes at the nested outcome groups' do
       expect(outcome_group_type.resolve("outcomesCount")).to eq 2
+    end
+
+    it "accepts search_query in outcomes_count" do
+      expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 1
     end
   end
 end

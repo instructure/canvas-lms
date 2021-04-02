@@ -21,18 +21,19 @@ import {Assignment} from '../graphqlData/Assignment'
 import AttemptSelect from './AttemptSelect'
 import AssignmentDetails from './AssignmentDetails'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import GradeDisplay from './GradeDisplay'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!assignments_2_student_header'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import {number, arrayOf, func} from 'prop-types'
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StepContainer from './StepContainer'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
+import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
 
 class Header extends React.Component {
   static propTypes = {
@@ -114,6 +115,7 @@ class Header extends React.Component {
       (submission.state === 'graded' || submission.state === 'submitted') &&
       submission.gradingStatus !== 'excused' &&
       context.isLatestAttempt &&
+      context.allowChangesToSubmission &&
       (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
     )
   }
@@ -139,6 +141,9 @@ class Header extends React.Component {
   )
 
   render() {
+    const lockAssignment =
+      this.props.assignment.env.modulePrereq || this.props.assignment.env.unlockDate
+
     return (
       <>
         <div
@@ -200,32 +205,25 @@ class Header extends React.Component {
               )}
             </Flex.Item>
           </Flex>
-          {!this.state.isSticky && this.props.submission && this.props.allSubmissions && (
-            <AttemptSelect
-              allSubmissions={this.props.allSubmissions}
-              onChangeSubmission={this.props.onChangeSubmission}
-              submission={this.props.submission}
-            />
+
+          {this.props.submission && (
+            <Flex>
+              {this.props.allSubmissions && (
+                <Flex.Item>
+                  <AttemptSelect
+                    allSubmissions={this.props.allSubmissions}
+                    onChangeSubmission={this.props.onChangeSubmission}
+                    submission={this.props.submission}
+                  />
+                </Flex.Item>
+              )}
+              {this.props.assignment.env.currentUser && !lockAssignment && (
+                <Flex.Item>
+                  <SubmissionWorkflowTracker submission={this.props.submission} />
+                </Flex.Item>
+              )}
+            </Flex>
           )}
-          <div className="assignment-pizza-header-outer">
-            <div
-              className="assignment-pizza-header-inner"
-              data-testid={
-                this.state.isSticky
-                  ? 'assignment-student-pizza-header-sticky'
-                  : 'assignment-student-pizza-header-normal'
-              }
-            >
-              <StepContainer
-                assignment={this.props.assignment}
-                submission={this.props.submission}
-                forceLockStatus={
-                  !this.props.assignment.env.currentUser || !!this.props.assignment.env.modulePrereq
-                }
-                isCollapsed={this.state.isSticky}
-              />
-            </div>
-          </div>
         </div>
         {
           // We need this element to fill the gap that is missing when the regular

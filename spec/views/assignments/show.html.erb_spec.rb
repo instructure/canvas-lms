@@ -40,9 +40,8 @@ describe "/assignments/show" do
     expect(response).not_to be_nil # have_tag()
   end
 
-  it "should render webcam wrapper when enable_webcam_submission is enabled" do
+  it "should render webcam wrapper" do
     course_with_student(active_all: true)
-    @course.root_account.enable_feature!(:enable_webcam_submission)
     view_context(@course, @student)
     g = @course.assignment_groups.create!(:name => "some group")
     a = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")

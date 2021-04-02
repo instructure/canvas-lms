@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, string, func, oneOf} from 'prop-types'
 
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {InPlaceEdit} from '@instructure/ui-editable'
 import {omitProps} from '@instructure/ui-react-utils'
 import {createChainedFunction} from '@instructure/ui-utils'

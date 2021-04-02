@@ -31,7 +31,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {Mutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
@@ -442,7 +442,7 @@ export default class SubmissionManager extends Component {
       <>
         {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
         <StudentViewContext.Consumer>
-          {context => this.renderActions(context)}
+          {context => context.allowChangesToSubmission && this.renderActions(context)}
         </StudentViewContext.Consumer>
         {this.state.showConfetti ? <Confetti /> : null}
       </>

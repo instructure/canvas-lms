@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'i18n_tasks'
 require 'i18n_extraction'
 require 'shellwords'

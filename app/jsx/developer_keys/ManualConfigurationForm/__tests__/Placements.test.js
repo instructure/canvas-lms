@@ -61,18 +61,14 @@ it('generates the displayNames correctly', () => {
 
 it('adds placements', () => {
   const wrapper = mount(<Placements {...props()} />)
-  wrapper
-    .instance()
-    .handlePlacementSelect(undefined, [{id: 'account_navigation'}, {id: 'course_navigation'}])
+  wrapper.instance().handlePlacementSelect(['account_navigation', 'course_navigation'])
   expect(wrapper.text()).toContain('Account Navigation')
   expect(wrapper.text()).toContain('Course Navigation')
 })
 
 it('adds new placements to output', () => {
   const wrapper = mount(<Placements {...props()} />)
-  wrapper
-    .instance()
-    .handlePlacementSelect(undefined, [{id: 'account_navigation'}, {id: 'course_navigation'}])
+  wrapper.instance().handlePlacementSelect(['account_navigation', 'course_navigation'])
   const toolConfig = wrapper.instance().generateToolConfigurationPart()
   expect(toolConfig.length).toEqual(2)
   expect(toolConfig[1].placement).toEqual('course_navigation')

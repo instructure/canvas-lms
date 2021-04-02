@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Avatar, Badge, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+
+import {Badge} from '@instructure/ui-badge'
+import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionComment} from '../../graphqlData/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
 

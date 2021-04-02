@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/assignments/AssignmentGroupListItem",
   "i18nScope": "assignments.assignment_group_list_item"
 }

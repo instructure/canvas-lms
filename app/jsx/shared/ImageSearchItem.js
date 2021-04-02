@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!image_search'
 
 class ImageSearchItem extends React.Component {

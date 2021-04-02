@@ -33,7 +33,8 @@ import {
   IconCalendarMonthLine,
   IconDocumentLine,
   IconEditLine,
-  IconPeerReviewLine
+  IconPeerReviewLine,
+  IconWarningLine
 } from '@instructure/ui-icons'
 import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
@@ -68,7 +69,7 @@ export class PlannerItem extends Component {
     context: object,
     html_url: string,
     toggleCompletion: func,
-    updateTodo: func.isRequired,
+    updateTodo: func,
     badges: arrayOf(shape(badgeShape)),
     registerAnimatable: func,
     deregisterAnimatable: func,
@@ -83,14 +84,16 @@ export class PlannerItem extends Component {
     location: string,
     endTime: momentObj,
     timeZone: string.isRequired,
-    simplifiedControls: bool
+    simplifiedControls: bool,
+    isMissingItem: bool
   }
 
   static defaultProps = {
     badges: [],
     responsiveSize: 'large',
     allDay: false,
-    simplifiedControls: false
+    simplifiedControls: false,
+    isMissingItem: false
   }
 
   constructor(props) {
@@ -119,7 +122,7 @@ export class PlannerItem extends Component {
 
   toDoLinkClick = e => {
     e.preventDefault()
-    this.props.updateTodo({updateTodoItem: {...this.props}})
+    this.props.updateTodo && this.props.updateTodo({updateTodoItem: {...this.props}})
   }
 
   registerRootDivRef = elt => {
@@ -427,6 +430,24 @@ export class PlannerItem extends Component {
     }
   }
 
+  renderCourseName = () => {
+    if (!this.props.isMissingItem || !this.props.courseName) return null
+
+    return (
+      <Text
+        size="x-small"
+        weight="bold"
+        color="primary"
+        letterSpacing="expanded"
+        transform="uppercase"
+        theme={{primaryColor: this.props.color}}
+        data-testid="MissingAssignments-CourseName"
+      >
+        {this.props.courseName}
+      </Text>
+    )
+  }
+
   renderItemDetails = () => {
     return (
       <div
@@ -440,6 +461,7 @@ export class PlannerItem extends Component {
           </div>
         )}
         {this.renderTitle()}
+        {this.renderCourseName()}
       </div>
     )
   }
@@ -520,7 +542,15 @@ export class PlannerItem extends Component {
     return null
   }
 
-  render() {
+  renderCompletedCheckbox() {
+    if (this.props.isMissingItem) {
+      return (
+        <div className={styles.completed}>
+          <IconWarningLine color="error" />
+        </div>
+      )
+    }
+
     const assignmentType = this.assignmentType()
     const checkboxLabel = this.state.completed
       ? formatMessage('{assignmentType} {title} is marked as done.', {
@@ -533,26 +563,34 @@ export class PlannerItem extends Component {
         })
 
     return (
+      <div className={styles.completed}>
+        <ApplyTheme
+          theme={{
+            [CheckboxFacade.theme]: this.getCheckboxTheme()
+          }}
+        >
+          <Checkbox
+            ref={this.registerFocusElementRef}
+            label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
+            checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
+            onChange={this.props.toggleCompletion}
+            disabled={this.props.toggleAPIPending}
+          />
+        </ApplyTheme>
+      </div>
+    )
+  }
+
+  render() {
+    return (
       <div
-        className={classnames(styles.root, styles[this.getLayout()], 'planner-item')}
+        className={classnames(styles.root, styles[this.getLayout()], 'planner-item', {
+          [styles.missingItem]: this.props.isMissingItem
+        })}
         ref={this.registerRootDivRef}
       >
         {this.renderNotificationBadge()}
-        <div className={styles.completed}>
-          <ApplyTheme
-            theme={{
-              [CheckboxFacade.theme]: this.getCheckboxTheme()
-            }}
-          >
-            <Checkbox
-              ref={this.registerFocusElementRef}
-              label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
-              checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
-              onChange={this.props.toggleCompletion}
-              disabled={this.props.toggleAPIPending}
-            />
-          </ApplyTheme>
-        </div>
+        {this.renderCompletedCheckbox()}
         <div
           className={this.props.associated_item === 'To Do' ? styles.avatar : styles.icon}
           style={{color: this.props.simplifiedControls ? undefined : this.props.color}}

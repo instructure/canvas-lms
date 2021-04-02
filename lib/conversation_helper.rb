@@ -37,4 +37,10 @@ module ConversationHelper
     # ids must be sorted for the scope to work
     write_attribute(:root_account_ids, ids.sort.join(','))
   end
+
+  def global_root_account_ids
+    root_account_ids&.map do |id|
+      Shard.global_id_for(id, Shard.birth)
+    end
+  end
 end

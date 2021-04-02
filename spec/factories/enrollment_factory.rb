@@ -78,7 +78,7 @@ module Factories
         limit_privileges_to_course_section: limit_privileges_to_course_section
       }
     }, options[:return_type])
-    create_enrollment_states(result, {state: enrollment_state})
+    create_enrollment_states(result, {state: enrollment_state, root_account_id: course.root_account_id})
     result
   end
 end

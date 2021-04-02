@@ -23,7 +23,7 @@ import TableFiles from './TableFiles'
 import TableFolders from './TableFolders'
 import TableHeader from './TableHeader'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const foldersPresent = folder => {
   return folder && folder.subFolderIDs

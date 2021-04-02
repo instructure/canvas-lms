@@ -19,9 +19,11 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, bool, shape, string} from 'prop-types'
-import {Grid, View} from '@instructure/ui-layout'
-import {Heading, Text} from '@instructure/ui-elements'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {Grid} from '@instructure/ui-grid'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -126,7 +128,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(GradersTable)
+export default connect(mapStateToProps, mapDispatchToProps)(GradersTable)

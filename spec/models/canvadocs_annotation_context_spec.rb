@@ -67,4 +67,42 @@ describe CanvadocsAnnotationContext do
       CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
     }.to raise_error(ActiveRecord::RecordInvalid)
   end
+
+  describe "permissions" do
+    describe "readwrite" do
+      it "grants readwrite when the user is a teacher" do
+        teacher = @course.enroll_teacher(User.create!).user
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+        expect(annotation_context.grants_right?(teacher, :readwrite)).to be true
+      end
+
+      it "grants readwrite when the submission belongs to the user and is a draft" do
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: nil)
+        expect(annotation_context.grants_right?(@sub.user, :readwrite)).to be true
+      end
+
+      it "does not grant readwrite when the submission belongs to the user but is not a draft" do
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+        expect(annotation_context.grants_right?(@sub.user, :readwrite)).to be false
+      end
+
+      it "does not grant readwrite when the submission does not belongs to the user yet is a draft" do
+        other_student = @course.enroll_student(User.create!).user
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: nil)
+        expect(annotation_context.grants_right?(other_student, :readwrite)).to be false
+      end
+    end
+  end
+
+  describe "#draft?" do
+    it "is a draft when it isn't associated with any submission attempt" do
+      annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att)
+      expect(annotation_context).to be_draft
+    end
+
+    it "is not a draft when it is associated with any submission attempt" do
+      annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+      expect(annotation_context).not_to be_draft
+    end
+  end
 end

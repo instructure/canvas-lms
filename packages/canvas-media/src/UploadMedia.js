@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {Tabs} from '@instructure/ui-tabs'
 import {px} from '@instructure/ui-utils'
 

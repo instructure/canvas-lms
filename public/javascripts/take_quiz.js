@@ -721,7 +721,7 @@ $(function() {
     .delegate(':text,textarea,select', 'change', function(event, update) {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
-        var val = numberHelper.parse($this.val())
+        const val = numberHelper.parse($this.val())
         $this.val(isNaN(val) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}))
       }
       if ($this.hasClass('precision_question_input')) {
@@ -908,6 +908,13 @@ $(function() {
           )
         }
       }
+    }
+
+    if ($('#fileupload_in_progress[value="true"]', $questions).length !== 0) {
+      warningMessage = I18n.t(
+        'confirms.file_upload_in_progress',
+        'File upload is in progress. You may lose your answer before it is complete.'
+      )
     }
 
     if (warningMessage != undefined && !quizSubmission.submitting) {

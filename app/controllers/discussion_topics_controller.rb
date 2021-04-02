@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -322,7 +324,7 @@ class DiscussionTopicsController < ApplicationController
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
             elsif params[:order_by] == 'title'
-              scope.order(DiscussionTopic.best_unicode_collation_key("discussion_topics.title")).order(:position, :id)
+              scope.order(DiscussionTopic.best_unicode_collation_key("discussion_topics.title")).ordered
             elsif params[:only_announcements]
               scope.by_posted_at
             else
@@ -421,7 +423,7 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
         js_env(hash)
         js_env({
-          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin] && @domain_root_account&.feature_enabled?(:direct_share)
+          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin]
         }, true)
         set_tutorial_js_env
 
@@ -640,6 +642,13 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def show
+    # Render updated Post UI if feature flag is enabled
+    if @domain_root_account.feature_enabled?(:react_discussions_post)
+      js_bundle :discussion_topics_post
+      render html: '', layout: true
+      return
+    end
+
     parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
@@ -746,7 +755,7 @@ class DiscussionTopicsController < ApplicationController
                 # Can attach files on replies
                 :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),
                 :CAN_RATE         => @topic.grants_right?(@current_user, session, :rate),
-                :CAN_READ_REPLIES => 
+                :CAN_READ_REPLIES =>
                   @topic.grants_right?(@current_user, :read_replies)  &&
                     !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics
@@ -834,6 +843,8 @@ class DiscussionTopicsController < ApplicationController
                 content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
               end
             end
+
+            
 
             render stream: can_stream_template?
           end

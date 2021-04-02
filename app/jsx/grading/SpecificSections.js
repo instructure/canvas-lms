@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import {Checkbox} from '@instructure/ui-forms'
-import {List} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {List} from '@instructure/ui-list'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 export default function SpecificSections(props) {

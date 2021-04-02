@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {
   IconMoveUpTopLine,
   IconMoveUpLine,

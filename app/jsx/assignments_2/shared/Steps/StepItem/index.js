@@ -24,7 +24,7 @@ import React, {Component} from 'react'
 import {IconCheckMarkSolid, IconLockSolid} from '@instructure/ui-icons'
 import {omitProps} from '@instructure/ui-react-utils'
 import {px} from '@instructure/ui-utils'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export const stepLabels = {
   get available() {

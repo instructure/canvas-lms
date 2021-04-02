@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/groups/manage/groupCategories",
   "i18nScope": "groups.manage.group_categories"
 }

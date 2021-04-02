@@ -71,8 +71,12 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
   field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
   field :delete_conversations, mutation: Mutations::DeleteConversations
+  field :delete_discussion_entries, mutation: Mutations::DeleteDiscussionEntries
   field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
+  field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
+  field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
+  field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

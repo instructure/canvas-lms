@@ -37,8 +37,6 @@ const deepMerge = (lhs, rhs) => {
 const combine = (promiseOfJson1, promiseOfJson2) =>
   Promise.all([promiseOfJson1, promiseOfJson2]).then(([json1, json2]) => deepMerge(json1, json2))
 
-const parse = response => response.text().then(text => JSON.parse(text.replace('while(1);', '')))
-
 export function fetchUrl(url, dispatch) {
   return dispatch
     .fetch(url, {
@@ -47,10 +45,11 @@ export function fetchUrl(url, dispatch) {
     .then(response => {
       const linkHeader = response.headers.get('link')
       const next = linkHeader ? parseLinkHeader(linkHeader).next : null
+      const jsonPromise = response.json()
       if (next) {
-        return combine(parse(response), fetchUrl(next.url, dispatch))
+        return combine(jsonPromise, fetchUrl(next.url, dispatch))
       } else {
-        return parse(response)
+        return jsonPromise
       }
     })
 }

@@ -860,7 +860,8 @@ describe CoursesController, type: :request do
           'workflow_state' => 'available',
           'default_view' => 'modules',
           'storage_quota_mb' => @account.default_storage_quota_mb,
-          'homeroom_course' => false
+          'homeroom_course' => false,
+          'course_color' => nil
         })
         expect(Auditors::Course).to receive(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
@@ -941,7 +942,8 @@ describe CoursesController, type: :request do
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
           'uuid' => new_course.uuid,
           'blueprint' => false,
-          'homeroom_course' => false
+          'homeroom_course' => false,
+          'course_color' => nil
         )
         expect(json).to eql course_response
       end
@@ -1357,9 +1359,28 @@ describe CoursesController, type: :request do
         @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
         @course.grading_standard = @standard
         @course.save!
-        json = api_call(:put, @path, @params, :course => {})
+        api_call(:put, @path, @params, :course => {})
         @course.reload
         expect(@course.grading_standard).to eq @standard
+      end
+
+      context "with course templates" do
+        before { @course.root_account.enable_feature!(:course_templates) }
+
+        it "allows setting a template" do
+          # can't do it if anyone is enrolled
+          @course.enrollments.each(&:destroy)
+          api_call(:put, @path, @params, { 'course' => { 'template' => true } })
+          @course.reload
+          expect(@course).to be_a_template
+        end
+
+        it "ignores setting template if it's not possible" do
+          @course.enroll_user(@user)
+          api_call(:put, @path, @params, { 'course' => { 'template' => true } })
+          @course.reload
+          expect(@course).not_to be_a_template
+        end
       end
 
       context "when an assignment is due in a closed grading period" do
@@ -1637,7 +1658,6 @@ describe CoursesController, type: :request do
         expect(JSON.parse(response.body)).to eq({
           'message' => 'Only "delete" and "conclude" events are allowed.'
         })
-
       end
 
       it "should return 400 if an unknown event type is used" do
@@ -1647,7 +1667,15 @@ describe CoursesController, type: :request do
           'message' => 'Only "delete" and "conclude" events are allowed.'
         })
       end
+
+      it "prevents deletion of template courses" do
+        @course.enrollments.each(&:destroy)
+        @course.update!(template: true)
+        raw_api_call(:delete, @path, @params, { event: 'delete' })
+        expect(response.code).to eql '401'
+      end
     end
+
     context "an unauthorized user" do
       it "should return 401" do
         @user = @student
@@ -3514,6 +3542,7 @@ describe CoursesController, type: :request do
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Los_Angeles',
         'homeroom_course' => false,
+        'course_color' => nil,
         'uuid' => @course1.uuid,
         'blueprint' => false,
         'license' => nil
@@ -3598,6 +3627,13 @@ describe CoursesController, type: :request do
         "rubrics"
       ]
       expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
+    end
+
+    it "includes template when feature enabled" do
+      @course1.root_account.enable_feature!(:course_templates)
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+                      { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+      expect(json['template']).to eq false
     end
 
     context "include[]=sections" do
@@ -3779,6 +3815,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'course_color' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3818,6 +3855,7 @@ describe CoursesController, type: :request do
           :allow_student_forum_attachments => true,
           :allow_student_discussion_editing => false,
           :allow_student_organized_groups => false,
+          :course_color => '#AABBCC',
           :filter_speed_grader_by_student_group => true,
           :hide_distribution_graphs => true,
           :hide_sections_on_course_users_page => true,
@@ -3836,6 +3874,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => false,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => false,
+          'course_color' => '#AABBCC',
           'filter_speed_grader_by_student_group' => true,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3862,6 +3901,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_forum_attachments).to eq true
         expect(@course.allow_student_discussion_editing).to eq false
         expect(@course.allow_student_organized_groups).to eq false
+        expect(@course.course_color).to eq '#AABBCC'
         expect(@course.hide_distribution_graphs).to eq true
         expect(@course.hide_sections_on_course_users_page).to be true
         expect(@course.hide_final_grades).to eq true
@@ -3891,6 +3931,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'course_color' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,

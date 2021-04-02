@@ -741,6 +741,15 @@ describe UsersController do
           expect(response).to be_successful
         end
 
+        it "should set root_account_ids" do
+          post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' },
+                                   user: { name: 'happy gilmore', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code + ' ', initial_enrollment_type: 'student' },
+                                   self_enrollment: '1' }
+          expect(response).to be_successful
+          u = User.where(name: 'happy gilmore').take
+          expect(u.root_account_ids).to eq [Account.default.id]
+        end
+
         it "should ignore the password if self enrolling with an email pseudonym" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'}
           expect(response).to be_successful
@@ -2338,6 +2347,7 @@ describe UsersController do
 
       new_user1 = User.where(:name => 'example1@example.com').first
       new_user2 = User.where(:name => 'Hurp Durp').first
+      expect([new_user1, new_user2].map(&:root_account_ids)).to match_array([[@course.root_account_id], [@course.root_account_id]])
       expect(json['invited_users'].map{|u| u['id']}).to match_array([new_user1.id, new_user2.id])
       expect(json['invited_users'].map{|u| u['user_token']}).to match_array([new_user1.token, new_user2.token])
     end
@@ -2518,7 +2528,7 @@ describe UsersController do
       user_session(@user)
       get 'pandata_events_token'
       assert_status(400)
-      json = JSON.parse(response.body.gsub("while(1);", ""))
+      json = JSON.parse(response.body)
       expect(json['message']).to eq "Access token required"
     end
   end

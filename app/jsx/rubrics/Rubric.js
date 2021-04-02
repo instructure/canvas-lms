@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import I18n from 'i18n!edit_rubricRubric'
 import {get, isUndefined, keyBy, max, sum} from 'lodash'

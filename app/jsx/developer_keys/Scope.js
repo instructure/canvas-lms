@@ -18,8 +18,9 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Flex, View} from '@instructure/ui-layout'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!react_developer_keys'
 import ScopesMethod from './ScopesMethod'
 

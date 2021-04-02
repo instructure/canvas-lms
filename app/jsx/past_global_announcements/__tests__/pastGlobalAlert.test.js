@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import PastGlobalAlert from '../PastGlobalAlert'
 import {fireEvent} from '@testing-library/dom'
 import {render} from '@testing-library/react'
-import React from 'react'
 
 describe('render past global announcement alert', () => {
   it('renders alert with message', async () => {

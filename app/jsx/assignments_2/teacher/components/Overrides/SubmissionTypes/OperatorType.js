@@ -20,8 +20,9 @@ import React from 'react'
 import {string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import {Flex, View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
 export default class OperatorType extends React.Component {
   static propTypes = {

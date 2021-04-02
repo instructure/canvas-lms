@@ -22,7 +22,7 @@ import {Provider} from 'react-redux'
 
 // TODO: we probably want this one eventually
 // import { subscribeFlashNotifications } from '../shared/reduxNotifications'
-import {ConnectedPermissionsIndex} from './components/PermissionsIndex'
+import {ConnectedPermissionsIndex} from './components/NewPermissionsIndex'
 
 import createStore from './store'
 

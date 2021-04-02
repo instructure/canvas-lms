@@ -21,11 +21,11 @@ import $ from 'jquery'
 import axios from 'axios'
 import minimatch from 'minimatch'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {Mask} from '@instructure/ui-overlays'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {
   IconOpenFolderSolid,
@@ -165,7 +165,7 @@ class FileBrowser extends React.Component {
   }
 
   populateCollectionsList = (folderList, opts = {}) => {
-    this.setState(function({collections}) {
+    this.setState(function ({collections}) {
       const newCollections = _.cloneDeep(collections)
       folderList.forEach(folder => {
         const collection = this.formatFolderInfo(folder, opts)
@@ -200,7 +200,7 @@ class FileBrowser extends React.Component {
   }
 
   populateItemsList = fileList => {
-    this.setState(function({items, collections}) {
+    this.setState(function ({items, collections}) {
       const newItems = _.cloneDeep(items)
       const newCollections = _.cloneDeep(collections)
       fileList.forEach(file => {

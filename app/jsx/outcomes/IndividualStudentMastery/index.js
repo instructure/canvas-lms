@@ -19,8 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryIndex'
-import {Flex} from '@instructure/ui-layout'
-import {List, Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import {Spinner} from '@instructure/ui-spinner'
 import natcompare from 'compiled/util/natcompare'
 import OutcomeGroup from './OutcomeGroup'
@@ -97,9 +98,12 @@ class IndividualStudentMastery extends React.Component {
 
   expand() {
     this.setState(
-      {
-        expandedGroups: Set(this.state.outcomeGroups.map(g => g.id)),
-        expandedOutcomes: Set(this.state.outcomes.map(o => o.expansionId))
+      oldState => {
+        const {outcomeGroups, outcomes} = oldState
+        return {
+          expandedGroups: Set(outcomeGroups.map(g => g.id)),
+          expandedOutcomes: Set(outcomes.map(o => o.expansionId))
+        }
       },
       () => this.notifyExpansionChange()
     )
@@ -134,7 +138,7 @@ class IndividualStudentMastery extends React.Component {
     return (
       <Flex justifyItems="start" alignItems="center" padding="medium 0">
         <Flex.Item>
-          <Text color="error">{I18n.t('An error occurred loading outcomes data.')}</Text>
+          <Text color="danger">{I18n.t('An error occurred loading outcomes data.')}</Text>
         </Flex.Item>
       </Flex>
     )

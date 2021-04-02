@@ -79,12 +79,7 @@ it('renders scope', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(
-    wrapper
-      .find('FlexItem')
-      .at(1)
-      .text()
-  ).toContain(scope.scope)
+  expect(wrapper.find('Item').at(1).text()).toContain(scope.scope)
 })
 
 it('renders the scope verb', () => {
@@ -95,10 +90,5 @@ it('renders the scope verb', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(
-    wrapper
-      .find('FlexItem')
-      .at(2)
-      .text()
-  ).toContain(scope.verb)
+  expect(wrapper.find('Item').at(2).text()).toContain(scope.verb)
 })

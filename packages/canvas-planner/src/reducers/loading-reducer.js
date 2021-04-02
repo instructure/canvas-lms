@@ -51,6 +51,10 @@ function getNextUrls(state, action) {
     linkState.pastNextUrl = nextLink
     if (nextLink == null) linkState.allPastItemsLoaded = true
   }
+  if (state.isLoading || state.loadingWeek) {
+    linkState.weekNextUrl = nextLink
+    if (nextLink == null) linkState.allWeekItemsLoaded = true
+  }
 
   return linkState
 }
@@ -62,6 +66,7 @@ function gotDaysSuccess(state, action) {
     state.partialFutureDays,
     action.payload.internalDays
   )
+  newState.partialWeekDays = purgeDuplicateDays(state.partialWeekDays, action.payload.internalDays)
   return loadingState(state, newState)
 }
 
@@ -83,6 +88,16 @@ function gotPartialFutureDays(state, action) {
   }
 }
 
+function gotPartialWeekDays(state, action) {
+  const linkState = getNextUrls(state, action)
+  const pwd = mergeDays(state.partialWeekDays, action.payload.internalDays)
+  return {
+    ...state,
+    ...linkState,
+    partialWeekDays: pwd
+  }
+}
+
 function gotItemsError(state, action) {
   const error = action.payload.message || action.payload
   return loadingState(state, {loadingError: error})
@@ -94,6 +109,7 @@ export default handleActions(
     GOT_ITEMS_ERROR: gotItemsError,
     GOT_PARTIAL_PAST_DAYS: gotPartialPastDays,
     GOT_PARTIAL_FUTURE_DAYS: gotPartialFutureDays,
+    GOT_PARTIAL_WEEK_DAYS: gotPartialWeekDays,
     START_LOADING_OPPORTUNITIES: (state, action) => {
       return {...state, loadingOpportunities: true}
     },
@@ -129,6 +145,9 @@ export default handleActions(
     ALL_FUTURE_ITEMS_LOADED: (state, action) => {
       return loadingState(state, {allFutureItemsLoaded: true})
     },
+    ALL_WEEK_ITEMS_LOADED: (state, action) => {
+      return loadingState(state, {allWeekItemsLoaded: true})
+    },
     ALL_OPPORTUNITIES_LOADED: (state, action) => {
       return {...state, loadingOpportunities: false, allOpportunitiesLoaded: true}
     },
@@ -154,7 +173,25 @@ export default handleActions(
       loadingGrades: false,
       gradesLoaded: false,
       gradesLoadingError: action.payload.message
-    })
+    }),
+    GETTING_WEEK_ITEMS: (state, action) => {
+      return loadingState(state, {
+        loadingError: state.loadingError, // don't reset error until we're successful
+        loadingWeek: true,
+        allWeekItemsLoaded: false // because it only refers to the week about to get loaded
+      })
+    },
+    WEEK_LOADED: (state, action) => {
+      return loadingState(state, {
+        loadingError: null,
+        isLoading: false,
+        hasSomeItems: true,
+        loadingWeek: false
+      })
+    },
+    JUMP_TO_WEEK: (state, action) => {
+      return loadingState(state, {loadingWeek: false})
+    }
   },
   loadingState(
     {},
@@ -162,9 +199,11 @@ export default handleActions(
       isLoading: false,
       loadingPast: false,
       loadingFuture: false,
+      loadingWeek: false,
       plannerLoaded: false,
       allPastItemsLoaded: false,
       allFutureItemsLoaded: false,
+      allWeekItemsLoaded: false,
       allOpportunitiesLoaded: false,
       loadingOpportunities: false,
       futureNextUrl: null,
@@ -172,6 +211,7 @@ export default handleActions(
       seekingNewActivity: false,
       partialPastDays: [],
       partialFutureDays: [],
+      partialWeekDays: [],
       hasSomeItems: null, // Tri-state. Initially null because we haven't checked yet.
       // Set to true if the first peek into the past returns an item.
       // Reset to false if an item is deleted, because we can't know

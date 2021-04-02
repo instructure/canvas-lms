@@ -393,6 +393,26 @@ test('cancels to env normally', function () {
   equal(view.locationAfterCancel({}), currentOrigin + '/foo')
 })
 
+test('cancels to referrer if allowed', function () {
+  Object.defineProperty(document, 'referrer', {
+    value: currentOrigin + '/foo'
+  })
+  ENV.CAN_CANCEL_TO = [currentOrigin + '/foo']
+  ENV.CANCEL_TO = currentOrigin + '/bar'
+  const view = this.editView()
+  equal(view.locationAfterCancel({}), currentOrigin + '/foo')
+})
+
+test('cancels to CANCEL_TO if referrer not allowed', function () {
+  Object.defineProperty(document, 'referrer', {
+    value: currentOrigin + '/foo'
+  })
+  ENV.CAN_CANCEL_TO = [currentOrigin + '/baz']
+  ENV.CANCEL_TO = currentOrigin + '/bar'
+  const view = this.editView()
+  equal(view.locationAfterCancel({}), currentOrigin + '/bar')
+})
+
 test('cancels to return_to', function () {
   ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
@@ -629,6 +649,11 @@ test('keeps original lock_at seconds if the date has not changed', function () {
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:23.000Z')
+})
+
+test('hides the build button for non NQ assignments', function () {
+  const view = this.editView()
+  strictEqual(view.$el.find('button.build_button').length, 0)
 })
 
 QUnit.module('EditView: handleGroupCategoryChange', {
@@ -1330,8 +1355,10 @@ QUnit.module('EditView: Quizzes 2', {
       LOCALE: 'en',
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED: true,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
+      CANCEL_TO: currentOrigin + '/cancel'
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1357,6 +1384,14 @@ test('does not show the moderated grading checkbox', () => {
 
 test('does not show the load in new tab checkbox', function () {
   equal(this.view.$externalToolsNewTab.length, 0)
+})
+
+test('shows the build button', function () {
+  strictEqual(this.view.$el.find('button.build_button').length, 1)
+})
+
+test('save routes to cancelLocation', function () {
+  equal(this.view.locationAfterSave({}), currentOrigin + '/cancel')
 })
 
 QUnit.module('EditView: anonymous grading', hooks => {

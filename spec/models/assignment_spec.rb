@@ -3159,6 +3159,62 @@ describe Assignment do
         points_possible: 10
     end
 
+    context "when submission_type is annotated_document" do
+      before(:once) do
+        @annotatable_attachment = attachment_model(context: @course)
+        @a.update!(annotatable_attachment: @annotatable_attachment, submission_types: "annotated_document")
+      end
+
+      it "raises an error if an attachment id is not present in the options" do
+        expect {
+          @a.submit_homework(@user, submission_type: "annotated_document")
+        }.to raise_error "Invalid Attachment"
+      end
+
+      it "raises an error if assignment is not an annotatable attachment" do
+        @a.update!(submission_types: "online_text_entry")
+
+        expect {
+          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+        }.to raise_error "Invalid submission type"
+      end
+
+      it "raises an error if given attachment id does not match assignment's annotatable attachment id" do
+        other_attachment = attachment_model(context: @course)
+
+        expect {
+          @a.submit_homework(@user, annotated_document_id: other_attachment.id, submission_type: "annotated_document")
+        }.to raise_error "Invalid Attachment"
+      end
+
+      it "changes a CanvadocsAnnotationContext from draft attempt to the current attempt" do
+        submission = @a.submissions.find_by(user: @user)
+        submission.update!(attempt: 7)
+        annotation_context = submission.annotation_context(draft: true)
+
+        expect {
+          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+        }.to change {
+          annotation_context.reload.submission_attempt
+        }.from(nil).to(8)
+      end
+
+      it "does not change unrelated draft CanvadocsAnnotationContexts" do
+        submission = @a.submissions.find_by(user: @user)
+        other_attachment = attachment_model(context: @course)
+        unrelated_annotation_context = submission.canvadocs_annotation_contexts.create!(
+          attachment: other_attachment,
+          submission_attempt: nil
+        )
+
+        expect {
+          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+        }.not_to change {
+          unrelated_annotation_context.reload.submission_attempt
+        }
+      end
+    end
+
     it "sets the 'eula_agreement_timestamp'" do
       setup_assignment_without_submission
       timestamp = Time.now.to_i.to_s

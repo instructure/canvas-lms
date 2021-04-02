@@ -31,6 +31,7 @@ module LiveAssessments
       return if possible == 0
 
       outcome_result = alignment.learning_outcome_results.where(user_id: user.id).first_or_initialize
+      outcome_result.workflow_state = :active
       outcome_result.title = "#{user.name}, #{assessment.title}"
       outcome_result.context = assessment.context
       outcome_result.associated_asset = assessment

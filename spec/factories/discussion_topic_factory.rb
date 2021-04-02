@@ -69,6 +69,12 @@ module Factories
     @topic.reload
   end
 
+  def create_valid_discussion_entry
+    course_with_teacher(:active_all => true)
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: 'threaded')
+    @topic.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
+  end
+
   def group_discussion_assignment
     course = @course || course_factory(active_all: true)
     group_category = course.group_categories.create!(:name => "category")

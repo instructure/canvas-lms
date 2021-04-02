@@ -22,8 +22,9 @@ import I18n from 'i18n!assignments_2'
 
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
-import {Flex, View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
 import EditableNumber from './EditableNumber'
 

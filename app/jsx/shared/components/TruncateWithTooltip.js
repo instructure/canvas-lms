@@ -17,8 +17,8 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {TruncateText} from '@instructure/ui-elements'
-import {Tooltip} from '@instructure/ui-overlays'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {pickProps} from '@instructure/ui-react-utils'
 
 export default class TruncateWithTooltip extends React.Component {

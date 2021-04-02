@@ -1,5 +1,5 @@
 #!/bin/bash
-source script/common.sh
+source script/common/utils/common.sh
 
 function ensure_in_canvas_root_directory {
   if ! is_canvas_root; then
@@ -16,7 +16,7 @@ function is_canvas_root {
 
 function compile_assets {
   echo_console_and_log "  Compiling assets (css and js only, no docs or styleguide) ..."
-  docker-compose run --rm web bundle exec rake canvas:compile_assets_dev >> "$LOG" 2>&1
+  _canvas_lms_track_with_log run_command bundle exec rake canvas:compile_assets_dev
 }
 
 function build_images {
@@ -86,25 +86,35 @@ If you want to migrate the existing database, use docker_dev_update
   message "Creating new database"
   _canvas_lms_track docker-compose run --rm web \
     bundle exec rake db:create
-  # initial_setup runs db:migrate for development
-  _canvas_lms_track docker-compose run -e TELEMETRY_OPT_IN --rm web \
-    bundle exec rake db:initial_setup
   # Rails db:migrate only runs on development by default
   # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
   _canvas_lms_track docker-compose run --rm web \
+    bundle exec rake db:migrate RAILS_ENV=development
+  _canvas_lms_track docker-compose run --rm web \
     bundle exec rake db:migrate RAILS_ENV=test
+  _canvas_lms_track docker-compose run -e TELEMETRY_OPT_IN --rm web \
+    bundle exec rake db:initial_setup
 }
 
+function sync_bundler_version {
+  expected_version=$(run_command bash -c "echo \$BUNDLER_VERSION" |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+  actual_version=$(eval run_command bundler --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+  if [ "$actual_version" != "$expected_version" ]; then
+    echo_console_and_log "  Wrong version of bundler installed, installing correct version..."
+    run_command bash -c "gem uninstall --all --ignore-dependencies --force bundler && gem install bundler --no-document -v $expected_version" >>"$LOG" 2>&1
+  fi
+}
 
 function bundle_install {
   echo_console_and_log "  Installing gems (bundle install) ..."
-  rm -f Gemfile.lock* >/dev/null 2>&1
-  docker-compose run --rm web bundle install >>"$LOG" 2>&1
+  run_command bash -c 'rm -f Gemfile.lock* >/dev/null 2>&1'
+  _canvas_lms_track_with_log run_command bundle install
 }
 
 function bundle_install_with_check {
   echo_console_and_log "  Checking your gems (bundle check) ..."
-  if docker-compose run --rm web bundle check >>"$LOG" 2>&1 ; then
+  sync_bundler_version
+  if _canvas_lms_track_with_log run_command bundle check ; then
     echo_console_and_log "  Gems are up to date, no need to bundle install ..."
   else
     bundle_install
@@ -113,14 +123,14 @@ function bundle_install_with_check {
 
 function rake_db_migrate_dev_and_test {
   echo_console_and_log "  Migrating development DB ..."
-  docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=development >>"$LOG" 2>&1
+  _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=development
   echo_console_and_log "  Migrating test DB ..."
-  docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test >>"$LOG" 2>&1
+  _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
 }
 
 function install_node_packages {
   echo_console_and_log "  Installing Node packages ..."
-  docker-compose run --rm web bundle exec rake js:yarn_install >>"$LOG" 2>&1
+  _canvas_lms_track_with_log run_command bundle exec rake js:yarn_install
 }
 
 function copy_docker_config {

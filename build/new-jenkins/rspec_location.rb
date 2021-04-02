@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RSpecLocationFormatter
   RSpec::Core::Formatters.register self, :example_started
 

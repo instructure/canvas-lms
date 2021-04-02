@@ -53,19 +53,49 @@ describe "/submissions/show_preview" do
     expect(response.body).to match(/No Preview Available/)
   end
 
-  it "a DocViewer url that includes the submission id" do
-    course_with_student
-    view_context
-    assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
-    attachment = Attachment.create!(context: @student, uploaded_data: stub_png_data, filename: "homework.png")
-    submission = assignment.submit_homework(@user, attachments: [attachment])
-    allow(Canvadocs).to receive(:enabled?).and_return(true)
-    allow(Canvadocs).to receive(:config).and_return({a: 1})
-    allow(Canvadoc).to receive(:mime_types).and_return("image/png")
-    assign(:assignment, assignment)
-    assign(:submission, submission)
-    render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
-    expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
+  context "when assignment involves DocViewer" do
+    before(:once) do
+      course_with_student
+    end
+
+    before(:each) do
+      @attachment = Attachment.create!(context: @student, uploaded_data: stub_png_data, filename: "homework.png")
+      allow(Canvadocs).to receive(:enabled?).and_return(true)
+      allow(Canvadocs).to receive(:config).and_return({a: 1})
+      allow(Canvadoc).to receive(:mime_types).and_return(@attachment.content_type)
+      view_context
+    end
+
+    it "renders a DocViewer url that includes the submission id when assignment takes file uploads" do
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+      submission = assignment.submit_homework(@user, attachments: [@attachment])
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
+    end
+
+    it "renders an iframe with a src to canvadoc sessions controller when assignment is an Annotated Document" do
+      assignment = @course.assignments.create!(
+        annotatable_attachment: @attachment,
+        submission_types: "annotated_document",
+        title: "some assignment"
+      )
+      submission = assignment.submit_homework(
+        @user,
+        annotated_document_id: @attachment.id,
+        submission_type: "annotated_document"
+      )
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      element = Nokogiri::HTML5.fragment(response.body).at_css("iframe.ef-file-preview-frame")
+
+      aggregate_failures do
+        expect(element).not_to be_nil
+        expect(element["src"]).to match(/\/api\/v1\/canvadoc_session?/)
+      end
+    end
   end
 
   describe "originality score" do

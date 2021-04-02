@@ -1030,21 +1030,21 @@ exports[`the Rubric component points column does not have a points column in sum
           <Flex
             as="span"
             direction="row"
+            display="flex"
             elementRef={[Function]}
-            inline={false}
             justifyItems="end"
-            visualDebug={false}
-            wrapItems={false}
+            withVisualDebug={false}
+            wrap="no-wrap"
           >
-            <FlexItem
+            <Item
               as="span"
               data-selenium="rubric_total"
               elementRef={[Function]}
-              grow={false}
-              shrink={false}
+              shouldGrow={false}
+              shouldShrink={false}
             >
               Total Points: 6 out of 11
-            </FlexItem>
+            </Item>
           </Flex>
         </Cell>
       </Row>
@@ -1273,21 +1273,21 @@ exports[`the Rubric component points column has a points column if points visibl
           <Flex
             as="span"
             direction="row"
+            display="flex"
             elementRef={[Function]}
-            inline={false}
             justifyItems="end"
-            visualDebug={false}
-            wrapItems={false}
+            withVisualDebug={false}
+            wrap="no-wrap"
           >
-            <FlexItem
+            <Item
               as="span"
               data-selenium="rubric_total"
               elementRef={[Function]}
-              grow={false}
-              shrink={false}
+              shouldGrow={false}
+              shouldShrink={false}
             >
               Total Points: 6 out of 11
-            </FlexItem>
+            </Item>
           </Flex>
         </Cell>
       </Row>
@@ -1516,21 +1516,21 @@ exports[`the Rubric component renders as expected 1`] = `
           <Flex
             as="span"
             direction="row"
+            display="flex"
             elementRef={[Function]}
-            inline={false}
             justifyItems="end"
-            visualDebug={false}
-            wrapItems={false}
+            withVisualDebug={false}
+            wrap="no-wrap"
           >
-            <FlexItem
+            <Item
               as="span"
               data-selenium="rubric_total"
               elementRef={[Function]}
-              grow={false}
-              shrink={false}
+              shouldGrow={false}
+              shouldShrink={false}
             >
               Total Points: 6
-            </FlexItem>
+            </Item>
           </Flex>
         </Cell>
       </Row>
@@ -1728,21 +1728,21 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
           <Flex
             as="span"
             direction="row"
+            display="flex"
             elementRef={[Function]}
-            inline={false}
             justifyItems="end"
-            visualDebug={false}
-            wrapItems={false}
+            withVisualDebug={false}
+            wrap="no-wrap"
           >
-            <FlexItem
+            <Item
               as="span"
               data-selenium="rubric_total"
               elementRef={[Function]}
-              grow={false}
-              shrink={false}
+              shouldGrow={false}
+              shouldShrink={false}
             >
               Total Points: 11
-            </FlexItem>
+            </Item>
           </Flex>
         </Cell>
       </Row>
@@ -1970,21 +1970,21 @@ exports[`the Rubric component updates the total score when an individual criteri
           <Flex
             as="span"
             direction="row"
+            display="flex"
             elementRef={[Function]}
-            inline={false}
             justifyItems="end"
-            visualDebug={false}
-            wrapItems={false}
+            withVisualDebug={false}
+            wrap="no-wrap"
           >
-            <FlexItem
+            <Item
               as="span"
               data-selenium="rubric_total"
               elementRef={[Function]}
-              grow={false}
-              shrink={false}
+              shouldGrow={false}
+              shouldShrink={false}
             >
               Total Points: 5 out of 11
-            </FlexItem>
+            </Item>
           </Flex>
         </Cell>
       </Row>

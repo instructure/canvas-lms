@@ -26,6 +26,7 @@ import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '../../mock
 import {MockedProvider} from '@apollo/react-testing'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
+import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
 async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
@@ -206,7 +207,7 @@ describe('CommentsTab', () => {
     expect(querySpy).toHaveBeenCalledTimes(3)
   })
 
-  it('renders CommentTextArea', async () => {
+  it('renders CommentTextArea when the student can make changes to the submission', async () => {
     const mocks = [await mockSubmissionCommentQuery()]
     const props = await mockAssignmentAndSubmission()
     const {getByLabelText} = render(
@@ -215,6 +216,19 @@ describe('CommentsTab', () => {
       </MockedProvider>
     )
     expect(await waitFor(() => getByLabelText('Comment input box'))).toBeInTheDocument()
+  })
+
+  it('does not render CommentTextArea when the student cannot make changes to the submission', async () => {
+    const mocks = [await mockSubmissionCommentQuery()]
+    const props = await mockAssignmentAndSubmission()
+    const {queryByLabelText} = render(
+      <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+    expect(await waitFor(() => queryByLabelText('Comment input box'))).not.toBeInTheDocument()
   })
 
   it('notifies user when comment successfully sent', async () => {

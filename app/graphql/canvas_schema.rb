@@ -65,6 +65,7 @@ class CanvasSchema < GraphQL::Schema
     when WikiPage then Types::PageType
     when Attachment then Types::FileType
     when DiscussionTopic then Types::DiscussionType
+    when DiscussionEntry then Types::DiscussionEntryType
     when Quizzes::Quiz then Types::QuizType
     when OutcomeCalculationMethod then Types::OutcomeCalculationMethodType
     when OutcomeProficiency then Types::OutcomeProficiencyType

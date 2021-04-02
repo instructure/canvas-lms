@@ -20,9 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
-import {View} from '@instructure/ui-layout'
-import {CheckboxGroup, Checkbox} from '@instructure/ui-forms'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {CheckboxGroup, Checkbox} from '@instructure/ui-checkbox'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class Services extends React.Component {

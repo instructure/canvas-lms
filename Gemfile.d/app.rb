@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
-  gem 'rails', '6.0.3.5'
+  gem 'rails', '6.0.3.6'
 else
   gem 'rails', '6.1.3'
 end
@@ -104,7 +106,7 @@ gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.3'
 gem 'rack-brotli', '1.0.0'
 gem 'rack-test', '1.1.0'
-gem 'rake', '13.0.1'
+gem 'rake', '13.0.3'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.10', require: false
 gem 'redcarpet', '3.5.0', require: false

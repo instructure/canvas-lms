@@ -27,7 +27,7 @@ import * as actions from '../assignment-picker-actions'
 import {ALL_ID} from '../categories'
 import AssignmentFilter from './assignment-filter'
 import AssignmentList from './assignment-list'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!conditional_release'
 
 const {object, string, func} = PropTypes
@@ -73,11 +73,7 @@ export class AssignmentPicker extends React.Component {
     const assignments = this.props.assignments.filter(assignment => {
       const notTrigger = String(assignment.get('id')) !== String(this.props.triggerAssignmentId)
       const matchesName =
-        !nameFilter ||
-        assignment
-          .get('name')
-          .toLowerCase()
-          .indexOf(nameFilter) !== -1
+        !nameFilter || assignment.get('name').toLowerCase().indexOf(nameFilter) !== -1
       const matchesCategory =
         !categoryFilter ||
         categoryFilter === ALL_ID ||

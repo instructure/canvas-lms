@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/MoveOutcomeDialog",
   "i18nScope": "move_outcome_dialog"
 }

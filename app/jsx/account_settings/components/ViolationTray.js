@@ -18,11 +18,11 @@
 
 import React, {useReducer, useCallback} from 'react'
 import I18n from 'i18n!csp_violation_tray'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {CloseButton} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import ViolationTable from './ViolationTable'
 

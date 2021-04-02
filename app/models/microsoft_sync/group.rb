@@ -18,16 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# It seems like it sometimes gets confused and misses the table prefix without this...
+require_dependency 'microsoft_sync'
+
 #
 # MicrosoftSync contains models used to sync course enrollments to Microsoft
 # Teams via Microsoft's APIs. For customers using their new (in development as
 # of 2021) Teams tool, Microsoft needs up-to-date Canvas course enrollment
 # details.
 #
-#
 # This model is the main model, and is created when a teacher turns on (in
 # course settings) the option to sync enrollments to Microsoft Teams. It is
 # then used to keep track of the syncing.
+#
+# Notable fields:
+# * ms_group_id -- Microsoft's ID used in the their Graph API for the group
 #
 class MicrosoftSync::Group < ActiveRecord::Base
   extend RootAccountResolver
@@ -65,5 +70,31 @@ class MicrosoftSync::Group < ActiveRecord::Base
       job_state: nil,
       last_error: nil
     )
+  end
+
+  # This should be used for most updates to the workflow_state, in case the
+  # group is deleted (e.g. by disabling Microsoft Sync in account settings)
+  # while the job is running.
+  # NOTE: this does not run any AR callbacks/validations (uses update_all)
+  # Whatever the result, this also updates workflow_state on the model passed
+  # in to reflect the actual DB state.
+  # Returns true if the record was updated (i.e. record exists and is not deleted).
+  def update_workflow_state_unless_deleted(new_state, extra={})
+    records_updated = self.class.where(id: id).where.not(workflow_state: 'deleted').
+      update_all(extra.merge(workflow_state: new_state))
+    if records_updated == 0
+      # It could actually be that the record was hard-deleted and not
+      # workflow_state=deleted, but whatever
+      self.workflow_state = 'deleted'
+      false
+    else
+      self.workflow_state = new_state
+      assign_attributes(extra)
+      true
+    end
+  end
+
+  def sync!
+    MicrosoftSync::Syncer.new(self).sync!
   end
 end

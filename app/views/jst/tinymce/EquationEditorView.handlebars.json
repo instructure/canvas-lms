@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/tinymce/EquationEditorView",
   "i18nScope": "tinymce.equation_editor_view"
 }

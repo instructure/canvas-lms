@@ -20,7 +20,7 @@ import React from 'react'
 import {func} from 'prop-types'
 import {Query} from 'react-apollo'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 import I18n from 'i18n!assignments_2'
 

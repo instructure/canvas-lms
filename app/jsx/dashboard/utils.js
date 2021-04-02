@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!k5_dashboard'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+import doFetchApi from 'jsx/shared/effects/doFetchApi'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -86,20 +87,20 @@ export const fetchLatestAnnouncement = courseId =>
     return null
   })
 
-export const fetchMissingAssignments = (userId = 'self') =>
-  asJson(
-    window.fetch(
-      `/api/v1/users/${userId}/missing_submissions?filter[]=submittable`,
-      defaultFetchOptions
-    )
-  )
-
 /* Fetches instructors for a given course - in this case an instructor is a user with
    either a Teacher or TA enrollment. */
 export const fetchCourseInstructors = courseId =>
   asJson(
     window.fetch(
       `/api/v1/courses/${courseId}/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments`,
+      defaultFetchOptions
+    )
+  )
+
+export const fetchCourseApps = courseId =>
+  asJson(
+    window.fetch(
+      `/api/v1/courses/${courseId}/external_tools/visible_course_nav_tools`,
       defaultFetchOptions
     )
   )
@@ -115,4 +116,20 @@ export const readableRoleName = role => {
   }
   // Custom roles return as named
   return ROLES[role] || role
+}
+
+export const sendMessage = (recipientId, message, subject) =>
+  doFetchApi({
+    path: '/api/v1/conversations',
+    method: 'POST',
+    body: {recipients: [recipientId], body: message, group_conversation: false, subject}
+  })
+
+export const TAB_IDS = {
+  HOMEROOM: 'tab-homeroom',
+  SCHEDULE: 'tab-schedule',
+  GRADES: 'tab-grades',
+  RESOURCES: 'tab-resources',
+  OVERVIEW: 'tab-overview',
+  MODULES: 'tab-modules'
 }

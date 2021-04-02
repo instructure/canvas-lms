@@ -138,6 +138,8 @@ module GraphQLNodeLoader
       Loaders::SISIDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"
       Loaders::IDLoader.for(DiscussionTopic).load(id).then(check_read_permission)
+    when "DiscussionEntry"
+      Loaders::IDLoader.for(DiscussionEntry).load(id).then(check_read_permission)
     when "Quiz"
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
     when "Submission"

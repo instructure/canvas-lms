@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require "i18nliner/processors/abstract_processor"
 require "i18nliner/scope"

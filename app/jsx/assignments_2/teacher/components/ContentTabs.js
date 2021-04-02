@@ -23,7 +23,7 @@ import {TabList} from '@instructure/ui-tabs'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 import StudentsSearcher from './StudentsTab/StudentsSearcher'
-import {Img} from '@instructure/ui-elements'
+import {Img} from '@instructure/ui-img'
 
 ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,

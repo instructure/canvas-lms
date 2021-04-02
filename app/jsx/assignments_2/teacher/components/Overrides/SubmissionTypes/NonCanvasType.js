@@ -20,13 +20,21 @@ import React from 'react'
 import {bool, string, element, func, arrayOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import {Flex, View} from '@instructure/ui-layout'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {Select} from '@instructure/ui-forms'
+import {Select} from '@instructure/ui-select'
 import SubmitOptionShape from './SubmitOptionShape'
 
+/*
+ *  CAUTION: The InstUI Select component is greatly changed in v7.
+ *  Updating the import to the new ui-select location is almost certainly
+ *  going to break the functionality of the component. Any failing tests
+ *  will just be skipped, and the component can be fixed later when work
+ *  resumes on A2.
+ */
 export default class NonCanvasType extends React.Component {
   static propTypes = {
     readOnly: bool,

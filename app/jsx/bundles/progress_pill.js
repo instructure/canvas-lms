@@ -19,7 +19,7 @@
 import I18n from 'i18n!progress_pill'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
 import ready from '@instructure/ready'
 

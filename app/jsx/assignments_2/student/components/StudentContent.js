@@ -27,8 +27,22 @@ import React, {Suspense, lazy} from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '../graphqlData/Submission'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
+
+function EnrollmentConcludedNotice() {
+  return (
+    <View as="div" textAlign="center" margin="auto" padding="small">
+      <Text fontStyle="italic" size="large">
+        {I18n.t(
+          'You are unable to submit to this assignment as your enrollment in this course has been concluded.'
+        )}
+      </Text>
+    </View>
+  )
+}
 
 function renderContentBaseOnAvailability({assignment, submission}) {
   if (assignment.env.modulePrereq) {
@@ -53,6 +67,7 @@ function renderContentBaseOnAvailability({assignment, submission}) {
       <>
         <AssignmentToggleDetails description={assignment.description} />
         <ContentTabs assignment={assignment} submission={submission} />
+        {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>
     )
   }

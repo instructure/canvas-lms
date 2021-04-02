@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {Alert} from '@instructure/ui-alerts/lib/Alert'
-import {Button} from '@instructure/ui-buttons/lib/Button'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!past_global_announcements'
 
 export default class PastGlobalAlert extends React.Component {

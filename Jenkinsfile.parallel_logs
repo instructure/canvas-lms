@@ -21,6 +21,7 @@ import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 library "canvas-builds-library"
+loadLocalLibrary("local-lib", "build/new-jenkins/library")
 
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
@@ -85,7 +86,6 @@ pipeline {
       steps {
         script {
           def stages = [:]
-          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
 
           distribution.stashBuildScripts()
 
@@ -100,7 +100,6 @@ pipeline {
     stage('Copy Files') {
       steps {
         script {
-          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
           rspec.uploadParallelLog()
         }
       }

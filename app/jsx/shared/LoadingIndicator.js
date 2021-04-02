@@ -18,7 +18,7 @@
 import I18n from 'i18n!courses'
 import React from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 export default function LoadingIndicator() {
   return (

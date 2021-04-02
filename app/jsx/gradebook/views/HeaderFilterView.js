@@ -22,12 +22,6 @@ import 'compiled/jquery.kylemenu'
 import template from 'jst/gradebook/header_filter'
 
 class HeaderFilterView extends View {
-  toJSON() {
-    return {
-      inactive_concluded_lmgb_filters: ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters
-    }
-  }
-
   onClick(e) {
     e.preventDefault()
     e.stopPropagation()
@@ -38,10 +32,7 @@ class HeaderFilterView extends View {
   }
 
   closeMenu() {
-    return this.$el
-      .find('.al-trigger')
-      .data('kyleMenu')
-      .close()
+    return this.$el.find('.al-trigger').data('kyleMenu').close()
   }
 
   updateLabel(key) {

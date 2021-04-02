@@ -52,6 +52,7 @@ module BasicLTI
 
     def validate!
       raise Errors::InvalidSourceId, 'Course is invalid' unless course
+      raise Errors::InvalidSourceId, 'Course is concluded' if course.concluded?
       raise Errors::InvalidSourceId, 'User is no longer in course' unless user
       raise Errors::InvalidSourceId, 'Assignment is invalid' unless assignment
 

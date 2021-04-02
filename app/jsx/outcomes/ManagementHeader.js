@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import I18n from 'i18n!OutcomeManagement'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconImportLine, IconPlusSolid, IconSearchLine} from '@instructure/ui-icons'
 import {showImportOutcomesModal} from './ImportOutcomesModal'

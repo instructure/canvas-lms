@@ -63,7 +63,7 @@ class User < ActiveRecord::Base
   has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy, inverse_of: :user
   has_many :notification_policies, through: :communication_channels
   has_many :notification_policy_overrides, through: :communication_channels
-  has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
+  has_one :communication_channel, -> { where("workflow_state<>'retired'").ordered }
   has_many :ignores
   has_many :planner_notes, :dependent => :destroy
   has_many :viewed_submission_comments, :dependent => :destroy
@@ -119,10 +119,10 @@ class User < ActiveRecord::Base
   has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
   has_many :all_submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, class_name: 'Submission', dependent: :destroy
   has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order('submissions.updated_at DESC') }
-  has_many :pseudonyms, -> { order(:position) }, dependent: :destroy
+  has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
-  has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").order(:position) }
+  has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").ordered }
   has_many :attachments, :as => 'context', :dependent => :destroy
   has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
@@ -439,6 +439,12 @@ class User < ActiveRecord::Base
 
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
+  end
+
+  def global_root_account_ids
+    root_account_ids&.map do |id|
+      Shard.global_id_for(id, self.shard)
+    end
   end
 
   # Update the root_account_ids column on the user
@@ -2450,7 +2456,7 @@ class User < ActiveRecord::Base
   end
 
   def last_mastered_assignment
-    self.learning_outcome_results.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
+    self.learning_outcome_results.active.sort_by{|r| r.assessed_at || r.created_at }.select{|r| r.mastery? }.map{|r| r.assignment }.last
   end
 
   def profile_pics_folder
@@ -2661,6 +2667,8 @@ class User < ActiveRecord::Base
   def can_create_enrollment_for?(course, session, type)
     granular_admin = course.root_account.feature_enabled?(:granular_permissions_manage_users)
     return false if type == 'StudentEnrollment' && MasterCourses::MasterTemplate.is_master_course?(course)
+    return false if course.template?
+
     if granular_admin
       return true if type == 'TeacherEnrollment' && course.grants_right?(self, session, :add_teacher_to_course)
       return true if type == 'TaEnrollment' && course.grants_right?(self, session, :add_ta_to_course)

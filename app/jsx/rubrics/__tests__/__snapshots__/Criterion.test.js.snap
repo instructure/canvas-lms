@@ -47,7 +47,6 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -212,7 +211,6 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -377,7 +375,6 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -538,7 +535,6 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -762,7 +758,6 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -986,7 +981,6 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1152,7 +1146,6 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1356,7 +1349,6 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1560,7 +1552,6 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1747,7 +1738,6 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -2010,7 +2000,6 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -2273,7 +2262,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description

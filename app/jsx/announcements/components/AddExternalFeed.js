@@ -25,9 +25,12 @@ import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
 import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-layout'
-import {Checkbox, TextInput, RadioInput, RadioInputGroup} from '@instructure/ui-forms'
-import {Dialog, ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-view'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Dialog} from '@instructure/ui-dialog'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {ConnectedRSSFeedList} from './RSSFeedList'
 
@@ -260,7 +263,4 @@ export default class AddExternalFeed extends React.Component {
 const connectState = state => ({isSaving: state.externalRssFeed.isSaving})
 const connectActions = dispatch =>
   bindActionCreators(select(actions, ['addExternalFeed']), dispatch)
-export const ConnectedAddExternalFeed = connect(
-  connectState,
-  connectActions
-)(AddExternalFeed)
+export const ConnectedAddExternalFeed = connect(connectState, connectActions)(AddExternalFeed)

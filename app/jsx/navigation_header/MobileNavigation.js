@@ -19,10 +19,10 @@
 import React from 'react'
 import $ from 'jquery'
 import {shape, func, object} from 'prop-types'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 import preventDefault from 'compiled/fn/preventDefault'
 import I18n from 'i18n!MobileNavigation'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))

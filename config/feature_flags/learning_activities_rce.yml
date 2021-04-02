@@ -11,11 +11,6 @@ cc_in_rce_video_tray:
   display_name: RCE Edit Closed Captions
   description: Edit closed captions/subtitles to videos from the video options tray in the RCE
   applies_to: SiteAdmin
-rce_lti_favorites:
-  state: hidden
-  display_name: Support favorite LTI tools in the RCE
-  description: Let the site administrator select up to 2 LTI apps as favorites, which will then be displayed in the RCE's toolbar
-  applies_to: SiteAdmin
 rce_pretty_html_editor:
   state: hidden
   display_name: RCE Pretty HTML Editor

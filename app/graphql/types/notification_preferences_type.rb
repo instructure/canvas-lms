@@ -26,9 +26,20 @@ module Types
       argument :channel_id, ID, required: false, default_value: nil
     end
     def channels(channel_id:)
-      return object[:channels] unless channel_id
-      object[:channels].select { |cc| cc.id == channel_id.to_i }
+      # if they queried a specific ID, return it regardless of whether it
+      # is enabled at the account level (ex: push being disabled)
+      if channel_id
+        return object[:channels].select { |cc| cc.id == channel_id.to_i }
+      end
+
+      # remove push notifications, if the account disabled them
+      unless context[:domain_root_account].enable_push_notifications?
+        return object[:channels].reject { |cc| cc.path_type == "push" }
+      end
+
+      object[:channels]
     end
+
 
     field :send_scores_in_emails, Boolean, null: true do
       argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')

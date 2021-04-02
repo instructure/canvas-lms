@@ -20,6 +20,7 @@
 require_relative 'common'
 require_relative 'announcements/pages/announcement_index_page'
 require_relative 'announcements/pages/announcement_new_edit_page'
+require_relative 'discussions/pages/discussions_index_page'
 require_relative 'helpers/announcements_common'
 require_relative 'helpers/legacy_announcements_common'
 require_relative 'helpers/conferences_common'
@@ -214,6 +215,30 @@ describe "groups" do
       it "should only allow group members to access announcements" do
         get announcements_page
         verify_no_course_user_access(announcements_page)
+      end
+
+      it "should not allow group members to edit someone else's announcement via discussion page", priority: "1", test_id: 327111 do
+        announcement = @testgroup.first.announcements.create!(
+          :title => "foobers",
+          :user => @students.first,
+          :message => "sup",
+          :workflow_state => "published"
+        )
+        user_session(@student)
+        get DiscussionsIndex.individual_discussion_url(announcement)
+        expect(f("#content")).not_to contain_css('.edit-btn')
+      end
+
+      it "should allow all group members to see announcements", priority: "1", test_id: 273613, ignore_js_errors: true do
+        @announcement = @testgroup.first.announcements.create!(
+          title: 'Group Announcement',
+          message: 'Group',
+          user: @teacher
+        )
+        AnnouncementIndex.visit_groups_index(@testgroup.first)
+        expect(ff('.ic-announcement-row').size).to eq 1
+        expect_new_page_load { ff('[data-testId="single-announcement-test-id"]')[0].click }
+        expect(f('.discussion-title')).to include_text(@announcement.title)
       end
     end
 

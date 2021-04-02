@@ -27,7 +27,7 @@ import Path from './assignment-path'
 import * as actions from './actions'
 import ScoringRange from './components/scoring-range'
 import AssignmentPickerModal from './components/assignment-picker-modal'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!conditional_release'
 
 const {object, func} = PropTypes

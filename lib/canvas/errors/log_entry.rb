@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -42,7 +44,7 @@ module Canvas
       end
 
       def message
-        msg = ""
+        msg = +""
         ActiveSupport::Deprecation.silence do
           msg << "\n\n[CANVAS_ERRORS] EXCEPTION LOG"
           if @ex.is_a?(String) || @ex.is_a?(Symbol)
@@ -62,7 +64,7 @@ module Canvas
       end
 
       def log_entry_for_exception(e)
-        entry = ""
+        entry = +""
         entry << "\n#{e.class}"
         begin
           entry << " (#{e.message}):" if e.respond_to?(:message)

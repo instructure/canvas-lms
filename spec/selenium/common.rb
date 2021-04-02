@@ -260,6 +260,7 @@ shared_context "in-process server selenium tests" do
 
       # if you run into something that doesn't make sense t
       browser_errors_we_dont_care_about = [
+        "Replacing React-rendered children with a new root component.",
         "A theme registry has already been initialized.",
         "Blocked attempt to show a 'beforeunload' confirmation panel for a frame that never had a user gesture since its load",
         "Error: <path> attribute d: Expected number",

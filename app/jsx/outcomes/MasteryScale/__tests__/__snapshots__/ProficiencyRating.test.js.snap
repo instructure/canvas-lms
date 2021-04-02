@@ -135,41 +135,40 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
       className="color"
     >
       <Popover
-        alignArrow={false}
+        color="primary"
         constrain="window"
         contentRef={[Function]}
-        defaultFocusElement={null}
-        defaultShow={false}
+        defaultIsShowingContent={false}
         insertAt="bottom"
-        label={null}
-        liveRegion={null}
-        mountNode={null}
         offsetX={0}
         offsetY={0}
         on="click"
         onBlur={[Function]}
         onClick={[Function]}
-        onDismiss={[Function]}
         onFocus={[Function]}
+        onHideContent={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
         onMouseOut={[Function]}
         onMouseOver={[Function]}
         onPositionChanged={[Function]}
         onPositioned={[Function]}
         onShow={[Function]}
+        onShowContent={[Function]}
         onToggle={[Function]}
         placement="bottom center"
-        positionTarget={null}
+        renderTrigger={null}
         shadow="resting"
+        shouldAlignArrow={false}
         shouldCloseOnDocumentClick={true}
         shouldCloseOnEscape={true}
         shouldContainFocus={true}
         shouldFocusContentOnTriggerBlur={true}
         shouldRenderOffscreen={false}
         shouldReturnFocus={true}
+        shouldTrackPosition={true}
         show={false}
         stacking="topmost"
-        trackPosition={true}
-        variant="default"
         withArrow={true}
       >
         <PopoverTrigger>
@@ -402,17 +401,16 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
       className="points"
     >
       <View
-        borderColor="default"
-        debug={false}
+        borderColor="primary"
         display="auto"
         focusColor="info"
         focusPosition="offset"
-        focused={false}
         margin="0 0 0 small"
         overflowX="visible"
         overflowY="visible"
         position="static"
         shouldAnimateFocus={true}
+        withVisualDebug={false}
       >
         <ScreenReaderContent
           as="span"

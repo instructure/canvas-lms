@@ -23,7 +23,7 @@
 <%
   whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
 
-  hidden_text = t("Instructor is working on grades")
+  hidden_text = t("Instructor has not posted this grade")
 %>
 <div id="grade-summary-content" style="display: none;">
   <% provide :right_side do %>
@@ -582,7 +582,7 @@
   </table>
   </div>
   <% if @presenter.hidden_submissions_for_published_assignments? %>
-    <small><i class="icon-off" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+    <small><i class="icon-off" role="presentation"></i><%= t("Your instructor has not posted the grade. While your instructor has not posted the grade, grade and comment information is unavailable.") %></small>
   <% end %>
   <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
   <%= render :partial => "shared/rubric_criterion_dialog" %>

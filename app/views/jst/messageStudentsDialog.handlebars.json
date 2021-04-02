@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/messageStudentsDialog",
   "i18nScope": "message_students_dialog"
 }

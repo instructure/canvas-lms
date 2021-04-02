@@ -53,14 +53,18 @@ module Types
       learning_outcome_group_children_service.total_subgroups(object.id)
     end
 
-    field :outcomes_count, Integer, null: false
-    def outcomes_count
-      learning_outcome_group_children_service.total_outcomes(object.id)
+    field :outcomes_count, Integer, null: false do
+      argument :search_query, String, required: false
+    end
+    def outcomes_count(**args)
+      learning_outcome_group_children_service.total_outcomes(object.id, args)
     end
 
-    field :outcomes, Types::ContentTagConnection, null: false
-    def outcomes
-      learning_outcome_group_children_service.suboutcomes_by_group_id(object.id)
+    field :outcomes, Types::ContentTagConnection, null: false do
+      argument :search_query, String, required: false
+    end
+    def outcomes(**args)
+      learning_outcome_group_children_service.suboutcomes_by_group_id(object.id, args)
     end
 
     private

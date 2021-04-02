@@ -55,6 +55,16 @@ it('sets loadingFuture to true on GETTING_FUTURE_ITEMS', () => {
   expect(newState).toMatchObject({loadingFuture: true})
 })
 
+it('sets loadingWeek to true on GETTING_WEEK_ITEMS', () => {
+  const newState = loadingReducer(initialState(), Actions.gettingWeekItems())
+  expect(newState).toMatchObject({loadingWeek: true})
+})
+
+it('sets loadingWeek to false on JUMP_TO_WEEK', () => {
+  const newState = loadingReducer(initialState({loadintWeek: true}), Actions.jumpToWeek())
+  expect(newState).toMatchObject({loadingWeek: false})
+})
+
 it('sets loading to false and plannerLoaded to true on GOT_DAYS_SUCCESS', () => {
   const state = initialState({isLoading: true})
   const newState = loadingReducer(state, Actions.gotDaysSuccess([]))
@@ -111,16 +121,33 @@ it('sets only opportunities fields on ALL_OPPORTUNITIES_LOADED', () => {
 
 it('purges complete days from partial days on GOT_DAYS_SUCCESS', () => {
   const state = initialState({
-    partialFutureDays: [['2017-12-18', []], ['2017-12-19', []], ['2017-12-20', [{id: 1}]]],
-    partialPastDays: [['2017-12-17', []], ['2017-12-16', []], ['2017-12-15', [{id: 2}]]]
+    partialFutureDays: [
+      ['2017-12-18', []],
+      ['2017-12-19', []],
+      ['2017-12-20', [{id: 1}]]
+    ],
+    partialPastDays: [
+      ['2017-12-17', []],
+      ['2017-12-16', []],
+      ['2017-12-15', [{id: 2}]]
+    ],
+    partialWeekDays: [
+      ['2017-12-15', [{id: 3}]],
+      ['2017-12-16', []],
+      ['2017-12-17', []]
+    ]
   })
   const newState = loadingReducer(
     state,
-    Actions.gotDaysSuccess([['2017-12-18', []], ['2017-12-17', []]])
+    Actions.gotDaysSuccess([
+      ['2017-12-18', []],
+      ['2017-12-17', []]
+    ])
   )
   expect(newState).toMatchObject({
     partialFutureDays: [['2017-12-20', [{id: 1}]]],
-    partialPastDays: [['2017-12-15', [{id: 2}]]]
+    partialPastDays: [['2017-12-15', [{id: 2}]]],
+    partialWeekDays: [['2017-12-15', [{id: 3}]]]
   })
 })
 
@@ -268,5 +295,49 @@ it('sets grades error', () => {
     loadingGrades: false,
     gradesLoaded: false,
     gradesLoadingError: 'some error'
+  })
+})
+
+it('sets nextWeekUrl from response on GOT_PARTIAL_WEEK_DAYS', () => {
+  const state = initialState({loadingWeek: true, weekNextUrl: 'original'})
+  const newState = loadingReducer(
+    state,
+    Actions.gotPartialWeekDays([], {
+      ...linkHeader('someurl')
+    })
+  )
+  expect(newState).toMatchObject({
+    weekNextUrl: 'someurl',
+    allWeekItemsLoaded: false
+  })
+})
+
+it('clears week url when not found', () => {
+  const state = initialState({
+    loadingWeek: true,
+    weekNextUrl: 'originalWeek'
+  })
+  const newState = loadingReducer(state, Actions.gotPartialWeekDays([]))
+  expect(newState).toMatchObject({
+    weekNextUrl: null,
+    allWeekItemsLoaded: true
+  })
+})
+
+it('adds to partialWeekDays', () => {
+  const originalDays = [['2017-12-17', [mockItem(1)]]]
+  const state = initialState({
+    originalState: 'original state',
+    partialWeekDays: originalDays
+  })
+  const newDays = [
+    ['2017-12-18', [mockItem(2)]],
+    ['2017-12-19', [mockItem(3)]],
+    ['2017-12-20', [mockItem(4)]]
+  ]
+  const newState = loadingReducer(state, Actions.gotPartialWeekDays(newDays))
+  expect(newState).toMatchObject({
+    originalState: 'original state',
+    partialWeekDays: [...originalDays, ...newDays]
   })
 })

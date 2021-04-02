@@ -19,6 +19,7 @@
 import React from 'react'
 
 export const StudentViewContextDefaults = {
+  allowChangesToSubmission: true,
   isLatestAttempt: true,
   startNewAttemptAction: () => {},
 

@@ -435,7 +435,7 @@ describe User do
           user.update_root_account_ids
         }.to change {
           user.root_account_ids
-        }.from(nil).to([root_account.global_id])
+        }.from([]).to([root_account.global_id])
       end
 
       context 'and communication channels for the user exist' do
@@ -448,7 +448,7 @@ describe User do
             user.update_root_account_ids
           }.to change {
             user.communication_channels.first.root_account_ids
-          }.from(nil).to([root_account.id])
+          }.from([]).to([root_account.id])
         end
       end
     end
@@ -472,7 +472,7 @@ describe User do
           user.update_root_account_ids
         }.to change {
           user.root_account_ids&.sort
-        }.from(nil).to(
+        }.from([]).to(
           [root_account.id, shard_two_root_account.global_id].sort
         )
       end

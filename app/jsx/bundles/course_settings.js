@@ -21,6 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import NavigationView from 'compiled/views/course_settings/NavigationView'
 import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
+import CourseColorSelector from '../course_settings/components/CourseColorSelector'
 import CourseImageSelector from '../course_settings/components/CourseImageSelector'
 import BlueprintLockOptions from '../blueprint_courses/components/BlueprintLockOptions'
 import CourseAvailabilityOptions from '../course_settings/components/CourseAvailabilityOptions'
@@ -70,10 +71,23 @@ const availabilityOptionsContainer = document.getElementById('availability_optio
 if (availabilityOptionsContainer) {
   ReactDOM.render(
     <CourseAvailabilityOptions
-      canManage={ENV.PERMISSIONS.manage}
+      canManage={
+        ENV.PERMISSIONS.manage_courses ||
+        (ENV.PERMISSIONS.manage && !ENV.PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS)
+      }
       viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
       viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
     />,
     availabilityOptionsContainer
   )
+}
+
+if (ENV.COURSE_COLORS_ENABLED) {
+  const courseColorPickerContainer = document.getElementById('course_color_picker_container')
+  if (courseColorPickerContainer) {
+    ReactDOM.render(
+      <CourseColorSelector courseColor={ENV.COURSE_COLOR} />,
+      courseColorPickerContainer
+    )
+  }
 }

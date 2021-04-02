@@ -260,6 +260,17 @@ module Canvadocs
       end
     end
 
+    # For Annotated Document assignments, the Canvadoc won't have a
+    # relationship with the Submission through CanvadocsSubmission, so we set
+    # a blank user_filter here to avoid the default of restricting to only the
+    # viewing user's annotations (default is in Canvadocs::Session). If we the
+    # user_filter is nil here, then we know we didn't have any other reason to
+    # be restrictive.
+    if session_params[:user_filter].nil? && submission.submission_type == "annotated_document"
+      session_params[:restrict_annotations_to_user_filter] = false
+      session_params[:user_filter] = []
+    end
+
     session_params
   end
 

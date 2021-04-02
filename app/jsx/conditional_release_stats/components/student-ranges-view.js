@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {IconMiniArrowDownSolid, IconMiniArrowEndSolid} from '@instructure/ui-icons'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar_student_ranges_view'

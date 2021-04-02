@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CascadeFkIdxsToAuditorCourses < CanvasPartman::Migration
   disable_ddl_transaction!
   tag :postdeploy

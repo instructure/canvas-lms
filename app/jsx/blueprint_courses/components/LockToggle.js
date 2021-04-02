@@ -21,9 +21,9 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {Tooltip} from '@instructure/ui-overlays'
-import {Text} from '@instructure/ui-elements'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {Text} from '@instructure/ui-text'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 

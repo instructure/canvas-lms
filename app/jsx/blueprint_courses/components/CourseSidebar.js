@@ -24,10 +24,10 @@ import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import {Tooltip} from '@instructure/ui-overlays'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 
 import propTypes from '../propTypes'
 import actions from '../actions'

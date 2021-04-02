@@ -59,6 +59,12 @@ describe LearningOutcomeResult do
     end
   end
 
+  it_behaves_like 'soft deletion' do
+    let(:first) { learning_outcome_result }
+    let(:second) { create_and_associate_lor(course.assignments.create!) }
+    subject { LearningOutcomeResult.all }
+  end
+
   describe '#submitted_or_assessed_at' do
     let_once(:submitted_at) { 1.month.ago }
     let_once(:assessed_at) { 2.weeks.ago }
@@ -95,10 +101,10 @@ describe LearningOutcomeResult do
 
       context 'assignment with unposted submissions with default posting policy' do
         it 'includes assignment result' do
-          # By default, an automatic post policy (post_manually: false) is associated to 
+          # By default, an automatic post policy (post_manually: false) is associated to
           # an assignment.  Now that post policy is included in exclude_muted_associations
           # the outcome result will appear in LMGB/SLMGB.  It will not appear for manual
-          # post policy assignment until the submission is posted.  See "manual posting 
+          # post policy assignment until the submission is posted.  See "manual posting
           # policy" test cases below.
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
@@ -161,12 +167,12 @@ describe LearningOutcomeResult do
     end
   end
 
-  describe "active scope" do
+  describe "with_active_link scope" do
     it "doesn't return deleted outcomes" do
-      expect(LearningOutcomeResult.active.count).to eq(1), "precondition"
+      expect(LearningOutcomeResult.with_active_link.count).to eq(1), "precondition"
       learning_outcome_result.alignment.workflow_state = 'deleted'
       learning_outcome_result.alignment.save!
-      expect(LearningOutcomeResult.active.count).to eq 0
+      expect(LearningOutcomeResult.with_active_link.count).to eq 0
     end
   end
 

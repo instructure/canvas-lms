@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
+import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
-import {K5Dashboard} from '../K5Dashboard'
+import K5Dashboard from '../K5Dashboard'
+import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
 const currentUser = {
@@ -100,12 +102,31 @@ const gradeCourses = [
     homeroom_course: true
   }
 ]
+const opportunities = [
+  {
+    id: 1,
+    course_id: 1,
+    name: 'Assignment 1',
+    point_possible: 23,
+    html_url: '/courses/1/assignments/1',
+    due_at: '2021-01-10T05:59:00Z',
+    submission_types: ['online_quiz']
+  },
+  {
+    id: 2,
+    course_id: 1,
+    name: 'Assignment 2',
+    point_possible: 10,
+    html_url: '/courses/1/assignments/2',
+    due_at: '2021-01-15T05:59:00Z',
+    submission_types: ['online_url']
+  }
+]
 const staff = [
   {
     id: '1',
     short_name: 'Mrs. Thompson',
     bio: 'Office Hours: 1-3pm W',
-    email: 't@abc.edu',
     avatar_url: '/images/avatar1.png',
     enrollments: [
       {
@@ -117,7 +138,6 @@ const staff = [
     id: '2',
     short_name: 'Tommy the TA',
     bio: 'Office Hours: 1-3pm F',
-    email: 'tommy@abc.edu',
     avatar_url: '/images/avatar2.png',
     enrollments: [
       {
@@ -126,8 +146,18 @@ const staff = [
     ]
   }
 ]
+const apps = [
+  {
+    id: '17',
+    course_navigation: {
+      text: 'Google Apps',
+      icon_url: 'google.png'
+    }
+  }
+]
 const defaultEnv = {
   current_user: currentUser,
+  K5_MODE: true,
   FEATURES: {
     canvas_for_elementary: true,
     unpublished_courses: true
@@ -140,8 +170,9 @@ const defaultEnv = {
 }
 const defaultProps = {
   currentUser,
-  env: defaultEnv,
-  plannerEnabled: false
+  plannerEnabled: false,
+  loadAllOpportunities: () => {},
+  timeZone: defaultEnv.TIMEZONE
 }
 
 beforeAll(() => {
@@ -150,12 +181,45 @@ beforeAll(() => {
     status: 200,
     response: dashboardCards
   })
-  moxios.stubRequest(/\/api\/v1\/planner\/items.*/, {
+  moxios.stubRequest(/api\/v1\/planner\/items.*/, {
     status: 200,
-    response: [],
-    headers: {
-      link: ''
-    }
+    headers: {link: 'url; rel="current"'},
+    response: [
+      {
+        context_name: 'Course2',
+        context_type: 'Course',
+        course_id: '2',
+        html_url: '/courses/2/assignments/15',
+        new_activity: false,
+        plannable: {
+          created_at: '2021-03-16T17:17:17Z',
+          due_at: moment().toISOString(),
+          id: '15',
+          points_possible: 10,
+          title: 'Assignment 15',
+          updated_at: '2021-03-16T17:31:52Z'
+        },
+        plannable_date: moment().toISOString(),
+        plannable_id: '15',
+        plannable_type: 'assignment',
+        planner_override: null,
+        submissions: {
+          excused: false,
+          graded: false,
+          has_feedback: false,
+          late: false,
+          missing: true,
+          needs_grading: false,
+          redo_request: false,
+          submitted: false
+        }
+      }
+    ]
+  })
+  moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submission.*/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: opportunities
   })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(
@@ -163,9 +227,12 @@ beforeAll(() => {
     JSON.stringify(homeroomAnnouncement)
   )
   fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_test.*/, '[]')
-  fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(/\/api\/v1\/courses\/homeroom\/users.*/, JSON.stringify(staff))
+  fetchMock.get(
+    '/api/v1/courses/test/external_tools/visible_course_nav_tools',
+    JSON.stringify(apps)
+  )
 })
 
 afterAll(() => {
@@ -174,7 +241,6 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.resetModules()
   global.ENV = defaultEnv
 })
 
@@ -257,11 +323,54 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Schedule Section', () => {
-    it('displays an empty state when no items are fetched', async () => {
+    afterEach(() => {
+      resetPlanner()
+    })
+
+    it('displays the planner with a planned item', async () => {
       const {findByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
+      // The new weekly planner doesn't display the PlannerEmptyState.
+      // This will get addressed one way or another with LS-2042
+      // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
+      // expect(await findByText('Nothing More To Do')).toBeInTheDocument()
+    })
+
+    it('displays a list of missing assignments if there are any', async () => {
+      const {findByText} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const missingAssignments = await findByText('Show 2 missing items')
+      expect(missingAssignments).toBeInTheDocument()
+    })
+
+    it('renders the weekly planner header', async () => {
+      const {findByTestId} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const planner = await findByTestId('PlannerApp')
+      expect(planner).toBeInTheDocument()
+
+      const header = await findByTestId('WeeklyPlannerHeader')
+      expect(header).toBeInTheDocument()
+    })
+
+    it('displays a teacher preview if the user has no student enrollments', async () => {
+      const {findByTestId, getByText} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
+      )
+
+      expect(await findByTestId('kinder-panda')).toBeInTheDocument()
+      expect(getByText('Teacher Schedule Preview')).toBeInTheDocument()
+      expect(
+        getByText('Below is an example of how your students will see their schedule')
+      ).toBeInTheDocument()
+      expect(getByText('Social Studies')).toBeInTheDocument()
+      expect(getByText('A great discussion assignment')).toBeInTheDocument()
     })
   })
 
@@ -284,6 +393,14 @@ describe('K-5 Dashboard', () => {
       expect(wrapper.getByText('Teacher')).toBeInTheDocument()
       expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
       expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
+    })
+
+    it("shows apps installed in the user's courses", async () => {
+      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
+      expect(await wrapper.findByText('Google Apps')).toBeInTheDocument()
+      const icon = wrapper.getByTestId('renderedIcon')
+      expect(icon).toBeInTheDocument()
+      expect(icon.src).toContain('google.png')
     })
   })
 })

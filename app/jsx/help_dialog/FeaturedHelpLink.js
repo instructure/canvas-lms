@@ -20,8 +20,10 @@ import React from 'react'
 import {bool, shape, string, func} from 'prop-types'
 import I18n from 'i18n!HelpLinks'
 import {Link} from '@instructure/ui-link'
-import {Text, Heading, Img} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Img} from '@instructure/ui-img'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import PandaMapSVGURL from '../../../public/images/panda-map.svg'
 
 export default function FeaturedHelpLink({featuredLink, handleClick}) {

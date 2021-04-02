@@ -467,21 +467,71 @@ describe CanvadocSessionsController do
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
-      it "sends along the annotation_context when annotation_context is present" do
-        @submission.update!(attempt: 2)
-        context = @submission.canvadocs_annotation_contexts.create!(
-          attachment: @attachment,
-          submission_attempt: @submission.attempt
-        )
+      context "when annotation_context is present" do
+        before(:once) do
+          @assignment.update!(annotatable_attachment: @attachment, submission_types: "annotated_document")
+          @submission.update!(attempt: 2)
+          @annotation_context = @submission.canvadocs_annotation_contexts.create!(
+            attachment: @attachment,
+            submission_attempt: @submission.attempt
+          )
+        end
 
-        custom_blob = blob.merge(annotation_context: context.launch_id).to_json
-        custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+        it "sends along the annotation_context" do
+          custom_blob = blob.merge(annotation_context: @annotation_context.launch_id).to_json
+          custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
 
-        expect(@attachment.canvadoc).
-          to receive(:session_url).
-          with(hash_including(annotation_context: context.launch_id))
+          expect(@attachment.canvadoc).
+            to receive(:session_url).
+            with(hash_including(annotation_context: @annotation_context.launch_id))
 
-        get :show, params: {blob: custom_blob, hmac: custom_hmac}
+          get :show, params: {blob: custom_blob, hmac: custom_hmac}
+        end
+
+        context "when the user is a student" do
+          before(:each) do
+            user_session(@student)
+          end
+
+          it "sets read_only to true if the CanvadocsAnnotationContext is not a draft" do
+            custom_blob = blob.merge(annotation_context: @annotation_context.launch_id).to_json
+            custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+            expect(@attachment.canvadoc).
+              to receive(:session_url).
+              with(hash_including(read_only: true))
+
+            get :show, params: {blob: custom_blob, hmac: custom_hmac}
+          end
+
+          it "sets read_only to false if the CanvadocsAnnotationContext is a draft" do
+            draft_annotation_context = @submission.annotation_context(draft: true)
+            custom_blob = blob.merge(annotation_context: draft_annotation_context.launch_id).to_json
+            custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+            expect(@attachment.canvadoc).
+              to receive(:session_url).
+              with(hash_including(read_only: false))
+
+            get :show, params: {blob: custom_blob, hmac: custom_hmac}
+          end
+        end
+
+        it "always sets read_only to false when the user is a teacher" do
+          user_session(@teacher)
+          custom_blob = blob.merge(
+            annotation_context: @annotation_context.launch_id,
+            enrollment_type: "teacher",
+            user_id: @teacher.global_id
+          ).to_json
+          custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+          expect(@attachment.canvadoc).
+            to receive(:session_url).
+            with(hash_including(read_only: false))
+
+          get :show, params: {blob: custom_blob, hmac: custom_hmac}
+        end
       end
 
       it "sends along the audit url when annotations are enabled and assignment is anonymous" do

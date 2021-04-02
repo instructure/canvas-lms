@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/groups/manage/addUnassignedMenu",
   "i18nScope": "groups.manage.add_unassigned_menu"
 }

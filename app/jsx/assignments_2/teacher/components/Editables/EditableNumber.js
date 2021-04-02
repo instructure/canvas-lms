@@ -19,11 +19,11 @@
 import React from 'react'
 import {bool, string, func, number, oneOf, oneOfType} from 'prop-types'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {NumberInput} from '@instructure/ui-number-input'
 import {InPlaceEdit} from '@instructure/ui-editable'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 import {omitProps} from '@instructure/ui-react-utils'
 import {createChainedFunction} from '@instructure/ui-utils'
 

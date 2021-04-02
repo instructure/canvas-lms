@@ -18,9 +18,9 @@
 
 import React from 'react'
 import I18n from 'i18n!external_tools'
-import {TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import {IconLtiLine} from '@instructure/ui-icons'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 class ConfigurationFormLti13 extends React.Component {
   constructor(props) {

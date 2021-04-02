@@ -18,9 +18,10 @@
 
 import React, {Component} from 'react'
 import {bool, func, shape} from 'prop-types'
-import {View} from '@instructure/ui-layout'
-import {List, Text} from '@instructure/ui-elements'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
 

@@ -26,9 +26,7 @@ function renderTable(canAddEdit) {
     ACCOUNT: {
       site_admin: false
     },
-    FEATURES: {
-      rce_lti_favorites: true
-    }
+    FEATURES: {}
   }
 
   const setFocusAbove = jest.fn()
@@ -36,7 +34,7 @@ function renderTable(canAddEdit) {
 }
 
 describe('ExternalToolsTable', () => {
-  describe('rce favorites toggle', function() {
+  describe('rce favorites toggle', function () {
     it('shows if admin has permission', () => {
       const {queryByText} = renderTable(true)
       expect(queryByText('Name')).toBeInTheDocument()

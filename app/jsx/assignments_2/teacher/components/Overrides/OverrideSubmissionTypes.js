@@ -26,10 +26,11 @@ import FileType from './SubmissionTypes/FileType'
 import NonCanvasType from './SubmissionTypes/NonCanvasType'
 import OperatorType from './SubmissionTypes/OperatorType'
 import SimpleType from './SubmissionTypes/SimpleType'
-import {Heading, Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
+import {Heading} from '@instructure/ui-heading'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Menu} from '@instructure/ui-menu'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import AddHorizontalRuleButton from '../AddHorizontalRuleButton'
 
 import {

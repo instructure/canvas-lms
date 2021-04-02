@@ -37,23 +37,6 @@ function checkStatus(response) {
   }
 }
 
-// convert a successful response into the parsed out data
-function parseResponse(response) {
-  // NOTE: this returns a promise, not a synchronous result. since it's passed
-  // to a .then(), that's fine, but before reusing somewhere where intended to
-  // be synchronous, be aware of that
-  return response.text().then(text => {
-    let json = text
-    try {
-      json = text.replace(/^while\(1\);/, '')
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('Strange json package', err)
-    }
-    return JSON.parse(json)
-  })
-}
-
 function defaultRefreshTokenHandler() {
   throw new Error('Token expired, no refresh function provided')
 }
@@ -332,7 +315,7 @@ class RceApiSource {
     }
     return fetch(preflightProps.upload_url, fetchOptions)
       .then(checkStatus)
-      .then(parseResponse)
+      .then(res => res.json())
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
@@ -354,7 +337,7 @@ class RceApiSource {
       // require authentication
       return fetch(preflightProps.upload_params.success_url)
         .then(checkStatus)
-        .then(parseResponse)
+        .then(res => res.json())
     } else if (uploadResults.location) {
       // inst-fs upload, follow-up by fetching file identified by location in
       // response. we can't just fetch the location as would be intended because
@@ -435,7 +418,7 @@ class RceApiSource {
         }
       })
       .then(checkStatus)
-      .then(options.skipParse ? () => {} : parseResponse)
+      .then(options.skipParse ? () => {} : res => res.json())
       .catch(throwConnectionError)
       .catch(e => {
         this.alertFunc({
@@ -472,7 +455,7 @@ class RceApiSource {
         }
       })
       .then(checkStatus)
-      .then(parseResponse)
+      .then(res => res.json())
       .catch(throwConnectionError)
       .catch(e => {
         console.error(e) // eslint-disable-line no-console

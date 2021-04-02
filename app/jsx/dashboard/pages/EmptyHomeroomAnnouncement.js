@@ -36,7 +36,7 @@ export default function EmptyHomeroomAnnouncement({courseUrl, courseName}) {
         </Link>
       </Heading>
       <Text as="div">
-        {I18n.t('Every new announcement shows up in this area. Create your first one now.')}
+        {I18n.t('New announcements show up in this area. Create a new announcement now.')}
       </Text>
       <Button
         renderIcon={IconAddLine}

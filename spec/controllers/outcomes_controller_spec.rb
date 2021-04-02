@@ -207,6 +207,39 @@ describe OutcomesController do
       expect(response).to be_successful
       expect(response).to render_template('user_outcome_results')
     end
+
+    context 'deleted results' do
+      before(:once) do
+        account_outcome
+        assessment_question_bank_with_questions
+        @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
+
+        @quiz = @course.quizzes.create!(:title => "a quiz")
+        @quiz.add_assessment_questions [ @q1, @q2 ]
+
+        @submission = @quiz.generate_submission @student
+        @submission.quiz_data = @quiz.generate_quiz_data
+        @submission.mark_completed
+        Quizzes::SubmissionGrader.new(@submission).grade_submission
+      end
+
+      it 'should return existing results' do
+        user_session(@admin)
+
+        get 'user_outcome_results', params: {account_id: @account.id, user_id: @student.id}
+        expect(response).to be_successful
+        expect(assigns[:results]).not_to be_empty
+      end
+
+      it 'should not return deleted results' do
+        user_session(@admin)
+        LearningOutcomeResult.find_by!(artifact: @submission, user: @student).destroy
+
+        get 'user_outcome_results', params: {account_id: @account.id, user_id: @student.id}
+        expect(response).to be_successful
+        expect(assigns[:results]).to be_empty
+      end
+    end
   end
 
   describe "GET 'list'" do
@@ -384,6 +417,16 @@ describe OutcomesController do
           :outcome_id => @outcome.id,
           :id => @outcome.learning_outcome_results.last}
         assert_unauthorized
+      end
+
+      it "should not return deleted results" do
+        @outcome.learning_outcome_results.last.destroy
+        user_session(@teacher)
+        get 'outcome_result',
+          params: {:course_id => @course.id,
+          :outcome_id => @outcome.id,
+          :id => @outcome.learning_outcome_results.last}
+        expect(response).to be_not_found
       end
 
       it "should redirect to show quiz when result is a quiz" do
