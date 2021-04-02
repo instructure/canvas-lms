@@ -43,6 +43,7 @@ afterAll(() => {
 })
 beforeEach(() => {
   successalert.mockReset()
+  jest.clearAllMocks()
 })
 
 describe('scrollToToday', () => {
@@ -293,6 +294,34 @@ describe('scrollToToday', () => {
         animation.acceptAction({type: 'SCROLL_TO_TODAY', payload: {isWeekly: true}})
         animation.uiDidUpdate()
         expect(srAlert).toHaveBeenCalledWith(nothingTodayMessage)
+        expect(animator.forceScrollTo).toHaveBeenCalledTimes(1)
+        expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem)
+        expect(animator.focusElement).toHaveBeenCalledWith('missing items')
+      })
+    })
+
+    describe('when there are items today, but the action specifies focusing on missing items instead', () => {
+      it('focuses on missing items', () => {
+        const today_elem = {}
+        const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday)
+        manager.getDocument().querySelector = function () {
+          return today_elem
+        }
+        manager.getDocument().getElementById = function () {
+          return 'missing items'
+        }
+        const mockRegistryEntries = [mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ))]
+        mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem)
+        registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries)
+        store.getState.mockReturnValue({
+          timeZone: TZ
+        })
+        animation.acceptAction({
+          type: 'SCROLL_TO_TODAY',
+          payload: {focusMissingItems: true, isWeekly: true}
+        })
+        animation.uiDidUpdate()
+        expect(srAlert).not.toHaveBeenCalledWith(nothingTodayMessage)
         expect(animator.forceScrollTo).toHaveBeenCalledTimes(1)
         expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem)
         expect(animator.focusElement).toHaveBeenCalledWith('missing items')

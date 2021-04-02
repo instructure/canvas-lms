@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 
 import {createPlannerApp, renderWeeklyPlannerHeader} from '@instructure/canvas-planner'
 
-const SchedulePage = ({visible = false}) => {
+const SchedulePage = ({focusMissingItems = false, visible = false}) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
   const plannerApp = useRef()
 
@@ -39,7 +39,7 @@ const SchedulePage = ({visible = false}) => {
       }}
       aria-hidden={!visible}
     >
-      {renderWeeklyPlannerHeader({visible})}
+      {renderWeeklyPlannerHeader({visible, focusMissingItems})}
       {isPlannerCreated && plannerApp.current}
       {isPlannerCreated && renderWeeklyPlannerHeader({visible, isFooter: true})}
     </section>
@@ -47,6 +47,7 @@ const SchedulePage = ({visible = false}) => {
 }
 
 SchedulePage.propTypes = {
+  focusMissingItems: PropTypes.bool,
   visible: PropTypes.bool
 }
 

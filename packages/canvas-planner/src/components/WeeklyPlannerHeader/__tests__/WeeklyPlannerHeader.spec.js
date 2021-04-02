@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import {render, waitFor} from '@testing-library/react'
 import {WeeklyPlannerHeader} from '../index'
 
 function defaultProps(options) {
@@ -97,5 +96,23 @@ describe('WeeklyPlannerHeader', () => {
     button.click()
     expect(callback).not.toHaveBeenCalled()
     expect(button.hasAttribute('disabled')).toEqual(true)
+  })
+
+  it('scrolls to today when it becomes visible', () => {
+    const callback = jest.fn()
+    const props = defaultProps({visible: false, scrollToToday: callback})
+    const {rerender} = render(<WeeklyPlannerHeader {...props} />)
+    expect(callback).not.toHaveBeenCalled()
+
+    rerender(<WeeklyPlannerHeader {...props} visible />)
+    waitFor(() => expect(callback).toHaveBeenCalledWith({focusMissingItems: false, isWeekly: true}))
+  })
+
+  it('scrolls to missing items instead when it becomes visible if configured', () => {
+    const callback = jest.fn()
+    const props = defaultProps({focusMissingItems: true, visible: false, scrollToToday: callback})
+    const {rerender} = render(<WeeklyPlannerHeader {...props} />)
+    rerender(<WeeklyPlannerHeader {...props} visible />)
+    waitFor(() => expect(callback).toHaveBeenCalledWith({focusMissingItems: true, isWeekly: true}))
   })
 })

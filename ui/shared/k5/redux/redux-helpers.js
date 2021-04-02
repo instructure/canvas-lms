@@ -20,11 +20,13 @@ import moment from 'moment-timezone'
 
 import {countByCourseId} from '../react/utils'
 
-export const mapStateToProps = ({days, opportunities, timeZone, loading}) => {
+export const mapStateToProps = ({loading, opportunities, timeZone, weeklyDashboard}) => {
   const props = {assignmentsDueToday: {}, assignmentsMissing: {}, assignmentsCompletedForToday: {}}
   const todaysDate = moment.tz(timeZone).format('YYYY-MM-DD')
-  const today = days?.length > 0 && days.find(([date]) => date === todaysDate)
-  if (today?.length === 2 && today[1]?.length > 0) {
+  const weeks = weeklyDashboard?.weeks || {}
+  const days = Object.values(weeks).flat(1)
+  const today = days.find(([date]) => date === todaysDate)
+  if (today?.[1]?.length) {
     props.assignmentsDueToday = countByCourseId(
       today[1].filter(({status}) => status && !status.submitted)
     )
@@ -32,7 +34,7 @@ export const mapStateToProps = ({days, opportunities, timeZone, loading}) => {
       today[1].filter(({status}) => status && status.submitted)
     )
   }
-  if (opportunities?.items?.length > 0) {
+  if (opportunities?.items?.length) {
     props.assignmentsMissing = countByCourseId(
       opportunities.items.filter(({planner_override}) => !planner_override?.dismissed)
     )

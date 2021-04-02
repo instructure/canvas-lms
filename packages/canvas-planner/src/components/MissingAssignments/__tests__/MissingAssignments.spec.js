@@ -21,7 +21,7 @@ import {act, render} from '@testing-library/react'
 
 import {convertSubmissionType, getMissingItemsText, MissingAssignments} from '..'
 
-const defaultProps = {
+const defaultProps = (expanded = false) => ({
   courses: [
     {
       id: '18',
@@ -65,33 +65,38 @@ const defaultProps = {
         course_id: '18'
       }
     ],
+    missingItemsExpanded: expanded,
     nextUrl: null
   },
   responsiveSize: 'large',
-  timeZone: 'Pacific/Guam'
-}
+  timeZone: 'Pacific/Guam',
+  toggleMissing: jest.fn()
+})
 
 describe('MissingAssignments', () => {
   it('Renders nothing if there are no opportunities', () => {
-    const {queryByRole} = render(<MissingAssignments {...defaultProps} opportunities={[]} />)
+    const {queryByRole} = render(<MissingAssignments {...defaultProps()} opportunities={[]} />)
     expect(queryByRole('button', {name: /missing items/})).not.toBeInTheDocument()
   })
 
   describe('when collapsed', () => {
     it('Renders a Show button with the number of opportunities if there are opportunities', () => {
-      const {getByRole} = render(<MissingAssignments {...defaultProps} />)
+      const {getByRole} = render(<MissingAssignments {...defaultProps()} />)
       expect(getByRole('button', {name: 'Show 3 missing items'})).toBeInTheDocument()
     })
 
     it('Renders a warning icon next to the Show button when collapsed', () => {
-      const {getByTestId} = render(<MissingAssignments {...defaultProps} />)
+      const {getByTestId} = render(<MissingAssignments {...defaultProps()} />)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
     })
 
     it('Expands to show a list of missing assignments when the Show button is clicked', async () => {
-      const {getByRole, getByText} = render(<MissingAssignments {...defaultProps} />)
+      const props = defaultProps()
+      const {getByRole} = render(<MissingAssignments {...props} />)
       act(() => getByRole('button', {name: 'Show 3 missing items'}).click())
+      expect(props.toggleMissing).toHaveBeenCalled()
 
+      const {getByText} = render(<MissingAssignments {...defaultProps(true)} />)
       expect(document.getElementsByClassName('planner-item').length).toBe(3)
       expect(getByText('My First Reactor')).toBeInTheDocument()
       expect(getByText('How to Tie a Knot')).toBeInTheDocument()
@@ -101,8 +106,7 @@ describe('MissingAssignments', () => {
 
   describe('when expanded', () => {
     it('Renders differently for discussions, quizzes, and assignments', () => {
-      const {getByRole, getByText} = render(<MissingAssignments {...defaultProps} />)
-      act(() => getByRole('button', {name: 'Show 3 missing items'}).click())
+      const {getByText} = render(<MissingAssignments {...defaultProps(true)} />)
 
       expect(
         getByText('Assignment My First Reactor, due Wednesday, July 10, 2019 3:59 PM.')
@@ -116,8 +120,7 @@ describe('MissingAssignments', () => {
     })
 
     it('Does not render a warning icon next to the Hide button when expanded', () => {
-      const {getByRole, queryByTestId} = render(<MissingAssignments {...defaultProps} />)
-      act(() => getByRole('button', {name: 'Show 3 missing items'}).click())
+      const {queryByTestId} = render(<MissingAssignments {...defaultProps(true)} />)
 
       expect(queryByTestId('warning-icon')).not.toBeInTheDocument()
     })

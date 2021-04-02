@@ -17,7 +17,7 @@
  */
 import opportunitiesReducer from '../opportunities-reducer'
 
-function basicOpportunity(option) {
+function basicOpportunity() {
   return {
     id: '6',
     course_id: '1',
@@ -46,7 +46,10 @@ it('adds items to the state on ADD_OPPORTUNITIES', () => {
   const newState = opportunitiesReducer(initialState, {
     type: 'ADD_OPPORTUNITIES',
     payload: {
-      items: [{id: '1', date: '2017-04-28'}, {id: '2', date: '2017-04-29'}],
+      items: [
+        {id: '1', date: '2017-04-28'},
+        {id: '2', date: '2017-04-29'}
+      ],
       nextUrl: null
     }
   })
@@ -62,7 +65,10 @@ it('discards duplicate items on ADD_OPPORTUNITIES', () => {
   const newState = opportunitiesReducer(initialState, {
     type: 'ADD_OPPORTUNITIES',
     payload: {
-      items: [{id: '6', date: '2017-04-28'}, {id: '2', date: '2017-04-29'}],
+      items: [
+        {id: '6', date: '2017-04-28'},
+        {id: '2', date: '2017-04-29'}
+      ],
       nextUrl: null
     }
   })
@@ -97,4 +103,38 @@ it('adds to opportunity object if no planner override DISMISSED_OPPORTUNITY', ()
   })
 
   expect(newState.items[0].planner_override.dismissed).toBe(true)
+})
+
+it('toggles missing items state when receiving TOGGLE_MISSING_ITEMS', () => {
+  const initialState = {
+    items: [basicOpportunity()],
+    missingItemsExpanded: false,
+    nextUrl: null
+  }
+
+  const newState = opportunitiesReducer(initialState, {type: 'TOGGLE_MISSING_ITEMS', payload: null})
+  expect(newState.missingItemsExpanded).toBeTruthy()
+
+  const finalState = opportunitiesReducer(newState, {type: 'TOGGLE_MISSING_ITEMS', payload: null})
+  expect(finalState.missingItemsExpanded).toBeFalsy()
+})
+
+it('TOGGLE_MISSING_ITEMS always expands when forceExpanded is true', () => {
+  const initialState = {
+    items: [basicOpportunity()],
+    missingItemsExpanded: false,
+    nextUrl: null
+  }
+
+  const newState = opportunitiesReducer(initialState, {
+    type: 'TOGGLE_MISSING_ITEMS',
+    payload: {forceExpanded: true}
+  })
+  expect(newState.missingItemsExpanded).toBeTruthy()
+
+  const finalState = opportunitiesReducer(newState, {
+    type: 'TOGGLE_MISSING_ITEMS',
+    payload: {forceExpanded: true}
+  })
+  expect(finalState.missingItemsExpanded).toBeTruthy()
 })

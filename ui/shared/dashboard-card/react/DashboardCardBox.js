@@ -33,7 +33,6 @@ export default class DashboardCardBox extends React.Component {
     headingLevel: PropTypes.oneOf(['h2', 'h3']),
     hideColorOverlays: PropTypes.bool,
     connectDropTarget: PropTypes.func,
-    requestTabChange: PropTypes.func,
     showSplitDashboardView: PropTypes.bool
   }
 
@@ -166,7 +165,6 @@ export default class DashboardCardBox extends React.Component {
         frontPageTitle={card.frontPageTitle}
         cardComponent={this.props.cardComponent}
         headingLevel={cardHeadingLevel}
-        requestTabChange={this.props.requestTabChange}
       />
     )
   }

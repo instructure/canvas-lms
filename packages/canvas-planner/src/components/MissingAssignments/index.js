@@ -17,7 +17,7 @@
  */
 
 import React, {PureComponent} from 'react'
-import {arrayOf, number, shape, string} from 'prop-types'
+import {arrayOf, func, number, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
@@ -28,8 +28,9 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {themeable} from '@instructure/ui-themeable'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
-import {courseShape, opportunityShape} from '../plannerPropTypes'
 
+import {courseShape, opportunityShape} from '../plannerPropTypes'
+import {toggleMissingItems} from '../../actions'
 import formatMessage from '../../format-message'
 import PlannerItem from '../PlannerItem'
 import responsiviser from '../responsiviser'
@@ -109,25 +110,24 @@ MissingAssignment.propTypes = {
 
 // Themeable doesn't support pure functional components
 export class MissingAssignments extends PureComponent {
-  static propTypes = {}
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      expanded: false
-    }
+  static propTypes = {
+    courses: arrayOf(shape(courseShape)).isRequired,
+    opportunities: shape(opportunityShape).isRequired,
+    timeZone: string.isRequired,
+    toggleMissing: func.isRequired,
+    responsiveSize: string
   }
 
   render() {
-    const {courses, opportunities, timeZone, responsiveSize = 'large'} = this.props
-    const {items = []} = opportunities
+    const {courses, opportunities, timeZone, toggleMissing, responsiveSize = 'large'} = this.props
+    const {items = [], missingItemsExpanded: expanded} = opportunities
     if (items.length === 0) {
       return null
     }
 
     return (
       <section className={classnames(styles.root, styles[responsiveSize])}>
-        {!this.state.expanded && (
+        {!expanded && (
           <div className={styles.icon} data-testid="warning-icon">
             <View margin="0 small 0 0">
               <PresentationContent>
@@ -138,13 +138,13 @@ export class MissingAssignments extends PureComponent {
         )}
         <ToggleDetails
           id="MissingAssignments"
-          expanded={this.state.expanded}
+          expanded={expanded}
           data-testid="missing-item-info"
           fluidWidth
-          onToggle={(_, expanded) => this.setState({expanded})}
+          onToggle={() => toggleMissing()}
           summary={
             <View data-testid="missing-data" margin="0 0 0 x-small">
-              {getMissingItemsText(this.state.expanded, items.length)}
+              {getMissingItemsText(expanded, items.length)}
             </View>
           }
           theme={{
@@ -168,21 +168,19 @@ export class MissingAssignments extends PureComponent {
   }
 }
 
-MissingAssignments.propTypes = {
-  courses: arrayOf(shape(courseShape)).isRequired,
-  opportunities: shape(opportunityShape).isRequired,
-  timeZone: string.isRequired,
-  responsiveSize: string
-}
-
 const mapStateToProps = ({courses, opportunities}) => ({
   courses,
   opportunities
 })
 
+const mapDispatchToProps = {toggleMissing: toggleMissingItems}
+
 const ResponsiveMissingAssignment = responsiviser()(MissingAssignments)
 const ThemeableMissingAssignments = themeable(theme, styles)(ResponsiveMissingAssignment)
-const ConnectedMissingAssignments = connect(mapStateToProps)(ThemeableMissingAssignments)
+const ConnectedMissingAssignments = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ThemeableMissingAssignments)
 ConnectedMissingAssignments.theme = ThemeableMissingAssignments.theme
 
 export default ConnectedMissingAssignments

@@ -27,9 +27,16 @@ import {handleNothingToday} from '../util'
 export class ScrollToToday extends Animation {
   uiDidUpdate() {
     const action = this.acceptedAction('SCROLL_TO_TODAY')
+    const focusMissingItems = !!action.payload?.focusMissingItems
     const isWeekly = !!action.payload?.isWeekly
     const todayElem = this.document().querySelector('.planner-today h2')
-    scrollAndFocusTodayItem(this.manager(), todayElem, isWeekly)
+    if (isWeekly && focusMissingItems) {
+      // Skip the items completely and focus the fallback instead, which will
+      // be the missing items element for the weekly planner
+      handleNothingToday(this.manager(), todayElem, false)
+    } else {
+      scrollAndFocusTodayItem(this.manager(), todayElem, isWeekly)
+    }
   }
 }
 

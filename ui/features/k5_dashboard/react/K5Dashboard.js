@@ -22,9 +22,11 @@ import PropTypes from 'prop-types'
 
 import {
   createTeacherPreview,
+  loadThisWeekItems,
   startLoadingAllOpportunities,
   responsiviser,
-  store
+  store,
+  toggleMissingItems
 } from '@instructure/canvas-planner'
 import {
   IconBankLine,
@@ -78,13 +80,16 @@ export const K5Dashboard = ({
   loadingOpportunities,
   currentUser: {display_name},
   loadAllOpportunities,
+  switchToToday,
   timeZone,
+  toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
   responsiveSize = 'large'
 }) => {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [cards, setCards] = useState(null)
+  const [focusMissingItems, setFocusMissingItems] = useState(false)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -99,6 +104,19 @@ export const K5Dashboard = ({
     }
   }, [cards, currentTab])
 
+  const handleSwitchToToday = () => {
+    setFocusMissingItems(false)
+    handleTabChange(TAB_IDS.SCHEDULE)
+    switchToToday()
+  }
+
+  const handleSwitchToMissingItems = () => {
+    toggleMissing({forceExpanded: true})
+    setFocusMissingItems(true)
+    handleTabChange(TAB_IDS.SCHEDULE)
+    switchToToday()
+  }
+
   return (
     <View as="section">
       <K5DashboardContext.Provider
@@ -108,24 +126,37 @@ export const K5Dashboard = ({
           assignmentsCompletedForToday,
           loadingOpportunities,
           isStudent: plannerEnabled,
-          responsiveSize
+          responsiveSize,
+          switchToMissingItems: handleSwitchToMissingItems,
+          switchToToday: handleSwitchToToday
         }}
       >
         <K5Tabs
           currentTab={currentTab}
           name={display_name}
-          onTabChange={handleTabChange}
+          onTabChange={id => {
+            if (id === TAB_IDS.SCHEDULE) {
+              setFocusMissingItems(false)
+            }
+            handleTabChange(id)
+          }}
           tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
-        <HomeroomPage
-          cards={cards}
-          isStudent={plannerEnabled}
-          requestTabChange={handleTabChange}
-          responsiveSize={responsiveSize}
-          visible={currentTab === TAB_IDS.HOMEROOM}
-        />
-        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
+        {cards && (
+          <HomeroomPage
+            cards={cards}
+            isStudent={plannerEnabled}
+            responsiveSize={responsiveSize}
+            visible={currentTab === TAB_IDS.HOMEROOM}
+          />
+        )}
+        {plannerInitialized && (
+          <SchedulePage
+            visible={currentTab === TAB_IDS.SCHEDULE}
+            focusMissingItems={focusMissingItems}
+          />
+        )}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
         {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
@@ -144,15 +175,24 @@ K5Dashboard.propTypes = {
     display_name: PropTypes.string
   }).isRequired,
   loadAllOpportunities: PropTypes.func.isRequired,
+  switchToToday: PropTypes.func.isRequired,
   timeZone: PropTypes.string.isRequired,
+  toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string
 }
 
-const WrappedK5Dashboard = connect(mapStateToProps, {
-  loadAllOpportunities: startLoadingAllOpportunities
-})(responsiviser()(K5Dashboard))
+const mapDispatchToProps = {
+  toggleMissing: toggleMissingItems,
+  loadAllOpportunities: startLoadingAllOpportunities,
+  switchToToday: loadThisWeekItems
+}
+
+const WrappedK5Dashboard = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(responsiviser()(K5Dashboard))
 
 export default props => (
   <ApplyTheme theme={theme}>

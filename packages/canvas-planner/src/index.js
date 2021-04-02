@@ -29,7 +29,9 @@ import {
   getWeeklyPlannerItems,
   scrollIntoPast,
   loadFutureItems,
-  startLoadingAllOpportunities
+  loadThisWeekItems,
+  startLoadingAllOpportunities,
+  toggleMissingItems
 } from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
@@ -46,7 +48,7 @@ const WeeklyPlannerHeader = React.lazy(() => import('./components/WeeklyPlannerH
 
 export * from './components'
 
-export {startLoadingAllOpportunities}
+export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
 
 export {responsiviser}
 

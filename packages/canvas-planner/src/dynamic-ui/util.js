@@ -23,8 +23,10 @@ export function specialFallbackFocusId(type) {
   return `~~~${type}-fallback-focus~~~`
 }
 
-export function handleNothingToday(manager, todayElem) {
-  srAlert(formatMessage('There is nothing planned for today.'))
+export function handleNothingToday(manager, todayElem, alertScreenReaders = true) {
+  if (alertScreenReaders) {
+    srAlert(formatMessage('There is nothing planned for today.'))
+  }
 
   // In the weekly planner the missing assignments will be under Today
   // if there are any.

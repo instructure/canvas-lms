@@ -33,7 +33,7 @@ import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import {fetchLatestAnnouncement, TAB_IDS} from '@canvas/k5/react/utils'
+import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
 
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 
@@ -109,14 +109,26 @@ LatestAnnouncementLink.propTypes = {
 
 export const AssignmentLinks = ({
   color,
-  requestTabChange,
+  courseName,
+  switchToMissingItems,
+  switchToToday,
   numDueToday = 0,
   numMissing = 0,
   numSubmittedToday = 0,
   loading
 }) => {
   const noneDueMessage =
-    numSubmittedToday > 0 ? I18n.t('Nothing else due') : I18n.t('Nothing due today')
+    numSubmittedToday > 0 ? (
+      <AccessibleContent
+        alt={I18n.t('Nothing else due today for course %{courseName}', {courseName})}
+      >
+        {I18n.t('Nothing else due')}
+      </AccessibleContent>
+    ) : (
+      <AccessibleContent alt={I18n.t('Nothing due today for course %{courseName}', {courseName})}>
+        {I18n.t('Nothing due today')}
+      </AccessibleContent>
+    )
   const content = (
     <>
       {numDueToday > 0 ? (
@@ -125,7 +137,7 @@ export const AssignmentLinks = ({
             href="/#schedule"
             onClick={e => {
               e.preventDefault()
-              requestTabChange(TAB_IDS.SCHEDULE)
+              switchToToday()
             }}
             display="block"
             isWithinText={false}
@@ -134,7 +146,14 @@ export const AssignmentLinks = ({
               hoverColor: k5Theme.variables.colors.textDarkest
             }}
           >
-            <Text>{I18n.t('%{due} due today', {due: numDueToday})}</Text>
+            <AccessibleContent
+              alt={I18n.t('View %{due} items due today for course %{courseName}', {
+                due: numDueToday,
+                courseName
+              })}
+            >
+              <Text>{I18n.t('%{due} due today', {due: numDueToday})}</Text>
+            </AccessibleContent>
           </Link>
         </Flex.Item>
       ) : (
@@ -152,7 +171,7 @@ export const AssignmentLinks = ({
               href="/#schedule"
               onClick={e => {
                 e.preventDefault()
-                requestTabChange(TAB_IDS.SCHEDULE)
+                switchToMissingItems()
               }}
               display="block"
               isWithinText={false}
@@ -161,7 +180,14 @@ export const AssignmentLinks = ({
                 hoverColor: k5Theme.variables.colors.textDanger
               }}
             >
-              <Text color="danger">{I18n.t('%{missing} missing', {missing: numMissing})}</Text>
+              <AccessibleContent
+                alt={I18n.t('View %{missing} missing items for course %{courseName}', {
+                  missing: numMissing,
+                  courseName
+                })}
+              >
+                <Text color="danger">{I18n.t('%{missing} missing', {missing: numMissing})}</Text>
+              </AccessibleContent>
             </Link>
           </Flex.Item>
         </>
@@ -193,7 +219,9 @@ export const AssignmentLinks = ({
 AssignmentLinks.displayName = 'AssignmentLinks'
 AssignmentLinks.propTypes = {
   color: PropTypes.string.isRequired,
-  requestTabChange: PropTypes.func.isRequired,
+  courseName: PropTypes.string.isRequired,
+  switchToMissingItems: PropTypes.func.isRequired,
+  switchToToday: PropTypes.func.isRequired,
   numDueToday: PropTypes.number,
   numMissing: PropTypes.number,
   numSubmittedToday: PropTypes.number,
@@ -204,7 +232,6 @@ const K5DashboardCard = ({
   href,
   id,
   originalName,
-  requestTabChange,
   backgroundColor = '#394B58',
   connectDragSource = c => c,
   connectDropTarget = c => c,
@@ -233,6 +260,8 @@ const K5DashboardCard = ({
     (k5Context?.assignmentsCompletedForToday && k5Context.assignmentsCompletedForToday[id]) || 0
   const loadingOpportunities = k5Context?.loadingOpportunities || false
   const isStudent = k5Context?.isStudent || false
+  const switchToMissingItems = k5Context?.switchToMissingItems
+  const switchToToday = k5Context?.switchToToday
 
   const handleHeaderClick = e => {
     if (e) {
@@ -298,11 +327,13 @@ const K5DashboardCard = ({
         {isStudent && (
           <AssignmentLinks
             color={backgroundColor}
+            courseName={originalName}
             numDueToday={assignmentsDueToday}
             numMissing={assignmentsMissing}
             numSubmittedToday={assignmentsCompletedForToday}
-            requestTabChange={requestTabChange}
             loading={loadingOpportunities}
+            switchToMissingItems={switchToMissingItems}
+            switchToToday={switchToToday}
           />
         )}
         <LatestAnnouncementLink
@@ -322,7 +353,6 @@ K5DashboardCard.propTypes = {
   href: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   originalName: PropTypes.string.isRequired,
-  requestTabChange: PropTypes.func.isRequired,
   backgroundColor: PropTypes.string,
   connectDragSource: PropTypes.func,
   connectDropTarget: PropTypes.func,

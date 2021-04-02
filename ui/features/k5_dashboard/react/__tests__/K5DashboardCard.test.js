@@ -26,20 +26,19 @@ import K5DashboardCard, {
 } from '../K5DashboardCard'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 
-import {TAB_IDS} from '@canvas/k5/react/utils'
-
 const defaultContext = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
-  isStudent: true
+  isStudent: true,
+  switchToMissingItems: jest.fn(),
+  switchToToday: jest.fn()
 }
 
 const defaultProps = {
   id: 'test',
   href: '/courses/5',
-  originalName: 'test course',
-  requestTabChange: () => {}
+  originalName: 'test course'
 }
 
 beforeEach(() => {
@@ -48,6 +47,7 @@ beforeEach(() => {
 
 afterEach(() => {
   fetchMock.restore()
+  jest.clearAllMocks()
 })
 
 describe('DashboardCardHeaderHero', () => {
@@ -119,15 +119,14 @@ describe('K-5 Dashboard Card', () => {
   })
 
   it('displays a link to the schedule tab if any assignments are due today', async () => {
-    const requestTabChange = jest.fn()
     const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsDueToday: {test: 3}}}>
-        <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
+        <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
     const link = await findByText('3 due today')
     link.click()
-    expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
+    expect(defaultContext.switchToToday).toHaveBeenCalled()
   })
 
   it('displays "Nothing else due" if all assignments due today are completed', async () => {
@@ -143,15 +142,14 @@ describe('K-5 Dashboard Card', () => {
   })
 
   it('displays a link to the schedule tab if any assignments are missing', async () => {
-    const requestTabChange = jest.fn()
     const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsMissing: {test: 2}}}>
-        <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
+        <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
     const link = await findByText('2 missing')
     link.click()
-    expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
+    expect(defaultContext.switchToMissingItems).toHaveBeenCalled()
   })
 
   it("doesn't display anything in the assignment links section if the user is not a student", async () => {

@@ -37,7 +37,7 @@ const cardSummary = [
 ]
 const dashboardCards = [
   {
-    id: 'test',
+    id: '1',
     assetString: 'course_1',
     href: '/courses/1',
     shortName: 'Econ 101',
@@ -47,7 +47,7 @@ const dashboardCards = [
     canManage: true
   },
   {
-    id: 'homeroom',
+    id: '2',
     assetString: 'course_2',
     href: '/courses/2',
     shortName: 'Homeroom1',
@@ -76,7 +76,7 @@ const homeroomAnnouncement = [
 ]
 const gradeCourses = [
   {
-    id: 'test',
+    id: '1',
     name: 'Economics 101',
     has_grading_periods: false,
     enrollments: [
@@ -89,7 +89,7 @@ const gradeCourses = [
     homeroom_course: false
   },
   {
-    id: 'homeroom',
+    id: '2',
     name: 'Homeroom Class',
     has_grading_periods: false,
     enrollments: [
@@ -105,7 +105,7 @@ const gradeCourses = [
 const opportunities = [
   {
     id: 1,
-    course_id: 1,
+    course_id: '1',
     name: 'Assignment 1',
     point_possible: 23,
     html_url: '/courses/1/assignments/1',
@@ -114,7 +114,7 @@ const opportunities = [
   },
   {
     id: 2,
-    course_id: 1,
+    course_id: '1',
     name: 'Assignment 2',
     point_possible: 10,
     html_url: '/courses/1/assignments/2',
@@ -188,7 +188,7 @@ beforeAll(() => {
       {
         context_name: 'Course2',
         context_type: 'Course',
-        course_id: '2',
+        course_id: '1',
         html_url: '/courses/2/assignments/15',
         new_activity: false,
         plannable: {
@@ -221,18 +221,15 @@ beforeAll(() => {
     headers: {link: 'url; rel="current"'},
     response: opportunities
   })
-  fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
+  fetchMock.get('/api/v1/courses/1/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(
-    /\/api\/v1\/announcements\?context_codes=course_homeroom.*/,
+    /\/api\/v1\/announcements\?context_codes=course_2.*/,
     JSON.stringify(homeroomAnnouncement)
   )
-  fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_test.*/, '[]')
+  fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_1.*/, '[]')
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
-  fetchMock.get(/\/api\/v1\/courses\/homeroom\/users.*/, JSON.stringify(staff))
-  fetchMock.get(
-    '/api/v1/courses/test/external_tools/visible_course_nav_tools',
-    JSON.stringify(apps)
-  )
+  fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
+  fetchMock.get('/api/v1/courses/1/external_tools/visible_course_nav_tools', JSON.stringify(apps))
 })
 
 afterAll(() => {
@@ -246,6 +243,8 @@ beforeEach(() => {
 
 afterEach(() => {
   global.ENV = {}
+  resetPlanner()
+  window.location.hash = ''
 })
 
 describe('K-5 Dashboard', () => {
@@ -320,13 +319,42 @@ describe('K-5 Dashboard', () => {
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://google.com/download')
     })
+
+    it('shows a due today link pointing to the first item on schedule tab for today', async () => {
+      const {findByText} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      const dueTodayLink = await findByText('1 due today', {timeout: 5000})
+      expect(dueTodayLink).toBeInTheDocument()
+
+      act(() => dueTodayLink.click())
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
+      // window.requestAnimationFrame doesn't really work in jsdom, so we can't test that the
+      // correct element is focused since that occurs at the end of the scrolling animation
+    })
+
+    it('shows a missing items link pointing to the missing items section on the schedule tab', async () => {
+      const {findByText, getByRole, getByText} = render(
+        <K5Dashboard {...defaultProps} plannerEnabled />
+      )
+      const missingLink = await findByText('2 missing')
+      expect(missingLink).toBeInTheDocument()
+
+      act(() => missingLink.click())
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
+
+      // The missing items button should be expanded and focused
+      await waitFor(() => {
+        expect(document.activeElement.dataset.testid).toBe('missing-item-info')
+        expect(document.activeElement.getAttribute('aria-expanded')).toBe('true')
+      })
+      expect(getByRole('button', {name: 'Hide 2 missing items'})).toBeInTheDocument()
+
+      // Missing item details should be shown underneath it
+      expect(getByText('Assignment 1')).toBeInTheDocument()
+      expect(getByText('Assignment 2')).toBeInTheDocument()
+    })
   })
 
   describe('Schedule Section', () => {
-    afterEach(() => {
-      resetPlanner()
-    })
-
     it('displays the planner with a planned item', async () => {
       const {findByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
@@ -339,12 +367,17 @@ describe('K-5 Dashboard', () => {
     })
 
     it('displays a list of missing assignments if there are any', async () => {
-      const {findByText} = render(
+      const {findByRole, getByRole, getByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
 
-      const missingAssignments = await findByText('Show 2 missing items')
+      const missingAssignments = await findByRole('button', {name: 'Show 2 missing items'})
       expect(missingAssignments).toBeInTheDocument()
+
+      act(() => missingAssignments.click())
+      expect(getByRole('button', {name: 'Hide 2 missing items'})).toBeInTheDocument()
+      expect(getByText('Assignment 1')).toBeInTheDocument()
+      expect(getByText('Assignment 2')).toBeInTheDocument()
     })
 
     it('renders the weekly planner header', async () => {

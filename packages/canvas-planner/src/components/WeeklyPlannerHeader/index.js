@@ -57,6 +57,7 @@ export class WeeklyPlannerHeader extends Component {
     visible: PropTypes.bool,
     isFooter: PropTypes.bool,
     today: PropTypes.string,
+    focusMissingItems: PropTypes.bool,
     weekStartDate: PropTypes.string,
     weekEndDate: PropTypes.string,
     wayPastItemDate: PropTypes.string,
@@ -171,13 +172,14 @@ export class WeeklyPlannerHeader extends Component {
     // 2. the window becomes narrow enough for the tabs to wrap.
     // We need to relocate the WeeklyPlannerHeader so it sticks
     // to the bottom of the tabs panel.
-    if (this.props.visible !== prevProps.visible) {
+    if (!this.props.isFooter && this.props.visible !== prevProps.visible) {
       if (this.props.visible) {
         this.handleStickyOffset()
         document.addEventListener('scroll', this.handleStickyOffset)
         window.addEventListener('resize', this.handleStickyOffset)
         if (isThisWeek(this.props.weekStartDate)) {
-          window.setTimeout(() => this.props.scrollToToday({isWeekly: true}), 0) // need to wait until the k5Dashboard tab is active
+          const focusMissingItems = this.props.focusMissingItems || false
+          window.setTimeout(() => this.props.scrollToToday({focusMissingItems, isWeekly: true}), 0) // need to wait until the k5Dashboard tab is active
         }
       } else {
         document.removeEventListener('scroll', this.handleStickyOffset)

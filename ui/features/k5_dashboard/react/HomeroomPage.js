@@ -69,7 +69,7 @@ export const fetchHomeroomAnnouncements = cards =>
   ).then(announcements => announcements.filter(a => a))
 
 export const HomeroomPage = props => {
-  const {cards, requestTabChange, visible} = props
+  const {cards, visible} = props
   const [dashboardCards, setDashboardCards] = useState([])
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
   const [announcementsLoading, setAnnouncementsLoading] = useState(true)
@@ -77,8 +77,7 @@ export const HomeroomPage = props => {
   useEffect(() => {
     setDashboardCards(
       createDashboardCards(cards?.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
-        headingLevel: 'h3',
-        requestTabChange
+        headingLevel: 'h3'
       })
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,8 +141,7 @@ export const HomeroomPage = props => {
 }
 
 HomeroomPage.propTypes = {
-  cards: PropTypes.array,
-  requestTabChange: PropTypes.func.isRequired,
+  cards: PropTypes.array.isRequired,
   visible: PropTypes.bool.isRequired
 }
 
