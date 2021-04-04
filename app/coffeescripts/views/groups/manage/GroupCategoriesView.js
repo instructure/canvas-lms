@@ -102,10 +102,10 @@ export default class GroupCategoriesView extends CollectionView {
   }
 
   loadTabFromUrl() {
-    if (location.hash === '#new') {
+    if (window.location.hash === '#new') {
       return this.addGroupSet()
     } else {
-      const id = location.hash.split('-')[1]
+      const id = window.location.hash.split('-')[1]
       if (id != null) {
         const model = this.collection.get(id)
         if (model) {
@@ -130,9 +130,12 @@ export default class GroupCategoriesView extends CollectionView {
       .data('loaded', false)
       .data('model', model)
     this.$tabs.append($panel)
-    // If this is the first panel, load the contents
-    if (this.$tabs.find('.tab-panel').length === 1) {
-      this.loadPanelView($panel, model)
+    // If this is the first panel, load contents only if hash is empty or #tab-1
+    if (
+      this.$tabs.find('.tab-panel').length === 1 &&
+      (!window.location.hash || window.location.hash === '#tab-1')
+    ) {
+      this.loadPanelView($panel)
     }
     // create the <li> tab view
     const view = super.createItemView(...arguments)
@@ -182,12 +185,15 @@ export default class GroupCategoriesView extends CollectionView {
   }
 
   activatedTab(event, ui) {
+    const scrollTop = $(window).scrollTop()
     const $panel = ui.newPanel
+    window.location.hash = $panel.selector
+    // Stay at current scroll position instead of scrolling to tab content
+    $(window).scrollTop(scrollTop)
     return this.loadPanelView($panel)
   }
 
   loadPanelView($panel) {
-    // there is a bug here where we load the first tab, then immediately load the tab from the hash
     if (!$panel.data('loaded')) {
       const model = $panel.data('model')
       const categoryView = new GroupCategoryView({model})
