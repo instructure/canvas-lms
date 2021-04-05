@@ -23,16 +23,18 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import Confetti from '@canvas/confetti/react/Confetti'
 import {
   CREATE_SUBMISSION,
-  CREATE_SUBMISSION_DRAFT
+  CREATE_SUBMISSION_DRAFT,
+  DELETE_SUBMISSION_DRAFT
 } from '@canvas/assignments/graphql/student/Mutations'
 import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import {Modal} from '@instructure/ui-modal'
-import {Mutation} from 'react-apollo'
+import {Mutation, useMutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import SimilarityPledge from './SimilarityPledge'
 import StudentFooter from './StudentFooter'
 import {
@@ -42,6 +44,62 @@ import {
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {View} from '@instructure/ui-view'
+
+function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}) {
+  const {attempt, id: submissionId, submissionDraft} = submission
+
+  const [deleteDraftMutation] = useMutation(DELETE_SUBMISSION_DRAFT, {
+    onCompleted: data => {
+      if (data.deleteSubmissionDraft.errors != null) {
+        onError()
+      }
+    },
+    onError: () => {
+      onError()
+    },
+    update: (cache, result) => {
+      if (!result.data.deleteSubmissionDraft.errors) {
+        handleCacheUpdate(cache)
+      }
+    },
+    variables: {submissionId}
+  })
+
+  const handleCancelDraft = async () => {
+    if (submissionDraft == null) {
+      // If the user hasn't added any content to this draft yet, we don't need to run the
+      // mutation since there's no draft object to delete
+      onSuccess()
+      return
+    }
+
+    const confirmed = await showConfirmationDialog({
+      body: I18n.t(
+        'Canceling this attempt will permanently delete any work performed in this attempt. Do you wish to proceed and delete your work?'
+      ),
+      confirmColor: 'danger',
+      confirmText: I18n.t('Delete Work'),
+      label: I18n.t('Delete your work?')
+    })
+
+    if (confirmed) {
+      deleteDraftMutation().then(onSuccess).catch(onError)
+    }
+  }
+
+  return (
+    <Button color="secondary" onClick={() => handleCancelDraft(deleteDraftMutation)}>
+      {I18n.t('Cancel Attempt %{attempt}', {attempt})}
+    </Button>
+  )
+}
+
+CancelAttemptButton.propTypes = {
+  handleCacheUpdate: PropTypes.func.isRequired,
+  onError: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
+  submission: PropTypes.shape.isRequired
+}
 
 export default class SubmissionManager extends Component {
   static propTypes = {
@@ -89,10 +147,13 @@ export default class SubmissionManager extends Component {
   }
 
   updateSubmissionDraftCache = (cache, result) => {
-    if (result.data.createSubmissionDraft.errors) {
-      return
+    if (!result.data.createSubmissionDraft.errors) {
+      const newDraft = result.data.createSubmissionDraft.submissionDraft
+      this.updateCachedSubmissionDraft(cache, newDraft)
     }
+  }
 
+  updateCachedSubmissionDraft = (cache, newDraft) => {
     const {assignment} = JSON.parse(
       JSON.stringify(
         cache.readQuery({
@@ -105,7 +166,6 @@ export default class SubmissionManager extends Component {
       )
     )
 
-    const newDraft = result.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
 
     cache.writeQuery({
@@ -336,6 +396,25 @@ export default class SubmissionManager extends Component {
 
   footerButtons() {
     return [
+      {
+        key: 'cancel-draft',
+        shouldRender: context =>
+          this.props.submission === context.latestSubmission &&
+          context.latestSubmission.state === 'unsubmitted' &&
+          this.props.submission.attempt > 1,
+        render: context => {
+          return (
+            <CancelAttemptButton
+              handleCacheUpdate={cache => {
+                this.updateCachedSubmissionDraft(cache, null)
+              }}
+              onError={() => context.setOnFailure(I18n.t('Error canceling draft'))}
+              onSuccess={() => context.cancelDraftAction()}
+              submission={context.latestSubmission}
+            />
+          )
+        }
+      },
       {
         key: 'back-to-draft',
         shouldRender: context =>

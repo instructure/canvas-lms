@@ -63,6 +63,12 @@
             "name": "Account"
           },
           {
+            "name": "AccountDomain"
+          },
+          {
+            "name": "AccountDomainLookup"
+          },
+          {
             "name": "Assignment"
           },
           {
@@ -398,6 +404,12 @@
         "kind": "INTERFACE",
         "name": "Timestamped",
         "possibleTypes": [
+          {
+            "name": "AccountDomain"
+          },
+          {
+            "name": "AccountDomainLookup"
+          },
           {
             "name": "Assignment"
           },

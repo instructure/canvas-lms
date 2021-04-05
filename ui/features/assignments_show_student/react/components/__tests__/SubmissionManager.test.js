@@ -17,9 +17,13 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {CREATE_SUBMISSION, SET_MODULE_ITEM_COMPLETION} from '@canvas/assignments/graphql/student/Mutations'
+import {
+  CREATE_SUBMISSION,
+  DELETE_SUBMISSION_DRAFT,
+  SET_MODULE_ITEM_COMPLETION
+} from '@canvas/assignments/graphql/student/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -583,6 +587,195 @@ describe('SubmissionManager', () => {
     })
   })
 
+  describe('"Cancel Attempt" button', () => {
+    it('is rendered if a draft exists and is shown', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2}
+      })
+
+      const {getByRole} = renderInContext(
+        {latestSubmission: props.submission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(getByRole('button', {name: /Cancel Attempt/})).toBeInTheDocument()
+    })
+
+    it('is not rendered when working on the initial attempt', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 1}
+      })
+
+      const {queryByRole} = renderInContext(
+        {latestSubmission: props.submission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', {name: /Cancel Attempt/})).not.toBeInTheDocument()
+    })
+
+    it('includes the attempt number in the button text', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2}
+      })
+
+      const {getByRole} = renderInContext(
+        {latestSubmission: props.submission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      const button = getByRole('button', {name: /Cancel Attempt/})
+      expect(button).toHaveTextContent('Cancel Attempt 2')
+    })
+
+    it('is not rendered if no draft exists', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted, attempt: 2}
+      })
+
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      expect(queryByRole('button', {name: /Cancel Attempt/})).not.toBeInTheDocument()
+    })
+
+    it('is not rendered if a draft exists but is not shown', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {...SubmissionMocks.submitted, attempt: 1}
+      })
+
+      const {queryByRole} = renderInContext(
+        {latestSubmission: {attempt: 2, state: 'unsubmitted'}},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      expect(queryByRole('button', {name: /Cancel Attempt/})).not.toBeInTheDocument()
+    })
+
+    describe('when clicked', () => {
+      const confirmationDialog = () => screen.queryByRole('dialog', {label: 'Delete your work?'})
+      const confirmButton = () =>
+        within(confirmationDialog()).getByRole('button', {name: 'Delete Work'})
+      const cancelButton = () => within(confirmationDialog()).getByRole('button', {name: 'Cancel'})
+
+      let cancelDraftAction
+
+      beforeEach(() => {
+        cancelDraftAction = jest.fn()
+      })
+
+      describe('when the current draft has actual content', () => {
+        const renderDraft = async () => {
+          const props = await mockAssignmentAndSubmission({
+            Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2, id: '123'}
+          })
+
+          const variables = {submissionId: '123'}
+          const deleteSubmissionDraftResult = await mockQuery(
+            DELETE_SUBMISSION_DRAFT,
+            {},
+            variables
+          )
+
+          const mocks = [
+            {
+              request: {query: DELETE_SUBMISSION_DRAFT, variables},
+              result: deleteSubmissionDraftResult
+            }
+          ]
+
+          return renderInContext(
+            {latestSubmission: props.submission, cancelDraftAction},
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          )
+        }
+
+        it('shows a confirmation modal if the current draft has any actual content', async () => {
+          const {getByRole} = await renderDraft()
+
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+          expect(confirmationDialog()).toBeInTheDocument()
+        })
+
+        it('calls the cancelDraftAction function if the user confirms the modal', async () => {
+          const {getByRole} = await renderDraft()
+
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+
+          act(() => {
+            fireEvent.click(confirmButton())
+          })
+
+          waitFor(() => {
+            expect(cancelDraftAction).toHaveBeenCalled()
+          })
+        })
+
+        it('does nothing if the user cancels the modal', async () => {
+          const {getByRole} = await renderDraft()
+
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+
+          act(() => {
+            fireEvent.click(cancelButton())
+          })
+
+          expect(cancelDraftAction).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('when the current draft has no content', () => {
+        const renderDraft = async () => {
+          const props = await mockAssignmentAndSubmission({
+            Submission: {attempt: 2}
+          })
+
+          return renderInContext(
+            {latestSubmission: props.submission, cancelDraftAction},
+            <MockedProvider>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          )
+        }
+
+        it('does not show a confirmation', async () => {
+          const {getByRole} = await renderDraft()
+
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+          expect(confirmationDialog()).not.toBeInTheDocument()
+        })
+
+        it('calls the cancelDraftAction function', async () => {
+          const {getByRole} = await renderDraft()
+
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+          expect(cancelDraftAction).toHaveBeenCalled()
+        })
+      })
+    })
+  })
+
   describe('footer', () => {
     it('is rendered if at least one button can be shown', async () => {
       const props = await mockAssignmentAndSubmission({
@@ -606,12 +799,9 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.submitted}
       })
 
-      const {queryByTestId} = render(
-        <StudentViewContext.Provider
-          value={{allowChangesToSubmission: false, latestSubmission: {}}}
-        >
-          <SubmissionManager {...props} />
-        </StudentViewContext.Provider>
+      const {queryByTestId} = renderInContext(
+        {allowChangesToSubmission: false},
+        <SubmissionManager {...props} />
       )
 
       expect(queryByTestId('student-footer')).not.toBeInTheDocument()
