@@ -395,8 +395,8 @@ pipeline {
               gerrit.submitLintReview("-2", "Build not executed due to [skip-ci] flag")
               error "[skip-ci] flag enabled: skipping the build"
               return
-            } else if(extendedStage.isAllowStagesFilterUsed()) {
-              gerrit.submitLintReview("-2", "Complete build not executed due to [allow-stages] flag")
+            } else if(extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed()) {
+              gerrit.submitLintReview("-2", "One or more build flags causes a subset of the build to be run")
             } else {
               gerrit.submitLintReview("0")
             }
@@ -719,7 +719,7 @@ pipeline {
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ], configuration.fscPropagate(), "", "Flakey Spec Catcher")
+                      ], true, "", "Flakey Spec Catcher")
                     }
                   }
 
