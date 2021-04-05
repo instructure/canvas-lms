@@ -159,6 +159,7 @@ module Canvas
             redis_port: 6379,
             redis_db: 6 # intentionally one probably not used elsewhere
           })
+          allow(ConfigFile).to receive(:load).and_call_original
           @lock_stub = stub_request(:get, "#{addr}/v1/#{credential_path}").
             to_return(status: 200, body: {
             data: credential_data,
