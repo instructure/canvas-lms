@@ -24,7 +24,7 @@
  * see apollo_without_react_spec.js for examples of this module.
  */
 
-import {createClient} from 'jsx/canvas-apollo'
+import {createClient} from '@canvas/apollo'
 import {MockLink} from '@apollo/react-testing'
 
 /*

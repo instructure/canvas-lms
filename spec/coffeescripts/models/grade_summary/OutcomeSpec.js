@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Outcome from 'compiled/models/grade_summary/Outcome'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
 
 QUnit.module('Outcome')
 

@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import GroupCategory from 'compiled/models/GroupCategory'
-import GroupCategoryCreateView from 'compiled/views/groups/manage/GroupCategoryCreateView'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
+import GroupCategoryCreateView from '@canvas/groups/backbone/views/GroupCategoryCreateView.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 let view = null

@@ -27,7 +27,7 @@ the following:
 npm install canvas-rce --save
 ```
 
-Please reference the [canvas-lms use of canvas-rce](https://github.com/instructure/canvas-lms/tree/stable/app/jsx/shared/rce)
+Please reference the [canvas-lms use of canvas-rce](https://github.com/instructure/canvas-lms/tree/stable/ui/shared/rce)
 to get an idea on how to incorporate it into your project. Pay
 special attention to the `RichContentEditor.js` and `serviceRCELoader.js`.
 

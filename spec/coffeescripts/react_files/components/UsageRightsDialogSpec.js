@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import UsageRightsDialog from 'jsx/files/UsageRightsDialog'
-import File from 'compiled/models/File'
-import Folder from 'compiled/models/Folder'
+import UsageRightsDialog from '@canvas/files/react/components/UsageRightsDialog'
+import File from '@canvas/files/backbone/models/File.coffee'
+import Folder from '@canvas/files/backbone/models/Folder'
 
 QUnit.module('UsageRightsDialog', suiteHooks => {
   let $container

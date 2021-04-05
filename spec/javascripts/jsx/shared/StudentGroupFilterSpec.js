@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import StudentGroupFilter from 'jsx/shared/StudentGroupFilter'
+import StudentGroupFilter from '@canvas/student-group-filter'
 
 QUnit.module('StudentGroupFilter', suiteHooks => {
   let $container

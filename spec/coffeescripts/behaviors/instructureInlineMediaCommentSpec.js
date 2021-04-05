@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import inlineMediaComment from 'compiled/behaviors/instructure_inline_media_comment'
+import inlineMediaComment from '../../../ui/boot/initializers/loadInlineMediaComments.js'
 
 QUnit.module('inlineMediaComment', {
   setup() {

@@ -27,9 +27,6 @@ const STUFF_TO_REV = [
   'public/fonts/**/*.{eot,otf,svg,ttf,woff,woff2}',
   'public/images/**/*',
 
-  // These files have links in their css to images from their own dir
-  'public/javascripts/vendor/slickgrid/images/*',
-
   // Include *everything* from plugins
   // so we don't have to worry about their internals
   // TODO: do we need these if we are all-webpack?
@@ -59,7 +56,7 @@ gulp.task('rev', () => {
     .pipe(gulpTimezonePlugin())
 
   const customTimezoneStream = gulp
-    .src('./public/javascripts/custom_timezone_locales/*.js')
+    .src('./ui/ext/custom_timezone_locales/*.js')
     .pipe(rename(path => (path.dirname = '/timezone')))
     .pipe(gulpTimezonePlugin())
 
@@ -92,6 +89,11 @@ gulp.task('rev', () => {
     .pipe(gulp.dest(DIST))
     .pipe(gulpPlugins.rev.manifest())
     .pipe(gulp.dest(DIST))
+    .pipe(
+      gulp.src(['packages/slickgrid/src/images/*.gif'], {
+        base: 'packages/slickgrid/src/images'
+      }).pipe(gulp.dest(`${DIST}/images/slickgrid`))
+    )
 })
 
 gulp.task('watch', () => gulp.watch(STUFF_TO_REV, ['rev']))

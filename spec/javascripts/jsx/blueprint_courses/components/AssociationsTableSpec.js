@@ -18,8 +18,8 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import AssociationsTable from 'jsx/blueprint_courses/components/AssociationsTable'
-import FocusManager from 'jsx/blueprint_courses/focusManager'
+import AssociationsTable from 'ui/features/blueprint_course_master/react/components/AssociationsTable.js'
+import FocusManager from 'ui/features/blueprint_course_master/react/focusManager.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('AssociationsTable component')

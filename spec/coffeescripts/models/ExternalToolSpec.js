@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ExternalTool from 'compiled/models/ExternalTool'
+import ExternalTool from '@canvas/external-tools/backbone/models/ExternalTool.coffee'
 
 QUnit.module('ExternalTool', {
   setup() {

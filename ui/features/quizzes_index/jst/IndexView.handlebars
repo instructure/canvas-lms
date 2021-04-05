@@ -1,0 +1,94 @@
+<h1 class="screenreader-only">{{#t "quizzes_title"}}Quizzes{{/t}}</h1>
+<div class="header-bar">
+  <div class="header-bar-left form-inline">
+    <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
+    <input id="searchTerm" placeholder="{{#t "search_for_quiz"}}Search for Quiz{{/t}}" value="" type="search" />
+  </div>
+
+  {{#ifAny permissions.create permissions.manage}}
+    <div class="header-bar-right">
+      {{#if flags.quiz_lti_enabled}}
+        <button class="btn btn-primary choose-quiz-engine"
+          title='{{#t}}Add Quiz{{/t}}'
+          aria-label='{{#t}}Add Quiz{{/t}}'>
+          <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
+        </button>
+      {{else}}
+        <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
+          <input type="hidden" name="authenticity_token" />
+          <button class="btn btn-primary new-quiz-link"
+            title='{{#t}}Add Quiz{{/t}}'
+            aria-label='{{#t}}Add Quiz{{/t}}'>
+            <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
+          </button>
+        </form>
+      {{/if}}
+
+      <div class="inline-block">
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <i class="icon-more" aria-hidden="true"></i>
+          <span class="screenreader-only">{{#t}}Quiz Settings{{/t}}</span>
+        </a>
+
+        <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+          {{#ifAll permissions.read_question_banks flags.question_banks}}
+          <li role="presentation">
+            <a href="{{urls.question_banks_url}}" class="icon-question" tabindex="-1" role="menuitem">
+              {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
+            </a>
+          </li>
+          {{/ifAll}}
+
+          {{#ifAll permissions.manage flags.publish_multiple}}
+          <li role="presentation">
+            <a href="#" class="publish_multiple_quizzes_link icon-unpublished" tabindex="-1" role="menuitem">
+              {{#t "links.publish_multiple_quizzes"}}Publish Multiple Quizzes{{/t}}
+            </a>
+          </li>
+          {{/ifAll}}
+          {{#ifAll flags.quiz_lti_enabled}}
+          <li role="presentation">
+            <a href="#" tabindex="-1" role="menuitem" class="reset-quiz-engine">
+              {{#t }}Reset quiz engine choice{{/t}}
+            </a>
+          </li>
+          {{/ifAll}}
+
+          {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars quizIndexPlacements}}
+        </ul>
+      </div>
+    </div>
+  {{else}}
+    {{#if permissions.read_question_banks}}
+      <div class="header-bar-right form-inline">
+        <a href="{{urls.question_banks_url}}" class="btn view_question_banks"
+           title='{{#t}}View Question Banks{{/t}}'
+           aria-label='{{#t}}View Question Banks{{/t}}'>
+          {{#t}}View Question Banks{{/t}}
+        </a>
+      </div>
+    {{/if}}
+  {{/ifAny}}
+</div>
+
+<div id="direct-share-mount-point" />
+<div id="external-tool-mount-point" />
+<div id="quiz-modal-mount-point" />
+
+<div class="item-group-container">
+  {{#if hasNoQuizzes}}
+  <div data-view="no_quizzes" class="item-group-condensed"></div>
+  {{/if}}
+
+  {{#if hasAssignmentQuizzes}}
+  <div data-view="assignment" class="item-group-condensed"></div>
+  {{/if}}
+
+  {{#if hasOpenQuizzes}}
+  <div data-view="open" class="item-group-condensed"></div>
+  {{/if}}
+
+  {{#if hasSurveys}}
+  <div data-view="surveys" class="item-group-condensed"></div>
+  {{/if}}
+</div>

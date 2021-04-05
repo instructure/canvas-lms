@@ -17,6 +17,6 @@
  */
 
 @import "base/environment";
-@import "../../../public/javascripts/vendor/bootstrap-select/bootstrap-select";
+@import "../../../packages/bootstrap-select/index";
 @import "pages/conversations/conversations_new";
 @import "pages/conversations/compose_message_dialog";

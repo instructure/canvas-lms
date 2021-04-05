@@ -20,7 +20,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import {Text} from '@instructure/ui-text'
 import {IconMoreSolid} from '@instructure/ui-icons'
-import StatusColorListItem from 'jsx/gradebook/default_gradebook/components/StatusColorListItem'
+import StatusColorListItem from 'ui/features/gradebook/react/default_gradebook/components/StatusColorListItem.js'
 
 function defaultProps(props = {}) {
   return {

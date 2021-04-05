@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import _ from 'underscore'
-import GradingStandardCollection from 'jsx/grading/gradingStandardCollection'
+import GradingStandardCollection from '@canvas/grading-standard-collection'
 
 const {Simulate} = TestUtils
 

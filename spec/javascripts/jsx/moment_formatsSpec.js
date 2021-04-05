@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment_formats from 'moment_formats'
+import moment_formats from '@canvas/timezone/moment_formats'
 import I18nStubber from 'helpers/I18nStubber'
 
 QUnit.module('Moment formats', {

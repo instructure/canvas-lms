@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOptionsMenu'
+import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu.js'
 
 function defaultProps({props, filterSettings} = {}) {
   return {

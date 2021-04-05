@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import api from 'compiled/api/enrollmentTermsApi'
-import 'jquery.ajaxJSON'
+import api from 'ui/features/account_grading_standards/enrollmentTermsApi.js'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 const deserializedTerms = [
   {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GravatarView from 'compiled/views/profiles/GravatarView'
+import GravatarView from '@canvas/avatar-dialog-view/backbone/views/GravatarView'
 import assertions from 'helpers/assertions'
 
 QUnit.module('GravatarView', {

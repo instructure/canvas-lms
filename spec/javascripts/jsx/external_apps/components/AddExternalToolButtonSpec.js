@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import AddExternalToolButton from 'jsx/external_apps/components/AddExternalToolButton'
+import AddExternalToolButton from 'ui/features/external_apps/react/components/AddExternalToolButton.js'
 
 QUnit.module('AddExternalToolButton', suiteHooks => {
   let server

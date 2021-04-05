@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import AvatarDialogView from 'compiled/views/profiles/AvatarDialogView'
+import AvatarDialogView from '@canvas/avatar-dialog-view/backbone/views/AvatarDialogView'
 import assertions from 'helpers/assertions'
 
 QUnit.module('AvatarDialogView#onPreflight', {

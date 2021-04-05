@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import InputView from 'compiled/views/InputView'
+import InputView from 'backbone-input-view'
 
 let view = null
 

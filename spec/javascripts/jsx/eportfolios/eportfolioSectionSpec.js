@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {fetchContent} from 'eportfolios/eportfolio_section'
+import {fetchContent} from 'ui/features/eportfolio/jquery/eportfolio_section.js'
 import fixtures from 'helpers/fixtures'
 
 let $section = null

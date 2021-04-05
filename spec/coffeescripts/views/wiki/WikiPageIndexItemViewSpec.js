@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageIndexItemView from 'compiled/views/wiki/WikiPageIndexItemView'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageIndexItemView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexItemView.js'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('WikiPageIndexItemView', {

@@ -32,7 +32,6 @@ services:
       - old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules:/usr/src/app/packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules
       - pacts:/usr/src/app/pacts
       - public_dist:/usr/src/app/public/dist
-      - public_javascripts_compiled:/usr/src/app/public/javascripts/compiled
       - reports:/usr/src/app/reports
       - styleguide:/usr/src/app/app/views/info
       - tmp:/usr/src/app/tmp
@@ -95,7 +94,6 @@ volumes:
   pg_data: {}
   pacts: {}
   public_dist: {}
-  public_javascripts_compiled: {}
   reports: {}
   styleguide: {}
   tmp: {}

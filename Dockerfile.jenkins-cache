@@ -42,6 +42,7 @@ RUN --mount=target=/tmp/src \
   find \
     gems/canvas_i18nliner \
     gems/plugins/* \
+    ui/shared/* \
     packages/* \
     \
     -name 'package.json' \
@@ -85,10 +86,7 @@ RUN --mount=target=/tmp/src \
     -not -path "gems/config_file/spec/*" \
     -exec cp -rf --parents {} /tmp/dst \; && \
   cp --parents -rf \
-    app/coffeescripts \
-    app/jsx \
     app/stylesheets \
-    app/views/jst \
     bin \
     config/environments \
     config/locales \
@@ -97,6 +95,7 @@ RUN --mount=target=/tmp/src \
     lib/rake \
     lib/tasks \
     public \
+    ui \
     \
     config/application.rb \
     config/boot.rb \
@@ -117,7 +116,6 @@ RUN --mount=target=/tmp/src \
     lib/temp_cache.rb \
     lib/canvas/cdn.rb \
     lib/canvas/reloader.rb \
-    .bowerrc \
     .i18nignore \
     .i18nrc \
     Rakefile \

@@ -148,7 +148,7 @@ class AssignmentsController < ApplicationController
       SUBMISSION_ID: graphql_submisison_id
     })
     css_bundle :assignments_2_student
-    js_bundle :assignments_2_show_student
+    js_bundle :assignments_show_student
     render html: '', layout: true
   end
 
@@ -269,7 +269,7 @@ class AssignmentsController < ApplicationController
         if @context.feature_enabled?(:assignments_2_teacher) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
-            js_bundle :assignments_2_show_teacher
+            js_bundle :assignments_show_teacher
             render html: '', layout: true
             return
           end

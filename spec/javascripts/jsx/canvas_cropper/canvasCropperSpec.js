@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import Cropper from 'jsx/canvas_cropper/cropper'
+import Cropper from '@canvas/avatar-dialog-view/react/cropper'
 
 let file, wrapper
 

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
-import * as StudentsApi from 'jsx/assignments/GradeSummary/students/StudentsApi'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions.js'
+import * as StudentsApi from 'ui/features/assignment_grade_summary/react/students/StudentsApi.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 QUnit.module('GradeSummary StudentActions', suiteHooks => {
   let store

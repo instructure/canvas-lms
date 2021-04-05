@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import SpeedGraderLink from 'jsx/shared/SpeedGraderLink'
+import SpeedGraderLink from '@canvas/speed-grader-link'
 
 QUnit.module('SpeedGraderLink', suiteHooks => {
   let $container

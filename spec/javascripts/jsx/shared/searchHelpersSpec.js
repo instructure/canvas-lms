@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Helpers from 'jsx/shared/helpers/searchHelpers'
+import Helpers from '@canvas/util/searchHelpers'
 
 QUnit.module('searchHelpers#exactMatchRegex', {
   setup() {

@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import 'jquery.instructure_misc_helpers'
-import 'mathquill'
+import '@canvas/jquery/jquery.instructure_misc_helpers'
+import '@canvas/mathquill'
 
 let view, container, toolbar
 

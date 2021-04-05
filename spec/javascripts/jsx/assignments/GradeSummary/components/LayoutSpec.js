@@ -20,10 +20,10 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
-import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
-import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
-import Layout from 'jsx/assignments/GradeSummary/components/Layout'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
+import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions.js'
+import Layout from 'ui/features/assignment_grade_summary/react/components/Layout.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 QUnit.module('GradeSummary Layout', suiteHooks => {
   let store

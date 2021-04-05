@@ -90,7 +90,6 @@ RUN set -eux; \
     pacts \
     public/dist \
     public/doc/api \
-    public/javascripts/compiled \
     public/javascripts/translations \
     reports \
     tmp \

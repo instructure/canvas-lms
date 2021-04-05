@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DatetimeField from 'compiled/widget/DatetimeField'
+import DatetimeField from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import portuguese from 'timezone/pt_PT'

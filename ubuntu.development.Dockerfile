@@ -97,7 +97,6 @@ RUN mkdir -p .yardoc \
              pacts \
              public/dist \
              public/doc/api \
-             public/javascripts/compiled \
              public/javascripts/translations \
              reports \
              tmp \

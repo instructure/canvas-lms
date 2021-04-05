@@ -238,7 +238,7 @@ class CollaborationsController < ApplicationController
 
     @page_title = t('lti_collaborations', 'LTICollaborations')
     @body_classes << 'full-width padless-content'
-    js_bundle :react_collaborations
+    js_bundle :lti_collaborations
     css_bundle :react_collaborations
 
     add_crumb(t('#crumbs.collaborations', "Collaborations"),  polymorphic_path([@context, :lti_collaborations]))

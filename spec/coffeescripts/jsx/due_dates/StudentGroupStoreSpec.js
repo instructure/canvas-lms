@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
+import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('StudentGroupStore', {

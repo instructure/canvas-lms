@@ -19,7 +19,7 @@
 import React from 'react'
 
 import TestUtils from 'react-dom/test-utils'
-import AssignmentItem from 'jsx/conditional_release_stats/components/student-assignment-item'
+import AssignmentItem from '@canvas/conditional-release-stats/react/components/student-assignment-item'
 
 QUnit.module('Student Assignment Item')
 

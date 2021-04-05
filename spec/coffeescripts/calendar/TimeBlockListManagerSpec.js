@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import TimeBlockListManager from 'compiled/calendar/TimeBlockListManager'
+import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
 import moment from 'moment'
 
 QUnit.module('TimeBlockListManager', {

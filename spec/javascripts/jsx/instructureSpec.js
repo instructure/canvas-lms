@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {enhanceUserContent} from 'instructure'
+import {enhanceUserContent} from 'ui/features/navigation_header/jquery/instructure.js'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Enhance User Content', hooks => {

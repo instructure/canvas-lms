@@ -19,9 +19,9 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import $ from 'jquery'
-import PostGradesApp from 'jsx/gradebook/SISGradePassback/PostGradesApp'
-import GradebookExportManager from 'jsx/gradebook/shared/GradebookExportManager'
-import ActionMenu from 'jsx/gradebook/default_gradebook/components/ActionMenu'
+import PostGradesApp from 'ui/features/gradebook/react/SISGradePassback/PostGradesApp.js'
+import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager.js'
+import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu.js'
 
 const workingMenuProps = () => ({
   gradebookIsEditable: true,

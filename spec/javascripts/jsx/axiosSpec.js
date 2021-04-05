@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
+import axios from '@canvas/axios'
 import moxios from 'moxios'
 
 QUnit.module('Custom Axios Tests', {

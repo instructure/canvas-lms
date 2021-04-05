@@ -29,7 +29,7 @@
   add_crumb @tag.context_module.name, cu
   add_crumb @tag.title
 
-  js_bundle :file_inline
+  js_bundle :file
   js_bundle 'module_sequence_footer'
 %>
   <h1 class="screenreader-only"><%= @tag.title %></h1>

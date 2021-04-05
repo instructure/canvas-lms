@@ -310,7 +310,7 @@ class ContextController < ApplicationController
 
       js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
 
-      js_bundle :user_name, "legacy/context_roster_user"
+      js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
       @google_analytics_page_title = "#{@context.name} People"
 

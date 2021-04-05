@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FocusManager from 'jsx/blueprint_courses/focusManager'
+import FocusManager from 'ui/features/blueprint_course_master/react/focusManager.js'
 
 QUnit.module('FocusManager')
 

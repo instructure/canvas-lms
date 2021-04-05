@@ -22,7 +22,7 @@ import TestUtils from 'react-dom/test-utils'
 import {Spinner} from '@instructure/ui-spinner'
 import {mount} from 'enzyme'
 
-import DeveloperKeysApp from 'jsx/developer_keys/App'
+import DeveloperKeysApp from 'ui/features/developer_keys_v2/react/App.js'
 
 QUnit.module('DevelopersKeyApp', {
   teardown() {

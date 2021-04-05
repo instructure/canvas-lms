@@ -18,7 +18,7 @@
 
 import React from 'react'
 import enzyme from 'enzyme'
-import AddPeople from 'jsx/add_people/components/add_people'
+import AddPeople from '@canvas/add-people/react/components/add_people'
 
 QUnit.module('AddPeople')
 

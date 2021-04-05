@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import FormContent from 'jsx/grading/HideAssignmentGradesTray/FormContent'
+import FormContent from '@canvas/hide-assignment-grades-tray/react/FormContent'
 
 QUnit.module('HideAssignmentGradesTray FormContent', suiteHooks => {
   let $container

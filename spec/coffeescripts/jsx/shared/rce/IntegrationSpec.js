@@ -17,8 +17,8 @@
  */
 
 import {waitFor} from '@testing-library/dom'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import RCELoader from 'jsx/shared/rce/serviceRCELoader'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
+import RCELoader from '@canvas/rce/serviceRCELoader'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import editorUtils from 'helpers/editorUtils'

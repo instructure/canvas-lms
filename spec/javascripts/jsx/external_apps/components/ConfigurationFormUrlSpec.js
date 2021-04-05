@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
+import ConfigurationFormUrl from 'ui/features/external_apps/react/components/ConfigurationFormUrl.js'
 
 const fakeStore = {
   findAppByShortName() {

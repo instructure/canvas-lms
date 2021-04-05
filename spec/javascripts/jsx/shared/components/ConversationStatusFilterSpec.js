@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import ConversationStatusFilter from 'jsx/shared/components/ConversationStatusFilter'
+import ConversationStatusFilter from 'ui/features/conversations/react/ConversationStatusFilter.js'
 import React from 'react'
 import {shallow} from 'enzyme'
 

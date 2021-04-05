@@ -437,7 +437,7 @@ class DiscussionTopicsController < ApplicationController
         feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
 
-        js_bundle :discussion_topics_index_v2
+        js_bundle :discussion_topics_index
         css_bundle :discussions_index
 
         render html: '', layout: true
@@ -633,7 +633,7 @@ class DiscussionTopicsController < ApplicationController
 
     # Render updated UI if feature flag is enabled
     if @domain_root_account.feature_enabled?(:react_announcement_discussion_edit)
-      js_bundle :discussion_topics_edit_react
+      js_bundle :discussion_topic_edit_v2
       render html: '', layout: true
       return
     end
@@ -788,7 +788,7 @@ class DiscussionTopicsController < ApplicationController
               :IS_GROUP => @topic.group_category_id?,
             }
             # will fire off the xhr for this as soon as the page comes back.
-            # see app/coffeescripts/models/Topic#fetch for where it is consumed
+            # see ui/features/discussion_topic/backbone/models/Topic#fetch for where it is consumed
             prefetch_xhr(env_hash[:ROOT_URL])
 
             env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
@@ -829,7 +829,7 @@ class DiscussionTopicsController < ApplicationController
             js_env(js_hash)
             set_master_course_js_env_data(@topic, @context)
             conditional_release_js_env(@topic.assignment, includes: [:rule])
-            js_bundle :discussion
+            js_bundle :discussion_topic
             css_bundle :tinymce, :discussions, :learning_outcomes
 
             if @context_enrollment

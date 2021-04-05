@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import regularizePathname from 'jsx/external_apps/lib/regularizePathname'
+import regularizePathname from 'ui/features/external_apps/react/lib/regularizePathname.js'
 
 QUnit.module('External Apps Client-side Router', {
   before() {

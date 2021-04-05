@@ -17,8 +17,8 @@
  */
 
 import I18n from 'i18n!sharedGradeFormatHelper'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import numberHelper from '@canvas/i18n/numberHelper'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup() {

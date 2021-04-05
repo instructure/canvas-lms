@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import merge from 'lodash/merge'
-import AnnouncementRow from 'jsx/shared/components/AnnouncementRow'
+import AnnouncementRow from '@canvas/announcements/react/components/AnnouncementRow'
 
 QUnit.module('AnnouncementRow component')
 

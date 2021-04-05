@@ -18,7 +18,7 @@
  */
 
 /*
- ** Copied from canvas-lms/app/jsx/shared/components/test/CanvasSelect.test.js
+ ** Copied from canvas-lms/ui/shared/react/components/__test__/CanvasSelect.test.js
  */
 
 import React from 'react'

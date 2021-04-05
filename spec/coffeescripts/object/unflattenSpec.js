@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import unflatten from 'compiled/object/unflatten'
+import unflatten from 'obj-unflatten'
 
 QUnit.module('unflatten')
 

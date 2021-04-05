@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Layout from 'jsx/grading/HideAssignmentGradesTray/Layout'
+import Layout from '@canvas/hide-assignment-grades-tray/react/Layout'
 
 QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
   let $container

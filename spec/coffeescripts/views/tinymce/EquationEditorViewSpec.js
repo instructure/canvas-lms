@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import EquationEditorView from 'compiled/views/tinymce/EquationEditorView'
+import EquationEditorView from '@canvas/rce/backbone/views/EquationEditorView'
 
 QUnit.module('EquationEditorView', () => {
   QUnit.module('doubleEncodeEquationForUrl', () => {

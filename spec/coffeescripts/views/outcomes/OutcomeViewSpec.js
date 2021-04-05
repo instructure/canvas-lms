@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import Outcome from 'compiled/models/Outcome'
-import OutcomeView from 'compiled/views/outcomes/OutcomeView'
+import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
+import OutcomeView from '@canvas/outcome-content-view/backbone/views/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
 
 const newOutcome = (outcomeOptions, outcomeLinkOptions) =>

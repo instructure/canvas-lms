@@ -18,8 +18,8 @@
 
 import ReactDOM from 'react-dom'
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import AssignmentColumnHeaderRenderer from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import AssignmentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer.js'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {

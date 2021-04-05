@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Router from 'jsx/blueprint_courses/router'
+import Router from '@canvas/blueprint-courses/react/router'
 
 QUnit.module('Blueprint router')
 

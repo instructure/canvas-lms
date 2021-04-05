@@ -21,16 +21,16 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
 
-import SpeedGrader from 'speed_grader'
-import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
-import SpeedGraderHelpers from 'speed_grader_helpers'
-import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache'
+import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader.js'
+import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts.js'
+import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
+import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache.js'
 import fakeENV from 'helpers/fakeENV'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
-import userSettings from 'compiled/userSettings'
-import htmlEscape from 'str/htmlEscape'
+import numberHelper from '@canvas/i18n/numberHelper'
+import userSettings from '@canvas/user-settings'
+import htmlEscape from 'html-escape'
 
-import 'jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 const {unescape} = htmlEscape
 

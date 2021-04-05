@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/announcements/actions'
-import * as apiClient from 'jsx/announcements/apiClient'
+import actions from 'ui/features/announcements/react/actions.js'
+import * as apiClient from 'ui/features/announcements/react/apiClient.js'
 
 let sandbox = null
 

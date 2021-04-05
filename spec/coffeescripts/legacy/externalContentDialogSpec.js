@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import ExternalContentSuccess from '../../../app/coffeescripts/bundles/legacy/external_content_success'
+import ExternalContentSuccess from 'ui/features/external_content_success/index.js'
 
 QUnit.module('ExternalContentSuccess', {
   setup() {

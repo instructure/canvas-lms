@@ -26,7 +26,7 @@
     js_env :SYLLABUS_PER_PAGE => Setting.get('syllabus_per_page', Setting.get('api_max_per_page', '50'))
     js_bundle :syllabus
   else
-    js_bundle :static_syllabus
+    js_bundle :syllabus_static
   end
   css_bundle :tinymce
 %>

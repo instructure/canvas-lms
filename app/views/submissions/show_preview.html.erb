@@ -131,7 +131,7 @@
   <% end %>
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
-  <% js_bundle 'legacy/submissions_show_preview_text' %>
+  <% js_bundle 'submissions_show_preview_text' %>
   <div style="text-align: <%= direction('right') %>; margin-top: 15px;">
     <select class="data_view">
       <option aria-label="<%= t("Assignment %{assignment} submission Paper View", :assignment=> @assignment.title) %>" value="paper"><%= t('Paper View') %></option>
@@ -226,7 +226,7 @@
 
   <% end %>
 
-  <% js_bundle 'legacy/submissions_show_preview_upload' %>
+  <% js_bundle 'submissions_show_preview_upload' %>
 <% elsif @submission.submission_type == "online_quiz" and  @assignment&.quiz&.id %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <div style="text-align: center;">
@@ -240,7 +240,7 @@
   </div>
   <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
 
-  <% js_bundle 'legacy/submissions_show_preview_media' %>
+  <% js_bundle 'submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
 <% elsif @submission.submission_type == "annotated_document" %>

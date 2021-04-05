@@ -17,8 +17,8 @@
  */
 
 import fakeENV from 'helpers/fakeENV'
-import ExternalContentReturnView from 'compiled/views/ExternalTools/ExternalContentReturnView'
-import ExternalTool from 'compiled/models/ExternalTool'
+import ExternalContentReturnView from '@canvas/external-tools/backbone/views/ExternalContentReturnView.coffee'
+import ExternalTool from '@canvas/external-tools/backbone/models/ExternalTool.coffee'
 
 let view
 let el

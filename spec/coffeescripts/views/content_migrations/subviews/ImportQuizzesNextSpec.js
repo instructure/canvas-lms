@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import ImportQuizzesNextView from 'compiled/views/content_migrations/subviews/ImportQuizzesNextView'
+import Backbone from '@canvas/backbone'
+import ImportQuizzesNextView from '@canvas/content-migrations/backbone/views/ImportQuizzesNextView.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('Import Quizzes Next', {})

@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Assignment from 'compiled/models/Assignment'
-import CreateAssignmentView from 'compiled/views/assignments/CreateAssignmentView'
-import DialogFormView from 'compiled/views/DialogFormView'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/CreateAssignmentView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
-import 'compiled/behaviors/tooltip'
+import '../../../../ui/boot/initializers/activateTooltips.js'
 
 function buildAssignment1() {
   const date1 = {

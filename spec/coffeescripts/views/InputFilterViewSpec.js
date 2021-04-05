@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import InputFilterView from 'compiled/views/InputFilterView'
+import InputFilterView from 'backbone-input-filter-view'
 import 'helpers/jquery.simulate'
 
 let view = null

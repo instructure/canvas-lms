@@ -20,7 +20,7 @@ import React from 'react'
 import {Provider} from 'react-redux'
 import {mount, shallow} from 'enzyme'
 
-import DiscussionsIndex from 'jsx/discussions/components/DiscussionsIndex'
+import DiscussionsIndex from 'ui/features/discussion_topics_index/react/components/DiscussionsIndex.js'
 
 const defaultProps = () => ({
   closeForComments: () => {},

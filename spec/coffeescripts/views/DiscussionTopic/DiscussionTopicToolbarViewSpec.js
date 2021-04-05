@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
-import DiscussionTopicToolbarView from 'compiled/views/DiscussionTopic/DiscussionTopicToolbarView'
+import DiscussionTopicToolbarView from 'ui/features/discussion_topic/backbone/views/DiscussionTopicToolbarView.js'
 
 const fixture = `\
 <div id="discussion-topic-toolbar">

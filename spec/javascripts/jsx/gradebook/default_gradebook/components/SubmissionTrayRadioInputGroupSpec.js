@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SubmissionTrayRadioInputGroup from 'jsx/gradebook/default_gradebook/components/SubmissionTrayRadioInputGroup'
+import SubmissionTrayRadioInputGroup from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTrayRadioInputGroup.js'
 
 function mountComponent(customProps) {
   const props = {

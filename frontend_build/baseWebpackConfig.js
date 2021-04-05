@@ -30,7 +30,6 @@ const glob = require('glob')
 const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
-const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
@@ -72,7 +71,7 @@ module.exports = {
           const thingsWeKnowAreWayTooBig = [
             'canvas-rce-async-chunk',
             'canvas-rce-old-async-chunk',
-            'permissions_index',
+            'permissions',
             'assignment_edit'
           ]
           return (
@@ -141,7 +140,7 @@ module.exports = {
     ? 'source-map'
     : 'eval',
 
-  entry: {main: 'jsx/main'},
+  entry: {main: path.resolve(__dirname, '../ui/index.js')},
 
   output: {
     // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
@@ -174,35 +173,22 @@ module.exports = {
       // `require('newless')` to make it work
       './themeable$': path.resolve(
         __dirname,
-        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       '../themeable$': path.resolve(
         __dirname,
-        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       '@instructure/ui-themeable/es/themeable$': path.resolve(
         __dirname,
-        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
-
-      'node_modules-version-of-backbone': require.resolve('backbone'),
-      'node_modules-version-of-react-modal': require.resolve('react-modal'),
-
-      backbone: 'Backbone',
-      timezone$: 'timezone_core',
-      jst: path.resolve(__dirname, '../app/views/jst'),
-      jqueryui: path.resolve(__dirname, '../public/javascripts/vendor/jqueryui'),
-      coffeescripts: path.resolve(__dirname, '../app/coffeescripts'),
-      'lodash.underscore$': path.resolve(
-        __dirname,
-        '../public/javascripts/vendor/lodash.underscore.js'
-      ),
-      jsx: path.resolve(__dirname, '../app/jsx'),
-
-      'jquery.qtip$': path.resolve(__dirname, '../public/javascripts/vendor/jquery.qtip.js')
+      'node_modules-version-of-backbone$': require.resolve('backbone'),
+      'node_modules-version-of-react-modal$': require.resolve('react-modal'),
     },
 
     modules: [
+      path.resolve(__dirname, '../ui/shims'),
       path.resolve(__dirname, '../public/javascripts'),
       path.resolve(__dirname, '../gems/plugins'),
       'node_modules'
@@ -225,18 +211,21 @@ module.exports = {
       {
         test: /\.js$/,
         include: [
-          path.resolve(__dirname, '../public/javascripts'),
-          path.resolve(__dirname, '../app/jsx'),
-          path.resolve(__dirname, '../app/coffeescripts'),
+          path.resolve(__dirname, '../ui'),
+          path.resolve(__dirname, '../packages/jquery-kyle-menu'),
+          path.resolve(__dirname, '../packages/jquery-sticky'),
+          path.resolve(__dirname, '../packages/jquery-popover'),
+          path.resolve(__dirname, '../packages/jquery-selectmenu'),
+          path.resolve(__dirname, '../packages/mathml'),
+          path.resolve(__dirname, '../packages/slickgrid'),
+          path.resolve(__dirname, '../packages/with-breakpoints'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
           path.resolve(__dirname, '../spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
         ],
         exclude: [
-          path.resolve(__dirname, '../public/javascripts/translations'),
-          path.resolve(__dirname, '../public/javascripts/react-dnd-test-backend'),
-          path.resolve(__dirname, '../public/javascripts/vendor/lodash.underscore'),
-          /bower\//
+          /bower\//,
+          /node_modules/,
         ],
         use: {
           loader: 'babel-loader',
@@ -248,27 +237,25 @@ module.exports = {
       {
         test: /\.coffee$/,
         include: [
-          path.resolve(__dirname, '../app/coffeescript'),
+          path.resolve(__dirname, '../ui'),
           path.resolve(__dirname, '../spec/coffeescripts'),
-          /app\/coffeescripts\//,
-          /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
+          path.resolve(__dirname, '../packages/backbone-input-filter-view/src'),
+          path.resolve(__dirname, '../packages/backbone-input-view/src'),
+          /gems\/plugins\/.*\/(app|spec_canvas)\/coffeescripts\//
         ],
         loaders: ['coffee-loader']
       },
       {
         test: /\.handlebars$/,
         include: [
-          path.resolve(__dirname, '../app/views/jst'),
+          path.resolve(__dirname, '../ui'),
           /gems\/plugins\/.*\/app\/views\/jst\//
         ],
         loaders: ['i18nLinerHandlebars']
       },
       {
         test: /\.hbs$/,
-        include: [
-          /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
-          /app\/coffeescripts\/ember\/shared\/templates\//
-        ],
+        include: [path.join(root, 'ui/features/screenreader_gradebook/jst')],
         loaders: [path.join(root, 'frontend_build/emberHandlebars')]
       },
       {
@@ -316,10 +303,6 @@ module.exports = {
 
     // handles our custom i18n stuff
     new I18nPlugin(),
-
-    // tells webpack to look for 'compiled/foobar' at app/coffeescripts/foobar.coffee
-    // instead of public/javascripts/compiled/foobar.js
-    new CompiledReferencePlugin(),
 
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({

@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import DeveloperKeysTable from 'jsx/developer_keys/AdminTable'
+import DeveloperKeysTable from 'ui/features/developer_keys_v2/react/AdminTable.js'
 import $ from 'jquery'
 
 QUnit.module('AdminTable', {

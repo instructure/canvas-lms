@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as AssignmentApi from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
+import * as AssignmentApi from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi.js'
 import FakeServer, {
   paramsFromRequest,
   pathFromRequest
-} from 'jsx/shared/network/__tests__/FakeServer'
+} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
   let server

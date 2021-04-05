@@ -22,22 +22,18 @@ module.exports = {
   moduleNameMapper: {
     '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
     '\\.svg$': '<rootDir>/jest/imageMock.js',
-    '^compiled/(.*)$': '<rootDir>/app/coffeescripts/$1',
-    '^coffeescripts/(.*)$': '<rootDir>/app/coffeescripts/$1',
-    '^jsx/(.*)$': '<rootDir>/app/jsx/$1',
-    '^jst/(.*)$': '<rootDir>/app/views/jst/$1',
-    '^timezone$': '<rootDir>/public/javascripts/timezone_core.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
+    'node_modules-version-of-react-modal': require.resolve('react-modal'),
     '^Backbone$': '<rootDir>/public/javascripts/Backbone.js'
   },
-  roots: ['app/jsx', 'app/coffeescripts', 'public/javascripts', 'gems/plugins'],
-  moduleDirectories: ['node_modules', 'public/javascripts', 'public/javascripts/vendor'],
+  roots: ['ui', 'gems/plugins', 'public/javascripts'],
+  moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
   reporters: ['default', 'jest-junit'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
-    './app/jsx/__tests__/ValidatedApolloCleanup'
+    './packages/validated-apollo/src/ValidatedApolloCleanup.js'
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
 

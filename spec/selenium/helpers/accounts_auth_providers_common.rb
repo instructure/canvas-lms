@@ -22,7 +22,7 @@ require_relative "../common"
 module AuthenticationProvidersCommon
   def add_auth_type(auth_type)
     click_option("#add-authentication-provider select", auth_type)
-    # public/javascripts/authentication_providers.js waits 100ms to focus
+    # ui/features/authentication_providers/jquery/index.js waits 100ms to focus
     # the first input; this can cause selenium to get focus-jacked and
     # put something in the wrong one :'(
     sleep 0.1

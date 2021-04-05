@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentOverride from 'compiled/models/AssignmentOverride'
-import Assignment from 'compiled/models/Assignment'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 
 QUnit.module('AssignmentOverride', {
   setup() {

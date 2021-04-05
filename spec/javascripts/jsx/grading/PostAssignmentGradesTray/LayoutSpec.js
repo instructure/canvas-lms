@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Layout from 'jsx/grading/PostAssignmentGradesTray/Layout'
-import {EVERYONE} from 'jsx/grading/PostAssignmentGradesTray/PostTypes'
+import Layout from '@canvas/post-assignment-grades-tray/react/Layout'
+import {EVERYONE} from '@canvas/post-assignment-grades-tray/react/PostTypes'
 
 QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   let $container

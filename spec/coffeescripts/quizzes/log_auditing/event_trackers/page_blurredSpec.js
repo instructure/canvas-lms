@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Subject from 'compiled/quizzes/log_auditing/event_trackers/page_blurred'
-import K from 'compiled/quizzes/log_auditing/constants'
+import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/page_blurred'
+import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
 
 QUnit.module('Quizzes::LogAuditing::EventTrackers::PageBlurred')

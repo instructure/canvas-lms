@@ -19,8 +19,8 @@
 import FakeServer, {
   formBodyFromRequest,
   pathFromRequest
-} from 'jsx/shared/network/__tests__/FakeServer'
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook', suiteHooks => {
   let gradebook

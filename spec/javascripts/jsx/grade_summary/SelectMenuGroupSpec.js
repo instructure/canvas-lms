@@ -19,7 +19,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {makeSelection, getSelect, getSelectMenuOptions, isSelectDisabled} from './SelectMenuHelpers'
 
-import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup'
+import SelectMenuGroup from 'ui/features/grade_summary/react/SelectMenuGroup.js'
 
 QUnit.module('SelectMenuGroup', suiteHooks => {
   let props

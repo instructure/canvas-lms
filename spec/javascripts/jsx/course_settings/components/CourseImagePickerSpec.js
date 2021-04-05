@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {getByText} from '@testing-library/dom'
-import CourseImagePicker from 'jsx/course_settings/components/CourseImagePicker'
+import CourseImagePicker from 'ui/features/course_settings/react/components/CourseImagePicker.js'
 
 const wrapper = document.getElementById('fixtures')
 const reset_env = window.ENV

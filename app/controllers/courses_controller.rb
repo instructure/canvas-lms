@@ -2181,13 +2181,13 @@ class CoursesController < ApplicationController
           js_bundle :k5_course, :context_modules
           css_bundle :k5_dashboard, :content_next, :context_modules2
         when 'announcements'
-          js_bundle :announcements_index_v2
+          js_bundle :announcements
           css_bundle :announcements_index
         else
           js_bundle :dashboard
         end
 
-        js_bundle :course, 'legacy/courses_show'
+        js_bundle :course, :course_show
         css_bundle :course_show
 
         if @context_enrollment
@@ -2219,7 +2219,7 @@ class CoursesController < ApplicationController
         send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@current_user, @domain_root_account)
       }
     )
-    js_bundle :course_notification_settings_show
+    js_bundle :course_notification_settings
     render html: '', layout: true
   end
 

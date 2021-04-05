@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import SpeedgraderSelectMenu from 'speed_grader_select_menu'
+import SpeedgraderSelectMenu from 'ui/features/speed_grader/jquery/speed_grader_select_menu.js'
 
 QUnit.module('SpeedGraderSelectMenu', {
   setup() {

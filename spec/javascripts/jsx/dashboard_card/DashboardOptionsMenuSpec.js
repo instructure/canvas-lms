@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {shallow, mount} from 'enzyme'
-import DashboardOptionsMenu from 'jsx/dashboard_card/DashboardOptionsMenu'
+import DashboardOptionsMenu from 'ui/features/dashboard/react/DashboardOptionsMenu.js'
 import sinon from 'sinon'
 
 const container = document.getElementById('fixtures')

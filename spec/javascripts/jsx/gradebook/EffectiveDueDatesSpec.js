@@ -17,8 +17,8 @@
  */
 
 import _ from 'underscore'
-import timezone from 'timezone'
-import {scopeToUser, updateWithSubmissions} from 'jsx/gradebook/EffectiveDueDates'
+import timezone from '@canvas/timezone'
+import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
 
 QUnit.module('EffectiveDueDates', () => {
   QUnit.module('.scopeToUser', () => {

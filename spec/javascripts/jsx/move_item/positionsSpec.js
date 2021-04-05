@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {positions, removeAllFromOrder} from 'jsx/move_item/positions'
+import {positions, removeAllFromOrder} from '@canvas/move-item-tray/positions'
 
 QUnit.module('MoveItem positions')
 

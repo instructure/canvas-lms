@@ -646,12 +646,7 @@ describe CoursesController do
         user_session(@teacher)
         get 'show', params: {id: @course.id, view: 'notifications'}
         expect(response).to be_successful
-
-        contains_js_bundle = false
-        assigns['js_bundles'].each do |js_bundle|
-          contains_js_bundle = js_bundle.include? :course_notification_settings_show if js_bundle.include? :course_notification_settings_show
-        end
-        expect(contains_js_bundle).to be true
+        expect(assigns[:js_bundles].flatten).to include(:course_notification_settings)
       end
     end
   end
@@ -1593,7 +1588,7 @@ describe CoursesController do
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:course_home_view]).to eq "announcements"
-        bundle = assigns[:js_bundles].select { |b| b.include? :announcements_index_v2 }
+        bundle = assigns[:js_bundles].select { |b| b.include? :announcements }
         expect(bundle.size).to eq 1
       end
     end

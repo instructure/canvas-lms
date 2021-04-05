@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import MoveItemTray from 'jsx/move_item/MoveItemTray'
+import MoveItemTray from '@canvas/move-item-tray/react/index'
 
 QUnit.module('MoveItemTray component')
 

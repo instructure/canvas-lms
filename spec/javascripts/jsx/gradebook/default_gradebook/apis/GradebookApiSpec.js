@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
+import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi.js'
 
 QUnit.module('GradebookApi.createTeacherNotesColumn', {
   setup() {

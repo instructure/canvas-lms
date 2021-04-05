@@ -18,7 +18,7 @@
 
 <%
   css_bundle :quizzes
-  js_bundle :quizzes_bundle
+  js_bundle :quizzes
   js_env :QUIZZES => {:QUIZ => true}
   provide :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>

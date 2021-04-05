@@ -20,7 +20,7 @@ import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import CourseListItem from 'jsx/epub_exports/CourseListItem'
+import CourseListItem from 'ui/features/epub_exports/react/CourseListItem.js'
 
 QUnit.module('CourseListItemSpec', {
   setup() {

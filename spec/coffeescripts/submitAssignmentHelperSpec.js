@@ -20,7 +20,7 @@ import {
   submitContentItem,
   recordEulaAgreement,
   verifyPledgeIsChecked
-} from 'submit_assignment_helper'
+} from 'ui/features/submit_assignment/jquery/helper.js'
 import $ from 'jquery'
 
 const formHtml = `\

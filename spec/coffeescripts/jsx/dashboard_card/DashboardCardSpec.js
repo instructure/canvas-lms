@@ -25,8 +25,8 @@ import sinon from 'sinon'
 import {moxiosWait} from 'jest-moxios-utils'
 import {waitFor} from '@testing-library/react'
 
-import DashboardCard from 'jsx/dashboard_card/DashboardCard'
-import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
+import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
+import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
 import assertions from 'helpers/assertions'
 
 QUnit.module('DashboardCard', {

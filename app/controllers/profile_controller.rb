@@ -241,7 +241,7 @@ class ProfileController < ApplicationController
       read_privacy_info: @user.preferences[:read_notification_privacy_info],
       account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
     }
-    js_bundle :account_notification_settings_show
+    js_bundle :account_notification_settings
     render html: '', layout: true
   end
 

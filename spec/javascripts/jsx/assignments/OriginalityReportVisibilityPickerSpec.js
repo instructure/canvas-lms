@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import OriginalityReportVisibilityPicker from 'jsx/assignments/OriginalityReportVisibilityPicker'
+import OriginalityReportVisibilityPicker from 'ui/features/assignment_edit/react/OriginalityReportVisibilityPicker.js'
 
 QUnit.module('OriginalityReportVisibilityPicker')
 

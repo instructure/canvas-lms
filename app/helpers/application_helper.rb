@@ -247,7 +247,7 @@ module ApplicationHelper
     capture do
       preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
 
-      # if you look the app/jsx/main.js, there is a function there that will
+      # if you look the ui/main.js, there is a function there that will
       # process anything on window.bundles and knows how to load everything it needs
       # to load that "js_bundle". And by the time that runs, the browser will have already
       # started downloading those script urls because of those preload tags above,

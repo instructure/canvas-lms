@@ -20,9 +20,9 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
-import DashboardCard from 'jsx/dashboard_card/DashboardCard'
-import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard'
-import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
+import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
+import DraggableDashboardCard from '@canvas/dashboard-card/react/DraggableDashboardCard'
+import getDroppableDashboardCardBox from '@canvas/dashboard-card/react/getDroppableDashboardCardBox'
 import fakeENV from 'helpers/fakeENV'
 
 let cards

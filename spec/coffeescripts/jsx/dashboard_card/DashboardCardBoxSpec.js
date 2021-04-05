@@ -23,9 +23,9 @@ import ReactDndTestBackend from 'react-dnd-test-backend'
 import sinon from 'sinon'
 import {waitFor} from '@testing-library/react'
 
-import DashboardCard from 'jsx/dashboard_card/DashboardCard'
-import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
-import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
+import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
+import getDroppableDashboardCardBox from '@canvas/dashboard-card/react/getDroppableDashboardCardBox'
+import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
   let $container

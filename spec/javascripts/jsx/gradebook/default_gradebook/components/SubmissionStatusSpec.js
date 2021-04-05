@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import SubmissionStatus from 'jsx/gradebook/default_gradebook/components/SubmissionStatus'
+import SubmissionStatus from 'ui/features/gradebook/react/default_gradebook/components/SubmissionStatus.js'
 
 QUnit.module('SubmissionStatus - Pills', hooks => {
   let props

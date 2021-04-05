@@ -23,8 +23,8 @@ import {
   FAILURE,
   NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
   STARTED
-} from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
-import ReleaseButton from 'jsx/assignments/GradeSummary/components/ReleaseButton'
+} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
+import ReleaseButton from 'ui/features/assignment_grade_summary/react/components/ReleaseButton.js'
 
 QUnit.module('GradeSummary ReleaseButton', suiteHooks => {
   let props

@@ -11,6 +11,7 @@
     "packages": [
       "gems/canvas_i18nliner",
       "gems/plugins/*",
+      "ui/shared/*",
       "packages/*"
     ],
     "nohoist": [
@@ -328,8 +329,8 @@
     "build:packages": "yarn workspace-run build:canvas",
     "lint:browser-code": "es-check es8 ./public/dist/**/*.js",
     "lint:staged": "lint-staged",
-    "lint:js:coffeescripts": "eslint ./app/coffeescripts/**/*.js",
-    "lint:js:jsx": "eslint ./app/jsx/**/*.js",
+    "lint:js:coffeescripts": "echo 'STOP CALLING ME IM NO LONGER NEEDED'",
+    "lint:js:jsx": "eslint './ui/**/*.js'",
     "lint:js:packages": "eslint ./packages/**/*.js",
     "lint:style": "stylelint  './app/**/*.{css,scss}' './packages/**/*.{css,scss}'",
     "lint:xss": "node ./script/xsslint.js",

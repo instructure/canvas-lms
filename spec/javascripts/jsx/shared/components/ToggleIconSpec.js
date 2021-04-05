@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import merge from 'lodash/merge'
-import ToggleIcon from 'jsx/shared/components/ToggleIcon'
+import ToggleIcon from 'ui/features/discussion_topics_index/react/components/ToggleIcon.js'
 
 QUnit.module('ToggleIcon component')
 

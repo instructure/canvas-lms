@@ -18,7 +18,7 @@
 
 <% provide :page_title do %><%= @lti_launch.link_text %><% end %>
 
-<% js_bundle 'legacy/external_tools_tool_show' %>
+<% js_bundle :external_tools_show %>
 <% js_bundle :external_tool_redirect if @redirect_return %>
 
 <%= render @prepend_template if @prepend_template %>

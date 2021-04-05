@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ThemeEditorColorRow from 'jsx/theme_editor/ThemeEditorColorRow'
+import ThemeEditorColorRow from 'ui/features/theme_editor/react/ThemeEditorColorRow.js'
 
 let elem, props
 
