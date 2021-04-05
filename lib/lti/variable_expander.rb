@@ -90,8 +90,7 @@ module Lti
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
     ORIGINALITY_REPORT_ATTACHMENT_GUARD = -> { @originality_report&.attachment.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
-    EDITOR_CONTENTS_GUARD = -> { @editor_contents.present? }
-    EDITOR_SELECTION_GUARD = -> { @editor_contents.present? }
+    EDITOR_GUARD = -> { @editor_contents.present? }
     STUDENT_ASSIGNMENT_GUARD = -> { @context.is_a?(Course) && @context.user_is_student?(@current_user) && @assignment }
 
     def initialize(root_account, context, controller, opts = {})
@@ -213,7 +212,7 @@ module Lti
     #   ```
     register_expansion 'com.instructure.Editor.contents', [],
                        -> { @editor_contents},
-                       EDITOR_CONTENTS_GUARD,
+                       EDITOR_GUARD,
                        default_name: 'com_instructure_editor_contents'
 
     # The contents the user has selected in the text editor associated
@@ -225,7 +224,7 @@ module Lti
     #   ```
     register_expansion 'com.instructure.Editor.selection', [],
                        -> { @editor_selection },
-                       EDITOR_SELECTION_GUARD,
+                       EDITOR_GUARD,
                        default_name: 'com_instructure_editor_selection'
 
     # A token that can be used for frontend communication between an LTI tool
