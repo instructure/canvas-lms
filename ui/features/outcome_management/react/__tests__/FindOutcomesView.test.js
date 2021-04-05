@@ -125,6 +125,34 @@ describe('FindOutcomesView', () => {
     expect(onAddAllHandlerMock).toHaveBeenCalled()
   })
 
+  it('shows outcome as not added when outcome has not been imnported', () => {
+    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
+    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
+    expect(toggle).not.toBeChecked()
+  })
+
+  it('shows outcome as added when outcome is already imported', () => {
+    const importedOutcome = {
+      outcomes: {
+        nodes: [
+          {
+            _id: '11',
+            title: 'Outcome 1',
+            description: 'Outcome 1 description',
+            isImported: true
+          }
+        ],
+        pageInfo: {
+          endCursor: 'abc',
+          hasNextPage: true
+        }
+      }
+    }
+    const {getAllByText} = render(<FindOutcomesView {...defaultProps(importedOutcome)} />)
+    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
+    expect(toggle).toBeChecked()
+  })
+
   it('shows outcome as added when toggle is turned on', () => {
     const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
     const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling

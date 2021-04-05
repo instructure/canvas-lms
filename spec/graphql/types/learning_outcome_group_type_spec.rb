@@ -58,8 +58,8 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("outcomesCount")).to be_a Integer
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
     expect(outcome_group_type.resolve("canEdit")).to eq true
-    expect(outcome_group_type.resolve("childGroups { nodes { _id } }")).
-      to match_array([@child_group.id.to_s, @child_group3.id.to_s])
+    expect(outcome_group_type.resolve("childGroups { nodes { _id } }"))
+      .to match_array([@child_group.id.to_s, @child_group3.id.to_s])
   end
 
   it "gets outcomes ordered by title" do
@@ -71,6 +71,31 @@ describe Types::LearningOutcomeGroupType do
   it "accepts search_query in outcomes" do
     expect(outcome_group_type.resolve("outcomes(searchQuery: \"BBBB\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
       @outcome1.id.to_s
+    ])
+  end
+
+  it "returns isImported for a given context" do
+    course = Course.create!
+    root_group = course.root_outcome_group
+
+    query = <<~GQL
+      outcomes() {
+        nodes {
+          ... on LearningOutcome {
+            isImported(targetContextType: "Course", targetContextId: #{course.id})
+          }
+        }
+      }
+    GQL
+
+    expect(outcome_group_type.resolve(query)).to match_array([
+      false, false
+    ])
+
+    root_group.add_outcome(@outcome2)
+
+    expect(outcome_group_type.resolve(query)).to match_array([
+      true, false
     ])
   end
 

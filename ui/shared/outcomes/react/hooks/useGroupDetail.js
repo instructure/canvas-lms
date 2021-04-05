@@ -21,24 +21,35 @@ import I18n from 'i18n!OutcomeManagement'
 import $ from 'jquery'
 import {useState, useEffect} from 'react'
 import {useApolloClient} from 'react-apollo'
-import {GROUP_DETAIL_QUERY} from '../../graphql/Management'
+import {
+  GROUP_DETAIL_QUERY,
+  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
+} from '../../graphql/Management'
 import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
+import useCanvasContext from './useCanvasContext'
 
-const useGroupDetail = id => {
+const useGroupDetail = (id, loadOutcomesIsImported = false) => {
+  const {contextType, contextId} = useCanvasContext()
   const client = useApolloClient()
   const [group, setGroup] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const outcomeIsImportedVariables = loadOutcomesIsImported
+    ? {outcomeIsImportedContextType: contextType, outcomeIsImportedContextId: contextId}
+    : {}
 
   const load = currentGroup => {
     if (id && String(id) !== String(ACCOUNT_FOLDER_ID)) {
       setLoading(true)
       client
         .query({
-          query: GROUP_DETAIL_QUERY,
+          query: loadOutcomesIsImported
+            ? GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
+            : GROUP_DETAIL_QUERY,
           variables: {
             id,
-            outcomesCursor: currentGroup?.outcomes?.pageInfo?.endCursor
+            outcomesCursor: currentGroup?.outcomes?.pageInfo?.endCursor,
+            ...outcomeIsImportedVariables
           }
         })
         .then(({data}) => {

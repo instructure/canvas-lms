@@ -45,7 +45,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     updateSearch,
     clearSearch
   } = useFindOutcomeModal(open)
-  const {group, loading, loadMore} = useGroupDetail(selectedGroupId)
+  const {group, loading, loadMore} = useGroupDetail(selectedGroupId, true)
 
   return (
     <Modal

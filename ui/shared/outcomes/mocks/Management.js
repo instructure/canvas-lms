@@ -15,7 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {CHILD_GROUPS_QUERY, GROUP_DETAIL_QUERY} from '../graphql/Management'
+import {
+  CHILD_GROUPS_QUERY,
+  GROUP_DETAIL_QUERY,
+  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
+} from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountId = '1'} = {}) => [
   {
@@ -259,6 +263,88 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
                 _id: '3',
                 description: '',
                 displayName: '',
+                title: `Outcome 3 - Group ${groupId}`,
+                __typename: 'LearningOutcome'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
+      variables: {
+        id: groupId
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: '',
+          title: `Group ${groupId}`,
+          outcomesCount: 0,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: true,
+              endCursor: 'Mg',
+              __typename: 'PageInfo'
+            },
+            nodes: [
+              {
+                _id: '1',
+                description: '',
+                displayName: '',
+                title: `Outcome 1 - Group ${groupId}`,
+                __typename: 'LearningOutcome'
+              },
+              {
+                _id: '2',
+                description: '',
+                displayName: '',
+                isImported: false,
+                title: `Outcome 2 - Group ${groupId}`,
+                __typename: 'LearningOutcome'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomesCursor: 'Mg'
+      }
+    },
+    result: {
+      data: {
+        group: {
+          _id: groupId,
+          description: '',
+          title: `Group ${groupId}`,
+          outcomesCount: 0,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: 'Mw',
+              __typename: 'PageInfo'
+            },
+            nodes: [
+              {
+                _id: '3',
+                description: '',
+                displayName: '',
+                isImported: false,
                 title: `Outcome 3 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }

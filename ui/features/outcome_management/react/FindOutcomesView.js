@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -44,13 +44,9 @@ const FindOutcomesView = ({
   const outcomesCount = collection?.outcomesCount || 0
   const enabled = !!outcomesCount && outcomesCount > 0
 
-  const [selectedOutcomes, setSelectedOutcomes] = useState({})
-  const onSelectOutcomesHandler = id =>
-    setSelectedOutcomes(prevState => {
-      const updatedState = {...prevState}
-      prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
-      return updatedState
-    })
+  const onSelectOutcomesHandler = _id => {
+    // TODO: OUT-4154
+  }
 
   if (loading && !outcomes) {
     return (
@@ -160,14 +156,14 @@ const FindOutcomesView = ({
             }
           >
             <View as="div" data-testid="find-outcome-items-list">
-              {outcomes?.nodes.map(({_id, title, description}, index) => (
+              {outcomes?.nodes.map(({_id, title, description, isImported}, index) => (
                 <FindOutcomeItem
                   key={_id}
                   id={_id}
                   title={title}
                   description={description}
                   isFirst={index === 0}
-                  isChecked={!!selectedOutcomes[_id]}
+                  isChecked={isImported}
                   onCheckboxHandler={onSelectOutcomesHandler}
                 />
               ))}

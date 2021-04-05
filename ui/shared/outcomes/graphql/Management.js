@@ -86,6 +86,43 @@ export const GROUP_DETAIL_QUERY = gql`
     }
   }
 `
+
+export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
+  query GroupDetailQuery(
+    $id: ID!
+    $outcomeIsImportedContextType: String!
+    $outcomeIsImportedContextId: ID!
+    $outcomesCursor: String
+  ) {
+    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
+      ... on LearningOutcomeGroup {
+        _id
+        description
+        title
+        outcomesCount
+        outcomes(first: 10, after: $outcomesCursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            ... on LearningOutcome {
+              _id
+              description
+              title
+              displayName
+              isImported(
+                targetContextType: $outcomeIsImportedContextType
+                targetContextId: $outcomeIsImportedContextId
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const updateOutcomeGroup = (contextType, contextId, group) => {
   return axios.put(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${group._id}`,
