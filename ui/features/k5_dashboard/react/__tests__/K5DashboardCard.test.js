@@ -19,7 +19,11 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import {render} from '@testing-library/react'
-import K5DashboardCard, {DashboardCardHeaderHero} from '../K5DashboardCard'
+import K5DashboardCard, {
+  DashboardCardHeaderHero,
+  LatestAnnouncementLink,
+  AssignmentLinks
+} from '../K5DashboardCard'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 
 import {TAB_IDS} from '@canvas/k5/react/utils'
@@ -158,5 +162,23 @@ describe('K-5 Dashboard Card', () => {
       </K5DashboardContext.Provider>
     )
     expect(queryByText('Nothing due today')).not.toBeInTheDocument()
+  })
+})
+
+describe('LatestAnnouncementLink', () => {
+  it('renders loading skeleton while loading', () => {
+    const {getByText, queryByText} = render(<LatestAnnouncementLink loading color="red" />)
+    expect(getByText('Loading latest announcement link')).toBeInTheDocument()
+    expect(queryByText('New announcement', {exact: false})).not.toBeInTheDocument()
+  })
+})
+
+describe('AssignmentLinks', () => {
+  it('renders loading skeleton while loading', () => {
+    const {getByText, queryByText} = render(
+      <AssignmentLinks loading color="red" requestTabChange={jest.fn()} numMissing={2} />
+    )
+    expect(getByText('Loading missing assignments link')).toBeInTheDocument()
+    expect(queryByText('2 missing')).not.toBeInTheDocument()
   })
 })

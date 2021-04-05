@@ -59,6 +59,7 @@ const homeroomAnnouncements = [
 describe('HomeroomAnnouncementsLayout', () => {
   const getProps = (overrides = {}) => ({
     homeroomAnnouncements,
+    loading: false,
     ...overrides
   })
 
@@ -113,7 +114,17 @@ describe('HomeroomAnnouncementsLayout', () => {
   })
 
   it('renders an empty view if no announcements are passed', () => {
-    const {container} = render(<HomeroomAnnouncementsLayout />)
+    const {container} = render(<HomeroomAnnouncementsLayout loading={false} />)
     expect(container.firstChild).toBeEmpty()
+  })
+
+  it('renders loading skeletons if loading', () => {
+    const {getByText, queryByText} = render(
+      <HomeroomAnnouncementsLayout {...getProps({loading: true})} />
+    )
+    expect(getByText('Loading Homeroom Course Name')).toBeInTheDocument()
+    expect(getByText('Loading Homeroom Announcement Title')).toBeInTheDocument()
+    expect(getByText('Loading Homeroom Announcement Content')).toBeInTheDocument()
+    expect(queryByText('Welcome to Class!')).not.toBeInTheDocument()
   })
 })

@@ -20,7 +20,7 @@ import moment from 'moment-timezone'
 
 import {countByCourseId} from '../react/utils'
 
-export const mapStateToProps = ({days, opportunities, timeZone}) => {
+export const mapStateToProps = ({days, opportunities, timeZone, loading}) => {
   const props = {assignmentsDueToday: {}, assignmentsMissing: {}, assignmentsCompletedForToday: {}}
   const todaysDate = moment.tz(timeZone).format('YYYY-MM-DD')
   const today = days?.length > 0 && days.find(([date]) => date === todaysDate)
@@ -37,5 +37,6 @@ export const mapStateToProps = ({days, opportunities, timeZone}) => {
       opportunities.items.filter(({planner_override}) => !planner_override?.dismissed)
     )
   }
+  props.loadingOpportunities = !loading?.allOpportunitiesLoaded
   return props
 }

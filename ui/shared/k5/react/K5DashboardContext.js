@@ -22,6 +22,7 @@ const DEFAULT_CONTEXT = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
+  loadingOpportunities: false,
   isStudent: false,
   responsiveSize: 'large'
 }

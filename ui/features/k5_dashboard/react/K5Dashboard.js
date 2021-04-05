@@ -75,6 +75,7 @@ export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
+  loadingOpportunities,
   currentUser: {display_name},
   loadAllOpportunities,
   timeZone,
@@ -93,7 +94,7 @@ export const K5Dashboard = ({
   })
 
   useEffect(() => {
-    if (!cards && (currentTab === TAB_IDS.RESOURCES || currentTab === TAB_IDS.HOMEROOM)) {
+    if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
       loadCardDashboard(setCards)
     }
   }, [cards, currentTab])
@@ -105,6 +106,7 @@ export const K5Dashboard = ({
           assignmentsDueToday,
           assignmentsMissing,
           assignmentsCompletedForToday,
+          loadingOpportunities,
           isStudent: plannerEnabled,
           responsiveSize
         }}
@@ -116,15 +118,13 @@ export const K5Dashboard = ({
           tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
-        {cards && (
-          <HomeroomPage
-            cards={cards}
-            isStudent={plannerEnabled}
-            requestTabChange={handleTabChange}
-            responsiveSize={responsiveSize}
-            visible={currentTab === TAB_IDS.HOMEROOM}
-          />
-        )}
+        <HomeroomPage
+          cards={cards}
+          isStudent={plannerEnabled}
+          requestTabChange={handleTabChange}
+          responsiveSize={responsiveSize}
+          visible={currentTab === TAB_IDS.HOMEROOM}
+        />
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
@@ -139,6 +139,7 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
+  loadingOpportunities: PropTypes.bool.isRequired,
   currentUser: PropTypes.shape({
     display_name: PropTypes.string
   }).isRequired,

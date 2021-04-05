@@ -28,6 +28,8 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
@@ -64,36 +66,54 @@ DashboardCardHeaderHero.propTypes = {
   image: PropTypes.string
 }
 
-const LatestAnnouncementLink = ({color, title, html_url}) => (
-  <Link href={html_url} display="block" isWithinText={false} margin="xx-small small xx-small small">
-    <Flex alignItems="start">
-      <Flex.Item margin="0 small 0 0">
-        <IconAnnouncementLine style={{color}} size="x-small" />
-      </Flex.Item>
+export const LatestAnnouncementLink = ({color, loading, title, html_url}) =>
+  loading ? (
+    <Flex alignItems="start" margin="xx-small small xx-small small">
       <Flex.Item shouldGrow shouldShrink>
-        <AccessibleContent alt={I18n.t('New announcement: %{title}', {title})}>
-          <Text color="primary">
-            <TruncateText maxLines={2}>{title}</TruncateText>
-          </Text>
-        </AccessibleContent>
+        <LoadingSkeleton
+          screenReaderLabel={I18n.t('Loading latest announcement link')}
+          width="100%"
+          height="1.5em"
+        />
       </Flex.Item>
     </Flex>
-  </Link>
-)
+  ) : title && html_url ? (
+    <Link
+      href={html_url}
+      display="block"
+      isWithinText={false}
+      margin="xx-small small xx-small small"
+    >
+      <Flex alignItems="start">
+        <Flex.Item margin="0 small 0 0">
+          <IconAnnouncementLine style={{color}} size="x-small" />
+        </Flex.Item>
+        <Flex.Item shouldGrow shouldShrink>
+          <AccessibleContent alt={I18n.t('New announcement: %{title}', {title})}>
+            <Text color="primary">
+              <TruncateText maxLines={2}>{title}</TruncateText>
+            </Text>
+          </AccessibleContent>
+        </Flex.Item>
+      </Flex>
+    </Link>
+  ) : null
 
 LatestAnnouncementLink.displayName = 'LatestAnnouncementLink'
 LatestAnnouncementLink.propTypes = {
   color: PropTypes.string.isRequired,
-  html_url: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired
+  loading: PropTypes.bool.isRequired,
+  html_url: PropTypes.string,
+  title: PropTypes.string
 }
 
-const AssignmentLinks = ({
+export const AssignmentLinks = ({
   color,
   requestTabChange,
   numDueToday = 0,
   numMissing = 0,
-  numSubmittedToday = 0
+  numSubmittedToday = 0,
+  loading
 }) => {
   const noneDueMessage =
     numSubmittedToday > 0 ? I18n.t('Nothing else due') : I18n.t('Nothing due today')
@@ -150,10 +170,22 @@ const AssignmentLinks = ({
   )
   return (
     <Flex alignItems="center" margin="small small xx-small small">
-      <Flex.Item margin="0 small xxx-small 0">
-        <IconBulletListLine style={{color}} size="x-small" />
-      </Flex.Item>
-      {content}
+      {loading ? (
+        <Flex.Item shouldGrow shouldShrink>
+          <LoadingSkeleton
+            screenReaderLabel={I18n.t('Loading missing assignments link')}
+            width="100%"
+            height="1.5em"
+          />
+        </Flex.Item>
+      ) : (
+        <>
+          <Flex.Item margin="0 small xxx-small 0">
+            <IconBulletListLine style={{color}} size="x-small" />
+          </Flex.Item>
+          {content}
+        </>
+      )}
     </Flex>
   )
 }
@@ -164,7 +196,8 @@ AssignmentLinks.propTypes = {
   requestTabChange: PropTypes.func.isRequired,
   numDueToday: PropTypes.number,
   numMissing: PropTypes.number,
-  numSubmittedToday: PropTypes.number
+  numSubmittedToday: PropTypes.number,
+  loading: PropTypes.bool.isRequired
 }
 
 const K5DashboardCard = ({
@@ -180,9 +213,16 @@ const K5DashboardCard = ({
   isDragging = false
 }) => {
   const [latestAnnouncement, setLatestAnnouncement] = useState(null)
+  const [loadingAnnouncement, setLoadingAnnouncement] = useState(false)
   useEffect(() => {
-    fetchLatestAnnouncement(id).then(setLatestAnnouncement)
-  }, [id])
+    setLoadingAnnouncement(true)
+    fetchLatestAnnouncement(id)
+      .then(setLatestAnnouncement)
+      .catch(
+        showFlashError(I18n.t('Failed to load announcement for %{originalName}.', {originalName}))
+      )
+      .finally(() => setLoadingAnnouncement(false))
+  }, [id, originalName])
 
   const k5Context = useContext(K5DashboardContext)
   const assignmentsDueToday =
@@ -191,6 +231,7 @@ const K5DashboardCard = ({
     (k5Context?.assignmentsMissing && k5Context.assignmentsMissing[id]) || 0
   const assignmentsCompletedForToday =
     (k5Context?.assignmentsCompletedForToday && k5Context.assignmentsCompletedForToday[id]) || 0
+  const loadingOpportunities = k5Context?.loadingOpportunities || false
   const isStudent = k5Context?.isStudent || false
 
   const handleHeaderClick = e => {
@@ -261,11 +302,14 @@ const K5DashboardCard = ({
             numMissing={assignmentsMissing}
             numSubmittedToday={assignmentsCompletedForToday}
             requestTabChange={requestTabChange}
+            loading={loadingOpportunities}
           />
         )}
-        {latestAnnouncement && (
-          <LatestAnnouncementLink color={backgroundColor} {...latestAnnouncement} />
-        )}
+        <LatestAnnouncementLink
+          color={backgroundColor}
+          loading={loadingAnnouncement}
+          {...latestAnnouncement}
+        />
       </View>
     </div>
   )

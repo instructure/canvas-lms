@@ -23,10 +23,12 @@ import I18n from 'i18n!k5_dashboard'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
-import K5DashboardCard from './K5DashboardCard'
+import K5DashboardCard, {CARD_SIZE_PX} from './K5DashboardCard'
 import {createDashboardCards} from '@canvas/dashboard-card'
 import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 export const fetchHomeroomAnnouncements = cards =>
   Promise.all(
@@ -68,23 +70,46 @@ export const fetchHomeroomAnnouncements = cards =>
 
 export const HomeroomPage = props => {
   const {cards, requestTabChange, visible} = props
-  const [dashboardCards] = useState(() =>
-    createDashboardCards(
-      cards.filter(c => !c.isHomeroom),
-      K5DashboardCard,
-      {
-        headingLevel: 'h3',
-        requestTabChange
-      }
-    )
-  )
+  const [dashboardCards, setDashboardCards] = useState([])
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true)
 
   useEffect(() => {
-    fetchHomeroomAnnouncements(cards).then(setHomeroomAnnouncements)
-    // Cards are only ever loaded once on the page, so this only runs on mount
+    setDashboardCards(
+      createDashboardCards(cards?.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
+        headingLevel: 'h3',
+        requestTabChange
+      })
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [cards])
+
+  useEffect(() => {
+    if (cards) {
+      setAnnouncementsLoading(true)
+      fetchHomeroomAnnouncements(cards)
+        .then(setHomeroomAnnouncements)
+        .catch(showFlashError(I18n.t('Failed to load announcements.')))
+        .finally(() => setAnnouncementsLoading(false))
+    }
+  }, [cards])
+
+  const NUM_CARD_SKELETONS = ENV?.INITIAL_NUM_K5_CARDS || 5
+  const skeletonCards = []
+  for (let i = 0; i < NUM_CARD_SKELETONS; i++) {
+    skeletonCards.push(
+      <div
+        className="ic-DashboardCard"
+        key={`card-${i}`}
+        style={{
+          height: `${CARD_SIZE_PX}px`,
+          minWidth: `${CARD_SIZE_PX}px`
+        }}
+      >
+        <LoadingSkeleton screenReaderLabel={I18n.t('Loading Card')} height="100%" width="100%" />
+      </div>
+    )
+  }
 
   return (
     <section
@@ -92,17 +117,24 @@ export const HomeroomPage = props => {
       style={{display: visible ? 'block' : 'none'}}
       aria-hidden={!visible}
     >
-      {homeroomAnnouncements?.length > 0 && (
-        <View as="section">
-          <HomeroomAnnouncementsLayout homeroomAnnouncements={homeroomAnnouncements} />
-        </View>
-      )}
-      {cards?.length > 0 && (
+      <View as="section">
+        <HomeroomAnnouncementsLayout
+          homeroomAnnouncements={homeroomAnnouncements}
+          loading={announcementsLoading}
+        />
+      </View>
+      {(!cards || cards.length > 0) && (
         <View as="section">
           <Heading level="h2" margin="medium 0 0 0">
             {I18n.t('My Subjects')}
           </Heading>
-          {dashboardCards}
+          {!cards ? (
+            <div className="ic-DashboardCard__box">
+              <div className="ic-DashboardCard__box__container">{skeletonCards}</div>
+            </div>
+          ) : (
+            dashboardCards
+          )}
         </View>
       )}
     </section>
@@ -110,7 +142,7 @@ export const HomeroomPage = props => {
 }
 
 HomeroomPage.propTypes = {
-  cards: PropTypes.array.isRequired,
+  cards: PropTypes.array,
   requestTabChange: PropTypes.func.isRequired,
   visible: PropTypes.bool.isRequired
 }
