@@ -150,8 +150,8 @@ describe('CourseAvailabilityOptions', () => {
       course_conclude_at: moment('2020-10-16').toISOString(),
       course_restrict_enrollments_to_course_dates: 'true'
     })
-    expect(getByLabelText('Start').value).toContain('Aug 14, 2020 at')
-    expect(getByLabelText('End').value).toContain('Oct 16, 2020 at')
+    expect(getByLabelText('Start').value).toContain('Aug 14, 2020')
+    expect(getByLabelText('End').value).toContain('Oct 16, 2020')
   })
 
   it('sets the restriction checkboxes to currently set values on render', () => {
@@ -173,7 +173,7 @@ describe('CourseAvailabilityOptions', () => {
     })
     const endDate = getByLabelText('End')
     const year = moment().year()
-    fireEvent.change(endDate, {target: {value: `Jan 1, ${year} at 12:00am`}})
+    fireEvent.change(endDate, {target: {value: `Jan 1, ${year} 12:00am`}})
     fireEvent.blur(endDate)
     fireEvent.click(endDate)
     fireEvent.blur(endDate)
@@ -186,7 +186,7 @@ describe('CourseAvailabilityOptions', () => {
     })
     const endDate = getByLabelText('End')
     const futureYear = moment().year() + 3
-    fireEvent.change(endDate, {target: {value: `Jan 1, ${futureYear} at 12:00am`}})
+    fireEvent.change(endDate, {target: {value: `Jan 1, ${futureYear} 12:00am`}})
     fireEvent.blur(endDate)
     fireEvent.click(endDate)
     fireEvent.blur(endDate)
