@@ -468,10 +468,10 @@ describe CanvadocSessionsController do
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
       context "when annotation_context is present" do
-        before(:once) do
+        before(:each) do
           @assignment.update!(annotatable_attachment: @attachment, submission_types: "annotated_document")
           @submission.update!(attempt: 2)
-          @annotation_context = @submission.canvadocs_annotation_contexts.create!(
+          @annotation_context = @submission.canvadocs_annotation_contexts.find_or_create_by(
             attachment: @attachment,
             submission_attempt: @submission.attempt
           )

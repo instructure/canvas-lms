@@ -277,6 +277,47 @@ describe Assignment do
       end
     end
 
+    describe "start_canvadocs_render" do
+      before(:once) do
+        @attachment = attachment_model(context: @course)
+        @canvadoc = Canvadoc.create!(attachment: @attachment)
+      end
+
+      before(:each) do
+        allow(Canvadocs).to receive(:enabled?).and_return true
+      end
+
+      it "does not call submit_to_canvadocs when annotatable_attachment is blank" do
+        assignment = @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: "annotated_document"
+        )
+        expect(@attachment).not_to receive(:submit_to_canvadocs)
+        assignment.update!(annotatable_attachment_id: nil)
+      end
+
+      it "does not call submit_to_canvadocs when a canvadoc is already available" do
+        @canvadoc.update!(document_id: "abc")
+        expect(@attachment).not_to receive(:submit_to_canvadocs)
+
+        @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: "annotated_document"
+        )
+      end
+
+      it "calls submit_to_canvadocs when a canvadoc is not available and annotatable_attachment is present" do
+        @canvadoc.update!(document_id: nil)
+        expected_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
+        expect(@attachment).to receive(:submit_to_canvadocs).with(1, expected_opts)
+
+        @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: "annotated_document"
+        )
+      end
+    end
+
     describe "automatic setting of post policies" do
       let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
 

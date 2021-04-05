@@ -563,6 +563,7 @@ class Assignment < ActiveRecord::Base
               :ensure_manual_posting_if_moderated,
               :create_default_post_policy
 
+  after_save  :start_canvadocs_render, if: :saved_change_to_annotatable_attachment_id?
   after_save  :update_due_date_smart_alerts, if: :update_cached_due_dates?
 
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
@@ -724,6 +725,14 @@ class Assignment < ActiveRecord::Base
       submissions.graded.exists?
   end
   private :needs_to_update_submissions?
+
+  def start_canvadocs_render
+    return if annotatable_attachment.blank? || annotatable_attachment.canvadoc&.available?
+
+    canvadocs_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
+    annotatable_attachment.submit_to_canvadocs(1, canvadocs_opts)
+  end
+  private :start_canvadocs_render
 
   # if a teacher changes the settings for an assignment and students have
   # already been graded, then we need to update the "grade" column to
