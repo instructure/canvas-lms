@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-def BLUE_OCEAN_TESTS_TAB = "display/redirect?page=tests"
 def JS_BUILD_IMAGE_STAGE = "Javascript (Build Image)"
 
 def buildParameters = [
@@ -655,7 +654,7 @@ pipeline {
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ], true, "", "Vendored Gems")
+                      ], "Vendored Gems")
                   }
 
                   buildSummaryReport.extendedStageAndReportIfFailure(JS_BUILD_IMAGE_STAGE, stages) {
@@ -691,7 +690,7 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], true, "", "Contract Tests")
+                    ], "Contract Tests")
                   }
 
                   if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
@@ -699,7 +698,7 @@ pipeline {
                     extendedStage('CDC Schema Check', stages) {
                       buildSummaryReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
                         string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                      ], true, "", "CDC Schema Check")
+                      ], "CDC Schema Check")
                     }
                   }
                   else {
@@ -719,7 +718,7 @@ pipeline {
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ], true, "", "Flakey Spec Catcher")
+                      ], "Flakey Spec Catcher")
                     }
                   }
 
@@ -732,7 +731,7 @@ pipeline {
                   if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                     echo 'adding Local Docker Dev Build'
                     extendedStage('Local Docker Dev Build', stages) {
-                      buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "", "Local Docker Dev Build")
+                      buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, "Local Docker Dev Build")
                     }
                   }
 
@@ -772,7 +771,7 @@ pipeline {
               buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "jest"),
-              ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Jest)")
+              ], "Javascript (Jest)")
             }
 
             echo 'adding Javascript (Coffeescript)'
@@ -780,7 +779,7 @@ pipeline {
               buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "coffee"),
-              ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Coffeescript)")
+              ], "Javascript (Coffeescript)")
             }
 
             echo 'adding Javascript (Karma)'
@@ -788,7 +787,7 @@ pipeline {
               buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "karma"),
-              ], true, BLUE_OCEAN_TESTS_TAB, "Javascript (Karma)")
+              ], "Javascript (Karma)")
             }
 
             parallel(nestedStages)
