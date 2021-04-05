@@ -38,7 +38,7 @@ cat <<EOF | DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
   --build-arg WEBPACK_BUILDER_TAG="$WEBPACK_BUILDER_IMAGE" \
   --tag "local/gergich" \
   -
-# syntax=docker/dockerfile:experimental
+# syntax=starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
 
 ARG PATCHSET_TAG
 ARG WEBPACK_BUILDER_TAG

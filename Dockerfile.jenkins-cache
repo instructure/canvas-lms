@@ -1,4 +1,4 @@
-# syntax = docker/dockerfile:1.0-experimental
+# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
 
 FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-gems
 WORKDIR /tmp/src
