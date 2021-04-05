@@ -24,10 +24,10 @@ function build_images {
   start_spinner 'Building docker images...'
   if [[ -n "$JENKINS" ]]; then
     _canvas_lms_track_with_log docker-compose build --build-arg USER_ID=$(id -u)
-  elif [[ "$(uname)" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
+  elif [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
     _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
   else
-    _canvas_lms_track_with_log docker-compose build --pull
+    _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
   fi
   stop_spinner
 }
@@ -42,7 +42,7 @@ errors.'
   fi
 
   # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'
-  if ! _canvas_lms_track_with_log docker-compose run --no-deps --rm web touch Gemfile.lock; then
+  if ! _canvas_lms_track_with_log $DOCKER_COMMAND run --no-deps --rm web touch Gemfile.lock; then
     message \
 "The 'docker' user is not allowed to write to Gemfile.lock. We need write
 permissions so we can install gems."
@@ -167,7 +167,10 @@ function copy_docker_config {
 
 function setup_docker_compose_override {
   message 'Setup override yaml and .env...'
-    if [ -f "docker-compose.override.yml" ]; then
+  if is_mutagen; then
+    message "Copying default configuration from docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml"
+    cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml
+  elif [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml exists, skipping copy of default configuration"
   else
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"

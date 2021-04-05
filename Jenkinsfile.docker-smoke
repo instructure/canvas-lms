@@ -31,7 +31,7 @@ pipeline {
   }
 
   environment {
-    JENKINS = 'true'
+    JENKINS='true'
     DOCKER='true'
   }
 

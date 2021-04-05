@@ -25,6 +25,11 @@ die () {
 }
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
+if is_mutagen; then
+  DOCKER_COMMAND="mutagen compose"
+  CANVAS_SKIP_DOCKER_USERMOD='true'
+  print_mutagen_intro
+fi
 
 while :; do
   case $1 in
@@ -66,10 +71,8 @@ while :; do
   shift
 done
 
-if ! docker info &> /dev/null; then
-  echo "Docker is not running! Start docker daemon and try again."
-  exit 1
-fi
+# check for docker daemon running before anything else
+docker_running || exit 1
 
 if [ -f "docker-compose.override.yml" ]; then
   echo "docker-compose.override.yml exists, skipping copy of default configuration"

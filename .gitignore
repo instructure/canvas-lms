@@ -12,6 +12,7 @@
 .bundle/
 .byebug_history
 .env
+.mutagen
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb

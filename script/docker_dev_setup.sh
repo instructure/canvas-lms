@@ -12,49 +12,58 @@ DOCKER='true'
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 
-# shellcheck disable=1004
-echo '
-  ________  ________  ________   ___      ___ ________  ________
-|\   ____\|\   __  \|\   ___  \|\  \    /  /|\   __  \|\   ____\
-\ \  \___|\ \  \|\  \ \  \\ \  \ \  \  /  / | \  \|\  \ \  \___|_
- \ \  \    \ \   __  \ \  \\ \  \ \  \/  / / \ \   __  \ \_____  \
-  \ \  \____\ \  \ \  \ \  \\ \  \ \    / /   \ \  \ \  \|____|\  \
-   \ \_______\ \__\ \__\ \__\\ \__\ \__/ /     \ \__\ \__\____\_\  \
-    \|_______|\|__|\|__|\|__| \|__|\|__|/       \|__|\|__|\_________\
-                                                         \|_________|
-
-Welcome! This script will guide you through the process of setting up a
-Canvas development environment with docker and dinghy/dory.
-
-When you git pull new changes, you can run ./scripts/docker_dev_update.sh
-to bring everything up to date.'
-
 if [[ "$USER" == 'root' ]]; then
   echo 'Please do not run this script as root!'
   echo "I'll ask for your sudo password if I need it."
   exit 1
 fi
+# remove hidden file if already exists
+rm .mutagen &> /dev/null || true
 
-function setup_docker_environment {
-  if [[ $OS == 'Darwin' ]]; then
-    . script/common/os/mac/dev_setup.sh
-  elif [[ $OS == 'Linux' ]]; then
-    . script/common/os/linux/dev_setup.sh
-  else
-    echo 'This script only supports MacOS and Linux :('
-    exit 1
-  fi
+usage () {
+  echo "usage:"
+  printf "  --mutagen\t\t\t\tUse Mutagen with Docker to setup development environment.\n"
+  printf "  -h|--help\t\t\t\tDisplay usage\n\n"
 }
+
+die() {
+  echo "$*" 1>&2
+  usage
+  exit 1
+}
+
+while :; do
+  case $1 in
+    -h|-\?|--help)
+      usage # Display a usage synopsis.
+      exit
+      ;;
+    --mutagen)
+      touch .mutagen
+      DOCKER_COMMAND="mutagen compose"
+      CANVAS_SKIP_DOCKER_USERMOD='true'
+      ;;
+    ?*)
+      die 'ERROR: Unknown option: ' "$1" >&2
+      ;;
+    *)
+      break
+  esac
+  shift
+done
+
+print_canvas_intro
+
 
 create_log_file
 init_log_file "Docker Dev Setup"
-setup_docker_environment
+os_setup
 message 'Now we can set up Canvas!'
 copy_docker_config
 setup_docker_compose_override
 build_images
-check_gemfile
 docker_compose_up
+check_gemfile
 build_assets
 create_db
 display_next_steps

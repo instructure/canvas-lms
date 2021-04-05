@@ -5,6 +5,12 @@ source script/common/utils/dory_setup.sh
 dependencies='docker,docker-compose 1.20.0'
 
 message "It looks like you're using Linux. Let's set that up."
+
+if is_mutagen; then
+  dependencies+=',mutagen'
+  print_mutagen_intro
+fi
+
 set_service_util
 check_dependencies
 check_for_dory

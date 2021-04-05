@@ -11,6 +11,7 @@ if [[ -n "${COMMON_LIB_LOADED-}" ]]; then
      return
 fi
 COMMON_LIB_LOADED=i_am_here
+DOCKER_COMMAND=${DOCKER_COMMAND:-"docker-compose"}
 
 function trap_result {
   exit_code=$?
@@ -37,8 +38,8 @@ function is_git_dir {
 function run_command {
   if is_running_on_jenkins; then
     docker-compose exec -T web "$@"
-  elif [ "${DOCKER:-}" == 'true' ]; then
-    docker-compose exec -e TELEMETRY_OPT_IN web "$@"
+  elif is_docker; then
+    $DOCKER_COMMAND exec -e TELEMETRY_OPT_IN web "$@"
   else
     "$@"
   fi
@@ -109,8 +110,14 @@ function confirm_command {
 }
 
 function docker_compose_up {
+  if is_mutagen; then
+    start_spinner "Starting mutagen containers..."
+    _canvas_lms_track_with_log mutagen compose up --no-start web
+    _canvas_lms_track_with_log mutagen compose run -u root --rm web chown docker:docker /usr/src/app
+    stop_spinner
+  fi
   start_spinner "Starting docker containers..."
-  _canvas_lms_track_with_log docker-compose up -d web
+  _canvas_lms_track_with_log $DOCKER_COMMAND up -d web
   stop_spinner
 }
 
@@ -147,11 +154,70 @@ function rebuild_docker_images {
     message "There have been some updates made to Dockerfile, you should rebuild your docker images."
     prompt "Rebuild docker images? [y/n]" rebuild_image
     if [ "${rebuild_image:n}" == 'y' ]; then
-      start_spinner "Rebuilding Docker images"
-      _canvas_lms_track_with_log docker-compose build
+      start_spinner "Rebuilding docker images..."
+      if [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
+        _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
+      else
+        _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
+      fi
       stop_spinner
     else
-      echo "Your docker image is now outdated and needs to be rebuilt! You should run \"docker-compose build\"."
+      echo "Your docker image is now outdated and needs to be rebuilt! You should run \"${DOCKER_COMMAND} build\"."
     fi
   fi
+}
+
+function is_mutagen {
+  [ -f ".mutagen" ]
+}
+
+function is_docker {
+  [[ "${DOCKER:-}" == 'true' ]]
+}
+
+function docker_running {
+  if ! docker info &> /dev/null; then
+  echo "Docker is not running! Start docker daemon and try again."
+  return 1
+fi
+}
+
+function os_setup {
+  if [[ $OS == 'Darwin' ]]; then
+    . script/common/os/mac/dev_setup.sh
+  elif [[ $OS == 'Linux' ]]; then
+    . script/common/os/linux/dev_setup.sh
+  else
+    echo 'This script only supports MacOS and Linux :('
+    exit 1
+  fi
+}
+
+function print_canvas_intro {
+  # shellcheck disable=1004
+  echo '
+  ________  ________  ________   ___      ___ ________  ________
+|\   ____\|\   __  \|\   ___  \|\  \    /  /|\   __  \|\   ____\
+\ \  \___|\ \  \|\  \ \  \\ \  \ \  \  /  / | \  \|\  \ \  \___|_
+ \ \  \    \ \   __  \ \  \\ \  \ \  \/  / / \ \   __  \ \_____  \
+  \ \  \____\ \  \ \  \ \  \\ \  \ \    / /   \ \  \ \  \|____|\  \
+   \ \_______\ \__\ \__\ \__\\ \__\ \__/ /     \ \__\ \__\____\_\  \
+    \|_______|\|__|\|__|\|__| \|__|\|__|/       \|__|\|__|\_________\
+                                                         \|_________|
+
+Welcome! This script will guide you through the process of setting up a
+Canvas development environment.'
+}
+
+function print_mutagen_intro {
+  # shellcheck disable=2016
+  echo '
+______  ___      _____
+___   |/  /___  ___  /______ _______ ____________
+__  /|_/ /_  / / /  __/  __ `/_  __ `/  _ \_  __ \
+_  /  / / / /_/ // /_ / /_/ /_  /_/ //  __/  / / /
+/_/  /_/  \__,_/ \__/ \__,_/ _\__, / \___//_/ /_/
+                             /____/
+
+'
 }

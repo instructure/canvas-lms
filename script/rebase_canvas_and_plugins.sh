@@ -23,7 +23,7 @@ die() {
   echo "$*" 1>&2
   usage
   exit 1
-  }
+}
 
 while :; do
   case $1 in
