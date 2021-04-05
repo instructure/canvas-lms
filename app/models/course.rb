@@ -229,6 +229,8 @@ class Course < ActiveRecord::Base
 
   has_one :microsoft_sync_group, class_name: "MicrosoftSync::Group", dependent: :destroy, inverse_of: :course
 
+  has_many :comment_bank_items, inverse_of: :course
+
   prepend Profile::Association
 
   before_save :assign_uuid
