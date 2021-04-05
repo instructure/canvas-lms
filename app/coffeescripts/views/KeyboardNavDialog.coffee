@@ -39,7 +39,8 @@ export default class KeyboardNavDialog extends View
     activeElement = null
     $(document).keydown((e) =>
       isQuestionMark = e.keyCode == 191 && e.shiftKey
-      if (isQuestionMark && !$(e.target).is(":input") && !ENV.disable_keyboard_shortcuts)
+      # e.path[0] is the correct element, when the input field is inside a shadow DOM
+      if (isQuestionMark && !$(e.target).is(":input") && !ENV.disable_keyboard_shortcuts && !$(e.path[0]).is(":input"))
         e.preventDefault()
         if(@$el.is(":visible"))
           @$el.dialog("close")
