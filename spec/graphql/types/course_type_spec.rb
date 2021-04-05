@@ -532,6 +532,18 @@ describe Types::CourseType do
     end
   end
 
+  describe "CommentBankItemsConnection" do
+    before do
+      @comment_bank_item = comment_bank_item_model(user: @teacher, context: @course)
+    end
+
+    it "returns comment bank items" do
+      expect(
+        course_type.resolve("commentBankItemsConnection { nodes { _id } }", current_user: @teacher)
+      ).to eq [@comment_bank_item.id.to_s]
+    end
+  end
+
   describe 'Account' do
     it 'works' do
       expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s

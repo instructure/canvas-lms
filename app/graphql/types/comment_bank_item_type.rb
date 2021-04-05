@@ -18,18 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CommentBankItem < ActiveRecord::Base
-  include Canvas::SoftDeletable
-  extend RootAccountResolver
+module Types
+  class CommentBankItemType < ApplicationObjectType
+    description 'Comment bank items'
 
-  belongs_to :course, optional: false, inverse_of: :comment_bank_items
-  belongs_to :user, optional: false
-  resolves_root_account through: :course
+    implements GraphQL::Types::Relay::Node
+    implements Interfaces::LegacyIDInterface
+    implements Interfaces::TimestampInterface
 
-  validates :comment, length: { maximum: maximum_text_length, allow_blank: false }
+    global_id_field :id
 
-  set_policy do
-    given { |user| self.user == user }
-    can :delete and can :read and can :update
+    field :course_id, ID, null: false
+    field :user_id, ID, null: false
+
+    field :comment, String, null: false
   end
 end

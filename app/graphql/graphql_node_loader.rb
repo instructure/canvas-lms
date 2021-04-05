@@ -206,6 +206,12 @@ module GraphQLNodeLoader
 
         record
       end
+    when "CommentBankItem"
+      Loaders::IDLoader.for(CommentBankItem).load(id).then do |record|
+        next if !record || record.deleted? || !record.grants_right?(ctx[:current_user], :read)
+
+        record
+      end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"
     end

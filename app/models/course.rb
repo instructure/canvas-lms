@@ -3691,6 +3691,10 @@ class Course < ActiveRecord::Base
     !templated_accounts.exists?
   end
 
+  def comment_bank_items_visible_to(user)
+    comment_bank_items.active.where(user: user)
+  end
+
   private
 
   def effective_due_dates

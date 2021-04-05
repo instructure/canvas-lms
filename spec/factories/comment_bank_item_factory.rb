@@ -18,18 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CommentBankItem < ActiveRecord::Base
-  include Canvas::SoftDeletable
-  extend RootAccountResolver
+module Factories
+  def comment_bank_item_model(opts = {})
+    course = opts.delete(:course) || @course || course_model(reusable: true)
+    comment = opts.delete(:comment) || 'my assignment comment'
+    user = opts.delete(:user) || @user || user_model
 
-  belongs_to :course, optional: false, inverse_of: :comment_bank_items
-  belongs_to :user, optional: false
-  resolves_root_account through: :course
-
-  validates :comment, length: { maximum: maximum_text_length, allow_blank: false }
-
-  set_policy do
-    given { |user| self.user == user }
-    can :delete and can :read and can :update
+    CommentBankItem.create!(course: course, user: user, comment: comment)
   end
 end
