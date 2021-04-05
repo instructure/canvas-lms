@@ -146,6 +146,7 @@ class Assignment < ActiveRecord::Base
   validate :reasonable_points_possible?
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?, :unless => :deleted?
+  validate :annotatable_and_group_exclusivity_ok?
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
@@ -2911,7 +2912,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def annotated_document?
-    submission_types.match?(/student_annotation/)
+    !!submission_types&.match?(/student_annotation/)
   end
 
   def readable_submission_type(submission_type)
@@ -3773,6 +3774,13 @@ class Assignment < ActiveRecord::Base
     if self.title.to_s.length > name_length && self.grading_type != 'not_graded'
       errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
     end
+  end
+
+  def annotatable_and_group_exclusivity_ok?
+    return unless has_group_category? && annotated_document?
+
+    errors.add(:annotatable_attachment_id, 'must be blank when group_category_id is present')
+    errors.add(:group_category_id, 'must be blank when annotatable_attachment_id is present')
   end
 
   def grader_section_ok?

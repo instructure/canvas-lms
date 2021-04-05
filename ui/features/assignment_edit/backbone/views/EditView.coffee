@@ -272,9 +272,12 @@ export default class EditView extends ValidatedFormView
     if isAnonymous
       @$groupCategoryBox.prop('checked', false)
     else if isGrouped
+      annotatedDocumentCheckbox = document.getElementById('assignment_annotated_document')
+      @disableCheckbox(@$allowAnnotatedDocument, I18n.t('Student annotation assignments are not currently supported for group assignments'))
       @disableCheckbox(@$anonymousGradingBox, I18n.t('Anonymous grading cannot be enabled for group assignments'))
     else
       @enableCheckbox(@$anonymousGradingBox)
+      @enableCheckbox(@$allowAnnotatedDocument)
 
     @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
     @togglePeerReviewsAndGroupCategoryEnabled()
@@ -282,6 +285,7 @@ export default class EditView extends ValidatedFormView
   handleAnonymousGradingChange: ->
     isGrouped = @$groupCategoryBox.prop('checked')
     isAnonymous = !isGrouped && @$anonymousGradingBox.prop('checked')
+    isAnnotated = @$allowAnnotatedDocument.prop('checked')
     @assignment.anonymousGrading(isAnonymous)
 
     if isGrouped
@@ -289,7 +293,10 @@ export default class EditView extends ValidatedFormView
     else if @assignment.anonymousGrading() || @assignment.gradersAnonymousToGraders()
       @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments cannot be enabled for anonymously graded assignments'))
     else if !@assignment.moderatedGrading()
-      @enableCheckbox(@$groupCategoryBox) if @model.canGroup()
+      if isAnnotated
+        @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments do not currently support student annotation assignments'))
+      else
+        @enableCheckbox(@$groupCategoryBox) if @model.canGroup()
 
   togglePeerReviewsAndGroupCategoryEnabled: =>
     if @assignment.moderatedGrading()
@@ -355,12 +362,18 @@ export default class EditView extends ValidatedFormView
     @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
 
   toggleAnnotatedDocument: =>
+    isAnonymous = @$anonymousGradingBox.prop('checked')
     @$annotatedDocumentOptions.toggleAccessibly @$allowAnnotatedDocument.prop('checked')
 
     if @$allowAnnotatedDocument.prop('checked')
+      @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments do not currently support student annotation assignments'))
       @renderAnnotatedDocumentSelector()
       @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
     else
+      if isAnonymous
+        @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments cannot be enabled for anonymously graded assignments'))
+      else if @model.canGroup()
+        @enableCheckbox(@$groupCategoryBox)
       @unmountAnnotatedDocumentSelector()
       @unmountAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
 

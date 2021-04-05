@@ -508,6 +508,31 @@ describe Assignment do
     end
   end
 
+  describe '#annotated_document?' do
+    before(:once) do
+      @assignment = @course.assignments.build
+    end
+
+    it 'returns true if submission_types equals "student_annotation"' do
+      @assignment.submission_types = 'student_annotation'
+      expect(@assignment).to be_annotated_document
+    end
+
+    it 'returns true if submission_types contains "student_annotation"' do
+      @assignment.submission_types = 'discussion_topic,student_annotation'
+      expect(@assignment).to be_annotated_document
+    end
+
+    it 'returns false if submission_types is nil' do
+      expect(@assignment).not_to be_annotated_document
+    end
+
+    it 'returns false if submission_types does not include student_annotation' do
+      @assignment.submission_types = 'discussion_topic'
+      expect(@assignment).not_to be_annotated_document
+    end
+  end
+
   describe '#ordered_moderation_graders_with_slot_taken' do
     let(:teacher1) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
     let(:teacher2) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
@@ -7591,6 +7616,12 @@ describe Assignment do
       a2 = assignment(@group_category)
       a2.group_category.destroy
       expect(a2.group_category_deleted_with_submissions?).to eq false
+    end
+
+    it "does not let student annotation assignments be group assignments" do
+      assignment = @course.assignments.build(submission_types: "student_annotation", group_category: @group_category)
+      assignment.validate
+      expect(assignment.errors.full_messages).to include "Group category must be blank when annotatable_attachment_id is present"
     end
 
     context 'when anonymous grading is enabled from before' do

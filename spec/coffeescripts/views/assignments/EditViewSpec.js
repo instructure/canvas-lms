@@ -2054,6 +2054,16 @@ QUnit.module('EditView student annotation submission', hooks => {
     ok(label.text().includes('Student Annotation'))
   })
 
+  test('disables annotatable document option for group assignments', () => {
+    ENV.GROUP_CATEGORIES = [{id: '1', name: 'Group Category #1'}]
+    view = editView({group_category_id: '1'})
+    view.$el.appendTo($('#fixtures'))
+    view.afterRender() // call this because it's called before everything is rendered in the specs
+    const annotatedDocumentCheckbox = view.$el.find('input#assignment_annotated_document')
+
+    strictEqual(annotatedDocumentCheckbox.prop('disabled'), true)
+  })
+
   QUnit.module('when Student Annotation is selected', function (contextHooks) {
     const filename = 'test.pdf'
     const serverResponse200 = data => [
