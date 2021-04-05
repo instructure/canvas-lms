@@ -334,5 +334,51 @@ describe "student k5 dashboard" do
 
       expect(instructor_bio(bio)).to be_displayed
     end
+
+    it 'allows student to send message to teacher', custom_timeout: 20 do
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/#resources"
+
+      click_message_button
+
+      expect(message_modal_displayed?(@teacher.name)).to be_truthy
+
+      expect(is_send_available?).to be_falsey
+
+      replace_content(subject_input, 'need help')
+      replace_content(message_input, 'hey teach, I really need help with these fractions.')
+
+      expect(is_send_available?).to be_truthy
+
+      click_send_button
+
+      wait_for_ajaximations
+
+      expect(is_modal_gone?(@teacher.name)).to be_truthy
+      expect(Conversation.count).to eq(1)
+    end
+
+    it 'allows student to cancel message to teacher' do
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/#resources"
+
+      click_message_button
+
+      expect(is_cancel_available?).to be_truthy
+
+      replace_content(subject_input, 'need help')
+      replace_content(message_input, 'hey teach, I really need help with these fractions.')
+
+      click_cancel_button
+
+      wait_for_ajaximations
+
+      expect(is_modal_gone?(@teacher.name)).to be_truthy
+      expect(Conversation.count).to eq(0)
+    end
   end
 end

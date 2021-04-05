@@ -157,6 +157,30 @@ module K5PageObject
     "a[href = '/courses/#{course_id}/assignments/#{assignment_id}']"
   end
 
+  def message_button_selector
+    "//button[.//*[contains(text(),'Send a message to')]]"
+  end
+
+  def subject_input_selector
+    "input[placeholder = 'No subject']"
+  end
+
+  def message_input_selector
+    "textarea[placeholder = 'Message']"
+  end
+
+  def send_button_selector
+    "//button[.//*[. = 'Send']]"
+  end
+
+  def cancel_button_selector
+    "//button[.//*[. = 'Cancel']]"
+  end
+
+  def message_modal_selector(user_name)
+    "[aria-label='Message #{user_name}']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -312,6 +336,30 @@ module K5PageObject
     fj(assignment_url_selector(assignment_title))
   end
 
+  def message_button
+    fxpath(message_button_selector)
+  end
+
+  def subject_input
+    f(subject_input_selector)
+  end
+
+  def message_input
+    f(message_input_selector)
+  end
+
+  def send_button
+    fxpath(send_button_selector)
+  end
+
+  def cancel_button
+    fxpath(cancel_button_selector)
+  end
+
+  def message_modal(user_name)
+    f(message_modal_selector(user_name))
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def check_enable_homeroom_checkbox
@@ -402,5 +450,33 @@ module K5PageObject
       due_at: assignment_due_at,
       submission_types: 'online_text_entry'
     )
+  end
+
+  def click_message_button
+    message_button.click
+  end
+
+  def click_send_button
+    send_button.click
+  end
+
+  def click_cancel_button
+    cancel_button.click
+  end
+
+  def is_send_available?
+    element_value_for_attr(send_button, 'cursor') == 'pointer'
+  end
+
+  def is_cancel_available?
+    element_value_for_attr(cancel_button, 'cursor') == 'pointer'
+  end
+
+  def is_modal_gone?(user_name)
+    wait_for_no_such_element { message_modal(user_name) }
+  end
+
+  def message_modal_displayed?(user_name)
+    element_exists?(message_modal_selector(user_name))
   end
 end
