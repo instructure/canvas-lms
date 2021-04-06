@@ -697,9 +697,7 @@ module Lti::Ims
           let(:params_overrides) do
             super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now.to_i })
           end
-          it_behaves_like 'a bad request' do 
-            skip 'INTEROP-6668 03/26/2021'
-          end
+          it_behaves_like 'a bad request'
         end
 
         context 'when submitted_at extension is an invalid timestamp' do
