@@ -1574,7 +1574,7 @@ describe CoursesController do
         expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_truthy
       end
 
-      it "sets STUDENT_PLANNER_ENABLED = true in js_env if the user doesn't have student enrollments" do
+      it "sets STUDENT_PLANNER_ENABLED = false in js_env if the user doesn't have student enrollments" do
         user_session(@teacher)
 
         get 'show', params: {:id => @course.id}
