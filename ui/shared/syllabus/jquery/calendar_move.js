@@ -20,6 +20,7 @@ import $ from 'jquery'
 import '@canvas/datetime'
 import '@canvas/util/templateData' /* fillTemplateData */
 import 'jqueryui/datepicker'
+import moment from 'moment'
 
 const monthNames = I18n.lookup('date.month_names')
 
@@ -52,12 +53,13 @@ export function changeMonth($month, change) {
     year_number: current.getFullYear()
   }
   $month.fillTemplateData({data})
+  const firstDayOfWeek = moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek()
   let date = new Date()
   const today = makeDate(date)
   const firstDayOfMonth = makeDate(current)
   date = current
   date.setDate(0)
-  date.setDate(date.getDate() - date.getDay())
+  date.setDate(date.getDate() - date.getDay() + firstDayOfWeek)
   const firstDayOfSquare = makeDate(date)
   let lastDayOfPreviousMonth = null
   if (firstDayOfMonth.day != firstDayOfSquare.day) {
@@ -131,6 +133,11 @@ export function changeMonth($month, change) {
       .text(day)
       .attr('title', `${month_number}/${day_number}/${year}`)
       .addClass(`date_${month_number}_${day_number}_${year}`) // left here because I don't know what it'll break...
+
+    // update a11y label
+    const monthName = monthNames[month + 1]
+    $day.find('span.screenreader-only:first-child').text(`${day} ${monthName} ${year}`)
+
     let $div = $day.children('div')
     if ($month.hasClass('mini_month')) {
       $div = $day
