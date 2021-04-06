@@ -252,6 +252,7 @@ class DiscussionTopicsController < ApplicationController
   include Api::V1::AssignmentOverride
   include KalturaHelper
   include SubmittableHelper
+  include K5Mode
 
   # @API List discussion topics
   #
@@ -847,7 +848,7 @@ class DiscussionTopicsController < ApplicationController
               end
             end
 
-            
+
 
             render stream: can_stream_template?
           end

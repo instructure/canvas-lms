@@ -211,6 +211,7 @@ class ApplicationController < ActionController::Base
         @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
         @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
         @js_env[:HOMEROOM_COURSE] = @context.elementary_homeroom_course? if @context.is_a?(Course)
+        @js_env[:K5_MODE] = @context.is_a?(Course) && @context.elementary_subject_course?
       end
     end
 

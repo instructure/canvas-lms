@@ -33,6 +33,7 @@ class AssignmentsController < ApplicationController
   include KalturaHelper
   include SyllabusHelper
   before_action :require_context
+  include K5Mode
   add_crumb(
     proc { t '#crumbs.assignments', "Assignments" },
     except: [:destroy, :syllabus, :index, :new, :edit]
