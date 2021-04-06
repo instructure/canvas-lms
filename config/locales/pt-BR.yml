@@ -5787,7 +5787,7 @@ pt-BR:
     angel_exporter: 
       content: Conteúdo
       options: Opções
-    bad_migration_type: "Tipo de migração inválida"
+    bad_migration_type: "migration_type inválida"
     blackboard_export: 
       content: Conteúdo
       options: Opções
@@ -22702,7 +22702,7 @@ pt-BR:
       section: turma
       section_id: section_id
       section_sis_id: section_sis_id
-      sis_id: id_sis
+      sis_id: sis_id
       submitted: enviada
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} para %{upper_bound}"

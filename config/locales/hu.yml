@@ -12563,6 +12563,7 @@ hu:
       select_profile_picture: "Profilkép kiválasztása"
       selecting_image: "Kép kiválasztása..."
     communication: 
+      confirm_email_instructions: "Mielőtt értesítéseket kapna, meg kell erősítenie az (%{email}) e-mail címét a levélben található linkre kattintva. Ha nem találja, **kattintson az e-mail újraküldéséhez**, és ellenőrizze a spam mappáját is."
       crumb_notification_preferences: "Értesítési beállítások"
       headers: 
         notification_preferences: "Értesítési beállítások"
