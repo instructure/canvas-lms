@@ -75,6 +75,7 @@ class CanvasSchema < GraphQL::Schema
     when MediaObject then Types::MediaObjectType
     when LearningOutcomeGroup then Types::LearningOutcomeGroupType
     when LearningOutcome then Types::LearningOutcomeType
+    when OutcomeFriendlyDescription then Types::OutcomeFriendlyDescriptionType
     when ContentTag
       if type&.name == "ModuleItemInterface"
         case obj.content_type
