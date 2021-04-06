@@ -31,10 +31,6 @@ describe "assignments" do
   include CustomScreenActions
   include CustomSeleniumActions
 
-  before :each do
-    Account.default.enable_feature!(:rce_enhancements)
-  end
-
   # note: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
