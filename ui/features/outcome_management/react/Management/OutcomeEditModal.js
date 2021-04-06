@@ -31,13 +31,27 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import useRCE from '../hooks/useRCE'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {updateOutcome} from '@canvas/outcomes/graphql/Management'
+import {
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
+  updateOutcome
+} from '@canvas/outcomes/graphql/Management'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import {useMutation} from 'react-apollo'
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
   const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(outcome.displayName)
   const [description] = useInput(outcome.description)
+  const [
+    alternateDescription,
+    alternateDescriptionChangeHandler,
+    alternateDescriptionChanged
+  ] = useInput(outcome.friendlyDescription?.description || '')
   const [setRCERef, getRCECode] = useRCE()
+
+  const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
+
+  const canvasContext = useCanvasContext()
 
   const invalidTitle = !title.trim().length
     ? I18n.t('Cannot be blank')
@@ -48,6 +62,14 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const invalidDisplayName =
     displayName.length > 255 ? I18n.t('Must be 255 characters or less') : null
 
+  const alternativeDescriptionMessages = []
+  if (alternateDescriptionChanged && alternateDescription.length > 255) {
+    alternativeDescriptionMessages.push({
+      text: I18n.t('Must be 255 characters or less'),
+      type: 'error'
+    })
+  }
+
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
       const descriptionRCE = getRCECode()
@@ -56,17 +78,39 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
       if (descriptionRCE && descriptionRCE !== description)
         updatedOutcome.description = descriptionRCE
       if (displayName && displayNameChanged) updatedOutcome.display_name = displayName
-
       try {
-        const result = await updateOutcome(outcome._id, updatedOutcome)
-        if (result?.status === 200) {
-          showFlashAlert({
-            message: I18n.t('This outcome was successfully updated.'),
-            type: 'success'
-          })
-        } else {
-          throw Error()
+        const promises = []
+        if (Object.keys(updatedOutcome).length > 0) {
+          promises.push(updateOutcome(outcome._id, updatedOutcome))
         }
+        if (alternateDescriptionChanged) {
+          promises.push(
+            setOutcomeFriendlyDescription({
+              variables: {
+                input: {
+                  description: alternateDescription,
+                  contextId: canvasContext.contextId,
+                  contextType: canvasContext.contextType,
+                  outcomeId: outcome._id
+                }
+              }
+            })
+          )
+        }
+
+        const results = await Promise.all(promises)
+        const lastResult = results[results.length - 1]
+
+        // if last result is outcome friendly mutation
+        // check for error
+        if (lastResult?.data?.setFriendlyDescription?.errors) {
+          throw new Error()
+        }
+
+        showFlashAlert({
+          message: I18n.t('This outcome was successfully updated.'),
+          type: 'success'
+        })
       } catch (err) {
         showFlashAlert({
           message: err.message
@@ -122,6 +166,19 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
               textareaRef={setRCERef}
             />
           </View>
+          <View as="div" padding="small 0">
+            <TextArea
+              autoGrow
+              size="medium"
+              height="8rem"
+              maxHeight="8rem"
+              value={alternateDescription}
+              label={I18n.t('Alternative description (for parent/student display)')}
+              placeholder={I18n.t('Enter your alternate description here')}
+              onChange={alternateDescriptionChangeHandler}
+              messages={alternativeDescriptionMessages}
+            />
+          </View>
         </Modal.Body>
         <Modal.Footer>
           <Button type="button" color="secondary" margin="0 x-small 0 0" onClick={onCloseHandler}>
@@ -131,7 +188,11 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
             type="button"
             color="primary"
             margin="0 x-small 0 0"
-            interaction={!invalidTitle && !invalidDisplayName ? 'enabled' : 'disabled'}
+            interaction={
+              !invalidTitle && !invalidDisplayName && alternativeDescriptionMessages.length === 0
+                ? 'enabled'
+                : 'disabled'
+            }
             onClick={onUpdateOutcomeHandler}
           >
             {I18n.t('Save')}
@@ -147,7 +208,10 @@ OutcomeEditModal.propTypes = {
     _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
-    displayName: PropTypes.string
+    displayName: PropTypes.string,
+    friendlyDescription: PropTypes.shape({
+      description: PropTypes.string.isRequired
+    })
   }).isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired

@@ -62,7 +62,12 @@ export const CHILD_GROUPS_QUERY = gql`
 `
 
 export const GROUP_DETAIL_QUERY = gql`
-  query GroupDetailQuery($id: ID!, $outcomesCursor: String) {
+  query GroupDetailQuery(
+    $id: ID!
+    $outcomesCursor: String
+    $outcomesContextId: ID!
+    $outcomesContextType: String!
+  ) {
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
       ... on LearningOutcomeGroup {
         _id
@@ -86,6 +91,13 @@ export const GROUP_DETAIL_QUERY = gql`
                 canEdit
                 contextType
                 contextId
+                friendlyDescription(
+                  contextId: $outcomesContextId
+                  contextType: $outcomesContextType
+                ) {
+                  _id
+                  description
+                }
               }
             }
           }
@@ -126,6 +138,21 @@ export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
             }
           }
         }
+      }
+    }
+  }
+`
+
+export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
+  mutation SetOutcomeFriendlyDescription($input: SetFriendlyDescriptionInput!) {
+    setFriendlyDescription(input: $input) {
+      outcomeFriendlyDescription {
+        _id
+        description
+      }
+      errors {
+        attribute
+        message
       }
     }
   }

@@ -76,3 +76,14 @@ withLongDescription.args = {
     displayName: 'Friendly outcome name'
   }
 }
+
+export const withAlternativeDescription = Template.bind({})
+withAlternativeDescription.args = {
+  outcome: {
+    _id: '1',
+    title: 'Outcome 1',
+    description: 'An outcome description.',
+    friendlyDescription: 'A alternative outcome description.',
+    displayName: 'Friendly outcome name'
+  }
+}

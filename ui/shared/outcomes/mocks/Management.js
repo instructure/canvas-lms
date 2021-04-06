@@ -18,7 +18,8 @@
 import {
   CHILD_GROUPS_QUERY,
   GROUP_DETAIL_QUERY,
-  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
+  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
 } from '../graphql/Management'
 
 export const accountMocks = ({
@@ -254,7 +255,9 @@ export const groupDetailMocks = ({
     request: {
       query: GROUP_DETAIL_QUERY,
       variables: {
-        id: groupId
+        id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -282,6 +285,7 @@ export const groupDetailMocks = ({
                   canEdit,
                   contextId,
                   contextType,
+                  friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -296,6 +300,7 @@ export const groupDetailMocks = ({
                   canEdit,
                   contextId,
                   contextType,
+                  friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -313,7 +318,9 @@ export const groupDetailMocks = ({
       query: GROUP_DETAIL_QUERY,
       variables: {
         id: groupId,
-        outcomesCursor: 'Mg'
+        outcomesCursor: 'Mg',
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -341,6 +348,7 @@ export const groupDetailMocks = ({
                   canEdit,
                   contextId,
                   contextType,
+                  friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -357,7 +365,9 @@ export const groupDetailMocks = ({
     request: {
       query: GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
       variables: {
-        id: groupId
+        id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -378,6 +388,7 @@ export const groupDetailMocks = ({
                 _id: '1',
                 description: '',
                 displayName: '',
+                friendlyDescription: null,
                 title: `Outcome 1 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               },
@@ -386,6 +397,7 @@ export const groupDetailMocks = ({
                 description: '',
                 displayName: '',
                 isImported: false,
+                friendlyDescription: null,
                 title: `Outcome 2 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -402,6 +414,8 @@ export const groupDetailMocks = ({
       query: GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
       variables: {
         id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
         outcomesCursor: 'Mg'
       }
     },
@@ -424,6 +438,7 @@ export const groupDetailMocks = ({
                 description: '',
                 displayName: '',
                 isImported: false,
+                friendlyDescription: null,
                 title: `Outcome 3 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -436,6 +451,70 @@ export const groupDetailMocks = ({
     }
   }
 ]
+
+export const setFriendlyDescriptionOutcomeMock = ({
+  inputDescription = 'Updated alternate description',
+  failResponse = false,
+  failMutation = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      setFriendlyDescription: {
+        outcomeFriendlyDescription: {
+          _id: '1',
+          description: 'Updated alternate description',
+          __typename: 'OutcomeFriendlyDescription'
+        },
+        __typename: 'SetFriendlyDescriptionPayload',
+        errors: null
+      }
+    }
+  }
+
+  const failedMutationResponse = {
+    data: {
+      setFriendlyDescription: {
+        outcomeFriendlyDescription: null,
+        __typename: 'SetFriendlyDescriptionPayload',
+        errors: [
+          {
+            message: 'sure, mutation failed',
+            attribute: 'message',
+            __typename: 'ErrorMessage'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedResponse = {
+    data: null,
+    errors: 'sure, why not'
+  }
+
+  let result = successfulResponse
+  if (failMutation) {
+    result = failedMutationResponse
+  }
+  if (failResponse) {
+    result = failedResponse
+  }
+
+  return {
+    request: {
+      query: SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
+      variables: {
+        input: {
+          description: inputDescription,
+          contextId: '1',
+          contextType: 'Account',
+          outcomeId: '1'
+        }
+      }
+    },
+    result
+  }
+}
 
 export const smallOutcomeTree = () => [
   ...accountMocks({childGroupsCount: 2}),

@@ -323,7 +323,7 @@ describe('OutcomeManagementPanel', () => {
       mocks: [
         ...courseMocks({childGroupsCount: 2, canEdit: false}),
         ...groupMocks({groupId: 200, canEdit: false}),
-        ...groupDetailMocks({groupId: 200, canEdit: false})
+        ...groupDetailMocks({groupId: 200, contextType: 'Course', contextId: '2', canEdit: false})
       ]
     })
     await act(async () => jest.runAllTimers())
