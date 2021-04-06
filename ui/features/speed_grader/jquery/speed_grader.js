@@ -1450,7 +1450,11 @@ EG = {
     // choose the first ungraded student if the requested one doesn't exist
     if (!jsonData.studentMap[representativeOrStudentId]) {
       const ungradedStudent = _(jsonData.studentsWithSubmissions).find(
-        s => s.submission && s.submission.workflow_state != 'graded' && s.submission.submission_type
+        s =>
+          s.submission &&
+          s.submission.workflow_state !== 'graded' &&
+          s.submission.submission_type &&
+          (!isModerated || s.submission.grade == null)
       )
       representativeOrStudentId = (ungradedStudent || jsonData.studentsWithSubmissions[0])[
         anonymizableId

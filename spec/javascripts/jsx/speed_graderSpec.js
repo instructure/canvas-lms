@@ -5754,6 +5754,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             {user_id: '40', anonymous_id: 'vvvvv', score: 20, workflow_state: 'graded'}
           ]
         }
+
         setupFixtures(`
         <div id="combo_box_container"></div>
       `)
@@ -5874,6 +5875,20 @@ QUnit.module('SpeedGrader', rootHooks => {
           queryParamsStub.returns({anonymous_id: 'vvvvv'})
           SpeedGrader.EG.setInitiallyLoadedStudent()
           strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'zzzzz')
+        })
+      })
+
+      QUnit.module('when moderated grading is active', moderatedHooks => {
+        moderatedHooks.beforeEach(() => {
+          window.jsonData.moderated_grading = true
+          SpeedGrader.EG.jsonReady()
+        })
+        moderatedHooks.afterEach(() => {
+          delete window.jsonData.moderated_grading
+        })
+        test('defaults to the first ungraded student', () => {
+          SpeedGrader.EG.setInitiallyLoadedStudent()
+          strictEqual(SpeedGrader.EG.currentStudent.id, '20')
         })
       })
     })
