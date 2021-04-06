@@ -763,7 +763,7 @@ pipeline {
             }
           }
 
-          extendedStage("Javascript (Waiting for Dependencies)").withLegacyOptions(extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE, 'Builder')).queue(rootStages) {
+          extendedStage("Javascript (Waiting for Dependencies)").waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
             def nestedStages = [:]
 
             echo 'adding Javascript (Jest)'
