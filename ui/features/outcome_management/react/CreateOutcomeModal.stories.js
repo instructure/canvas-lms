@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import CreateOutcomeModal from 'jsx/outcomes/CreateOutcomeModal'
+import CreateOutcomeModal from './CreateOutcomeModal'
 
 export default {
   title: 'Examples/Outcomes/CreateOutcomeModal',

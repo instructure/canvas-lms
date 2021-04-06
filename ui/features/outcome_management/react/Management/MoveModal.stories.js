@@ -19,9 +19,9 @@
 import React from 'react'
 import MoveModal from './MoveModal'
 import {MockedProvider} from '@apollo/react-testing'
-import OutcomesContext from '../contexts/OutcomesContext'
-import {smallOutcomeTree} from './__tests__/mocks'
-import {createCache} from 'jsx/canvas-apollo'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
+import {createCache} from '@canvas/apollo'
 
 export default {
   title: 'Examples/Outcomes/MoveModal',

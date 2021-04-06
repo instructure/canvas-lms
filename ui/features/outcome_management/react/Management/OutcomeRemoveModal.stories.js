@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import OutcomesContext from '../contexts/OutcomesContext'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 
 export default {

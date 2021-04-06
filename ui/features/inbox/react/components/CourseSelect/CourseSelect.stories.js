@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import React from 'react'
 import {CourseSelect} from './CourseSelect'
 

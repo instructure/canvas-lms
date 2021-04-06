@@ -2,7 +2,7 @@ import React from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {ApplyTextDirection} from '@instructure/ui-i18n'
 import I18n from 'i18n-js'
-import i18nLolcalize from 'coffeescripts/str/i18nLolcalize'
+import i18nLolcalize from '@canvas/i18n/i18nLolcalize'
 import '@instructure/canvas-high-contrast-theme'
 import '@instructure/canvas-theme'
 

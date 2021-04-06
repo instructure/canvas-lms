@@ -19,9 +19,9 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import FindOutcomesModal from './FindOutcomesModal'
-import {createCache} from 'jsx/canvas-apollo'
-import OutcomesContext from './contexts/OutcomesContext'
-import {findModalMocks} from './__tests__/mocks'
+import {createCache} from '@canvas/apollo'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 
 export default {
   title: 'Examples/Outcomes/FindOutcomesModal',
