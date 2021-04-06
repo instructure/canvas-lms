@@ -22,6 +22,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
+import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -52,6 +53,20 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
 
   const canvasContext = useCanvasContext()
+  let attributesEditable = {
+    alternativeDescription: true
+  }
+  if (
+    outcome.contextType === canvasContext.contextType &&
+    outcome.contextId?.toString() === canvasContext.contextId
+  ) {
+    attributesEditable = {
+      ...attributesEditable,
+      title: true,
+      displayName: true,
+      description: true
+    }
+  }
 
   const invalidTitle = !title.trim().length
     ? I18n.t('Cannot be blank')
@@ -69,6 +84,11 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
       type: 'error'
     })
   }
+  const formValid = !(
+    invalidTitle ||
+    invalidDisplayName ||
+    alternativeDescriptionMessages.length > 0
+  )
 
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
@@ -138,33 +158,63 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
         <Modal.Body>
           <Flex as="div" alignItems="start" padding="small 0" height="7rem">
             <Flex.Item size="50%" padding="0 xx-small 0 0">
-              <TextInput
-                type="text"
-                size="medium"
-                value={title}
-                messages={invalidTitle ? [{text: invalidTitle, type: 'error'}] : []}
-                renderLabel={I18n.t('Name')}
-                onChange={titleChangeHandler}
-              />
+              {attributesEditable.title ? (
+                <TextInput
+                  type="text"
+                  size="medium"
+                  value={title}
+                  messages={invalidTitle ? [{text: invalidTitle, type: 'error'}] : []}
+                  renderLabel={I18n.t('Name')}
+                  onChange={titleChangeHandler}
+                  data-testid="name-input"
+                />
+              ) : (
+                <View as="div">
+                  <Text weight="bold">{I18n.t('Name')}</Text> <br />
+                  <View as="div" margin="small 0 0">
+                    <Text>{outcome.title}</Text>
+                  </View>
+                </View>
+              )}
             </Flex.Item>
             <Flex.Item size="50%" padding="0 0 0 xx-small">
-              <TextInput
-                type="text"
-                size="medium"
-                value={displayName}
-                messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
-                renderLabel={I18n.t('Friendly Name')}
-                onChange={displayNameChangeHandler}
-              />
+              {attributesEditable.displayName ? (
+                <TextInput
+                  type="text"
+                  size="medium"
+                  value={displayName}
+                  messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+                  renderLabel={I18n.t('Friendly Name')}
+                  onChange={displayNameChangeHandler}
+                  data-testid="display-name-input"
+                />
+              ) : (
+                <View as="div">
+                  <Text weight="bold">{I18n.t('Friendly Name')}</Text> <br />
+                  <View as="div" margin="small 0 0">
+                    <Text>{outcome.displayName}</Text>
+                  </View>
+                </View>
+              )}
             </Flex.Item>
           </Flex>
           <View as="div" padding="small 0">
-            <TextArea
-              size="medium"
-              defaultValue={description}
-              label={I18n.t('Description')}
-              textareaRef={setRCERef}
-            />
+            {attributesEditable.description ? (
+              <TextArea
+                size="medium"
+                defaultValue={description}
+                label={I18n.t('Description')}
+                textareaRef={setRCERef}
+                data-testid="description-input"
+              />
+            ) : (
+              <View as="div">
+                <Text weight="bold">{I18n.t('Description')}</Text> <br />
+                <View as="div" margin="small 0 0">
+                  <Text as="p" dangerouslySetInnerHTML={{__html: outcome.description}} />
+                </View>
+              </View>
+            )}
           </View>
           <View as="div" padding="small 0">
             <TextArea
@@ -177,6 +227,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
               placeholder={I18n.t('Enter your alternate description here')}
               onChange={alternateDescriptionChangeHandler}
               messages={alternativeDescriptionMessages}
+              data-testid="alternate-description-input"
             />
           </View>
         </Modal.Body>
@@ -188,11 +239,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
             type="button"
             color="primary"
             margin="0 x-small 0 0"
-            interaction={
-              !invalidTitle && !invalidDisplayName && alternativeDescriptionMessages.length === 0
-                ? 'enabled'
-                : 'disabled'
-            }
+            interaction={formValid ? 'enabled' : 'disabled'}
             onClick={onUpdateOutcomeHandler}
           >
             {I18n.t('Save')}
@@ -209,6 +256,8 @@ OutcomeEditModal.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     displayName: PropTypes.string,
+    contextId: PropTypes.number,
+    contextType: PropTypes.string,
     friendlyDescription: PropTypes.shape({
       description: PropTypes.string.isRequired
     })

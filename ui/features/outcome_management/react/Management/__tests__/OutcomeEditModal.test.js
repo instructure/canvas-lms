@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render as rawRender, fireEvent, act} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import OutcomeEditModal from '../OutcomeEditModal'
 import * as Management from '@canvas/outcomes/graphql/Management'
@@ -29,6 +29,14 @@ import {setFriendlyDescriptionOutcomeMock} from '@canvas/outcomes/mocks/Manageme
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.useFakeTimers()
+
+const render = (children, {contextType = 'Account', contextId = '1'} = {}) => {
+  return rawRender(
+    <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      {children}
+    </OutcomesContext.Provider>
+  )
+}
 
 describe('OutcomeEditModal', () => {
   let onCloseHandlerMock
@@ -47,7 +55,9 @@ describe('OutcomeEditModal', () => {
         _id: '1',
         title: 'Outcome',
         description: 'Outcome description',
-        displayName: 'Friendly outcome name'
+        displayName: 'Friendly outcome name',
+        contextType: 'Account',
+        contextId: 1
       },
       isOpen: true,
       onCloseHandler: onCloseHandlerMock
@@ -57,7 +67,11 @@ describe('OutcomeEditModal', () => {
   const renderWithProvider = ({
     overrides = {},
     failResponse = false,
-    failMutation = false
+    failMutation = false,
+    env = {
+      contextType: 'Account',
+      contextId: '1'
+    }
   } = {}) => {
     const mocks = [
       setFriendlyDescriptionOutcomeMock({
@@ -65,11 +79,6 @@ describe('OutcomeEditModal', () => {
         failMutation
       })
     ]
-
-    const env = {
-      contextType: 'Account',
-      contextId: '1'
-    }
 
     return render(
       <OutcomesContext.Provider value={{env}}>
@@ -240,5 +249,21 @@ describe('OutcomeEditModal', () => {
       message: 'An error occurred while updating this outcome: Network error',
       type: 'error'
     })
+  })
+
+  it('Shows forms elements when editing in same context', () => {
+    const {getByTestId} = renderWithProvider()
+    expect(getByTestId('name-input')).toBeInTheDocument()
+    expect(getByTestId('display-name-input')).toBeInTheDocument()
+    expect(getByTestId('description-input')).toBeInTheDocument()
+    expect(getByTestId('alternate-description-input')).toBeInTheDocument()
+  })
+
+  it('Hides forms elements when editing in different context', () => {
+    const {queryByTestId} = renderWithProvider({env: {contextType: 'Course', contextId: '1'}})
+    expect(queryByTestId('name-input')).not.toBeInTheDocument()
+    expect(queryByTestId('display-name-input')).not.toBeInTheDocument()
+    expect(queryByTestId('description-input')).not.toBeInTheDocument()
+    expect(queryByTestId('alternate-description-input')).toBeInTheDocument()
   })
 })

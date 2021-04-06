@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import React from 'react'
 import OutcomeEditModal from './OutcomeEditModal'
 
@@ -27,14 +28,22 @@ export default {
       _id: '1',
       title: 'Outcome 1',
       description: 'Outcome description',
-      displayName: 'Friendly outcome name'
+      displayName: 'Friendly outcome name',
+      contextType: 'Account',
+      contextId: 1
     },
     isOpen: true,
     onCloseHandler: () => {}
   }
 }
 
-const Template = args => <OutcomeEditModal {...args} />
+const withContext = (children, {contextType = 'Account', contextId = '1'} = {}) => (
+  <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+    {children}
+  </OutcomesContext.Provider>
+)
+
+const Template = args => withContext(<OutcomeEditModal {...args} />)
 export const Default = Template.bind({})
 
 export const withNoName = Template.bind({})
@@ -43,7 +52,9 @@ withNoName.args = {
     _id: '1',
     title: '',
     description: 'Outcome description',
-    displayName: 'Friendly outcome name'
+    displayName: 'Friendly outcome name',
+    contextType: 'Account',
+    contextId: 1
   }
 }
 
@@ -53,7 +64,9 @@ withLongName.args = {
     _id: '1',
     title: 'A very long outcome name. '.repeat(10),
     description: 'Outcome description',
-    displayName: 'Friendly outcome name'
+    displayName: 'Friendly outcome name',
+    contextType: 'Account',
+    contextId: 1
   }
 }
 
@@ -63,7 +76,9 @@ withLongDisplayName.args = {
     _id: '1',
     title: 'Outcome 1',
     description: 'Outcome description',
-    displayName: 'Long friendly outcome name. '.repeat(10)
+    displayName: 'Long friendly outcome name. '.repeat(10),
+    contextType: 'Account',
+    contextId: 1
   }
 }
 
@@ -73,7 +88,21 @@ withLongDescription.args = {
     _id: '1',
     title: 'Outcome 1',
     description: 'A very long outcome description. '.repeat(18),
-    displayName: 'Friendly outcome name'
+    displayName: 'Friendly outcome name',
+    contextType: 'Account',
+    contextId: 1
+  }
+}
+
+export const withoutEditPermission = Template.bind({})
+withoutEditPermission.args = {
+  outcome: {
+    _id: '1',
+    title: 'Outcome 1',
+    description: 'Outcome description',
+    displayName: 'Friendly outcome name',
+    contextType: 'Account',
+    contextId: 2
   }
 }
 
