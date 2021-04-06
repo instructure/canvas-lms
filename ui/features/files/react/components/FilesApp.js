@@ -28,7 +28,7 @@ import FolderTree from './FolderTree'
 import FilesUsage from './FilesUsage'
 import Toolbar from './Toolbar'
 
-FilesApp.previewItem = function(item) {
+FilesApp.previewItem = function (item) {
   this.clearSelectedItems(() => {
     this.toggleItemSelected(item, null, () => {
       const queryString = $.param(this.getPreviewQuery())
@@ -37,7 +37,7 @@ FilesApp.previewItem = function(item) {
   })
 }
 
-FilesApp.getPreviewRoute = function() {
+FilesApp.getPreviewRoute = function () {
   if (this.props.query && this.props.query.search_term) {
     return '/search'
   } else if (this.props.splat) {
@@ -47,7 +47,7 @@ FilesApp.getPreviewRoute = function() {
   }
 }
 
-FilesApp.render = function() {
+FilesApp.render = function () {
   let contextType
   let contextId
 
@@ -88,26 +88,28 @@ FilesApp.render = function() {
       <header>
         <h1 className="screenreader-only">{I18n.t('Files')}</h1>
       </header>
-      <div className="ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print">
-        <button
-          className="Button Button--link ic-app-course-nav-toggle"
-          type="button"
-          id="courseMenuToggle"
-          aria-label={I18n.t('Show and hide courses menu')}
-          aria-hidden
-        >
-          <i className="icon-hamburger" aria-hidden="true" />
-        </button>
-        <div className="ic-app-crumbs">
-          <Breadcrumbs
-            rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-            showingSearchResults={this.state.showingSearchResults}
-            query={this.props.query}
-            contextAssetString={this.props.contextAssetString}
-          />
+      {!window.ENV.K5_MODE && (
+        <div className="ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print">
+          <button
+            className="Button Button--link ic-app-course-nav-toggle"
+            type="button"
+            id="courseMenuToggle"
+            aria-label={I18n.t('Show and hide courses menu')}
+            aria-hidden
+          >
+            <i className="icon-hamburger" aria-hidden="true" />
+          </button>
+          <div className="ic-app-crumbs">
+            <Breadcrumbs
+              rootTillCurrentFolder={this.state.rootTillCurrentFolder}
+              showingSearchResults={this.state.showingSearchResults}
+              query={this.props.query}
+              contextAssetString={this.props.contextAssetString}
+            />
+          </div>
+          <div className="TutorialToggleHolder" />
         </div>
-        <div className="TutorialToggleHolder" />
-      </div>
+      )}
       <Toolbar
         currentFolder={this.state.currentFolder}
         query={this.props.query}

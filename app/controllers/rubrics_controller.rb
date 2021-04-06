@@ -24,6 +24,7 @@ class RubricsController < ApplicationController
   before_action { |c| c.active_tab = "rubrics" }
 
   include Api::V1::Outcome
+  include K5Mode
 
   def index
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
