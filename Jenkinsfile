@@ -411,7 +411,7 @@ pipeline {
 
           def rootStages = [:]
 
-          extendedStage.withOptions('Builder', rootStages, extendedStage.DISABLE_MEASURE_TIMINGS) {
+          extendedStage('Builder').withLegacyOptions(extendedStage.DISABLE_MEASURE_TIMINGS).queue(rootStages) {
             // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
             // wait for the current steps to complete (even wait to spin up a node), causing
             // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
@@ -649,7 +649,7 @@ pipeline {
                   }
 
                   echo 'adding Vendored Gems'
-                  extendedStage('Vendored Gems', stages) {
+                  extendedStage('Vendored Gems').queue(stages) {
                       buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
@@ -685,7 +685,7 @@ pipeline {
                   }
 
                   echo 'adding Contract Tests'
-                  extendedStage('Contract Tests', stages) {
+                  extendedStage('Contract Tests').queue(stages) {
                     buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
@@ -695,7 +695,7 @@ pipeline {
 
                   if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                     echo 'adding CDC Schema check'
-                    extendedStage('CDC Schema Check', stages) {
+                    extendedStage('CDC Schema Check').queue(stages) {
                       buildSummaryReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
                         string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
                       ], "CDC Schema Check")
@@ -713,7 +713,7 @@ pipeline {
                     )
                   ) {
                     echo 'adding Flakey Spec Catcher'
-                    extendedStage('Flakey Spec Catcher', stages) {
+                    extendedStage('Flakey Spec Catcher').queue(stages) {
                       buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
@@ -730,7 +730,7 @@ pipeline {
 
                   if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                     echo 'adding Local Docker Dev Build'
-                    extendedStage('Local Docker Dev Build', stages) {
+                    extendedStage('Local Docker Dev Build').queue(stages) {
                       buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, "Local Docker Dev Build")
                     }
                   }
@@ -763,11 +763,11 @@ pipeline {
             }
           }
 
-          extendedStage.withOptions("Javascript (Waiting for Dependencies)", rootStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE, 'Builder')) {
+          extendedStage("Javascript (Waiting for Dependencies)").withLegacyOptions(extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE, 'Builder')).queue(rootStages) {
             def nestedStages = [:]
 
             echo 'adding Javascript (Jest)'
-            extendedStage.withOptions('Javascript (Jest)', nestedStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
+            extendedStage('Javascript (Jest)').queue(nestedStages) {
               buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "jest"),
@@ -775,7 +775,7 @@ pipeline {
             }
 
             echo 'adding Javascript (Coffeescript)'
-            extendedStage.withOptions('Javascript (Coffeescript)', nestedStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
+            extendedStage('Javascript (Coffeescript)').queue(nestedStages) {
               buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "coffee"),
@@ -783,7 +783,7 @@ pipeline {
             }
 
             echo 'adding Javascript (Karma)'
-            extendedStage.withOptions('Javascript (Karma)', nestedStages, extendedStage.dependsOn(JS_BUILD_IMAGE_STAGE)) {
+            extendedStage('Javascript (Karma)').queue(nestedStages) {
               buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "karma"),
