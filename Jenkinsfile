@@ -411,7 +411,7 @@ pipeline {
 
           def rootStages = [:]
 
-          extendedStage('Builder').withLegacyOptions(extendedStage.DISABLE_MEASURE_TIMINGS).queue(rootStages) {
+          extendedStage('Builder').timings(false).queue(rootStages) {
             // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
             // wait for the current steps to complete (even wait to spin up a node), causing
             // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
