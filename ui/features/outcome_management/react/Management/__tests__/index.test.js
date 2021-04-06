@@ -44,7 +44,7 @@ describe('OutcomeManagementPanel', () => {
     mocks: [
       ...courseMocks({childGroupsCount: 2}),
       ...groupMocks({groupId: 200}),
-      ...groupDetailMocks({groupId: 200})
+      ...groupDetailMocks({groupId: 200, contextType: 'Course', contextId: '2'})
     ]
   }
 
@@ -60,17 +60,6 @@ describe('OutcomeManagementPanel', () => {
       </OutcomesContext.Provider>
     )
   }
-
-  const renderWithGroupDetail = children =>
-    render(children, {
-      contextType: 'Course',
-      contextId: '2',
-      mocks: [
-        ...courseMocks({childGroupsCount: 2}),
-        ...groupMocks({groupId: 200}),
-        ...groupDetailMocks({groupId: 200})
-      ]
-    })
 
   it('renders the empty billboard for accounts without child outcomes', async () => {
     const {getByText} = render(<OutcomeManagementPanel />)
@@ -117,7 +106,7 @@ describe('OutcomeManagementPanel', () => {
       mocks: [
         ...accountMocks({childGroupsCount: 2}),
         ...groupMocks({groupId: 100}),
-        ...groupDetailMocks({groupId: 100})
+        ...groupDetailMocks({groupId: 100, contextType: 'Account', contextId: '1'})
       ]
     })
     await act(async () => jest.runAllTimers())
@@ -277,9 +266,9 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('shows edit outcome modal if edit option from individual outcome menu is selected', async () => {
-    const {getByText, getAllByText, getByRole} = renderWithGroupDetail(
-      <OutcomeManagementPanel contextType="Course" contextId="2" />
-    )
+    const {getByText, getAllByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
@@ -290,9 +279,9 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('clears selected outcome when edit outcome modal is closed', async () => {
-    const {getByText, getAllByText, queryByText, getByRole} = renderWithGroupDetail(
-      <OutcomeManagementPanel contextType="Course" contextId="2" />
-    )
+    const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
@@ -304,9 +293,9 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('clears selected outcome when remove outcome modal is closed', async () => {
-    const {getByText, getAllByText, queryByText, getByRole} = renderWithGroupDetail(
-      <OutcomeManagementPanel contextType="Course" contextId="2" />
-    )
+    const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
@@ -315,5 +304,21 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Cancel'))
     expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
+  })
+
+  it('hides the Outcome Menu if the user doesnt have permission to edit the outcome', async () => {
+    const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+      contextType: 'Course',
+      contextId: '2',
+      mocks: [
+        ...courseMocks({childGroupsCount: 2, canEdit: false}),
+        ...groupMocks({groupId: 200, canEdit: false}),
+        ...groupDetailMocks({groupId: 200, canEdit: false})
+      ]
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
   })
 })

@@ -27,23 +27,41 @@ export default {
       id: '1',
       title: 'Parent Outcome',
       description: 'Parent Outcome Description',
-      children: [
-        {
-          id: '2',
-          title: 'Outcome Child 1',
-          description: 'Outcome Child 1 Description'
+      outcomesCount: 3,
+      outcomes: {
+        pageInfo: {
+          hasNextPage: false
         },
-        {
-          id: '3',
-          title: 'Outcome Child 2',
-          description: 'Outcome Child 2 Description'
-        },
-        {
-          id: '4',
-          title: 'Outcome Child 2',
-          description: 'Outcome Child 2 Description'
-        }
-      ]
+        edges: [
+          {
+            canUnlink: true,
+            node: {
+              id: '2',
+              title: 'Outcome Child 1',
+              description: 'Outcome Child 1 Description',
+              canEdit: true
+            }
+          },
+          {
+            canUnlink: true,
+            node: {
+              id: '3',
+              title: 'Outcome Child 2',
+              description: 'Outcome Child 2 Description',
+              canEdit: true
+            }
+          },
+          {
+            canUnlink: true,
+            node: {
+              id: '4',
+              title: 'Outcome Child 2',
+              description: 'Outcome Child 2 Description',
+              canEdit: true
+            }
+          }
+        ]
+      }
     },
     selectedOutcomes: {2: false, 3: false, 4: true},
     searchString: '',
@@ -51,7 +69,9 @@ export default {
     onOutcomeGroupMenuHandler: () => {},
     onOutcomeMenuHandler: () => {},
     onSearchChangeHandler: () => {},
-    onSearchClearHandler: () => {}
+    onSearchClearHandler: () => {},
+    loadMore: false,
+    loading: false
   }
 }
 

@@ -26,7 +26,7 @@ import OutcomeKebabMenu from './OutcomeKebabMenu'
 import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 
-const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
+const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler, canManage}) => (
   <View as="div">
     <Flex as="div" alignItems="start">
       <Flex.Item size={minWidth} shouldGrow>
@@ -40,9 +40,15 @@ const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
           </Heading>
         </div>
       </Flex.Item>
-      <Flex.Item>
-        <OutcomeKebabMenu menuTitle={I18n.t('Outcome Group Menu')} onMenuHandler={onMenuHandler} />
-      </Flex.Item>
+      {canManage && (
+        <Flex.Item>
+          <OutcomeKebabMenu
+            canDestroy
+            menuTitle={I18n.t('Outcome Group Menu')}
+            onMenuHandler={onMenuHandler}
+          />
+        </Flex.Item>
+      )}
     </Flex>
     <View as="div" padding="small 0 0">
       <OutcomeDescription description={description} />
@@ -53,13 +59,15 @@ const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
 OutcomeGroupHeader.defaultProps = {
   minWidth: 'auto',
   title: '',
-  description: ''
+  description: '',
+  canManage: false
 }
 
 OutcomeGroupHeader.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   minWidth: PropTypes.string,
+  canManage: PropTypes.bool,
   onMenuHandler: PropTypes.func.isRequired
 }
 

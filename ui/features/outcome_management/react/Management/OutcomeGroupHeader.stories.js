@@ -23,7 +23,8 @@ export default {
   title: 'Examples/Outcomes/OutcomeGroupHeader',
   component: OutcomeGroupHeader,
   args: {
-    minWidth: 'auto'
+    minWidth: 'auto',
+    canManage: true
   }
 }
 
@@ -39,4 +40,9 @@ export const reallyLongDescription = Template.bind({})
 reallyLongDescription.args = {
   title: 'Outcome Group With a Very Very Very Long Description',
   description: 'Outcome Group Description '.repeat(100)
+}
+
+export const notManageable = Template.bind({})
+notManageable.args = {
+  canManage: false
 }

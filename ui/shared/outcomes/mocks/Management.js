@@ -21,7 +21,12 @@ import {
   GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
 } from '../graphql/Management'
 
-export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountId = '1'} = {}) => [
+export const accountMocks = ({
+  childGroupsCount = 10,
+  outcomesCount = 2,
+  accountId = '1',
+  canEdit = true
+} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -48,7 +53,8 @@ export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountI
                 _id: 100 + i,
                 outcomesCount,
                 childGroupsCount,
-                title: `Account folder ${i}`
+                title: `Account folder ${i}`,
+                canEdit
               }))
             }
           }
@@ -58,7 +64,12 @@ export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountI
   }
 ]
 
-export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId = '2'} = {}) => [
+export const courseMocks = ({
+  childGroupsCount = 1,
+  outcomesCount = 2,
+  courseId = '2',
+  canEdit = true
+} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -85,7 +96,8 @@ export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId =
                 _id: 200 + i,
                 outcomesCount: 2,
                 childGroupsCount: 10,
-                title: `Course folder ${i}`
+                title: `Course folder ${i}`,
+                canEdit
               }))
             }
           }
@@ -99,7 +111,8 @@ export const groupMocks = ({
   groupId,
   childGroupsCount = 1,
   outcomesCount = 2,
-  childGroupOffset = 300
+  childGroupOffset = 300,
+  canEdit = true
 } = {}) => [
   {
     request: {
@@ -124,7 +137,8 @@ export const groupMocks = ({
               _id: childGroupOffset + i,
               outcomesCount: 2,
               childGroupsCount: 5,
-              title: `Group ${groupId} folder ${i}`
+              title: `Group ${groupId} folder ${i}`,
+              canEdit
             }))
           }
         }
@@ -140,60 +154,102 @@ export const outcomeGroup = {
     2
   ),
   outcomesCount: 15,
+  canEdit: true,
   outcomes: {
     pageInfo: {
       hasNextPage: false,
       endCursor: ''
     },
-    nodes: [
+    edges: [
       {
-        _id: '1',
-        title: 'CCSS.Math.Content.2.MD.A.1 - Outcome with regular length title and description',
-        description: '<p>Partition <strong>circles</strong> and <strong><em>rectangle</em></strong> into two, three, or four equal share. </p>'.repeat(
-          2
-        )
+        canUnlink: true,
+        node: {
+          _id: '1',
+          title: 'CCSS.Math.Content.2.MD.A.1 - Outcome with regular length title and description',
+          description: '<p>Partition <strong>circles</strong> and <strong><em>rectangle</em></strong> into two, three, or four equal share. </p>'.repeat(
+            2
+          ),
+          contextType: null,
+          contextId: null,
+          canEdit: true
+        }
       },
       {
-        _id: '2',
-        title:
-          'CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.Outcome.with.long.title.and.description',
-        description: '<p>Measure the <strong><em>length</em></strong> of an <strong>object</strong> by selecting and using appropriate measurements. </p>'.repeat(
-          2
-        )
+        canUnlink: true,
+        node: {
+          _id: '2',
+          title:
+            'CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.Outcome.with.long.title.and.description',
+          description: '<p>Measure the <strong><em>length</em></strong> of an <strong>object</strong> by selecting and using appropriate measurements. </p>'.repeat(
+            2
+          ),
+          contextType: null,
+          contextId: null,
+          canEdit: true
+        }
       },
       {
-        _id: '3',
-        title: 'CCSS.Math.Content.2.G.A.3 - Outcome with regular length title and no description',
-        description: ''
+        canUnlink: true,
+        node: {
+          _id: '3',
+          title: 'CCSS.Math.Content.2.G.A.3 - Outcome with regular length title and no description',
+          description: '',
+          contextType: null,
+          contextId: null,
+          canEdit: true
+        }
       },
       {
-        _id: '4',
-        title:
-          'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
-        description: '<p><em>Partition circles and rectangle into two, three, or four equal share. </em></p>'.repeat(
-          2
-        )
+        canUnlink: true,
+        node: {
+          _id: '4',
+          title:
+            'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
+          description: '<p><em>Partition circles and rectangle into two, three, or four equal share. </em></p>'.repeat(
+            2
+          ),
+          contextType: null,
+          contextId: null,
+          canEdit: true
+        }
       },
       {
-        _id: '5',
-        title:
-          'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
-        description: '<p><strong>Partition circles and rectangle into two, three, or four equal share. </strong></p>'.repeat(
-          2
-        )
+        canUnlink: true,
+        node: {
+          _id: '5',
+          title:
+            'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
+          description: '<p><strong>Partition circles and rectangle into two, three, or four equal share. </strong></p>'.repeat(
+            2
+          ),
+          contextType: null,
+          contextId: null,
+          canEdit: true
+        }
       },
       {
-        _id: '6',
-        title: 'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3',
-        description: '<p>Partition circles and rectangle into two, three, or four equal share. </p>'.repeat(
-          2
-        )
+        canUnlink: true,
+        node: {
+          _id: '6',
+          title: 'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3',
+          description: '<p>Partition circles and rectangle into two, three, or four equal share. </p>'.repeat(
+            2
+          ),
+          contextType: null,
+          contextId: null,
+          canEdit: true
+        }
       }
     ]
   }
 }
 
-export const groupDetailMocks = ({groupId = '1'} = {}) => [
+export const groupDetailMocks = ({
+  groupId = '1',
+  canEdit = true,
+  contextType = 'Account',
+  contextId = '1'
+} = {}) => [
   {
     request: {
       query: GROUP_DETAIL_QUERY,
@@ -208,26 +264,41 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
+          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: true,
               endCursor: 'Mg',
               __typename: 'PageInfo'
             },
-            nodes: [
+            edges: [
               {
-                _id: '1',
-                description: '',
-                displayName: '',
-                title: `Outcome 1 - Group ${groupId}`,
-                __typename: 'LearningOutcome'
+                canUnlink: canEdit,
+                node: {
+                  _id: '1',
+                  description: '',
+                  displayName: '',
+                  title: `Outcome 1 - Group ${groupId}`,
+                  canEdit,
+                  contextId,
+                  contextType,
+                  __typename: 'LearningOutcome'
+                },
+                __typename: 'ContentTag'
               },
               {
-                _id: '2',
-                description: '',
-                displayName: '',
-                title: `Outcome 2 - Group ${groupId}`,
-                __typename: 'LearningOutcome'
+                canUnlink: canEdit,
+                node: {
+                  _id: '2',
+                  description: '',
+                  displayName: '',
+                  title: `Outcome 2 - Group ${groupId}`,
+                  canEdit,
+                  contextId,
+                  contextType,
+                  __typename: 'LearningOutcome'
+                },
+                __typename: 'ContentTag'
               }
             ],
             __typename: 'ContentTagConnection'
@@ -252,19 +323,27 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
+          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
               endCursor: 'Mw',
               __typename: 'PageInfo'
             },
-            nodes: [
+            edges: [
               {
-                _id: '3',
-                description: '',
-                displayName: '',
-                title: `Outcome 3 - Group ${groupId}`,
-                __typename: 'LearningOutcome'
+                canUnlink: canEdit,
+                node: {
+                  _id: '3',
+                  description: '',
+                  displayName: '',
+                  title: `Outcome 3 - Group ${groupId}`,
+                  canEdit,
+                  contextId,
+                  contextType,
+                  __typename: 'LearningOutcome'
+                },
+                __typename: 'ContentTag'
               }
             ],
             __typename: 'ContentTagConnection'

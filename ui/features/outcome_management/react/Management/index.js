@@ -118,7 +118,7 @@ const OutcomeManagementPanel = () => {
     }
   }
   const outcomeMenuHandler = (id, action) => {
-    setSelectedOutcome(group.outcomes.nodes.find(outcome => outcome._id === id))
+    setSelectedOutcome(group.outcomes.edges.find(edge => edge.node._id === id))
     if (action === 'remove') {
       openOutcomeRemoveModal()
     } else if (action === 'edit') {

@@ -25,33 +25,36 @@ import {IconMoreLine, IconEditLine, IconTrashLine, IconMoveEndLine} from '@instr
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 
-const OutcomeKebabMenu = ({menuTitle, onMenuHandler}) => (
-  <Menu
-    trigger={
-      <Button variant="icon" icon={IconMoreLine}>
-        <ScreenReaderContent>{menuTitle || I18n.t('Menu')}</ScreenReaderContent>
-      </Button>
-    }
-    onSelect={onMenuHandler}
-  >
-    <Menu.Item value="edit">
-      <IconEditLine size="x-small" />
-      <View padding="0 small">{I18n.t('Edit')}</View>
-    </Menu.Item>
-    <Menu.Item value="remove">
-      <IconTrashLine size="x-small" />
-      <View padding="0 small">{I18n.t('Remove')}</View>
-    </Menu.Item>
-    <Menu.Item value="move">
-      <IconMoveEndLine size="x-small" />
-      <View padding="0 small">{I18n.t('Move')}</View>
-    </Menu.Item>
-  </Menu>
-)
+const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy}) => {
+  return (
+    <Menu
+      trigger={
+        <Button variant="icon" icon={IconMoreLine}>
+          <ScreenReaderContent>{menuTitle || I18n.t('Menu')}</ScreenReaderContent>
+        </Button>
+      }
+      onSelect={onMenuHandler}
+    >
+      <Menu.Item value="edit">
+        <IconEditLine size="x-small" />
+        <View padding="0 small">{I18n.t('Edit')}</View>
+      </Menu.Item>
+      <Menu.Item disabled={!canDestroy} value="remove">
+        <IconTrashLine size="x-small" />
+        <View padding="0 small">{I18n.t('Remove')}</View>
+      </Menu.Item>
+      <Menu.Item value="move">
+        <IconMoveEndLine size="x-small" />
+        <View padding="0 small">{I18n.t('Move')}</View>
+      </Menu.Item>
+    </Menu>
+  )
+}
 
 OutcomeKebabMenu.propTypes = {
   onMenuHandler: PropTypes.func.isRequired,
-  menuTitle: PropTypes.string
+  menuTitle: PropTypes.string,
+  canDestroy: PropTypes.bool.isRequired
 }
 
 OutcomeKebabMenu.defaultProps = {

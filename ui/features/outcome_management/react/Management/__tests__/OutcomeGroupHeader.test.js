@@ -17,20 +17,30 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import {merge} from 'lodash'
 import OutcomeGroupHeader from '../OutcomeGroupHeader'
 
 describe('OutcomeGroupHeader', () => {
+  let onMenuHandlerMock
   const defaultProps = (props = {}) =>
     merge(
       {
         title: 'Group 3',
         description: 'Description',
-        onMenuHandler: jest.fn()
+        onMenuHandler: onMenuHandlerMock,
+        canManage: true
       },
       props
     )
+
+  beforeEach(() => {
+    onMenuHandlerMock = jest.fn()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('renders Outcome Group custom title when title prop provided', () => {
     const {getByText} = render(<OutcomeGroupHeader {...defaultProps()} />)
@@ -40,5 +50,22 @@ describe('OutcomeGroupHeader', () => {
   it('renders Outcome Group default title when title prop not provided', () => {
     const {getByText} = render(<OutcomeGroupHeader {...defaultProps({title: null})} />)
     expect(getByText('Outcomes')).toBeInTheDocument()
+  })
+
+  describe('OutcomeKebabMenu', () => {
+    it('renders OutcomeKebabMenu with functional move/edit/delete when canManage is true', () => {
+      const {getByText} = render(<OutcomeGroupHeader {...defaultProps({})} />)
+      const actions = ['Edit', 'Remove', 'Move']
+      actions.forEach(action => {
+        fireEvent.click(getByText('Outcome Group Menu'))
+        fireEvent.click(getByText(action))
+      })
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('does not render OutcomeKebabMenu when canManage is false', () => {
+      const {queryByText} = render(<OutcomeGroupHeader {...defaultProps({canManage: false})} />)
+      expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+    })
   })
 })

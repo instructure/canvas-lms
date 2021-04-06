@@ -47,14 +47,14 @@ describe('groupDetailHook', () => {
     await act(async () => jest.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(result.current.group.title).toBe('Group 1')
-    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1'
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1',
       'Outcome 3 - Group 1'
@@ -78,13 +78,13 @@ describe('groupDetailHook', () => {
     act(() => rerender('2'))
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 2')
-    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 1 - Group 2',
       'Outcome 2 - Group 2'
     ])
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
-    expect(result.current.group.outcomes.nodes.map(o => o.title)).toEqual([
+    expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 1 - Group 2',
       'Outcome 2 - Group 2',
       'Outcome 3 - Group 2'

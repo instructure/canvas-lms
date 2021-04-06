@@ -30,14 +30,26 @@ import OutcomeKebabMenu from './OutcomeKebabMenu'
 import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 
+// This allows account admins to edit global outcomes
+// within a course. See OUT-1415, OUT-1511
+const allowAdminEdit = () => {
+  return (
+    ENV.ROOT_OUTCOME_GROUP?.context_type === 'Course' &&
+    ENV.PERMISSIONS?.manage_outcomes &&
+    ENV.current_user_roles?.includes('admin')
+  )
+}
+
 const ManageOutcomeItem = ({
   id,
   title,
   description,
+  canManageOutcome,
   isFirst,
   isChecked,
   onMenuHandler,
-  onCheckboxHandler
+  onCheckboxHandler,
+  canUnlink
 }) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
@@ -97,12 +109,15 @@ const ManageOutcomeItem = ({
             </Heading>
           </div>
         </Flex.Item>
-        <Flex.Item>
-          <OutcomeKebabMenu
-            menuTitle={I18n.t('Outcome Menu')}
-            onMenuHandler={onMenuHandlerWrapper}
-          />
-        </Flex.Item>
+        {(canManageOutcome || allowAdminEdit()) && (
+          <Flex.Item>
+            <OutcomeKebabMenu
+              canDestroy={canUnlink}
+              menuTitle={I18n.t('Outcome Menu')}
+              onMenuHandler={onMenuHandlerWrapper}
+            />
+          </Flex.Item>
+        )}
       </Flex>
       <Flex as="div" alignItems="start">
         <Flex.Item size="4.125rem" />
@@ -134,7 +149,9 @@ ManageOutcomeItem.propTypes = {
   isFirst: PropTypes.bool,
   isChecked: PropTypes.bool.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
-  onCheckboxHandler: PropTypes.func.isRequired
+  onCheckboxHandler: PropTypes.func.isRequired,
+  canUnlink: PropTypes.bool.isRequired,
+  canManageOutcome: PropTypes.bool.isRequired
 }
 
 export default ManageOutcomeItem

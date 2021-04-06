@@ -60,7 +60,7 @@ const useGroupDetail = (id, loadOutcomesIsImported = false) => {
               ...data.group,
               outcomes: {
                 pageInfo: data.group.outcomes.pageInfo,
-                nodes: [...currentGroup.outcomes.nodes, ...data.group.outcomes.nodes]
+                edges: [...currentGroup.outcomes.edges, ...data.group.outcomes.edges]
               }
             })
           }

@@ -71,7 +71,8 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {nodes: [], pageInfo: {hasNextPage: false}}
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
+            canEdit: true
           }
         })}
       />
@@ -98,5 +99,27 @@ describe('ManageOutcomesView', () => {
   it('does not render component if outcomeGroup not provided', () => {
     const {queryByTestId} = render(<ManageOutcomesView {...defaultProps({outcomeGroup: null})} />)
     expect(queryByTestId('outcome-group-container')).not.toBeInTheDocument()
+  })
+
+  it('does not render the kebab menu if the group isnt editable', () => {
+    const {queryByText} = render(
+      <ManageOutcomesView
+        {...defaultProps({
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
+            canEdit: false
+          }
+        })}
+      />
+    )
+    expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+  })
+
+  it('renders the kebab menu if the group is editable', () => {
+    const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
+    expect(getByText('Outcome Group Menu')).toBeInTheDocument()
   })
 })

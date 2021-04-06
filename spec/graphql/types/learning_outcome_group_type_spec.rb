@@ -107,6 +107,12 @@ describe Types::LearningOutcomeGroupType do
     it "returns false for canEdit" do
       expect(outcome_group_type.resolve("canEdit")).to eq false
     end
+
+    it "returns false for canUnlink on the outcome edge" do
+      expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+        false, false
+      ])
+    end
   end
 
   context "when doesn't have context permission" do
@@ -155,6 +161,64 @@ describe Types::LearningOutcomeGroupType do
 
     it "accepts search_query in outcomes_count" do
       expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 1
+    end
+  end
+
+  describe "content tag links" do
+    it "canUnlink returns false if there are outcome alignments" do
+      @rubric = Rubric.new(context: Account.default)
+      @rubric.data = [
+        {
+          points: 3,
+          description: "Rubric with outcome",
+          id: 1,
+          data: [],
+          learning_outcome_id: @outcome1.id
+        }
+      ]
+      @rubric.save!
+      expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+        true, false
+      ])
+    end
+  end
+
+  describe "global outcomes" do
+    before do
+      @global_group = LearningOutcomeGroup.find_or_create_root(nil, true)
+      outcome_model(outcome_group: @global_group)
+    end
+
+    let(:outcome_group_type) { GraphQLTypeTester.new(@global_group, current_user: @user) }
+
+    describe "without manage_global_outcomes permission" do
+      before do
+        account_admin_user_with_role_changes(
+          account: Account.site_admin,
+          role_changes: {manage_global_outcomes: false}
+        )
+      end
+
+      it "canUnlink returns false" do
+        expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+          false
+        ])
+      end
+    end
+
+    describe "with manage_global_outcomes permission" do
+      before do
+        account_admin_user_with_role_changes(
+          account: Account.site_admin,
+          role_changes: {manage_global_outcomes: true}
+        )
+      end
+
+      it "canUnlink returns true" do
+        expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+          true
+        ])
+      end
     end
   end
 end

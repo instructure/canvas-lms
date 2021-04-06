@@ -29,7 +29,8 @@ describe('OutcomeKebabMenu', () => {
     merge(
       {
         menuTitle: groupMenuTitle,
-        onMenuHandler: onMenuHandlerMock
+        onMenuHandler: onMenuHandlerMock,
+        canDestroy: true
       },
       props
     )
@@ -90,6 +91,15 @@ describe('OutcomeKebabMenu', () => {
       fireEvent.click(menuItem)
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
       expect(onMenuHandlerMock.mock.calls[0][1]).toBe('move')
+    })
+
+    it('does not call menuHandler if canDestroy is false', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({canDestroy: false})} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('Remove')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(0)
     })
   })
 })

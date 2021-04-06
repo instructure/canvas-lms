@@ -32,6 +32,7 @@ const groupFragment = gql`
         description
         outcomesCount
         childGroupsCount
+        canEdit
       }
     }
   }
@@ -68,17 +69,24 @@ export const GROUP_DETAIL_QUERY = gql`
         description
         title
         outcomesCount
+        canEdit
         outcomes(first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
             endCursor
           }
-          nodes {
-            ... on LearningOutcome {
-              _id
-              description
-              title
-              displayName
+          edges {
+            canUnlink
+            node {
+              ... on LearningOutcome {
+                _id
+                description
+                title
+                displayName
+                canEdit
+                contextType
+                contextId
+              }
             }
           }
         }

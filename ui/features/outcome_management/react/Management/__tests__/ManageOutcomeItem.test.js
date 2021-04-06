@@ -29,6 +29,8 @@ describe('ManageOutcomeItem', () => {
     description: 'Outcome Description',
     isFirst: false,
     isChecked: false,
+    canManageOutcome: true,
+    canUnlink: true,
     onMenuHandler: onMenuHandlerMock,
     onCheckboxHandler: onCheckboxHandlerMock,
     ...props
@@ -121,5 +123,47 @@ describe('ManageOutcomeItem', () => {
     expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
     expect(onMenuHandlerMock.mock.calls[0][0]).toBe('1')
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
+  })
+
+  describe('when canManageOutcome is false', () => {
+    it('hides the kebab menu', () => {
+      const {queryByText} = render(
+        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+      )
+      expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
+    })
+
+    describe('with manage_outcomes permission', () => {
+      beforeEach(() => {
+        window.ENV = {
+          ROOT_OUTCOME_GROUP: {
+            context_type: 'Course'
+          },
+          PERMISSIONS: {
+            manage_outcomes: true
+          },
+          current_user_roles: ['admin']
+        }
+      })
+
+      afterEach(() => {
+        window.ENV = null
+      })
+
+      it('renders the kebab menu if the user is an admin within the course context', () => {
+        const {getByText} = render(
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+        )
+        expect(getByText('Outcome Menu')).toBeInTheDocument()
+      })
+
+      it('does not render the kebab menu if the user is not an admin', () => {
+        window.ENV.current_user_roles = []
+        const {queryByText} = render(
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+        )
+        expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
+      })
+    })
   })
 })

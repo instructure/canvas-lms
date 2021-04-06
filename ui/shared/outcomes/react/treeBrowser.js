@@ -71,6 +71,7 @@ const structFromGroup = (g, parentGroupId) => ({
   descriptor: groupDescriptor(g),
   collections: [],
   outcomesCount: g.outcomesCount,
+  canEdit: g.canEdit,
   parentGroupId
 })
 

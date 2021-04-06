@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ManageOutcomeItem from './ManageOutcomeItem'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 export default {
   title: 'Examples/Outcomes/ManageOutcomeItem',
@@ -28,11 +29,31 @@ export default {
     description: 'Outcome Description',
     isFirst: false,
     isChecked: false,
+    canManageOutcome: true,
+    canUnlink: true,
     onMenuHandler: () => {},
     onCheckboxHandler: () => {}
   }
 }
 
-const Template = args => <ManageOutcomeItem {...args} />
+const Template = args => {
+  return withContext(<ManageOutcomeItem {...args} />)
+}
+
+const withContext = (children, {contextType = 'Account', contextId = '1'} = {}) => (
+  <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+    {children}
+  </OutcomesContext.Provider>
+)
 
 export const Default = Template.bind({})
+
+export const withoutManagePermission = Template.bind({})
+withoutManagePermission.args = {
+  canManageOutcome: false
+}
+
+export const withoutDestroyPermission = Template.bind({})
+withoutDestroyPermission.args = {
+  canUnlink: false
+}

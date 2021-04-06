@@ -44,6 +44,7 @@ const ManageOutcomesView = ({
   const groupDescription = outcomeGroup?.description
   const outcomes = outcomeGroup?.outcomes
   const numOutcomes = outcomeGroup?.outcomesCount
+  const canManageGroup = outcomeGroup?.canEdit
 
   if (loading && !outcomeGroup) {
     return (
@@ -65,6 +66,7 @@ const ManageOutcomesView = ({
         <OutcomeGroupHeader
           title={groupTitle}
           description={groupDescription}
+          canManage={canManageGroup}
           minWidth="calc(50% + 4.125rem)"
           onMenuHandler={onOutcomeGroupMenuHandler}
         />
@@ -94,12 +96,14 @@ const ManageOutcomesView = ({
           </Heading>
         </View>
         <View as="div" data-testid="outcome-items-list">
-          {outcomes?.nodes.map(({_id, title, description}, index) => (
+          {outcomes?.edges?.map(({canUnlink, node: {_id, title, description, canEdit}}, index) => (
             <ManageOutcomeItem
               key={_id}
               id={_id}
               title={title}
               description={description}
+              canManageOutcome={canEdit}
+              canUnlink={canUnlink}
               isFirst={index === 0}
               isChecked={!!selectedOutcomes[_id]}
               onMenuHandler={onOutcomeMenuHandler}
@@ -118,12 +122,19 @@ ManageOutcomesView.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     outcomesCount: PropTypes.number.isRequired,
+    canEdit: PropTypes.bool.isRequired,
     outcomes: PropTypes.shape({
-      nodes: PropTypes.arrayOf(
+      edges: PropTypes.arrayOf(
         PropTypes.shape({
-          _id: PropTypes.string.isRequired,
-          title: PropTypes.string.isRequired,
-          description: PropTypes.string
+          canUnlink: PropTypes.bool.isRequired,
+          node: PropTypes.shape({
+            _id: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+            description: PropTypes.string,
+            canEdit: PropTypes.bool.isRequired,
+            contextType: PropTypes.string,
+            contextId: PropTypes.number
+          })
         })
       ),
       pageInfo: PropTypes.shape({
