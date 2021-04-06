@@ -288,4 +288,12 @@ describe "teacher k5 dashboard" do
       expect(instructor_bio(bio)).to be_displayed
     end
   end
+
+  context 'teacher schedule' do
+    it 'shows a sample preview for teacher view of the schedule tab' do
+      get "/#schedule"
+      
+      expect(teacher_preview).to be_displayed
+    end
+  end
 end

@@ -129,6 +129,10 @@ module K5PageObject
     "h2 div"
   end
 
+  def teacher_preview_selector
+    "h2:contains('Teacher Schedule Preview')"
+  end
+
   def previous_week_button_selector
     "//button[.//span[. = 'View previous week']]"
   end
@@ -289,6 +293,10 @@ module K5PageObject
 
   def grading_period_dropdown
     f(grading_period_dropdown_selector)
+  end
+
+  def teacher_preview
+    fj(teacher_preview_selector)
   end
 
   def beginning_of_week_date
