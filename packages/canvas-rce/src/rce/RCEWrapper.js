@@ -27,6 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import getCookie from 'get-cookie'
 
 import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'
@@ -46,8 +47,6 @@ import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
-
-import getCookie from 'get-cookie'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -145,6 +144,13 @@ export function storageAvailable() {
       storage.length !== 0
     )
   }
+}
+
+function getHtmlEditorCookie() {
+  const value = getCookie('rce.htmleditor')
+  return value === RAW_HTML_EDITOR_VIEW || value === PRETTY_HTML_EDITOR_VIEW
+    ? value
+    : PRETTY_HTML_EDITOR_VIEW
 }
 
 function renderLoading() {
@@ -560,6 +566,9 @@ class RCEWrapper extends React.Component {
         }, 200) // due to the animation it takes some time for fullscreen to complete
       }
     })
+    if (newView === PRETTY_HTML_EDITOR_VIEW || newView === RAW_HTML_EDITOR_VIEW) {
+      document.cookie = `rce.htmleditor=${newView};path=/;max-age=31536000`
+    }
   }
 
   _isFullscreen() {
@@ -1476,6 +1485,7 @@ class RCEWrapper extends React.Component {
           path={this.state.path}
           wordCount={this.state.wordCount}
           editorView={this.state.editorView}
+          preferredHtmlEditor={getHtmlEditorCookie()}
           onResize={this.onResize}
           onKBShortcutModalOpen={this.openKBShortcutModal}
           onA11yChecker={this.onA11yChecker}

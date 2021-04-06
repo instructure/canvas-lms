@@ -56,7 +56,6 @@
   "dependencies": {
     "@instructure/canvas-media": ">=1.0.0",
     "@instructure/canvas-theme": "7",
-    "@instructure/js-utils": "1",
     "@instructure/k5uploader": ">=1",
     "@instructure/media-capture": "~7.1.0",
     "@instructure/ui-a11y-content": "7",
@@ -108,6 +107,7 @@
     "classnames": "^2.2.5",
     "format-message": "^6",
     "format-message-generate-id": "^6",
+    "get-cookie": "1",
     "i18n-js": "^3",
     "i18nliner": "~0.2.0",
     "isomorphic-fetch": "2.2.1",

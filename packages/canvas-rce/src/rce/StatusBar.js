@@ -37,9 +37,9 @@ import {
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
 
-export const WYSIWYG_VIEW = Symbol('WYSIWYG')
-export const PRETTY_HTML_EDITOR_VIEW = Symbol('PRETTY')
-export const RAW_HTML_EDITOR_VIEW = Symbol('RAW')
+export const WYSIWYG_VIEW = 'WYSIWYG'
+export const PRETTY_HTML_EDITOR_VIEW = 'PRETTY'
+export const RAW_HTML_EDITOR_VIEW = 'RAW'
 
 // I don't know why eslint is reporting this, the props are all used
 /* eslint-disable react/no-unused-prop-types */
@@ -52,7 +52,8 @@ StatusBar.propTypes = {
   onKBShortcutModalOpen: func.isRequired,
   onA11yChecker: func.isRequired,
   onFullscreen: func.isRequired,
-  use_rce_pretty_html_editor: bool
+  use_rce_pretty_html_editor: bool,
+  preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW])
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -114,6 +115,19 @@ export default function StatusBar(props) {
       setIncludeEdtrDesc(props.use_rce_pretty_html_editor && !isHtmlView())
     }, 100)
   }, [props.editorView]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function preferredHtmlEditor() {
+    if (props.preferredHtmlEditor) return props.preferredHtmlEditor
+    return props.use_rce_pretty_html_editor ? PRETTY_HTML_EDITOR_VIEW : RAW_HTML_EDITOR_VIEW
+  }
+
+  function getHtmlEditorView(event) {
+    if (!props.use_rce_pretty_html_editor) return RAW_HTML_EDITOR_VIEW
+    if (!event.shiftKey) return preferredHtmlEditor()
+    return preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
+      ? PRETTY_HTML_EDITOR_VIEW
+      : RAW_HTML_EDITOR_VIEW
+  }
 
   function handleKey(event) {
     const buttons = findFocusable(statusBarRef.current)
@@ -235,10 +249,22 @@ export default function StatusBar(props) {
     )
   }
 
+  function descMsg() {
+    return preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
+      ? formatMessage('Shift-O to open the pretty html editor.')
+      : formatMessage(
+          'The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor.'
+        )
+  }
+
   function renderToggleHtml() {
-    const toggleToHtml = formatMessage('Switch to html editor')
-    const toggleToRich = formatMessage('Switch to rich text editor')
-    const toggleText = isHtmlView() ? toggleToRich : toggleToHtml
+    const toggleToHtml = formatMessage('Switch to the html editor')
+    const toggleToRich = formatMessage('Switch to the rich text editor')
+    const toggleToHtmlTip = props.use_rce_pretty_html_editor
+      ? formatMessage('Click or shift-click for the html editor.')
+      : toggleToHtml
+    const descText = isHtmlView() ? toggleToRich : toggleToHtml
+    const titleText = isHtmlView() ? toggleToRich : toggleToHtmlTip
 
     return (
       <View display="inline-block" padding="0 0 0 x-small">
@@ -246,34 +272,33 @@ export default function StatusBar(props) {
           data-btn-id="rce-edit-btn"
           variant="link"
           icon={emptyTagIcon()}
-          onClick={() => {
-            const html_view = props.use_rce_pretty_html_editor
-              ? PRETTY_HTML_EDITOR_VIEW
-              : RAW_HTML_EDITOR_VIEW
-            props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : html_view)
+          onClick={event => {
+            props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : getHtmlEditorView(event))
           }}
           onKeyUp={event => {
             if (
               props.use_rce_pretty_html_editor &&
-              props.editorView !== PRETTY_HTML_EDITOR_VIEW &&
+              props.editorView === WYSIWYG_VIEW &&
               event.shiftKey &&
               event.keyCode === 79
             ) {
-              props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : RAW_HTML_EDITOR_VIEW)
+              const html_view =
+                preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
+                  ? PRETTY_HTML_EDITOR_VIEW
+                  : RAW_HTML_EDITOR_VIEW
+              props.onChangeView(html_view)
             }
           }}
           onFocus={() => setFocusedBtnId('rce-edit-btn')}
-          title={toggleText}
+          title={titleText}
           tabIndex={tabIndexForBtn('rce-edit-btn')}
           aria-describedby={includeEdtrDesc ? 'edit-button-desc' : undefined}
         >
-          <ScreenReaderContent>{toggleText}</ScreenReaderContent>
+          <ScreenReaderContent>{descText}</ScreenReaderContent>
         </Button>
         {includeEdtrDesc && (
           <span style={{display: 'none'}} id="edit-button-desc">
-            {formatMessage(
-              'The html editor is not keyboard accessible. Press Shift O to open the raw html view.'
-            )}
+            {descMsg()}
           </span>
         )}
       </View>
