@@ -103,7 +103,6 @@ RUN --mount=target=/tmp/src \
     config/browsers.yml \
     config/canvas_rails_switcher.rb \
     config/environment.rb \
-    config/initializers/plugin_symlinks.rb \
     config/initializers/json.rb \
     config/initializers/revved_asset_urls.rb \
     db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb \

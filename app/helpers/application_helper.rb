@@ -294,7 +294,10 @@ module ApplicationHelper
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
-    bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
+    bundle_path = plugin ?
+      "../../gems/plugins/#{plugin}/app/stylesheets/#{bundle_name}" :
+      "bundles/#{bundle_name}"
+
     cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
     base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant(opts)
     File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")

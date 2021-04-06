@@ -5,7 +5,6 @@ require 'json'
 namespace :js do
   desc "Build development webpack js"
   task :webpack_development do
-    require 'config/initializers/plugin_symlinks'
     puts "--> Building DEVELOPMENT webpack bundles"
     system "yarn run webpack-development"
     raise "Error running js:webpack_development: \nABORTING" if $?.exitstatus != 0
@@ -13,7 +12,6 @@ namespace :js do
 
   desc "Build production webpack js"
   task :webpack_production do
-    require 'config/initializers/plugin_symlinks'
     puts "--> Building PRODUCTION webpack bundles"
     system "yarn run webpack-production"
     raise "Error running js:webpack_production: \nABORTING" if $?.exitstatus != 0

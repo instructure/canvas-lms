@@ -45,15 +45,6 @@ npm-debug.log
 /vendor/bundle
 yarn-error.log
 
-# generated plugin stuff
-/app/coffeescripts/plugins/
-/app/stylesheets/plugins/
-/app/views/jst/plugins/
-/public/javascripts/plugins/
-/public/plugins/
-/spec/coffeescripts/plugins/
-/spec/plugins/
-
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp

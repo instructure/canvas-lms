@@ -22,6 +22,8 @@ const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
+const glob = require('glob')
+const { promisify } = require('util')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
@@ -36,6 +38,8 @@ const RESOURCE_JSA_SPLIT_SPEC = /^\.\/[a-f].*Spec$/
 const RESOURCE_JSG_SPLIT_SPEC = /^\.\/g.*Spec$/
 const RESOURCE_JSH_SPLIT_SPEC = /^\.\/[h-z].*Spec$/
 
+const WEBPACK_PLUGIN_SPECS = path.resolve(__dirname, 'tmp/webpack-plugin-specs.js')
+
 testWebpackConfig.entry = undefined
 
 testWebpackConfig.plugins.push(
@@ -45,7 +49,8 @@ testWebpackConfig.plugins.push(
     CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
     RESOURCE_COFFEESCRIPT_SPEC,
     RESOURCE_EMBER_GRADEBOOK_SPEC,
-    RESOURCE_JSX_SPEC
+    RESOURCE_JSX_SPEC,
+    WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
   })
 )
 
@@ -215,6 +220,33 @@ if (process.env.SENTRY_DSN) {
     ]
   }));
 }
+
+class PluginSpecsRunner {
+  constructor({ pattern, outfile }) {
+    this.pattern = pattern
+    this.outfile = outfile
+  }
+
+  apply(compiler) {
+    compiler.hooks.beforeCompile.tapAsync('PluginSpecsRunner', (_, callback) => {
+      glob(this.pattern, { absolute: true }, (e, files) => {
+        if (e) { return callback(e) }
+
+        fs.writeFile(
+          this.outfile,
+          files.map(x => `require("${x}")`).join('\n'),
+          'utf8',
+          callback
+        )
+      })
+    })
+  }
+}
+
+testWebpackConfig.plugins.push(new PluginSpecsRunner({
+  pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
+  outfile: WEBPACK_PLUGIN_SPECS
+}))
 
 testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(__dirname, CONTEXT_EMBER_GRADEBOOK_SPEC)
 testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(__dirname, CONTEXT_COFFEESCRIPT_SPEC)
