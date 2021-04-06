@@ -21,11 +21,25 @@ class AddCourseTemplateColumns < ActiveRecord::Migration[6.0]
   tag :predeploy
   disable_ddl_transaction!
 
-  def change
-    add_column :courses, :template, :boolean, default: false, null: false, if_not_exists: true
+  def up
+    new_pg = connection.postgresql_version >= 110000
+    defaults = new_pg ? { default: false, null: false } : {}
+
+    add_column :courses, :template, :boolean, if_not_exists: true, **defaults
     add_index :courses, :root_account_id, where: "template", algorithm: :concurrently, if_not_exists: true
     add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
     add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
     add_index :accounts, :course_template_id, where: "course_template_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true
+
+    unless new_pg
+      change_column_default :courses, :template, false
+      DataFixup::BackfillNulls.run(Course, :template, default_value: false)
+      change_column_null :courses, :template, false
+    end
+  end
+
+  def down
+    remove_column :courses, :template
+    remove_column :accounts, :course_template_id
   end
 end
