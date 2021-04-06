@@ -69,7 +69,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
   const datesInteraction = () =>
     canManage && selectedApplicabilityValue === 'course' ? 'enabled' : 'disabled'
 
-  const formatDate = date => tz.format(date, '%b %-d, %Y at %-l:%M%P %Z')
+  const formatDate = date => tz.format(date, 'date.formats.full')
 
   const participationExplanationText = () => {
     return selectedApplicabilityValue === 'term'
