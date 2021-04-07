@@ -63,4 +63,13 @@ describe Types::DiscussionType do
     discussion.context_module_tags.create!(context_module: module2, context: discussion.course, tag_type: 'context_module')
     expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
   end
+
+  context 'graded discussion' do
+    it 'allows querying the assignment type on a discussion' do
+      Assignment::ALLOWED_GRADING_TYPES.each do |grading_type|
+        discussion.assignment.update!(grading_type: grading_type)
+        expect(discussion_type.resolve('assignment { gradingType }')).to eq grading_type
+      end
+    end
+  end
 end
