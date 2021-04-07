@@ -339,7 +339,7 @@
     "webpack": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --progress --color --watch",
     "webpack-development": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color",
     "webpack-production": "NODE_ENV=production gulp rev && NODE_ENV=production NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color",
-    "workspace-run": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report -c $@; exit $?; } && r",
+    "workspace-run": "r() { wsrun --fast-exit --exclude-missing --report -c $@; exit $?; } && r",
     "workspace-run-serial": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report --serial -c $@; exit $?; } && r",
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
