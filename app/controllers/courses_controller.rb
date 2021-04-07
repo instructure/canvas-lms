@@ -2044,7 +2044,8 @@ class CoursesController < ApplicationController
 
       @context_enrollment ||= @pending_enrollment
       if @context.grants_right?(@current_user, session, :read)
-        @k5_mode = @context.elementary_subject_course?
+        # Temporarily disabled in production (see https://instructure.atlassian.net/browse/LS-2118)
+        @k5_mode = @context.elementary_subject_course? && !Rails.env.production?
         @show_left_side = !@k5_mode
 
         check_for_readonly_enrollment_state
