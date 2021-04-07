@@ -513,6 +513,28 @@ module PostgreSQLAdapterExtensions
                       end
     execute("ALTER TABLE #{quote_table_name(table)} REPLICA IDENTITY #{identity_clause}")
   end
+
+  class AbortExceptionMatcher
+    def self.===(other)
+      return true if defined?(IRB::Abort) && other.is_a?(IRB::Abort)
+
+      false
+    end
+  end
+
+  def execute(*)
+    super
+  rescue AbortExceptionMatcher
+    @connection.cancel
+    raise
+  end
+
+  def exec_query(*)
+    super
+  rescue AbortExceptionMatcher
+    @connection.cancel
+    raise
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
