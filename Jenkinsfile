@@ -649,13 +649,13 @@ pipeline {
                   }
 
                   echo 'adding Vendored Gems'
-                  extendedStage('Vendored Gems').queue(stages) {
-                      buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
-                        string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                        string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                        string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ], "Vendored Gems")
-                  }
+                  extendedStage('Vendored Gems')
+                    .handler(buildSummaryReport)
+                    .queue(stages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ])
 
                   extendedStage(JS_BUILD_IMAGE_STAGE).handler(buildSummaryReport).queue(stages) {
                     credentials.withStarlordCredentials {
@@ -685,21 +685,21 @@ pipeline {
                   }
 
                   echo 'adding Contract Tests'
-                  extendedStage('Contract Tests').queue(stages) {
-                    buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
+                  extendedStage('Contract Tests')
+                    .handler(buildSummaryReport)
+                    .queue(stages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], "Contract Tests")
-                  }
+                    ])
 
                   if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                     echo 'adding CDC Schema check'
-                    extendedStage('CDC Schema Check').queue(stages) {
-                      buildSummaryReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
+                    extendedStage('CDC Schema Check')
+                      .handler(buildSummaryReport)
+                      .queue(stages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
                         string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                      ], "CDC Schema Check")
-                    }
+                      ])
                   }
                   else {
                     echo 'no migrations added, skipping CDC Schema check'
@@ -713,13 +713,13 @@ pipeline {
                     )
                   ) {
                     echo 'adding Flakey Spec Catcher'
-                    extendedStage('Flakey Spec Catcher').queue(stages) {
-                      buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
+                    extendedStage('Flakey Spec Catcher')
+                      .handler(buildSummaryReport)
+                      .queue(stages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
                         string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                         string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ], "Flakey Spec Catcher")
-                    }
+                      ])
                   }
 
                   // Flakey spec catcher using the dir step above will create this @tmp file, we need to remove it
@@ -730,9 +730,9 @@ pipeline {
 
                   if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                     echo 'adding Local Docker Dev Build'
-                    extendedStage('Local Docker Dev Build').queue(stages) {
-                      buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, "Local Docker Dev Build")
-                    }
+                    extendedStage('Local Docker Dev Build')
+                      .handler(buildSummaryReport)
+                      .queue(stages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
                   }
 
                   if(configuration.isChangeMerged()) {
@@ -767,28 +767,28 @@ pipeline {
             def nestedStages = [:]
 
             echo 'adding Javascript (Jest)'
-            extendedStage('Javascript (Jest)').queue(nestedStages) {
-              buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+            extendedStage('Javascript (Jest)')
+              .handler(buildSummaryReport)
+              .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "jest"),
-              ], "Javascript (Jest)")
-            }
+              ])
 
             echo 'adding Javascript (Coffeescript)'
-            extendedStage('Javascript (Coffeescript)').queue(nestedStages) {
-              buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+            extendedStage('Javascript (Coffeescript)')
+              .handler(buildSummaryReport)
+              .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "coffee"),
-              ], "Javascript (Coffeescript)")
-            }
+              ])
 
             echo 'adding Javascript (Karma)'
-            extendedStage('Javascript (Karma)').queue(nestedStages) {
-              buildSummaryReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+            extendedStage('Javascript (Karma)')
+              .handler(buildSummaryReport)
+              .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "karma"),
-              ], "Javascript (Karma)")
-            }
+              ])
 
             parallel(nestedStages)
           }
