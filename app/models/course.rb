@@ -751,15 +751,15 @@ class Course < ActiveRecord::Base
     enrollment_completed_sql = ""
 
     if args[1].blank?
-      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS c ON c.id = caa.course_id
-        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = c.enrollment_term_id
-        WHERE (c.workflow_state<>'completed' AND
-          (c.conclude_at IS NULL OR c.conclude_at >= ?) AND
-          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS courses ON courses.id = caa.course_id
+        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
+        WHERE courses.workflow_state<>'completed' AND
+          ((et.end_at IS NULL OR et.end_at >= :end) OR
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
       enrollment_completed_sql = sanitize_sql(["INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
-        WHERE (courses.workflow_state<>'completed' AND
-          (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
-          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+        WHERE courses.workflow_state<>'completed' AND
+          ((et.end_at IS NULL OR et.end_at >= :end) OR
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
     end
 
     distinct.joins("INNER JOIN (

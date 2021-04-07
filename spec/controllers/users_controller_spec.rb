@@ -361,11 +361,10 @@ describe UsersController do
         course1.workflow_state = 'completed'
         course1.save!
 
-        course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
-        course2 = @course
-        course2.start_at = 7.days.ago
-        course2.conclude_at = 1.day.ago
-        course2.save!
+        past_term = EnrollmentTerm.create(start_at: 14.days.ago, end_at:7.days.ago, root_account: @teacher.account)
+        course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+
+        course_with_teacher(:course_name => "MyOldCourse", :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
 
         course_with_teacher(:course_name => "MyCourse3", :user => @teacher, :active_all => 1)
       end
@@ -386,6 +385,55 @@ describe UsersController do
         courses = json_parse
         expect(courses.map { |c| c['id'] }).to eq [@course.id]
       end
+
+      it "should include concluded courses for teachers when passing include = 'concluded'" do
+        get 'manageable_courses', params: {:user_id => @teacher.id, :include => 'concluded'}
+        expect(response).to be_successful
+        courses = json_parse
+
+        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyCourse1','MyCourse2','MyCourse3',"MyOldCourse"].sort
+      end
+
+      it "should include concluded courses for admins when passing include = 'concluded'" do
+        account_admin_user
+        user_session(@admin)
+
+        get 'manageable_courses', params: {:user_id => @admin.id, :include => 'concluded'}
+        expect(response).to be_successful
+        courses = json_parse
+
+        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyCourse1','MyCourse2','MyCourse3',"MyOldCourse"].sort
+      end
+
+      it "should include courses with overridden dates as not concluded for teachers if the course period is active" do
+        my_old_course = Course.find_by(course_code: 'MyOldCourse')
+        my_old_course.restrict_enrollments_to_course_dates = true
+        my_old_course.start_at = 2.weeks.ago
+        my_old_course.conclude_at = 2.weeks.from_now
+        my_old_course.save!
+
+        get 'manageable_courses', params: {:user_id => @teacher.id}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['course_code'] }).to include('MyOldCourse')
+      end
+
+      it "should include courses with overridden dates as not concluded for admins if the course period is active" do
+        my_old_course = Course.find_by(course_code: 'MyOldCourse')
+        my_old_course.restrict_enrollments_to_course_dates = true
+        my_old_course.start_at = 2.weeks.ago
+        my_old_course.conclude_at = 2.weeks.from_now
+        my_old_course.save!
+
+        account_admin_user
+        user_session(@admin)
+
+        get 'manageable_courses', params: {:user_id => @admin.id}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['course_code'] }).to include('MyOldCourse')
+      end
+
     end
 
     context "sharding" do
