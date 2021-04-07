@@ -287,6 +287,8 @@ class CollaborationsController < ApplicationController
         format.json { render :json => @collaboration.errors, :status => :bad_request }
       end
     end
+  rescue Collaboration::InvalidCollaborationType
+    head :bad_request
   end
 
   def update
