@@ -30,6 +30,18 @@ describe('DiscussionPostToolbar', () => {
       const component = setup()
       expect(component).toBeTruthy()
     })
+
+    it('should not render Collapse Toggle by default', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('collapseToggle')).toBeNull()
+    })
+
+    it('should render Collapse Toggle when onCollapseRepliesToggle present', () => {
+      const {queryByTestId} = setup({
+        onCollapseRepliesToggle: jest.fn()
+      })
+      expect(queryByTestId('collapseToggle')).toBeTruthy()
+    })
   })
 
   describe('Search Field', () => {

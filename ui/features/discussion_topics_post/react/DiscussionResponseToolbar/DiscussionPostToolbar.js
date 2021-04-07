@@ -53,7 +53,7 @@ const DiscussionPostToolbar = props => {
       <Flex width="100%">
         <Flex.Item align="start" shouldGrow>
           <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t('Checkbox examples')}</ScreenReaderContent>}
+            description={<ScreenReaderContent>{I18n.t('Discussion Actions')}</ScreenReaderContent>}
             vAlign="middle"
             layout="columns"
           >
@@ -110,14 +110,16 @@ const DiscussionPostToolbar = props => {
               </Button>
             </Tooltip>
 
-            <Checkbox
-              label={I18n.t('Collapse Replies')}
-              variant="toggle"
-              size="small"
-              defaultChecked={props.isCollapsedReplies}
-              onChange={props.onCollapseRepliesToggle}
-              data-testid="collapseToggle"
-            />
+            {props.onCollapseRepliesToggle && (
+              <Checkbox
+                label={I18n.t('Collapse Replies')}
+                variant="toggle"
+                size="small"
+                defaultChecked={props.isCollapsedReplies}
+                onChange={props.onCollapseRepliesToggle}
+                data-testid="collapseToggle"
+              />
+            )}
           </FormFieldGroup>
         </Flex.Item>
         <Flex.Item align="end">
