@@ -44,7 +44,7 @@ import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
-import '../../../boot/initializers/trackGoogleAnalyticsEventsOnClick.js'
+import '../../../boot/initializers/trackGoogleAnalyticsEventsOnClick'
 
 let preview_counter = 0
 function previewId() {
@@ -206,11 +206,13 @@ export function enhanceUserContent() {
 
   $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
     const $link = $(this)
-    $('.user_content.unenhanced:visible')
-    const apiReturnType = $link.data('api-returntype')
-    const isFile = apiReturnType == null || apiReturnType === 'File'
-    if ($link.find('.ui-icon-extlink').length || !isFile) {
-      // a bug in the new RCE added instructure_file_link class name to external and internal links for a while
+    const href = new URL($link[0].href)
+    const matchesCanvasFile = href.pathname.match(
+      /(?:\/(courses|groups|users)\/(\d+))?\/files\/(\d+)/
+    )
+    if (!matchesCanvasFile) {
+      // a bug in the new RCE added instructure_file_link class name to all links
+      // only proceed if this is a canvas file link
       return
     }
     let $download_btn, $preview_link, $preview_container
@@ -220,7 +222,6 @@ export function enhanceUserContent() {
       const preview_id = previewId()
       $preview_container = $('<div role="region" />').attr('id', preview_id).css('display', 'none')
       if (ENV.FEATURES?.rce_better_file_downloading) {
-        const href = new URL($link[0].href)
         const qs = href.searchParams
         qs.delete('wrap')
         qs.append('download_frd', '1')

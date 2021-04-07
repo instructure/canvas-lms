@@ -82,6 +82,7 @@ export default function HomeroomAnnouncement({
               title={attachment.filename}
               /* classes request download button and preview overlay in instructure.js's postprocessing */
               className="instructure_file_link preview_in_overlay"
+              data-api-returntype="File"
             >
               {attachment.display_name}
             </a>
