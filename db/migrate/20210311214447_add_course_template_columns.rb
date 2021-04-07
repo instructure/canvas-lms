@@ -27,9 +27,10 @@ class AddCourseTemplateColumns < ActiveRecord::Migration[6.0]
 
     add_column :courses, :template, :boolean, if_not_exists: true, **defaults
     add_index :courses, :root_account_id, where: "template", algorithm: :concurrently, if_not_exists: true
-    add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
-    add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
-    add_index :accounts, :course_template_id, where: "course_template_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true
+    add_reference :accounts, :course_template,
+                  if_not_exists: true,
+                  index: { where: "course_template_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true },
+                  foreign_key: { to_table: :courses }
 
     unless new_pg
       change_column_default :courses, :template, false
