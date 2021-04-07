@@ -133,7 +133,7 @@ module Canvas
             "security_token"=>"fake-security-token"
           }
         }
-        allow(ConfigFile).to receive(:load).with("vault_contents").and_return(creds_hash)
+        allow(ConfigFile).to receive(:load).and_return(creds_hash)
         allow(described_class).to receive(:config).and_return(local_config)
         result = described_class.read(cred_path)
         expect(result[:security_token]).to eq("fake-security-token")
