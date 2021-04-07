@@ -289,7 +289,7 @@ module PostgreSQLAdapterExtensions
       raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
                                  "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
     elsif matching_indexes.none?
-      return if options[:if_exists]
+      return if options.is_a?(Hash) && options[:if_exists]
       raise ArgumentError, "No indexes found on #{table_name} with the options provided."
     else
       matching_indexes.first.name
