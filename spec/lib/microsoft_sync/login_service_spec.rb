@@ -31,14 +31,13 @@ describe MicrosoftSync::LoginService do
 
     context 'when not configured' do
       before do
-        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(Canvas::DynamicSettings).to receive(:find).with('microsoft-sync').and_return(nil)
+        allow(Rails.application.credentials).to receive(:microsoft_sync).and_return(nil)
       end
 
       it 'returns an error "MicrosoftSync not configured"' do
         expect {
           described_class.new_token('abc')
-        }.to raise_error(/MicrosoftSync not configured/)
+        }.to raise_error(/Missing MicrosoftSync creds/)
       end
     end
 
@@ -46,10 +45,9 @@ describe MicrosoftSync::LoginService do
       subject { described_class.new_token('mytenant') }
 
       before do
-        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(Canvas::DynamicSettings).to receive(:find).with('microsoft-sync').and_return({
-          'client-id' => 'theclientid',
-          'client-secret' => 'thesecret'
+        allow(Rails.application.credentials).to receive(:microsoft_sync).and_return({
+          client_id: 'theclientid',
+          client_secret: 'thesecret'
         })
 
         WebMock.stub_request(
