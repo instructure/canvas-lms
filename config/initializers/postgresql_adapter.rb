@@ -506,3 +506,97 @@ module PostgreSQLAdapterExtensions
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
+
+
+module SchemaCreationExtensions
+  def set_table_context(table)
+    @table = table
+  end
+
+  def visit_AlterTable(o)
+    set_table_context(o.name)
+    super
+  end
+
+  def visit_TableDefinition(o)
+    set_table_context(o.name)
+    super
+  end
+
+  def visit_ColumnDefinition(o)
+    column_sql = super
+    column_sql << " " << foreign_key_column_constraint(@table, o.foreign_key[:to_table], column: o.name, **o.foreign_key) if o.foreign_key
+    column_sql
+  end
+
+  def visit_ForeignKeyDefinition(o, constraint_type: :table)
+    sql = +"CONSTRAINT #{quote_column_name(o.name)}"
+    sql << " FOREIGN KEY (#{quote_column_name(o.column)})" if constraint_type == :table
+    sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
+    sql << " #{action_sql('DELETE', o.on_delete)}" if o.on_delete
+    sql << " #{action_sql('UPDATE', o.on_update)}" if o.on_update
+    sql
+  end
+
+  def foreign_key_column_constraint(from_table, to_table, options)
+    prefix = ActiveRecord::Base.table_name_prefix
+    suffix = ActiveRecord::Base.table_name_suffix
+    to_table = "#{prefix}#{to_table}#{suffix}"
+
+    options = foreign_key_options(from_table, to_table, options)
+    fk = ActiveRecord::ConnectionAdapters::ForeignKeyDefinition.new(from_table, to_table, options)
+    visit_ForeignKeyDefinition(fk, constraint_type: :column)
+  end
+end
+
+module ColumnDefinitionExtensions
+  def foreign_key
+    options[:foreign_key]
+  end
+
+  def foreign_key=(value)
+    options[:foreign_key] = value
+  end
+end
+
+module ReferenceDefinitionExtensions
+  def add_to(table)
+    columns.each do |name, type, options|
+      options = options.merge(foreign_key: foreign_key_options) if foreign_key
+      table.column(name, type, **options)
+    end
+
+    if index
+      if CANVAS_RAILS6_0
+        table.index(column_names, index_options)
+      else
+        table.index(column_names, **index_options(table.name))
+      end
+    end
+  end
+
+  def foreign_key_options
+    as_options(foreign_key).merge(column: column_name, to_table: foreign_table_name)
+  end
+
+  def foreign_table_name
+    as_options(foreign_key).fetch(:to_table) do
+      ActiveRecord::Base.pluralize_table_names ? name.to_s.pluralize : name
+    end
+  end
+end
+
+module SchemaStatementsExtensions
+  def add_column_for_alter(table_name, column_name, type, **options)
+    td = create_table_definition(table_name)
+    cd = td.new_column_definition(column_name, type, **options)
+    schema = schema_creation
+    schema.set_table_context(table_name)
+    schema.accept(AddColumnDefinition.new(cd))
+  end
+end
+
+ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::SchemaCreation.prepend(SchemaCreationExtensions)
+ActiveRecord::ConnectionAdapters::ColumnDefinition.prepend(ColumnDefinitionExtensions)
+ActiveRecord::ConnectionAdapters::ReferenceDefinition.prepend(ReferenceDefinitionExtensions)
+ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(SchemaStatementsExtensions)
