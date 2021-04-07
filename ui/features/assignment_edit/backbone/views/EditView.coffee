@@ -639,14 +639,16 @@ export default class EditView extends ValidatedFormView
     @handleGroupCategoryChange()
     @handleAnonymousGradingChange()
 
-    if ENV.ANNOTATED_DOCUMENT_SUBMISSIONS && ENV.ANNOTATED_DOCUMENT
-      @setAnnotatedDocument({
-        id: ENV.ANNOTATED_DOCUMENT.id,
-        name: ENV.ANNOTATED_DOCUMENT.display_name,
-        contextType: pluralize(ENV.ANNOTATED_DOCUMENT.context_type).toLowerCase(),
-        contextId: ENV.ANNOTATED_DOCUMENT.context_id,
-      })
-      @renderAnnotatedDocumentSelector()
+    if ENV.ANNOTATED_DOCUMENT_SUBMISSIONS
+      if ENV.ANNOTATED_DOCUMENT
+        @setAnnotatedDocument({
+          id: ENV.ANNOTATED_DOCUMENT.id,
+          name: ENV.ANNOTATED_DOCUMENT.display_name,
+          contextType: pluralize(ENV.ANNOTATED_DOCUMENT.context_type).toLowerCase(),
+          contextId: ENV.ANNOTATED_DOCUMENT.context_id,
+        })
+
+      @renderAnnotatedDocumentSelector() if @$allowAnnotatedDocument.prop('checked')
       @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
 
     if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED

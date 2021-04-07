@@ -2079,20 +2079,35 @@ QUnit.module('EditView annotatable document submission', hooks => {
       server.restore()
     })
 
+    test('renders a file browser when creating new assignment and defaults to Annotated Document', function () {
+      delete ENV.ANNOTATED_DOCUMENT
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
+      const fileBrowserContainer = document.getElementById('annotated_document_chooser_container')
+      ok(fileBrowserContainer.textContent.includes('Loading'))
+    })
+
     test('renders the filename if attachment is present', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       const file = document.querySelector('div#annotated_document_chooser_container span')
       strictEqual(file.textContent, filename)
     })
 
     test('renders a remove button if attachment is present', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       const button = document.querySelector('div#annotated_document_chooser_container button')
       strictEqual(button.textContent, 'Remove selected attachment')
     })
 
     test('clicking the remove button de-selects the file', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       document.querySelector('div#annotated_document_chooser_container button').click()
       const container = document.querySelector('div#annotated_document_chooser_container')
       notOk(container.textContent.includes(filename))
@@ -2144,7 +2159,9 @@ QUnit.module('EditView annotatable document submission', hooks => {
     })
 
     test('clicking the remove button unmount usage rights container properly', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       document.querySelector('div#annotated_document_chooser_container button').click()
       const container = document.querySelector('#annotated_document_usage_rights_container')
       strictEqual(container.innerHTML, '')
