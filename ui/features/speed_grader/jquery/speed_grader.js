@@ -1536,8 +1536,9 @@ EG = {
       let maxAttempts = false
       let tooltipText = ''
       if (submittedAt) {
+        const {allowed_attempts} = window.jsonData
         maxAttempts =
-          window.jsonData.allowed_attempts != null
+          allowed_attempts != null && allowed_attempts > 0
             ? (this.currentStudent.submission.attempt || 1) >= window.jsonData.allowed_attempts
             : false
         submittedAt = new Date(submittedAt)
