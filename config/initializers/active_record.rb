@@ -1541,12 +1541,12 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     primary_column = klass.primary_key
     index_name = "index_#{klass.table_name}_replica_identity"
     add_index klass.table_name, [column_name, primary_column], name: index_name, algorithm: :concurrently, unique: true, if_not_exists: true
-    execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY USING INDEX #{index_name}])
+    set_replica_identity klass.table_name, index_name
   end
 
   def remove_replica_identity(model_name)
     klass = model_name.constantize
-    execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY DEFAULT])
+    set_replica_identity klass.table_name, :default
     remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
   end
 end

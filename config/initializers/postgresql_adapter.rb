@@ -503,6 +503,16 @@ module PostgreSQLAdapterExtensions
       select_value("SELECT pg_current_xlog_location()")
     end
   end
+
+  def set_replica_identity(table, identity)
+    identity_clause = case identity
+                      when :default, :full, :nothing
+                        identity.to_s.upcase
+                      else
+                        "USING INDEX #{quote_column_name(identity)}"
+                      end
+    execute("ALTER TABLE #{quote_table_name(table)} REPLICA IDENTITY #{identity_clause}")
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
