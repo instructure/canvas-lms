@@ -17,7 +17,7 @@
  */
 import React from 'react'
 
-import DiscussionPostToolbar, {ViewOptions} from './DiscussionPostToolbar'
+import DiscussionPostToolbar, {getMenuConfig} from './DiscussionPostToolbar'
 
 export default {
   title: 'Examples/Discussion Posts/Discussion Post Toolbar',
@@ -27,7 +27,7 @@ export default {
     selectedView: {
       control: {
         type: 'select',
-        options: Object.keys(ViewOptions)
+        options: Object.keys(getMenuConfig({enableDeleteFilter: true}))
       }
     },
     sortDirection: {
@@ -51,4 +51,9 @@ SortedDesc.args = {
 export const CollapsedReplies = Template.bind({})
 CollapsedReplies.args = {
   isCollapsedReplies: true
+}
+
+export const ShowDeleted = Template.bind({})
+ShowDeleted.args = {
+  enableDeleteFilter: true
 }

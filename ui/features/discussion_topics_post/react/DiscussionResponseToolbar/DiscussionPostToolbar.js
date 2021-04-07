@@ -35,13 +35,16 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!discussions_posts'
 
-export const ViewOptions = {
-  all: () => I18n.t('All'),
-  read: () => I18n.t('Read'),
-  unread: () => I18n.t('Unread'),
-  graded: () => I18n.t('Graded'),
-  ungraded: () => I18n.t('Ungraded'),
-  deleted: () => I18n.t('Deleted')
+export const getMenuConfig = props => {
+  const options = {
+    all: () => I18n.t('All'),
+    unread: () => I18n.t('Unread')
+  }
+  if (props.enableDeleteFilter) {
+    options.deleted = () => I18n.t('Deleted')
+  }
+
+  return options
 }
 
 const DiscussionPostToolbar = props => {
@@ -72,7 +75,7 @@ const DiscussionPostToolbar = props => {
               width="120px"
             >
               <SimpleSelect.Group renderLabel={I18n.t('View')}>
-                {Object.entries(ViewOptions).map(([viewOption, viewOptionLabel]) => (
+                {Object.entries(getMenuConfig(props)).map(([viewOption, viewOptionLabel]) => (
                   <SimpleSelect.Option id={viewOption} key={viewOption} value={viewOption}>
                     {viewOptionLabel.call()}
                   </SimpleSelect.Option>

@@ -50,10 +50,10 @@ describe('DiscussionPostToolbar', () => {
       const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
       const simpleSelect = getByLabelText('Filter by')
       fireEvent.click(simpleSelect)
-      const graded = getByText('Graded')
-      fireEvent.click(graded)
+      const unread = getByText('Unread')
+      fireEvent.click(unread)
       expect(onViewFilterMock.mock.calls.length).toBe(1)
-      expect(onViewFilterMock.mock.calls[0][1].id).toBe('graded')
+      expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
     })
   })
 
