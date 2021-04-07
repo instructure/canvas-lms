@@ -84,6 +84,7 @@ class Message < ActiveRecord::Base
   before_save :infer_defaults
   before_save :move_dashboard_messages
   before_save :move_messages_for_deleted_users
+  before_save :truncate_invalid_message
 
   # Validations
   validate :prevent_updates
@@ -820,6 +821,13 @@ class Message < ActiveRecord::Base
     message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
   end
 
+  # Public: Message to use if the message is unavailable to send.
+  #
+  # Returns a string
+  def self.unavailable_message
+    I18n.t('message preview unavailable')
+  end
+
   # Public: Get the root account of this message's context.
   #
   # Returns an account.
@@ -941,6 +949,17 @@ class Message < ActiveRecord::Base
   def move_messages_for_deleted_users
     if context_type != 'ErrorReport' && (!user || user.deleted?)
       self.workflow_state = 'closed'
+    end
+  end
+
+  # Public: Truncate the message if it exceeds 64kb
+  #
+  # Returns nothing.
+  def truncate_invalid_message
+    [:body, :html_body].each do |attr|
+      if self.send(attr) && self.send(attr).bytesize > self.class.maximum_text_length
+        self.send("#{attr}=", Message.unavailable_message)
+      end
     end
   end
 
