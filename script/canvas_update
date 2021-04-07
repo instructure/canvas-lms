@@ -24,7 +24,8 @@ function tips {
 
 function update_canvas {
   ensure_in_canvas_root_directory
-  intro_message "Canvas Update"
+  message "Bringing Canvas up to date ..."
+  init_log_file "Canvas Update"
 
   if [[ -z "$SKIP_CODE" ]] ; then
     ./script/rebase_canvas_and_plugins.sh

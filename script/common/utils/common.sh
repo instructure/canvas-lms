@@ -44,9 +44,8 @@ function is_git_dir {
 }
 
 # Parameter: the name of the script calling this function
-function intro_message {
+function init_log_file {
   script_name="$1"
-  echo "Bringing Canvas up to date ..."
   echo "  Log file is $LOG"
 
   echo >>"$LOG"

@@ -88,7 +88,8 @@ fi
 echo ""
 
 create_log_file
-intro_message "Docker Dev Update"
+message "Bringing Canvas up to date ..."
+init_log_file "Docker Dev Update"
 [[ -n "$UPDATE_CODE" ]] && ./script/rebase_canvas_and_plugins.sh "${params[@]}"
 bundle_install_with_check
 install_node_packages
