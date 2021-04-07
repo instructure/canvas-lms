@@ -60,7 +60,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     getFormValue(FORM_IDS.RESTRICT_PAST) === 'true'
   )
 
-  const formatDate = date => tz.format(date, '%b %-d, %Y at %-l:%M%P %Z')
+  const formatDate = date => tz.format(date, 'date.formats.full')
 
   const canInteract = () => (canManage ? 'enabled' : 'disabled')
 
