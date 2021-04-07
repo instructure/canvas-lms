@@ -17,6 +17,7 @@
 /app/views/info/styleguide.html.erb
 /config/*.yml
 /config/environments/*-local.rb
+/config/credentials.yml.enc
 /config/locales/generated/
 /config/RAILS6_0
 /coverage/

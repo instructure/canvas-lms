@@ -56,7 +56,7 @@ module MicrosoftSync
         unless (200..299).cover?(response.code)
           # Probably the key itself is bad. As of 3/2021, it seems like if the tenant
           # hasn't granted permission, we get a token but then a 401 from the Graph API
-          raise MicrosoftSync::Errors::InvalidStatusCode.new(
+          raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
             service: 'login', tenant: tenant, response: response
           )
         end
@@ -96,16 +96,18 @@ module MicrosoftSync
       private
 
       def settings
-        DynamicSettings.find('microsoft-sync') or
-          raise ArgumentError, 'MicrosoftSync not configured'
+        Rails.application.credentials.microsoft_sync or
+          raise ArgumentError, 'Missing MicrosoftSync creds in microsoft_sync[:client_id] and ' \
+          'microsoft_sync[:client_secret]. Add to vault for this environment, or run rails ' \
+          'credentials:edit in development (see config/credentials.yml.example).'
       end
 
       def client_id
-        settings['client-id']
+        settings[:client_id]
       end
 
       def client_secret
-        settings['client-secret']
+        settings[:client_secret]
       end
     end
   end
