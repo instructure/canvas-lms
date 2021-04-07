@@ -36,7 +36,8 @@ module LtiAdvantage::Messages
       assignment_and_grade_service: LtiAdvantage::Claims::AssignmentAndGradeService,
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
-      role_scope_mentor: Array
+      role_scope_mentor: Array,
+      lti1p1: LtiAdvantage::Claims::Lti1p1
     }.freeze
 
     attr_accessor *(REQUIRED_CLAIMS + OPTIONAL_CLAIMS)
@@ -107,6 +108,10 @@ module LtiAdvantage::Messages
 
     def tool_platform
       @tool_platform ||= TYPED_ATTRIBUTES[:tool_platform].new
+    end
+
+    def lti1p1
+      @lti1p1 ||= TYPED_ATTRIBUTES[:lti1p1].new
     end
 
     def read_attribute(attribute)

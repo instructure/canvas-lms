@@ -96,5 +96,13 @@ RSpec.shared_examples 'message_claims_examples' do
         'tool_platform must be an instance of LtiAdvantage::Claims::Platform'
       ]
     end
+
+    it 'verifies that "lti1p1" is an Lti1p1' do
+      message.lti1p1 = 'foo'
+      message.validate
+      expect(message.errors.messages[:lti1p1]).to match_array [
+        'lti1p1 must be an instance of LtiAdvantage::Claims::Lti1p1'
+      ]
+    end
   end
 end

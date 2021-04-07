@@ -71,6 +71,7 @@ module Lti::Messages
       add_custom_params_claims! if include_claims?(:custom_params)
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
       add_lti11_legacy_user_id!
+      add_lti1p1_claims! if include_lti1p1_claims?
       add_extension("placement", @opts[:resource_type])
 
       @expander.expand_variables!(@message.extensions)
@@ -164,6 +165,18 @@ module Lti::Messages
 
     def add_lti11_legacy_user_id!
       @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || ''
+    end
+
+    def add_lti1p1_claims!
+      @message.lti1p1.user_id = @user&.lti_context_id
+    end
+
+    # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters
+    # If the parameter's value is not the same as its LTI 1.3 equivalent, the
+    # platform MUST include the parameter and its LTI 1.1 value. Otherwise the
+    # platform MAY omit that attribute.
+    def include_lti1p1_claims?
+      @user&.lti_context_id && @user.lti_context_id != @user.lti_id
     end
 
     def include_names_and_roles_service_claims?
