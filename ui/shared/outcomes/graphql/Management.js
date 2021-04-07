@@ -131,15 +131,11 @@ export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
   }
 `
 
-export const updateOutcomeGroup = (contextType, contextId, group) => {
-  return axios.put(
-    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${group._id}`,
-    {
-      title: group.title,
-      description: group.description
-    }
+export const updateOutcomeGroup = (contextType, contextId, groupId, group) =>
+  axios.put(
+    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
+    group
   )
-}
 
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(

@@ -108,6 +108,9 @@ const OutcomeManagementPanel = () => {
     closeOutcomeEditModal()
     setSelectedOutcome(null)
   }
+  const onCloseEditGroupModal = () => {
+    closeEditGroupModal()
+  }
   const groupMenuHandler = (_, action) => {
     if (action === 'move') {
       openMoveGroupModal()
@@ -286,7 +289,7 @@ const OutcomeManagementPanel = () => {
             <EditGroupModal
               outcomeGroup={group}
               isOpen={isEditGroupModalOpen}
-              onCloseHandler={closeEditGroupModal}
+              onCloseHandler={onCloseEditGroupModal}
             />
           )}
         </>
