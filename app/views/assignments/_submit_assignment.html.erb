@@ -51,6 +51,9 @@
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
         <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
       <% end %>
+      <% if @assignment.submission_types && @assignment.submission_types.match(/annotated_document/) %>
+        <li><a href="#submit_annotated_document_form" class="submit_annotated_document_option"><%= t 'Annotated Document' %></a></li>
+      <% end %>
       <% if show_google_docs %>
         <li><a href="#submit_google_doc_form" class="submit_online_url_option"><%= t 'links.submit.google_doc', 'Google Doc' %></a></li>
       <% end %>
@@ -113,6 +116,32 @@
             </td>
           </tr>
         </table>
+      <% end %>
+    <% end %>
+
+    <% if @assignment.annotated_document? %>
+      <%= form_tag(submission_create_url, id: "submit_annotated_document_form" , class: "submit_assignment_form" ) do %>
+        <%= hidden_field :submission, :submission_type, value: "annotated_document" %>
+        <%= hidden_field :submission, :annotated_document_id, value: @assignment.annotatable_attachment_id %>
+            <table class="formtable" style="width: 100%;">
+              <tr>
+                <div class="ef-file-preview-stretch">
+                  <iframe allowfullscreen title="<%= t 'Document to annotate' %>" src=""
+                    class="ef-file-preview-frame annotated-document-submission" style="width: 100%;">
+                  </iframe>
+                </div>
+              </tr>
+              <tr>
+                <td colspan="2" class='button-container'>
+                  <button type="button" class="cancel_button btn">
+                    <%= t '#buttons.cancel' , "Cancel" %>
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <%= t "Submit Assignment" %>
+                  </button>
+                </td>
+              </tr>
+            </table>
       <% end %>
     <% end %>
 
@@ -343,31 +372,4 @@
       <% end %>
     <% end %>
   </div>
-
-  <% if @assignment.annotated_document? %>
-    <%= form_tag(submission_create_url, id: "submit_annotated_document_form", class: "submit_assignment_form") do %>
-      <%= hidden_field :submission, :submission_type, value: "annotated_document" %>
-      <%= hidden_field :submission, :annotated_document_id, value: @assignment.annotatable_attachment_id %>
-
-      <table class="formtable" style="width: 100%;">
-        <tr>
-          <div class="ef-file-preview-stretch">
-            <iframe
-              allowfullscreen
-              title="<%= t 'Document to annotate' %>"
-              src=""
-              class="ef-file-preview-frame annotated-document-submission"
-              style="width: 100%;">
-            </iframe>
-          </div>
-        </tr>
-        <tr>
-          <td colspan="2" class='button-container'>
-            <button type="button" class="cancel_button btn"><%= t '#buttons.cancel', "Cancel" %></button>
-            <button type="submit" class="btn btn-primary"><%= t "Submit Assignment" %></button>
-          </td>
-        </tr>
-      </table>
-    <% end %>
-  <% end %>
 </div>
