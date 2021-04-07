@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment_formats from '@canvas/timezone/moment_formats'
 import I18nStubber from 'helpers/I18nStubber'
+import {
+  prepareFormats
+} from '../../../ui/boot/initializers/configureDateTimeMomentParser'
 
 QUnit.module('Moment formats', {
   setup() {
@@ -32,18 +34,18 @@ QUnit.module('Moment formats', {
     })
   },
   teardown() {
-    I18nStubber.popFrame()
+    I18nStubber.clear()
   }
 })
 
 test('formatsForLocale include formats matching datepicker', () => {
-  const formats = moment_formats.formatsForLocale()
+  const formats = prepareFormats().map(x => x())
   ok(formats.includes('%b %-d, %Y %l:%M%P'))
   ok(formats.includes('%b %-d, %Y %l%P'))
 })
 
 test('formatsForLocale includes all event formats', () => {
-  const formats = moment_formats.formatsForLocale()
+  const formats = prepareFormats().map(x => x())
   ok(formats.includes('%b %-d, %Y event %l:%M%P'))
   ok(formats.includes('%b %-d event %l:%M%P'))
   ok(formats.includes('%b %-d, %Y event %l%P'))

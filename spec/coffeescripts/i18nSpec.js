@@ -34,7 +34,7 @@ QUnit.module('I18n', {
   },
 
   teardown() {
-    return I18nStubber.popFrame()
+    return I18nStubber.clear()
   }
 })
 
@@ -159,7 +159,7 @@ QUnit.module('I18n localize number', {
   },
 
   teardown() {
-    return I18nStubber.popFrame()
+    return I18nStubber.clear()
   }
 })
 

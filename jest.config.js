@@ -33,7 +33,7 @@ module.exports = {
     // mock the tinymce-react Editor react component
     '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
   },
-  roots: ['ui', 'gems/plugins', 'public/javascripts'],
+  roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
   reporters: [
     'default',

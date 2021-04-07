@@ -23,7 +23,8 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import Submission from '@canvas/assignments/backbone/models/Submission'
 import AssignmentListItemView from 'ui/features/assignment_index/backbone/views/AssignmentListItemView.coffee'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
@@ -169,14 +170,13 @@ QUnit.module('AssignmentListItemViewSpec', {
       URLS: {assignment_sort_base_url: 'test'}
     })
     genSetup.call(this)
-    this.snapshot = tz.snapshot()
     return I18nStubber.pushFrame()
   },
   teardown() {
     fakeENV.teardown()
     genTeardown.call(this)
-    tz.restore(this.snapshot)
-    return I18nStubber.popFrame()
+    tzInTest.restore()
+    return I18nStubber.clear()
   }
 })
 
@@ -542,7 +542,10 @@ test('does not render score template without permission', function () {
 })
 
 test('renders lockAt/unlockAt with locale-appropriate format string', function () {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
@@ -570,7 +573,12 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function (
 })
 
 test('renders lockAt/unlockAt in appropriate time zone', function () {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.formats.date_at_time': '%b %-d at %l:%M%P',
@@ -646,7 +654,10 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
 })
 
 test('renders due date column with locale-appropriate format string', function () {
-  tz.changeLocale(french, 'fr_FR', 'fr')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr'
+  })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
@@ -660,7 +671,12 @@ test('renders due date column with locale-appropriate format string', function (
 })
 
 test('renders due date column in appropriate time zone', function () {
-  tz.changeZone(juneau, 'America/Juneau')
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(juneau, 'America/Juneau'),
+    tzData: {
+      'America/Juneau': juneau
+    }
+  })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.abbr_month_names.8': 'Aug'

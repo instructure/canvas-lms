@@ -667,7 +667,7 @@ test('validates i18n mastery points', function() {
   view.$('input[name="mastery_points"]').val('1 234,5')
   ok(view.isValid())
   view.remove()
-  I18nStubber.popFrame()
+  I18nStubber.clear()
 })
 
 test('getModifiedFields returns false for all fields when not modified', () => {

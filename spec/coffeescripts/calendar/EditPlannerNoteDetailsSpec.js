@@ -49,6 +49,7 @@ QUnit.module('EditAssignmentDetails', {
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
     tz.restore(this.snapshot)
+    I18nStubber.clear()
   }
 })
 const createView = function(event = note) {
@@ -74,7 +75,6 @@ test('should localize start date', () => {
   })
   const view = createView(commonEvent())
   equal(view.$('.date_field').val(), '22 juil. 2017')
-  I18nStubber.popFrame()
 })
 
 test('requires name to save assignment note', () => {

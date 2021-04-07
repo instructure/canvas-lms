@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
-import timezone from '@canvas/timezone'
+import tz from 'timezone'
+import timezone, { configure as configureTimezone } from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
 import anchorage from 'timezone/America/Anchorage'
 import moment from 'moment-timezone'
@@ -129,21 +131,24 @@ beforeEach(() => {
 
 describe('Assignment Bulk Edit Dates', () => {
   let oldEnv
-  let timezoneSnapshot
   beforeEach(() => {
     oldEnv = window.ENV
     window.ENV = {
       TIMEZONE: 'Asia/Tokyo',
       FEATURES: {}
     }
-    timezoneSnapshot = timezone.snapshot()
-    timezone.changeZone(tokyo, 'Asia/Tokyo')
+    tzInTest.configureAndRestoreLater({
+      tz: tz(tokyo, 'Asia/Tokyo'),
+      tzData: {
+        'Asia/Tokyo': tokyo
+      }
+    })
   })
 
   afterEach(async () => {
     await flushPromises()
     window.ENV = oldEnv
-    timezone.restore(timezoneSnapshot)
+    tzInTest.restore()
   })
 
   it('shows a spinner while loading', async () => {
@@ -1020,21 +1025,25 @@ describe('Assignment Bulk Edit Dates', () => {
 
 describe('in a timezone that does DST', () => {
   let oldEnv
-  let timezoneSnapshot
   beforeEach(() => {
+    tzInTest.configureAndRestoreLater({
+      tz: tz(anchorage, 'America/Anchorage'),
+      tzData: {
+        'America/Anchorage': anchorage
+      }
+    })
+
     oldEnv = window.ENV
     window.ENV = {
       TIMEZONE: 'America/Anchorage',
       FEATURES: {}
     }
-    timezoneSnapshot = timezone.snapshot()
-    timezone.changeZone(anchorage, 'America/Anchorage')
   })
 
   afterEach(async () => {
     await flushPromises()
     window.ENV = oldEnv
-    timezone.restore(timezoneSnapshot)
+    tzInTest.restore()
   })
 
   it('preserves the time when shifting to a DST transition day', async () => {

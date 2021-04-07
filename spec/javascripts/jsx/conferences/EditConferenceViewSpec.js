@@ -37,6 +37,7 @@ QUnit.module('EditConferenceView', {
     this.view.$el.remove()
     fakeENV.teardown()
     tz.restore(this.snapshot)
+    I18nStubber.clear()
   }
 })
 
@@ -49,7 +50,6 @@ test('updateConferenceUserSettingDetailsForConference localizes values for datep
   const conferenceData = {user_settings: {datepickerSetting: '2015-08-07T17:00:00Z'}}
   this.view.updateConferenceUserSettingDetailsForConference(conferenceData)
   equal(this.datepickerSetting.value, 'ven. 7 août, 2015 17:00')
-  I18nStubber.popFrame()
 })
 
 test('#show sets the proper title for new conferences', function() {

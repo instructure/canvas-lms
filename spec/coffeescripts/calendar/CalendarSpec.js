@@ -22,6 +22,8 @@ import I18n from 'i18n!calendar'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import moment from 'moment'
 import tz from '@canvas/timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
+import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
@@ -30,14 +32,19 @@ import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Calendar', {
   setup() {
-    this.snapshot = tz.snapshot()
-    tz.changeZone(denver, 'America/Denver')
+    tzInTest.configureAndRestoreLater({
+      tz: timezone(denver, 'America/Denver'),
+      tzData: {
+        'America/Denver': denver
+      }
+    })
+
     fixtures.setup()
     sinon.stub($, 'getJSON')
     fakeENV.setup()
   },
   teardown() {
-    tz.restore(this.snapshot)
+    tzInTest.restore()
     const calendar = $('#fixtures .calendar').data('fullCalendar')
     if (calendar) {
       calendar.destroy()
