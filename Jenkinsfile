@@ -416,7 +416,7 @@ pipeline {
             // wait for the current steps to complete (even wait to spin up a node), causing
             // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
             protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
-              buildSummaryReport.extendedStageAndReportIfFailure('Setup') {
+              extendedStage('Setup').handler(buildSummaryReport).execute {
                 timeout(time: 2) {
                   echo "Cleaning Workspace From Previous Runs"
                   sh 'ls -A1 | xargs rm -rf'
@@ -476,7 +476,7 @@ pipeline {
               }
 
               if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
-                buildSummaryReport.extendedStageAndReportIfFailure('Rebase') {
+                extendedStage('Rebase').handler(buildSummaryReport).execute {
                   timeout(time: 2) {
                     rebaseHelper(GERRIT_BRANCH)
 
@@ -488,7 +488,7 @@ pipeline {
               }
 
               if (configuration.isChangeMerged()) {
-                buildSummaryReport.extendedStageAndReportIfFailure('Build Docker Image (Pre-Merge)') {
+                extendedStage('Build Docker Image (Pre-Merge)').handler(buildSummaryReport).execute {
                   timeout(time: 20) {
                     credentials.withStarlordCredentials {
                       withEnv([
@@ -525,7 +525,7 @@ pipeline {
                 }
               }
 
-              buildSummaryReport.extendedStageAndReportIfFailure('Build Docker Image') {
+              extendedStage('Build Docker Image').handler(buildSummaryReport).execute {
                 timeout(time: 20) {
                   credentials.withStarlordCredentials {
                     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
@@ -576,7 +576,7 @@ pipeline {
                 }
               }
 
-              buildSummaryReport.extendedStageAndReportIfFailure('Run Migrations') {
+              extendedStage('Run Migrations').handler(buildSummaryReport).execute {
                 timeout(time: 10) {
                   credentials.withStarlordCredentials {
                     def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
@@ -622,7 +622,7 @@ pipeline {
 
                   if (!configuration.isChangeMerged()) {
                     echo 'adding Linters'
-                    buildSummaryReport.extendedStageAndReportIfFailure('Linters', stages) {
+                    extendedStage('Linters').handler(buildSummaryReport).queue(stages) {
                       credentials.withStarlordCredentials {
                         credentials.withGerritCredentials {
                           withEnv([
@@ -644,7 +644,7 @@ pipeline {
                   }
 
                   echo 'adding Consumer Smoke Test'
-                  buildSummaryReport.extendedStageAndReportIfFailure('Consumer Smoke Test', stages) {
+                  extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
                     sh 'build/new-jenkins/consumer-smoke-test.sh'
                   }
 
@@ -657,7 +657,7 @@ pipeline {
                       ], "Vendored Gems")
                   }
 
-                  buildSummaryReport.extendedStageAndReportIfFailure(JS_BUILD_IMAGE_STAGE, stages) {
+                  extendedStage(JS_BUILD_IMAGE_STAGE).handler(buildSummaryReport).queue(stages) {
                     credentials.withStarlordCredentials {
                       try {
                         def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
@@ -736,7 +736,7 @@ pipeline {
                   }
 
                   if(configuration.isChangeMerged()) {
-                    buildSummaryReport.extendedStageAndReportIfFailure('Dependency Check', stages) {
+                    extendedStage('Dependency Check').handler(buildSummaryReport).queue(stages) {
                       catchError (buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         try {
                           snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
