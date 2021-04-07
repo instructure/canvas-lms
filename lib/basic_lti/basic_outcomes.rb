@@ -35,6 +35,9 @@ module BasicLTI
       end
     end
 
+    # gives instfs about 7 hours to have an outage and eventually take the file
+    MAX_ATTEMPTS=10
+
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
     def self.decode_source_id(tool, sourceid)
@@ -273,25 +276,15 @@ to because the assignment has no points possible.
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
         else
+          create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
           if attachment
             job_options = {
               :priority => Delayed::HIGH_PRIORITY,
-              :max_attempts => 1,
+              :max_attempts => MAX_ATTEMPTS,
               :n_strand => Attachment.clone_url_strand(url)
             }
 
-            delay(**job_options).fetch_attachment_and_save_submission(
-              url,
-              attachment,
-              tool,
-              submission_hash,
-              assignment,
-              user,
-              new_score,
-              raw_score
-            )
-          else
-            create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
+            delay(**job_options).fetch_attachment(url, attachment)
           end
         end
 
@@ -352,9 +345,9 @@ to because the assignment has no points possible.
       end
 
       # rubocop:disable Metrics/ParameterLists
-      def fetch_attachment_and_save_submission(url, attachment, tool, submission_hash, assignment, user, new_score, raw_score)
+      def fetch_attachment(url, attachment)
         attachment.clone_url(url, 'rename', true)
-        create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score
+        raise 'retry attachment clone' if attachment.file_state == 'errored'
       end
       # rubocop:enable Metrics/ParameterLists
 
