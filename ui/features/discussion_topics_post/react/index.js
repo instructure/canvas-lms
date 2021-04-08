@@ -18,9 +18,11 @@
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider, createClient} from '@canvas/apollo'
+import DiscussionTopicQuery from './DiscussionTopicQuery'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import I18n from 'i18n!discussion_topics_post'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -33,12 +35,12 @@ export default function renderDiscussionPosts(env, elt) {
         errorComponent={
           <GenericErrorPage
             imageUrl={errorShipUrl}
-            errorCategory="Discussion Topic Post Error Page"
+            errorCategory={I18n.t('Discussion Topic Post Error Page')}
           />
         }
       >
         <AlertManager>
-          <h1>New Discussion Post Entry Point</h1>
+          <DiscussionTopicQuery discussionTopicId={env.discussion_topic_id} />
         </AlertManager>
       </ErrorBoundary>
     </ApolloProvider>,

@@ -644,6 +644,7 @@ class DiscussionTopicsController < ApplicationController
   def show
     # Render updated Post UI if feature flag is enabled
     if @domain_root_account.feature_enabled?(:react_discussions_post)
+      js_env(discussion_topic_id: params[:id])
       js_bundle :discussion_topics_post
       render html: '', layout: true
       return

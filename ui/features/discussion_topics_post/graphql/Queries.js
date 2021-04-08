@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Discussion} from './graphqlData/Discussion'
-import {DiscussionEntry} from './graphqlData/DiscussionEntry'
+import {Discussion} from './Discussion'
+import {DiscussionEntry} from './DiscussionEntry'
 import gql from 'graphql-tag'
 
 export const DISCUSSION_QUERY = gql`
