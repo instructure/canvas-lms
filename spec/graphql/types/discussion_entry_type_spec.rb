@@ -49,6 +49,16 @@ describe Types::DiscussionEntryType do
     expect(result[0]).to eq de.message
   end
 
+  it 'allows querying for the last subentry' do
+    de = discussion_entry
+    4.times do |i|
+      de = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry #{i}", user: @teacher, parent_id: de.id)
+    end
+
+    result = discussion_entry_type.resolve('lastReply { message }')
+    expect(result).to eq de.message
+  end
+
   it 'returns a null message when entry is marked as deleted' do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil

@@ -82,5 +82,10 @@ module Types
     def attachment
       load_association(:attachment)
     end
+
+    field :last_reply, Types::DiscussionEntryType, null: true
+    def last_reply
+      load_association(:last_discussion_subentry)
+    end
   end
 end

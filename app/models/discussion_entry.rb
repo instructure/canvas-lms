@@ -31,6 +31,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
+  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: 'DiscussionEntry', foreign_key: 'root_entry_id'
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
