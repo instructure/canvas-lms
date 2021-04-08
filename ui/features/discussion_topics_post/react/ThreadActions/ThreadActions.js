@@ -27,6 +27,8 @@ import {
   IconDiscussionLine,
   IconEditLine,
   IconTrashLine,
+  IconMarkAsReadLine,
+  IconMarkAsReadSolid,
   IconSpeedGraderLine
 } from '@instructure/ui-icons'
 
@@ -64,12 +66,27 @@ export class ThreadActions extends React.Component {
 const getMenuConfigs = props => {
   const options = [
     {
-      key: 'markAsUnread',
+      key: 'markAllAsRead',
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark All as Read'),
-      selectionCallback: props.markAsUnread
+      selectionCallback: props.onMarkAllAsUnread
     }
   ]
+  if (props.isUnread) {
+    options.push({
+      key: 'markAsRead',
+      icon: <IconMarkAsReadLine />,
+      label: I18n.t('Mark as Read'),
+      selectionCallback: props.onToggleUnread
+    })
+  } else {
+    options.push({
+      key: 'markAsUnread',
+      icon: <IconMarkAsReadSolid />,
+      label: I18n.t('Mark as Unread'),
+      selectionCallback: props.onToggleUnread
+    })
+  }
   if (props.goToTopic) {
     options.push({
       key: 'toTopic',
@@ -114,7 +131,13 @@ const getMenuConfigs = props => {
 }
 
 const renderMenuItem = ({selectionCallback, icon, label, key}, id) => (
-  <Menu.Item key={`${key}-${id}`} onSelect={selectionCallback} data-testid={key}>
+  <Menu.Item
+    key={`${key}-${id}`}
+    onSelect={() => {
+      selectionCallback(key)
+    }}
+    data-testid={key}
+  >
     <Flex>
       <Flex.Item>{icon}</Flex.Item>
       <Flex.Item padding="0 0 0 xx-small">
@@ -126,12 +149,18 @@ const renderMenuItem = ({selectionCallback, icon, label, key}, id) => (
 
 ThreadActions.propTypes = {
   id: PropTypes.string.isRequired,
-  markAsUnread: PropTypes.func.isRequired,
+  onMarkAllAsUnread: PropTypes.func.isRequired,
+  onToggleUnread: PropTypes.func.isRequired,
+  isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,
   goToParent: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   openInSpeedGrader: PropTypes.func
+}
+
+ThreadActions.defaultProps = {
+  isUnread: false
 }
 
 export default ThreadActions

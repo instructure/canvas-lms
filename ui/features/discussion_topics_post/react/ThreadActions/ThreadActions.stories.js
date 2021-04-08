@@ -24,11 +24,12 @@ export default {
   title: 'Examples/Discussion Posts/ThreadActions',
   component: ThreadActions,
   argTypes: {
-    markAsUnread: {action: 'markAsUnread'},
     goToTopic: {action: 'goToTopic'},
     goToParent: {action: 'goToParent'},
     onEdit: {action: 'onEdit'},
     onDelete: {action: 'onDelete'},
+    onMarkAllAsUnread: {action: 'onMarkAsUnread'},
+    onToggleUnread: {action: 'onToggleUnread'},
     openInSpeedGrader: {action: 'openInSpeedGrader'}
   }
 }
@@ -51,4 +52,14 @@ OtherStudentView.args = {
   onDelete: null,
   onEdit: null,
   openInSpeedGrader: null
+}
+
+export const UnreadThread = Template.bind({})
+UnreadThread.args = {
+  isUnread: true
+}
+
+export const ReadThread = Template.bind({})
+ReadThread.args = {
+  isUnread: false
 }

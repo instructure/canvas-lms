@@ -23,11 +23,12 @@ import {ThreadActions} from '../ThreadActions'
 const createProps = overrides => {
   return {
     goToParent: jest.fn(),
-    markAsUnread: jest.fn(),
+    onMarkAllAsUnread: jest.fn(),
     goToTopic: jest.fn(),
     onEdit: jest.fn(),
     onDelete: jest.fn(),
     openInSpeedGrader: jest.fn(),
+    onToggleUnread: jest.fn(),
     ...overrides
   }
 }
@@ -41,6 +42,7 @@ describe('ThreadActions', () => {
     expect(menu).toBeInTheDocument()
     fireEvent.click(menu)
 
+    expect(getByTestId('markAllAsRead')).toBeInTheDocument()
     expect(getByTestId('markAsUnread')).toBeInTheDocument()
     expect(getByTestId('toTopic')).toBeInTheDocument()
     expect(getByTestId('edit')).toBeInTheDocument()
@@ -55,7 +57,7 @@ describe('ThreadActions', () => {
   })
 
   it('does not display if callback is not provided', () => {
-    const props = {markAsUnread: jest.fn()}
+    const props = {onMarkAllAsUnread: jest.fn()}
     const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
     const menu = getByTestId('thread-actions-menu')
 
@@ -76,15 +78,53 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.markAsUnread.mock.calls.length).toBe(0)
+        expect(props.onMarkAllAsUnread.mock.calls.length).toBe(0)
         fireEvent.click(getByText('Mark All as Read'))
-        expect(props.markAsUnread.mock.calls.length).toBe(1)
+        expect(props.onMarkAllAsUnread.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('mark as read/unread', () => {
+      it('should render Mark as Unread button when read', () => {
+        const props = createProps()
+        const {getByTestId} = render(<ThreadActions {...props} />)
+
+        const menu = getByTestId('thread-actions-menu')
+        expect(menu).toBeInTheDocument()
+        fireEvent.click(menu)
+
+        const markAsUnread = getByTestId('markAsUnread')
+
+        expect(markAsUnread).toBeInTheDocument()
+
+        fireEvent.click(markAsUnread)
+
+        expect(props.onToggleUnread.mock.calls.length).toBe(1)
+        expect(props.onToggleUnread.mock.calls[0][0]).toBe('markAsUnread')
+      })
+
+      it('should render Mark as Read button when unread', () => {
+        const props = createProps()
+        const {getByTestId} = render(<ThreadActions isUnread {...props} />)
+
+        const menu = getByTestId('thread-actions-menu')
+        expect(menu).toBeInTheDocument()
+        fireEvent.click(menu)
+
+        const markAsRead = getByTestId('markAsRead')
+
+        expect(markAsRead).toBeInTheDocument()
+
+        fireEvent.click(markAsRead)
+
+        expect(props.onToggleUnread.mock.calls.length).toBe(1)
+        expect(props.onToggleUnread.mock.calls[0][0]).toBe('markAsRead')
       })
     })
 
     describe('edit', () => {
       it('does not render if the callback is not provided', () => {
-        const props = {markAsUnread: jest.fn()}
+        const props = {onMarkAllAsUnread: jest.fn()}
         const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
@@ -104,7 +144,7 @@ describe('ThreadActions', () => {
 
     describe('delete', () => {
       it('does not render if the callback is not provided', () => {
-        const props = {markAsUnread: jest.fn()}
+        const props = {onMarkAllAsUnread: jest.fn()}
         const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
@@ -124,7 +164,7 @@ describe('ThreadActions', () => {
 
     describe('SpeedGrader', () => {
       it('does not render if the callback is not provided', () => {
-        const props = {markAsUnread: jest.fn()}
+        const props = {onMarkAllAsUnread: jest.fn()}
         const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
@@ -144,7 +184,7 @@ describe('ThreadActions', () => {
 
     describe('Go to topic', () => {
       it('does not render if the callback is not provided', () => {
-        const props = {markAsUnread: jest.fn()}
+        const props = {onMarkAllAsUnread: jest.fn()}
         const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
@@ -164,7 +204,7 @@ describe('ThreadActions', () => {
 
     describe('Go to Parent', () => {
       it('does not render if the callback is not provided', () => {
-        const props = {markAsUnread: jest.fn()}
+        const props = {onMarkAllAsUnread: jest.fn()}
         const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
