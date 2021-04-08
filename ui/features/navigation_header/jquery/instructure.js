@@ -125,10 +125,12 @@ export function enhanceUserContent() {
             )
           }
         }
-        if (img.naturalWidth === 0) {
-          img.addEventListener('load', handleWidth)
-        } else {
-          handleWidth()
+        if (typeof img.style.width !== 'string' || !img.style.width.endsWith('%')) {
+          if (img.naturalWidth === 0) {
+            img.addEventListener('load', handleWidth)
+          } else {
+            handleWidth()
+          }
         }
 
         // if the image file is unpublished it's replaced with the lock image
