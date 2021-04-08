@@ -44,12 +44,6 @@ def dockerDevFiles = [
   'Jenkinsfile.docker-smoke'
 ]
 
-def jenkinsFiles = [
-  'Jenkinsfile*',
-  '^docker-compose.new-jenkins*.yml',
-  'build/new-jenkins/*'
-]
-
 def getSummaryUrl() {
   return "${env.BUILD_URL}/build-summary-report"
 }
@@ -376,7 +370,7 @@ pipeline {
 
                   // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                   // the gerrit rather than master.
-                  if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(jenkinsFiles, 'HEAD^') ) {
+                  if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('Jenkinsfile')) {
                       buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
                   }
 
@@ -405,15 +399,11 @@ pipeline {
               }
 
               if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
-                extendedStage('Rebase').obeysAllowStages(false).handler(buildSummaryReport).execute {
-                  timeout(time: 2) {
-                    rebaseHelper(GERRIT_BRANCH)
-
-                    if(!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(jenkinsFiles, 'origin/master')) {
-                      error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
-                    }
-                  }
-                }
+                extendedStage('Rebase')
+                  .obeysAllowStages(false)
+                  .handler(buildSummaryReport)
+                  .timeout(2)
+                  .execute({ rebaseStage() })
               }
 
               if (configuration.isChangeMerged()) {
