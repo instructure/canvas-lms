@@ -44,7 +44,7 @@ gem 'aws-sdk-sqs', '1.34.0', require: false
 gem 'aws-sdk-kms', '1.39.0', require: false
 gem 'aws-sigv4', '1.2.2', require: false
 gem 'barby', '0.6.8', require: false
-  gem 'rqrcode', '1.1.2', require: false
+  gem 'rqrcode', '1.2.0', require: false
   gem 'chunky_png', '1.3.14', require: false
 gem 'bcrypt', '3.1.16'
 gem 'brotli', '0.2.3', require: false
