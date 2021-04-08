@@ -42,14 +42,16 @@ import natcompare from '@canvas/util/natcompare'
 class FileBrowser extends React.Component {
   static propTypes = {
     allowUpload: PropTypes.bool,
-    selectFile: PropTypes.func.isRequired,
     contentTypes: PropTypes.arrayOf(PropTypes.string),
+    defaultUploadFolderId: PropTypes.string,
+    selectFile: PropTypes.func.isRequired,
     useContextAssets: PropTypes.bool
   }
 
   static defaultProps = {
     allowUpload: true,
     contentTypes: ['*/*'],
+    defaultUploadFolderId: null,
     useContextAssets: true
   }
 
@@ -272,6 +274,10 @@ class FileBrowser extends React.Component {
     }
   }
 
+  uploadFolderId = () => {
+    return this.state.uploadFolder || this.props.defaultUploadFolderId
+  }
+
   onFolderToggle = folder => {
     return this.onFolderClick(folder.id, folder)
   }
@@ -304,7 +310,7 @@ class FileBrowser extends React.Component {
 
   submitFile = file => {
     this.setState({uploading: true})
-    uploadFile(file, this.state.uploadFolder, this.onUploadSucceed, this.onUploadFail)
+    uploadFile(file, this.uploadFolderId(), this.onUploadSucceed, this.onUploadFail)
   }
 
   onUploadSucceed = response => {
@@ -355,7 +361,7 @@ class FileBrowser extends React.Component {
     if (!this.props.allowUpload) {
       return null
     }
-    const uploadFolder = this.state.collections[this.state.uploadFolder]
+    const uploadFolder = this.state.collections[this.uploadFolderId()]
     const disabled = !uploadFolder || uploadFolder.locked || !uploadFolder.canUpload
     const srError = disabled ? (
       <ScreenReaderContent>{I18n.t('Upload not available for this folder')}</ScreenReaderContent>

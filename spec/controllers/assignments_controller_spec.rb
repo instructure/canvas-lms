@@ -1411,6 +1411,13 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    it "sets the root folder ID in the ENV" do
+      user_session(@teacher)
+      root_folder = Folder.root_folders(@course).first
+      get 'new', params: {course_id: @course.id, id: @assignment.id}
+      expect(assigns[:js_env][:ROOT_FOLDER_ID]).to eq root_folder.id
+    end
+
     context "with ?quiz_lti query param" do
       it "uses quizzes 2 if available" do
         tool = @course.context_external_tools.create!(
@@ -1623,6 +1630,13 @@ describe AssignmentsController do
       user_session(@teacher)
       get 'new', params: { :course_id => @course.id, :quiz_lti => true }
       expect(assigns[:js_env][:CANCEL_TO]).to include('assignments')
+    end
+
+    it "sets the root folder ID in the ENV" do
+      user_session(@teacher)
+      root_folder = Folder.root_folders(@course).first
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:ROOT_FOLDER_ID]).to eq root_folder.id
     end
 
     it "should require authorization" do

@@ -382,6 +382,7 @@ export default class EditView extends ValidatedFormView
   renderAnnotatedDocumentSelector: () =>
     props = {
       attachment: @getAnnotatedDocument(),
+      defaultUploadFolderId: ENV.ROOT_FOLDER_ID,
       onRemove: (fileInfo) =>
         $.screenReaderFlashMessageExclusive(
           I18n.t('removed %{filename}', {filename: fileInfo.name})

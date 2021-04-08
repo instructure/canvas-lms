@@ -55,7 +55,7 @@ function FileBrowserWrapper(props) {
   )
 }
 
-export function AnnotatedDocumentSelector({attachment, onSelect, onRemove}) {
+export function AnnotatedDocumentSelector({attachment, defaultUploadFolderId, onSelect, onRemove}) {
   return attachment ? (
     <div>
       <span style={attachmentNameStyle}>{`${attachment.name}`}</span>
@@ -70,7 +70,12 @@ export function AnnotatedDocumentSelector({attachment, onSelect, onRemove}) {
       </IconButton>
     </div>
   ) : (
-    <FileBrowserWrapper allowUpload selectFile={onSelect} useContextAssets />
+    <FileBrowserWrapper
+      defaultUploadFolderId={defaultUploadFolderId}
+      selectFile={onSelect}
+      allowUpload
+      useContextAssets
+    />
   )
 }
 
@@ -79,6 +84,11 @@ AnnotatedDocumentSelector.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string
   }),
+  defaultUploadFolderId: PropTypes.string,
   onSelect: PropTypes.func,
   onRemove: PropTypes.func
+}
+
+AnnotatedDocumentSelector.defaultProps = {
+  defaultUploadFolderId: null
 }

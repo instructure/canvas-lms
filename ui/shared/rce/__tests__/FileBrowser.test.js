@@ -96,15 +96,9 @@ describe('FileBrowser', () => {
     }
     wrapper.instance().setState({collections})
     wrapper.update()
-    wrapper
-      .find('TreeButton')
-      .first()
-      .simulate('click')
+    wrapper.find('TreeButton').first().simulate('click')
     moxios.wait(() => {
-      wrapper
-        .find('TreeButton')
-        .at(1)
-        .simulate('click')
+      wrapper.find('TreeButton').at(1).simulate('click')
       expect(wrapper.find('TreeButton')).toHaveLength(3)
       expect(wrapper.find('Img')).toHaveLength(1)
       done()
@@ -127,15 +121,9 @@ describe('FileBrowser', () => {
     }
     wrapper.instance().setState({collections})
     wrapper.update()
-    wrapper
-      .find('TreeButton')
-      .first()
-      .simulate('click')
+    wrapper.find('TreeButton').first().simulate('click')
     moxios.wait(() => {
-      wrapper
-        .find('TreeButton')
-        .at(1)
-        .simulate('click')
+      wrapper.find('TreeButton').at(1).simulate('click')
       expect(wrapper.find('Img')).toHaveLength(1)
       done()
     })
@@ -243,10 +231,7 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections})
       wrapper.update()
       const spy = sinon.spy(wrapper.instance(), 'getFolderData')
-      wrapper
-        .find('TreeButton')
-        .first()
-        .simulate('click')
+      wrapper.find('TreeButton').first().simulate('click')
       expect(spy.called).toBeTruthy()
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
@@ -270,10 +255,7 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections, openFolders: [1]})
       wrapper.update()
       const spy = sinon.spy(wrapper.instance(), 'getFolderData')
-      wrapper
-        .find('TreeButton')
-        .first()
-        .simulate('click')
+      wrapper.find('TreeButton').first().simulate('click')
       expect(spy.notCalled).toBeTruthy()
     })
 
@@ -350,10 +332,7 @@ describe('FileBrowser', () => {
       }
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper
-        .find('TreeButton')
-        .first()
-        .simulate('click')
+      wrapper.find('TreeButton').first().simulate('click')
       moxios.wait(() => {
         moxios.wait(() => {
           moxios.wait(() => {
@@ -398,16 +377,8 @@ describe('FileBrowser', () => {
       }
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper
-        .find('TreeButton')
-        .first()
-        .simulate('click')
-      expect(
-        wrapper
-          .find('TreeButton span span span')
-          .last()
-          .text()
-      ).toEqual('Locked')
+      wrapper.find('TreeButton').first().simulate('click')
+      expect(wrapper.find('TreeButton span span span').last().text()).toEqual('Locked')
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[4].collections).toEqual([])
@@ -443,10 +414,7 @@ describe('FileBrowser', () => {
       const items = {1: {id: 1, name: 'old name 1'}}
       wrapper.instance().setState({collections, items})
       wrapper.update()
-      wrapper
-        .find('TreeButton')
-        .first()
-        .simulate('click')
+      wrapper.find('TreeButton').first().simulate('click')
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[5].name).toEqual('sub folder 1')
@@ -472,15 +440,9 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections, items})
       wrapper.update()
       wrapper.find('TreeButton').simulate('click')
-      wrapper
-        .find('TreeButton')
-        .at(1)
-        .simulate('click')
+      wrapper.find('TreeButton').at(1).simulate('click')
       expect(spy.getCall(0).args[0]).toEqual(items[1])
-      wrapper
-        .find('TreeButton')
-        .at(2)
-        .simulate('click')
+      wrapper.find('TreeButton').at(2).simulate('click')
       expect(spy.getCall(1).args[0]).toEqual(items[2])
     })
   })
@@ -594,20 +556,11 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections})
       wrapper.update()
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(true)
-      wrapper
-        .find('TreeButton')
-        .at(0)
-        .simulate('click')
+      wrapper.find('TreeButton').at(0).simulate('click')
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(false)
-      wrapper
-        .find('TreeButton')
-        .at(1)
-        .simulate('click')
+      wrapper.find('TreeButton').at(1).simulate('click')
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(true)
-      wrapper
-        .find('TreeButton')
-        .at(2)
-        .simulate('click')
+      wrapper.find('TreeButton').at(2).simulate('click')
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(true)
     })
 
@@ -628,16 +581,33 @@ describe('FileBrowser', () => {
       const spy = sinon.spy(wrapper.instance(), 'submitFile')
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper
-        .find('TreeButton')
-        .at(0)
-        .simulate('click')
+      wrapper.find('TreeButton').at(0).simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
           files: ['dummyValue.png']
         }
       })
       expect(spy.called).toBeTruthy()
+    })
+
+    it('allows uploads without folder selection when a default folder is provided', () => {
+      const overrides = {defaultUploadFolderId: courseFolder().id}
+      const wrapper = mount(<FileBrowser {...getProps(overrides)} />)
+      const collections = {
+        0: {collections: [1]},
+        1: {
+          id: 1,
+          name: 'folder 1',
+          collections: [],
+          items: [],
+          canUpload: true,
+          locked: false,
+          context: '/courses/1'
+        }
+      }
+      wrapper.instance().setState({collections})
+      wrapper.update()
+      expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(false)
     })
 
     it('renders a spinner while uploading files', () => {
@@ -656,10 +626,7 @@ describe('FileBrowser', () => {
       }
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper
-        .find('TreeButton')
-        .at(0)
-        .simulate('click')
+      wrapper.find('TreeButton').at(0).simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
           files: ['dummyValue.png']
