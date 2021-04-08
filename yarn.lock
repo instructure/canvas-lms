@@ -1678,7 +1678,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-a11y-utils@^6.27.0":
+"@instructure/ui-a11y-utils@^6.22.0", "@instructure/ui-a11y-utils@^6.27.0":
   version "6.27.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-a11y-utils/-/ui-a11y-utils-6.27.0.tgz#00207ed706a719d9fac73a34368198ae078cf758"
   integrity sha512-XrZpuyu7JkLHvfkOyNkRisXX2cMEFSHAEWFVJ/qEbA1ekxrR8hsteJBbvuMtl2LetIU6idM6Kwmu8M1e1ZEitg==
@@ -2875,13 +2875,14 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-media-player@7", "@instructure/ui-media-player@^7":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-media-player/-/ui-media-player-7.1.0.tgz#524442fe338be99b0688f44d3a56414128f3558c"
-  integrity sha512-9vcU3kkgDUER8y0JDWgiNn9Qn6ijUmfPt7xuxlSPbQBbjrrp9VrP+rLv4hxmhxqLCDoTcoZ7EtF6ViBjs7iHug==
+"@instructure/ui-media-player@7", "@instructure/ui-media-player@^7.2":
+  version "7.2.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-media-player/-/ui-media-player-7.2.2.tgz#850ae64fb29c10ea6f594a78cb97c0f60a3d8e8d"
+  integrity sha512-3yz7wUxiTk5TYW+ev1vjonmbi8Lq+uwHuEa8XnMGJ3atJG2gi6GwZu3teVHOle00S/n2FAVFZB3JLg6/+u4n0Q==
   dependencies:
     "@babel/runtime" "^7"
     "@instructure/ui-a11y-content" "^6.22.0"
+    "@instructure/ui-a11y-utils" "^6.22.0"
     "@instructure/ui-buttons" "^6.22.0"
     "@instructure/ui-color-utils" "^6.22.0"
     "@instructure/ui-dom-utils" "^6.22.0"

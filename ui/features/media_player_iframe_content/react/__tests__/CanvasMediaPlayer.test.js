@@ -23,7 +23,7 @@
 import React from 'react'
 import {render, waitFor, fireEvent, act} from '@testing-library/react'
 import {queries as domQueries} from '@testing-library/dom'
-import CanvasMediaPlayer, {setPlayerSize} from '../CanvasMediaPlayer'
+import CanvasMediaPlayer, {setPlayerSize, getAutoTrack} from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
 
 const defaultMediaObject = (overrides = {}) => ({
@@ -487,6 +487,92 @@ describe('CanvasMediaPlayer', () => {
         expect(player.style.width).toBe('400px')
         expect(player.style.height).toBe('800px')
       })
+    })
+  })
+
+  describe('getAutoTrack', () => {
+    beforeEach(() => {
+      global.ENV = {
+        auto_show_cc: true,
+        locale: 'es'
+      }
+    })
+
+    it('finds the track for the user locale', () => {
+      const tracks = [
+        {id: 1, locale: 'en'},
+        {id: 2, locale: 'es'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toEqual('es')
+    })
+
+    it('finds the generic local given a regional locale', () => {
+      global.ENV.locale = 'en-US'
+      const tracks = [
+        {id: 1, locale: 'en-UK'},
+        {id: 2, locale: 'en'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toEqual('en')
+    })
+
+    it('finds any a matching de-regionalized locale local given regional locale', () => {
+      global.ENV.locale = 'en-US'
+      const tracks = [
+        {id: 1, locale: 'en-UK'},
+        {id: 2, locale: 'es-MX'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toEqual('en-UK')
+    })
+
+    it('uses lang attribute on the doc if no locale in ENV', () => {
+      delete global.ENV.locale
+      document.documentElement.setAttribute('lang', 'he')
+      const tracks = [
+        {id: 1, locale: 'en'},
+        {id: 2, locale: 'es'},
+        {id: 3, locale: 'he'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toEqual('he')
+    })
+
+    it('defaults to English if it cannot find a locale', () => {
+      delete global.ENV.locale
+      document.documentElement.removeAttribute('lang')
+      const tracks = [
+        {id: 1, locale: 'en'},
+        {id: 2, locale: 'es'},
+        {id: 3, locale: 'he'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toEqual('en')
+    })
+
+    it('returns undefined if the right track is not found', () => {
+      const tracks = [
+        {id: 1, locale: 'en'},
+        {id: 2, locale: 'he'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toBeUndefined()
+    })
+
+    it('returns undefined if there are no tracks', () => {
+      const found = getAutoTrack()
+      expect(found).toBeUndefined()
+    })
+
+    it('returns undefined if auto_show_cc feature is off', () => {
+      global.ENV.auto_show_cc = false
+      const tracks = [
+        {id: 1, locale: 'en'},
+        {id: 2, locale: 'es'}
+      ]
+      const found = getAutoTrack(tracks)
+      expect(found).toBeUndefined()
     })
   })
 })

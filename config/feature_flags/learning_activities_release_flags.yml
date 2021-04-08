@@ -29,7 +29,7 @@ submission_type_tool_placement:
     assignment submission type dropdown to quickly configure the assignment for the tool
 new_math_equation_handling:
   state: hidden
-  display_name: "Math: Updated equation handling"
+  display_name: 'Math: Updated equation handling'
   description: |-
     Replaces the existing image of the math equation plus its hidden mathml
     with a MathJax processed version. This change provides better accessibility
@@ -37,7 +37,7 @@ new_math_equation_handling:
   applies_to: RootAccount
 inline_math_everywhere:
   state: hidden
-  display_name: "Math: Support LaTex math equations almost everywhere"
+  display_name: 'Math: Support LaTex math equations almost everywhere'
   description: |-
     With this feature, LaTex math equations entered into most
     text entry fields in Canvas will be processed by MathJax.
@@ -56,3 +56,11 @@ canvas_for_elementary:
   description: |-
     A simplified Canvas interface for K-5. Enable applicable
     subaccount(s) as K-5 accounts in account settings.
+auto_show_cc:
+  state: allowed
+  display_name: Auto Show Closed Captions
+  description: |-
+    Automatically show closed captions in the user's current
+    language (if available) when playing canvas media.
+  applies_to: User
+  autoexpand: true

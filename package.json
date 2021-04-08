@@ -56,7 +56,7 @@
     "@instructure/ui-layout": "6",
     "@instructure/ui-link": "6",
     "@instructure/ui-list": "6",
-    "@instructure/ui-media-player": "^7",
+    "@instructure/ui-media-player": "^7.2",
     "@instructure/ui-menu": "6",
     "@instructure/ui-metric": "6",
     "@instructure/ui-modal": "6",

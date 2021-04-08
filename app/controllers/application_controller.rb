@@ -171,6 +171,7 @@ class ApplicationController < ActionController::Base
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user.try(:prefers_high_contrast?),
+          auto_show_cc: @current_user.try(:auto_show_cc?),
           disable_celebrations: @current_user.try(:prefers_no_celebrations?),
           disable_keyboard_shortcuts: @current_user.try(:prefers_no_keyboard_shortcuts?),
           LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),

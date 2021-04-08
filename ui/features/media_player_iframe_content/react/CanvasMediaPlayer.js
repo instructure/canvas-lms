@@ -35,6 +35,23 @@ const liveRegion = () => window.top.document.getElementById('flash_screenreader_
 const DEFAULT_MAX_RETRY_ATTEMPTS = 11
 const DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS = 3
 
+export function getAutoTrack(tracks) {
+  if (!ENV.auto_show_cc) return undefined
+  if (!tracks) return undefined
+  let locale = ENV.locale || document.documentElement.getAttribute('lang') || 'en'
+  // look for an exact match
+  let auto_track = tracks.find(t => t.locale === locale)
+  if (!auto_track) {
+    // look for an exact match to the de-regionalized user locale
+    locale = locale.replace(/-.*/, '')
+    auto_track = tracks.find(t => t.locale === locale)
+    if (!auto_track) {
+      // look for any match to de-regionalized tracks
+      auto_track = tracks.find(t => t.locale.replace(/-.*/, '') === locale)
+    }
+  }
+  return auto_track?.locale
+}
 export default function CanvasMediaPlayer(props) {
   const sorted_sources = Array.isArray(props.media_sources)
     ? props.media_sources.sort(byBitrate)
@@ -57,6 +74,7 @@ export default function CanvasMediaPlayer(props) {
   const [SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS] = useState(
     ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS || props.SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS
   )
+  const [auto_cc_track] = useState(getAutoTrack(tracks))
 
   const containerRef = useRef(null)
   const mediaPlayerRef = useRef(null)
@@ -98,7 +116,7 @@ export default function CanvasMediaPlayer(props) {
   )
 
   const fetchSources = useCallback(
-    async function() {
+    async function () {
       const url = `/media_objects/${props.media_id}/info`
       let resp
       try {
@@ -202,6 +220,7 @@ export default function CanvasMediaPlayer(props) {
           hideFullScreen={!includeFullscreen}
           onLoadedMetadata={handleLoadedMetadata}
           captionPosition="bottom"
+          autoShowCaption={auto_cc_track}
         />
       ) : (
         renderNoPlayer()
