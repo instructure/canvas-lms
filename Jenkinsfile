@@ -62,10 +62,6 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-def getRailsLoadAllLocales() {
-  return configuration.isChangeMerged() ? 1 : (configuration.getBoolean('rails-load-all-locales', 'false') ? 1 : 0)
-}
-
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
 def ignoreBuildNeverStartedError(block) {
@@ -199,53 +195,6 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def slackSendCacheBuild(block) {
-  def buildStartTime = System.currentTimeMillis()
-
-  block()
-
-  def buildEndTime = System.currentTimeMillis()
-
-  def buildLog = sh(script: 'cat tmp/docker-build.log', returnStdout: true).trim()
-  def buildLogParts = buildLog.split('\n')
-  def buildLogPartsLength = buildLogParts.size()
-
-  // slackSend() has a ridiculously low limit of 2k, so we need to split longer logs
-  // into parts.
-  def i = 0
-  def partitions = []
-  def cur_partition = []
-  def max_entries = 5
-
-  while(i < buildLogPartsLength) {
-    cur_partition.add(buildLogParts[i])
-
-    if(cur_partition.size() >= max_entries) {
-      partitions.add(cur_partition)
-
-      cur_partition = []
-    }
-
-    i++
-  }
-
-  if(cur_partition.size() > 0) {
-    partitions.add(cur_partition)
-  }
-
-  for(i = 0; i < partitions.size(); i++) {
-    slackSend(
-      channel: '#jenkins_cache_noisy',
-      message: """<${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> (${i} / ${partitions.size() - 1})
-      Duration: ${buildEndTime - buildStartTime}ms
-      Instance: ${env.NODE_NAME}
-
-        ```${partitions[i].join('\n\n')}```
-      """
-    )
-  }
-}
-
 // These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
 // builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
 // running real post-merge builds.
@@ -286,21 +235,6 @@ def getCanvasLmsRefspec() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.canvasLmsRefspecDefault() : configuration.canvasLmsRefspec()
 }
 // =========
-
-def handleDockerBuildFailure(imagePrefix, e) {
-  if(configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
-    // DEBUG: In some cases, such as the the image build failing only on Jenkins, it can be useful to be able to
-    // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
-    // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.
-
-    sh(script: """
-      docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $imagePrefix-failed
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $imagePrefix-failed
-    """, label: 'upload failed image')
-  }
-
-  throw e
-}
 
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary("local-lib", "build/new-jenkins/library")
@@ -483,88 +417,18 @@ pipeline {
               }
 
               if (configuration.isChangeMerged()) {
-                extendedStage('Build Docker Image (Pre-Merge)').obeysAllowStages(false).handler(buildSummaryReport).execute {
-                  timeout(time: 20) {
-                    credentials.withStarlordCredentials {
-                      withEnv([
-                        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                        "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                        "COMPILE_ADDITIONAL_ASSETS=0",
-                        "JS_BUILD_NO_UGLIFY=1",
-                        "RAILS_LOAD_ALL_LOCALES=0",
-                        "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
-                        "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                        "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                        "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
-                      ]) {
-                        slackSendCacheBuild {
-                          try {
-                            sh "build/new-jenkins/docker-build.sh"
-                          } catch(e) {
-                            handleDockerBuildFailure("$PATCHSET_TAG-pre-merge-failed", e)
-                          }
-                        }
-
-                        // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
-                        // has changed between the post-merge build and this pre-merge build.
-                        sh(script: """
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
-                        """, label: 'upload cache images')
-                      }
-                    }
-                  }
-                }
+                extendedStage('Build Docker Image (Pre-Merge)')
+                  .obeysAllowStages(false)
+                  .handler(buildSummaryReport)
+                  .timeout(20)
+                  .execute(buildDockerImageStage.&premergeCacheImage)
               }
 
-              extendedStage('Build Docker Image').obeysAllowStages(false).handler(buildSummaryReport).execute {
-                timeout(time: 20) {
-                  credentials.withStarlordCredentials {
-                    def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
-
-                    slackSendCacheBuild {
-                      withEnv([
-                        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                        "CACHE_SAVE_SCOPE=${cacheScope}",
-                        "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
-                        "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
-                        "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
-                        "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-                        "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
-                        "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                        "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                        "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
-                      ]) {
-                        try {
-                          sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
-                        } catch(e) {
-                          handleDockerBuildFailure(PATCHSET_TAG, e)
-                        }
-                      }
-                    }
-
-                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
-
-                    if(configuration.isChangeMerged()) {
-                      def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                      sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
-
-                      sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
-                    }
-
-                    sh(script: """
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
-                    """, label: 'upload cache images')
-                  }
-                }
-              }
+              extendedStage('Build Docker Image')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(20)
+                .execute(buildDockerImageStage.&patchsetImage)
 
               extendedStage('Run Migrations').obeysAllowStages(false).handler(buildSummaryReport).execute {
                 timeout(time: 10) {
@@ -647,32 +511,9 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
-                  extendedStage(JS_BUILD_IMAGE_STAGE).handler(buildSummaryReport).queue(stages) {
-                    credentials.withStarlordCredentials {
-                      try {
-                        def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
-
-                        withEnv([
-                          "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-                          "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-                          "CACHE_SAVE_SCOPE=${cacheScope}",
-                          "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
-                          "PATCHSET_TAG=${env.PATCHSET_TAG}",
-                          "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-                          "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
-                        ]) {
-                          sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
-                        }
-
-                        sh """
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
-                          ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_BUILDER_PREFIX
-                        """
-                      } catch(e) {
-                        handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
-                      }
-                    }
-                  }
+                  extendedStage(JS_BUILD_IMAGE_STAGE)
+                    .handler(buildSummaryReport)
+                    .queue(stages, buildDockerImageStage.&jsImage)
 
                   echo 'adding Contract Tests'
                   extendedStage('Contract Tests')
