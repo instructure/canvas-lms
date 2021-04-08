@@ -358,21 +358,19 @@ pipeline {
                 .timeout(2)
                 .execute({ setupStage() })
 
-              if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
-                extendedStage('Rebase')
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .timeout(2)
-                  .execute({ rebaseStage() })
-              }
+              extendedStage('Rebase')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
+                .timeout(2)
+                .execute({ rebaseStage() })
 
-              if (configuration.isChangeMerged()) {
-                extendedStage('Build Docker Image (Pre-Merge)')
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .timeout(20)
-                  .execute(buildDockerImageStage.&premergeCacheImage)
-              }
+              extendedStage('Build Docker Image (Pre-Merge)')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .required(configuration.isChangeMerged())
+                .timeout(20)
+                .execute(buildDockerImageStage.&premergeCacheImage)
 
               extendedStage('Build Docker Image')
                 .obeysAllowStages(false)
@@ -394,12 +392,11 @@ pipeline {
                 ]) {
                   def stages = [:]
 
-                  if (!configuration.isChangeMerged()) {
-                    echo 'adding Linters'
-                    extendedStage('Linters')
-                      .handler(buildSummaryReport)
-                      .queue(stages, { lintersStage() })
-                  }
+                  echo 'adding Linters'
+                  extendedStage('Linters')
+                    .handler(buildSummaryReport)
+                    .required(!configuration.isChangeMerged())
+                    .queue(stages, { lintersStage() })
 
                   echo 'adding Consumer Smoke Test'
                   extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
@@ -470,11 +467,10 @@ pipeline {
                       .queue(stages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
                   }
 
-                  if(configuration.isChangeMerged()) {
-                    extendedStage('Dependency Check')
-                      .handler(buildSummaryReport)
-                      .queue(stages, { dependencyCheckStage() })
-                  }
+                  extendedStage('Dependency Check')
+                    .handler(buildSummaryReport)
+                    .required(configuration.isChangeMerged())
+                    .queue(stages, { dependencyCheckStage() })
 
                   distribution.stashBuildScripts()
 
