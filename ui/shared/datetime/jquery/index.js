@@ -96,20 +96,25 @@ $.timeString = function(date, options) {
   if (date == null) return ''
   const timezone = options && options.timezone
 
+  if (typeof timezone === 'string' || timezone instanceof String) {
+    // match ruby-side short format on the hour, e.g. `1pm`
+    // can't just check getMinutes, cuz not all timezone offsets are on the hour
+    const format =
+      tz.hasMeridian() && tz.format(date, '%M', timezone) === '00'
+        ? 'time.formats.tiny_on_the_hour'
+        : 'time.formats.tiny'
+    return tz.format(date, format, timezone) || ''
+  }
+
   // match ruby-side short format on the hour, e.g. `1pm`
   // can't just check getMinutes, cuz not all timezone offsets are on the hour
-  const format = tz.hasMeridian() && tz.format(date, '%M') === '00' ? (
-    'time.formats.tiny_on_the_hour'
-  ) : (
-    'time.formats.tiny'
-  )
-
-  if (typeof timezone === 'string' || timezone instanceof String) {
-    return tz.format(date, format, timezone) || ''
-  } else {
-    return tz.format(date, format) || ''
-  }
+  const format =
+    tz.hasMeridian() && tz.format(date, '%M') === '00'
+      ? 'time.formats.tiny_on_the_hour'
+      : 'time.formats.tiny'
+  return tz.format(date, format) || ''
 }
+
 $.datetimeString = function(datetime, options) {
   datetime = tz.parse(datetime)
   if (datetime == null) return ''
