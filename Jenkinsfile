@@ -119,6 +119,10 @@ def postFn(status) {
 
       buildSummaryReport.publishReport('Build Summary Report', status)
 
+      if(isPatchsetPublishable()) {
+        dockerUtils.tagRemote(env.PATCHSET_TAG, env.EXTERNAL_TAG)
+      }
+
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
         dockerUtils.tagRemote(env.CASSANDRA_IMAGE, env.CASSANDRA_MERGE_IMAGE)
@@ -558,11 +562,6 @@ pipeline {
                       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
                       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                     """, label: 'upload cache images')
-
-                    if (isPatchsetPublishable()) {
-                      sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                      sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
-                    }
                   }
                 }
               }
