@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+def FILES_CHANGED_STAGE = "Detect Files Changed"
 def JS_BUILD_IMAGE_STAGE = "Javascript (Build Image)"
 
 def buildParameters = [
@@ -358,6 +359,25 @@ pipeline {
                 .timeout(2)
                 .execute({ setupStage() })
 
+              extendedStage(FILES_CHANGED_STAGE)
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(2)
+                .execute { stageConfig ->
+                  stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
+                  stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
+
+                  dir(env.LOCAL_WORKDIR) {
+                    stageConfig.value('specFiles', sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)
+                  }
+
+                  // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
+                  // https://issues.jenkins.io/browse/JENKINS-52750
+                  if(env.GERRIT_PROJECT != "canvas-lms") {
+                    sh "rm -vrf $LOCAL_WORKDIR@tmp"
+                  }
+                }
+
               extendedStage('Rebase')
                 .obeysAllowStages(false)
                 .handler(buildSummaryReport)
@@ -384,7 +404,7 @@ pipeline {
                 .timeout(10)
                 .execute({ runMigrationsStage() })
 
-              stage('Parallel Run Tests') {
+              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
                 withEnv([
                     "CASSANDRA_IMAGE_TAG=${env.CASSANDRA_IMAGE}",
                     "DYNAMODB_IMAGE_TAG=${env.DYNAMODB_IMAGE}",
@@ -425,47 +445,29 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
-                  if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
-                    echo 'adding CDC Schema check'
-                    extendedStage('CDC Schema Check')
-                      .handler(buildSummaryReport)
-                      .queue(stages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
-                        string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                      ])
-                  }
-                  else {
-                    echo 'no migrations added, skipping CDC Schema check'
-                  }
+                  echo 'adding CDC Schema check'
+                  extendedStage('CDC Schema Check')
+                    .handler(buildSummaryReport)
+                    .required(buildConfig[FILES_CHANGED_STAGE].value('migrationFiles'))
+                    .queue(stages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
+                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
+                    ])
 
-                  if (
-                    !configuration.isChangeMerged() &&
-                    (
-                      dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) } ||
-                      configuration.forceFailureFSC() == '1'
-                    )
-                  ) {
-                    echo 'adding Flakey Spec Catcher'
-                    extendedStage('Flakey Spec Catcher')
-                      .handler(buildSummaryReport)
-                      .queue(stages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
-                        string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                        string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                        string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ])
-                  }
+                  echo 'adding Flakey Spec Catcher'
+                  extendedStage('Flakey Spec Catcher')
+                    .handler(buildSummaryReport)
+                    .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
+                    .queue(stages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ])
 
-                  // Flakey spec catcher using the dir step above will create this @tmp file, we need to remove it
-                  // https://issues.jenkins.io/browse/JENKINS-52750
-                  if(!configuration.isChangeMerged() && env.GERRIT_PROJECT != "canvas-lms") {
-                    sh "rm -vrf $LOCAL_WORKDIR@tmp"
-                  }
-
-                  if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
-                    echo 'adding Local Docker Dev Build'
-                    extendedStage('Local Docker Dev Build')
-                      .handler(buildSummaryReport)
-                      .queue(stages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
-                  }
+                  echo 'adding Local Docker Dev Build'
+                  extendedStage('Local Docker Dev Build')
+                    .handler(buildSummaryReport)
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('dockerDevFiles'))
+                    .queue(stages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
 
                   extendedStage('Dependency Check')
                     .handler(buildSummaryReport)
