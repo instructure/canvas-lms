@@ -1826,6 +1826,14 @@
     classnames "^2"
     prop-types "^15"
 
+"@instructure/ui-axe-check@^6.27.0":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-axe-check/-/ui-axe-check-6.27.0.tgz#1d8aad2ea872e1f9881065fabf6ce38bbafc2d85"
+  integrity sha512-xmoWXg1dN5loP42I5ED/EMmiH+Yn1jbuf96KIpgjGTbU+FWmVpxi/UpcM7rWSqObu5mhz4P5zGgOpREvGXZEkg==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    axe-core "^3.3.2"
+
 "@instructure/ui-axe-check@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@instructure/ui-axe-check/-/ui-axe-check-7.4.4.tgz#c535838a9b30882df91acce007599a959ab5299c"
@@ -3947,6 +3955,14 @@
     classnames "^2"
     prop-types "^15"
 
+"@instructure/ui-test-locator@^6.27.0":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-test-locator/-/ui-test-locator-6.27.0.tgz#967ab50c15873162956eb2d2e183f54c278976be"
+  integrity sha512-b/EvIB/vanuWnPLfsIViU3ItKCk2YxeSgfhgh4YrUxzwzZJNp7aqUGP9udDASkPeutGVWIj6fW7CHMfB2B1hiQ==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/ui-test-queries" "^6.27.0"
+
 "@instructure/ui-test-locator@^7.3.0":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@instructure/ui-test-locator/-/ui-test-locator-7.4.4.tgz#cd832da459a7613eee162a98546fe3deb0ff55c3"
@@ -3954,6 +3970,18 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
     "@instructure/ui-test-queries" "^7.4.4"
+
+"@instructure/ui-test-queries@^6.27.0":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-test-queries/-/ui-test-queries-6.27.0.tgz#d740ef090ae4e1f458b97c069c1fdb7d3dda7044"
+  integrity sha512-KRAoMyHAFqdEOKVf24Ygkj3p/pi8NiK+m518kdkyqavWizNJ9FUg97E88340E3TspJ63IdiCfSqxh36xLEATHw==
+  dependencies:
+    "@instructure/debounce" "^6.27.0"
+    "@instructure/ui-axe-check" "^6.27.0"
+    "@instructure/ui-test-sandbox" "^6.27.0"
+    keycode "^2"
+    pretty-format "^24.9.0"
+    sizzle "^2.3.4"
 
 "@instructure/ui-test-queries@^7.4.4":
   version "7.4.4"
@@ -3966,6 +3994,14 @@
     keycode "^2"
     pretty-format "^24.9.0"
     sizzle "^2.3.4"
+
+"@instructure/ui-test-sandbox@^6.27.0":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-test-sandbox/-/ui-test-sandbox-6.27.0.tgz#07249427502a572a87c2bd363fbc4e8ffe691b6b"
+  integrity sha512-QEdekAo1+7GuMYazHdt4BGt7UGWnJGvO4l891NnDGgnZlHpD21TJSH76OF+QHA5yw7Ukfoeu7Gp/GlwtrIOuEQ==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    sinon "^7.4.2"
 
 "@instructure/ui-test-sandbox@^7.4.4":
   version "7.4.4"
@@ -4178,6 +4214,24 @@
   dependencies:
     "@babel/runtime" "^7"
     "@instructure/ui-themeable" "^5.52.3"
+
+"@instructure/ui-time-select@6":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-time-select/-/ui-time-select-6.27.0.tgz#337a376e2df4c0934baffe3f34daf4578dfa1479"
+  integrity sha512-FVidYN10CSU+2vmSpiQgBC9XUK3yBtGCUQAIxxE0v3lkxFa2AtiD8J3FlvG/0ztXjKU1BmhbYyZDjLBRCxMPhw==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/console" "^6.27.0"
+    "@instructure/ui-form-field" "^6.27.0"
+    "@instructure/ui-i18n" "^6.27.0"
+    "@instructure/ui-position" "^6.27.0"
+    "@instructure/ui-prop-types" "^6.27.0"
+    "@instructure/ui-react-utils" "^6.27.0"
+    "@instructure/ui-select" "^6.27.0"
+    "@instructure/ui-test-locator" "^6.27.0"
+    "@instructure/ui-testable" "^6.27.0"
+    "@instructure/uid" "^6.27.0"
+    prop-types "^15"
 
 "@instructure/ui-toggle-details@6":
   version "6.27.0"
