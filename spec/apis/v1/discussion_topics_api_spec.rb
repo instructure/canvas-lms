@@ -3067,6 +3067,20 @@ describe DiscussionTopicsController, type: :request do
         :expected_status => 200)
     end
 
+    it "duplicate doesn't work if student" do
+      @user = student_in_course(active_all: true).user
+
+      api_call(:post,"/api/v1/courses/#{@course.id}/discussion_topics/#{@group_topic.id}/duplicate",
+               { :controller => "discussion_topics_api",
+                 :action => "duplicate",
+                 :format => "json",
+                 :course_id => @course.to_param,
+                 :topic_id => @group_topic.to_param },
+               {},
+               {},
+               :expected_status => 401)
+    end
+
     it "duplicate carries sections over" do
       @user = @teacher
       discussion_topic_model(:context => @course, :title => "Section Specific Topic", :user => @teacher)
