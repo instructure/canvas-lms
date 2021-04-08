@@ -302,15 +302,6 @@ library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary("local-lib", "build/new-jenkins/library")
 
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
-extendedStage.setAlwaysAllowStages([
-    'Builder',
-    'Setup',
-    'Rebase',
-    'Build Docker Image',
-    'Run Migrations',
-    'Parallel Run Tests',
-    'Waiting',
-])
 
 pipeline {
   agent none
@@ -411,12 +402,12 @@ pipeline {
 
           def rootStages = [:]
 
-          extendedStage('Builder').timings(false).queue(rootStages) {
+          extendedStage('Builder').obeysAllowStages(false).timings(false).queue(rootStages) {
             // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
             // wait for the current steps to complete (even wait to spin up a node), causing
             // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
             protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
-              extendedStage('Setup').handler(buildSummaryReport).execute {
+              extendedStage('Setup').obeysAllowStages(false).handler(buildSummaryReport).execute {
                 timeout(time: 2) {
                   echo "Cleaning Workspace From Previous Runs"
                   sh 'ls -A1 | xargs rm -rf'
@@ -476,7 +467,7 @@ pipeline {
               }
 
               if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
-                extendedStage('Rebase').handler(buildSummaryReport).execute {
+                extendedStage('Rebase').obeysAllowStages(false).handler(buildSummaryReport).execute {
                   timeout(time: 2) {
                     rebaseHelper(GERRIT_BRANCH)
 
@@ -488,7 +479,7 @@ pipeline {
               }
 
               if (configuration.isChangeMerged()) {
-                extendedStage('Build Docker Image (Pre-Merge)').handler(buildSummaryReport).execute {
+                extendedStage('Build Docker Image (Pre-Merge)').obeysAllowStages(false).handler(buildSummaryReport).execute {
                   timeout(time: 20) {
                     credentials.withStarlordCredentials {
                       withEnv([
@@ -525,7 +516,7 @@ pipeline {
                 }
               }
 
-              extendedStage('Build Docker Image').handler(buildSummaryReport).execute {
+              extendedStage('Build Docker Image').obeysAllowStages(false).handler(buildSummaryReport).execute {
                 timeout(time: 20) {
                   credentials.withStarlordCredentials {
                     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
@@ -576,7 +567,7 @@ pipeline {
                 }
               }
 
-              extendedStage('Run Migrations').handler(buildSummaryReport).execute {
+              extendedStage('Run Migrations').obeysAllowStages(false).handler(buildSummaryReport).execute {
                 timeout(time: 10) {
                   credentials.withStarlordCredentials {
                     def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
