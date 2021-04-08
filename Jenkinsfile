@@ -436,25 +436,9 @@ pipeline {
 
                   if (!configuration.isChangeMerged()) {
                     echo 'adding Linters'
-                    extendedStage('Linters').handler(buildSummaryReport).queue(stages) {
-                      credentials.withStarlordCredentials {
-                        credentials.withGerritCredentials {
-                          withEnv([
-                            "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
-                            "PLUGINS_LIST=${configuration.plugins().join(' ')}",
-                            "SKIP_ESLINT=${configuration.getString('skip-eslint', 'false')}",
-                            "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
-                          ]) {
-                            sh 'build/new-jenkins/linters/run-gergich.sh'
-                          }
-                        }
-                        if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
-                          credentials.withMasterBouncerCredentials {
-                            sh 'build/new-jenkins/linters/run-master-bouncer.sh'
-                          }
-                        }
-                      }
-                    }
+                    extendedStage('Linters')
+                      .handler(buildSummaryReport)
+                      .queue(stages, { lintersStage() })
                   }
 
                   echo 'adding Consumer Smoke Test'
