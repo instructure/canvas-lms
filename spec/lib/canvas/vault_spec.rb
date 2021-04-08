@@ -125,7 +125,7 @@ module Canvas
       end
 
       it "reads from disk config if configured to do so" do
-        cred_path = "sts/testaccount/sts/canvas-shards-lookuper-test"
+        cred_path = "sts/testaccount/sts/canvas-shards-lookupper-test"
         creds_hash = {
           cred_path => {
             "access_key"=>"fake-access-key",
