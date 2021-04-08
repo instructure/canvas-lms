@@ -108,11 +108,11 @@ describe('GradesSummary', () => {
     )
     expect(getByTestId('k5-grades-course-image')).toBeInTheDocument()
     expect(queryByLabelText('Grade for Horticulture', {exact: false})).not.toBeInTheDocument()
-    expect(getByRole('link', {name: 'View Gradebook'})).toBeInTheDocument()
+    expect(getByRole('link', {name: 'View Gradebook for Horticulture'})).toBeInTheDocument()
   })
 
   it('does not render a link to the gradebook for students', () => {
     const {queryByRole} = render(<GradesSummary courses={[defaultCourse]} />)
-    expect(queryByRole('link', {name: 'View Gradebook'})).not.toBeInTheDocument()
+    expect(queryByRole('link', {name: 'View Gradebook for Horticulture'})).not.toBeInTheDocument()
   })
 })

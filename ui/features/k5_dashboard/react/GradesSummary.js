@@ -176,6 +176,7 @@ export const GradeSummaryLine = ({
                 renderIcon={IconExternalLinkLine}
                 href={`/courses/${courseId}/gradebook`}
                 target="_blank"
+                aria-label={I18n.t('View Gradebook for %{course}', {course: courseName})}
               >
                 {I18n.t('View Gradebook')}
               </Button>
