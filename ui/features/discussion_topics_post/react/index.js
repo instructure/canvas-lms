@@ -16,9 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import AlertManager from '@canvas/alerts/react/AlertManager'
+import {ApolloProvider, createClient} from '@canvas/apollo'
+import ErrorBoundary from '@canvas/error-boundary'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import GenericErrorPage from '@canvas/generic-error-page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+const client = createClient()
+
 export default function renderDiscussionPosts(env, elt) {
-  ReactDOM.render(<h1>New Discussion Post Entry Point</h1>, elt)
+  ReactDOM.render(
+    <ApolloProvider client={client}>
+      <ErrorBoundary
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorCategory="Discussion Topic Post Error Page"
+          />
+        }
+      >
+        <AlertManager>
+          <h1>New Discussion Post Entry Point</h1>
+        </AlertManager>
+      </ErrorBoundary>
+    </ApolloProvider>,
+    elt
+  )
 }
