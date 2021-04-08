@@ -193,12 +193,6 @@ def maybeSlackSendRetrigger() {
 // builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
 // running real post-merge builds.
 // =========
-def getPluginVersion(plugin) {
-  if(env.GERRIT_BRANCH.contains('stable/')) {
-    return configuration.getString("pin-commit-$plugin", env.GERRIT_BRANCH)
-  }
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
-}
 
 def getSlackChannel() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
@@ -334,69 +328,35 @@ pipeline {
 
           def rootStages = [:]
 
+          buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
+          buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
+          buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
+          buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
+          buildParameters += string(name: 'CANVAS_RAILS6_0', value: "1")
+
+          // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
+          // the gerrit rather than master.
+          if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('Jenkinsfile')) {
+              buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
+          }
+
+          if (env.GERRIT_PROJECT != "canvas-lms") {
+            // the plugin builds require the canvas lms refspec to be different. so only
+            // set this refspec if the main build is requesting it to be set.
+            // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
+            buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
+          }
+
           extendedStage('Builder').obeysAllowStages(false).timings(false).queue(rootStages) {
             // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
             // wait for the current steps to complete (even wait to spin up a node), causing
             // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
             protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
-              extendedStage('Setup').obeysAllowStages(false).handler(buildSummaryReport).execute {
-                timeout(time: 2) {
-                  echo "Cleaning Workspace From Previous Runs"
-                  sh 'ls -A1 | xargs rm -rf'
-                  sh 'find .'
-                  cleanAndSetup()
-                  def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
-                  checkoutRepo("canvas-lms", refspecToCheckout, 100)
-
-                  if(env.GERRIT_PROJECT != "canvas-lms") {
-                    dir(env.LOCAL_WORKDIR) {
-                      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
-                    }
-
-                    // Plugin builds using the dir step above will create this @tmp file, we need to remove it
-                    // https://issues.jenkins.io/browse/JENKINS-52750
-                    sh 'rm -vr gems/plugins/*@tmp'
-                  }
-
-                  buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
-                  buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
-                  buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
-                  buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-
-                  // if (currentBuild.projectName.contains("rails-6")) {
-                    // when updating this for future rails versions, change the value back to ${env.CANVAS_RAILSX_Y}
-                    buildParameters += string(name: 'CANVAS_RAILS6_0', value: "1")
-                  // }
-
-                  // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
-                  // the gerrit rather than master.
-                  if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('Jenkinsfile')) {
-                      buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
-                  }
-
-                  if (env.GERRIT_PROJECT != "canvas-lms") {
-                    // the plugin builds require the canvas lms refspec to be different. so only
-                    // set this refspec if the main build is requesting it to be set.
-                    // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
-                    buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
-                  }
-
-                  gems = configuration.plugins()
-                  echo "Plugin list: ${gems}"
-                  def pluginsToPull = []
-                  gems.each {
-                    if (env.GERRIT_PROJECT != it) {
-                      pluginsToPull.add([name: it, version: getPluginVersion(it), target: "gems/plugins/$it"])
-                    }
-                  }
-
-                  pluginsToPull.add([name: 'qti_migration_tool', version: getPluginVersion('qti_migration_tool'), target: "vendor/qti_migration_tool"])
-
-                  pullRepos(pluginsToPull)
-
-                  libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
-                }
-              }
+              extendedStage('Setup')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(2)
+                .execute({ setupStage() })
 
               if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                 extendedStage('Rebase')
