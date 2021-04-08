@@ -317,7 +317,7 @@ pipeline {
               gerrit.submitLintReview("-2", "Build not executed due to [skip-ci] flag")
               error "[skip-ci] flag enabled: skipping the build"
               return
-            } else if(extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed()) {
+            } else if(extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
               gerrit.submitLintReview("-2", "One or more build flags causes a subset of the build to be run")
             } else {
               gerrit.submitLintReview("0")
@@ -398,7 +398,7 @@ pipeline {
                 }
               }
 
-              if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
+              if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                 extendedStage('Rebase')
                   .obeysAllowStages(false)
                   .handler(buildSummaryReport)
