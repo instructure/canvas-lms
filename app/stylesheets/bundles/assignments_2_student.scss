@@ -25,6 +25,9 @@
 @import "components/_rubric.scss";
 @import "components/_ic-code.scss";
 
+$student-footer-height: 75px;
+$student-view-banner-height: 50px;
+
 #assignments_2 {
     max-width: 1000px;
 }
@@ -32,6 +35,7 @@
 #assignments-student-footer {
   position: fixed;
   bottom: 0;
+  height: $student-footer-height;
   #{direction(right)}: 0;
   width: 100%;
   box-sizing: border-box;
@@ -40,4 +44,21 @@
   text-align: #{direction(right)};
   z-index: 999;
   background: blue;
+}
+
+#content-wrapper {
+  padding-bottom: $student-footer-height;
+}
+
+body.is-masquerading-or-student-view {
+  // show the student footer above the masquerading banner
+  #assignments-student-footer {
+    bottom: $student-view-banner-height;
+    // don't obstruct the "border" of the student view
+    #{direction(right)}: 3px;
+  }
+
+  #content-wrapper {
+    padding-bottom: $student-footer-height + $student-view-banner-height;
+  }
 }
