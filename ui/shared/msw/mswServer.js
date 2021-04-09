@@ -17,6 +17,6 @@
  */
 
 import {setupServer} from 'msw/node'
-import {handlers} from './mswHandlers'
 
-export const mswServer = setupServer(...handlers)
+// must pass in an array of msw style handlers
+export const mswServer = handlers => setupServer(...handlers)

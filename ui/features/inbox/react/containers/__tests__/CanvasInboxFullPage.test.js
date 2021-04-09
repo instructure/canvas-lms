@@ -19,25 +19,27 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CanvasInbox from '../CanvasInbox'
 import {ApolloProvider} from 'react-apollo'
-import {mswServer} from '../../../graphql/mswServer'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {mswClient} from '../../../graphql/mswClient'
+import {mswClient} from '../../../../../shared/msw/mswClient'
+import {mswServer} from '../../../../../shared/msw/mswServer'
+import {handlers} from '../../../graphql/mswHandlers'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 
 describe('CanvasInbox Full Page', () => {
+  const server = mswServer(handlers)
   beforeAll(() => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
-    mswServer.listen()
+    server.listen()
   })
 
   afterEach(() => {
-    mswServer.resetHandlers()
+    server.resetHandlers()
   })
 
   afterAll(() => {
-    mswServer.close()
+    server.close()
     // eslint-disable-next-line no-undef
     fetchMock.enableMocks()
   })
