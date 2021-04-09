@@ -463,12 +463,6 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
-                  echo 'adding Local Docker Dev Build'
-                  extendedStage('Local Docker Dev Build')
-                    .handler(buildSummaryReport)
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('dockerDevFiles'))
-                    .queue(stages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
-
                   extendedStage('Dependency Check')
                     .handler(buildSummaryReport)
                     .required(configuration.isChangeMerged())
@@ -483,6 +477,18 @@ pipeline {
                 }
               }
             }
+          }
+
+          extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+            def nestedStages = [:]
+
+            echo 'adding Local Docker Dev Build'
+            extendedStage('Local Docker Dev Build')
+              .handler(buildSummaryReport)
+              .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('dockerDevFiles'))
+              .queue(nestedStages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
+
+            parallel(nestedStages)
           }
 
           extendedStage("Javascript (Waiting for Dependencies)").waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
