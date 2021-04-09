@@ -118,8 +118,11 @@ describe 'new ui' do
 
     it 'should not override high contrast theme', priority: "2", test_id: 244898 do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
-      @user.enable_feature!('high_contrast')
       get '/profile/settings'
+      f('.high_contrast .ic-Super-toggle__switch').click
+      wait_for_ajaximations
+      f = FeatureFlag.find_by(feature: 'high_contrast')
+      expect(f.state).to eq 'on'
       menu_link = f('.profile_settings.active')
       expect(menu_link.css_value('border-left')).to eq('2px solid rgb(45, 59, 69)')
       expect(menu_link.css_value('color')).to eq('rgba(45, 59, 69, 1)')

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import FeatureFlagAdminView from '@canvas/feature-flag-admin-view'
 import '@canvas/backoff-poller'
 import './jquery/index'
 import '@canvas/user-sortable-name'
@@ -32,11 +33,16 @@ ready(() => {
     hiddenFlags.push('new_user_tutorial_on_off')
   }
 
-  ReactDOM.render(
-    <FeatureFlags hiddenFlags={hiddenFlags} disableDefaults />,
-    // There is only one of these
-    document.querySelector('.feature-flag-wrapper')
-  )
+  if (window.ENV.NEW_FEATURES_UI) {
+    ReactDOM.render(
+      <FeatureFlags hiddenFlags={hiddenFlags} disableDefaults />,
+      // There is only one of these
+      document.querySelector('.feature-flag-wrapper')
+    )
+  } else {
+    const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
+    view.collection.fetchAll()
+  }
 
   const container = document.querySelector('#pairing-code')
   if (container) {

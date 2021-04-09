@@ -1107,6 +1107,7 @@ class AccountsController < ApplicationController
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
+        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
           :manage_feature_flags => @account.grants_right?(@current_user, session, :manage_feature_flags)

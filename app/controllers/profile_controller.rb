@@ -215,6 +215,7 @@ class ProfileController < ApplicationController
         add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path)
         js_env(
           NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
+          NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
           CONTEXT_BASE_URL: "/users/#{@user.id}"
         )
         render :profile
