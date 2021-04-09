@@ -201,20 +201,30 @@ QUnit.module('mathEquationHelper', {
   }
 })
 
-test('getImageEquationText uses data-equation-content if available', () => {
-  const img = document.createElement('img')
-  img.setAttribute('data-equation-content', 'y = sqrt{x}')
-  equal(mathImageHelper.getImageEquationText(img), 'y = sqrt{x}')
-})
-
-test('getImageEquationText uses img src if missing data-equation-content', () => {
+test('getImageEquationText does not use data-equation-content', () => {
   const img = document.createElement('img')
   const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
   img.setAttribute('src', `http://host/equation_images/${txt}`)
+  img.setAttribute('data-equation-content', 'never use me')
   equal(mathImageHelper.getImageEquationText(img), 'y = sqrt{x}')
 })
 
-test('getImageEquationText returns undefined if it not an equation image', () => {
+test('getImageEquationText uses img src as the source of truth', () => {
+  const img = document.createElement('img')
+  const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
+  img.setAttribute('src', `http://host/equation_images/${txt}`)
+  img.setAttribute('data-equation-content', 'never use me')
+  equal(mathImageHelper.getImageEquationText(img), 'y = sqrt{x}')
+})
+
+test('getImageEquationText returns undefined if there is no src', () => {
+  const img = document.createElement('img')
+  const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
+  img.setAttribute('alt', `http://host/not_equation_images/${txt}`)
+  equal(mathImageHelper.getImageEquationText(img), undefined)
+})
+
+test('getImageEquationText returns undefined if it is not an equation image', () => {
   const img = document.createElement('img')
   const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
   img.setAttribute('src', `http://host/not_equation_images/${txt}`)
