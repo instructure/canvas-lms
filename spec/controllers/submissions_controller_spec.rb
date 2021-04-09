@@ -421,7 +421,7 @@ describe SubmissionsController do
 
         aggregate_failures do
           expect(response).to be_redirect
-          expect(flash[:error]).to eq "Annotated Document submissions require an annotated_document_id to submit"
+          expect(flash[:error]).to eq "Student Annotation submissions require an annotated_document_id to submit"
         end
       end
 

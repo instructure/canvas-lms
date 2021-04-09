@@ -68,7 +68,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     case submission_type
     when 'annotated_document'
       if input[:annotated_document_id].blank?
-        return validation_error(I18n.t('Annotated Document submissions require an annotated_document_id to submit'))
+        return validation_error(I18n.t('Student Annotation submissions require an annotated_document_id to submit'))
       end
     when 'media_recording'
       unless input[:media_id]

@@ -2001,7 +2001,7 @@ QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', hooks => {
   })
 })
 
-QUnit.module('EditView annotatable document submission', hooks => {
+QUnit.module('EditView student annotation submission', hooks => {
   let server
   let view
 
@@ -2051,10 +2051,10 @@ QUnit.module('EditView annotatable document submission', hooks => {
     ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
     view = editView()
     const label = view.$('#assignment_annotated_document').parent()
-    ok(label.text().includes('Annotated Document'))
+    ok(label.text().includes('Student Annotation'))
   })
 
-  QUnit.module('when Annotated Document is selected', function (contextHooks) {
+  QUnit.module('when Student Annotation is selected', function (contextHooks) {
     const filename = 'test.pdf'
     const serverResponse200 = data => [
       200,
@@ -2080,7 +2080,7 @@ QUnit.module('EditView annotatable document submission', hooks => {
       server.restore()
     })
 
-    test('renders a file browser when creating new assignment and defaults to Annotated Document', function () {
+    test('renders a file browser when creating new assignment and defaults to Student Annotation', function () {
       delete ENV.ANNOTATED_DOCUMENT
       view = editView(assignmentOpts)
       view.$el.find('#assignment_annotated_document').prop('checked', true)

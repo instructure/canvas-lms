@@ -457,7 +457,7 @@ export default class EditView extends ValidatedFormView
       @fetchAttachmentFile(annotatedDocument.id,
         (document) -> self.setAnnotatedDocumentUsageRights(document.usage_rights),
         () ->
-          message = I18n.t("Failed to load annotated document file data.")
+          message = I18n.t("Failed to load student annotation file data.")
           $.flashError(message)
           $.screenReaderFlashMessage(message)
       )

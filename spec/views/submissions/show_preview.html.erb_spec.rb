@@ -75,7 +75,7 @@ describe "/submissions/show_preview" do
       expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
     end
 
-    it "renders an iframe with a src to canvadoc sessions controller when assignment is an Annotated Document" do
+    it "renders an iframe with a src to canvadoc sessions controller when assignment is a student annotation" do
       assignment = @course.assignments.create!(
         annotatable_attachment: @attachment,
         submission_types: "annotated_document",

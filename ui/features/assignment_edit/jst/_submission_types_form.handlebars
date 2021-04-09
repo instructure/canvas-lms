@@ -82,9 +82,9 @@
           id="assignment_annotated_document"
           name="online_submission_types[annotated_document]"
           aria-controls="restrict_file_extensions_container"
-          aria-label=(t "Online Submission Type - Annotated Document")
+          aria-label=(t "Online Submission Type - Student Annotation")
           disabled=submissionTypesFrozen}}
-          {{#t "labels.allows_annotated_document"}}Annotated Document{{/t}}
+          {{#t "labels.allows_annotated_document"}}Student Annotation{{/t}}
         </label>
         <div id="annotated_document_chooser_container" class="nested" aria-expanded="{{acceptsAnnotatedDocument}}"
           style="{{hiddenUnless acceptsAnnotatedDocument}}; padding: 0 0 0 42px;">
@@ -177,7 +177,7 @@
           </div>
         </div>
 
-        {{!-- Annotated Document Usage Rights Container used for React rendering --}}
+        {{!-- Student Annotation Usage Rights Container used for React rendering --}}
         <div id="annotated_document_usage_rights_container"></div>
       </div>
 

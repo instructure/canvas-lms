@@ -260,7 +260,7 @@ module Canvadocs
       end
     end
 
-    # For Annotated Document assignments, the Canvadoc won't have a
+    # For Student Annotation assignments, the Canvadoc won't have a
     # relationship with the Submission through CanvadocsSubmission, so we set
     # a blank user_filter here to avoid the default of restricting to only the
     # viewing user's annotations (default is in Canvadocs::Session). If we the

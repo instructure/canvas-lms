@@ -2923,7 +2923,7 @@ class Assignment < ActiveRecord::Base
     when 'online_url'
       t 'submission_types.a_website_url', "a website url"
     when 'annotated_document'
-      t 'annotated_document', "an annotated document"
+      t 'annotated_document', "a student annotation"
     when 'discussion_topic'
       t 'submission_types.a_discussion_post', "a discussion post"
     when 'wiki_page'

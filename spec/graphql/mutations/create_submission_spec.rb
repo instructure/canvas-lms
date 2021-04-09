@@ -113,7 +113,7 @@ RSpec.describe Mutations::CreateSubmission do
   context 'when the submission_type is annotated_document' do
     it 'requires annotated_document_id to be present' do
       result = run_mutation(submission_type: 'annotated_document')
-      error_message = 'Annotated Document submissions require an annotated_document_id to submit'
+      error_message = 'Student Annotation submissions require an annotated_document_id to submit'
       expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq error_message
     end
 

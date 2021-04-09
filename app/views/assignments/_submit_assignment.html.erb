@@ -52,7 +52,7 @@
         <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/annotated_document/) %>
-        <li><a href="#submit_annotated_document_form" class="submit_annotated_document_option"><%= t 'Annotated Document' %></a></li>
+        <li><a href="#submit_annotated_document_form" class="submit_annotated_document_option"><%= t 'Student Annotation' %></a></li>
       <% end %>
       <% if show_google_docs %>
         <li><a href="#submit_google_doc_form" class="submit_online_url_option"><%= t 'links.submit.google_doc', 'Google Doc' %></a></li>

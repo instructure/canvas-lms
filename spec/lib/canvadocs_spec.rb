@@ -747,7 +747,7 @@ describe Canvadocs do
           end
         end
 
-        context 'for an Annotated Document assignment' do
+        context 'for a student annotation assignment' do
           before(:each) do
             assignment.update!(submission_types: 'annotated_document', annotatable_attachment: attachment)
             assignment.submit_homework(
