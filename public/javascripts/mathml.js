@@ -230,9 +230,10 @@ const mathml = {
 
 const mathImageHelper = {
   getImageEquationText(img) {
-    let equation_text = img.getAttribute('data-equation-content')
-    if (!equation_text) {
-      const srceq = img.getAttribute('src').split('/equation_images/')[1]
+    let equation_text
+    const src = img.getAttribute('src')
+    if (src) {
+      const srceq = src.split('/equation_images/')[1]
       if (srceq) {
         equation_text = decodeURIComponent(decodeURIComponent(srceq))
       }

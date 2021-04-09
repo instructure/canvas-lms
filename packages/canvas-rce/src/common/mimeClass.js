@@ -83,6 +83,8 @@ export function mimeClass(file) {
         'audio/mp4': 'audio',
         'audio/wav': 'audio',
         'audio/webm': 'audio',
+        'audio/*': 'audio',
+        audio: 'audio',
         'video/mpeg': 'video',
         'video/quicktime': 'video',
         'video/x-la-asf': 'video',
@@ -95,6 +97,8 @@ export function mimeClass(file) {
         'video/mp4': 'video',
         'video/webm': 'video',
         'video/avi': 'video',
+        'video/*': 'video',
+        video: 'video',
         'application/x-shockwave-flash': 'flash'
       }[contentType] ||
       file.mime_class ||
