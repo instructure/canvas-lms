@@ -423,7 +423,7 @@ pipeline {
             }
           }
 
-          extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+          extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
             def nestedStages = [:]
 
             extendedStage('Local Docker Dev Build')
@@ -434,7 +434,7 @@ pipeline {
             parallel(nestedStages)
           }
 
-          extendedStage("Javascript (Waiting for Dependencies)").waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
+          extendedStage("Javascript (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
             def nestedStages = [:]
 
             extendedStage('Javascript (Jest)')
@@ -461,7 +461,7 @@ pipeline {
             parallel(nestedStages)
           }
 
-          extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+          extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
             def nestedStages = [:]
 
             extendedStage('CDC Schema Check')
