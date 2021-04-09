@@ -19,6 +19,7 @@
  */
 def FILES_CHANGED_STAGE = "Detect Files Changed"
 def JS_BUILD_IMAGE_STAGE = "Javascript (Build Image)"
+def RUN_MIGRATIONS_STAGE = "Run Migrations"
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -398,7 +399,7 @@ pipeline {
                 .timeout(20)
                 .execute(buildDockerImageStage.&patchsetImage)
 
-              extendedStage('Run Migrations')
+              extendedStage(RUN_MIGRATIONS_STAGE)
                 .obeysAllowStages(false)
                 .handler(buildSummaryReport)
                 .timeout(10)
@@ -423,45 +424,9 @@ pipeline {
                     sh 'build/new-jenkins/consumer-smoke-test.sh'
                   }
 
-                  echo 'adding Vendored Gems'
-                  extendedStage('Vendored Gems')
-                    .handler(buildSummaryReport)
-                    .queue(stages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ])
-
                   extendedStage(JS_BUILD_IMAGE_STAGE)
                     .handler(buildSummaryReport)
                     .queue(stages, buildDockerImageStage.&jsImage)
-
-                  echo 'adding Contract Tests'
-                  extendedStage('Contract Tests')
-                    .handler(buildSummaryReport)
-                    .queue(stages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ])
-
-                  echo 'adding CDC Schema check'
-                  extendedStage('CDC Schema Check')
-                    .handler(buildSummaryReport)
-                    .required(buildConfig[FILES_CHANGED_STAGE].value('migrationFiles'))
-                    .queue(stages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
-                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                    ])
-
-                  echo 'adding Flakey Spec Catcher'
-                  extendedStage('Flakey Spec Catcher')
-                    .handler(buildSummaryReport)
-                    .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
-                    .queue(stages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ])
 
                   extendedStage('Dependency Check')
                     .handler(buildSummaryReport)
@@ -516,6 +481,48 @@ pipeline {
               .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                 string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                 string(name: 'TEST_SUITE', value: "karma"),
+              ])
+
+            parallel(nestedStages)
+          }
+
+          extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+            def nestedStages = [:]
+
+            echo 'adding CDC Schema check'
+            extendedStage('CDC Schema Check')
+              .handler(buildSummaryReport)
+              .required(buildConfig[FILES_CHANGED_STAGE].value('migrationFiles'))
+              .queue(nestedStages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
+                string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
+              ])
+
+            echo 'adding Contract Tests'
+            extendedStage('Contract Tests')
+              .handler(buildSummaryReport)
+              .queue(nestedStages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
+                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE}"),
+                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE}"),
+                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
+              ])
+
+            echo 'adding Flakey Spec Catcher'
+            extendedStage('Flakey Spec Catcher')
+              .handler(buildSummaryReport)
+              .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
+              .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
+                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE}"),
+                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE}"),
+                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
+              ])
+
+            echo 'adding Vendored Gems'
+            extendedStage('Vendored Gems')
+              .handler(buildSummaryReport)
+              .queue(nestedStages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
+                string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE}"),
+                string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE}"),
+                string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
               ])
 
             parallel(nestedStages)
