@@ -28,7 +28,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconLtiSolid} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import k5Theme from '@canvas/k5/react/k5-theme'
+import k5Theme from './k5-theme'
 import {Flex} from '@instructure/ui-flex'
 
 export default function K5AppLink({app}) {

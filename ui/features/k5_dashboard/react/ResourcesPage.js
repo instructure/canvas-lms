@@ -21,7 +21,7 @@ import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import StaffContactInfoLayout from './StaffContactInfoLayout'
 import {fetchCourseInstructors, fetchCourseApps} from '@canvas/k5/react/utils'
-import AppsList from './AppsList'
+import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const fetchStaff = cards =>

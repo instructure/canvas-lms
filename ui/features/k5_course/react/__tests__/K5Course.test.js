@@ -20,6 +20,8 @@ import React from 'react'
 import moxios from 'moxios'
 import {render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
+import fetchMock from 'fetch-mock'
+import {TAB_IDS} from '@canvas/k5/react/utils'
 
 const currentUser = {
   id: '1',
@@ -42,15 +44,28 @@ const defaultProps = {
   currentUser,
   loadAllOpportunities: () => {},
   name: 'Arts and Crafts',
+  id: '30',
   timeZone: defaultEnv.TIMEZONE
 }
+const fetchAppsResponse = [
+  {
+    id: '7',
+    course_navigation: {
+      text: 'Studio',
+      icon_url: 'studio.png'
+    }
+  }
+]
+const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 
 beforeAll(() => {
   moxios.install()
+  fetchMock.get(FETCH_APPS_URL, JSON.stringify(fetchAppsResponse))
 })
 
 afterAll(() => {
   moxios.uninstall()
+  fetchMock.restore()
 })
 
 beforeEach(() => {
@@ -84,9 +99,9 @@ describe('K-5 Subject Course', () => {
       expect(getByText(defaultProps.name)).toBeInTheDocument()
     })
 
-    it('shows Overview, Schedule, Modules, and Grades options', () => {
+    it('shows Overview, Schedule, Modules, Grades, and Resources options', () => {
       const {getByText} = render(<K5Course {...defaultProps} />)
-      ;['Overview', 'Schedule', 'Modules', 'Grades'].forEach(label =>
+      ;['Overview', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label =>
         expect(getByText(label)).toBeInTheDocument()
       )
     })
@@ -106,6 +121,32 @@ describe('K-5 Subject Course', () => {
       expect(modulesContainer.style.display).toBe('none')
       getByRole('tab', {name: 'Modules'}).click()
       waitFor(() => expect(modulesContainer.style.display).toBe('block'))
+    })
+  })
+
+  describe('resources tab', () => {
+    it("displays user's apps", () => {
+      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+      waitFor(() => {
+        expect(getByText('Studio')).toBeInTheDocument()
+        expect(getByText('Student Applications')).toBeInTheDocument()
+      })
+    })
+
+    it('shows a loading spinner while apps are loading', () => {
+      const {getByText, queryByText} = render(
+        <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+      )
+      waitFor(() => expect(getByText('Loading apps...')).toBeInTheDocument())
+      expect(queryByText('Studio')).not.toBeInTheDocument()
+    })
+
+    it('shows an error if apps fail to load', () => {
+      fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
+      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+      waitFor(() =>
+        expect(getByText('Failed to load apps for Arts and Crafts.')).toBeInTheDocument()
+      )
     })
   })
 })

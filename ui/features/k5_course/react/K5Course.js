@@ -29,7 +29,8 @@ import {
   IconCalendarMonthLine,
   IconHomeLine,
   IconModuleLine,
-  IconStarLightLine
+  IconStarLightLine,
+  IconBankLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
@@ -42,8 +43,10 @@ import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {TAB_IDS} from '@canvas/k5/react/utils'
+import {TAB_IDS, fetchCourseApps} from '@canvas/k5/react/utils'
 import k5Theme, {theme} from '@canvas/k5/react/k5-theme'
+import AppsList from '@canvas/k5/react/AppsList'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
 const HERO_HEIGHT_PX = 400
@@ -68,6 +71,11 @@ const COURSE_TABS = [
     id: TAB_IDS.GRADES,
     icon: IconStarLightLine,
     label: I18n.t('Grades')
+  },
+  {
+    id: TAB_IDS.RESOURCES,
+    icon: IconBankLine,
+    label: I18n.t('Resources')
   }
 ]
 
@@ -108,6 +116,16 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
   )
 }
 
+const fetchApps = (courseId, courseName) =>
+  fetchCourseApps(courseId).then(apps =>
+    apps.map(app => ({
+      id: app.id,
+      courses: [{id: courseId, name: courseName}],
+      title: app.course_navigation.text || app.name,
+      icon: app.course_navigation.icon_url || app.icon_url
+    }))
+  )
+
 export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
@@ -115,6 +133,7 @@ export function K5Course({
   imageUrl,
   loadAllOpportunities,
   name,
+  id,
   timeZone,
   defaultTab = TAB_IDS.OVERVIEW,
   plannerEnabled = false
@@ -128,6 +147,8 @@ export function K5Course({
     callback: () => loadAllOpportunities(),
     singleCourse: true
   })
+  const [apps, setApps] = useState([])
+  const [isAppsLoading, setAppsLoading] = useState(false)
 
   const modulesRef = useRef(null)
   useEffect(() => {
@@ -139,6 +160,14 @@ export function K5Course({
       modulesRef.current.style.display = currentTab === TAB_IDS.MODULES ? 'block' : 'none'
     }
   }, [currentTab])
+
+  useEffect(() => {
+    setAppsLoading(true)
+    fetchApps(id, name)
+      .then(setApps)
+      .catch(showFlashError(I18n.t('Failed to load apps for %{name}.', {name})))
+      .finally(() => setAppsLoading(false))
+  }, [id, name])
 
   return (
     <K5DashboardContext.Provider
@@ -160,6 +189,7 @@ export function K5Course({
         </K5Tabs>
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
+        {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
       </View>
     </K5DashboardContext.Provider>
   )
@@ -171,6 +201,7 @@ K5Course.propTypes = {
   assignmentsCompletedForToday: PropTypes.object.isRequired,
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
