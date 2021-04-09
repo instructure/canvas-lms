@@ -413,13 +413,11 @@ pipeline {
                 ]) {
                   def stages = [:]
 
-                  echo 'adding Linters'
                   extendedStage('Linters')
                     .handler(buildSummaryReport)
                     .required(!configuration.isChangeMerged())
                     .queue(stages, { lintersStage() })
 
-                  echo 'adding Consumer Smoke Test'
                   extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
                     sh 'build/new-jenkins/consumer-smoke-test.sh'
                   }
@@ -447,7 +445,6 @@ pipeline {
           extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
             def nestedStages = [:]
 
-            echo 'adding Local Docker Dev Build'
             extendedStage('Local Docker Dev Build')
               .handler(buildSummaryReport)
               .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('dockerDevFiles'))
@@ -459,7 +456,6 @@ pipeline {
           extendedStage("Javascript (Waiting for Dependencies)").waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
             def nestedStages = [:]
 
-            echo 'adding Javascript (Jest)'
             extendedStage('Javascript (Jest)')
               .handler(buildSummaryReport)
               .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
@@ -467,7 +463,6 @@ pipeline {
                 string(name: 'TEST_SUITE', value: "jest"),
               ])
 
-            echo 'adding Javascript (Coffeescript)'
             extendedStage('Javascript (Coffeescript)')
               .handler(buildSummaryReport)
               .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
@@ -475,7 +470,6 @@ pipeline {
                 string(name: 'TEST_SUITE', value: "coffee"),
               ])
 
-            echo 'adding Javascript (Karma)'
             extendedStage('Javascript (Karma)')
               .handler(buildSummaryReport)
               .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
@@ -489,7 +483,6 @@ pipeline {
           extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
             def nestedStages = [:]
 
-            echo 'adding CDC Schema check'
             extendedStage('CDC Schema Check')
               .handler(buildSummaryReport)
               .required(buildConfig[FILES_CHANGED_STAGE].value('migrationFiles'))
@@ -497,7 +490,6 @@ pipeline {
                 string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
               ])
 
-            echo 'adding Contract Tests'
             extendedStage('Contract Tests')
               .handler(buildSummaryReport)
               .queue(nestedStages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
@@ -506,7 +498,6 @@ pipeline {
                 string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
               ])
 
-            echo 'adding Flakey Spec Catcher'
             extendedStage('Flakey Spec Catcher')
               .handler(buildSummaryReport)
               .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
@@ -516,7 +507,6 @@ pipeline {
                 string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
               ])
 
-            echo 'adding Vendored Gems'
             extendedStage('Vendored Gems')
               .handler(buildSummaryReport)
               .queue(nestedStages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
