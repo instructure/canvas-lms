@@ -63,6 +63,11 @@ module Types
       load_association(:editor)
     end
 
+    field :root_entry_participant_counts, Types::RootEntryParticipantCountType, null: true
+    def root_entry_participant_counts
+      Loaders::RootEntryParticipantCountsLoader.for(current_user: current_user).load(object)
+    end
+
     field :discussion_topic, Types::DiscussionType, null: false
     def discussion_topic
       load_association(:discussion_topic)

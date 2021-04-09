@@ -445,7 +445,7 @@ class DiscussionEntry < ActiveRecord::Base
   # opts         - Additional named arguments (default: {})
   #                :forced - Also set the forced_read_state to this value.
   #
-  # Returns nil if current_user is nil, the DiscussionEntryParticipent if the
+  # Returns nil if current_user is nil, the DiscussionEntryParticipant if the
   # read_state was changed, or true if the read_state was not changed. If the
   # read_state is not changed, a participant record will not be created.
   def change_read_state(new_state, current_user = nil, opts = {})

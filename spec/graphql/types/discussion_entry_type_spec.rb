@@ -59,6 +59,16 @@ describe Types::DiscussionEntryType do
     expect(result).to eq de.message
   end
 
+  it 'allows querying for participant counts' do
+    3.times { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id) }
+
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { unreadCount }')).to eq 0
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { repliesCount }')).to eq 3
+    DiscussionEntryParticipant.where(user_id: @teacher).update_all(workflow_state: 'unread')
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { unreadCount }')).to eq 3
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { repliesCount }')).to eq 3
+  end
+
   it 'returns a null message when entry is marked as deleted' do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil
