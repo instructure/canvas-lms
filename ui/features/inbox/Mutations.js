@@ -19,7 +19,7 @@
 import {ConversationMessage} from './graphql/ConversationMessage'
 import {ConversationParticipant} from './graphql/ConversationParticipant'
 import {ConversationParticipantWithConversation} from './graphql/ConversationParticipantWithConversation'
-import {Error} from './graphql/Error'
+import {Error} from '../../shared/graphql/Error'
 import gql from 'graphql-tag'
 
 export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
