@@ -58,23 +58,6 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-// if the build never starts or gets into a node block, then we
-// can never load a file. and a very noisy/confusing error is thrown.
-def ignoreBuildNeverStartedError(block) {
-  try {
-    block()
-  }
-  catch (org.jenkinsci.plugins.workflow.steps.MissingContextVariableException ex) {
-    if (!ex.message.startsWith('Required context class hudson.FilePath is missing')) {
-      throw ex
-    }
-    else {
-      echo "ignored MissingContextVariableException: \n${ex.message}"
-    }
-    // we can ignore this very noisy error
-  }
-}
-
 // return false if the current patchset tag doesn't match the
 // mainline publishable tag. i.e. ignore pg-9.5 builds
 def isPatchsetPublishable() {
@@ -92,9 +75,7 @@ def isPatchsetRetriggered() {
 }
 
 def cleanupFn(status) {
-  ignoreBuildNeverStartedError {
-    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
-  }
+  libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
 }
 
 def postFn(status) {
