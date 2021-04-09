@@ -27,11 +27,7 @@ import RCEKeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts' /* TinyMCE
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {uploadFile} from '@canvas/upload-file'
-import {
-  submitContentItem,
-  recordEulaAgreement,
-  verifyPledgeIsChecked
-} from './helper'
+import {submitContentItem, recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tree'
@@ -46,6 +42,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import FileBrowser from '@canvas/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
+import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
 
 const SubmitAssignment = {
@@ -143,6 +140,21 @@ $(document).ready(function () {
   if (!ENV.use_rce_enhancements) {
     const keyboardShortcutsView = new RCEKeyboardShortcuts()
     keyboardShortcutsView.render().$el.insertBefore($('.switch_text_entry_submission_views:first'))
+  }
+
+  // Add screen reader message for student annotation assignments
+  const accessibilityAlert = I18n.t(
+    'The student annotation tab includes the document for the assignment. Tabs with additional submission types may also be available.'
+  )
+  const alertMount = () => document.getElementById('annotated-screenreader-alert')
+
+  if (alertMount()) {
+    ReactDOM.render(
+      <Alert screenReaderOnly liveRegion={alertMount} liveRegionPoliteness="assertive">
+        {accessibilityAlert}
+      </Alert>,
+      alertMount()
+    )
   }
 
   // grow and shrink the comments box on focus/blur if the user

@@ -40,6 +40,9 @@
   })
 %>
 <div style="display: none;" id="submit_assignment" data-context_code="<%= @assignment.context_code %>" data-asset_string="<%= @assignment.asset_string %>">
+  <% if @assignment.submission_types && @assignment.annotated_document? %>
+      <div id="annotated-screenreader-alert"></div>
+  <% end %>
   <div class="content" id="submit_assignment_tabs">
     <ul>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
