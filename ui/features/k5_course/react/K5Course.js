@@ -210,7 +210,11 @@ export function K5Course({
               padding="0 0 medium 0"
               margin="0 0 medium 0"
             >
-              <Button onClick={handleOpenTray} renderIcon={<IconEditSolid />}>
+              <Button
+                data-testid="manage-button"
+                onClick={handleOpenTray}
+                renderIcon={<IconEditSolid />}
+              >
                 {I18n.t('Manage')}
               </Button>
             </View>

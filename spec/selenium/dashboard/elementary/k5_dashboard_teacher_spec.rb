@@ -27,11 +27,7 @@ describe "teacher k5 dashboard" do
   include K5Common
 
   before :each do
-    @account = Account.default
-    @account.enable_feature!(:canvas_for_elementary)
-    toggle_k5_setting(@account)
-    @course_name = "K5 Course"
-    course_with_teacher_logged_in(active_all: true, new_user: true, user_name: 'K5Teacher', course_name: @course_name)
+    teacher_setup
   end
 
   context 'homeroom dashboard standard' do

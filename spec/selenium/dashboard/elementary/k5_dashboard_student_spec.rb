@@ -29,17 +29,7 @@ describe "student k5 dashboard" do
   include GradebookSetup
 
   before :each do
-    @account = Account.default
-    @account.enable_feature!(:canvas_for_elementary)
-    toggle_k5_setting(@account)
-    @course_name = "K5 Course"
-    course_with_teacher(
-      active_course: 1,
-      active_enrollment: 1,
-      course_name: @course_name,
-      name: 'K5Teacher1'
-    )
-    course_with_student_logged_in(active_all: true, new_user: true, user_name: 'KTStudent1', course: @course)
+    student_setup
   end
 
   context 'homeroom dashboard standard' do
@@ -335,7 +325,7 @@ describe "student k5 dashboard" do
       expect(instructor_bio(bio)).to be_displayed
     end
 
-    it 'allows student to send message to teacher', custom_timeout: 20 do
+    it 'allows student to send message to teacher', custom_timeout: 25 do
       @course.homeroom_course = true
       @course.save!
 

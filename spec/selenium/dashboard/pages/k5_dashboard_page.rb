@@ -29,6 +29,10 @@ module K5PageObject
     'h1'
   end
 
+  def course_dashboard_title_selector
+    'h1'
+  end
+
   def homeroom_tab_selector
     '#tab-tab-homeroom'
   end
@@ -43,6 +47,14 @@ module K5PageObject
 
   def resources_tab_selector
     '#tab-tab-resources'
+  end
+
+  def home_tab_selector
+    '#tab-tab-home'
+  end
+
+  def modules_tab_selector
+    '#tab-tab-modules'
   end
 
   def course_card_selector(course_title)
@@ -197,6 +209,28 @@ module K5PageObject
     "//*[@aria-label = 'Choose a Course']//a"
   end
 
+  def dashboard_card_selector
+    "[data-testid='k5-dashboard-card-hero']"
+  end
+
+  def front_page_info_selector
+    "#course_home_content .user_content"
+  end
+
+  def manage_button_selector
+    "[data-testid = 'manage-button']"
+  end
+
+  def course_navigation_tray_selector
+    "[aria-label='Course Navigation Tray']"
+  end
+
+  def course_nav_tray_close_selector
+    "//button[.//*[. = 'Close']]"
+  end
+
+
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -205,6 +239,10 @@ module K5PageObject
 
   def welcome_title
     f(welcome_title_selector)
+  end
+
+  def course_dashboard_title
+    f(course_dashboard_title_selector)
   end
 
   def homeroom_tab
@@ -221,6 +259,14 @@ module K5PageObject
 
   def resources_tab
     f(resources_tab_selector)
+  end
+
+  def home_tab
+    f(home_tab_selector)
+  end
+
+  def modules_tab
+    f(modules_tab_selector)
   end
 
   def course_card(course_title)
@@ -392,6 +438,30 @@ module K5PageObject
     ffxpath(course_list_selector)
   end
 
+  def dashboard_card
+    f(dashboard_card_selector)
+  end
+
+  def front_page_info
+    f(front_page_info_selector)
+  end
+
+  def manage_button
+    f(manage_button_selector)
+  end
+
+  def course_navigation_tray
+    f(course_navigation_tray_selector)
+  end
+
+  def course_nav_tray_close
+    fxpath(course_nav_tray_close_selector)
+  end
+
+  def assignments_link
+    fln('Assignments')
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def check_enable_homeroom_checkbox
@@ -416,6 +486,10 @@ module K5PageObject
 
   def retrieve_welcome_text
     welcome_title.text
+  end
+
+  def retrieve_title_text
+    course_dashboard_title.text
   end
 
   def new_announcement(course, title, message)
@@ -547,5 +621,51 @@ module K5PageObject
     )
     @tool.course_navigation = {enabled: true}
     @tool.save!
+  end
+
+  def click_dashboard_card
+    dashboard_card.click
+  end
+
+  def click_manage_button
+    manage_button.click
+    wait_for(method: nil, timeout: 2) { course_navigation_tray }
+  end
+
+  def course_navigation_tray_exists?
+    element_exists?(course_navigation_tray_selector)
+  end
+
+  def click_nav_tray_close
+    course_nav_tray_close.click
+    wait_for_ajaximations
+  end
+
+  def click_assignments_link
+    assignments_link.click
+  end
+
+  def feature_setup
+    @account = Account.default
+    @account.enable_feature!(:canvas_for_elementary)
+    toggle_k5_setting(@account)
+  end
+
+  def student_setup
+    feature_setup
+    @course_name = "K5 Course"
+    course_with_teacher(
+      active_course: 1,
+      active_enrollment: 1,
+      course_name: @course_name,
+      name: 'K5Teacher1'
+    )
+    course_with_student_logged_in(active_all: true, new_user: true, user_name: 'KTStudent1', course: @course)
+  end
+
+  def teacher_setup
+    feature_setup
+    @course_name = "K5 Course"
+    course_with_teacher_logged_in(active_all: true, new_user: true, user_name: 'K5Teacher', course_name: @course_name)
   end
 end

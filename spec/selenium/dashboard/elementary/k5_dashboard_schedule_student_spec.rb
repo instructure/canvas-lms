@@ -29,18 +29,8 @@ describe "student k5 dashboard schedule" do
   include GradebookSetup
 
   before :each do
-    @account = Account.default
-    @account.enable_feature!(:canvas_for_elementary)
-    toggle_k5_setting(@account)
-    @course_name = "K5 Course"
-    course_with_teacher(
-      active_course: 1,
-      active_enrollment: 1,
-      course_name: @course_name,
-      name: 'K5Teacher1'
-    )
+    student_setup
     @now = Time.zone.now
-    course_with_student_logged_in(active_all: true, new_user: true, user_name: 'KTStudent1', course: @course)
   end
 
   context 'entry' do
