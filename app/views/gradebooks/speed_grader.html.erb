@@ -54,7 +54,7 @@
           <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
         </a>
         <p class="assignmentDetails__Info">
-          <span><%= translated_due_date(@assignment) %></span>
+          <span><%= translated_due_date_for_speedgrader(@assignment) %></span>
           - <a id="context_title" href="<%= context_url(@context, :context_url) %>"><%= @context.short_name %></a>
         </p>
       </div>

@@ -166,4 +166,27 @@ module GradebooksHelper
     content_tag('i', '', 'class' => html_classes.join(' '), 'aria-hidden' => true) +
       content_tag('span', icon_attrs[:screenreader_text], 'class' => 'screenreader-only')
   end
+
+  def translated_due_date_for_speedgrader(assignment)
+    return t('Due: Multiple Due Dates') if assignment.multiple_due_dates_apply_to?(@current_user)
+
+    assignment = assignment.overridden_for(@current_user)
+
+    if assignment.due_at
+      return t('Due: %{assignment_due_date_time}', assignment_due_date_time: datetime_string(force_zone(assignment.due_at)))
+    end
+
+    override_dates = if assignment.only_visible_to_overrides?
+      assignment.active_assignment_overrides.where(due_at_overridden: true).pluck(:due_at).uniq
+    else
+      []
+    end
+
+    if override_dates.count == 1
+      t('Due: %{assignment_due_date_time}', assignment_due_date_time: datetime_string(force_zone(override_dates.first)))
+    else
+      t('Due: No Due Date')
+    end
+
+  end
 end
