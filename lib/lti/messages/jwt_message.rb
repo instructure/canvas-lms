@@ -92,8 +92,12 @@ module Lti::Messages
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
-      @message.sub = @user&.lookup_lti_id(@context) || User.public_lti_id
+      @message.sub = @user&.lookup_lti_id(@context) if include_sub_claim?
       @message.target_link_uri = target_link_uri
+    end
+
+    def include_sub_claim?
+      @user.present?
     end
 
     def target_link_uri
@@ -159,7 +163,7 @@ module Lti::Messages
     end
 
     def add_lti11_legacy_user_id!
-      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || User.public_lti_id
+      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || ''
     end
 
     def include_names_and_roles_service_claims?

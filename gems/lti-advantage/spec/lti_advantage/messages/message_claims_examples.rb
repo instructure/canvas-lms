@@ -17,8 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_context 'typed_attribute_examples' do
-  shared_examples_for 'validations for a JWT LTI message' do
+RSpec.shared_examples 'message_claims_examples' do
+  shared_examples_for 'validations for optional claims' do
+    it 'is valid when sub is not given' do
+      valid_message.sub = nil
+      valid_message.validate
+      expect(valid_message.valid?).to be true
+    end
+
+    it 'is valid when lti11_legacy_user_id is not given' do
+      valid_message.lti11_legacy_user_id = nil
+      valid_message.validate
+      expect(valid_message.valid?).to be true
+    end
+  end
+
+  shared_examples_for 'validations for claims types' do
     it 'verifies that "aud" is an array' do
       message.aud = 1
       message.validate

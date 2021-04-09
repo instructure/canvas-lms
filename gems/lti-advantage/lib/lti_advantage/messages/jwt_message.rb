@@ -16,10 +16,13 @@ module LtiAdvantage::Messages
       iss
       message_type
       nonce
-      sub
       version
       target_link_uri
+    ].freeze
+
+    OPTIONAL_CLAIMS = %i[
       lti11_legacy_user_id
+      sub
     ].freeze
 
     TYPED_ATTRIBUTES = {
@@ -36,7 +39,7 @@ module LtiAdvantage::Messages
       role_scope_mentor: Array
     }.freeze
 
-    attr_accessor *REQUIRED_CLAIMS
+    attr_accessor *(REQUIRED_CLAIMS + OPTIONAL_CLAIMS)
     attr_accessor *TYPED_ATTRIBUTES.keys
     attr_accessor :address,
                   :birthdate,

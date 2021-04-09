@@ -19,7 +19,7 @@
 
 require 'lti_advantage'
 
-require File.expand_path(File.dirname(__FILE__) + '/typed_attribute_examples')
+require File.expand_path(File.dirname(__FILE__) + '/message_claims_examples')
 
 module LtiAdvantage::Messages
   RSpec.describe ResourceLinkRequest do
@@ -84,9 +84,11 @@ module LtiAdvantage::Messages
     end
 
     describe 'validations' do
-      include_context 'typed_attribute_examples'
+      include_context 'message_claims_examples'
 
-      it_behaves_like 'validations for a JWT LTI message'
+      it_behaves_like 'validations for claims types'
+
+      it_behaves_like 'validations for optional claims'
 
       it 'is not valid if required claims are missing' do
         expect(message).to be_invalid

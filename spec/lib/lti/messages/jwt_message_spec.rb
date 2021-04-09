@@ -128,8 +128,18 @@ describe Lti::Messages::JwtMessage do
       expect(first_nonce).not_to eq second_nonce
     end
 
-    it 'sets the "sub" claim' do
-      expect(decoded_jwt['sub']).to eq user.lti_id
+    context 'when user is an authorized user' do
+      it 'sets the "sub" claim' do
+        expect(decoded_jwt['sub']).to eq user.lti_id
+      end
+    end
+
+    context 'when user is an unauthorized user' do
+      let(:user) { nil }
+
+      it 'does not sets the "sub" claim' do
+        expect(decoded_jwt['sub']).to be_nil
+      end
     end
 
     it 'sets the "sub" claim to past lti_id' do
@@ -726,7 +736,7 @@ describe Lti::Messages::JwtMessage do
     context 'when the user is blank' do
       let(:user) { nil }
 
-      it { is_expected.to eq User.public_lti_id }
+      it { is_expected.to be_empty }
     end
   end
 end
