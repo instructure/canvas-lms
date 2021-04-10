@@ -33,7 +33,7 @@ describe 'Gradebook Post Policy' do
       course_name: "Post Policy Course",
       active_course: true,
       active_enrollment: true,
-      name: "Teacher Boss1",
+      name: "Dedicated Teacher1",
       active_user: true
     ).course
     @teacher1 = @teacher
@@ -42,7 +42,7 @@ describe 'Gradebook Post Policy' do
       course_name: "Post Policy Course Manually",
       active_course: true,
       active_enrollment: true,
-      name: "Teacher Boss2",
+      name: "Dedicated Teacher2",
       active_user: true
     ).course
     @teacher2 = @teacher

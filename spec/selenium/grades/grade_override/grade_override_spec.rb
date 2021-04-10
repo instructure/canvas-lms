@@ -35,7 +35,7 @@ describe 'Final Grade Override' do
     allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
 
-    course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Teacher Boss1",active_user: true)
+    course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Dedicated Teacher1",active_user: true)
     @course.update!(grading_standard_enabled: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
     @course.enable_feature!(:final_grades_override)

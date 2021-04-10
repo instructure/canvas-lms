@@ -1569,9 +1569,9 @@ describe Course do
       expect(@course.course_section_visibility(unlimited_teacher)).to eq :all
     end
 
-    it "returns none for a nobody" do
-      worthless_loser = User.create(:name => "Worthless Loser")
-      expect(@course.course_section_visibility(worthless_loser)).to eq []
+    it "returns none for a user with no visibility" do
+      user_with_no_visibility = User.create(:name => "Sans Connexion")
+      expect(@course.course_section_visibility(user_with_no_visibility)).to eq []
     end
   end
 
