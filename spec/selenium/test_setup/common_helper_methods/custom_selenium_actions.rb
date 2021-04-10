@@ -245,8 +245,8 @@ module CustomSeleniumActions
     Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
   end
 
-  # this is a smell; you should know what's on the page you're testing,
-  # so conditionally doing stuff based on elements == :poop:
+  # conditionally doing stuff based on what elements are on the page
+  # is a smell; you should know what's on the page you're testing.
   def element_exists?(selector, xpath = false)
     disable_implicit_wait { xpath ? fxpath(selector) : f(selector) }
     true

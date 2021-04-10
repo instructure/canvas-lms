@@ -33,7 +33,7 @@ describe 'Gradebook Post Policy' do
       course_name: "Post Policy Course",
       active_course: true,
       active_enrollment: true,
-      name: "Teacher Boss1",
+      name: "Dedicated Teacher1",
       active_user: true
     ).course
     @teacher1 = @teacher
@@ -42,7 +42,7 @@ describe 'Gradebook Post Policy' do
       course_name: "Post Policy Course Manually",
       active_course: true,
       active_enrollment: true,
-      name: "Teacher Boss2",
+      name: "Dedicated Teacher2",
       active_user: true
     ).course
     @teacher2 = @teacher
@@ -195,10 +195,8 @@ describe 'Gradebook Post Policy' do
 
   context 'when post for graded' do
     before :once do
-      @graded_students = [@students[0], @students[1], @students[2]]
-      @graded_students.each do |student|
-        @manual_assignment.grade_student(student, grade: 8, grader: @teacher1)
-      end
+      @graded_student = @students[0]
+      @manual_assignment.grade_student(@graded_student, grade: 8, grader: @teacher1)
     end
 
     before :each do
@@ -206,9 +204,7 @@ describe 'Gradebook Post Policy' do
     end
 
     it 'graded students see grades', priority: '1', test_id: 3756680 do
-      @graded_students.each do |student|
-        verify_grade_displayed_on_student_grade_page(student, "8", @manual_assignment, @course_with_manual_post)
-      end
+      verify_grade_displayed_on_student_grade_page(@graded_student, "8", @manual_assignment, @course_with_manual_post)
     end
 
     it 'does not post for ungraded', priority: '1', test_id: 3756680 do
