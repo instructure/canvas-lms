@@ -95,7 +95,7 @@ module Types
 
     field :subentries_count, Integer, null: true
     def subentries_count
-      Loaders::DiscussionSubentriesCountLoader.load(object)
+      Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
     end
   end
 end
