@@ -35,13 +35,6 @@ describe('DiscussionPostToolbar', () => {
       const {queryByTestId} = setup()
       expect(queryByTestId('collapseToggle')).toBeNull()
     })
-
-    it('should render Collapse Toggle when onCollapseRepliesToggle present', () => {
-      const {queryByTestId} = setup({
-        onCollapseRepliesToggle: jest.fn()
-      })
-      expect(queryByTestId('collapseToggle')).toBeTruthy()
-    })
   })
 
   describe('Search Field', () => {
@@ -94,18 +87,6 @@ describe('DiscussionPostToolbar', () => {
       const button = getByTestId('sortButton')
       button.click()
       expect(onSortClickMock.mock.calls.length).toBe(1)
-    })
-  })
-
-  describe('Collapse Toggle', () => {
-    it('should call onChange when toggle is changed', () => {
-      const onCollapseRepliesToggleMock = jest.fn()
-      const {getByTestId} = setup({
-        onCollapseRepliesToggle: onCollapseRepliesToggleMock
-      })
-      const toggle = getByTestId('collapseToggle')
-      toggle.click()
-      expect(onCollapseRepliesToggleMock.mock.calls.length).toBe(1)
     })
   })
 

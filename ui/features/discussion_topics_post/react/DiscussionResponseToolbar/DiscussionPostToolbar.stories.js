@@ -36,9 +36,6 @@ export default {
         options: ['asc', 'desc']
       }
     }
-  },
-  args: {
-    onCollapseRepliesToggle: null
   }
 }
 
@@ -49,12 +46,6 @@ export const Default = Template.bind({})
 export const SortedDesc = Template.bind({})
 SortedDesc.args = {
   sortDirection: 'desc'
-}
-
-export const CollapsedReplies = Template.bind({})
-CollapsedReplies.args = {
-  isCollapsedReplies: true,
-  onCollapseRepliesToggle: () => {}
 }
 
 export const ShowDeleted = Template.bind({})

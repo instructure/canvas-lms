@@ -19,7 +19,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
@@ -109,17 +108,6 @@ const DiscussionPostToolbar = props => {
                 </ScreenReaderContent>
               </Button>
             </Tooltip>
-
-            {props.onCollapseRepliesToggle && (
-              <Checkbox
-                label={I18n.t('Collapse Replies')}
-                variant="toggle"
-                size="small"
-                defaultChecked={props.isCollapsedReplies}
-                onChange={props.onCollapseRepliesToggle}
-                data-testid="collapseToggle"
-              />
-            )}
           </FormFieldGroup>
         </Flex.Item>
         <Flex.Item align="end">
@@ -151,7 +139,6 @@ DiscussionPostToolbar.propTypes = {
   onSearchChange: PropTypes.func,
   onViewFilter: PropTypes.func,
   onSortClick: PropTypes.func,
-  onCollapseRepliesToggle: PropTypes.func,
   onTopClick: PropTypes.func
 }
 
