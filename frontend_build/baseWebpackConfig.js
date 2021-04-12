@@ -73,7 +73,8 @@ module.exports = {
             'canvas-rce-async-chunk',
             'canvas-rce-old-async-chunk',
             'permissions_index',
-            'assignment_edit'
+            'assignment_edit',
+            'discussion_topics_edit'
           ]
           return (
             assetFilename.endsWith('.js') &&
