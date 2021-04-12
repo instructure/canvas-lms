@@ -372,7 +372,12 @@ class ExternalToolsController < ApplicationController
   #      }
   def show
     if api_request?
-      tool = @context.context_external_tools.active.find(params[:external_tool_id])
+      unless ContextExternalTool.visible?('admins', @current_user, @context, session)
+        render_unauthorized_action
+        return
+      end
+
+      tool = ContextExternalTool.find_for(params[:external_tool_id], @context, nil)
       render :json => external_tool_json(tool, @context, @current_user, session)
     else
       placement = placement_from_params

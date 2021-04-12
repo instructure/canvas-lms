@@ -71,14 +71,7 @@ store.fetch = function() {
 
 store.fetchWithDetails = function(tool) {
   if (tool.app_type === 'ContextExternalTool') {
-    return $.getJSON(
-      '/api/v1/' +
-        tool.context.toLowerCase() +
-        's/' +
-        tool.context_id +
-        '/external_tools/' +
-        tool.app_id
-    )
+    return $.getJSON('/api/v1/' + ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id)
   } else {
     // DOES NOT EXIST YET
     return $.getJSON('/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id)
