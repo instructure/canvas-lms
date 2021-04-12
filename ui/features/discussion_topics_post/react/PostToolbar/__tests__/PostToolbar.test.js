@@ -207,5 +207,56 @@ describe('PostToolbar', () => {
         expect(onCopyMock.mock.calls.length).toBe(1)
       })
     })
+
+    describe('speedgrader', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Open in Speedgrader')).toBeFalsy()
+      })
+
+      it('calls provided callback when clicked', () => {
+        const onOpenSpeedgraderMock = jest.fn()
+        const {getByTestId, getByText} = setup({onOpenSpeedgrader: onOpenSpeedgraderMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onOpenSpeedgraderMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Open in Speedgrader'))
+        expect(onOpenSpeedgraderMock.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('rubric', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Show Rubric')).toBeFalsy()
+      })
+
+      it('calls provided callback when clicked', () => {
+        const onShowRubricMock = jest.fn()
+        const {getByTestId, getByText} = setup({onShowRubric: onShowRubricMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onShowRubricMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Show Rubric'))
+        expect(onShowRubricMock.mock.calls.length).toBe(1)
+      })
+    })
+
+    describe('share to commons', () => {
+      it('does not render if the callback is not provided', () => {
+        const {queryByText, getByTestId} = setup()
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(queryByText('Share to Commons')).toBeFalsy()
+      })
+
+      it('calls provided callback when clicked', () => {
+        const onShareToCommonsMock = jest.fn()
+        const {getByTestId, getByText} = setup({onShareToCommons: onShareToCommonsMock})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(onShareToCommonsMock.mock.calls.length).toBe(0)
+        fireEvent.click(getByText('Share to Commons'))
+        expect(onShareToCommonsMock.mock.calls.length).toBe(1)
+      })
+    })
   })
 })

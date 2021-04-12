@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {
   IconBookmarkSolid,
   IconBookmarkLine,
+  IconCommonsSolid,
   IconCompleteSolid,
   IconDuplicateLine,
   IconEditLine,
@@ -32,6 +33,8 @@ import {
   IconMarkAsReadLine,
   IconMoreLine,
   IconNoSolid,
+  IconRubricSolid,
+  IconSpeedGraderSolid,
   IconTrashLine,
   IconUnlockLine,
   IconUserLine
@@ -155,6 +158,30 @@ const getMenuConfigs = props => {
       selectionCallback: props.onCopy
     })
   }
+  if (props.onOpenSpeedgrader) {
+    options.push({
+      key: 'speedGrader',
+      icon: <IconSpeedGraderSolid />,
+      label: I18n.t('Open in Speedgrader'),
+      selectionCallback: props.onOpenSpeedgrader
+    })
+  }
+  if (props.onShowRubric) {
+    options.push({
+      key: 'rubric',
+      icon: <IconRubricSolid />,
+      label: I18n.t('Show Rubric'),
+      selectionCallback: props.onShowRubric
+    })
+  }
+  if (props.onShareToCommons) {
+    options.push({
+      key: 'shareToCommons',
+      icon: <IconCommonsSolid />,
+      label: I18n.t('Share to Commons'),
+      selectionCallback: props.onShareToCommons
+    })
+  }
   return options
 }
 
@@ -229,7 +256,19 @@ PostToolbar.propTypes = {
   /**
    * Text to be displayed with the toolbar
    */
-  infoText: PropTypes.string
+  infoText: PropTypes.string,
+  /**
+   * Callback to be fired when Speedgrader actions are fired.
+   */
+  onOpenSpeedgrader: PropTypes.func,
+  /**
+   * Callback to be fired when Show Rubric action is fired.
+   */
+  onShowRubric: PropTypes.func,
+  /**
+   * Callback to be fired when Share to Commons action is fired.
+   */
+  onShareToCommons: PropTypes.func
 }
 
 export default PostToolbar

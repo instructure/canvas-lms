@@ -52,5 +52,7 @@ StudentView.args = {
   onCopy: null,
   onEdit: null,
   onTogglePublish: null,
-  onToggleSubscription: null
+  onToggleSubscription: null,
+  onOpenSpeedgrader: null,
+  onShareToCommons: null
 }
