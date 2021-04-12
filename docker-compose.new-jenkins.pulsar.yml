@@ -3,13 +3,8 @@
 version: "2.3"
 
 services:
-  postgres:
-    environment:
-      REPLICATION_USER: impulse
-      REPLICATION_PASSWORD: impulse
-      REPLICATION_DB: canvas
-  web:
-    links:
+  canvas:
+    depends_on:
       - pulsar
   pulsar:
     image: apachepulsar/pulsar:latest
@@ -17,13 +12,11 @@ services:
     ports:
       - "6650"
       - "8080"
-    volumes:
-      - pulsar-data:/pulsar/data
   pulsar-admin:
     image: apachepulsar/pulsar:latest
     volumes:
       - ./docker-compose/pulsar:/pulsar/scripts
-    links:
+    depends_on:
       - pulsar
 
 volumes:

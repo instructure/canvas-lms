@@ -95,6 +95,18 @@ pipeline {
                   sh 'build/new-jenkins/test-engines.sh'
                 }
               }
+
+              stage ('Run Pulsar specs') {
+                withEnv([
+                  "COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml:docker-compose.new-jenkins.pulsar.yml"
+                ]) {
+                  sh """
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh pull apachepulsar/pulsar:latest
+                    docker-compose run pulsar-admin ./scripts/bootstrap.sh
+                    docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
+                  """
+                }
+              }
             }
           }
         }
