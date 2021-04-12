@@ -592,7 +592,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       context 'without manage files permissions' do
         before(:each) do
           RoleOverride.create!(
-            permission: 'manage_files',
+            permission: 'manage_files_add',
             enabled: false,
             context: @course.account,
             role: teacher_role

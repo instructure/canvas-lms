@@ -206,7 +206,7 @@ class FoldersController < ApplicationController
   # @returns [Folder]
   def resolve_path
     # as long as one granted permission holds true, in most cases :read, user is authorized
-    if authorized_action(@context, @current_user, [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
+    if authorized_action(@context, @current_user, [:read, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
       folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
@@ -620,9 +620,7 @@ class FoldersController < ApplicationController
       return render :json => {:message => "source folder may not contain destination folder"}, :status => :bad_request
     end
 
-    if authorized_action(@source_folder.context,
-                         @current_user,
-                         [:manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
+    if authorized_action(@source_folder.context, @current_user, [*RoleOverride::GRANULAR_FILE_PERMISSIONS])
       @folder = @context.folders.build(parent_folder: @dest_folder)
       if authorized_action(@folder, @current_user, :create)
         @folder = @source_folder.clone_for(@context, @folder, everything: true, force_copy: true)
@@ -652,12 +650,7 @@ class FoldersController < ApplicationController
     require_context
     if authorized_action(@context, @current_user, :read)
       folder_context =
-        if @context.grants_any_right?(
-          @current_user,
-          session,
-          :manage_files,
-          *RoleOverride::GRANULAR_FILE_PERMISSIONS
-        )
+        if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
           @context
         else
           @current_user

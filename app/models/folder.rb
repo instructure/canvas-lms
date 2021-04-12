@@ -60,10 +60,7 @@ class Folder < ActiveRecord::Base
   after_commit :clear_permissions_cache, if: ->{[:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? {|k| saved_changes.key?(k)}}
 
   def file_attachments_visible_to(user)
-    if context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-        self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
-      self.active_file_attachments
-    elsif self.context.grants_right?(user, :manage_files)
+    if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
       self.active_file_attachments
     else
       self.visible_file_attachments.not_locked
@@ -78,19 +75,6 @@ class Folder < ActiveRecord::Base
     else
       self.root_account_id = self.context.root_account_id
     end
-  end
-
-  def context_root_account(user = nil)
-    # Granular Permissions
-    #
-    # The primary use case for this method is for accurately checking
-    # feature flag enablement, given a user and the calling context.
-    # We want to prefer finding the root_account through the context
-    # of the authorizing resource or fallback to the user's active
-    # pseudonym's residing account.
-    return self.context.account if self.context.is_a?(User)
-
-    self.context.try(:root_account) || user&.account
   end
 
   def protect_root_folder_name
@@ -501,23 +485,6 @@ class Folder < ActiveRecord::Base
   alias currently_locked? currently_locked
 
   set_policy do
-    #################### Begin legacy permission block #########################
-
-    given do |user, session|
-      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      self.context.grants_right?(user, session, :manage_files)
-    end
-    can :read and can :read_contents
-
-    given do |user, session|
-      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      !self.for_submissions? &&
-      self.context.grants_right?(user, session, :manage_files)
-    end
-    can :create and can :update and can :delete and can :manage_contents
-
-    ##################### End legacy permission block ##########################
-
     given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }
     can :read
 
@@ -536,29 +503,22 @@ class Folder < ActiveRecord::Base
     can :read_contents_for_export
 
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
       self.context.grants_any_right?(user, session, :manage_files_add, :manage_files_delete, :manage_files_edit)
     end
     can :read and can :read_contents
 
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      !self.for_submissions? &&
-      self.context.grants_right?(user, session, :manage_files_add)
+      !self.for_submissions? && self.context.grants_right?(user, session, :manage_files_add)
     end
     can :create and can :manage_contents
 
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      !self.for_submissions? &&
-      self.context.grants_right?(user, session, :manage_files_edit)
+      !self.for_submissions? && self.context.grants_right?(user, session, :manage_files_edit)
     end
     can :update and can :manage_contents
 
     given do |user, session|
-      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
-      !self.for_submissions? &&
-      self.context.grants_right?(user, session, :manage_files_delete)
+      !self.for_submissions? && self.context.grants_right?(user, session, :manage_files_delete)
     end
     can :delete and can :manage_contents
   end

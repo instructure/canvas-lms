@@ -573,13 +573,7 @@ class DiscussionTopicsController < ApplicationController
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
       PERMISSIONS: {
-        manage_files:
-          @context.grants_any_right?(
-            @current_user,
-            session,
-            :manage_files,
-            *RoleOverride::GRANULAR_FILE_PERMISSIONS
-          )
+        manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post)
     }
@@ -850,7 +844,6 @@ class DiscussionTopicsController < ApplicationController
                 content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
               end
             end
-
 
             render stream: can_stream_template?
           end
@@ -1503,12 +1496,7 @@ class DiscussionTopicsController < ApplicationController
   def set_default_usage_rights(attachment)
     return unless @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
     return unless @context.try(:usage_rights_required?)
-    return if @context.grants_any_right?(
-      @current_user,
-      session,
-      :manage_files,
-      *RoleOverride::GRANULAR_FILE_PERMISSIONS
-    )
+    return if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
     attachment.usage_rights = @context.usage_rights.find_or_create_by(
       use_justification:'own_copyright',

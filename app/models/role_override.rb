@@ -881,25 +881,6 @@ class RoleOverride < ActiveRecord::Base
       ],
       :true_for => []
     },
-    # legacy :manage_files permission bundle
-    manage_files: {
-      label: -> { t('Manage (add / edit / delete) course files') },
-      label_v2: -> { t('Course Files - add / edit / delete') },
-      available_to: %w[
-        TaEnrollment
-        DesignerEnrollment
-        TeacherEnrollment
-        TeacherlessStudentEnrollment
-        ObserverEnrollment
-        AccountAdmin
-        AccountMembership
-      ],
-      true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        !a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
-    },
     manage_files_add: {
       label: -> { t('Add course files') },
       label_v2: -> { t('Course Files - add') },
@@ -915,10 +896,7 @@ class RoleOverride < ActiveRecord::Base
         AccountMembership
       ],
       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      acts_as_access_token_scope: true
     },
     manage_files_edit: {
       label: -> { t('Edit course files') },
@@ -935,10 +913,7 @@ class RoleOverride < ActiveRecord::Base
         AccountMembership
       ],
       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      acts_as_access_token_scope: true
     },
     manage_files_delete: {
       label: -> { t('Delete course files') },
@@ -955,10 +930,7 @@ class RoleOverride < ActiveRecord::Base
         AccountMembership
       ],
       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      acts_as_access_token_scope: true
     },
     :manage_grades => {
       :label => lambda { t('permissions.manage_grades', "Edit grades") },

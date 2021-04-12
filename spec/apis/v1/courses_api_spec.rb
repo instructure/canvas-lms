@@ -631,9 +631,8 @@ describe CoursesController, type: :request do
     ])
   end
 
-  it "should include files tab if requested (granular)" do
+  it "should include files tab if requested" do
     course_with_teacher(active_all: true)
-    @course.root_account.enable_feature!(:granular_permissions_course_files)
 
     json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
     expect(json.first['tabs']).to include(a_hash_including({"id" => "files"}))

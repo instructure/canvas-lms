@@ -503,7 +503,6 @@ class Group < ActiveRecord::Base
     can :participate and
     can :manage_calendar and
     can :manage_content and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete and
@@ -567,7 +566,6 @@ class Group < ActiveRecord::Base
       can :allow_course_admin_actions and
       can :manage_calendar and
       can :manage_content and
-      can :manage_files and
       can :manage_files_add and
       can :manage_files_edit and
       can :manage_files_delete and

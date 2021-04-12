@@ -1720,7 +1720,6 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
     can :grade and
     can :attach_submission_comment_files and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete

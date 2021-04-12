@@ -3135,14 +3135,9 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
+        delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
         tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, :manage_assignments)
-
-        if self.root_account.feature_enabled?(:granular_permissions_course_files)
-          delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
-        else
-          delete_unless.call([TAB_FILES], :read, :manage_files)
-        end
 
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
@@ -3155,13 +3150,9 @@ class Course < ActiveRecord::Base
           TAB_QUIZZES => [:manage_content, :manage_assignments],
           TAB_GRADES => [:view_all_grades, :manage_grades],
           TAB_PEOPLE => [:manage_students, :manage_admin_users],
-          TAB_FILES => [:manage_files],
+          TAB_FILES => RoleOverride::GRANULAR_FILE_PERMISSIONS,
           TAB_DISCUSSIONS => [:moderate_forum]
         }
-
-        if self.root_account.feature_enabled?(:granular_permissions_course_files)
-          additional_checks[TAB_FILES] = RoleOverride::GRANULAR_FILE_PERMISSIONS
-        end
 
         if self.root_account.feature_enabled?(:granular_permissions_manage_users)
           additional_checks[TAB_PEOPLE] = RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS

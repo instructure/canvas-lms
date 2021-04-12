@@ -39,9 +39,6 @@ def new_valid_tool(course)
   tool
 end
 
-# We have the funky indenting here because we will remove this once the granular
-# permission stuff is released, and I don't want to complicate the git history
-RSpec.shared_examples "course_files" do
 describe FilesController do
   include K5Common
 
@@ -101,7 +98,6 @@ describe FilesController do
     @other_user = user_factory(active_all: true)
     course_with_teacher active_all: true
     student_in_course active_all: true
-    set_granular_permission
   end
 
   describe "GET 'quota'" do
@@ -1557,18 +1553,5 @@ describe FilesController do
       end
     end
 
-  end
-end
-end # End shared_example block
-
-RSpec.describe 'With granular permission on' do
-  it_behaves_like "course_files" do
-    let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_course_files) }
-  end
-end
-
-RSpec.describe 'With granular permission off' do
-  it_behaves_like "course_files" do
-    let(:set_granular_permission) { @course.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end
