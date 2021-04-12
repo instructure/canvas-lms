@@ -72,7 +72,8 @@ module.exports = {
             'canvas-rce-async-chunk',
             'canvas-rce-old-async-chunk',
             'permissions',
-            'assignment_edit'
+            'assignment_edit',
+            'discussion_topics_edit'
           ]
           return (
             assetFilename.endsWith('.js') &&
@@ -184,7 +185,7 @@ module.exports = {
         '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       'node_modules-version-of-backbone$': require.resolve('backbone'),
-      'node_modules-version-of-react-modal$': require.resolve('react-modal'),
+      'node_modules-version-of-react-modal$': require.resolve('react-modal')
     },
 
     modules: [
@@ -223,10 +224,7 @@ module.exports = {
           path.resolve(__dirname, '../spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
         ],
-        exclude: [
-          /bower\//,
-          /node_modules/,
-        ],
+        exclude: [/bower\//, /node_modules/],
         use: {
           loader: 'babel-loader',
           options: {
@@ -247,10 +245,7 @@ module.exports = {
       },
       {
         test: /\.handlebars$/,
-        include: [
-          path.resolve(__dirname, '../ui'),
-          /gems\/plugins\/.*\/app\/views\/jst\//
-        ],
+        include: [path.resolve(__dirname, '../ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
         loaders: ['i18nLinerHandlebars']
       },
       {
