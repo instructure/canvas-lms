@@ -18,8 +18,6 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import $ from 'jquery'
-import '@canvas/rails-flash-notifications'
 import I18n from 'i18n!MasteryScale'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {Button} from '@instructure/ui-buttons'
@@ -31,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {NumberInput} from '@instructure/ui-number-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
@@ -206,7 +205,10 @@ const ProficiencyCalculation = ({
 
   useEffect(() => {
     if (updateError) {
-      $.flashError(I18n.t('An error occurred updating the calculation method'))
+      showFlashAlert({
+        message: I18n.t('An error occurred updating the calculation method'),
+        type: 'error'
+      })
     }
   }, [updateError])
 

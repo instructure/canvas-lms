@@ -21,17 +21,24 @@ import useGroupDetail from '../useGroupDetail'
 import {createCache} from '@canvas/apollo'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {groupDetailMocks} from '../../../mocks/Management'
-import $ from 'jquery'
 import {MockedProvider} from '@apollo/react-testing'
 import {ACCOUNT_FOLDER_ID} from '../../treeBrowser'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 describe('groupDetailHook', () => {
-  let cache, mocks
+  let cache, mocks, showFlashAlertSpy
 
   beforeEach(() => {
     jest.useFakeTimers()
     cache = createCache()
     mocks = groupDetailMocks()
+    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   const wrapper = ({children}) => (
@@ -63,10 +70,12 @@ describe('groupDetailHook', () => {
   })
 
   it("should flash an error message and return the error when coudn't load", async () => {
-    const flashMock = jest.spyOn($, 'flashError').mockImplementation()
     const {result} = renderHook(() => useGroupDetail('2'), {wrapper})
     await act(async () => jest.runAllTimers())
-    expect(flashMock).toHaveBeenCalledWith('An error occurred while loading selected group.')
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading selected group.',
+      type: 'error'
+    })
     expect(result.current.error).not.toBe(null)
   })
 

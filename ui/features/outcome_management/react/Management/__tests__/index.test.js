@@ -15,16 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
+
 import {MockedProvider} from '@apollo/react-testing'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import {within} from '@testing-library/dom'
-import '@canvas/rails-flash-notifications'
 import React from 'react'
 import {createCache} from '@canvas/apollo'
 import OutcomeManagementPanel from '../index'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {accountMocks, courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
+import {
+  accountMocks,
+  courseMocks,
+  groupDetailMocks,
+  groupMocks
+} from '@canvas/outcomes/mocks/Management'
 import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
@@ -33,9 +37,15 @@ jest.useFakeTimers()
 
 describe('OutcomeManagementPanel', () => {
   let cache
+  let showFlashAlertSpy
 
   beforeEach(() => {
     cache = createCache()
+    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   const groupDetailDefaultProps = {
@@ -116,25 +126,27 @@ describe('OutcomeManagementPanel', () => {
   })
 
   it('displays an error on failed request for course outcome groups', async () => {
-    const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<OutcomeManagementPanel />, {
+    render(<OutcomeManagementPanel />, {
       contextType: 'Course',
       contextId: '2',
       mocks: []
     })
     await act(async () => jest.runAllTimers())
-    expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
-    expect(getByText(/course/)).toBeInTheDocument()
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading course outcomes.',
+      type: 'error'
+    })
   })
 
   it('displays an error on failed request for account outcome groups', async () => {
-    const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<OutcomeManagementPanel />, {
+    render(<OutcomeManagementPanel />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
-    expect(flashMock).toHaveBeenCalledWith('An error occurred while loading account outcomes.')
-    expect(getByText(/account/)).toBeInTheDocument()
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading account outcomes.',
+      type: 'error'
+    })
   })
 
   it('loads group detail data correctly', async () => {
@@ -177,8 +189,7 @@ describe('OutcomeManagementPanel', () => {
     })
 
     it('shows successful flash message when moving a group succeeds', async () => {
-      // Flash alert & API mocks
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      // API mock
       jest.spyOn(api, 'moveOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
 
       const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
@@ -207,8 +218,7 @@ describe('OutcomeManagementPanel', () => {
     })
 
     it('shows error flash message when moving a group fails', async () => {
-      // Flash alert & API mocks
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      // API mock
       jest
         .spyOn(api, 'moveOutcomeGroup')
         .mockImplementation(() => Promise.reject(new Error('Network error')))

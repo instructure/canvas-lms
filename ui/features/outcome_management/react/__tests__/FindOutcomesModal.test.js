@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import $ from 'jquery'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
-import '@canvas/rails-flash-notifications'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 
 jest.useFakeTimers()
@@ -31,6 +30,7 @@ jest.useFakeTimers()
 describe('FindOutcomesModal', () => {
   let cache
   let onCloseHandlerMock
+  let showFlashAlertSpy
   const defaultProps = (props = {}) => ({
     open: true,
     onCloseHandler: onCloseHandlerMock,
@@ -40,6 +40,7 @@ describe('FindOutcomesModal', () => {
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
     cache = createCache()
+    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -127,10 +128,12 @@ describe('FindOutcomesModal', () => {
     })
 
     it('displays an error on failed request', async () => {
-      const flashMock = jest.spyOn($, 'flashError').mockImplementation()
       render(<FindOutcomesModal {...defaultProps()} />, {mocks: []})
       await act(async () => jest.runAllTimers())
-      expect(flashMock).toHaveBeenCalledWith('An error occurred while loading account outcomes.')
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'An error occurred while loading account outcomes.',
+        type: 'error'
+      })
     })
   })
 
@@ -147,13 +150,15 @@ describe('FindOutcomesModal', () => {
     })
 
     it('displays an error on failed request', async () => {
-      const flashMock = jest.spyOn($, 'flashError').mockImplementation()
       render(<FindOutcomesModal {...defaultProps()} />, {
         contextType: 'Course',
         mocks: []
       })
       await act(async () => jest.runAllTimers())
-      expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'An error occurred while loading course outcomes.',
+        type: 'error'
+      })
     })
   })
 

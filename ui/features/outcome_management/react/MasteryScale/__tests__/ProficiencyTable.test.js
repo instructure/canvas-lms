@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
+
 import React from 'react'
 import {render, fireEvent, waitFor, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const defaultProps = (props = {}) => ({
   update: () => Promise.resolve(),
@@ -27,13 +28,13 @@ const defaultProps = (props = {}) => ({
 })
 
 describe('default proficiency', () => {
-  let srFlashMock
+  let showFlashAlertSpy
   beforeEach(() => {
-    srFlashMock = jest.spyOn($, 'screenReaderFlashMessage')
+    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
-    srFlashMock.mockRestore()
+    jest.clearAllMocks()
   })
 
   it('renders the correct headers', () => {
@@ -62,14 +63,22 @@ describe('default proficiency', () => {
     const {getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
-    expect(srFlashMock).toHaveBeenCalledTimes(1)
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'Added mastery level',
+      type: 'success',
+      srOnly: true
+    })
   })
 
   it('handling delete rating removes rating and flashes SR message', () => {
     const {getAllByText, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     fireEvent.click(getAllByText(/Delete mastery level/)[0])
     fireEvent.click(getByText(/Confirm/))
-    expect(srFlashMock).toHaveBeenCalledTimes(1)
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'Mastery level deleted',
+      type: 'success',
+      srOnly: true
+    })
   })
 
   it('setting blank description sets error and focus', async () => {
@@ -136,7 +145,6 @@ describe('default proficiency', () => {
 
   it('renders confirmation modal, calls update on save, and flashes a message to the user', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
-    const flashMock = jest.spyOn($, 'flashMessage')
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps({contextType: 'course'})} update={updateSpy} />
     )
@@ -146,7 +154,10 @@ describe('default proficiency', () => {
     fireEvent.click(getByText('Save'))
     await waitFor(() => {
       expect(updateSpy).toHaveBeenCalled()
-      expect(flashMock).toHaveBeenCalledWith('Mastery scale saved')
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Mastery scale saved',
+        type: 'success'
+      })
     })
   })
 

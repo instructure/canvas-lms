@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React, {useCallback} from 'react'
 import I18n from 'i18n!MasteryScale'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,6 +29,7 @@ import {
 } from '@canvas/outcomes/graphql/MasteryCalculation'
 import {useQuery, useMutation} from 'react-apollo'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const MasteryCalculation = ({onNotifyPendingChanges}) => {
   const {contextType, contextId} = useCanvasContext()
@@ -47,7 +47,12 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
     (calculationMethod, calculationInt) => {
       setCalculationMethodQuery({
         variables: {contextType, contextId, calculationMethod, calculationInt}
-      }).then(() => $.flashMessage(I18n.t('Mastery calculation saved')))
+      }).then(() =>
+        showFlashAlert({
+          message: I18n.t('Mastery calculation saved'),
+          type: 'success'
+        })
+      )
     },
     [contextType, contextId, setCalculationMethodQuery]
   )

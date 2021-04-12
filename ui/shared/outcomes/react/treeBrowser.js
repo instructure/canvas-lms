@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
+
 import {useEffect, useState} from 'react'
 import {useApolloClient} from 'react-apollo'
 import I18n from 'i18n!OutcomeManagement'
-import '@canvas/rails-flash-notifications'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CHILD_GROUPS_QUERY} from '../graphql/Management'
 import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
@@ -130,8 +130,14 @@ const useTreeBrowser = () => {
   useEffect(() => {
     if (error) {
       contextType === 'Course'
-        ? $.flashError(I18n.t('An error occurred while loading course outcomes.'))
-        : $.flashError(I18n.t('An error occurred while loading account outcomes.'))
+        ? showFlashAlert({
+            message: I18n.t('An error occurred while loading course outcomes.'),
+            type: 'error'
+          })
+        : showFlashAlert({
+            message: I18n.t('An error occurred while loading account outcomes.'),
+            type: 'error'
+          })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
