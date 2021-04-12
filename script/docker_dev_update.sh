@@ -8,7 +8,7 @@ LOG="$(pwd)/log/docker_dev_update.log"
 DOCKER='y'
 SCRIPT_NAME=$0
 
-trap print_results EXIT
+trap trap_result EXIT
 trap "printf '\nTerminated\n' && exit 130" SIGINT
 
 usage () {
