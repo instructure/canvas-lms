@@ -150,6 +150,12 @@ def maybeSlackSendFailure() {
       message: "${authorSegment}. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\n$extra"
     )
   }
+
+  slackSend(
+    channel: '#canvas_builds-noisy',
+    color: 'danger',
+    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>."
+  )
 }
 
 def maybeSlackSendSuccess() {
@@ -160,6 +166,12 @@ def maybeSlackSendSuccess() {
       message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> succeeded on re-trigger. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>"
     )
   }
+
+  slackSend(
+    channel: '#canvas_builds-noisy',
+    color: 'good',
+    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> succeeded. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>."
+  )
 }
 
 def maybeSlackSendRetrigger() {
