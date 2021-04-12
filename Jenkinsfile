@@ -98,9 +98,9 @@ def postFn(status) {
 
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
-        dockerUtils.tagRemote(env.CASSANDRA_IMAGE, env.CASSANDRA_MERGE_IMAGE)
-        dockerUtils.tagRemote(env.DYNAMODB_IMAGE, env.DYNAMODB_MERGE_IMAGE)
-        dockerUtils.tagRemote(env.POSTGRES_IMAGE, env.POSTGRES_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.CASSANDRA_IMAGE_TAG, env.CASSANDRA_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.DYNAMODB_IMAGE_TAG, env.DYNAMODB_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.POSTGRES_IMAGE_TAG, env.POSTGRES_MERGE_IMAGE)
       }
     }
   } finally {
@@ -266,9 +266,9 @@ pipeline {
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
     IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
 
-    CASSANDRA_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    DYNAMODB_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    POSTGRES_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
     CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
@@ -389,38 +389,32 @@ pipeline {
                     .execute({ runMigrationsStage() })
 
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
-                    withEnv([
-                        "CASSANDRA_IMAGE_TAG=${env.CASSANDRA_IMAGE}",
-                        "DYNAMODB_IMAGE_TAG=${env.DYNAMODB_IMAGE}",
-                        "POSTGRES_IMAGE_TAG=${env.POSTGRES_IMAGE}",
-                    ]) {
-                      def stages = [:]
+                    def stages = [:]
 
-                      extendedStage('Linters')
-                        .handler(buildSummaryReport)
-                        .required(!configuration.isChangeMerged())
-                        .queue(stages, { lintersStage() })
+                    extendedStage('Linters')
+                      .handler(buildSummaryReport)
+                      .required(!configuration.isChangeMerged())
+                      .queue(stages, { lintersStage() })
 
-                      extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
-                        sh 'build/new-jenkins/consumer-smoke-test.sh'
-                      }
-
-                      extendedStage(JS_BUILD_IMAGE_STAGE)
-                        .handler(buildSummaryReport)
-                        .queue(stages, buildDockerImageStage.&jsImage)
-
-                      extendedStage('Dependency Check')
-                        .handler(buildSummaryReport)
-                        .required(configuration.isChangeMerged())
-                        .queue(stages, { dependencyCheckStage() })
-
-                      distribution.stashBuildScripts()
-
-                      distribution.addRSpecSuites(stages)
-                      distribution.addSeleniumSuites(stages)
-
-                      parallel(stages)
+                    extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
+                      sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
+
+                    extendedStage(JS_BUILD_IMAGE_STAGE)
+                      .handler(buildSummaryReport)
+                      .queue(stages, buildDockerImageStage.&jsImage)
+
+                    extendedStage('Dependency Check')
+                      .handler(buildSummaryReport)
+                      .required(configuration.isChangeMerged())
+                      .queue(stages, { dependencyCheckStage() })
+
+                    distribution.stashBuildScripts()
+
+                    distribution.addRSpecSuites(stages)
+                    distribution.addSeleniumSuites(stages)
+
+                    parallel(stages)
                   }
                 }
               }
@@ -476,26 +470,26 @@ pipeline {
                 extendedStage('Contract Tests')
                   .handler(buildSummaryReport)
                   .queue(nestedStages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
-                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE}"),
-                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                   ])
 
                 extendedStage('Flakey Spec Catcher')
                   .handler(buildSummaryReport)
                   .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
                   .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
-                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE}"),
-                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                   ])
 
                 extendedStage('Vendored Gems')
                   .handler(buildSummaryReport)
                   .queue(nestedStages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
-                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE}"),
-                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE}"),
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                   ])
 
                 parallel(nestedStages)
