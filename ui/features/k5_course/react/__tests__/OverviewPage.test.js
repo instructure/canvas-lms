@@ -15,28 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
-import ReactDOM from 'react-dom'
-import K5Course from './react/K5Course'
-import k5Theme from '@canvas/k5/react/k5-theme'
-import ready from '@instructure/ready'
+import {render} from '@testing-library/react'
+import OverviewPage from '../OverviewPage'
 
-k5Theme.use()
+describe('Overview Content', () => {
+  const getProps = (overrides = {}) => ({
+    content: '<h1>About this course <p>this is the course overview</p></h1>',
+    ...overrides
+  })
 
-ready(() => {
-  const courseContainer = document.getElementById('course-dashboard-container')
-  if (courseContainer) {
-    ReactDOM.render(
-      <K5Course
-        currentUser={ENV.current_user}
-        name={ENV.COURSE.name}
-        id={ENV.COURSE.id}
-        imageUrl={ENV.COURSE.image_url}
-        plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
-        timeZone={ENV.TIMEZONE}
-        courseOverview={ENV.COURSE.course_overview}
-      />,
-      courseContainer
-    )
-  }
+  it('renders overview content', () => {
+    const {queryByText} = render(<OverviewPage {...getProps()} />)
+    expect(queryByText('About this course')).toBeInTheDocument()
+  })
 })

@@ -47,6 +47,7 @@ import {TAB_IDS, fetchCourseApps} from '@canvas/k5/react/utils'
 import k5Theme, {theme} from '@canvas/k5/react/k5-theme'
 import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import OverviewPage from './OverviewPage'
 
 const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
 const HERO_HEIGHT_PX = 400
@@ -136,7 +137,8 @@ export function K5Course({
   id,
   timeZone,
   defaultTab = TAB_IDS.OVERVIEW,
-  plannerEnabled = false
+  plannerEnabled = false,
+  courseOverview
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [tabsRef, setTabsRef] = useState(null)
@@ -187,6 +189,7 @@ export function K5Course({
         >
           <CourseHeaderHero name={name} image={imageUrl} backgroundColor={DEFAULT_COLOR} />
         </K5Tabs>
+        {currentTab === TAB_IDS.OVERVIEW && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
@@ -205,7 +208,8 @@ K5Course.propTypes = {
   timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
-  plannerEnabled: PropTypes.bool
+  plannerEnabled: PropTypes.bool,
+  courseOverview: PropTypes.string.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

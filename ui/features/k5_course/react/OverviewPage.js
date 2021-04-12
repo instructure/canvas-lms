@@ -15,28 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
-import ReactDOM from 'react-dom'
-import K5Course from './react/K5Course'
-import k5Theme from '@canvas/k5/react/k5-theme'
-import ready from '@instructure/ready'
+import apiUserContent from '@canvas/util/jquery/apiUserContent'
+import PropTypes from 'prop-types'
 
-k5Theme.use()
+export default function OverviewPage({content}) {
+  return (
+    <div
+      className="user_content"
+      /* html sanitized by server */
+      dangerouslySetInnerHTML={{__html: apiUserContent.convert(content)}}
+    />
+  )
+}
 
-ready(() => {
-  const courseContainer = document.getElementById('course-dashboard-container')
-  if (courseContainer) {
-    ReactDOM.render(
-      <K5Course
-        currentUser={ENV.current_user}
-        name={ENV.COURSE.name}
-        id={ENV.COURSE.id}
-        imageUrl={ENV.COURSE.image_url}
-        plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
-        timeZone={ENV.TIMEZONE}
-        courseOverview={ENV.COURSE.course_overview}
-      />,
-      courseContainer
-    )
-  }
-})
+OverviewPage.propTypes = {
+  content: PropTypes.string.isRequired
+}

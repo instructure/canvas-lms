@@ -2079,7 +2079,8 @@ class CoursesController < ApplicationController
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
                    is_student: @context.user_is_student?(@current_user),
-                   is_instructor: @context.user_is_instructor?(@current_user)
+                   is_instructor: @context.user_is_instructor?(@current_user),
+                   course_overview: @context&.wiki&.front_page&.body
                  }
                })
 
