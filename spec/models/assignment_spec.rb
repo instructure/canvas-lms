@@ -1053,6 +1053,13 @@ describe Assignment do
           @assignment.post_submissions
           expect(@assignment).not_to be_anonymize_students
         end
+
+        it "ignores unposted submissions for test students" do
+          @assignment.post_submissions
+
+          @course.student_view_student
+          expect(@assignment).not_to be_anonymize_students
+        end
       end
     end
   end

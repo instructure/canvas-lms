@@ -1555,6 +1555,8 @@ class Assignment < ActiveRecord::Base
       return
     end
 
+    # Ignore test student enrollments so that adding a test student doesn't
+    # inadvertently flip a posted anonymous assignment back to unposted
     assignment_ids_with_unposted_anonymous_submissions = Assignment.
       where(id: assignments, anonymous_grading: true).
       where(
@@ -1562,7 +1564,7 @@ class Assignment < ActiveRecord::Base
           where("submissions.user_id = users.id").
           where("submissions.assignment_id = assignments.id").
           where("enrollments.course_id = assignments.context_id").
-          where(Enrollment.active_student_conditions)
+          merge(Enrollment.of_student_type.where(workflow_state: "active"))
       ).
       pluck(:id).to_set
 
