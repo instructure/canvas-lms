@@ -218,6 +218,13 @@ div.form-column-right, div.overrides-column-right {
   #assignment_points_possible[readonly] { // points possible
     margin-top: -3px;   // because it sits too low
   }
+  #assignment_annotated_document_info {
+    color: $ic-hint-text;
+    margin-inline-start: 42px;
+    margin-inline-end: 8px;
+    margin-block-end: 8px;
+    @include fontSize(14px);
+  }
 }
 
 

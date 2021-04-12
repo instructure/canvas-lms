@@ -75,6 +75,7 @@ export default class EditView extends ValidatedFormView
   NAME = '[name="name"]'
   ALLOW_FILE_UPLOADS = '#assignment_online_upload'
   ALLOW_ANNOTATED_DOCUMENT = '#assignment_annotated_document'
+  ALLOW_ANNOTATED_DOCUMENT_INFO = '#assignment_annotated_document_info'
   ALLOW_TEXT_ENTRY = '#assignment_text_entry'
   RESTRICT_FILE_UPLOADS = '#assignment_restrict_file_extensions'
   RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
@@ -127,6 +128,7 @@ export default class EditView extends ValidatedFormView
     els["#{NAME}"] = '$name'
     els["#{ALLOW_FILE_UPLOADS}"] = '$allowFileUploads'
     els["#{ALLOW_ANNOTATED_DOCUMENT}"] = '$allowAnnotatedDocument'
+    els["#{ALLOW_ANNOTATED_DOCUMENT_INFO}"] = '$allowAnnotatedDocumentInfo'
     els["#{RESTRICT_FILE_UPLOADS}"] = '$restrictFileUploads'
     els["#{RESTRICT_FILE_UPLOADS_OPTIONS}"] = '$restrictFileUploadsOptions'
     els["#{ANNOTATED_DOCUMENT_OPTIONS}"] = '$annotatedDocumentOptions'
@@ -369,6 +371,7 @@ export default class EditView extends ValidatedFormView
       @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments do not currently support student annotation assignments'))
       @renderAnnotatedDocumentSelector()
       @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
+      @$allowAnnotatedDocumentInfo.show()
     else
       if isAnonymous
         @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments cannot be enabled for anonymously graded assignments'))
@@ -376,6 +379,7 @@ export default class EditView extends ValidatedFormView
         @enableCheckbox(@$groupCategoryBox)
       @unmountAnnotatedDocumentSelector()
       @unmountAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
+      @$allowAnnotatedDocumentInfo.hide()
 
   getAnnotatedDocumentContainer: =>
     return document.querySelector('#annotated_document_chooser_container')
@@ -663,6 +667,12 @@ export default class EditView extends ValidatedFormView
         })
 
       @renderAnnotatedDocumentSelector() if @$allowAnnotatedDocument.prop('checked')
+
+      if @$allowAnnotatedDocument.prop('checked')
+        @$allowAnnotatedDocumentInfo.show()
+      else
+        @$allowAnnotatedDocumentInfo.hide()
+
       @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
 
     if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED

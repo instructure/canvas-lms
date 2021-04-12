@@ -2107,6 +2107,24 @@ QUnit.module('EditView student annotation submission', hooks => {
       strictEqual(file.textContent, filename)
     })
 
+    test('hide a11y notice when annotated document type is unchecked', function () {
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.$el.find('#assignment_annotated_document').prop('checked', false)
+      view.afterRender()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'none')
+    })
+
+    test('show a11y notice when annotated document type is checked', function () {
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'block')
+    })
+
     test('renders a remove button if attachment is present', function () {
       view = editView(assignmentOpts)
       view.$el.find('#assignment_annotated_document').prop('checked', true)
