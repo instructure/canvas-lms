@@ -360,6 +360,8 @@ pipeline {
                       if(env.GERRIT_PROJECT != "canvas-lms") {
                         sh "rm -vrf $LOCAL_WORKDIR@tmp"
                       }
+
+                      distribution.stashBuildScripts()
                     }
 
                   extendedStage('Rebase')
@@ -408,11 +410,6 @@ pipeline {
                       .handler(buildSummaryReport)
                       .required(configuration.isChangeMerged())
                       .queue(stages, { dependencyCheckStage() })
-
-                    distribution.stashBuildScripts()
-
-                    distribution.addRSpecSuites(stages)
-                    distribution.addSeleniumSuites(stages)
 
                     parallel(stages)
                   }
@@ -491,6 +488,9 @@ pipeline {
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                     string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                   ])
+
+                distribution.addRSpecSuites(nestedStages)
+                distribution.addSeleniumSuites(nestedStages)
 
                 parallel(nestedStages)
               }
