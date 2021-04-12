@@ -2015,6 +2015,7 @@ nn:
   allow_in_mastery_paths_5332c786: "Tillat i meistringsstiane"
   allow_intra_group_peer_reviews_53f1e455: "Tillat fagfellevurdering innad i gruppa"
   allow_lor_tools: "Tillat brukarar å vise og bruke eksterne verktøy som er konfigurerte for LOR."
+  allow_migration_of_quizzes_during_course_copy_and__35d80756: "Tillat migrering av quizar gjennom emnekopiering og -import"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "La ein vurderingsmoderator gå gjennom fleire uavhengige vurderingar for utvalde innleveringar"
   allow_multiple_attempts_e67a0a37: "Tillat fleire forsøk"
   allow_opt_out_of_inbox: "Tillat brukarar å trekkje seg frå samtaleinnboksen. Dette vil medføre at alle samtalemeldingar og -varsel blir sende direkte til den primære e-postadressa til brukaren, at meldingsindikatoren for ulesne meldingar blir skjult, og at varslingsinnstillingar for samtalar blir skjulte."
@@ -3111,6 +3112,9 @@ nn:
       assignment_delete: "Oppgåva er sletta"
       assignment_not_available: "Oppgåva du spør etter er ikkje tilgjengeleg for emneseksjonen din."
       created: "Oppgåva er oppretta."
+      quizzes_published: 
+        one: "1 quiz er publisert! "
+        other: "%{count} quizar er publiserte!"
       updated: "Oppgåva er oppdatert."
     overdue_assignments: "Oppgåver med passert innleveringsfrist"
     past_assignments: "Tidlegare oppgåver"
@@ -3721,6 +3725,7 @@ nn:
       Emnemedlem kan berre administrere innhald i Blueprintemne dersom dei er lagt til Blueprintemnet med rolla faglærar, undervisingsassistent eller designar.
       
       For å endre låseinnstilling på eit Blueprintemne frå diskusjonsoversikta, må 'Diskusjonar - administrer' òg vere slått på.
+  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Blueprint-emne må vere aktivert på kontonivå av ein admin. Emneroller kan kun administrere innhald i Blueprint-emne dersom dei er lagde til Blueprint-emnet som ein faglærar, undervisingsassistent eller designar. Ein brukar kan framleis justere låseinnstillinger for innhald på individuelle sider i eit Blueprint-masteremne, sjølv om løyvet er slått av. "
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Blueprint-emne må vere aktivert på kontonivå av ein admin.
       Emneroller kan kun administrere innhald i Blueprint-emne dersom dei er lagde til Blueprint-emnet som ein faglærar, undervisingsasstent eller designar.
@@ -6169,6 +6174,7 @@ nn:
   course_results_updated_df9d1c95: "Emneresultat oppdatert."
   course_role_role_type_119c2f64: "Emnerolle: %{role_type}"
   course_roles_1314f962: Emneroller
+  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Emneroller kan kun administrere Blueprint-emne dersom dei er lagd til Blueprint-emnet som ein faglærar, undervisingsassistent eller designar. For å få tilgang til Blueprint-menyen, må 'Emne - legg til / rediger / slett emne' vere aktivert. For å legge til eit tilknytta emne, må 'Emne - vis liste' og 'Emne - legg til / rediger / slett' òg vere aktivert. For å redigere låseinnstillingar for alle Blueprint-objekt, må 'Emne - legg til / rediger / slett' vere aktivert. "
   course_roles_d2d5d666: Emneroller
   course_roster_78f70e97: Emneliste
   course_search: 
@@ -6931,6 +6937,7 @@ nn:
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Eigendefinerte koplingar som kan leggast til i hurtigmenyen for dialogboksen"
   custom_reports_experimental_features_40bbfe7c: "Eigendefinerte rapportar: eksperimentelle funksjonar"
   customize_configuration_69c22ef3: "Tilpass konfigurasjon"
+  customize_course_details_26fd4afe: "Tilpass emnedetaljar"
   customize_help_link_62cd05eb: "Eigendefiner Hjelp-kopling"
   customize_learning_mastery_ratings_4ace142a: "Eigendefiner meistringsnivå"
   customize_this_menu_efa72a9: "Tilpass denne menyen"
@@ -10563,12 +10570,14 @@ nn:
   hours_late_989e9081: "Timar for seint"
   hover_over_me_496521b9: "Flytt peikaren over meg"
   how_do_i_add_a_rubric_in_a_course_a4c7a40: "Korleis legg eg ein rubrikk til i eit emne?"
+  how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Korleis opprettar eg ei quiz til vurdering i New Quizzes? "
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Korleis importerer eg ein pakke som er eksportert frå eit Canvas-emne?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Korleis kan eg som faglærar rydde og organisere filene mine?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Korleis flyttar eg eller omorganiser ein modul? "
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Korleis publiserer eller avpubliserer eg som faglærar ei side? "
   how_do_i_use_course_settings_1e8467e6: "Kva kan eg gjere med emne-innstillingar?"
   how_do_i_use_speedgrader_e18e4ca2: "Korleis brukar eg SpeedGrader?"
+  how_do_i_use_the_quizzes_index_page_cc2e15d3: "Korleis brukar eg quizoversikta?"
   how_is_the_grade_determined_bb75bf53: "Korleis er vurderinga gjort?"
   how_is_this_affecting_you_b3b6a639: "Korleis verkar dette på deg?"
   how_many_minutes_ecca5ee7: "Kor mange minutt?"
@@ -13913,6 +13922,7 @@ nn:
   new_quiz_34aacba6: "Ny quiz"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_importing_c167dce0: "New Quizzes importerer"
+  new_quizzes_migration_required_7854aa1a: "Krav om migrering til New Quizzes"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på quizsida"
   new_quizzes_submission_history_d81b477b: "New Quizzes-innleveringshistorikk"
   new_rating_canceled_eed3c4ff: "Ny rangering er avbrote"
@@ -17160,6 +17170,7 @@ nn:
   quizzes_7e598f57: Quizar
   quizzes_and_question_banks_9b7569e3: "Quizar og spørsmålsbankar"
   quizzes_are_not_yet_handled_in_the_new_assignments_3898536a: "Quizar er ikkje inkludert i den nye oppgåveprosessen enno. Gå til den gamle lag quiz-sida? "
+  quizzes_b1e4b6cb: quizar
   quizzes_index: 
     headers: 
       assignment_quizzes: Oppgåvespørsmål
