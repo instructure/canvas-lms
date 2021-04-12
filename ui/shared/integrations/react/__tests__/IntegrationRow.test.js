@@ -32,7 +32,7 @@ describe('IntegrationRow', () => {
   const subject = overrides => render(<IntegrationRow {...props(overrides)} />)
 
   it('displays the integration name', () => {
-    expect(subject().getAllByText('Microsoft Sync')).toBeTruthy()
+    expect(subject().getAllByText('Microsoft Sync')).not.toHaveLength(0)
   })
 
   it('shows the integration is enabled', () => {
@@ -54,6 +54,19 @@ describe('IntegrationRow', () => {
 
   describe('when "loading" is true', () => {
     const propOverrides = {loading: true}
-    expect(subject(propOverrides).getByText('Loading Microsoft Sync data')).toBeTruthy()
+
+    it('shows the loading spinner', () => {
+      expect(subject(propOverrides).getByText('Loading Microsoft Sync data')).toBeInTheDocument()
+    })
+  })
+
+  describe('when "error" is set', () => {
+    const propOverrides = {error: 'Something bad happened!', expanded: true}
+
+    it('shows the error', () => {
+      const expectedError = `An error occurred, please try again. Error: ${propOverrides.error}`
+
+      expect(subject(propOverrides).getByText(expectedError)).toBeInTheDocument()
+    })
   })
 })

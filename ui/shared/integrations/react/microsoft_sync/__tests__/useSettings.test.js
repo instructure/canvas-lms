@@ -18,24 +18,67 @@
 
 import useSettings from '../useSettings'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import {act} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks/dom'
+import axios from 'axios'
 
 jest.mock('@canvas/use-fetch-api-hook')
+jest.mock('axios')
 
 const courseId = 11
 const subject = () => renderHook(() => useSettings(courseId))
 
 afterEach(() => {
   useFetchApi.mockClear()
+  axios.request.mockClear()
 })
 
 describe('useSettings', () => {
+  it('renders without error', () => {
+    const {result} = subject()
+    expect(result.error).toBeFalsy()
+  })
+
   it('makes a GET request to load the group', () => {
     subject()
     const lastCall = useFetchApi.mock.calls.pop()
 
     expect(lastCall[0]).toMatchObject({
       path: `/api/v1/courses/${courseId}/microsoft_sync/group`
+    })
+  })
+
+  describe('toggleEnabled', () => {
+    it('enables the integration when it is disabled', () => {
+      const {result} = subject()
+      const toggleEnabled = result.current[4]
+
+      act(() => {
+        toggleEnabled()
+      })
+
+      expect(axios.request).toHaveBeenLastCalledWith({
+        method: 'post',
+        url: `/api/v1/courses/${courseId}/microsoft_sync/group`
+      })
+    })
+
+    it('disables the integration when it is enabled', () => {
+      useFetchApi.mockImplementationOnce(({success}) => {
+        success({workflow_state: 'active'})
+      })
+
+      const {result} = subject()
+      const toggleEnabled = result.current[4]
+
+      act(() => {
+        toggleEnabled()
+      })
+
+      expect(axios.request).toHaveBeenLastCalledWith({
+        method: 'delete',
+        url: `/api/v1/courses/${courseId}/microsoft_sync/group`
+      })
     })
   })
 })

@@ -16,47 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import axios from 'axios'
 import {useState, useCallback} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 
-function useSettings(coursId) {
+function useSettings(courseId) {
   const [group, setGroup] = useState({})
-  const [enabled, setEnabled] = useState()
+  const [enabled, setEnabled] = useState(false)
   const [loading, setLoading] = useState({})
   const [error, setError] = useState()
+  const groupEndpoint = `/api/v1/courses/${courseId}/microsoft_sync/group`
 
-  // TODO: Make real requests to create/delete the group
-  function toggleGroup() {
-    return new Promise(resolve =>
-      setTimeout(
-        resolve({
-          workflow_state: 'deleted',
-          last_synced_at: 'Tue, 30 Mar 2021 20:44:10 UTC +00:00'
-        }),
-        3000
-      )
-    )
+  async function toggleGroup() {
+    const response = await axios.request({
+      method: enabled ? 'delete' : 'post',
+      url: groupEndpoint
+    })
+
+    setGroup(response.data)
+    setEnabled(!!response.data.workflow_state)
+    setError()
   }
 
+  // This effect is called once on render
   useFetchApi({
     success: useCallback(response => {
       setGroup(response)
-      setEnabled(response.workflow_state !== 'deleted')
+      setEnabled(!!response.workflow_state)
     }, []),
-    error: setError,
+    error: useCallback(e => {
+      // 404s are expected if the group has not been created yet.
+      if (!(e.response.status === 404)) {
+        setError(e.message)
+      }
+    }, []),
     loading: setLoading,
-    path: `/api/v1/courses/${coursId}/microsoft_sync/group`
+    path: groupEndpoint
   })
 
-  // TODO: Extract bits to a common method that handles setting loading/error state
+  // The function called to enable/disable
+  // Microsoft Sync plugin
   async function toggleEnabled() {
     setLoading(true)
     try {
-      const groupResponse = await toggleGroup()
-      setGroup(groupResponse)
-      setEnabled(groupResponse.workflow_state !== 'deleted')
+      await toggleGroup()
     } catch (e) {
-      setError(e)
+      setError(e.message)
     }
     setLoading(false)
   }

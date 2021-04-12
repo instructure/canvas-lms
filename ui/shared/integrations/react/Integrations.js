@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import I18n from 'i18n!course_settings'
 
 import {Flex} from '@instructure/ui-flex'
@@ -30,6 +30,7 @@ const Integrations = () => {
   const [msGroup, msEnabled, msLoading, msError, msToggleEnabled] = useMicrosoftSettings(
     ENV.COURSE_ID
   )
+  const [msExpanded, setMSExpanded] = useState(false)
 
   return (
     <>
@@ -49,8 +50,11 @@ const Integrations = () => {
         enabled={msEnabled}
         loading={msLoading}
         onChange={msToggleEnabled}
+        error={msError}
+        expanded={msExpanded || !!msError}
+        onToggle={() => setMSExpanded(expanded => !expanded)}
       >
-        <MicrosoftSync enabled={msEnabled} group={msGroup} loading={msLoading} error={msError} />
+        <MicrosoftSync enabled={msEnabled} group={msGroup} loading={msLoading} />
       </IntegrationRow>
     </>
   )

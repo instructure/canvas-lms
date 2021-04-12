@@ -28,31 +28,44 @@ import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
-const IntegrationRow = ({name, enabled, loading, onChange, children}) => {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const onToggle = () => setIsExpanded(prevIsExpanded => !prevIsExpanded)
+const IntegrationRow = ({
+  name,
+  enabled,
+  loading,
+  onChange,
+  children,
+  error,
+  expanded,
+  onToggle
+}) => {
   const summary = () => (
     <Flex justifyItems="space-between">
       <Flex.Item>
         <Text>{name}</Text>
       </Flex.Item>
       <Flex.Item>
-        {loading ? (
-          <View as="div" textAlign="center">
-            <Spinner
-              margin="none medium none none"
-              size="x-small"
-              renderTitle={I18n.t('Loading %{name} data', {name})}
+        <Flex>
+          <Flex.Item>
+            {loading && (
+              <View as="div" textAlign="center">
+                <Spinner
+                  margin="none medium none none"
+                  size="x-small"
+                  renderTitle={I18n.t('Loading %{name} data', {name})}
+                />
+              </View>
+            )}
+          </Flex.Item>
+          <Flex.Item>
+            <Checkbox
+              label={<ScreenReaderContent>{I18n.t('Toggle %{name}', {name})}</ScreenReaderContent>}
+              variant="toggle"
+              checked={enabled}
+              onChange={onChange}
+              disabled={loading}
             />
-          </View>
-        ) : (
-          <Checkbox
-            label={<ScreenReaderContent>{I18n.t('Toggle %{name}', {name})}</ScreenReaderContent>}
-            variant="toggle"
-            checked={enabled}
-            onChange={onChange}
-          />
-        )}
+          </Flex.Item>
+        </Flex>
       </Flex.Item>
     </Flex>
   )
@@ -64,16 +77,25 @@ const IntegrationRow = ({name, enabled, loading, onChange, children}) => {
       toggleLabel={toggleLabel()}
       summary={summary()}
       border={false}
-      expanded={isExpanded}
+      expanded={expanded}
       onToggle={onToggle}
     >
-      {!enabled && !loading && (
-        <Alert variant="info" margin="small">
-          <Text>
-            {I18n.t('This integration is not enabled. Please enable it to interact with settings.')}
-          </Text>
-        </Alert>
-      )}
+      <div role="region" aria-live="polite">
+        {error && !loading && (
+          <Alert variant="error" margin="small">
+            <Text>{I18n.t('An error occurred, please try again. Error: %{error}', {error})}</Text>
+          </Alert>
+        )}
+        {!enabled && !loading && (
+          <Alert variant="info" margin="small">
+            <Text>
+              {I18n.t(
+                'This integration is not enabled. Please enable it to interact with settings.'
+              )}
+            </Text>
+          </Alert>
+        )}
+      </div>
       <View display="block" padding="small">
         {children}
       </View>

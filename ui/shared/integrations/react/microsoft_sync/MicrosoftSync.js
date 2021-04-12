@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const MicrosoftSync = ({enabled, group, loading, error}) => {
+const MicrosoftSync = ({enabled, group, loading}) => {
   if (loading) {
     return (
       <View as="div" textAlign="center">
@@ -37,7 +37,7 @@ const MicrosoftSync = ({enabled, group, loading, error}) => {
 
   return (
     <>
-      <Text>{I18n.t('Sync and Provision Microsoft Teams with you Canvas Course')}</Text>
+      <Text>{I18n.t('Sync and Provision Microsoft Teams with your Canvas Course')}</Text>
       <Flex margin="small none none none">
         <Flex.Item>
           <Button
