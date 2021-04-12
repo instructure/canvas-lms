@@ -92,5 +92,10 @@ module Types
     def last_reply
       load_association(:last_discussion_subentry)
     end
+
+    field :subentries_count, Integer, null: true
+    def subentries_count
+      Loaders::DiscussionSubentriesCountLoader.load(object)
+    end
   end
 end

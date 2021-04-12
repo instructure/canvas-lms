@@ -73,4 +73,12 @@ describe Types::DiscussionEntryType do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil
   end
+
+  it 'returns subentries count' do
+    4.times do |i|
+      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry #{i}", user: @teacher, parent_id: discussion_entry.id)
+    end
+
+    expect(discussion_entry_type.resolve('subentriesCount')).to eq 4
+  end
 end
