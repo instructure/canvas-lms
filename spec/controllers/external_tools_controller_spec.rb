@@ -872,6 +872,16 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
+    it 'should restrict students from launching tools with limited visibility' do
+      user_session(@student)
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob")
+      tool.url = "http://www.example.com/basic_lti"
+      tool.course_navigation = { visibility: 'admins'}
+      tool.save!
+      get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/basic_lti", placement: 'course_navigation'}
+      assert_unauthorized
+    end
+
     it "should find tools matching by exact url" do
       user_session(@teacher)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")

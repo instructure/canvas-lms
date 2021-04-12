@@ -965,6 +965,21 @@ end
     end
   end
 
+  def override_visibility(visibility, placement = nil)
+    to_override = placement.present? ? self.settings[placement.to_sym] : self.settings
+    to_override[:visibility_override] = visibility
+  end
+
+  def clear_visibility_override(placement = nil)
+    to_override = placement.present? ? self.settings[placement.to_sym] : self.settings
+    to_override.delete(:visibility_override)
+  end
+
+  def visible?(placement, user, context, session=nil)
+    visibility = self.extension_setting(placement, :visibility_override) || self.extension_setting(placement, :visibility)
+    self.class.visible?(visibility, user, context, session)
+  end
+
   def visible_with_permission_check?(launch_type, user, context, session=nil)
     return false unless self.class.visible?(self.extension_setting(launch_type, 'visibility'), user, context, session)
     permission_given?(launch_type, user, context, session)
