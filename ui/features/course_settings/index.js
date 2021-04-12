@@ -38,7 +38,7 @@ const CourseTemplateDetails = React.lazy(() => import('./react/components/Course
 const CourseAvailabilityOptions = React.lazy(() =>
   import('./react/components/CourseAvailabilityOptions')
 )
-const Integrations = React.lazy(() => import('@canvas/integrations/react/Integrations'))
+const Integrations = React.lazy(() => import('@canvas/integrations/react/courses/Integrations'))
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const Error = () => (

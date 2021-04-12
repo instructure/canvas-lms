@@ -65,6 +65,9 @@
     <% if can_do(@context, @current_user, :manage_storage_quotas) %>
     <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
     <% end %>
+    <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
+    <li><a href="#tab-integrations" id="tab-integrations-link"><%= t(:tab_integrations, "Integrations") %></a></li>
+    <% end %>
     <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
@@ -899,7 +902,10 @@ acknowledge that you have read and agreed to the
       <h2 class="screenreader-only"><%= t('headings.quotas', "Account Quotas") %></h2>
     </div>
   <% end %>
-
+  <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
+    <div id="tab-integrations">
+    </div>
+  <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <div id="tab-notifications">
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings_notifications"} do |f| %>

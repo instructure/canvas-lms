@@ -27,6 +27,7 @@ import './jquery/index'
 import './backbone/account_quota_settings.coffee'
 import FeatureFlags from '@canvas/feature-flags'
 import ready from '@instructure/ready'
+import MicrosoftSyncAccountSettings from '@canvas/integrations/react/accounts/microsoft_sync/MicrosoftSyncAccountSettings'
 
 ready(() => {
   if (window.ENV.NEW_FEATURES_UI) {
@@ -57,5 +58,9 @@ ready(() => {
       </View>,
       document.getElementById('tab-security')
     )
+  }
+
+  if (document.getElementById('tab-integrations')) {
+    ReactDOM.render(<MicrosoftSyncAccountSettings />, document.getElementById('tab-integrations'))
   }
 })
