@@ -17,6 +17,7 @@
  */
 
 import {DISCUSSION_QUERY} from '../graphql/Queries'
+import DiscussionThreadContainer from './containers/DiscussionThreadContainer/DiscussionThreadContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
@@ -27,7 +28,7 @@ import {useQuery} from 'react-apollo'
 
 export const PER_PAGE = 20
 
-const DiscussionTopicQuery = props => {
+const DiscussionTopicManager = props => {
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables: {
       discussionID: props.discussionTopicId,
@@ -49,12 +50,17 @@ const DiscussionTopicQuery = props => {
     return <LoadingIndicator />
   }
 
-  // TODO: do something with the queried data
-  return <h1>New Discussion Post Entry Point</h1>
+  return (
+    <>
+      <DiscussionThreadContainer
+        threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
+      />
+    </>
+  )
 }
 
-DiscussionTopicQuery.propTypes = {
+DiscussionTopicManager.propTypes = {
   discussionTopicId: PropTypes.string.isRequired
 }
 
-export default DiscussionTopicQuery
+export default DiscussionTopicManager

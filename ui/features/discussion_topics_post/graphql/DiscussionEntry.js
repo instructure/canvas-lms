@@ -33,11 +33,19 @@ export const DiscussionEntry = {
       ratingSum
       rating
       read
+      subentriesCount
+      rootEntryParticipantCounts {
+        unreadCount
+        repliesCount
+      }
       author {
         ...User
       }
       editor {
         ...User
+      }
+      lastReply {
+        createdAt
       }
     }
     ${User.fragment}
@@ -47,14 +55,23 @@ export const DiscussionEntry = {
     id: string,
     _id: string,
     createdAt: string,
+    updatedAt: string,
     deleted: bool,
     message: string,
     ratingCount: number,
     ratingSum: number,
     rating: bool,
     read: bool,
+    subentriesCount: number,
     author: User.shape,
-    editor: User.shape
+    editor: User.shape,
+    rootEntryParticipantCounts: {
+      unreadCount: number,
+      repliesCount: number
+    },
+    lastReply: shape({
+      createdAt: string
+    })
   })
 }
 
@@ -68,6 +85,10 @@ export const DefaultMocks = {
     ratingCount: 5,
     ratingSum: 5,
     rating: true,
-    read: true
+    read: true,
+    subentriesCount: 5,
+    lastReply: {
+      createdAt: '2021-03-25T13:22:24-06:00'
+    }
   })
 }

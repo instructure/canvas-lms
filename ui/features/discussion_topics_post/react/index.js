@@ -18,7 +18,7 @@
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider, createClient} from '@canvas/apollo'
-import DiscussionTopicQuery from './DiscussionTopicQuery'
+import DiscussionTopicManager from './DiscussionTopicManager'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -40,7 +40,7 @@ export default function renderDiscussionPosts(env, elt) {
         }
       >
         <AlertManager>
-          <DiscussionTopicQuery discussionTopicId={env.discussion_topic_id} />
+          <DiscussionTopicManager discussionTopicId={env.discussion_topic_id} />
         </AlertManager>
       </ErrorBoundary>
     </ApolloProvider>,

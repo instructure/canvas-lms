@@ -16,174 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThread} from '../../DiscussionThread/DiscussionThread'
-
-export const mockThreads = [
-  {
-    id: '432',
-    authorName: 'Jeffrey Johnson',
-    avatarUrl: 'someURL',
-    timingDisplay: 'Jan 1st, 2021',
-    message:
-      'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-    pillText: 'Author',
-    isUnread: false,
-    replies: [
-      {
-        id: '532',
-        authorName: 'Jeffrey Johnson2',
-        avatarUrl: 'someURL',
-        timingDisplay: 'Jan 1st, 2021',
-        message:
-          'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-        isUnread: false,
-        replies: [
-          {
-            id: '533',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: true
-          },
-          {
-            id: '534',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: false
-          },
-          {
-            id: '535',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: false
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: '433',
-    authorName: 'Jeffrey Johnson',
-    avatarUrl: 'someURL',
-    timingDisplay: 'Jan 1st, 2021',
-    message:
-      'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-    isUnread: false,
-    replies: [
-      {
-        id: '536',
-        authorName: 'Jeffrey Johnson2',
-        avatarUrl: 'someURL',
-        timingDisplay: 'Jan 1st, 2021',
-        message:
-          'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-        isUnread: false,
-        replies: [
-          {
-            id: '537',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: true
-          },
-          {
-            id: '538',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: false
-          },
-          {
-            id: '539',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: false
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: '434',
-    authorName: 'Jeffrey Johnson',
-    avatarUrl: 'someURL',
-    timingDisplay: 'Jan 1st, 2021',
-    message:
-      'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-    isUnread: false,
-    replies: [
-      {
-        id: '540',
-        authorName: 'Jeffrey Johnson2',
-        avatarUrl: 'someURL',
-        timingDisplay: 'Jan 1st, 2021',
-        message:
-          'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-        isUnread: false,
-        replies: [
-          {
-            id: '541',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: true
-          },
-          {
-            id: '542',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: false
-          },
-          {
-            id: '543',
-            authorName: 'Jeffrey Johnson3',
-            avatarUrl: 'someURL',
-            timingDisplay: 'Jan 1st, 2021',
-            message:
-              'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-            isUnread: false
-          }
-        ]
-      }
-    ]
-  }
-]
+import PropTypes from 'prop-types'
+import React from 'react'
 
 export const DiscussionThreadContainer = props => {
   return (
@@ -200,7 +36,7 @@ export const DiscussionThreadContainer = props => {
 }
 
 DiscussionThreadContainer.propTypes = {
-  threads: PropTypes.array.isRequired
+  threads: PropTypes.arrayOf(DiscussionEntry.shape).isRequired
 }
 
 export default DiscussionThreadContainer

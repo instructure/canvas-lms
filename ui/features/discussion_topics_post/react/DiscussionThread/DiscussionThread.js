@@ -15,80 +15,38 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {CollapseReplies} from '../CollapseReplies/CollapseReplies'
+import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
+import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
-import React, {useState} from 'react'
-import PropTypes from 'prop-types'
+import I18n from 'i18n!discussion_topics_post'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../PostMessage/PostMessage'
+import PropTypes from 'prop-types'
+import React, {useContext, useState} from 'react'
 import {ThreadActions} from '../ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../ThreadingToolbar/ThreadingToolbar'
+import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-import {CollapseReplies} from '../CollapseReplies/CollapseReplies'
 
 export const mockThreads = {
   id: '432',
-  authorName: 'Jeffrey Johnson',
-  avatarUrl: 'someURL',
-  timingDisplay: 'Jan 1st, 2021',
+  author: {
+    name: 'Jeffrey Johnson',
+    avatarUrl: 'someURL'
+  },
+  createdAt: '2021-02-08T13:36:05-07:00',
   message:
-    'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-  pillText: 'Author',
-  isUnread: false,
-  replies: [
-    {
-      id: '532',
-      authorName: 'Jeffrey Johnson2',
-      avatarUrl: 'someURL',
-      timingDisplay: 'Jan 1st, 2021',
-      message:
-        'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-      isUnread: false,
-      replies: [
-        {
-          id: '533',
-          authorName: 'Jeffrey Johnson3',
-          avatarUrl: 'someURL',
-          timingDisplay: 'Jan 1st, 2021',
-          message:
-            'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-          isUnread: true
-        },
-        {
-          id: '534',
-          authorName: 'Jeffrey Johnson3',
-          avatarUrl: 'someURL',
-          timingDisplay: 'Jan 1st, 2021',
-          message:
-            'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-          isUnread: false
-        },
-        {
-          id: '535',
-          authorName: 'Jeffrey Johnson3',
-          avatarUrl: 'someURL',
-          timingDisplay: 'Jan 1st, 2021',
-          message:
-            'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-
-          isUnread: false
-        }
-      ]
-    }
-  ]
-}
-
-export const mockThreadsNoReplies = {
-  id: '432',
-  authorName: 'Jeffrey Johnson',
-  avatarUrl: 'someURL',
-  timingDisplay: 'Jan 1st, 2021',
-  message:
-    'This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. ',
-  pillText: 'Author',
-  isUnread: false,
-  replies: []
+    '<p>This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends.</p>',
+  read: true,
+  lastReply: null,
+  rootEntryParticipantCounts: {
+    unreadCount: 0,
+    repliesCount: 0
+  },
+  subentriesCount: 0
 }
 
 export const DiscussionThread = props => {
@@ -98,25 +56,41 @@ export const DiscussionThread = props => {
 
   const threadActions = [
     <ThreadingToolbar.Reply key={`reply-${props.id}`} onReply={() => {}} />,
-    <ThreadingToolbar.Like key={`like-${props.id}`} onClick={() => {}} />
+    <ThreadingToolbar.Like
+      key={`like-${props.id}`}
+      onClick={() => {}}
+      isLiked={props.rating}
+      likeCount={props.ratingCount}
+    />
   ]
 
-  if (props.depth === 0 && props.replies?.length > 0) {
+  if (props.depth === 0 && props.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
         key={`expand-${props.id}`}
-        expandText="4 replies, 2 unread"
+        expandText={I18n.t('%{replies} replies, %{unread} unread', {
+          replies: props.rootEntryParticipantCounts?.repliesCount,
+          unread: props.rootEntryParticipantCounts?.unreadCount
+        })}
         onClick={() => setExpandReplies(!expandReplies)}
       />
     )
   }
 
+  const createdAt = Date.parse(props.createdAt)
+
   return (
     <>
       <div style={{marginLeft: marginDepth + 'rem'}}>
         <Flex>
-          <Flex.Item shroudGrow shouldShrink>
-            <PostMessage {...props}>
+          <Flex.Item shouldShrink shouldGrow>
+            <PostMessage
+              authorName={props.author.name}
+              avatarUrl={props.author.avatarUrl}
+              timingDisplay={createdAt.toDateString()}
+              message={props.message}
+              isUnread={!props.read}
+            >
               <ThreadingToolbar>{threadActions}</ThreadingToolbar>
             </PostMessage>
           </Flex.Item>
@@ -125,16 +99,12 @@ export const DiscussionThread = props => {
           </Flex.Item>
         </Flex>
       </div>
-      {(expandReplies || props.depth > 0) &&
-        props.replies?.length !== 0 &&
-        props.replies?.map(r => {
-          return (
-            <DiscussionThread key={`discussion-thread-${r.id}`} depth={props.depth + 1} {...r} />
-          )
-        })}
-      {expandReplies && props.depth === 0 && props.replies?.length !== 0 && (
+      {(expandReplies || props.depth > 0) && props.subentriesCount > 0 && (
+        <DiscussionSubentries discussionEntryId={props._id} depth={props.depth + 1} />
+      )}
+      {expandReplies && props.depth === 0 && props.lastReply && (
         <div
-          style={{'margin-left': '4rem'}}
+          style={{marginLeft: '4rem'}}
           width="100%"
           key={`discussion-thread-collapse-${props.id}`}
         >
@@ -155,14 +125,7 @@ export const DiscussionThread = props => {
 }
 
 DiscussionThread.propTypes = {
-  id: PropTypes.string,
-  authorName: PropTypes.string,
-  avatarUrl: PropTypes.string,
-  timingDisplay: PropTypes.string,
-  message: PropTypes.string,
-  pillTest: PropTypes.string,
-  isUnread: PropTypes.bool,
-  replies: PropTypes.array,
+  ...DiscussionEntry.shape,
   depth: PropTypes.number
 }
 
@@ -171,3 +134,34 @@ DiscussionThread.defaultProps = {
 }
 
 export default DiscussionThread
+
+const DiscussionSubentries = props => {
+  const {setOnFailure} = useContext(AlertManagerContext)
+
+  const PER_PAGE = 25
+
+  const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
+    variables: {
+      discussionEntryID: props.discussionEntryId,
+      perPage: PER_PAGE
+    }
+  })
+
+  if (subentries.error) {
+    setOnFailure(I18n.t('Error loading replies'))
+    return null
+  }
+
+  if (subentries.loading) {
+    return <LoadingIndicator />
+  }
+
+  return subentries.data.legacyNode.discussionSubentriesConnection.nodes.map(entry => (
+    <DiscussionThread key={`discussion-thread-${entry.id}`} depth={props.depth} {...entry} />
+  ))
+}
+
+DiscussionSubentries.propTypes = {
+  discussionEntryId: PropTypes.string,
+  depth: PropTypes.number
+}

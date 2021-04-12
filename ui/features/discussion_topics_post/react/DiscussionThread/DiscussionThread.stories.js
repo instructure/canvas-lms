@@ -18,7 +18,7 @@
 
 import React from 'react'
 
-import {DiscussionThread, mockThreads, mockThreadsNoReplies} from './DiscussionThread'
+import {DiscussionThread, mockThreads} from './DiscussionThread'
 
 export default {
   title: 'Examples/Discussion Posts/DiscussionThread',
@@ -30,6 +30,3 @@ const Template = args => <DiscussionThread {...args} />
 
 export const Default = Template.bind({})
 Default.args = {...mockThreads}
-
-export const NoReplies = Template.bind({})
-NoReplies.args = {...mockThreadsNoReplies}

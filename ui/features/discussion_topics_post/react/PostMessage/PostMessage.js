@@ -42,7 +42,7 @@ export function PostMessage({...props}) {
       }
       description={
         <>
-          {props.message}
+          <div dangerouslySetInnerHTML={{__html: props.message}} />
           <View display="block" margin="small none none none">
             {props.children}
           </View>
@@ -55,8 +55,8 @@ export function PostMessage({...props}) {
         <div
           style={{
             float: 'left',
-            'margin-left': '-24px',
-            'margin-top': '13px'
+            marginLeft: '-24px',
+            marginTop: '13px'
           }}
         >
           <Badge
