@@ -18,6 +18,8 @@
 
 def call() {
   credentials.withStarlordCredentials {
+    sh "./build/new-jenkins/linters/docker-build.sh local/gergich"
+
     credentials.withGerritCredentials {
       withEnv([
         "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",

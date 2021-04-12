@@ -33,24 +33,6 @@ inputs+=("--env GERRIT_REFSPEC=$GERRIT_REFSPEC")
 GERGICH_VOLUME="gergich-results-$(date +%s)"
 docker volume create $GERGICH_VOLUME
 
-cat <<EOF | DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
-  --build-arg PATCHSET_TAG="$PATCHSET_TAG" \
-  --build-arg WEBPACK_BUILDER_TAG="$WEBPACK_BUILDER_IMAGE" \
-  --tag "local/gergich" \
-  -
-# syntax=starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
-
-ARG PATCHSET_TAG
-ARG WEBPACK_BUILDER_TAG
-FROM \$PATCHSET_TAG AS patchset
-FROM \$WEBPACK_BUILDER_TAG
-USER docker
-RUN mkdir -p /home/docker/gergich
-RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
-  cp -rf /tmp/src/. /usr/src/app
-RUN cp -rf config/docker-compose.override.yml.example /usr/src/app/docker-compose.override.yml
-EOF
-
 if [ "$UPLOAD_DEBUG_IMAGE" = "true" ]; then
   docker tag local/gergich $LINTER_DEBUG_IMAGE
   docker push $LINTER_DEBUG_IMAGE
@@ -95,7 +77,6 @@ fi
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/rlint"
 [ "\${SKIP_ESLINT-}" != "true" ] && ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/eslint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/lint_commit_message"
-./build/new-jenkins/linters/run-and-collect-output.sh "yarn lint:browser-code"
 
 gergich status
 echo "LINTER OK!"
