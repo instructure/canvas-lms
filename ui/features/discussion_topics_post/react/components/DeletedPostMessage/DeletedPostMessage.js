@@ -25,18 +25,35 @@ import {View} from '@instructure/ui-view'
 
 export function DeletedPostMessage({...props}) {
   return (
-    <Byline alignContent="top">
-      <Text weight="bold">
-        {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
-      </Text>
-      <View padding="0 small">
-        <Text color="secondary">{props.timingDisplay}</Text>
-      </View>
+    <Byline
+      alignContent="top"
+      margin="0 0 medium 0"
+      title={
+        <>
+          <Text weight="bold">
+            {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
+          </Text>
+          <View padding="0 small">
+            <Text color="secondary">{props.timingDisplay}</Text>
+          </View>
+        </>
+      }
+      description={
+        <View display="block" margin="small none none none">
+          {props.children}
+        </View>
+      }
+    >
+      <div style={{marginLeft: '3rem'}} />
     </Byline>
   )
 }
 
 DeletedPostMessage.propTypes = {
+  /**
+   * Children to be directly rendered below the PostMessage
+   */
+  children: PropTypes.node,
   /**
    * Display name for the deleter of the message
    */

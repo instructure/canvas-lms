@@ -71,6 +71,15 @@ describe('DiscussionThreadContainer', () => {
           editor: null,
           lastReply: {
             createdAt: '2021-04-05T13:41:42-06:00'
+          },
+          permissions: {
+            attach: true,
+            create: true,
+            delete: true,
+            rate: true,
+            read: true,
+            reply: true,
+            update: true
           }
         }
       ]
