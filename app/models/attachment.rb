@@ -1718,7 +1718,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def canvadocable?
-    canvadocable_mime_types = self&.folder&.for_submissions? ? Canvadoc.submission_mime_types : Canvadoc.mime_types
+    for_assignment_or_submissions = self.folder&.for_submissions? || self.folder&.for_student_annotation_documents?
+    canvadocable_mime_types = for_assignment_or_submissions ? Canvadoc.submission_mime_types : Canvadoc.mime_types
     Canvadocs.enabled? && canvadocable_mime_types.include?(content_type_with_text_match)
   end
 
@@ -2109,6 +2110,10 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def copy_to_student_annotation_documents_folder(course)
+    return self if folder == course.student_annotation_documents_folder
+    copy_to_folder!(course.student_annotation_documents_folder)
+  end
 
   def set_publish_state_for_usage_rights
     if self.context &&

@@ -531,4 +531,25 @@ describe Folder do
       end
     end
   end
+
+  describe "#for_student_annotation_documents?" do
+    before(:once) do
+      @course = Course.create!
+    end
+
+    it "is false when it does not have the correct unique_type" do
+      annotation_documents_folder = @course.student_annotation_documents_folder
+      folder_without_unique_type = @course.folders.create!(
+        name: annotation_documents_folder.name,
+        parent_folder: annotation_documents_folder.parent_folder,
+        workflow_state: annotation_documents_folder.workflow_state
+      )
+
+      expect(folder_without_unique_type).not_to be_for_student_annotation_documents
+    end
+
+    it "is true when the folder is the student annotation documents folder for a course" do
+      expect(@course.student_annotation_documents_folder).to be_for_student_annotation_documents
+    end
+  end
 end
