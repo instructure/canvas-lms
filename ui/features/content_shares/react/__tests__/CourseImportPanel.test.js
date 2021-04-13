@@ -56,6 +56,12 @@ describe('CourseImportPanel', () => {
     fetchMock.restore()
   })
 
+  it('does not include concluded courses', () => {
+    render(<CourseImportPanel contentShare={mockShare()} />)
+    expect(useManagedCourseSearchApi).toHaveBeenCalledTimes(2)
+    expect(useManagedCourseSearchApi.mock.calls[0][0].params.include).toEqual('')
+  })
+
   it('disables the import button initially', () => {
     const {getByText} = render(<CourseImportPanel contentShare={mockShare()} />)
     expect(
