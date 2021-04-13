@@ -101,6 +101,11 @@ module Types
       ).load(object)
     end
 
+    field :entry_counts, Types::DiscussionEntryCountsType, null: true
+    def entry_counts
+      Loaders::DiscussionTopicEntryCountsLoader.for(current_user: current_user).load(object)
+    end
+
     field :subscribed, Boolean, null: false
     def subscribed
       load_association(:discussion_topic_participants).then do

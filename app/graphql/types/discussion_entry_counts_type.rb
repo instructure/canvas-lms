@@ -19,8 +19,8 @@
 #
 
 module Types
-  class RootEntryParticipantCountType < ApplicationObjectType
-    graphql_name 'RootEntryParticipantCount'
+  class DiscussionEntryCountsType < ApplicationObjectType
+    graphql_name 'DiscussionEntryCounts'
 
     field :unread_count, Integer, null: false
     field :replies_count, Integer, null: false

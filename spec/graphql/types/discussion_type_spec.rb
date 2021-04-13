@@ -30,6 +30,17 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
+  it 'allows querying for entry counts' do
+
+    3.times { discussion.discussion_entries.create!(message: "sub entry", user: @teacher) }
+
+    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 0
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+    DiscussionEntryParticipant.where(user_id: @teacher).update_all(workflow_state: 'unread')
+    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 3
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+  end
+
   it "queries the attribute" do
     expect(discussion_type.resolve("title")).to eq discussion.title
     expect(discussion_type.resolve("podcastHasStudentPosts")).to eq discussion.podcast_has_student_posts
