@@ -317,11 +317,11 @@ pipeline {
 
           maybeSlackSendRetrigger()
 
-          def postBuildHandler = new Expando(
+          def postBuildHandler = [
             onStageResult: { _, stageConfig ->
               postFn(stageConfig.status())
             }
-          )
+          ]
 
           extendedStage('Root').handler(postBuildHandler).timings(false).execute {
             def rootStages = [:]
