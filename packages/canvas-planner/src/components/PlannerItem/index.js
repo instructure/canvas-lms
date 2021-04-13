@@ -46,6 +46,7 @@ import responsiviser from '../responsiviser'
 import styles from './styles.css'
 import theme from './theme'
 import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../plannerPropTypes'
+import {getDynamicFullDateAndTime} from '../../utilities/dateUtils'
 import {showPillForOverdueStatus} from '../../utilities/statusUtils'
 import {assignmentType as getAssignmentType} from '../../utilities/contentUtils'
 import formatMessage from '../../format-message'
@@ -173,6 +174,12 @@ export class PlannerItem extends Component {
     return getAssignmentType(this.props.associated_item)
   }
 
+  formatDate = date => {
+    return this.props.isMissingItem
+      ? getDynamicFullDateAndTime(date, this.props.timeZone)
+      : date.format('LT')
+  }
+
   renderDateField = () => {
     if (this.props.date) {
       if (this.props.allDay) {
@@ -182,25 +189,25 @@ export class PlannerItem extends Component {
       if (this.props.associated_item === 'Calendar Event') {
         if (this.showEndTime()) {
           return formatMessage('{startTime} to {endTime}', {
-            startTime: this.props.date.format('LT'),
-            endTime: this.props.endTime.format('LT')
+            startTime: this.formatDate(this.props.date),
+            endTime: this.formatDate(this.props.endTime)
           })
         } else {
-          return formatMessage(this.props.date.format('LT'))
+          return this.formatDate(this.props.date)
         }
       }
 
       if (this.hasDueTime()) {
         if (this.props.associated_item === 'Peer Review') {
-          return formatMessage('Reminder: {date}', {date: this.props.date.format('LT')})
+          return formatMessage('Reminder: {date}', {date: this.formatDate(this.props.date)})
         } else if (this.props.dateStyle === 'todo') {
-          return formatMessage('To Do: {date}', {date: this.props.date.format('LT')})
+          return formatMessage('To Do: {date}', {date: this.formatDate(this.props.date)})
         } else {
-          return formatMessage('Due: {date}', {date: this.props.date.format('LT')})
+          return formatMessage('Due: {date}', {date: this.formatDate(this.props.date)})
         }
       }
 
-      return this.props.date.format('LT')
+      return this.formatDate(this.props.date)
     }
     return null
   }

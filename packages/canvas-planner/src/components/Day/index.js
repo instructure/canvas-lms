@@ -27,7 +27,7 @@ import {bool, shape, string, number, arrayOf, func} from 'prop-types'
 import {userShape, itemShape} from '../plannerPropTypes'
 import styles from './styles.css'
 import theme from './theme'
-import {getFriendlyDate, getFullDate, getShortDate, isToday} from '../../utilities/dateUtils'
+import {getFriendlyDate, getDynamicFullDate, isToday} from '../../utilities/dateUtils'
 import MissingAssignments from '../MissingAssignments'
 import Grouping from '../Grouping'
 import formatMessage from '../../format-message'
@@ -61,9 +61,7 @@ export class Day extends Component {
 
     const tzMomentizedDate = moment.tz(props.day, props.timeZone)
     this.friendlyName = getFriendlyDate(tzMomentizedDate)
-    this.date = tzMomentizedDate.isSame(moment().tz(props.timeZone), 'year')
-      ? getShortDate(tzMomentizedDate)
-      : getFullDate(tzMomentizedDate)
+    this.date = getDynamicFullDate(tzMomentizedDate, props.timeZone)
   }
 
   componentDidMount() {
