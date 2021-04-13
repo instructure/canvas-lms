@@ -81,4 +81,14 @@ describe Types::DiscussionEntryType do
 
     expect(discussion_entry_type.resolve('subentriesCount')).to eq 4
   end
+
+  it 'returns the current user permissions' do
+    expect(discussion_entry_type.resolve('permissions { delete }')).to eq true
+    expect(discussion_entry.grants_right?(@teacher, nil, :delete)).to eq true
+
+    student_in_course(active_all: true)
+    type = GraphQLTypeTester.new(discussion_entry, current_user: @student)
+    expect(type.resolve('permissions { delete }')).to eq false
+    expect(discussion_entry.grants_right?(@student, nil, :delete)).to eq false
+  end
 end

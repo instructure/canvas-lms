@@ -117,5 +117,10 @@ module Types
     def editor
       load_association(:editor)
     end
+
+    field :permissions, Types::DiscussionPermissionsType, null: true
+    def permissions
+      Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+    end
   end
 end

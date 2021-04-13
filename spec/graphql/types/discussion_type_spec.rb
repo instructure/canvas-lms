@@ -121,4 +121,14 @@ describe Types::DiscussionType do
       expect(result[0]).to eq true
     end
   end
+
+  it 'returns the current user permissions' do
+    expect(discussion_type.resolve('permissions { delete }')).to eq true
+    expect(discussion.grants_right?(@teacher, nil, :delete)).to eq true
+
+    student_in_course(active_all: true)
+    type = GraphQLTypeTester.new(discussion, current_user: @student)
+    expect(type.resolve('permissions { delete }')).to eq false
+    expect(discussion.grants_right?(@student, nil, :delete)).to eq false
+  end
 end

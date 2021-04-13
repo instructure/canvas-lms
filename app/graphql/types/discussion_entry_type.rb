@@ -97,5 +97,10 @@ module Types
     def subentries_count
       Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
     end
+
+    field :permissions, Types::DiscussionEntryPermissionsType, null: true
+    def permissions
+      Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+    end
   end
 end
