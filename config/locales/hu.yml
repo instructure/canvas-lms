@@ -6024,6 +6024,8 @@ hu:
     loading: Betöltés...
   disable_a5c05db3: Letilt
   disable_and_lock_7d0ef0e8: "Letiltás és zárolás"
+  disable_celebrations_description: "Ennek a beállításnak az engedélyezése elrejti az összes ünnepi animációt."
+  disable_keyboard_shortcuts_9db78832: "A gyors elérés billentyűkombinációk letiltása"
   disabled_18c33a73: (letiltva)
   disabled_3b1b332a: Letiltott
   disabled_in_course_settings_d15ee35d: "* Kurzusbeállításoknál letiltva"
@@ -7124,8 +7126,10 @@ hu:
   features: 
     allow_opt_out_of_inbox: "Bejövő üzenetek elhagyásának engedélyezése a felhasználók számára "
     canvas_parent_display_name: "Canvas Szülő"
+    disable_alert_timeouts: "Riasztás értesítési időkeretek letiltása"
     google_docs_domain_restriction: "Google Dokumentumok tartománykorlátozás"
     gradebook_list_students_by_sortable_name: "Osztálynapló - Hallgatók listázása a rendezhető nevek alapján"
+    hide_celebrations: "Ünnepi animációk letiltása"
     high_contrast: "Magas kontrasztú felhasználói felület"
     k12: "Közoktatásspecifikus funkciók"
     learning_mastery_gradebook: "Jártassági szint napló"
@@ -11888,6 +11892,7 @@ hu:
   page_name_21defa75: "Oldal neve"
   page_name_is_required_d8c2736e: "Az oldal nevének megadása kötelező"
   page_not_found_2b0d05f5: "Az oldal nem található"
+  page_page_59070cd8: "Oldal %{page}"
   page_pagenum_20dbfeb8: "%{pageNum}. oldal"
   page_views: 
     download_filename: "%{user} oldalmegtekintései"
@@ -14159,6 +14164,7 @@ hu:
   ratings_2433172b: Értékelések
   ratio_answered_correctly_b0c1e7d: "%{ratio}% felelt helyesen"
   ratio_responded_correctly_6d890107: "%{ratio}% válaszolt helyesen"
+  raw_html_editor_e3993e41: "Egyszerű HTML szerkesztő"
   rce_contents_replace_display_name: "RCE Tartalom Csere"
   rce_enhancements_5701e06: RCE-fejlesztések
   re_activate_user_f7d77c9a: "Felhasználó újbóli aktiválása"
@@ -16705,6 +16711,7 @@ hu:
     port_moresby: "Port Moresby"
     prague: Prága
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Rangun
     riga: Riga
@@ -17726,7 +17733,9 @@ hu:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Az összes pontja közül a legnagyobbat tartalmazza"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Az összes pontja közül a legutóbbit tartalmazza"
   will_paginate: 
+    container_aria_label: Lapszámozás
     next_label: "Következő &#8594;"
+    page_aria_label: "Oldal %{page}"
     page_entries_info: 
       multi_page: "%{model} %{from} - %{to} megjelenítése az összes %{count} közül"
       multi_page_html: "%{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> megjelenítése az összes <b>%{count}</b> közül"
