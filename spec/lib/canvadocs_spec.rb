@@ -749,10 +749,10 @@ describe Canvadocs do
 
         context 'for a student annotation assignment' do
           before(:each) do
-            assignment.update!(submission_types: 'annotated_document', annotatable_attachment: attachment)
+            assignment.update!(submission_types: 'student_annotation', annotatable_attachment: attachment)
             assignment.submit_homework(
               submission.user,
-              submission_type: 'annotated_document',
+              submission_type: 'student_annotation',
               annotatable_attachment_id: attachment.id
             )
             submission.reload

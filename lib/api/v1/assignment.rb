@@ -574,7 +574,7 @@ module Api::V1::Assignment
     "media_recording",
     "not_graded",
     "wiki_page",
-    "annotated_document",
+    "student_annotation",
     ""
   ].freeze
 
@@ -791,7 +791,7 @@ module Api::V1::Assignment
       end
     end
 
-    if update_params[:submission_types]&.include?('annotated_document')
+    if update_params[:submission_types]&.include?('student_annotation')
       if assignment_params.key?(:annotatable_attachment_id)
         assignment.annotatable_attachment_id = assignment_params.delete(:annotatable_attachment_id)
       end
@@ -986,7 +986,7 @@ module Api::V1::Assignment
     return false unless assignment_dates_valid?(assignment, assignment_params)
     return false unless submission_types_valid?(assignment, assignment_params)
 
-    if assignment_params[:submission_types]&.include?("annotated_document")
+    if assignment_params[:submission_types]&.include?("student_annotation")
       return false unless assignment_params.key?(:annotatable_attachment_id)
 
       attachment = Attachment.find_by(id: assignment_params[:annotatable_attachment_id])

@@ -110,19 +110,19 @@ RSpec.describe Mutations::CreateSubmission do
     end
   end
 
-  context 'when the submission_type is annotated_document' do
+  context 'when the submission_type is student_annotation' do
     it 'requires annotatable_attachment_id to be present' do
-      result = run_mutation(submission_type: 'annotated_document')
+      result = run_mutation(submission_type: 'student_annotation')
       error_message = 'Student Annotation submissions require an annotatable_attachment_id to submit'
       expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq error_message
     end
 
     it 'changes a CanvadocsAnnotationContext from draft attempt to the current attempt' do
-      @assignment.update!(annotatable_attachment: @attachment, submission_types: 'annotated_document')
+      @assignment.update!(annotatable_attachment: @attachment, submission_types: 'student_annotation')
       submission = @assignment.submissions.find_by(user: @student)
       submission.update!(attempt: 7)
       annotation_context = submission.annotation_context(draft: true)
-      result = run_mutation(annotatable_attachment_id: @attachment.id, submission_type: 'annotated_document')
+      result = run_mutation(annotatable_attachment_id: @attachment.id, submission_type: 'student_annotation')
 
       aggregate_failures do
         expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to be_nil

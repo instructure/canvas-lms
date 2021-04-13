@@ -19,7 +19,7 @@
 #
 
 class OnlineSubmissionType < Types::BaseEnum
-  VALID_SUBMISSION_TYPES = %w[annotated_document media_recording online_text_entry online_upload online_url].freeze
+  VALID_SUBMISSION_TYPES = %w[student_annotation media_recording online_text_entry online_upload online_url].freeze
 
   graphql_name 'OnlineSubmissionType'
   description 'Types that can be submitted online'
@@ -66,7 +66,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     }
 
     case submission_type
-    when 'annotated_document'
+    when 'student_annotation'
       if input[:annotatable_attachment_id].blank?
         return validation_error(I18n.t('Student Annotation submissions require an annotatable_attachment_id to submit'))
       end

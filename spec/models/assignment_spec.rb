@@ -290,7 +290,7 @@ describe Assignment do
       it "does not call submit_to_canvadocs when annotatable_attachment is blank" do
         assignment = @course.assignments.create!(
           annotatable_attachment: @attachment,
-          submission_types: "annotated_document"
+          submission_types: "student_annotation"
         )
         expect(@attachment).not_to receive(:submit_to_canvadocs)
         assignment.update!(annotatable_attachment_id: nil)
@@ -302,7 +302,7 @@ describe Assignment do
 
         @course.assignments.create!(
           annotatable_attachment: @attachment,
-          submission_types: "annotated_document"
+          submission_types: "student_annotation"
         )
       end
 
@@ -313,7 +313,7 @@ describe Assignment do
 
         @course.assignments.create!(
           annotatable_attachment: @attachment,
-          submission_types: "annotated_document"
+          submission_types: "student_annotation"
         )
       end
     end
@@ -3200,15 +3200,15 @@ describe Assignment do
         points_possible: 10
     end
 
-    context "when submission_type is annotated_document" do
+    context "when submission_type is student_annotation" do
       before(:once) do
         @annotatable_attachment = attachment_model(context: @course)
-        @a.update!(annotatable_attachment: @annotatable_attachment, submission_types: "annotated_document")
+        @a.update!(annotatable_attachment: @annotatable_attachment, submission_types: "student_annotation")
       end
 
       it "raises an error if an attachment id is not present in the options" do
         expect {
-          @a.submit_homework(@user, submission_type: "annotated_document")
+          @a.submit_homework(@user, submission_type: "student_annotation")
         }.to raise_error "Invalid Attachment"
       end
 
@@ -3216,7 +3216,7 @@ describe Assignment do
         @a.update!(submission_types: "online_text_entry")
 
         expect {
-          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "student_annotation")
         }.to raise_error "Invalid submission type"
       end
 
@@ -3224,7 +3224,7 @@ describe Assignment do
         other_attachment = attachment_model(context: @course)
 
         expect {
-          @a.submit_homework(@user, annotatable_attachment_id: other_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: other_attachment.id, submission_type: "student_annotation")
         }.to raise_error "Invalid Attachment"
       end
 
@@ -3234,7 +3234,7 @@ describe Assignment do
         annotation_context = submission.annotation_context(draft: true)
 
         expect {
-          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "student_annotation")
         }.to change {
           annotation_context.reload.submission_attempt
         }.from(nil).to(8)
@@ -3249,7 +3249,7 @@ describe Assignment do
         )
 
         expect {
-          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "student_annotation")
         }.not_to change {
           unrelated_annotation_context.reload.submission_attempt
         }

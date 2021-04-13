@@ -266,7 +266,7 @@ module Canvadocs
     # viewing user's annotations (default is in Canvadocs::Session). If we the
     # user_filter is nil here, then we know we didn't have any other reason to
     # be restrictive.
-    if session_params[:user_filter].nil? && submission.submission_type == "annotated_document"
+    if session_params[:user_filter].nil? && submission.submission_type == "student_annotation"
       session_params[:restrict_annotations_to_user_filter] = false
       session_params[:user_filter] = []
     end

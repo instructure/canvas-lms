@@ -2147,7 +2147,7 @@ class Assignment < ActiveRecord::Base
 
     eula_timestamp = opts[:eula_agreement_timestamp]
 
-    if opts[:submission_type] == "annotated_document"
+    if opts[:submission_type] == "student_annotation"
       raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
       raise "Invalid submission type" unless self.annotated_document?
       # Prevent the case where a user clicks Submit on a stale tab, expecting
@@ -2909,7 +2909,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def annotated_document?
-    submission_types.match?(/annotated_document/)
+    submission_types.match?(/student_annotation/)
   end
 
   def readable_submission_type(submission_type)
@@ -2922,8 +2922,8 @@ class Assignment < ActiveRecord::Base
       t 'submission_types.a_text_entry_box', "a text entry box"
     when 'online_url'
       t 'submission_types.a_website_url', "a website url"
-    when 'annotated_document'
-      t 'annotated_document', "a student annotation"
+    when 'student_annotation'
+      t 'student_annotation', "a student annotation"
     when 'discussion_topic'
       t 'submission_types.a_discussion_post', "a discussion post"
     when 'wiki_page'

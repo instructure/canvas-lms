@@ -469,7 +469,7 @@ describe CanvadocSessionsController do
 
       context "when annotation_context is present" do
         before(:each) do
-          @assignment.update!(annotatable_attachment: @attachment, submission_types: "annotated_document")
+          @assignment.update!(annotatable_attachment: @attachment, submission_types: "student_annotation")
           @submission.update!(attempt: 2)
           @annotation_context = @submission.canvadocs_annotation_contexts.find_or_create_by(
             attachment: @attachment,

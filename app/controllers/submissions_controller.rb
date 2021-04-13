@@ -248,7 +248,7 @@ class SubmissionsController < SubmissionsBaseController
       elsif is_media_recording? && !has_media_recording?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-      elsif params[:submission][:submission_type] == 'annotated_document' && params[:submission][:annotatable_attachment_id].blank?
+      elsif params[:submission][:submission_type] == 'student_annotation' && params[:submission][:annotatable_attachment_id].blank?
         flash[:error] = t("Student Annotation submissions require an annotatable_attachment_id to submit")
         return redirect_to(course_assignment_url(@context, @assignment))
       end

@@ -78,13 +78,13 @@ describe "/submissions/show_preview" do
     it "renders an iframe with a src to canvadoc sessions controller when assignment is a student annotation" do
       assignment = @course.assignments.create!(
         annotatable_attachment: @attachment,
-        submission_types: "annotated_document",
+        submission_types: "student_annotation",
         title: "some assignment"
       )
       submission = assignment.submit_homework(
         @user,
         annotatable_attachment_id: @attachment.id,
-        submission_type: "annotated_document"
+        submission_type: "student_annotation"
       )
       assign(:assignment, assignment)
       assign(:submission, submission)

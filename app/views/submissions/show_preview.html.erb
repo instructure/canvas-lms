@@ -32,7 +32,7 @@
     submission_id: @submission.id
   }
 
-  if @submission.submission_type == "annotated_document"
+  if @submission.submission_type == "student_annotation"
     annotation_context = @submission.annotation_context(attempt: @submission.attempt)
     preview_url_opts[:annotation_context] = annotation_context.launch_id
   end
@@ -243,7 +243,7 @@
   <% js_bundle 'submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
-<% elsif @submission.submission_type == "annotated_document" %>
+<% elsif @submission.submission_type == "student_annotation" %>
   <div class="ef-file-preview-stretch">
     <iframe
       allowfullscreen

@@ -191,9 +191,9 @@ test('validates grader count', function () {
 
 test('validates presence of attachment when assignment has type annotatable_attachment', function () {
   const view = this.editView()
-  const data = {submission_types: ['annotated_document']}
+  const data = {submission_types: ['student_annotation']}
   const errors = view.validateBeforeSave(data, {})
-  const annotatedDocumentError = errors['online_submission_types[annotated_document]'][0]
+  const annotatedDocumentError = errors['online_submission_types[student_annotation]'][0]
   strictEqual(annotatedDocumentError.message, 'You must attach a file')
 })
 
@@ -202,7 +202,7 @@ test('validates presence of attachment use justification when assignment has typ
   view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
   view.renderAnnotatedDocumentUsageRightsSelectBox()
   view.$('#usageRightSelector').val('choose')
-  const data = {submission_types: ['annotated_document']}
+  const data = {submission_types: ['student_annotation']}
   const errors = view.validateBeforeSave(data, {})
   const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
   strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
@@ -213,7 +213,7 @@ test('validates presence of attachment legal copyright when assignment has type 
   view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
   view.renderAnnotatedDocumentUsageRightsSelectBox()
   view.$('#copyrightHolder').val('')
-  const data = {submission_types: ['annotated_document']}
+  const data = {submission_types: ['student_annotation']}
   const errors = view.validateBeforeSave(data, {})
   const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
   strictEqual(
@@ -228,7 +228,7 @@ test('validates presence of attachment use justification and legal copyright whe
   view.renderAnnotatedDocumentUsageRightsSelectBox()
   view.$('#usageRightSelector').val('choose')
   view.$('#copyrightHolder').val('')
-  const data = {submission_types: ['annotated_document']}
+  const data = {submission_types: ['student_annotation']}
   const errors = view.validateBeforeSave(data, {})
   const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
   const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
@@ -2072,7 +2072,7 @@ QUnit.module('EditView student annotation submission', hooks => {
         context_id: '1'
       }
       ENV.context_asset_string = 'course_1'
-      assignmentOpts = {submissionTypes: ['annotated_document']}
+      assignmentOpts = {submissionTypes: ['student_annotation']}
       server = sinon.fakeServer.create()
     })
 

@@ -401,13 +401,13 @@ describe SubmissionsController do
       expect(assigns[:submission]).to be_nil
     end
 
-    context 'when the submission_type is annotated_document' do
+    context 'when the submission_type is student_annotation' do
       before(:once) do
         @course = course_model(workflow_state: "available")
         @attachment = attachment_model(context: @course)
         @assignment = @course.assignments.create!(
           annotatable_attachment: @attachment,
-          submission_types: 'annotated_document'
+          submission_types: 'student_annotation'
         )
       end
 
@@ -416,7 +416,7 @@ describe SubmissionsController do
         post :create, params: {
           assignment_id: @assignment.id,
           course_id: @course.id,
-          submission: { submission_type: 'annotated_document' }
+          submission: { submission_type: 'student_annotation' }
         }
 
         aggregate_failures do
@@ -433,7 +433,7 @@ describe SubmissionsController do
         post :create, params: {
           assignment_id: @assignment.id,
           course_id: @course.id,
-          submission: { annotatable_attachment_id: @attachment.id, submission_type: 'annotated_document' }
+          submission: { annotatable_attachment_id: @attachment.id, submission_type: 'student_annotation' }
         }
 
         aggregate_failures do

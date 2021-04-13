@@ -3136,17 +3136,17 @@ describe AssignmentsApiController, type: :request do
         }
       end
 
-      it "sets the assignment's annotatable_attachment_id when id is present and type is annotated_document" do
+      it "sets the assignment's annotatable_attachment_id when id is present and type is student_annotation" do
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["annotated_document"] } }
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
         )
         expect(@assignment.reload.annotatable_attachment_id).to be @attachment.id
       end
 
-      it "does not set the assignment's annotatable_attachment_id when type is not annotated_document" do
+      it "does not set the assignment's annotatable_attachment_id when type is not student_annotation" do
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
@@ -3156,12 +3156,12 @@ describe AssignmentsApiController, type: :request do
         expect(@assignment.reload.annotatable_attachment_id).to be_nil
       end
 
-      it "returns bad_request when the user did not include an attachment id for an annotated_document type" do
+      it "returns bad_request when the user did not include an attachment id for an student_annotation type" do
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { submission_types: ["annotated_document"] } }
+          { assignment: { submission_types: ["student_annotation"] } }
         )
 
         expect(response).to have_http_status(:bad_request)
@@ -3176,7 +3176,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotatable_attachment_id: second_attachment.id, submission_types: ["annotated_document"] } }
+          { assignment: { annotatable_attachment_id: second_attachment.id, submission_types: ["student_annotation"] } }
         )
 
         aggregate_failures do
@@ -3190,7 +3190,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotatable_attachment_id: Attachment.last.id + 1, submission_types: ["annotated_document"] } }
+          { assignment: { annotatable_attachment_id: Attachment.last.id + 1, submission_types: ["student_annotation"] } }
         )
 
         aggregate_failures do
@@ -3209,7 +3209,7 @@ describe AssignmentsApiController, type: :request do
         expect(@assignment.reload.annotatable_attachment_id).to be_nil
       end
 
-      it "removes the assignment's annotatable_attachment_id when the type is not annotated_document" do
+      it "removes the assignment's annotatable_attachment_id when the type is not student_annotation" do
         @assignment.update!(annotatable_attachment: @attachment)
 
         api_call(

@@ -196,7 +196,7 @@ export default class EditView extends ValidatedFormView
     @dueDateOverrideView = options.views['js-assignment-overrides']
     @on 'success', () =>
       annotatedDocument = @getAnnotatedDocument()
-      if !!annotatedDocument and @assignment.get("submission_types")?.includes('annotated_document')
+      if !!annotatedDocument and @assignment.get("submission_types")?.includes('student_annotation')
         usageRights = @getAnnotatedDocumentUsageRights()
         annotatedDocumentModel = new File(annotatedDocument, { parse: true })
         setUsageRights(
@@ -946,9 +946,9 @@ export default class EditView extends ValidatedFormView
         errors["online_submission_types[online_text_entry]"] = [
           message: I18n.t 'vericite_submission_types_validation', 'VeriCite only supports file submissions and text entry'
         ]
-    else if !@getAnnotatedDocument() && data.submission_types?.includes('annotated_document')
-      errors["online_submission_types[annotated_document]"] = [message: I18n.t('You must attach a file')]
-    else if @getAnnotatedDocument() and data.submission_types?.includes('annotated_document') and @shouldRenderUsageRights()
+    else if !@getAnnotatedDocument() && data.submission_types?.includes('student_annotation')
+      errors["online_submission_types[student_annotation]"] = [message: I18n.t('You must attach a file')]
+    else if @getAnnotatedDocument() and data.submission_types?.includes('student_annotation') and @shouldRenderUsageRights()
       annotatedDocumentUsageRights = @getAnnotatedDocumentUsageRights()
       if annotatedDocumentUsageRights.use_justification == 'choose'
         errors['usage_rights_use_justification'] = [{message: I18n.t('You must set document usage rights')}]

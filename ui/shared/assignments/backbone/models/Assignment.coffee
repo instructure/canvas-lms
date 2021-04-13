@@ -239,7 +239,7 @@ export default class Assignment extends Model
     !! _.includes @_submissionTypes(), 'online_upload'
 
   acceptsAnnotatedDocument: =>
-    !! _.includes @_submissionTypes(), 'annotated_document'
+    !! _.includes @_submissionTypes(), 'student_annotation'
 
   acceptsOnlineURL: =>
     !! _.includes @_submissionTypes(), 'online_url'
@@ -253,7 +253,7 @@ export default class Assignment extends Model
   isOnlineSubmission: =>
     _.some @_submissionTypes(), (thing) ->
       thing in ['online', 'online_text_entry',
-        'media_recording', 'online_url', 'online_upload', 'annotated_document']
+        'media_recording', 'online_url', 'online_upload', 'student_annotation']
 
   postToSIS: (postToSisBoolean) =>
     return @get 'post_to_sis' unless arguments.length > 0
