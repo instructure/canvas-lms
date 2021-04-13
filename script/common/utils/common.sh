@@ -56,7 +56,7 @@ function init_log_file {
 
 # If DOCKER var set true, run with docker-compose
 function run_command {
-  if [[ -n "${JENKINS}" ]]; then
+  if is_running_on_jenkins; then
     docker-compose exec -T web "$@"
   elif [ "${DOCKER:-}" == 'y' ]; then
     docker-compose exec -e TELEMETRY_OPT_IN web "$@"
@@ -78,7 +78,7 @@ function _canvas_lms_track_with_log {
   command="$@"
   if _canvas_lms_telemetry_enabled; then
     _inst_telemetry_with_log $command
-  elif [[ -z "${JENKINS}" ]]; then
+  elif ! is_running_on_jenkins; then
     $command >> "$LOG" 2>&1
   else
     $command
@@ -131,7 +131,7 @@ function message {
 }
 
 function confirm_command {
-  if [ -z "${JENKINS-}" ]; then
+  if ! is_running_on_jenkins; then
     prompt "OK to run '$*'? [y/n]" confirm
     [[ ${confirm:-n} == 'y' ]] || return 1
   fi
@@ -242,4 +242,8 @@ function display_next_steps {
     the mailing list or IRC - GitHub issues are for verified bugs only.
     Thanks and good luck!
   "
+}
+
+function is_running_on_jenkins() {
+  [[ -n "${JENKINS:-}" ]]
 }

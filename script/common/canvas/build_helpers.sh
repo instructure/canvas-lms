@@ -85,7 +85,7 @@ This script will destroy ALL EXISTING DATA if it continues
 If you want to migrate the existing database, use docker_dev_update
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     message 'About to run "bundle exec rake db:drop"'
-    if [[ -z "${JENKINS}" ]]; then
+    if ! is_running_on_jenkins; then
       prompt "type NUKE in all caps: " nuked
       [[ ${nuked:-n} == 'NUKE' ]] || exit 1
     fi
