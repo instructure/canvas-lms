@@ -20,6 +20,17 @@ import {graphql} from 'msw'
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
+// helper function that filters out undefined values in objects before assigning
+const mswAssign = (target, ...objects) => {
+  return Object.assign(
+    target,
+    ...objects.map(object => {
+      return Object.entries(object)
+        .filter(([_k, v]) => v !== undefined)
+        .reduce((obj, [k, v]) => ((obj[k] = v), obj), {}) // eslint-disable-line no-sequences
+    })
+  )
+}
 const defaultEntry = {
   _id: '49',
   id: '49',
@@ -242,12 +253,15 @@ export const handlers = [
     return res(
       ctx.data({
         updateDiscussionEntryParticipant: {
-          discussionEntry: {
-            ...defaultEntry,
-            id: req.body.variables.discussionEntryId,
-            read: req.body.variables.read,
-            rating: false
-          },
+          discussionEntry: mswAssign(
+            {...defaultEntry},
+            {
+              id: req.body.variables.discussionEntryId,
+              read: req.body.variables.read,
+              rating: req.body.variables.rating === 'liked',
+              ratingSum: req.body.variables.rating === 'liked' ? 1 : 0
+            }
+          ),
           __typename: 'UpdateDiscussionEntryParticipantPayload'
         }
       })

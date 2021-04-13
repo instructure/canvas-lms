@@ -100,6 +100,18 @@ describe('DiscussionsFullPage', () => {
       fireEvent.click(container.getByTestId('markAsRead'))
       await waitFor(() => expect(container.queryByTestId('is-unread')).not.toBeInTheDocument())
     })
+
+    it('toggles an entries rating state when the like button is clicked', async () => {
+      const container = setup()
+      const likeButton = await container.findByTestId('like-button')
+
+      expect(container.queryByText('Like count: 1')).toBeNull()
+      fireEvent.click(likeButton)
+      await waitFor(() => expect(container.queryByText('Like count: 1')).toBeTruthy())
+
+      fireEvent.click(likeButton)
+      await waitFor(() => expect(container.queryByText('Like count: 1')).toBeNull())
+    })
   })
 
   describe('discussion topic', () => {

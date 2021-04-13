@@ -71,19 +71,34 @@ export const DiscussionThreadContainer = props => {
       setOnFailure(I18n.t('There was an unexpected error while deleting the entry'))
     }
   })
-
-  const [toggleUnread] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+  const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
     onCompleted: data => {
-      if (data.updateDiscussionEntryParticipant.discussionEntry.read) {
-        setOnSuccess(I18n.t('The entry was successfully marked as read'))
-      } else {
-        setOnSuccess(I18n.t('The entry was successfully marked as unread'))
+      if (!data || !data.updateDiscussionEntryParticipant) {
+        return null
       }
+      setOnSuccess(I18n.t('The entry was successfully updated.'))
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the entry.'))
     }
   })
+  const toggleRating = () => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: props._id,
+        rating: props.rating ? 'not_liked' : 'liked'
+      }
+    })
+  }
+
+  const toggleUnread = () => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: props._id,
+        read: !props.read
+      }
+    })
+  }
 
   const marginDepth = 4 * props.depth
 
@@ -93,9 +108,9 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Like
         key={`like-${props.id}`}
-        onClick={() => {}}
+        onClick={toggleRating}
         isLiked={props.rating}
-        likeCount={props.ratingCount}
+        likeCount={props.ratingSum || 0}
       />
     )
   }
@@ -160,14 +175,7 @@ export const DiscussionThreadContainer = props => {
               <ThreadActions
                 id={props.id}
                 isUnread={!props.read}
-                onToggleUnread={() => {
-                  toggleUnread({
-                    variables: {
-                      discussionEntryId: props._id,
-                      read: !props.read
-                    }
-                  })
-                }}
+                onToggleUnread={toggleUnread}
                 onDelete={props.permissions.delete ? onDelete : null}
               />
             </Flex.Item>
