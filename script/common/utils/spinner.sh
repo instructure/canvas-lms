@@ -71,16 +71,20 @@ function _inst_spinner() {
 }
 
 function start_spinner {
-  _inst_spinner "start" "$1" &
-  export _sp_pid=$!
-  disown
+  if ! is_running_on_jenkins; then
+    _inst_spinner "start" "$1" &
+    export _sp_pid=$!
+    disown
+  fi
 }
 
 function stop_spinner {
-  exit_status=$?
-  if [[ ! -z ${1-} ]]; then
-    exit_status=$1
+  if ! is_running_on_jenkins; then
+    exit_status=$?
+    if [[ ! -z ${1-} ]]; then
+      exit_status=$1
+    fi
+    _inst_spinner "stop" $exit_status ${_sp_pid:-}
+    unset _sp_pid
   fi
-  _inst_spinner "stop" $exit_status ${_sp_pid:-}
-  unset _sp_pid
 }
