@@ -154,7 +154,7 @@ class SubmissionsController < SubmissionsBaseController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
-  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"]
+  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"|"student_annotation"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
@@ -196,6 +196,12 @@ class SubmissionsController < SubmissionsBaseController
   #
   # @argument submission[user_id] [Integer]
   #   Submit on behalf of the given user. Requires grading permission.
+  #
+  # @argument submission[annotatable_attachment_id] [Integer]
+  #   The Attachment ID of the document being annotated. This should match
+  #   the annotatable_attachment_id on the assignment.
+  #
+  #   Requires a submission_type of "student_annotation".
   #
   # @argument submission[submitted_at] [DateTime]
   #   Choose the time the submission is listed as submitted at.  Requires grading permission.
