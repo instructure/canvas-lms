@@ -117,7 +117,7 @@ def _runRspecTestSuite(
           ids=( $(docker ps -aq --filter "name=canvas_") )
           for i in "${ids[@]}"
           do
-            docker exec $i cat /usr/src/app/log/cmd_output/*.log
+            docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
           done
         '''
       }

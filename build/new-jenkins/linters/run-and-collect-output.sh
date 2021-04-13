@@ -12,13 +12,12 @@ echo "=== RUN $CMD"
 LOG_FILE=./log/cmd_output/interrupt-output-pid$$.log
 mkdir -p "`dirname \"$LOG_FILE\"`"
 echo "Writing to Log File: $(readlink -f $LOG_FILE)"
+echo "=== START OUTPUT $CMD" > "$LOG_FILE"
 eval "$CMD" >> "$LOG_FILE" 2>&1; EXIT_CODE=$?
+echo "=== END OUTPUT $CMD" >> "$LOG_FILE"
 
 [ $EXIT_CODE -ne 0 ] && echo "=== FAILED $CMD"
-echo "=== START OUTPUT $CMD"
 cat "$LOG_FILE"
-echo "=== END OUTPUT $CMD"
-
 rm "$LOG_FILE"
 
 exit $EXIT_CODE
