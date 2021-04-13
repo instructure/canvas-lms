@@ -3137,6 +3137,8 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "sets the assignment's annotatable_attachment_id when id is present and type is student_annotation" do
+        @attachment.update!(folder: @course.student_annotation_documents_folder)
+
         api_call(
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
@@ -3144,6 +3146,19 @@ describe AssignmentsApiController, type: :request do
           { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
         )
         expect(@assignment.reload.annotatable_attachment_id).to be @attachment.id
+      end
+
+      it "copies the given attachment to a special folder and uses that attachment instead of the supplied one" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
+        )
+
+        annotation_documents_folder = @course.student_annotation_documents_folder
+        clone_attachment = annotation_documents_folder.active_file_attachments.find_by(md5: @attachment.md5)
+        expect(@assignment.reload.annotatable_attachment_id).to be clone_attachment.id
       end
 
       it "does not set the assignment's annotatable_attachment_id when type is not student_annotation" do

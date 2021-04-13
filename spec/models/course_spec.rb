@@ -5570,6 +5570,53 @@ describe Course, "default_section" do
   end
 end
 
+describe Course, "#student_annotation_documents_folder" do
+  before(:each) do
+    @course = Course.create!
+  end
+
+  it "creates a folder if not already existent" do
+    expect {
+      @course.student_annotation_documents_folder
+    }.to change {
+      Folder.where(course: @course, name: "Student Annotation Documents").count
+    }.by(1)
+  end
+
+  it "initially sets the folder workflow_state to hidden" do
+    folder = @course.student_annotation_documents_folder
+    expect(folder.workflow_state).to eq "hidden"
+  end
+
+  it "creates a folder with a unique type" do
+    folder = @course.student_annotation_documents_folder
+    expect(folder.unique_type).to eq Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE
+  end
+
+  it "creates a folder with the root folder as the parent folder" do
+    folder = @course.student_annotation_documents_folder
+    root_folder = Folder.root_folders(@course).first
+    expect(folder.parent_folder).to eq root_folder
+  end
+
+  it "returns the existing folder for student annotation documents" do
+    newly_made_folder = @course.student_annotation_documents_folder
+    existing_folder = @course.student_annotation_documents_folder
+    expect(existing_folder).to eq newly_made_folder
+  end
+
+  it "creates a new folder if one was destroyed in the past" do
+    old_folder = @course.student_annotation_documents_folder
+    old_folder.destroy
+
+    expect {
+      @course.student_annotation_documents_folder
+    }.to change {
+      Folder.where(course: @course, name: "Student Annotation Documents").count
+    }.by(1)
+  end
+end
+
 describe Course, 'touch_root_folder_if_necessary' do
   before(:once) do
     course_with_student(active_all: true)

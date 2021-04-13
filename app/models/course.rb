@@ -2358,6 +2358,14 @@ class Course < ActiveRecord::Base
     }
   end
 
+  def student_annotation_documents_folder
+    Folder.unique_folder(
+      self,
+      Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE,
+      lambda { t "Student Annotation Documents" }
+    )
+  end
+
   def copy_attachments_from_course(course, options={})
     root_folder = Folder.root_folders(self).first
     root_folder_name = root_folder.name + '/'
