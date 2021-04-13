@@ -292,7 +292,7 @@ module CanvasSanitize #:nodoc:
       }.freeze,
       css: {
         properties: ([
-          'background', 'border', 'clear', 'color',
+          'background', 'border', 'clear', 'clip', 'color',
           'cursor', 'direction', 'display', 'float',
           'font', 'height', 'left', 'line-height',
           'list-style', 'margin', 'max-height',
