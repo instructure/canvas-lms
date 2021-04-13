@@ -185,4 +185,89 @@ const closedCaptionLanguages = {
   }
 }
 
+if (ENV.FEATURES?.expand_cc_languages) {
+  Object.defineProperties(closedCaptionLanguages, {
+    'en-CA': {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('English (Canada)')
+      }
+    },
+    'en-AU': {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('English (Australia)')
+      }
+    },
+    'en-GB': {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('English (United Kingdom)')
+      }
+    },
+    'fr-CA': {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('French (Canada)')
+      }
+    },
+    he: {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Hebrew')
+      }
+    },
+    hy: {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Armenian')
+      }
+    },
+    mi: {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Māori (New Zealand)')
+      }
+    },
+    nb: {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Norwegian Bokmål')
+      }
+    },
+    nn: {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Norwegian Nynorsk')
+      }
+    },
+    'zh-Hans': {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Chinese Simplified')
+      }
+    },
+    'zh-Hant': {
+      configurable: false,
+      enumerable: true,
+      get() {
+        return I18n.t('Chinese Traditional')
+      }
+    }
+  })
+  delete closedCaptionLanguages['zh-cn']
+  delete closedCaptionLanguages['zh-tw']
+  delete closedCaptionLanguages.iw
+}
+
 export default closedCaptionLanguages

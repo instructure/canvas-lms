@@ -64,3 +64,10 @@ auto_show_cc:
     language (if available) when playing canvas media.
   applies_to: User
   autoexpand: true
+expand_cc_languages:
+  state: hidden
+  display_name: Expand Closed Caption Languages
+  description: |-
+    Support uploading closed caption files in all the
+    languages Canvas supports.
+  applies_to: SiteAdmin
