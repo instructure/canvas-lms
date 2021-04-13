@@ -41,7 +41,6 @@ def cleanupFn() {
     ]
   } finally {
     sh 'rm -vrf ./spec_results/'
-    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
@@ -66,7 +65,6 @@ pipeline {
         script {
           protectedNode('canvas-docker', { cleanupFn() }) {
             stage ('Setup') {
-              cleanAndSetup()
               timeout(time: 2) {
                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 

@@ -20,7 +20,6 @@ def call() {
   echo 'Cleaning Workspace From Previous Runs'
   sh 'ls -A1 | xargs rm -rf'
   sh 'find .'
-  cleanAndSetup()
   def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
   checkoutRepo("canvas-lms", refspecToCheckout, 100)
 

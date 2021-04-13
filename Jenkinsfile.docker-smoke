@@ -22,10 +22,6 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
-def cleanupFn() {
-  libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
-}
-
 pipeline {
   agent none
   options {
@@ -43,9 +39,8 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { cleanupFn() }) {
+          protectedNode('canvas-docker') {
             stage('Setup') {
-              cleanAndSetup()
               // always pull from gerrit refspec to test the changed docker dev code
               checkoutRepo("canvas-lms", env.GERRIT_REFSPEC, 1)
               sh '''#!/bin/bash

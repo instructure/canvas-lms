@@ -41,7 +41,6 @@ def getLocalWorkDir() {
 }
 
 def setupNode() {
-  cleanAndSetup()
   sh 'rm -vrf ./tmp'
   def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
 
@@ -179,7 +178,6 @@ def cleanupFn(status) {
     }
   } finally {
     sh 'rm -vrf ./tmp/'
-    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
@@ -268,7 +266,6 @@ pipeline {
                       }
                       finally {
                         sh 'rm -vrf ./tmp'
-                        libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
                       }
                     }
                   }

@@ -103,7 +103,6 @@ def _runRspecTestSuite(
       "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
   ]) {
     try {
-      cleanAndSetup()
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 15) {
         credentials.withStarlordCredentials { ->
@@ -175,7 +174,6 @@ def _runRspecTestSuite(
       }
 
       sh 'rm -rf ./tmp'
-      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }
