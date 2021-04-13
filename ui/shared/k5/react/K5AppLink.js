@@ -47,6 +47,7 @@ export default function K5AppLink({app}) {
 
   const renderButton = () => (
     <View
+      data-testid="k5-app-button"
       position="relative"
       margin="small"
       padding="small"

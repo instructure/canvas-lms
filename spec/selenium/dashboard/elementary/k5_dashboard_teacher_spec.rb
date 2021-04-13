@@ -246,7 +246,7 @@ describe "teacher k5 dashboard" do
     end
   end
 
-  context 'homeroom dashboard resource panel' do
+  context 'homeroom dashboard resource panel contacts' do
     it 'shows the resource panel staff contacts' do
       @course.homeroom_course = true
       @course.save!
@@ -289,10 +289,47 @@ describe "teacher k5 dashboard" do
     end
   end
 
+  context 'homeroom dashboard resource panel LTI resources' do
+    before :each do
+      @lti_resource_name = 'Commons'
+      create_lti_resource(@lti_resource_name)
+    end
+
+    it 'shows the LTI resources for account and course on resources page' do
+      get "/#resources"
+
+      expect(k5_app_buttons[0].text).to eq @lti_resource_name
+    end
+
+    it 'shows course modal to choose which LTI resource context when button clicked', ignore_js_errors:true do
+      second_course_title = 'Second Course'
+      course_with_teacher(
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_course_title,
+        user: @teacher
+      )
+      get "/#resources"
+
+      click_k5_button(0)
+
+      expect(course_selection_modal).to be_displayed
+      expect(course_list.count).to eq(2)
+    end
+
+    it 'shows the LTI resource scoped to the course', ignore_js_errors:true do
+      create_lti_resource('New Commons')
+
+      get "/#resources"
+
+      expect(k5_resource_button_names_list).to include 'New Commons'
+    end
+  end
+
   context 'teacher schedule' do
     it 'shows a sample preview for teacher view of the schedule tab' do
       get "/#schedule"
-      
+
       expect(teacher_preview).to be_displayed
     end
   end

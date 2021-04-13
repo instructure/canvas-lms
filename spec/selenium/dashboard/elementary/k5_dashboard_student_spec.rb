@@ -381,4 +381,33 @@ describe "student k5 dashboard" do
       expect(Conversation.count).to eq(0)
     end
   end
+
+  context 'homeroom dashboard resource panel LTI resources' do
+    before :each do
+      @lti_resource_name = 'Commons'
+      create_lti_resource(@lti_resource_name)
+    end
+
+    it 'shows the LTI resources for account and course on resources page' do
+      get "/#resources"
+
+      expect(k5_app_buttons[0].text).to eq @lti_resource_name
+    end
+
+    it 'shows course modal to choose which LTI resource context when button clicked', ignore_js_errors:true do
+      second_course_title = 'Second Course'
+      course_with_student(
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_course_title,
+        user: @student
+      )
+      get "/#resources"
+
+      click_k5_button(0)
+
+      expect(course_selection_modal).to be_displayed
+      expect(course_list.count).to eq(2)
+    end
+  end
 end

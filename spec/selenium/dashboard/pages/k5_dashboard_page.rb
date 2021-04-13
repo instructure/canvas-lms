@@ -185,6 +185,18 @@ module K5PageObject
     "[aria-label='Message #{user_name}']"
   end
 
+  def k5_app_button_selector
+    "[data-testid='k5-app-button']"
+  end
+
+  def course_selection_modal_selector
+    "[aria-label='Choose a Course']"
+  end
+
+  def course_list_selector
+    "//*[@aria-label = 'Choose a Course']//a"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -368,6 +380,18 @@ module K5PageObject
     f(message_modal_selector(user_name))
   end
 
+  def k5_app_buttons
+    ff(k5_app_button_selector)
+  end
+
+  def course_selection_modal
+    f(course_selection_modal_selector)
+  end
+
+  def course_list
+    ffxpath(course_list_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def check_enable_homeroom_checkbox
@@ -486,5 +510,42 @@ module K5PageObject
 
   def message_modal_displayed?(user_name)
     element_exists?(message_modal_selector(user_name))
+  end
+
+  def click_k5_button(button_item)
+    k5_app_buttons[button_item].click
+  end
+
+  def k5_resource_button_names_list
+    k5_app_buttons.map(&:text)
+  end
+
+  def create_lti_resource(resource_name)
+    @rendered_icon='https://lor.instructure.com/img/icon_commons.png'
+    @lti_resource_url='http://www.example.com'
+    @tool =
+      Account.default.context_external_tools.new(
+        {
+          name: resource_name,
+          domain: 'canvaslms.com',
+          consumer_key: '12345',
+          shared_secret: 'secret',
+          is_rce_favorite: 'true'
+        }
+      )
+    @tool.set_extension_setting(
+      :editor_button,
+      {
+        message_type: 'ContentItemSelectionRequest',
+        url: @lti_resource_url,
+        icon_url: @rendered_icon,
+        text: "#{resource_name} Favorites",
+        enabled: 'true',
+        use_tray: 'true',
+        favorite: 'true'
+      }
+    )
+    @tool.course_navigation = {enabled: true}
+    @tool.save!
   end
 end
