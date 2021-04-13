@@ -20,8 +20,8 @@ import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
 
 export const AlertManagerContext = React.createContext({
-  setOnFailure: {},
-  setOnSuccess: {}
+  setOnFailure: () => {},
+  setOnSuccess: () => {}
 })
 
 export default class AlertManager extends React.Component {

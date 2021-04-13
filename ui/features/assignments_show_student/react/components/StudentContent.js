@@ -23,6 +23,7 @@ import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
 import MarkAsDoneButton from './MarkAsDoneButton'
+import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
 import React, {Suspense, lazy, useContext} from 'react'
@@ -34,6 +35,8 @@ import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
+
+const RubricsQuery = lazy(() => import('./RubricsQuery'))
 
 function EnrollmentConcludedNotice() {
   return (
@@ -83,7 +86,7 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return <DateLocked date={assignment.env.unlockDate} type="assignment" />
   } else if (assignment.nonDigitalSubmission) {
     return renderSubmissionlessAssignment({assignment}, alertContext)
-  } else if (submission === null) {
+  } else if (submission == null) {
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
@@ -99,6 +102,11 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return (
       <>
         <AssignmentToggleDetails description={assignment.description} />
+        {assignment.rubric && (
+          <Suspense fallback={<LoadingIndicator />}>
+            <RubricsQuery assignment={assignment} submission={submission} />
+          </Suspense>
+        )}
         <ContentTabs assignment={assignment} submission={submission} />
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>

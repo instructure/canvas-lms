@@ -43,14 +43,13 @@ describe('Assignment Student Content View', () => {
     expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
   })
 
-  it('renders the assignment details and student content tab if the assignment is unlocked', async () => {
+  it('renders the assignment details and student content if the assignment is unlocked', async () => {
     const props = await mockAssignmentAndSubmission()
-    const {getByRole, getByText, queryByText} = render(
+    const {getByText, queryByText} = render(
       <MockedProvider>
         <StudentContent {...props} />
       </MockedProvider>
     )
-    expect(getByRole('tablist')).toHaveTextContent('Attempt 1')
     expect(getByText('Details')).toBeInTheDocument()
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })

@@ -242,18 +242,31 @@ describe('student view integration tests', () => {
       expect((await findAllByText('Test Assignment'))[0]).toBeInTheDocument()
     })
 
-    it('renders a rubric if present', async () => {
+    it('renders the rubric panel if a rubric if present', async () => {
       const overrides = [
         {Assignment: {name: 'Test Assignment', rubric: {}}},
         {Rubric: {title: 'Test Rubric'}}
       ]
       const mocks = [await createPublicAssignmentMocks(overrides)]
-      const {findAllByText} = render(
+      const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" />
         </MockedProvider>
       )
-      expect((await findAllByText('Test Rubric'))[0]).toBeInTheDocument()
+
+      expect(await findByRole('button', {name: 'View Rubric'})).toBeInTheDocument()
+    })
+
+    it('does not render the rubric panel if no rubric is present', async () => {
+      const overrides = [{Assignment: {name: 'Test Assignment'}}]
+      const mocks = [await createPublicAssignmentMocks(overrides)]
+      const {queryByRole} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+
+      expect(queryByRole('button', {name: 'View Rubric'})).not.toBeInTheDocument()
     })
   })
 })

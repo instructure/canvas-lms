@@ -104,10 +104,6 @@ CancelAttemptButton.propTypes = {
 export default class SubmissionManager extends Component {
   static propTypes = {
     assignment: Assignment.shape,
-    focusElement: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.shape({current: PropTypes.instanceOf(Component)})
-    ]),
     submission: Submission.shape
   }
 
@@ -189,11 +185,7 @@ export default class SubmissionManager extends Component {
     if (this.state.submittingAssignment || this.state.activeSubmissionType === null) {
       return
     }
-    this.setState({submittingAssignment: true}, () => {
-      if (this.props.focusElement) {
-        this.props.focusElement.focus()
-      }
-    })
+    this.setState({submittingAssignment: true})
 
     switch (this.state.activeSubmissionType) {
       case 'media_recording':
