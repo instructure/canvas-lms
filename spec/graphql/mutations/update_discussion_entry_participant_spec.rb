@@ -41,6 +41,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
           discussionEntry {
             read
             rating
+            ratingSum
           }
         }
       }
@@ -75,6 +76,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
 
     expect(result.dig('errors')).to be nil
     expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'rating')).to be true
+    expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'ratingSum')).to eq 1
     expect(@discussion_entry.rating(@discussion_entry.user)).to be_equal 1
   end
 end

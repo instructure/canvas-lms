@@ -45,8 +45,10 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
       discussion_entry.change_rating(input[:rating], current_user)
     end
 
+    # TODO: VICE-1321
+    # need to reload entry record as we currently return stale data
     {
-      discussion_entry: discussion_entry
+      discussion_entry: discussion_entry.reload
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
