@@ -18,6 +18,7 @@
 
 import {Assignment} from './Assignment'
 import {bool, shape, string} from 'prop-types'
+import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
 
@@ -45,9 +46,13 @@ export const Discussion = {
       assignment {
         ...Assignment
       }
+      permissions {
+        ...DiscussionPermissions
+      }
     }
     ${User.fragment}
     ${Assignment.fragment}
+    ${DiscussionPermissions.fragment}
   `,
 
   shape: shape({
@@ -65,7 +70,8 @@ export const Discussion = {
     delayedPostAt: string,
     author: User.shape,
     editor: User.shape,
-    assignment: Assignment.shape
+    assignment: Assignment.shape,
+    permissions: DiscussionPermissions.shape
   })
 }
 

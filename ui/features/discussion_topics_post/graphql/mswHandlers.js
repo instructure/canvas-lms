@@ -77,6 +77,16 @@ export const handlers = [
                 },
                 editor: null,
                 lastReply: null,
+                permissions: {
+                  attach: true,
+                  create: true,
+                  delete: true,
+                  rate: true,
+                  read: true,
+                  reply: true,
+                  update: true,
+                  __typename: 'DiscussionEntryPermissions'
+                },
                 __typename: 'DiscussionEntry'
               }
             ],
@@ -88,6 +98,16 @@ export const handlers = [
               __typename: 'PageInfo'
             },
             __typename: 'DiscussionSubentriesConnection'
+          },
+          permissions: {
+            attach: true,
+            create: true,
+            delete: true,
+            rate: true,
+            read: true,
+            reply: true,
+            update: true,
+            __typename: 'DiscussionEntryPermissions'
           },
           __typename: 'DiscussionEntry'
         }

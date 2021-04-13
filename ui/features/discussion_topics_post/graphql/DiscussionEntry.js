@@ -17,6 +17,7 @@
  */
 
 import {bool, number, shape, string} from 'prop-types'
+import {DiscussionEntryPermissions} from './DiscussionEntryPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
 
@@ -47,8 +48,12 @@ export const DiscussionEntry = {
       lastReply {
         createdAt
       }
+      permissions {
+        ...DiscussionEntryPermissions
+      }
     }
     ${User.fragment}
+    ${DiscussionEntryPermissions.fragment}
   `,
 
   shape: shape({
@@ -71,7 +76,8 @@ export const DiscussionEntry = {
     },
     lastReply: shape({
       createdAt: string
-    })
+    }),
+    permissions: DiscussionEntryPermissions.shape
   })
 }
 
