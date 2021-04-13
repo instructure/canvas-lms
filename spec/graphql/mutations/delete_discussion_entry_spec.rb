@@ -36,6 +36,10 @@ describe Mutations::DeleteDiscussionEntry do
           discussionEntry {
             _id
             deleted
+            editor {
+              _id
+              name
+            }
           }
           errors {
             message
@@ -65,6 +69,15 @@ describe Mutations::DeleteDiscussionEntry do
     expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', '_id')).to eq @discussion_entry.id.to_s
     expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', 'deleted')).to be true
     expect(@discussion_entry.reload.workflow_state).to eq 'deleted'
+  end
+
+  it 'sets the editor when deleting' do
+    expect(@discussion_entry.editor_id).to be_nil
+    result = run_mutation(id: @discussion_entry.id)
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'deleteDiscussionEntry', 'errors')).to be_nil
+    expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', 'editor', '_id')).to eq @teacher.id.to_s
+    expect(@discussion_entry.reload.editor_id).to eq @teacher.id
   end
 
   context 'errors' do

@@ -32,6 +32,7 @@ class Mutations::DeleteDiscussionEntry < Mutations::BaseMutation
     raise GraphQL::ExecutionError, 'not found' unless entry.grants_right?(current_user, session, :read)
     return validation_error(I18n.t('Insufficient permissions')) unless entry.grants_right?(current_user, session, :delete)
 
+    entry.editor_id = current_user.id
     entry.destroy
     {discussion_entry: entry}
   rescue ActiveRecord::RecordNotFound
