@@ -63,29 +63,37 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { cleanupFn() }) {
-            stage ('Setup') {
-              timeout(time: 2) {
-               def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
-
-               checkoutRepo("canvas-lms", refspecToCheckout, 1)
-
-               credentials.withStarlordCredentials { ->
-                 sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-               }
-                sh 'build/new-jenkins/docker-compose-build-up.sh'
+          protectedNode('canvas-docker') {
+            def postBuildHandler = [
+              onStageResult: { _ ->
+                cleanupFn()
               }
-            }
+            ]
 
-            stage ('Run Vendored Gems specs') {
-              timeout(time: 10) {
-                sh 'build/new-jenkins/test-gems.sh'
+            extendedStage('Builder').handler(postBuildHandler).execute {
+              stage ('Setup') {
+                timeout(time: 2) {
+                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
+
+                 credentials.withStarlordCredentials { ->
+                   sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+                 }
+                  sh 'build/new-jenkins/docker-compose-build-up.sh'
+                }
               }
-            }
 
-            stage ('Run Engine specs') {
-              timeout(time: 10) {
-                sh 'build/new-jenkins/test-engines.sh'
+              stage ('Run Vendored Gems specs') {
+                timeout(time: 10) {
+                  sh 'build/new-jenkins/test-gems.sh'
+                }
+              }
+
+              stage ('Run Engine specs') {
+                timeout(time: 10) {
+                  sh 'build/new-jenkins/test-engines.sh'
+                }
               }
             }
           }
