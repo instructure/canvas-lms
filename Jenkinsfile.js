@@ -86,7 +86,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { cleanupFn() }) {
+          protectedNode('canvas-docker') {
             stage('Setup') {
               timeout(time: 3) {
                 sh 'rm -vrf ./tmp/*'
@@ -100,7 +100,13 @@ pipeline {
               }
             }
 
-            stage('Run Tests') {
+            def postBuildHandler = [
+              onStageResult: { _ ->
+                cleanupFn()
+              }
+            ]
+
+            extendedStage('Run Tests').handler(postBuildHandler).execute {
               timeout(time: 10) {
                 script {
                   def tests = [:]
