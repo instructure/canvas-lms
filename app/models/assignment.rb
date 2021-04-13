@@ -2148,12 +2148,12 @@ class Assignment < ActiveRecord::Base
     eula_timestamp = opts[:eula_agreement_timestamp]
 
     if opts[:submission_type] == "annotated_document"
-      raise "Invalid Attachment" if opts[:annotated_document_id].blank?
+      raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
       raise "Invalid submission type" unless self.annotated_document?
       # Prevent the case where a user clicks Submit on a stale tab, expecting
       # to submit one set of work, only for another set to be submitted
       # instead.
-      raise "Invalid Attachment" if opts[:annotated_document_id].to_i != self.annotatable_attachment_id
+      raise "Invalid Attachment" if opts[:annotatable_attachment_id].to_i != self.annotatable_attachment_id
     end
 
     # Only allow a few fields to be submitted.  Cannot submit the grade of a

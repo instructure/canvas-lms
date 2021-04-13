@@ -3141,7 +3141,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotated_document_id: @attachment.id, submission_types: ["annotated_document"] } }
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["annotated_document"] } }
         )
         expect(@assignment.reload.annotatable_attachment_id).to be @attachment.id
       end
@@ -3151,7 +3151,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotated_document_id: @attachment.id, submission_types: ["online_text_entry"] } }
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["online_text_entry"] } }
         )
         expect(@assignment.reload.annotatable_attachment_id).to be_nil
       end
@@ -3176,7 +3176,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotated_document_id: second_attachment.id, submission_types: ["annotated_document"] } }
+          { assignment: { annotatable_attachment_id: second_attachment.id, submission_types: ["annotated_document"] } }
         )
 
         aggregate_failures do
@@ -3190,7 +3190,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotated_document_id: Attachment.last.id + 1, submission_types: ["annotated_document"] } }
+          { assignment: { annotatable_attachment_id: Attachment.last.id + 1, submission_types: ["annotated_document"] } }
         )
 
         aggregate_failures do
@@ -3204,7 +3204,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotated_document_id: "" } }
+          { assignment: { annotatable_attachment_id: "" } }
         )
         expect(@assignment.reload.annotatable_attachment_id).to be_nil
       end
@@ -3216,7 +3216,7 @@ describe AssignmentsApiController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
           endpoint_params,
-          { assignment: { annotated_document_id: @attachment.id, submission_types: ["online_text_entry"] } }
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["online_text_entry"] } }
         )
         expect(@assignment.reload.annotatable_attachment_id).to be_nil
       end

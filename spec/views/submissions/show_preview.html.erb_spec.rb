@@ -83,7 +83,7 @@ describe "/submissions/show_preview" do
       )
       submission = assignment.submit_homework(
         @user,
-        annotated_document_id: @attachment.id,
+        annotatable_attachment_id: @attachment.id,
         submission_type: "annotated_document"
       )
       assign(:assignment, assignment)

@@ -122,7 +122,7 @@
     <% if @assignment.annotated_document? %>
       <%= form_tag(submission_create_url, id: "submit_annotated_document_form" , class: "submit_assignment_form" ) do %>
         <%= hidden_field :submission, :submission_type, value: "annotated_document" %>
-        <%= hidden_field :submission, :annotated_document_id, value: @assignment.annotatable_attachment_id %>
+        <%= hidden_field :submission, :annotatable_attachment_id, value: @assignment.annotatable_attachment_id %>
             <table class="formtable" style="width: 100%;">
               <tr>
                 <div class="ef-file-preview-stretch">

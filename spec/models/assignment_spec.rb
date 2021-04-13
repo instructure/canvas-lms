@@ -3216,7 +3216,7 @@ describe Assignment do
         @a.update!(submission_types: "online_text_entry")
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "annotated_document")
         }.to raise_error "Invalid submission type"
       end
 
@@ -3224,7 +3224,7 @@ describe Assignment do
         other_attachment = attachment_model(context: @course)
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: other_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: other_attachment.id, submission_type: "annotated_document")
         }.to raise_error "Invalid Attachment"
       end
 
@@ -3234,7 +3234,7 @@ describe Assignment do
         annotation_context = submission.annotation_context(draft: true)
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "annotated_document")
         }.to change {
           annotation_context.reload.submission_attempt
         }.from(nil).to(8)
@@ -3249,7 +3249,7 @@ describe Assignment do
         )
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "annotated_document")
         }.not_to change {
           unrelated_annotation_context.reload.submission_attempt
         }

@@ -30,7 +30,7 @@ end
 class Mutations::CreateSubmission < Mutations::BaseMutation
   graphql_name 'CreateSubmission'
 
-  argument :annotated_document_id,
+  argument :annotatable_attachment_id,
            ID,
            required: false,
            prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Attachment')
@@ -57,7 +57,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
 
     submission_type = input[:submission_type]
     submission_params = {
-      annotated_document_id: input[:annotated_document_id],
+      annotatable_attachment_id: input[:annotatable_attachment_id],
       attachments: [],
       body: '',
       require_submission_type_is_valid: true,
@@ -67,8 +67,8 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
 
     case submission_type
     when 'annotated_document'
-      if input[:annotated_document_id].blank?
-        return validation_error(I18n.t('Student Annotation submissions require an annotated_document_id to submit'))
+      if input[:annotatable_attachment_id].blank?
+        return validation_error(I18n.t('Student Annotation submissions require an annotatable_attachment_id to submit'))
       end
     when 'media_recording'
       unless input[:media_id]

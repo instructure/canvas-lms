@@ -753,7 +753,7 @@ describe Canvadocs do
             assignment.submit_homework(
               submission.user,
               submission_type: 'annotated_document',
-              annotated_document_id: attachment.id
+              annotatable_attachment_id: attachment.id
             )
             submission.reload
           end

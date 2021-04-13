@@ -112,7 +112,7 @@ QUnit.module('EditView', {
   setup() {
     fixtures.innerHTML = `
         <span data-component="ModeratedGradingFormFieldGroup"></span>
-        <input id="annotated_document_id" type="hidden" />
+        <input id="annotatable_attachment_id" type="hidden" />
         <div id="annotated_document_usage_rights_container"></div>
     `
     fakeENV.setup({
@@ -2009,7 +2009,7 @@ QUnit.module('EditView student annotation submission', hooks => {
     fixtures.innerHTML = `
       <span data-component="ModeratedGradingFormFieldGroup"></span>
       <div id="annotated_document_chooser_container"></div>
-      <input id="annotated_document_id" type="checkbox"></input>
+      <input id="annotatable_attachment_id" type="checkbox"></input>
       <div id="annotated_document_usage_rights_container"></div>
     `
 

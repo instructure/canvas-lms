@@ -792,8 +792,8 @@ module Api::V1::Assignment
     end
 
     if update_params[:submission_types]&.include?('annotated_document')
-      if assignment_params.key?(:annotated_document_id)
-        assignment.annotatable_attachment_id = assignment_params.delete(:annotated_document_id)
+      if assignment_params.key?(:annotatable_attachment_id)
+        assignment.annotatable_attachment_id = assignment_params.delete(:annotatable_attachment_id)
       end
     else
       assignment.annotatable_attachment_id = nil
@@ -987,9 +987,9 @@ module Api::V1::Assignment
     return false unless submission_types_valid?(assignment, assignment_params)
 
     if assignment_params[:submission_types]&.include?("annotated_document")
-      return false unless assignment_params.key?(:annotated_document_id)
+      return false unless assignment_params.key?(:annotatable_attachment_id)
 
-      attachment = Attachment.find_by(id: assignment_params[:annotated_document_id])
+      attachment = Attachment.find_by(id: assignment_params[:annotatable_attachment_id])
       return false unless attachment&.grants_right?(user, :read)
     end
 

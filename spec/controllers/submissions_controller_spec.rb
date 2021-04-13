@@ -411,7 +411,7 @@ describe SubmissionsController do
         )
       end
 
-      it 'redirects with an error if annotated_document_id is not present in params' do
+      it 'redirects with an error if annotatable_attachment_id is not present in params' do
         course_with_student_logged_in(active_all: true, course: @course)
         post :create, params: {
           assignment_id: @assignment.id,
@@ -421,7 +421,7 @@ describe SubmissionsController do
 
         aggregate_failures do
           expect(response).to be_redirect
-          expect(flash[:error]).to eq "Student Annotation submissions require an annotated_document_id to submit"
+          expect(flash[:error]).to eq "Student Annotation submissions require an annotatable_attachment_id to submit"
         end
       end
 
@@ -433,7 +433,7 @@ describe SubmissionsController do
         post :create, params: {
           assignment_id: @assignment.id,
           course_id: @course.id,
-          submission: { annotated_document_id: @attachment.id, submission_type: 'annotated_document' }
+          submission: { annotatable_attachment_id: @attachment.id, submission_type: 'annotated_document' }
         }
 
         aggregate_failures do

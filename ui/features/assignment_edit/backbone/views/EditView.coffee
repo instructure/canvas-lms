@@ -368,13 +368,13 @@ export default class EditView extends ValidatedFormView
     return document.querySelector('#annotated_document_chooser_container')
 
   setAnnotatedDocument: (file) =>
-    $annotatedDocumentInput = document.getElementById('annotated_document_id')
+    $annotatableAttachmentInput = document.getElementById('annotatable_attachment_id')
     @annotatedDocument = file
 
     if @annotatedDocument == null
-      $annotatedDocumentInput.value = ''
+      $annotatableAttachmentInput.value = ''
     else
-      $annotatedDocumentInput.value = @annotatedDocument.id
+      $annotatableAttachmentInput.value = @annotatedDocument.id
 
   getAnnotatedDocument: () =>
     return @annotatedDocument
