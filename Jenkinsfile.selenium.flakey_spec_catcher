@@ -219,59 +219,67 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
-            stage('Setup') {
-              setupNode()
-            }
+          protectedNode('canvas-docker') {
+            def postBuildHandler = [
+              onStageResult: { _, stageConfig ->
+                cleanupFn(stageConfig.status())
+              }
+            ]
 
-            stage("Compute Build Distribution") {
-              computeTestCount()
-            }
-
-            stage("Run Flakey Spec Catcher") {
-              if(partitions.size() == 0) {
-                return
-              } else if(partitions.size() > env.MAX_NODES.toInteger()) {
-                error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
-
-                return
+            extendedStage('Builder').handler(postBuildHandler).execute {
+              stage('Setup') {
+                setupNode()
               }
 
-              def stages = [:]
+              stage("Compute Build Distribution") {
+                computeTestCount()
+              }
 
-              stages["flakey set 00"] = {
-                withEnv([
-                  "FSC_TESTS=${partitions[0].join(',')}",
-                  "NODE_NUMBER=00"
-                ]) {
-                  executeFlakeySpecCatcher()
+              stage('Run Flakey Spec Catcher') {
+                if(partitions.size() == 0) {
+                  return
+                } else if(partitions.size() > env.MAX_NODES.toInteger()) {
+                  error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+
+                  return
                 }
-              }
 
-              for(int i = 1; i < partitions.size(); i++) {
-                // make sure to create a new index variable so this value gets
-                // captured by the lambda
-                def index = i
-                def node_number = (index).toString().padLeft(2, '0')
+                def stages = [:]
 
-                stages["flakey set $node_number"] = {
-                  protectedNode('canvas-docker') {
-                    withEnv([
-                      "FSC_TESTS=${partitions[index].join(',')}",
-                      "NODE_NUMBER=$node_number"
-                    ]) {
-                      try {
-                        setupNode()
-                        executeFlakeySpecCatcher("node$node_number")
-                      }
-                      finally {
-                        sh 'rm -vrf ./tmp'
+                stages["flakey set 00"] = {
+                  withEnv([
+                    "FSC_TESTS=${partitions[0].join(',')}",
+                    "NODE_NUMBER=00"
+                  ]) {
+                    executeFlakeySpecCatcher()
+                  }
+                }
+
+                for(int i = 1; i < partitions.size(); i++) {
+                  // make sure to create a new index variable so this value gets
+                  // captured by the lambda
+                  def index = i
+                  def node_number = (index).toString().padLeft(2, '0')
+
+                  stages["flakey set $node_number"] = {
+                    protectedNode('canvas-docker') {
+                      withEnv([
+                        "FSC_TESTS=${partitions[index].join(',')}",
+                        "NODE_NUMBER=$node_number"
+                      ]) {
+                        try {
+                          setupNode()
+                          executeFlakeySpecCatcher("node$node_number")
+                        }
+                        finally {
+                          sh 'rm -vrf ./tmp'
+                        }
                       }
                     }
                   }
                 }
+                parallel(stages)
               }
-              parallel(stages)
             }
           }
         }
