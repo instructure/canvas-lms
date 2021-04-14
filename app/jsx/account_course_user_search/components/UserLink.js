@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {Avatar} from '@instructure/ui-elements'
+import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
 
 export default function UserLink({size, avatar_url, name, avatarName, ...propsToPassOnToLink}) {

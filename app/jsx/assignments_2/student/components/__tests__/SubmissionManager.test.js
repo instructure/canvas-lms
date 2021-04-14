@@ -110,6 +110,22 @@ describe('SubmissionManager', () => {
     expect(queryByText('Submit')).not.toBeInTheDocument()
   })
 
+  it('does not render the submit button if the submission cannot be modified', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+
+    const {queryByText} = render(
+      <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
+  })
+
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
     // eslint-disable-next-line jest/valid-describe
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {

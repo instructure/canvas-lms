@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// xsslint safeString.method I18n.t
+
 import I18n from 'i18n!submit_assignment'
 import $ from 'jquery'
-import _ from 'underscore'
+import axios from 'axios'
 import GoogleDocsTreeView from 'compiled/views/GoogleDocsTreeView'
-import homework_submission_tool from 'jst/assignments/homework_submission_tool'
 import HomeworkSubmissionLtiContainer from 'compiled/external_tools/HomeworkSubmissionLtiContainer'
 import RCEKeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
@@ -47,7 +48,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
 import Attachment from 'jsx/assignments/Attachment'
 
-var SubmitAssignment = {
+const SubmitAssignment = {
   // This ensures that the tool links in the "More" tab (which only appears with 4
   // or more tools) behave properly when clicked
   moreToolsListClickHandler(event) {
@@ -95,17 +96,15 @@ var SubmitAssignment = {
     const tabHelperHeight = 35
     $div.append(
       $('<div/>', {id: 'tab-helper', style: 'height:0px;padding:5px', tabindex: '0'})
-        .focus(function() {
+        .focus(function () {
           $(this).height(`${tabHelperHeight}px`)
           const joke = document.createTextNode(
             I18n.t('Q: What goes black, white, black, white?  A: A panda rolling down a hill.')
           )
           this.appendChild(joke)
         })
-        .blur(function() {
-          $(this)
-            .html('')
-            .height('0px')
+        .blur(function () {
+          $(this).html('').height('0px')
         })
     )
 
@@ -115,8 +114,10 @@ var SubmitAssignment = {
   beforeUnloadHandler(e) {
     return (e.returnValue = I18n.t('Changes you made may not be saved.'))
   },
-  dialogCancelHandler(event, ui) {
-    const r = confirm(I18n.t('Are you sure you want to cancel? Changes you made may not be saved.'))
+  dialogCancelHandler(event, _ui) {
+    const r = window.confirm(
+      I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
+    )
     if (r == false) {
       event.preventDefault()
     }
@@ -127,9 +128,9 @@ let submissionAttachmentIndex = -1
 
 RichContentEditor.preloadRemoteModule()
 
-$(document).ready(function() {
-  let submitting = false,
-    submissionForm = $('.submit_assignment_form')
+$(document).ready(function () {
+  let submitting = false
+  const submissionForm = $('.submit_assignment_form')
 
   const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer(
     '#submit_from_external_tool_form'
@@ -147,20 +148,20 @@ $(document).ready(function() {
   // grow and shrink the comments box on focus/blur if the user
   // hasn't entered any content.
   submissionForm
-    .delegate('#submission_comment', 'focus', function(e) {
+    .delegate('#submission_comment', 'focus', function (_e) {
       const box = $(this)
       if (box.val().trim() === '') {
         box.addClass('focus_or_content')
       }
     })
-    .delegate('#submission_comment', 'blur', function(e) {
+    .delegate('#submission_comment', 'blur', function (_e) {
       const box = $(this)
       if (box.val().trim() === '') {
         box.removeClass('focus_or_content')
       }
     })
 
-  submissionForm.submit(function(event) {
+  submissionForm.submit(function (event) {
     const self = this
     const $turnitin = $(this).find('.turnitin_pledge')
     const $vericite = $(this).find('.vericite_pledge')
@@ -193,18 +194,14 @@ $(document).ready(function() {
 
     RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
 
-    $(this)
-      .find("button[type='submit']")
-      .text(I18n.t('messages.submitting', 'Submitting...'))
-    $(this)
-      .find('button')
-      .attr('disabled', true)
+    $(this).find("button[type='submit']").text(I18n.t('messages.submitting', 'Submitting...'))
+    $(this).find('button').attr('disabled', true)
 
     if ($(this).attr('id') == 'submit_online_upload_form') {
       event.preventDefault() && event.stopPropagation()
       const fileElements = $(this)
         .find('input[type=file]:visible')
-        .filter(function() {
+        .filter(function () {
           return $(this).val() !== ''
         })
 
@@ -221,22 +218,20 @@ $(document).ready(function() {
 
       const emptyFiles = $(this)
         .find('input[type=file]:visible')
-        .filter(function() {
+        .filter(function () {
           return this.files[0] && this.files[0].size === 0
         })
 
-      const uploadedAttachmentIds = $(this)
-        .find('#submission_attachment_ids')
-        .val()
+      const uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val()
 
-      const reenableSubmitButton = function() {
+      const reenableSubmitButton = function () {
         $(self)
           .find('button[type=submit]')
           .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
           .prop('disabled', false)
       }
 
-      const progressIndicator = function(event) {
+      const progressIndicator = function (event) {
         if (event.lengthComputable) {
           const mountPoint = document.getElementById('progress_indicator')
 
@@ -332,7 +327,7 @@ $(document).ready(function() {
           }
           window.location = url.toString()
         },
-        error(data) {
+        error(_data) {
           submissionForm
             .find("button[type='submit']")
             .text(I18n.t('messages.submit_failed', 'Submit Failed, please try again'))
@@ -367,20 +362,20 @@ $(document).ready(function() {
     recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
   })
 
-  $('.submit_assignment_link').click(function(event, skipConfirmation) {
+  $('.submit_assignment_link').click(function (event, skipConfirmation) {
     event.preventDefault()
     const late = $(this).hasClass('late')
     if (late && !skipConfirmation) {
       let result
       if ($('.resubmit_link').length > 0) {
-        result = confirm(
+        result = window.confirm(
           I18n.t(
             'messages.now_overdue',
             'This assignment is now overdue.  Any new submissions will be marked as late.  Continue anyway?'
           )
         )
       } else {
-        result = confirm(
+        result = window.confirm(
           I18n.t('messages.overdue', 'This assignment is overdue.  Do you still want to submit it?')
         )
       }
@@ -393,19 +388,14 @@ $(document).ready(function() {
     $('html,body').scrollTo($('#submit_assignment'))
     createSubmitAssignmentTabs()
     homeworkSubmissionLtiContainer.loadExternalTools()
-    $('#submit_assignment_tabs li')
-      .first()
-      .focus()
+    $('#submit_assignment_tabs li').first().focus()
   })
 
-  $('.switch_text_entry_submission_views').click(function(event) {
+  $('.switch_text_entry_submission_views').click(function (event) {
     event.preventDefault()
     RichContentEditor.callOnRCE($('#submit_online_text_entry_form textarea:first'), 'toggle')
     //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-    $(this)
-      .siblings('.switch_text_entry_submission_views')
-      .andSelf()
-      .toggle()
+    $(this).siblings('.switch_text_entry_submission_views').andSelf().toggle()
   })
 
   $('.submit_assignment_form .cancel_button').click(() => {
@@ -484,14 +474,11 @@ $(document).ready(function() {
   const webcamBlobs = {}
 
   $('.add_another_file_link')
-    .click(function(event) {
+    .click(function (event) {
       event.preventDefault()
       const clone = $('#submission_attachment_blank').clone(true)
 
-      clone
-        .removeAttr('id')
-        .show()
-        .insertBefore(this)
+      clone.removeAttr('id').show().insertBefore(this)
 
       const wrapperDom = clone.find('.attachment_wrapper')[0]
       if (wrapperDom) {
@@ -510,11 +497,9 @@ $(document).ready(function() {
     })
     .click()
 
-  $('.remove_attachment_link').click(function(event) {
+  $('.remove_attachment_link').click(function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.submission_attachment')
-      .remove()
+    $(this).parents('.submission_attachment').remove()
     checkAllowUploadSubmit()
     toggleRemoveAttachmentLinks()
   })
@@ -524,14 +509,12 @@ $(document).ready(function() {
     $.get(
       url,
       {},
-      (data, textStatus) => {
+      (data, _textStatus) => {
         const tree = new GoogleDocsTreeView({model: data})
         $('div#google_docs_container').html(tree.el)
         tree.render()
         tree.on('activate-file', file_id => {
-          $('#submit_google_doc_form')
-            .find("input[name='google_doc[document_id]']")
-            .val(file_id)
+          $('#submit_google_doc_form').find("input[name='google_doc[document_id]']").val(file_id)
           const submitButton = $('#submit_google_doc_form').find('[disabled].btn-primary')
           if (submitButton) {
             submitButton.removeAttr('disabled')
@@ -542,7 +525,7 @@ $(document).ready(function() {
     )
   }
 
-  $('#auth-google').live('click', function(e) {
+  $('#auth-google').live('click', function (e) {
     e.preventDefault()
     const href = $(this).attr('href')
     reauth(href)
@@ -614,12 +597,9 @@ $(document).ready(function() {
       const filename = getFilename(fileInput)
       altText = I18n.t('remove %{filename}', {filename})
     }
-    fileInput
-      .parent()
-      .find('img')
-      .attr('alt', altText)
+    fileInput.parent().find('img').attr('alt', altText)
   }
-  $('.submission_attachment input[type=file]').live('change', function() {
+  $('.submission_attachment input[type=file]').live('change', function () {
     updateRemoveLinkAltText($(this))
     if ($(this).val() === '') return
 
@@ -628,11 +608,7 @@ $(document).ready(function() {
     $.screenReaderFlashMessage(I18n.t('File selected for upload: %{filename}', {filename}))
     if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1) return
 
-    const ext = $(this)
-      .val()
-      .split('.')
-      .pop()
-      .toLowerCase()
+    const ext = $(this).val().split('.').pop().toLowerCase()
     $(this)
       .parents('.submission_attachment')
       .find('.bad_ext_msg')
@@ -643,11 +619,7 @@ $(document).ready(function() {
 
 $('#submit_google_doc_form').submit(() => {
   // make sure we have a document selected
-  if (
-    !$('#submit_google_doc_form')
-      .find("input[name='google_doc[document_id]']")
-      .val()
-  ) {
+  if (!$('#submit_google_doc_form').find("input[name='google_doc[document_id]']").val()) {
     return false
   }
 
@@ -673,14 +645,30 @@ $(document).ready(() => {
         .text(I18n.t('buttons.submit_assignment', 'Submit Assignment'))
       $('#submit_media_recording_form .media_comment_id').val(id)
       $('#submit_media_recording_form .media_comment_type').val(type)
-      $('#media_media_recording_submission_holder')
-        .children()
-        .hide()
+      $('#media_media_recording_submission_holder').children().hide()
       $('#media_media_recording_ready').show()
       $('#media_comment_submit_button').attr('disabled', false)
       $('#media_media_recording_thumbnail').attr('id', 'media_comment_' + id)
     })
   })
+
+  const annotatedDocumentSubmission = $('.annotated-document-submission')
+  if (ENV.SUBMISSION_ID && annotatedDocumentSubmission.length) {
+    axios
+      .post('/api/v1/canvadoc_session', {
+        submission_attempt: 'draft',
+        submission_id: ENV.SUBMISSION_ID
+      })
+      .then(result => {
+        $(annotatedDocumentSubmission).attr('src', result.data.canvadocs_session_url)
+      })
+      .catch(error => {
+        annotatedDocumentSubmission.replaceWith(
+          `<div>${I18n.t('There was an error loading the document.')}</div>`
+        )
+        throw new Error(error)
+      })
+  }
 })
 
 const $tools = $('#submit_from_external_tool_form')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeFailedJobsHandlerToText < ActiveRecord::Migration[5.1]
   tag :predeploy
 

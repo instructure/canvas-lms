@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
 import ConfigOptionField from './ConfigOptionField'
 import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 export default class ManageAppListButton extends React.Component {
   static propTypes = {

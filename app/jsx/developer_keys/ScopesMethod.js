@@ -17,7 +17,7 @@
  */
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 
 export default class ScopesMethod extends React.Component {
   methodColorMap() {

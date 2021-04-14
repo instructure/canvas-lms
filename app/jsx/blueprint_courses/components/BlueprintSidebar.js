@@ -19,9 +19,10 @@
 import I18n from 'i18n!BlueprintCourseSidebar'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 import {Button} from '@instructure/ui-buttons'
-import {Text, Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {IconBlueprintSolid, IconXSolid} from '@instructure/ui-icons'
 
 export default class BlueprintCourseSidebar extends Component {

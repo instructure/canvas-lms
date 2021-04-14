@@ -21,8 +21,8 @@ import {any, arrayOf, bool, shape, string} from 'prop-types'
 
 import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Heading} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-heading'
+import {View} from '@instructure/ui-view'
 
 import I18n from 'i18n!post_assignment_grades_tray'
 

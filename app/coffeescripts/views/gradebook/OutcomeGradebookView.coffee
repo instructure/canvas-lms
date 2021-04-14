@@ -81,8 +81,6 @@ export default class OutcomeGradebookView extends View
     constructor: (options) ->
       super
       @_validateOptions(options)
-      this.inactive_concluded_lmgb_filters = ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters
-
       if ENV.GRADEBOOK_OPTIONS.outcome_proficiency?.ratings
         @ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
         @checkboxes = @ratings.map (rating) -> new CheckboxView({color: "\##{rating.color}", label: rating.description})
@@ -149,8 +147,6 @@ export default class OutcomeGradebookView extends View
       view.on('togglestate', @_createFilter("rating_#{i}")) for view, i in @checkboxes
       @updateExportLink(@learningMastery.getCurrentSectionId())
       @$('#no_results_outcomes').change(() -> _this._toggleOutcomesWithNoResults(this.checked))
-      if !@inactive_concluded_lmgb_filters
-        @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
 
     _setFilterSetting: (name, value) ->
       filters = userSettings.contextGet('lmgb_filters')
@@ -222,12 +218,10 @@ export default class OutcomeGradebookView extends View
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, checkboxes: @checkboxes, inactive_concluded_lmgb_filters: @inactive_concluded_lmgb_filters)
+      _.extend({}, checkboxes: @checkboxes)
 
     _loadFilterSettings: ->
       @$('#no_results_outcomes').prop('checked', @._getFilterSetting('outcomes_no_results'))
-      if !@inactive_concluded_lmgb_filters
-        @$('#no_results_students').prop('checked', @._getFilterSetting('students_no_results'))
 
     # Public: Render the view once all needed data is loaded.
     #
@@ -344,12 +338,9 @@ export default class OutcomeGradebookView extends View
 
     _getOutcomeFilters: ->
       outcome_filters = []
-      if @inactive_concluded_lmgb_filters
-        if !@._getFilterSetting('inactive_enrollments') then outcome_filters.push('inactive_enrollments')
-        if !@._getFilterSetting('concluded_enrollments') then outcome_filters.push('concluded_enrollments')
-        if !@._getFilterSetting('students_no_results') then outcome_filters.push('missing_user_rollups')
-      else
-        if @._getFilterSetting('students_no_results') then outcome_filters.push('missing_user_rollups')
+      if !@._getFilterSetting('inactive_enrollments') then outcome_filters.push('inactive_enrollments')
+      if !@._getFilterSetting('concluded_enrollments') then outcome_filters.push('concluded_enrollments')
+      if !@._getFilterSetting('students_no_results') then outcome_filters.push('missing_user_rollups')
 
       return outcome_filters
 

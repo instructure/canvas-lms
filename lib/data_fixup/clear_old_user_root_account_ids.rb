@@ -24,8 +24,8 @@ module DataFixup
     def self.run
       User.find_ids_in_ranges(batch_size: 1000) do |start_id, end_id|
         User.where(id: start_id..end_id).
-          where.not(root_account_ids: nil).
-          update_all(root_account_ids: nil)
+          where.not(root_account_ids: []).
+          update_all(root_account_ids: [])
       end
     end
   end

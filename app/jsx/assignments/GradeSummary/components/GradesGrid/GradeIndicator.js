@@ -18,9 +18,9 @@
 
 import React, {Component} from 'react'
 import {bool, number, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!assignment_grade_summary'
 
 export default class GradeIndicator extends Component {

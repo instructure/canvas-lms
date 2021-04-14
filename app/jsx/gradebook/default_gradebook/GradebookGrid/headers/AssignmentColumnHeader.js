@@ -18,11 +18,11 @@
 
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
-import {Grid} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
 import I18n from 'i18n!gradebook'
 

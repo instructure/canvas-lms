@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/googleDocsTreeView",
   "i18nScope": "google_docs_tree_view"
 }

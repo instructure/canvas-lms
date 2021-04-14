@@ -23,7 +23,8 @@ import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
-import {Text, TruncateText} from '@instructure/ui-elements'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Text} from '@instructure/ui-text'
 
 export default function AssignmentDetails({assignment, isSticky}) {
   return (

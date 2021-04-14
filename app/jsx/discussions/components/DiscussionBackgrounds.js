@@ -20,9 +20,9 @@ import I18n from 'i18n!discussions_v2'
 import React from 'react'
 import {string} from 'prop-types'
 
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 import propTypes from '../propTypes'
 

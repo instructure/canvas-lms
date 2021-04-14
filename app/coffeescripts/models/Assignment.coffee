@@ -474,6 +474,12 @@ export default class Assignment extends Model
   submissionTypeSelectionTools: =>
     return ENV.SUBMISSION_TYPE_SELECTION_TOOLS || []
 
+  newQuizzesAssignmentBuildButtonEnabled: =>
+    return ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
+
+  showBuildButton: =>
+    @isQuizLTIAssignment() && @newQuizzesAssignmentBuildButtonEnabled()
+
   defaultDates: =>
     group = new DateGroup
       due_at:    @get("due_at")
@@ -580,12 +586,12 @@ export default class Assignment extends Model
       'isNonPlacementExternalTool', 'isNotGraded', 'isOnlineSubmission',
       'isOnlyVisibleToOverrides', 'isQuizLTIAssignment', 'isSimple',
       'is_quiz_assignment', 'labelId', 'lockAt', 'moderatedGrading',
-      'multipleDueDates', 'name', 'nonBaseDates', 'notifyOfUpdate',
-      'objectTypeDisplayName', 'omitFromFinalGrade', 'originalAssignmentName',
-      'peerReviewCount', 'peerReviews', 'peerReviewsAssignAt', 'pointsPossible',
-      'position', 'postToSIS', 'postToSISEnabled', 'published',
+      'multipleDueDates', 'name', 'newQuizzesAssignmentBuildButtonEnabled',
+      'nonBaseDates', 'notifyOfUpdate', 'objectTypeDisplayName', 'omitFromFinalGrade',
+      'originalAssignmentName', 'peerReviewCount', 'peerReviews', 'peerReviewsAssignAt',
+      'pointsPossible', 'position', 'postToSIS', 'postToSISEnabled', 'published',
       'restrictFileExtensions', 'secureParams', 'selectedSubmissionTypeToolId',
-      'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
+      'showBuildButton', 'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
       'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen',
       'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
       'vericiteEnabled'

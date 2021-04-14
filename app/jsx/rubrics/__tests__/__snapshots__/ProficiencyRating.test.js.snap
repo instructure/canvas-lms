@@ -96,41 +96,39 @@ exports[`renders the ProficiencyRating component 1`] = `
       }
     >
       <Popover
-        alignArrow={false}
+        color="primary"
         constrain="window"
         contentRef={[Function]}
-        defaultFocusElement={null}
-        defaultShow={false}
+        defaultIsShowingContent={false}
         insertAt="bottom"
-        label={null}
-        liveRegion={null}
-        mountNode={null}
         offsetX={0}
         offsetY={0}
         on="click"
         onBlur={[Function]}
         onClick={[Function]}
-        onDismiss={[Function]}
         onFocus={[Function]}
+        onHideContent={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
         onMouseOut={[Function]}
         onMouseOver={[Function]}
         onPositionChanged={[Function]}
         onPositioned={[Function]}
-        onShow={[Function]}
+        onShowContent={[Function]}
         onToggle={[Function]}
         placement="bottom center"
-        positionTarget={null}
+        renderTrigger={null}
         shadow="resting"
+        shouldAlignArrow={false}
         shouldCloseOnDocumentClick={true}
         shouldCloseOnEscape={true}
         shouldContainFocus={false}
         shouldFocusContentOnTriggerBlur={false}
         shouldRenderOffscreen={false}
         shouldReturnFocus={true}
+        shouldTrackPosition={true}
         show={false}
         stacking="topmost"
-        trackPosition={true}
-        variant="default"
         withArrow={true}
       >
         <PopoverTrigger>

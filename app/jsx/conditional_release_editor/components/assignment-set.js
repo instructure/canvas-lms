@@ -23,7 +23,7 @@ import {DropTarget} from 'react-dnd'
 
 import Assignment from './assignment-card'
 import ConditionToggle from './condition-toggle'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const {object, func, string, bool} = PropTypes
 

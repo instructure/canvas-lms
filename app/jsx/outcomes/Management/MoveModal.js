@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!MoveOutcomesModal'
 import {Text} from '@instructure/ui-text'
@@ -25,14 +25,37 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import Modal from '../../shared/components/InstuiModal'
 import TreeBrowser from './TreeBrowser'
-import {useGroupMoveModal} from 'jsx/outcomes/shared/treeBrowser'
+import {useGroupMoveModal} from '../shared/treeBrowser'
 import useCanvasContext from '../shared/hooks/useCanvasContext'
 
-const noop = () => {}
-
-const MoveModal = ({title, type, isOpen, onCloseHandler}) => {
-  const {error, isLoading, collections, queryCollections, rootId} = useGroupMoveModal()
+const MoveModal = ({
+  title,
+  groupId,
+  parentGroupId,
+  type,
+  isOpen,
+  onMoveHandler,
+  onCloseHandler
+}) => {
+  const {error, isLoading, collections, queryCollections, rootId} = useGroupMoveModal(groupId)
   const {contextType} = useCanvasContext()
+  const [targetGroup, setTargetGroup] = useState(null)
+
+  const onCollectionClick = (_, selectedGroupTreeCollectionObject) => {
+    const selectedGroupObject = collections[selectedGroupTreeCollectionObject.id]
+    if (
+      groupId === selectedGroupObject.id ||
+      selectedGroupObject.id.toString() === parentGroupId.toString()
+    ) {
+      setTargetGroup(null)
+    } else {
+      setTargetGroup(selectedGroupObject)
+    }
+  }
+
+  const handleMove = () => {
+    onMoveHandler(targetGroup)
+  }
 
   return (
     <Modal
@@ -63,7 +86,9 @@ const MoveModal = ({title, type, isOpen, onCloseHandler}) => {
               </Text>
             ) : (
               <TreeBrowser
+                selectionType="single"
                 onCollectionToggle={queryCollections}
+                onCollectionClick={onCollectionClick}
                 collections={collections}
                 rootId={rootId}
               />
@@ -75,7 +100,13 @@ const MoveModal = ({title, type, isOpen, onCloseHandler}) => {
         <Button type="button" color="secondary" margin="0 x-small 0 0" onClick={onCloseHandler}>
           {I18n.t('Cancel')}
         </Button>
-        <Button type="button" color="primary" margin="0 x-small 0 0" onClick={noop}>
+        <Button
+          type="button"
+          color="primary"
+          margin="0 x-small 0 0"
+          disabled={!targetGroup}
+          onClick={handleMove}
+        >
           {I18n.t('Move')}
         </Button>
       </Modal.Footer>
@@ -85,8 +116,11 @@ const MoveModal = ({title, type, isOpen, onCloseHandler}) => {
 
 MoveModal.propTypes = {
   title: PropTypes.string.isRequired,
+  groupId: PropTypes.string.isRequired,
+  parentGroupId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   type: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
+  onMoveHandler: PropTypes.func.isRequired,
   onCloseHandler: PropTypes.func.isRequired
 }
 

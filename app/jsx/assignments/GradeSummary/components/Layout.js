@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!assignment_grade_summary'
 
 import '../../../context_cards/StudentContextCardTrigger'

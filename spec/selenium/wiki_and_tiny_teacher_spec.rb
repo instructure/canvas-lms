@@ -29,51 +29,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       course_with_teacher_logged_in
     end
 
-    it "should add a quiz to the rce" do
-      #create test quiz
-      @context = @course
-      quiz = quiz_model
-      quiz.generate_quiz_data
-      quiz.save!
-
-      get "/courses/#{@course.id}/pages/front-page/edit"
-      # add quiz to rce
-      fj('#editor_tabs button[aria-expanded="false"]:contains("Quizzes")').click
-      wait_for_ajaximations
-      skip('figure out why when you expand any of the accordions in the rcs sidbar, it doesnt show anything CORE-2714')
-      fj("#editor_tabs a:contains('#{quiz.title}')'").click
-      in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce')).to include_text(quiz.title)
-      end
-
-      f('form.edit-form button.submit').click
-      wait_for_ajax_requests
-
-      expect(f('#wiki_page_show').find_element(:link, quiz.title)).to be_displayed
-    end
-
-    it "should add an assignment to the rce" do
-      assignment_name = 'first assignment'
-      @assignment = @course.assignments.create(:name => assignment_name)
-      get "/courses/#{@course.id}/pages/front-page/edit"
-      wait_for_ajaximations
-      clear_wiki_rce
-      #check assignment accordion
-
-      fj('#editor_tabs button[aria-expanded="false"]:contains("Assignments")').click
-      wait_for_ajaximations
-      skip('figure out why when you expand any of the accordions in the rcs sidbar, it doesnt show anything CORE-2714')
-      fj("#editor_tabs a:contains('#{assignment_name}')'").click
-      wait_for_ajaximations
-      in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce')).to include_text(assignment_name)
-      end
-
-      f('form.edit-form button.submit').click
-      wait_for_ajax_requests
-      expect(f('#wiki_page_show').find_element(:css, "a[title='#{assignment_name}']")).to be_displayed
-    end
-
     ['Only teachers', 'Teachers and students', 'Anyone'].each_with_index do |permission, i|
       it "should validate correct permissions for #{permission}" do
         title = "test_page"

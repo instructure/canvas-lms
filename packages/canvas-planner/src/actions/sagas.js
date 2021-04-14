@@ -21,16 +21,22 @@ import parseLinkHeader from 'parse-link-header'
 import {put, select, call, all, takeEvery} from 'redux-saga/effects'
 import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
 import {transformApiToInternalGrade} from '../utilities/apiUtils'
+import {alert} from '../utilities/alertUtils'
+import formatMessage from '../format-message'
 
 import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from './loading-actions'
+import {addOpportunities, allOpportunitiesLoaded} from './index'
 
 import {
   mergeFutureItems,
   mergePastItems,
   mergePastItemsForNewActivity,
   mergePastItemsForToday,
+  mergeWeekItems,
   consumePeekIntoPast
 } from './saga-actions'
+
+const MAX_PAGE_SIZE = 100
 
 export default function* allSagas() {
   yield all([call(watchForSagas)])
@@ -43,6 +49,8 @@ function* watchForSagas() {
   yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga)
   yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga)
   yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga)
+  yield takeEvery('START_LOADING_WEEK_SAGA', loadWeekSaga)
+  yield takeEvery('START_LOADING_ALL_OPPORTUNITIES', loadAllOpportunitiesSaga)
 }
 
 // fromMomentFunction: function
@@ -84,19 +92,19 @@ function* loadingLoop(fromMomentFunction, actionCreator, opts) {
 }
 
 export function* loadPastSaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItems, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItems, {mode: 'past'})
 }
 
 export function* loadFutureSaga() {
-  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {intoThePast: false})
+  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {mode: 'future'})
 }
 
 export function* loadPastUntilNewActivitySaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {mode: 'past'})
 }
 
 export function* peekIntoPastSaga() {
-  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {intoThePast: true, perPage: 1})
+  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {mode: 'past', perPage: 1})
 }
 
 export function* loadGradesSaga() {
@@ -128,8 +136,38 @@ export function* loadGradesSaga() {
   }
 }
 
+export function* loadAllOpportunitiesSaga() {
+  try {
+    let loadingUrl = '/api/v1/users/self/missing_submissions'
+    const items = []
+    while (loadingUrl != null) {
+      const response = yield call(axios.get, loadingUrl, {
+        params: {include: ['planner_overrides'], filter: ['submittable'], per_page: MAX_PAGE_SIZE}
+      })
+      items.push(...response.data)
+
+      const links = parseLinkHeader(response.headers.link)
+      loadingUrl = links?.next ? links.next.url : null
+    }
+    yield put(addOpportunities({items, nextUrl: null}))
+    yield put(allOpportunitiesLoaded())
+  } catch (err) {
+    alert(formatMessage('Failed to load opportunities'), true)
+  }
+}
+
 export function* loadPastUntilTodaySaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {mode: 'past'})
+}
+
+export function* loadWeekSaga({payload}) {
+  yield* loadingLoop(() => payload.weekStart, mergeWeekItems, {
+    mode: 'week',
+    extraParams: {
+      end_date: payload.weekEnd.format(),
+      per_page: MAX_PAGE_SIZE
+    }
+  })
 }
 
 function fromMomentPast(state) {

@@ -23,10 +23,11 @@ import {DropTarget} from 'react-dnd'
 import {string, func, bool} from 'prop-types'
 import I18n from 'i18n!discussions_v2'
 import moment from 'moment'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {Text, Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import update from 'immutability-helper'
 

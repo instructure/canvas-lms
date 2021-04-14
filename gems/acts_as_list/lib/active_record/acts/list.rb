@@ -127,7 +127,7 @@ module ActiveRecord
             RUBY
           end
 
-          class_eval <<-RUBY
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
             include ActiveRecord::Acts::List::InstanceMethods
 
             def self.position_column
@@ -137,12 +137,14 @@ module ActiveRecord
             #{scope_condition_method}
 
             def list_scope
-              list_scope_base.order(self.class.nulls(:last, self.class.position_column), self.class.primary_key)
+              list_scope_base.order(self.class.position_column.to_sym, self.class.primary_key.to_sym)
             end
 
             before_destroy :remove_from_list_for_destroy
             before_create  :add_to_list_bottom
           RUBY
+
+          scope(:ordered, -> { order(position_column.to_sym, primary_key.to_sym) })
 
           if position_column != 'position'
             define_method(:position) { read_attribute(self.class.position_column.to_sym) }

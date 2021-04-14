@@ -1043,7 +1043,7 @@ class Assignment < ActiveRecord::Base
     tags = all_context_module_tags
     return unless tags.any?
 
-    modules = ContextModule.where(:id => tags.map(&:context_module_id)).order(:position).to_a.select do |mod|
+    modules = ContextModule.where(:id => tags.map(&:context_module_id)).ordered.to_a.select do |mod|
       mod.completion_requirements && mod.completion_requirements.any?{|req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id])}
     end
     return unless modules.any?
@@ -2143,13 +2143,24 @@ class Assignment < ActiveRecord::Base
                                     %w[comment group_comment attachments require_submission_type_is_valid resource_link_lookup_uuid]).to_set
 
   def submit_homework(original_student, opts={})
+    raise "Student Required" unless original_student
+
     eula_timestamp = opts[:eula_agreement_timestamp]
+
+    if opts[:submission_type] == "annotated_document"
+      raise "Invalid Attachment" if opts[:annotated_document_id].blank?
+      raise "Invalid submission type" unless self.annotated_document?
+      # Prevent the case where a user clicks Submit on a stale tab, expecting
+      # to submit one set of work, only for another set to be submitted
+      # instead.
+      raise "Invalid Attachment" if opts[:annotated_document_id].to_i != self.annotatable_attachment_id
+    end
+
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
     opts.keys.each { |k|
       opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
     }
-    raise "Student Required" unless original_student
 
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
@@ -2189,6 +2200,11 @@ class Assignment < ActiveRecord::Base
         homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
+
+        if self.annotated_document?
+          annotation_context = homework.annotation_context(draft: true)
+        end
+
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             Submission.suspend_callbacks(:delete_submission_drafts!) do
@@ -2200,6 +2216,7 @@ class Assignment < ActiveRecord::Base
             end
           else
             homework.save!
+            annotation_context.update!(submission_attempt: homework.attempt) if annotation_context.present?
           end
         end
         homeworks << homework
@@ -2878,6 +2895,10 @@ class Assignment < ActiveRecord::Base
     res.to_sentence(:or)
   end
 
+  def annotated_document?
+    submission_types.match?(/annotated_document/)
+  end
+
   def readable_submission_type(submission_type)
     case submission_type
     when 'online_quiz'
@@ -2888,6 +2909,8 @@ class Assignment < ActiveRecord::Base
       t 'submission_types.a_text_entry_box', "a text entry box"
     when 'online_url'
       t 'submission_types.a_website_url', "a website url"
+    when 'annotated_document'
+      t 'annotated_document', "an annotated document"
     when 'discussion_topic'
       t 'submission_types.a_discussion_post', "a discussion post"
     when 'wiki_page'

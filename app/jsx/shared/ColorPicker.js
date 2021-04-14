@@ -23,14 +23,14 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
 import {Button} from '@instructure/ui-buttons'
-import {TextInput} from '@instructure/ui-forms'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-text-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!calendar_color_picker'
 import CourseNicknameEdit from './CourseNicknameEdit'
 import classnames from 'classnames'
 import {isRTL} from './helpers/rtlHelper'
 import 'compiled/jquery.rails_flash_notifications'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
 
 export const PREDEFINED_COLORS = [
@@ -203,7 +203,7 @@ const ColorPicker = createReactClass({
       // somewhat loosely, by seeing if a TouchEven exists.  The result isn't
       // great, but it's better than before.
       // A more permenant fix is in the works, pending a fix to INSTUI Popover.
-      hideOnScroll: (function() {
+      hideOnScroll: (function () {
         try {
           document.createEvent('TouchEvent')
           return false

@@ -91,7 +91,12 @@ export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId =
   }
 ]
 
-export const groupMocks = ({groupId, childGroupsCount = 1, outcomesCount = 2} = {}) => [
+export const groupMocks = ({
+  groupId,
+  childGroupsCount = 1,
+  outcomesCount = 2,
+  childGroupOffset = 300
+} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -112,7 +117,7 @@ export const groupMocks = ({groupId, childGroupsCount = 1, outcomesCount = 2} = 
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
               description: `Group ${groupId} folder description ${i}`,
-              _id: 300 + i,
+              _id: childGroupOffset + i,
               outcomesCount: 2,
               childGroupsCount: 5,
               title: `Group ${groupId} folder ${i}`
@@ -209,12 +214,14 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
               {
                 _id: '1',
                 description: '',
+                displayName: '',
                 title: `Outcome 1 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               },
               {
                 _id: '2',
                 description: '',
+                displayName: '',
                 title: `Outcome 2 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -251,6 +258,7 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
               {
                 _id: '3',
                 description: '',
+                displayName: '',
                 title: `Outcome 3 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -262,4 +270,14 @@ export const groupDetailMocks = ({groupId = '1'} = {}) => [
       }
     }
   }
+]
+
+export const smallOutcomeTree = () => [
+  ...accountMocks({childGroupsCount: 2}),
+  ...groupMocks({groupId: 100, childGroupOffset: 400}),
+  ...groupMocks({groupId: 101, childGroupsCount: 0}),
+  ...groupMocks({groupId: 400, childGroupsCount: 0}),
+  ...groupDetailMocks({groupId: 100}),
+  ...groupDetailMocks({groupId: 101}),
+  ...groupDetailMocks({groupId: 400})
 ]

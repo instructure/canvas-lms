@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -322,6 +324,11 @@ require 'securerandom'
 #           "description": "optional: Sets of restrictions differentiated by object type applied to locked course objects",
 #           "example": {"assignment": {"content": true, "points": true}, "wiki_page": {"content": true}},
 #           "type": "object"
+#         },
+#         "template": {
+#           "description": "optional: whether the course is set as a template (requires the Course Templates feature)",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -342,6 +349,7 @@ require 'securerandom'
 class CoursesController < ApplicationController
   include SearchHelper
   include ContextExternalToolsHelper
+  include CustomColorHelper
   include CustomSidebarLinksHelper
   include SyllabusHelper
   include WebZipExportHelper
@@ -1151,7 +1159,6 @@ class CoursesController < ApplicationController
   # @returns [User]
   def content_share_users
     get_context
-    return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
@@ -1316,14 +1323,17 @@ class CoursesController < ApplicationController
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-      @context.destroy
-      Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
-      flash[:notice] = t('notices.deleted', "Course successfully deleted")
+      if (success = @context.destroy)
+        Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
+        flash[:notice] = t('notices.deleted', "Course successfully deleted")
+      else
+        flash[:notice] = t("Course cannot be deleted")
+      end
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
 
       @context.complete
-      if @context.save
+      if (success = @context.save)
         Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
@@ -1334,7 +1344,7 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to dashboard_url }
       format.json {
-        render :json => { params[:event] => true }
+        render :json => { params[:event] => success }, status: success ? 200 : 400
       }
     end
   end
@@ -1407,6 +1417,7 @@ class CoursesController < ApplicationController
 
       course_card_images_enabled = @context.feature_enabled?(:course_card_images)
       js_permissions = {
+        :manage_courses => @context.account.grants_right?(@current_user, session, :manage_courses),
         :manage_students => @context.grants_right?(@current_user, session, :manage_students),
         :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
         :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
@@ -1435,14 +1446,20 @@ class CoursesController < ApplicationController
         TOOL_CONFIGURATION_SHOW_URL: course_show_tool_configuration_url(course_id: @context.id, developer_key_id: ':developer_key_id'),
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
+        COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
         PUBLISHING_ENABLED: @publishing_enabled,
+        COURSE_COLORS_ENABLED: @context.elementary_enabled?,
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
         NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
         NEW_COURSE_AVAILABILITY_UI: @context.root_account.feature_enabled?(:new_course_availability_ui),
+        STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect{|term| term[:enrollment_type]=="StudentEnrollment"}&.slice(:start_at,:end_at),
+        DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at,:end_at),
+        COURSE_DATES: {:start_at => @context.start_at,:end_at => @context.conclude_at},
         RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
-        RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked]
+        RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked],
+        PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers]
       })
 
       set_tutorial_js_env
@@ -1583,7 +1600,8 @@ class CoursesController < ApplicationController
       :show_announcements_on_home_page,
       :syllabus_course_summary,
       :home_page_announcement_limit,
-      :homeroom_course
+      :homeroom_course,
+      :course_color
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY).
@@ -1934,6 +1952,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::ContextModule
   include ContextModulesController::ModuleIndexHelper
+  include AnnouncementsController::AnnouncementsIndexHelper
 
   # @API Get a single course
   # Return information on a single course.
@@ -2025,13 +2044,19 @@ class CoursesController < ApplicationController
 
       @context_enrollment ||= @pending_enrollment
       if @context.grants_right?(@current_user, session, :read)
+        # Temporarily disabled in production (see https://instructure.atlassian.net/browse/LS-2118)
+        @k5_mode = @context.elementary_subject_course? && !Rails.env.production?
+        @show_left_side = !@k5_mode
+
         check_for_readonly_enrollment_state
 
         log_asset_access(["home", @context], "home", "other", nil, @context_enrollment.class.to_s, context: @context)
 
         check_incomplete_registration
 
-        add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
+        unless @k5_mode
+          add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
+        end
         GuardRail.activate(:primary) do
           set_badge_counts_for(@context, @current_user, @current_enrollment)
         end
@@ -2041,10 +2066,15 @@ class CoursesController < ApplicationController
         default_view = @context.default_view || @context.default_home_page
         @course_home_view = "feed" if params[:view] == "feed"
         @course_home_view ||= default_view
+        @course_home_view = "k5_dashboard" if @k5_mode
+        @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
         js_env({
+                 K5_MODE: @k5_mode,
                  COURSE: {
                    id: @context.id.to_s,
+                   name: @context.name,
+                   image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
@@ -2099,6 +2129,12 @@ class CoursesController < ApplicationController
             AssignmentGroup.best_unicode_collation_key('name')
           ).to_a
           @syllabus_body = syllabus_user_content
+        when 'k5_dashboard'
+          # don't do any of this stuff for now
+        when 'announcements'
+          add_crumb(t('Announcements'))
+          set_active_tab 'announcements'
+          load_announcements
         else
           set_active_tab "home"
           if @context.grants_right?(@current_user, session, :manage_groups)
@@ -2139,6 +2175,14 @@ class CoursesController < ApplicationController
         when 'syllabus'
           js_bundle :syllabus
           css_bundle :syllabus, :tinymce
+        when 'k5_dashboard'
+          js_env(STUDENT_PLANNER_ENABLED: planner_enabled?)
+
+          js_bundle :k5_course
+          css_bundle :k5_dashboard
+        when 'announcements'
+          js_bundle :announcements_index_v2
+          css_bundle :announcements_index
         else
           js_bundle :dashboard
         end
@@ -2611,7 +2655,14 @@ class CoursesController < ApplicationController
   #
   # @argument course[homeroom_course] [Boolean]
   #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
-  #   is enabled in the course's account.
+  #   is enabled and the course is associated with a K-5-enabled account.
+  #
+  # @argument course[template] [Boolean]
+  #   Enable or disable the course as a template that can be selected by an account
+  #
+  # @argument course[course_color] [String]
+  #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the
+  #   Canvas for Elementary feature is enabled and the course is associated with a K-5-enabled account.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2659,6 +2710,13 @@ class CoursesController < ApplicationController
       end
       unless @course.grants_right?(@current_user, :manage_course_visibility)
         params_for_update.delete(:indexed)
+      end
+      if params_for_update.key?(:template)
+        template = value_to_boolean(params_for_update.delete(:template))
+        if template && @course.grants_right?(@current_user, session, :add_course_template) ||
+          !template && @course.grants_right?(@current_user, session, :delete_course_template)
+          @course.template = template
+        end
       end
 
       account_id = params[:course].delete :account_id
@@ -2760,6 +2818,15 @@ class CoursesController < ApplicationController
         unless process_course_event
           render_update_failure
           return
+        end
+      end
+
+      if params[:course][:course_color]
+        if valid_hexcode?(params[:course][:course_color])
+          @course.course_color = normalize_hexcode(params[:course][:course_color])
+          params_for_update.delete :course_color
+        else
+          @course.errors.add(:course_color, t("Invalid hexcode provided"))
         end
       end
 
@@ -3468,7 +3535,9 @@ class CoursesController < ApplicationController
 
   def course_params
     return {} unless params[:course]
-    params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
+
+    params[:course].permit(
+      :name, :group_weighting_scheme, :start_at, :conclude_at,
       :grading_standard_id, :grade_passback_setting, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :syllabus_course_summary, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
@@ -3477,7 +3546,8 @@ class CoursesController < ApplicationController
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
-      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course
+      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
+      :template, :course_color
     )
   end
 end

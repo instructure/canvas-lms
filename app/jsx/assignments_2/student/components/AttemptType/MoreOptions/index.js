@@ -28,7 +28,7 @@ import UserGroupsQuery from './UserGroupsQuery'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 
 class MoreOptions extends React.Component {
   state = {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1

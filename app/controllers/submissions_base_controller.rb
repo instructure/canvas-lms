@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -199,11 +201,6 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def redo_submission
-    unless @domain_root_account.feature_enabled?(:reassign_assignments)
-      head :not_implemented
-      return
-    end
-
     if @assignment.can_reassign?(@current_user) &&
         @submission.cached_due_date
       @submission.update!(redo_request: true)

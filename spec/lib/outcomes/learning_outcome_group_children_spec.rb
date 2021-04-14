@@ -47,7 +47,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:o8) { outcome_model(context: context, outcome_group: g5, title:'Outcome 6', short_description: 'Outcome 6') }
   let!(:o9) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.1', short_description: 'Outcome 7.1') }
   let!(:o10) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.2', short_description: 'Outcome 7.2') }
-  let!(:o11) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.3', short_description: 'Outcome 7.3') }
+  let!(:o11) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.3 mathematic', short_description: 'Outcome 7.3 mathematic') }
   # rubocop:enable RSpec/LetSetup
 
   # Outcome Structure for visual reference
@@ -144,6 +144,16 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
     end
 
+    it 'returns the total with search_query' do
+      expect(subject.total_outcomes(g0.id, search_query: 'mathematic')).to eq 1
+      expect(subject.total_outcomes(g1.id, search_query: 'mathematic')).to eq 1
+      expect(subject.total_outcomes(g2.id, search_query: 'mathematic')).to eq 0
+      expect(subject.total_outcomes(g3.id, search_query: 'mathematic')).to eq 1
+      expect(subject.total_outcomes(g4.id, search_query: 'mathematic')).to eq 0
+      expect(subject.total_outcomes(g5.id, search_query: 'mathematic')).to eq 0
+      expect(subject.total_outcomes(g6.id, search_query: 'mathematic')).to eq 1
+    end
+
     context 'when outcome is deleted' do
       before { o4.destroy }
 
@@ -176,7 +186,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
         [
           'Outcome 1', 'Outcome 2.1', 'Outcome 2.2', 'Outcome 3', 'Outcome 4.1',
           'Outcome 4.2', 'Outcome 4.3', 'Outcome 5', 'Outcome 6', 'Outcome 7.1',
-          'Outcome 7.2', 'Outcome 7.3'
+          'Outcome 7.2', 'Outcome 7.3 mathematic'
         ]
       )
     end
@@ -190,7 +200,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
           [
             'Outcome 3', 'Outcome 1', 'Outcome 2.1', 'Outcome 2.2', 'Outcome 4.1',
             'Outcome 4.2', 'Outcome 4.3', 'Outcome 5', 'Outcome 6', 'Outcome 7.1',
-            'Outcome 7.2', 'Outcome 7.3'
+            'Outcome 7.2', 'Outcome 7.3 mathematic'
           ]
         )
       end
@@ -206,7 +216,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
         expect(outcomes).to match_array(
           [
             'Outcome 2.1', 'Outcome 2.2', 'A Outcome 4.2', 'Outcome 4.1', 'Outcome 4.3',
-            'Outcome 5', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3'
+            'Outcome 5', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3 mathematic'
           ]
         )
       end
@@ -223,7 +233,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
         expect(outcomes).to match_array(
           [
             'Outcome 5', 'Outcome 2.1', 'Outcome 2.2', 'A Outcome 4.3', 'Outcome 4.1',
-            'Outcome 4.2', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3'
+            'Outcome 4.2', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3 mathematic'
           ]
         )
       end
@@ -235,6 +245,88 @@ describe Outcomes::LearningOutcomeGroupChildren do
       it 'returns global outcomes' do
         outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
+      end
+    end
+
+    context "search" do
+      before do
+        outcome_model(
+          context: context,
+          outcome_group: g1,
+          title: "LA.1.1.1.1",
+          description: 'Talk about personal experiences and familiar events.'
+        )
+        outcome_model(
+          context: context,
+          outcome_group: g1,
+          title: "LA.1.1.1",
+          description: 'continue to apply phonic knowledge and skills as the route to decode words until '\
+                       'automatic decoding has become embedded and reading is fluent'
+        )
+        outcome_model(
+          context: context,
+          outcome_group: g1,
+          title: "LA.2.2.1.2",
+          description: 'Explain anticipated meaning, recognize relationships, and draw conclusions; self-correct'\
+                       ' understanding using a variety of strategies [including rereading for story sense].'
+        )
+        outcome_model(
+          context: context,
+          outcome_group: g1,
+          title: "FO.3",
+          description: 'apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology)'\
+                       ' as listed in English Appendix 1, both to read aloud and to understand the meaning of new words they meet'
+        )
+        outcome_model(
+          context: context,
+          outcome_group: g1,
+          title: "HT.ML.1.1",
+          description: '<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>'
+        )
+        outcome_model(
+          context: context,
+          outcome_group: g1,
+          title: "HT.ML.1.2",
+          description: '<p>This is <b>awesome</b>.</p>'
+        )
+      end
+
+      it "filters title with non-alphanumerical chars" do
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1"}).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to eql([
+          "LA.1.1.1", "LA.1.1.1.1"
+        ])
+      end
+
+      it "filters description with text content" do
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "knowledge"}).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to eql([
+          'LA.1.1.1', 'FO.3'
+        ])
+      end
+
+      it "filters description with html content" do
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "Pellentesque"}).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to eql([
+          'HT.ML.1.1'
+        ])
+      end
+
+      it "filters more than 1 word" do
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "LA.1.1 Pellentesque"}).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to eql([
+          "LA.1.1.1",
+          "LA.1.1.1.1",
+          "HT.ML.1.1"
+        ])
+      end
+
+      it "filters when words aren't all completed" do
+        outcomes = subject.suboutcomes_by_group_id(g1.id, {search_query: "recog awe"}).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to eql([
+          "HT.ML.1.2",
+          "LA.2.2.1.2"
+        ])
       end
     end
   end

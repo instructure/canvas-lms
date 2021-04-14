@@ -44,8 +44,8 @@ describe 'as a student' do
         StudentAssignmentPageV2.visit(@course, @assignment)
       end
 
-      it 'should show available checkmark stepper' do
-        expect(StudentAssignmentPageV2.checkmark_icon).to be_displayed
+      it 'should show submission workflow tracker' do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to be_displayed
       end
 
       it 'should show assignment title' do
@@ -86,9 +86,10 @@ describe 'as a student' do
       before(:each) do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
       end
 
-      it 'should be able to be submitted' do
+      it 'should be able to be submitted', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.submit_assignment

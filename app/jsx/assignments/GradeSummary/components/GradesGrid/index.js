@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {speedGraderUrl} from '../../assignment/AssignmentApi'

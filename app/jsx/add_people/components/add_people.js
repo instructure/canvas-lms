@@ -19,11 +19,11 @@
 import I18n from 'i18n!add_people'
 import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {CloseButton, Button} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   courseParamsShape,
   apiStateShape,

@@ -23,10 +23,16 @@ import {View} from '@instructure/ui-view'
 import StaffInfo, {StaffShape} from 'jsx/dashboard/pages/StaffInfo'
 import {Heading} from '@instructure/ui-heading'
 import {PresentationContent} from '@instructure/ui-a11y-content'
+import {Spinner} from '@instructure/ui-spinner'
 
-export default function StaffContactInfoLayout({staff}) {
+export default function StaffContactInfoLayout({isLoading, staff}) {
   return (
     <View>
+      {isLoading && (
+        <View as="div" textAlign="center" margin="large 0">
+          <Spinner renderTitle={I18n.t('Loading staff...')} size="large" />
+        </View>
+      )}
       {staff.length > 0 && (
         <View>
           <Heading level="h3" as="h2" margin="medium 0 0">
@@ -45,5 +51,6 @@ export default function StaffContactInfoLayout({staff}) {
 }
 
 StaffContactInfoLayout.propTypes = {
+  isLoading: PropTypes.bool,
   staff: PropTypes.arrayOf(PropTypes.shape(StaffShape)).isRequired
 }

@@ -22,6 +22,12 @@ module Outcomes
   class LearningOutcomeGroupChildren
     attr_reader :context
 
+    SHORT_DESCRIPTION = "coalesce(learning_outcomes.short_description, '')"
+
+    # E'<[^>]+>' -> removes html tags
+    # E'&\\w+;'  -> removes html entities
+    DESCRIPTION = "regexp_replace(regexp_replace(coalesce(learning_outcomes.description, ''), E'<[^>]+>', '', 'gi'), E'&\\w+;', ' ', 'gi')"
+
     def initialize(context = nil)
       @context = context
     end
@@ -32,32 +38,38 @@ module Outcomes
       children_ids(learning_outcome_group_id).length
     end
 
-    def total_outcomes(learning_outcome_group_id)
+    def total_outcomes(learning_outcome_group_id, args={})
       return 0 unless improved_outcomes_management?
 
-      cache_key = total_outcomes_cache_key(learning_outcome_group_id)
-      Rails.cache.fetch(cache_key) do
-        learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
-        ContentTag.active.learning_outcome_links.
-          where(associated_asset_id: learning_outcome_groups_ids).
-          joins(:learning_outcome_content).
-          select(:content_id).
-          distinct.
-          count
+      if args == {}
+        cache_key = total_outcomes_cache_key(learning_outcome_group_id)
+        Rails.cache.fetch(cache_key) do
+          total_outcomes_for(learning_outcome_group_id, args)
+        end
+      else
+        total_outcomes_for(learning_outcome_group_id, args)
       end
     end
 
-    def suboutcomes_by_group_id(learning_outcome_group_id)
-      return unless improved_outcomes_management?
+    def suboutcomes_by_group_id(learning_outcome_group_id, args={})
+      return ContentTag.none unless improved_outcomes_management?
 
       learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
-      ContentTag.active.learning_outcome_links.
+      relation = ContentTag.active.learning_outcome_links.
         where(associated_asset_id: learning_outcome_groups_ids).
         joins(:learning_outcome_content).
         joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
-              ON logs.id = content_tags.associated_asset_id").
-        order(LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
-              LearningOutcome.best_unicode_collation_key('short_description'))
+              ON logs.id = content_tags.associated_asset_id")
+
+      if args[:search_query]
+        relation = add_search_query(relation, args[:search_query])
+        add_search_order(relation, args[:search_query])
+      else
+        relation.order(
+          LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
+          LearningOutcome.best_unicode_collation_key('short_description')
+        )
+      end
     end
 
     def clear_descendants_cache
@@ -72,6 +84,42 @@ module Outcomes
     end
 
     private
+
+    def total_outcomes_for(learning_outcome_group_id, args={})
+      learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+
+      relation = ContentTag.active.learning_outcome_links.
+        where(associated_asset_id: learning_outcome_groups_ids).
+        joins(:learning_outcome_content)
+
+      if args[:search_query]
+        relation = add_search_query(relation, args[:search_query])
+      end
+
+      relation.select(:content_id).distinct.count
+    end
+
+    def add_search_query(relation, search_query)
+      search_query_tokens = search_query.split(' ')
+
+      short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])", search_query_tokens])
+      description_query = ContentTag.sanitize_sql_array(["#{DESCRIPTION} ~* ANY(array[?])", search_query_tokens])
+
+      relation.where("#{short_description_query} OR #{description_query}")
+    end
+
+    def add_search_order(relation, search_query)
+      select_query = ContentTag.sanitize_sql_array([<<-SQL, search_query, search_query])
+        "content_tags".*,
+        GREATEST(public.word_similarity(#{SHORT_DESCRIPTION}, ?), public.word_similarity(#{DESCRIPTION}, ?)) as sim
+      SQL
+
+      relation.select(select_query).order(
+        "sim DESC",
+        LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
+        LearningOutcome.best_unicode_collation_key('short_description')
+      )
+    end
 
     def children_ids(learning_outcome_group_id)
       parent = data.find { |d| d['parent_id'] == learning_outcome_group_id }

@@ -22,7 +22,7 @@ module Types
   class LearningOutcomeType < ApplicationObjectType
     class AssessedLoader < GraphQL::Batch::Loader
       def perform(outcomes)
-        assessed_ids = LearningOutcomeResult.where(learning_outcome_id: outcomes).distinct.pluck(:learning_outcome_id)
+        assessed_ids = LearningOutcomeResult.active.where(learning_outcome_id: outcomes).distinct.pluck(:learning_outcome_id)
         outcomes.each do |outcome|
           fulfill(outcome, assessed_ids.include?(outcome.id))
         end

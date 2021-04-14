@@ -20,8 +20,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_traySubmissionProgressBars'
 import classnames from 'classnames'
-import {Heading, Progress, Text, Link} from '@instructure/ui-elements'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {Progress} from '@instructure/ui-progress'
+import {Heading} from '@instructure/ui-heading'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 function scoreInPoints(score, pointsPossible) {
   const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})

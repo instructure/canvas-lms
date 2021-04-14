@@ -373,6 +373,36 @@ describe RubricAssessment do
         expect(LearningOutcomeResult.last.hidden).to be true
       end
 
+      it "restores a deleted result" do
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3"
+            }
+          }
+        })
+        result = LearningOutcomeResult.last
+        result.destroy
+
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3"
+            }
+          }
+        })
+        expect(result.reload).to be_active
+      end
+
       it "does not update outcomes on a peer assessment" do
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         expect do

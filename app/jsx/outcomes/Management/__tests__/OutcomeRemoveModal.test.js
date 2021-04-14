@@ -24,6 +24,16 @@ import {removeOutcome} from '../api'
 import * as FlashAlert from '../../../shared/FlashAlert'
 
 jest.mock('../api')
+class CustomError extends Error {
+  constructor(message) {
+    super()
+    this.response = {
+      data: {
+        message
+      }
+    }
+  }
+}
 
 describe('OutcomeRemoveModal', () => {
   let onCloseHandlerMock
@@ -61,19 +71,19 @@ describe('OutcomeRemoveModal', () => {
     expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
   })
 
-  it('calls onCloseHandler on Remove button click', async () => {
+  it('calls onCloseHandler on Remove button click', () => {
     const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Outcome'))
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onCloseHandler on Cancel button click', async () => {
+  it('calls onCloseHandler on Cancel button click', () => {
     const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Cancel'))
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onCloseHandler on Close (X) button click', async () => {
+  it('calls onCloseHandler on Close (X) button click', () => {
     const {getAllByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
     const closeBtn = getAllByText('Close')[getAllByText('Close').length - 1]
     fireEvent.click(closeBtn)
@@ -126,15 +136,18 @@ describe('OutcomeRemoveModal', () => {
     })
   })
 
-  it('displays flash error if delete request fails', async () => {
+  it('displays flash error with proper message if delete request fails due to outcome being aligned to content', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(Promise.reject(new Error('Network error')))
+    removeOutcome.mockReturnValue(
+      Promise.reject(new CustomError('Outcome cannot be deleted because it is aligned to content'))
+    )
     const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Outcome'))
     expect(removeOutcome).toHaveBeenCalledWith('Account', '1', '123', '12')
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while removing the outcome: Network error',
+        message:
+          'An error occurred while removing the outcome: Outcome cannot be removed because it is aligned to content',
         type: 'error'
       })
     })

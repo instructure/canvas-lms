@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!gradebook'
 
 import GradeFormatHelper from '../../shared/helpers/GradeFormatHelper'

@@ -64,9 +64,6 @@ describe "quizzes questions" do
       answers = question.find_elements(:css, ".form_answers > div.answer")
       expect(answers.length).to eq 3
 
-      # check that the wiki sidebar is visible
-      expect(f('#editor_tabs')).to include_text("Link to other content in the course.")
-
       submit_form(question)
       wait_for_ajaximations
       question = f("#question_#{quest1.id}")

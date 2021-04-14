@@ -22,7 +22,7 @@ import Modal from 'react-modal'
 
 import ConnectedAssignmentPicker from './assignment-picker'
 import I18n from 'i18n!conditional_release'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {transformScore} from '../score-helpers'
 
 const {object, bool, func} = PropTypes

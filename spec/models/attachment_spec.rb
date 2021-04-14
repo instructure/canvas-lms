@@ -1408,6 +1408,18 @@ describe Attachment do
         end
         expect(att.root_account_id).to eq Account.default.local_id
       end
+
+      it "links a cross-shard cloned_item correctly" do
+        c0 = course_factory
+        a0 = attachment_model(display_name: 'lolcats.mp4', context: @course, uploaded_data: stub_file_data('lolcats.mp4', '...', 'video/mp4'))
+        @shard1.activate do
+          c1 = course_factory(account: account_model)
+          a1 = a0.clone_for(c1)
+        end
+        a0.reload
+        expect(Shard.shard_for(a0.cloned_item_id)).to eq @shard1
+        expect(a0.cloned_item_id).not_to be_nil
+      end
     end
   end
 
@@ -2252,10 +2264,11 @@ describe Attachment do
             error, attachment.clone_url_error_info(error, url)
           )
           subject
+          expect(attachment.upload_error_message).to include(url)
         end
       end
 
-      context 'and the error was unkown' do
+      context 'and the error was unknown' do
         let(:error) { StandardError }
 
         it 'captures the error' do
@@ -2263,6 +2276,7 @@ describe Attachment do
             error, attachment.clone_url_error_info(error, url)
           )
           subject
+          expect(attachment.upload_error_message).to include(url)
         end
       end
     end

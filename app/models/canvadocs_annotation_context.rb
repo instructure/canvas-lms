@@ -32,6 +32,19 @@ class CanvadocsAnnotationContext < ApplicationRecord
   before_validation :set_launch_id, if: :new_record?
   before_validation :set_root_account_id, if: :new_record?
 
+  set_policy do
+    given do |user|
+      user &&
+        (submission.grants_right?(user, :grade) || (draft? && user == submission.user))
+    end
+
+    can :readwrite
+  end
+
+  def draft?
+    self.submission_attempt.nil?
+  end
+
   def set_launch_id
     self.launch_id ||= SecureRandom.hex(20)
   end

@@ -748,6 +748,29 @@ describe CoursesController do
       expect(controller.js_env[:PERMISSIONS]).to be_nil
     end
 
+    it "should only set course color js_env vars for elementary courses" do
+      @course.root_account.enable_feature!(:canvas_for_elementary)
+      @course.account.settings[:enable_as_k5_account] = {value: true}
+      @course.account.save!
+      @course.course_color = "#BAD"
+      @course.save!
+
+      user_session(@teacher)
+      get 'settings', params: {:course_id => @course.id}
+      expect(controller.js_env[:COURSE_COLOR]).to eq "#BAD"
+      expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be true
+    end
+
+    it "should not set course color js_env vars for non-elementary courses" do
+      @course.course_color = "#BAD"
+      @course.save!
+
+      user_session(@teacher)
+      get 'settings', params: {:course_id => @course.id}
+      expect(controller.js_env[:COURSE_COLOR]).to be_falsy
+      expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be false
+    end
+
     it "should require authorization" do
       get 'settings', params: {:course_id => @course.id}
       assert_unauthorized
@@ -1507,6 +1530,63 @@ describe CoursesController do
         expect(assigns[:course_home_sub_navigation_tools].size).to eq 0
       end
     end
+
+    describe "when account is enabled as k5 account" do
+      before :once do
+        @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
+      end
+
+      it "sets the course_home_view to 'k5_dashboard'" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq 'k5_dashboard'
+      end
+
+      it "registers k5_course js and css bundles and sets K5_MODE = true in js_env" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_bundles].flatten).to include :k5_course
+        expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+        expect(assigns[:js_env][:K5_MODE]).to be_truthy
+      end
+
+      it "does not render the sidebar navigation or breadcrumbs" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:show_left_side]).to be_falsy
+        expect(assigns[:_crumbs].length).to be 1
+      end
+
+      it "sets STUDENT_PLANNER_ENABLED = true in js_env if the user has student enrollments" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_truthy
+      end
+
+      it "sets STUDENT_PLANNER_ENABLED = false in js_env if the user doesn't have student enrollments" do
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_falsy
+      end
+
+      it "loads announcements on home page when course is a k5 homeroom course" do
+        @course.homeroom_course = true
+        @course.save!
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:course_home_view]).to eq "announcements"
+        bundle = assigns[:js_bundles].select { |b| b.include? :announcements_index_v2 }
+        expect(bundle.size).to eq 1
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
@@ -2107,6 +2187,32 @@ describe CoursesController do
         @course.reload
         expect(@course.settings[:image_id]).to eq ''
         expect(@course.settings[:image_url]).to eq ''
+      end
+    end
+
+    describe 'course colors' do
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "should allow valid hexcodes" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#112233" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to eq '#112233'
+      end
+
+      it "should reject invalid hexcodes" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#NOOOO" }}
+        put 'update', params: {:id => @course.id, :course => { :course_color => "1" }}
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#1a2b3c4e5f6" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to be_nil
+      end
+
+      it "should normalize hexcodes without a leading #" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "123456" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to eq '#123456'
       end
     end
 
@@ -2823,13 +2929,13 @@ describe CoursesController do
       test_student = @course.student_view_student
       session[:become_user_id] = test_student.id
       rubric_assessment_model(rubric_association: @rubric_association, user: test_student)
-      expect(test_student.learning_outcome_results.size).not_to be_zero
+      expect(test_student.learning_outcome_results.active.size).not_to be_zero
       expect(@outcome.assessed?).to be_truthy
 
       delete 'reset_test_student', params: {course_id: @course.id}
 
       test_student.reload
-      expect(test_student.learning_outcome_results.size).to be_zero
+      expect(test_student.learning_outcome_results.active.size).to be_zero
       expect(@outcome.assessed?).to be_falsey
     end
   end
@@ -2932,7 +3038,6 @@ describe CoursesController do
   describe '#content_share_users' do
     before :once do
       course_with_teacher(name: 'search teacher', :active_all => true)
-      @course.root_account.enable_feature!(:direct_share)
     end
 
     it 'requires a search term' do
@@ -2953,12 +3058,6 @@ describe CoursesController do
       expect(json[0]).to include({'name' => 'search teacher'})
     end
 
-    it 'requires the feature be enabled' do
-      @course.root_account.disable_feature!(:direct_share)
-      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
-      expect(response).to be_forbidden
-    end
-
     it 'should return email, url avatar (if avatars are enabled), and name' do
       user_session(@teacher)
       @search_context = @course
@@ -2966,7 +3065,7 @@ describe CoursesController do
       @teacher.account.enable_service(:avatars)
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
       json = json_parse(response.body)
-      expect(json[0]).to include({'email' => nil, 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+      expect(json[0]).to include({'email' => nil, 'name' => 'course teacher'})
     end
 
     it 'should search by name and email' do
@@ -2982,11 +3081,11 @@ describe CoursesController do
 
       get 'content_share_users', params: {course_id: @course.id, search_term: 'course teacher'}
       json = json_parse(response.body)
-      expect(json[0]).to include({'email' => 'course_teacher@test.edu', 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+      expect(json[0]).to include({'email' => 'course_teacher@test.edu', 'name' => 'course teacher'})
 
       get 'content_share_users', params: {course_id: @course.id, search_term: 'course_designer@test.edu'}
       json = json_parse(response.body)
-      expect(json[0]).to include({'email' => 'course_designer@test.edu', 'name' => 'course designer', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+      expect(json[0]).to include({'email' => 'course_designer@test.edu', 'name' => 'course designer'})
     end
 
     it 'searches for teachers, TAs, and designers' do

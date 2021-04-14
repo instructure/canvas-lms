@@ -27,7 +27,8 @@ import {
   getFullDateAndTime,
   dateRangeString,
   timeString,
-  dateTimeString
+  dateTimeString,
+  isThisWeek
 } from '../dateUtils'
 
 const TZ = 'Asia/Tokyo'
@@ -180,5 +181,16 @@ describe('dateRangeString', () => {
     const end = start.clone().add(1, 'day')
     const result = dateRangeString(start, end, 'UTC')
     expect(result).toBe(`${dateTimeString(start)} - ${dateTimeString(end)}`)
+  })
+})
+
+describe('isThisWeek', () => {
+  it('returns true when given day is during this week', () => {
+    const wednesday = new moment().startOf('week').add(3, 'days')
+    expect(isThisWeek(wednesday)).toEqual(true)
+  })
+  it('return false when given day is not during this week', () => {
+    const lastFriday = new moment().startOf('week').add(-2, 'days')
+    expect(isThisWeek(lastFriday)).toEqual(false)
   })
 })

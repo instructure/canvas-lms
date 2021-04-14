@@ -4528,7 +4528,7 @@ describe Submission do
       expect(@submission.moderation_allow_list_for_user(other_student)).to be_empty
     end
 
-    context 'when grades are not published' do
+    context 'when the submission is not posted' do
       context 'when the user is the final grader' do
         let(:allow_list) { @submission.moderation_allow_list_for_user(@teacher) }
 
@@ -4754,13 +4754,14 @@ describe Submission do
       end
     end
 
-    context 'when grades are published' do
+    context 'when the submission is posted' do
       before(:once) do
         provisional_grade = @submission.find_or_create_provisional_grade!(@provisional_grader)
         selection = @assignment.moderated_grading_selections.find_by(student: @student)
         selection.update!(provisional_grade: provisional_grade)
         provisional_grade.publish!
         @assignment.update!(grades_published_at: 1.hour.ago)
+        @assignment.post_submissions
         @submission.reload
       end
 

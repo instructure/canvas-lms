@@ -22,7 +22,7 @@ import {string, node} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Grid} from '@instructure/ui-grid'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {

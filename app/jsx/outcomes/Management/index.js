@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,14 +30,16 @@ import ManageOutcomesFooter from './ManageOutcomesFooter'
 import useSearch from 'jsx/shared/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
-import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
+import useCanvasContext from '../shared/hooks/useCanvasContext'
 import useModal from '../../shared/hooks/useModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
 import MoveModal from './MoveModal'
 import EditGroupModal from './EditGroupModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
-import useModalWithData from 'jsx/outcomes/shared/hooks/useModalWithData'
+import OutcomeEditModal from './OutcomeEditModal'
+import {moveOutcomeGroup} from './api'
+import {showFlashAlert} from '../../shared/FlashAlert'
 
 const NoOutcomesBillboard = () => {
   const {contextType} = useCanvasContext()
@@ -71,7 +73,7 @@ const NoOutcomesBillboard = () => {
 }
 
 const OutcomeManagementPanel = () => {
-  const {contextType} = useCanvasContext()
+  const {contextType, contextId} = useCanvasContext()
   const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
@@ -88,18 +90,24 @@ const OutcomeManagementPanel = () => {
     collections,
     queryCollections,
     rootId,
-    selectedGroupId
+    selectedGroupId,
+    selectedParentGroupId
   } = useManageOutcomes()
   const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
-
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
-  const [
-    outcomeRemoveModalData,
-    openOutcomeRemoveModal,
-    closeOutcomeRemoveModal
-  ] = useModalWithData()
+  const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
+  const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
+  const [selectedOutcome, setSelectedOutcome] = useState(null)
+  const onCloseOutcomeRemoveModal = () => {
+    closeOutcomeRemoveModal()
+    setSelectedOutcome(null)
+  }
+  const onCloseOutcomeEditModal = () => {
+    closeOutcomeEditModal()
+    setSelectedOutcome(null)
+  }
   const groupMenuHandler = (_, action) => {
     if (action === 'move') {
       openMoveGroupModal()
@@ -110,7 +118,41 @@ const OutcomeManagementPanel = () => {
     }
   }
   const outcomeMenuHandler = (id, action) => {
-    if (action === 'remove') openOutcomeRemoveModal({id})
+    setSelectedOutcome(group.outcomes.nodes.find(outcome => outcome._id === id))
+    if (action === 'remove') {
+      openOutcomeRemoveModal()
+    } else if (action === 'edit') {
+      openOutcomeEditModal()
+    }
+  }
+
+  const onMoveHandler = async newParentGroup => {
+    closeMoveGroupModal()
+    try {
+      if (!group) {
+        return
+      }
+      await moveOutcomeGroup(contextType, contextId, group._id, newParentGroup.id)
+      showFlashAlert({
+        message: I18n.t('"%{title}" has been moved to "%{newGroupTitle}".', {
+          title: group.title,
+          newGroupTitle: newParentGroup.name
+        }),
+        type: 'success'
+      })
+    } catch (err) {
+      showFlashAlert({
+        message: err.message
+          ? I18n.t('An error occurred moving group "%{title}": %{message}', {
+              title: group.title,
+              message: err.message
+            })
+          : I18n.t('An error occurred moving group "%{title}"', {
+              title: group.title
+            }),
+        type: 'error'
+      })
+    }
   }
 
   if (isLoading) {
@@ -201,28 +243,44 @@ const OutcomeManagementPanel = () => {
           </Flex>
           <hr />
           {selectedGroupId && (
-            <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
+            <>
+              <ManageOutcomesFooter
+                selected={selected}
+                onRemoveHandler={noop}
+                onMoveHandler={noop}
+              />
+
+              <MoveModal
+                title={loading ? '' : group.title}
+                groupId={selectedGroupId}
+                parentGroupId={selectedParentGroupId}
+                type="group"
+                isOpen={isMoveGroupModalOpen}
+                onCloseHandler={closeMoveGroupModal}
+                onMoveHandler={onMoveHandler}
+              />
+
+              <GroupRemoveModal
+                groupId={selectedGroupId}
+                isOpen={isGroupRemoveModalOpen}
+                onCloseHandler={closeGroupRemoveModal}
+              />
+            </>
           )}
-          <MoveModal
-            title={group ? group.title : ''}
-            type="group"
-            isOpen={isMoveGroupModalOpen}
-            onCloseHandler={closeMoveGroupModal}
-          />
-          {selectedGroupId && (
-            <GroupRemoveModal
-              groupId={selectedGroupId}
-              isOpen={isGroupRemoveModalOpen}
-              onCloseHandler={closeGroupRemoveModal}
-            />
-          )}
-          {selectedGroupId && outcomeRemoveModalData?.id && (
-            <OutcomeRemoveModal
-              groupId={selectedGroupId}
-              outcomeId={outcomeRemoveModalData?.id}
-              isOpen={outcomeRemoveModalData?.open}
-              onCloseHandler={closeOutcomeRemoveModal}
-            />
+          {selectedGroupId && selectedOutcome && (
+            <>
+              <OutcomeRemoveModal
+                groupId={selectedGroupId}
+                outcomeId={selectedOutcome._id}
+                isOpen={isOutcomeRemoveModalOpen}
+                onCloseHandler={onCloseOutcomeRemoveModal}
+              />
+              <OutcomeEditModal
+                outcome={selectedOutcome}
+                isOpen={isOutcomeEditModalOpen}
+                onCloseHandler={onCloseOutcomeEditModal}
+              />
+            </>
           )}
           {group && (
             <EditGroupModal

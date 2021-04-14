@@ -31,7 +31,8 @@ export default class FileUploadQuestion extends View {
       '.file-upload': '$fileUpload',
       '.file-upload-btn': '$fileDialogButton',
       '.attachment-id': '$attachmentID',
-      '.file-upload-box': '$fileUploadBox'
+      '.file-upload-box': '$fileUploadBox',
+      '#fileupload_in_progress': '$fileUploadInprogress'
     }
 
     this.prototype.events = {
@@ -50,6 +51,7 @@ export default class FileUploadQuestion extends View {
     if ((val = this.$fileUpload.val())) {
       this.removeFileStatusMessage()
       this.model.set('file', this.$fileUpload[0])
+      this.$fileUploadInprogress.val(true)
       const dfrd = this.model.save(null, {success: this.processAttachment.bind(this)})
       return this.$fileUploadBox.disableWhileLoading(dfrd)
     }
@@ -80,6 +82,7 @@ export default class FileUploadQuestion extends View {
   // For now we'll just process the first one.
   processAttachment(attachment) {
     this.$attachmentID.val(this.model.id).trigger('change')
+    this.$fileUploadInprogress.val(false)
     this.$fileUploadBox.addClass('file-upload-box-with-file')
     this.render()
     this.$fileUploadBox

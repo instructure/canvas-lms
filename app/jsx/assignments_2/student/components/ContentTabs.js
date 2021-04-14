@@ -17,9 +17,10 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import {Badge, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Badge} from '@instructure/ui-badge'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './AttemptSelect'
 import GradeDisplay from './GradeDisplay'

@@ -20,10 +20,11 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {TextInput, RadioInputGroup, RadioInput} from '@instructure/ui-forms'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {TextInput} from '@instructure/ui-text-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class Placement extends React.Component {

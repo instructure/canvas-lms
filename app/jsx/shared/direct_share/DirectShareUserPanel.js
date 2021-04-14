@@ -19,7 +19,7 @@
 import I18n from 'i18n!direct_share_user_panel'
 import React from 'react'
 import {arrayOf, func, string} from 'prop-types'
-import {Tag} from '@instructure/ui-elements'
+import {Tag} from '@instructure/ui-tag'
 import ContentShareUserSearchSelector from '../components/ContentShareUserSearchSelector'
 import {basicUser} from '../proptypes/user'
 

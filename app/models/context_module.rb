@@ -549,11 +549,11 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def visibility_for_user(user)
+  def visibility_for_user(user, session=nil)
     opts = {}
-    opts[:can_read] = self.context.grants_right?(user, :read)
+    opts[:can_read] = self.context.grants_right?(user, session, :read)
     if opts[:can_read]
-      opts[:can_read_as_admin] = self.context.grants_right?(user, :read_as_admin)
+      opts[:can_read_as_admin] = self.context.grants_right?(user, session, :read_as_admin)
     end
     opts
   end

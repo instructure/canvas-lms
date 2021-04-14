@@ -28,5 +28,60 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
+    field :title, String, null: true
+    field :delayed_post_at, Types::DateTimeType, null: true
+    field :lock_at, Types::DateTimeType, null: true
+    field :last_reply_at, Types::DateTimeType, null: true
+    field :posted_at, Types::DateTimeType, null: true
+    field :podcast_has_student_posts, Boolean, null: true
+    field :discussion_type, String, null: true
+    field :position, Int, null: true
+    field :allow_rating, Boolean, null: true
+    field :only_graders_can_rate, Boolean, null: true
+    field :sort_by_rating, Boolean, null: true
+    field :is_section_specific, Boolean, null: true
+    field :require_initial_post, Boolean, null: true
+
+    field :published, Boolean, null: false
+    def published
+      object.published?
+    end
+
+    field :assignment, Types::AssignmentType, null: true
+    def assignment
+      load_association(:assignment)
+    end
+
+    field :root_topic, Types::DiscussionType, null: true
+    def root_topic
+      load_association(:root_topic)
+    end
+
+    field :discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true
+    def discussion_entries_connection
+      load_association(:discussion_entries)
+    end
+
+    field :root_discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true
+    def root_discussion_entries_connection
+      load_association(:root_discussion_entries)
+    end
+
+    field :subscribed, Boolean, null: false
+    def subscribed
+      load_association(:discussion_topic_participants).then do
+        object.subscribed?(current_user)
+      end
+    end
+
+    field :author, Types::UserType, null: false
+    def author
+      load_association(:user)
+    end
+
+    field :editor, Types::UserType, null: true
+    def editor
+      load_association(:editor)
+    end
   end
 end

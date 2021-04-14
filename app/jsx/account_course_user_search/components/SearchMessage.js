@@ -22,7 +22,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
 import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import EmptyDesert from '../../shared/EmptyDesert'
 
 const linkPropType = shape({

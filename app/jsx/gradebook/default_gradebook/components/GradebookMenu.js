@@ -21,7 +21,7 @@ import {oneOf, bool, string} from 'prop-types'
 import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!gradebook'
 
 class GradebookMenu extends React.Component {

@@ -38,14 +38,10 @@ module SpeedGrader
       submission_json_fields = %i(id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
-                                  grading_period_id excused updated_at attempt posted_at resource_link_lookup_uuid)
+                                  grading_period_id excused updated_at attempt posted_at resource_link_lookup_uuid
+                                  redo_request cached_due_date)
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
-
-      if course.root_account.feature_enabled?(:reassign_assignments)
-        submission_json_fields << :redo_request
-        submission_json_fields << :cached_due_date
-      end
 
       attachment_json_fields = %i(id comment_id content_type context_id context_type display_name
                                   filename mime_class size submitter_id workflow_state)

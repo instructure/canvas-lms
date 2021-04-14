@@ -216,7 +216,7 @@ shared_examples 'pages_page' do |context|
     expect(ff('.collectionViewItems .clickable').size).to eq 2
   end
 
-  it "should only list in-group pages in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
+  it "should only list in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
     group_page = @testgroup.first.wiki_pages.create!(user: @teacher,
                                                           title: 'Group Page')
@@ -224,21 +224,22 @@ shared_examples 'pages_page' do |context|
                                                   title: 'Course Page')
 
     get pages_page
-    f('.btn-primary').click
+
     wait_for_ajaximations
-    fj('button:contains("Pages")').click
-    wait_for_ajaximations
-    expect(fln(group_page.title.to_s)).to be_displayed
-    expect(f("#content")).not_to contain_link(course_page.title.to_s)
+    expect(pages_list_item_exists?('Group Page')).to be_truthy
+    expect(pages_list_item_exists?('Course Page')).to be_falsey
   end
 
-  it "should only access group files in pages right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
+  it "should only access group files in page file tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
     add_test_files
-    get pages_page
-    f('.btn-primary').click
+
+    get "/groups/#{@testgroup.first.id}/pages/test_page/edit"
+    wait_for_tiny(edit_wiki_css)
+    click_document_toolbar_menu_button
+    click_group_documents
     wait_for_ajaximations
-    expand_files_on_content_pane
-    expect(ff('svg[name=IconDocument]').size).to eq 1
+
+    expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 end
 
@@ -262,12 +263,13 @@ end
 shared_examples 'discussions_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   before(:each) do
     stub_rcs_config
   end
 
-  it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
+  it "should only list in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                        title: 'Group Discussion', message: 'Group')
@@ -276,19 +278,26 @@ shared_examples 'discussions_page' do |context|
 
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }
-    expect(f('#editor_tabs')).to be_displayed
-    fj('button:contains("Discussions")').click
+
+    click_links_toolbar_menu_button
+    click_group_links
+
+    click_discussions_accordion
     wait_for_ajaximations
-    expect(fln(group_dt.title.to_s)).to be_displayed
-    expect(f("#content")).not_to contain_link(course_dt.title.to_s)
+
+    expect(course_item_link(group_dt.title.to_s)).to be_displayed
+    expect(course_item_link_exists?(course_dt.title.to_s)).to be_falsey
   end
 
-  it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
+  it "should only access group files in discussions RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
     add_test_files
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }
-    expand_files_on_content_pane
-    expect(ff('svg[name=IconDocument]').size).to eq 1
+    click_document_toolbar_menu_button
+    click_group_documents
+    wait_for_ajaximations
+
+    expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 end
 

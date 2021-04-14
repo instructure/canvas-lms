@@ -101,4 +101,68 @@ describe MicrosoftSync::Group do
       end
     end
   end
+
+  describe '#update_workflow_state_unless_deleted' do
+    def run_method!
+      subject.update_workflow_state_unless_deleted('errored', last_error: 'abc')
+    end
+
+    context 'when state is deleted in the database' do
+      before do
+        described_class.where(id: subject.id).update_all(workflow_state: 'deleted')
+      end
+
+      it { expect(run_method!).to eq(false) }
+
+      it 'updates the state on the object to match the "deleted" in the DB' do
+        expect { run_method! }.to change { subject.workflow_state }.from('pending').to('deleted')
+      end
+
+      it 'does not update the state in the DB' do
+        expect { run_method! }.to_not change {
+          described_class.find(subject.id).workflow_state
+        }.from('deleted')
+      end
+
+      it 'does not update the extra attributes in the DB' do
+        expect { run_method! }.to_not change {
+          described_class.find(subject.id).last_error
+        }.from(nil)
+      end
+
+      it 'does not update the extra attributes on the object' do
+        expect { run_method! }.to_not change { subject.last_error }.from(nil)
+      end
+    end
+
+    context 'when state is not deleted' do
+      it { expect(run_method!).to eq(true) }
+
+      it 'updates the state on the object' do
+        expect { run_method! }.to change { subject.workflow_state }.from('pending').to('errored')
+      end
+
+      it 'updates the state in the DB' do
+        expect { run_method! }.to change {
+          described_class.find(subject.id).workflow_state
+        }.from('pending').to('errored')
+      end
+
+      it 'updates the extra attributes in the DB' do
+        expect { run_method! }.to change {
+          described_class.find(subject.id).last_error
+        }.from(nil).to('abc')
+      end
+
+      it 'updates the extra attributes on the object' do
+        expect { run_method! }.to change { subject.last_error }.from(nil).to('abc')
+      end
+
+      it 'can be called without extra attributes' do
+        expect { subject.update_workflow_state_unless_deleted('errored') }.to change {
+          described_class.find(subject.id).workflow_state
+        }.from('pending').to('errored')
+      end
+    end
+  end
 end

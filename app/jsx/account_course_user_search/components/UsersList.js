@@ -17,7 +17,7 @@
  */
 
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, string, object, func} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'

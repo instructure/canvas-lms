@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rake::Task['db:drop'].enhance do
   GuardRail.activate(:deploy) { Canvas.redis.flushdb }
 end

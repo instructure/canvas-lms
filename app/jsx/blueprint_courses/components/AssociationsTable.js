@@ -22,10 +22,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import 'compiled/jquery.rails_flash_notifications'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
 

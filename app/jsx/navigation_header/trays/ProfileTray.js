@@ -19,13 +19,17 @@
 import I18n from 'i18n!ProfileTray'
 import React from 'react'
 import {arrayOf, bool, object, shape, string} from 'prop-types'
-import {Avatar, Badge, Heading, List, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {Heading} from '@instructure/ui-heading'
+import {Badge} from '@instructure/ui-badge'
+import {Avatar} from '@instructure/ui-avatar'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
-import {AccessibleContent} from '@instructure/ui-a11y'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 // Trying to keep this as generalized as possible, but it's still a bit
 // gross matching on the id of the tray tabs given to us by Rails

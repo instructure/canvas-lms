@@ -28,6 +28,11 @@ module DataFixup
       all_select_final_grade_overrides = RoleOverride.where(permission: 'select_final_grade')
       all_ta_and_related_roles = Role.where(base_role_type: 'TaEnrollment')
       site_admin = Account.site_admin
+      # this fixup gets run from a migration that takes place before the
+      # root_account_id column is added to the table.  it also gets run from
+      # its own specs which execute after said column is added.  so both
+      # versions of the table need to be accommodated.
+      add_root_account_id = RoleOverride.column_names.include?('root_account_id')
 
       # The case where moderate_grades RoleOverrides exist for non-ta roles.
       all_moderate_grades_overrides.where(enabled: false).find_in_batches do |moderate_overrides|
@@ -47,7 +52,9 @@ module DataFixup
             enabled: moderate_override.enabled,
             locked: moderate_override.locked,
             role_id: moderate_override.role_id
-          }
+          }.tap do |override|
+            override.merge!(root_account_id: moderate_override.root_account_id) if add_root_account_id
+          end
         end
 
         RoleOverride.bulk_insert(new_role_overrides)
@@ -81,7 +88,9 @@ module DataFixup
               enabled: false,
               locked: false,
               role_id: ta_role.id
-            }
+            }.tap do |override|
+              override.merge!(root_account_id: account.resolved_root_account_id) if add_root_account_id
+            end
           end
         end
         RoleOverride.bulk_insert(new_role_overrides)

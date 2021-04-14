@@ -20,8 +20,8 @@ import moment from 'moment'
 import React from 'react'
 import 'jquery.instructure_date_and_time'
 
-import {View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {IconTimerLine} from '@instructure/ui-icons'
 
 /*

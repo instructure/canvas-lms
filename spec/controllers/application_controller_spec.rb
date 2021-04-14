@@ -148,40 +148,28 @@ RSpec.describe ApplicationController do
       end
     end
 
-    describe "DIRECT_SHARE_ENABLED feature flag" do
+    describe "ENV.DIRECT_SHARE_ENABLED" do
       before :each do
         allow(controller).to receive(:user_display_json)
         controller.instance_variable_set(:@domain_root_account, Account.default)
       end
 
-      it "sets the env var to true when FF is enabled and the user can use it" do
-        Account.default.enable_feature!(:direct_share)
-
+      it "sets the env var to true when the user can use it" do
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
       end
 
-      it "sets the env var to false when FF is enabled but the user can't use it" do
-        Account.default.enable_feature!(:direct_share)
-
+      it "sets the env var to false when the user can't use it" do
         course_with_student(:active_all => true)
         controller.instance_variable_set(:@current_user, @student)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
 
       it "sets the env var to false when the context is a group" do
-        Account.default.enable_feature!(:direct_share)
-
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         controller.instance_variable_set(:@context, group_model)
-        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
-      end
-
-      it "sets the env var to false when FF is disabled" do
-        course_with_teacher(:active_all => true)
-        controller.instance_variable_set(:@current_user, @teacher)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
     end
@@ -331,18 +319,6 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_truthy
         end
       end
-
-      context "rce_lti_favorites" do
-        it 'is false if the feature flag is off' do
-          Account.site_admin.disable_feature!(:rce_lti_favorites)
-          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.site_admin.enable_feature!(:rce_lti_favorites)
-          expect(controller.js_env[:FEATURES][:rce_lti_favorites]).to be_truthy
-        end
-      end
     end
 
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do
@@ -403,22 +379,37 @@ RSpec.describe ApplicationController do
       end
 
       describe "HOMEROOM_COURSE" do
-        it "is true if course is a homeroom course and canvas_for_elementary flag is on" do
-          course.root_account.enable_feature!(:canvas_for_elementary)
-          course.homeroom_course = true
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
+        describe "with canvas_for_elementary flag on" do
+          before(:once) do
+            course.root_account.enable_feature!(:canvas_for_elementary)
+          end
+
+          it "is true if the course is a homeroom course and in a K-5 account" do
+            course.account.settings[:enable_as_k5_account] = {value: true}
+            course.homeroom_course = true
+            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
+          end
+
+          it "is false if the course is a homeroom course and not in a K-5 account" do
+            course.homeroom_course = true
+            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          end
+
+          it "is false if the course is not a homeroom course and n a K-5 account" do
+            course.account.settings[:enable_as_k5_account] = {value: true}
+            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          end
         end
 
-        it "is false if course is a homeroom course and canvas_for_elementary flag is off" do
-          course.root_account.disable_feature!(:canvas_for_elementary)
-          course.homeroom_course = true
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsey
-        end
+        it "is false with the canvas_for_elementary flag off" do
+          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
 
-        it "is false if course is not a homeroom course and canvas_for_elementary flag is on" do
-          course.root_account.enable_feature!(:canvas_for_elementary)
+          course.homeroom_course = true
+          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+
           course.homeroom_course = false
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsey
+          course.account.settings[:enable_as_k5_account] = {value: true}
+          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
         end
       end
     end
@@ -1145,6 +1136,39 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context 'is set to modules page when launched from modules page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/modules')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/modules')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+        end
+
+        context 'is set to assignments page when launched from assignments page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+        end
+
+
         context 'is set to quizzes page when launched from quizzes page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
@@ -1160,6 +1184,55 @@ RSpec.describe ApplicationController do
             expect(assigns[:return_url]).to eq 'host/quizzes'
           end
         end
+
+        context 'is set to modules page when launched from edit page accessed from modules' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/100/edit?module_item_id=42')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/1/edit?module_item_id=42')
+            expect(controller).to receive(:polymorphic_url).with([course, :context_modules]).and_return('host/modules')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/modules'
+          end
+        end
+
+        context 'is set to assignments page when launched from edit page accessed from assignments' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/1/edit')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/100/edit')
+            expect(controller).to receive(:polymorphic_url).with([course, :assignments]).and_return('host/assignments')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/assignments'
+          end
+        end
+
+        context 'is set to quizzes page when launched from edit page accessed from quizzes' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/assignments/1/edit?quiz_lti')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/assignments/100/edit?quiz_lti')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+        end
+
 
         it 'is set to quizzes page when launched from assignments/new' do
           allow(controller.request).to receive(:referer).and_return('assignments/new')

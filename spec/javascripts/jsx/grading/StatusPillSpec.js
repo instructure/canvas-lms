@@ -18,7 +18,7 @@
 
 import 'react'
 import ReactDOM from 'react-dom'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import StatusPill from 'jsx/grading/StatusPill'
 
 const wrapper = document.getElementById('fixtures')

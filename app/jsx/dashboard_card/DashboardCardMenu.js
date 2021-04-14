@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import {Popover} from '@instructure/ui-overlays'
+import {Popover} from '@instructure/ui-popover'
 import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 

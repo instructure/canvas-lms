@@ -20,10 +20,12 @@ import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {bool, oneOf, string, func, number, arrayOf, element} from 'prop-types'
-import {Heading, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {View, Grid} from '@instructure/ui-layout'
-import {Checkbox} from '@instructure/ui-forms'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {
   getCspEnabled,
   setCspEnabled,

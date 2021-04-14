@@ -62,7 +62,7 @@ module Interfaces::AssignmentsConnectionInterface
     # a lot more straigthforward
     case self
     when Types::AssignmentGroupType
-      assignments.reorder(:position, :id)
+      assignments.except(:order).ordered
     when Types::CourseType
       assignments.
         joins(:assignment_group).

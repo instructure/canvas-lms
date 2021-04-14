@@ -61,6 +61,7 @@ class DiscussionTopic < ActiveRecord::Base
     Arel.sql('COALESCE(parent_id, 0)'), Arel.sql('COALESCE(rating_sum, 0) DESC'), :created_at) }, class_name: 'DiscussionEntry'
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
   has_one :external_feed_entry, :as => :asset
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :external_feed
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :attachment
@@ -1122,12 +1123,11 @@ class DiscussionTopic < ActiveRecord::Base
         self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && can_participate_in_course?(user)}
     can :reply
 
-    given { |user, session|
-      !is_announcement &&
-      context.grants_right?(user, session, :create_forum) &&
-      context_allows_user_to_create?(user)
-    }
+    given { |user, session| user_can_create(user, session) }
     can :create
+
+    given { |user, session| user_can_create(user, session) && (self.context.is_a?(Group) || self.course.user_is_instructor?(user)) }
+    can :duplicate
 
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_any_right?(user, session, :create_forum, :post_to_forum) }
     can :attach
@@ -1163,6 +1163,12 @@ class DiscussionTopic < ActiveRecord::Base
     return true unless context.respond_to?(:allow_student_discussion_topics)
     return true if context.grants_right?(user, :read_as_admin)
     context.allow_student_discussion_topics
+  end
+
+  def user_can_create(user, session)
+    !is_announcement &&
+      context.grants_right?(user, session, :create_forum) &&
+      context_allows_user_to_create?(user)
   end
 
   def discussion_topic_id

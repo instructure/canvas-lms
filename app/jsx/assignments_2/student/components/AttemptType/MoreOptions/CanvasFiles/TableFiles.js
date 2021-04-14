@@ -23,15 +23,16 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import tz from 'timezone'
 
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {
   IconCheckMarkIndeterminateLine,
   IconPublishSolid,
   IconUnpublishedLine
 } from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text, TruncateText} from '@instructure/ui-elements'
-import {Tooltip} from '@instructure/ui-overlays'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const FileButton = props => {
   return (

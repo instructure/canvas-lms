@@ -24,14 +24,14 @@ import UsageRightsSelectBox from './UsageRightsSelectBox'
 import RestrictedRadioButtons from './RestrictedRadioButtons'
 import DialogPreview from './DialogPreview'
 import Folder from 'compiled/models/Folder'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {CloseButton, Button} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import htmlEscape from 'str/htmlEscape'
 
 const MAX_FOLDERS_TO_SHOW = 2
 
-UsageRightsDialog.renderFileName = function() {
+UsageRightsDialog.renderFileName = function () {
   const textToShow =
     this.props.itemsToManage.length > 1
       ? I18n.t('%{items} items selected', {items: this.props.itemsToManage.length})
@@ -44,7 +44,7 @@ UsageRightsDialog.renderFileName = function() {
   )
 }
 
-UsageRightsDialog.renderFolderList = function(folders) {
+UsageRightsDialog.renderFolderList = function (folders) {
   if (folders.length) {
     const foldersToShow = folders.slice(0, MAX_FOLDERS_TO_SHOW)
     return (
@@ -62,7 +62,7 @@ UsageRightsDialog.renderFolderList = function(folders) {
   }
 }
 
-UsageRightsDialog.renderFolderTooltip = function(folders) {
+UsageRightsDialog.renderFolderTooltip = function (folders) {
   const toolTipFolders = folders.slice(MAX_FOLDERS_TO_SHOW)
 
   if (toolTipFolders.length) {
@@ -100,7 +100,7 @@ UsageRightsDialog.renderFolderTooltip = function(folders) {
   }
 }
 
-UsageRightsDialog.renderFolderMessage = function() {
+UsageRightsDialog.renderFolderMessage = function () {
   const folders = this.props.itemsToManage.filter(item => item instanceof Folder)
 
   return (
@@ -112,7 +112,7 @@ UsageRightsDialog.renderFolderMessage = function() {
   )
 }
 
-UsageRightsDialog.renderDifferentRightsMessage = function() {
+UsageRightsDialog.renderDifferentRightsMessage = function () {
   if (
     (this.copyright == null || this.use_justification === 'choose') &&
     this.props.itemsToManage.length > 1
@@ -129,7 +129,7 @@ UsageRightsDialog.renderDifferentRightsMessage = function() {
   }
 }
 
-UsageRightsDialog.renderAccessManagement = function() {
+UsageRightsDialog.renderAccessManagement = function () {
   if (this.props.userCanRestrictFilesForContext) {
     return (
       <div>
@@ -146,7 +146,7 @@ UsageRightsDialog.renderAccessManagement = function() {
   }
 }
 
-UsageRightsDialog.render = function() {
+UsageRightsDialog.render = function () {
   return (
     <Modal
       ref={e => (this.usageRightsDialog = e)}

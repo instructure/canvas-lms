@@ -18,6 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require_relative '../rcs/pages/rce_next_page'
 module WikiAndTinyCommon
+  include RCENextPage
   def wiki_page_body
     f('textarea.body')
   end
@@ -56,7 +57,7 @@ module WikiAndTinyCommon
   end
   def add_text_to_tiny(text)
     type_in_tiny('textarea.body', text + " ") # space is necessary for html to render in tinymce
-    in_frame wiki_page_body_ifr_id do
+    in_frame tiny_rce_ifr_id do
       f('#tinymce').send_keys(:backspace) # delete the space added above for accurate asserting
       expect(f('#tinymce')).to include_text(text)
     end
@@ -190,9 +191,7 @@ module WikiAndTinyCommon
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')").click
     click_content_tray_close_button
   end
-  def tiny_rce_ifr_id
-    f('.tox-editor-container iframe')['id']
-  end
+
   def wiki_page_body_ifr_id
     f('.mce-container iframe')['id']
   end

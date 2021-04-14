@@ -124,9 +124,15 @@
               {{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}
             </label>
 
-            <input id="assignment_allowed_extensions" name="allowed_extensions" type="text" maxlength="254" placeholder="{{#t "
-              labels.allowed_extensions"}}Allowed File Extensions{{/t}}" aria-labelledby="explanation_nest"
-              value="{{join allowedExtensions " ,"}}" {{disabledIfIncludes frozenAttributes "submission_types"}} />
+            <input
+              id="assignment_allowed_extensions"
+              name="allowed_extensions"
+              type="text"
+              maxlength="254"
+              placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
+              aria-labelledby="explanation_nest"
+              value="{{join allowedExtensions " ,"}}"
+              {{disabledIfIncludes frozenAttributes "submission_types"}} />
             <div id="explanation_nest" class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
               Enter a list of accepted extensions, for example: doc,xls,txt

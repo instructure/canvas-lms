@@ -401,6 +401,49 @@ describe SubmissionsController do
       expect(assigns[:submission]).to be_nil
     end
 
+    context 'when the submission_type is annotated_document' do
+      before(:once) do
+        @course = course_model(workflow_state: "available")
+        @attachment = attachment_model(context: @course)
+        @assignment = @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: 'annotated_document'
+        )
+      end
+
+      it 'redirects with an error if annotated_document_id is not present in params' do
+        course_with_student_logged_in(active_all: true, course: @course)
+        post :create, params: {
+          assignment_id: @assignment.id,
+          course_id: @course.id,
+          submission: { submission_type: 'annotated_document' }
+        }
+
+        aggregate_failures do
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Annotated Document submissions require an annotated_document_id to submit"
+        end
+      end
+
+      it 'changes a CanvadocsAnnotationContext from draft attempt to the current attempt' do
+        course_with_student_logged_in(active_all: true, course: @course)
+        submission = @assignment.submissions.find_by(user: @student)
+        annotation_context = submission.annotation_context(draft: true)
+
+        post :create, params: {
+          assignment_id: @assignment.id,
+          course_id: @course.id,
+          submission: { annotated_document_id: @attachment.id, submission_type: 'annotated_document' }
+        }
+
+        aggregate_failures do
+          annotation_context.reload
+          expect(annotation_context.submission_attempt).not_to be_nil
+          expect(annotation_context.submission_attempt).to eq submission.reload.attempt
+        end
+      end
+    end
+
     context "group comments" do
       before do
         course_with_student_logged_in(:active_all => true)

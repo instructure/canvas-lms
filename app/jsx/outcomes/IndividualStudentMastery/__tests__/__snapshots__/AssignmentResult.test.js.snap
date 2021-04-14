@@ -5,18 +5,18 @@ exports[`renders the AlignmentResult component 1`] = `
   alignItems="stretch"
   as="span"
   direction="column"
+  display="flex"
   elementRef={[Function]}
-  inline={false}
   justifyItems="start"
   padding="small"
-  visualDebug={false}
-  wrapItems={false}
+  withVisualDebug={false}
+  wrap="no-wrap"
 >
-  <FlexItem
+  <Item
     as="span"
     elementRef={[Function]}
-    grow={false}
-    shrink={false}
+    shouldGrow={false}
+    shouldShrink={false}
   >
     <Button
       as="button"
@@ -32,7 +32,7 @@ exports[`renders the AlignmentResult component 1`] = `
         Object {
           "fontWeight": "700",
           "mediumHeight": "normal",
-          "mediumPadding": "0",
+          "mediumPaddingHorizontal": "0",
         }
       }
       type="button"
@@ -41,26 +41,25 @@ exports[`renders the AlignmentResult component 1`] = `
     >
       My assignment
     </Button>
-  </FlexItem>
-  <FlexItem
+  </Item>
+  <Item
     as="span"
     elementRef={[Function]}
-    grow={false}
     padding="x-small 0"
-    shrink={false}
+    shouldGrow={false}
+    shouldShrink={false}
   >
     <View
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="x-small 0 0 0"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <Text
         as="span"
@@ -73,13 +72,13 @@ exports[`renders the AlignmentResult component 1`] = `
         Your score: 1
       </Text>
     </View>
-  </FlexItem>
-  <FlexItem
+  </Item>
+  <Item
     as="span"
     borderWidth="small"
     elementRef={[Function]}
-    grow={false}
-    shrink={false}
+    shouldGrow={false}
+    shouldShrink={false}
   >
     <div
       className="react-rubric"
@@ -110,6 +109,6 @@ exports[`renders the AlignmentResult component 1`] = `
         />
       </div>
     </div>
-  </FlexItem>
+  </Item>
 </Flex>
 `;

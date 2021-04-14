@@ -21,7 +21,7 @@ import {object} from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryUnassessedAssignment'
 import _ from 'lodash'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
 

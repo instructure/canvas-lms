@@ -20,9 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments_2_student_points_display'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Flex} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
 export default function PointsDisplay(props) {

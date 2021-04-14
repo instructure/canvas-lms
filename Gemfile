@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # What have they done to the Gemfile???
 #
 # Relax. Breathe deep. All the gems are still there; they're just loaded in various files in Gemfile.d/

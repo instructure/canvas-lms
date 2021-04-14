@@ -30,7 +30,7 @@ ready(() => {
       <K5Dashboard
         currentUser={ENV.current_user}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
-        env={window.ENV}
+        timeZone={ENV.TIMEZONE}
       />,
       dashboardContainer
     )

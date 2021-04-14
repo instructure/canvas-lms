@@ -23,7 +23,7 @@ import {List} from 'immutable'
 
 import ScoreLabel from './score-label'
 import ScoreInput from './score-input'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AssignmentSet from './assignment-set'
 import * as actions from '../actions'
 import I18n from 'i18n!conditional_release'

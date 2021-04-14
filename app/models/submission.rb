@@ -2082,7 +2082,7 @@ class Submission < ActiveRecord::Base
     allow_list = []
     return allow_list unless current_user.present? && assignment.moderated_grading?
 
-    if assignment.grades_published?
+    if posted?
       allow_list.push(self.grader, self.user, current_user)
     elsif self.user == current_user
       # Requesting user is the student.

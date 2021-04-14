@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/groups/manage/assignToGroupMenu",
   "i18nScope": "groups.manage.assign_to_group_menu"
 }

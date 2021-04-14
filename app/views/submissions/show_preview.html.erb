@@ -23,6 +23,19 @@
     assessment_request: @assessment_request,
     current_host: request.host
   )
+
+  preview_url_opts = {
+    anonymous_instructor_annotations: @anonymous_instructor_annotations,
+    enable_annotations: true,
+    enrollment_type: @enrollment_type,
+    moderated_grading_allow_list: @moderated_grading_allow_list,
+    submission_id: @submission.id
+  }
+
+  if @submission.submission_type == "annotated_document"
+    annotation_context = @submission.annotation_context(attempt: @submission.attempt)
+    preview_url_opts[:annotation_context] = annotation_context.launch_id
+  end
 %>
 
 <% css_bundle :submission %>
@@ -201,16 +214,7 @@
               data-attachment_id="<%= attachment.id %>"
               data-submission_id="<%= @submission.id %>"
               data-dialog-title="<%= attachment.display_name %>"
-              <%=
-                doc_preview_attributes(
-                  attachment,
-                  anonymous_instructor_annotations: @anonymous_instructor_annotations,
-                  enable_annotations: true,
-                  enrollment_type: @enrollment_type,
-                  moderated_grading_allow_list: @moderated_grading_allow_list,
-                  submission_id: @submission.id
-                )
-              %>
+              <%= doc_preview_attributes(attachment, preview_url_opts) %>
             >
               <%= button_text %>
             </a>
@@ -239,6 +243,16 @@
   <% js_bundle 'legacy/submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
+<% elsif @submission.submission_type == "annotated_document" %>
+  <div class="ef-file-preview-stretch">
+    <iframe
+      allowfullscreen
+      title="<%= t "Annotated Document submission" %>"
+      src="<%= annotation_context.attachment.canvadoc_url(@current_user, preview_url_opts) %>"
+      class="ef-file-preview-frame annotated-document-submission"
+      style="width: 100%;">
+    </iframe>
+  </div>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

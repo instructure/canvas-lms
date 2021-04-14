@@ -20,8 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import sortBy from 'lodash/sortBy'
 
-import {View} from '@instructure/ui-layout'
-import {Heading, Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 
 export default function RoleTrayTable({title, children}) {
   const sortedChildren = sortBy(React.Children.toArray(children), c => c.props.title)

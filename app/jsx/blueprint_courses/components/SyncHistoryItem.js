@@ -20,7 +20,8 @@ import I18n from 'i18n!blueprint_settingsSyncHistoryItem'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {Heading, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import SyncChange from './SyncChange'
 

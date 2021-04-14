@@ -19,9 +19,9 @@
 import I18n from 'i18n!blueprint_settingsCourseFilter'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {TextInput} from '@instructure/ui-forms'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Flex} from '@instructure/ui-layout'
+import {TextInput} from '@instructure/ui-text-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
 import CanvasSelect from 'jsx/shared/components/CanvasSelect'
 import propTypes from '../propTypes'
 

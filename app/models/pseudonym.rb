@@ -26,7 +26,7 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :account
   include Canvas::RootAccountCacher
   belongs_to :user
-  has_many :communication_channels, -> { order(:position) }
+  has_many :communication_channels, -> { ordered }
   has_many :sis_enrollments, class_name: 'Enrollment', inverse_of: :sis_pseudonym
   has_many :auditor_authentication_records,
     class_name: "Auditors::ActiveRecord::AuthenticationRecord",

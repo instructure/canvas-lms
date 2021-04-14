@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -1146,8 +1148,7 @@ class AccountsController < ApplicationController
                       Account.site_admin.grants_right?(@current_user, :read_messages),
        logging: logging
       }
-    js_env enhanced_grade_change_query: Auditors::read_from_postgres? &&
-      Account.site_admin.feature_enabled?(:enhanced_grade_change_query)
+    js_env enhanced_grade_change_query: Auditors::read_from_postgres?
     js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
   end
 
@@ -1568,10 +1569,10 @@ class AccountsController < ApplicationController
                                    :include_students_in_global_survey, :license_type,
                                    {:lock_all_announcements => [:value, :locked]}.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
-                                   :mobile_qr_login_is_enabled,
-                                   :open_registration, :outgoing_email_default_name,
-                                   :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
-                                   {:restrict_student_future_listing => [:value, :locked]}.freeze,
+                                   :mobile_qr_login_is_enabled, :open_registration,
+                                   :outgoing_email_default_name, :prevent_course_renaming_by_teachers,
+                                   :prevent_course_availability_editing_by_teachers, :restrict_quiz_questions,
+                                   {:restrict_student_future_listing => [:value, :locked].freeze}.freeze,
                                    {:restrict_student_future_view => [:value, :locked]}.freeze,
                                    {:restrict_student_past_view => [:value, :locked]}.freeze,
                                    :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,

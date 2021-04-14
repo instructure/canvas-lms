@@ -151,6 +151,10 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_prevent_course_renaming_by_teachers", :prevent_course_renaming_by_teachers)
     end
 
+    it "should click on don't let teachers change availability on their courses" do
+      check_box_verifier("#account_settings_prevent_course_availability_editing_by_teachers", :prevent_course_availability_editing_by_teachers)
+    end
+
     it "should uncheck 'students can opt-in to receiving scores in email notifications' " do
       check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
     end

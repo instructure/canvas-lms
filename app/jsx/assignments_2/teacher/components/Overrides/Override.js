@@ -21,7 +21,7 @@ import {bool, func, number} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {OverrideShape} from '../../assignmentData'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import OverrideSummary from './OverrideSummary'
 import OverrideDetail from './OverrideDetail'
 

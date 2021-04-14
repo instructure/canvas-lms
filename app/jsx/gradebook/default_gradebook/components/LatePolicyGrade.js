@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, number, oneOf, shape, string} from 'prop-types'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!gradebook'
 import GradeFormatHelper from '../../shared/helpers/GradeFormatHelper'
 

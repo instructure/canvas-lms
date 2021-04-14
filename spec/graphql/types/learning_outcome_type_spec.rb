@@ -78,5 +78,11 @@ describe Types::LearningOutcomeType do
       rubric_assessment_model(rubric: @rubric, user: @student)
       expect(outcome_type.resolve("assessed")).to eq true
     end
+
+    it "returns false when assessment deleted" do
+      assessment = rubric_assessment_model(rubric: @rubric, user: @student)
+      assessment.learning_outcome_results.destroy_all
+      expect(outcome_type.resolve("assessed")).to eq false
+    end
   end
 end

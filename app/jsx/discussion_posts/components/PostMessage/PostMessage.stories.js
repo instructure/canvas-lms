@@ -18,6 +18,7 @@
 
 import React from 'react'
 
+import {ThreadingToolbar} from '../ThreadingToolbar/ThreadingToolbar'
 import {PostMessage} from './PostMessage'
 
 export default {
@@ -56,4 +57,19 @@ AvatarPost.args = {
 export const UnreadPost = Template.bind({})
 UnreadPost.args = {
   isUnread: true
+}
+
+export const WithChildren = Template.bind({})
+WithChildren.args = {
+  children: (
+    <ThreadingToolbar>
+      <ThreadingToolbar.Reply onReply={Function.prototype} />
+      <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked />
+      <ThreadingToolbar.Expansion
+        onExpand={Function.prototype}
+        expandText="4 replies, 2 unread"
+        isExpanded
+      />
+    </ThreadingToolbar>
+  )
 }

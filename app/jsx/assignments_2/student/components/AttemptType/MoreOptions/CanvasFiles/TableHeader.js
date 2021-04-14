@@ -20,8 +20,8 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {shape, string} from 'prop-types'
 
-import {Flex} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 
 const TableHeader = props => {

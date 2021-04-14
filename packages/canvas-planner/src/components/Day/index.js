@@ -28,6 +28,7 @@ import {userShape, itemShape} from '../plannerPropTypes'
 import styles from './styles.css'
 import theme from './theme'
 import {getFriendlyDate, getFullDate, getShortDate, isToday} from '../../utilities/dateUtils'
+import MissingAssignments from '../MissingAssignments'
 import Grouping from '../Grouping'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
@@ -43,12 +44,14 @@ export class Day extends Component {
     registerAnimatable: func.isRequired,
     deregisterAnimatable: func.isRequired,
     currentUser: shape(userShape),
-    simplifiedControls: bool
+    simplifiedControls: bool,
+    showMissingAssignments: bool
   }
 
   static defaultProps = {
     animatableIndex: 0,
-    simplifiedControls: false
+    simplifiedControls: false,
+    showMissingAssignments: false
   }
 
   constructor(props) {
@@ -168,6 +171,9 @@ export class Day extends Component {
             </View>
           )}
         </div>
+        {thisIsToday && this.props.showMissingAssignments && (
+          <MissingAssignments timeZone={this.props.timeZone} />
+        )}
       </div>
     )
   }

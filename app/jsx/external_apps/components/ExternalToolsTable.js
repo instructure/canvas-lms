@@ -26,7 +26,7 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 import store from '../lib/ExternalAppsStore'
 import ExternalToolsTableRow from './ExternalToolsTableRow'
 import InfiniteScroll from './InfiniteScroll'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import splitAssetString from 'compiled/str/splitAssetString'
 
@@ -111,7 +111,6 @@ export default class ExternalToolsTable extends React.Component {
     const show_lti_favorite_toggles =
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
-      ENV.FEATURES?.rce_lti_favorites &&
       this.props.canAddEdit
 
     return (

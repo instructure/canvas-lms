@@ -20,7 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_trayRating'
 import classnames from 'classnames'
-import {Heading, Rating as InstUIRating, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Rating as InstUIRating} from '@instructure/ui-rating'
+import {Heading} from '@instructure/ui-heading'
 
 class Rating extends React.Component {
   static propTypes = {

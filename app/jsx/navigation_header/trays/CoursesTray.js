@@ -19,8 +19,10 @@
 import I18n from 'i18n!CoursesTray'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
-import {View} from '@instructure/ui-layout'
-import {Heading, List, Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 

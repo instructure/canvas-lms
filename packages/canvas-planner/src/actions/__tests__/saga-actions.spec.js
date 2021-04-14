@@ -16,19 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment-timezone'
 import MockDate from 'mockdate'
 import {
   mergeFutureItems,
   mergePastItems,
   mergePastItemsForNewActivity,
   mergePastItemsForToday,
-  consumePeekIntoPast
+  consumePeekIntoPast,
+  mergeWeekItems
 } from '../saga-actions'
 import {
   gotPartialFutureDays,
   gotPartialPastDays,
   gotDaysSuccess,
-  peekedIntoPast
+  peekedIntoPast,
+  gotPartialWeekDays,
+  weekLoaded
 } from '../loading-actions'
 import {itemsToDays} from '../../utilities/daysUtils'
 
@@ -308,5 +312,84 @@ describe('consumePeekIntoPast', () => {
     const result = consumePeekIntoPast([], 'mock response')(mockDispatch, () => {})
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(peekedIntoPast({hasSomeItems: false}))
+  })
+})
+
+describe('mergeWeekItems', () => {
+  let getStateMock
+  beforeAll(() => {
+    MockDate.set('2021-03-07') // a Sunday
+  })
+
+  afterAll(() => {
+    MockDate.reset()
+  })
+
+  beforeEach(() => {
+    getStateMock = jest.fn(() => {
+      return {
+        ...getStateFn(),
+        weeklyDashboard: {
+          weekStart: moment.tz('UTC').startOf('week'),
+          weekEnd: moment.tz('UTC').endOf('week'),
+          weeks: []
+        }
+      }
+    })
+  })
+
+  it('extracts and dispatches complete days and returns true', () => {
+    const mockDispatch = jest.fn()
+    const mockItems = []
+    const sunday = moment.tz('UTC').startOf('week')
+    for (let i = 0; i < 8; ++i) {
+      mockItems.push(mockItem(sunday.clone().add(i, 'days').format()))
+    }
+    const mockDays = itemsToDays(mockItems)
+    const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
+      return {
+        ...getStateMock(),
+        loading: {partialWeekDays: mockDays, allWeekItemsLoaded: true}
+      }
+    })
+    expect(result).toBe(true)
+    expect(mockDispatch).toHaveBeenCalledWith(gotPartialWeekDays(mockDays, 'mock response'))
+    expect(mockDispatch).toHaveBeenCalledWith(weekLoaded(itemsToDays(mockItems), 'mock response'))
+  })
+
+  it('does not dispatch weekLoaded we do not get the full week up front', () => {
+    const mockDispatch = jest.fn()
+    const mockItems = []
+    const sunday = moment.tz('UTC').startOf('week')
+    for (let i = 0; i < 5; ++i) {
+      mockItems.push(mockItem(sunday.clone().add(i, 'days').format()))
+    }
+    const mockDays = itemsToDays(mockItems)
+    const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
+      return {
+        ...getStateMock(),
+        loading: {partialWeekDays: mockDays, allWeekItemsLoaded: false}
+      }
+    })
+    expect(result).toBe(false)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      gotPartialWeekDays(itemsToDays(mockItems), 'mock response')
+    )
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns true when allWeekItemsLoaded but there are no available days', () => {
+    const mockDispatch = jest.fn()
+    const mockItems = []
+    const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
+      return {
+        ...getStateMock(),
+        loading: {partialWeekDays: [], allWeekItemsLoaded: true}
+      }
+    })
+    expect(result).toBe(true)
+    // still want to pretend something was loaded so all the loading states get updated.
+    expect(mockDispatch).toHaveBeenCalledWith(gotPartialWeekDays([], 'mock response'))
+    expect(mockDispatch).toHaveBeenCalledWith(weekLoaded([], 'mock response'))
   })
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MakeSubmissionCourseIdNotNull < ActiveRecord::Migration[5.2]
   tag :predeploy
   disable_ddl_transaction!

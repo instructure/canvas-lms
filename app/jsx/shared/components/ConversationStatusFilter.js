@@ -22,7 +22,7 @@ import {FormField} from '@instructure/ui-form-field'
 import I18n from 'i18n!ConversationStatusFilter'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class ConversationStatusFilter extends React.Component {
   static propTypes = {

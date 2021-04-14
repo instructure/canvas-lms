@@ -19,9 +19,9 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!course_settings'
 import {bool, func, shape, string} from 'prop-types'
-import {Checkbox} from '@instructure/ui-forms'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Spinner} from '@instructure/ui-spinner'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import {showFlashError} from '../../shared/FlashAlert'
 

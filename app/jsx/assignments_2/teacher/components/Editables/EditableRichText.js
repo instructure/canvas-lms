@@ -21,8 +21,8 @@ import {bool, string, func, oneOf} from 'prop-types'
 import apiUserContent from 'compiled/str/apiUserContent'
 
 import {InPlaceEdit} from '@instructure/ui-editable'
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 

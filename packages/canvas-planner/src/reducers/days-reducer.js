@@ -27,7 +27,13 @@ function deletedPlannerItem(state, action) {
 export default handleActions(
   {
     GOT_DAYS_SUCCESS: (state, action) => mergeDays(state, action.payload.internalDays),
-    DELETED_PLANNER_ITEM: deletedPlannerItem
+    DELETED_PLANNER_ITEM: deletedPlannerItem,
+    WEEK_LOADED: (state, action) => {
+      return action.payload
+    },
+    JUMP_TO_WEEK: (state, action) => {
+      return action.payload
+    }
   },
   []
 )

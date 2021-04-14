@@ -56,7 +56,6 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     if body.respond_to?(:call)
       StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
     end
-    body.sub!(%r{^while\(1\);}, '')
     # Check that the body doesn't have any duplicate keys. this can happen if
     # you add both a string and a symbol to the hash before calling to_json on
     # it.

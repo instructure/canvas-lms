@@ -29,37 +29,43 @@ describe "quiz taking" do
     @quiz = quiz_with_new_questions(!:goto_edit)
   end
 
-  it 'should allow toggling between RCE and HTML entry on essay questions' do
+  it 'should allow toggling between RCE and HTML entry on essay questions', custom_timeout: 25 do
     @quiz = quiz_with_multiple_type_questions
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
-    links = ff('.toggle_question_content_views_link')
-    expect(links[0].text).to eq("HTML Editor")
-    expect(links[0]).to be_displayed
-    links[0].click
-    expect(links[1].text).to eq("Rich Content Editor")
-    expect(links[1]).to be_displayed
+    wait_for_ajaximations
+    html_link = f('[data-btn-id="rce-edit-btn"]')
+    expect(html_link.text).to include("Switch to html editor")
+    expect(html_link).to be_displayed
+    html_link.click
+    rce_editor_link = f('[data-btn-id="rce-edit-btn"]')
+    expect(rce_editor_link.text).to include("Switch to rich text editor")
+    expect(rce_editor_link).to be_displayed
   end
 
-  it 'should toggle only the essay question that was toggled leaving others on the page alone' do
+  it 'should toggle only the essay question that was toggled leaving others on the page alone', custom_timeout: 30 do
     @quiz = quiz_with_essay_questions
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
-    links = ff('.toggle_question_content_views_link')
-    # first link of the first RCE
-    expect(links[0].text).to eq("HTML Editor")
+    wait_for_ajaximations
+
+    links = ff('[data-btn-id="rce-edit-btn"]')
+    # the first RCE
+    expect(links[0].text).to include("Switch to html editor")
     expect(links[0]).to be_displayed
-    # first link of the second RCE
-    expect(links[2].text).to eq("HTML Editor")
-    expect(links[2]).to be_displayed
-    links[0].click
-    # first link hidden, second link now showing
-    expect(links[1].text).to eq("Rich Content Editor")
-    expect(links[0]).not_to be_displayed
+    # the second RCE
+    expect(links[1].text).to include("Switch to html editor")
     expect(links[1]).to be_displayed
-    # first link of second RCE is unchanged
-    expect(links[2].text).to eq("HTML Editor")
-    expect(links[2]).to be_displayed
+    links[0].click
+
+    # Retrieve the links again
+    links = ff('[data-btn-id="rce-edit-btn"]')
+    # first rce is now html
+    expect(links[0].text).to include("Switch to rich text editor")
+    expect(links[0]).to be_displayed
+    # second RCE is unchanged
+    expect(links[1].text).to include("Switch to html editor")
+    expect(links[1]).to be_displayed
   end
 
   it "should allow to take the quiz as long as there are attempts left", :xbrowser, priority: "1", test_id: 140606 do

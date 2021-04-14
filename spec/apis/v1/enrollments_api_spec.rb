@@ -450,7 +450,13 @@ describe EnrollmentsApiController, type: :request do
       it "should not enroll a user lacking a pseudonym on the course's account" do
         foreign_user = user_factory
         api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},
-                 { expected_status: 404 }
+                         { expected_status: 404 }
+      end
+
+      it "does not allow adding users to a template course" do
+        @course.update!(template: true)
+        api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id } }, {},
+                 { expected_status: 401 }
       end
 
       context "custom course-level roles" do

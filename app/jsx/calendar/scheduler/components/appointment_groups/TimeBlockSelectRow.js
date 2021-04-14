@@ -21,7 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {IconXSolid} from '@instructure/ui-icons'
 import coupleTimeFields from 'compiled/util/coupleTimeFields'
 import 'jquery.instructure_date_and_time'
@@ -91,9 +91,7 @@ class TimeBlockSelectorRow extends React.Component {
     // Only call the onBlur if it's not blank, and it's the last one in the list.
     if (
       !$(e.target).data('blank') &&
-      $(e.target)
-        .closest('.TimeBlockSelectorRow')
-        .is(':last-child')
+      $(e.target).closest('.TimeBlockSelectorRow').is(':last-child')
     ) {
       this.props.onBlur && this.props.onBlur()
     }

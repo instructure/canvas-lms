@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/TreeBrowser",
   "i18nScope": "tree_browser"
 }

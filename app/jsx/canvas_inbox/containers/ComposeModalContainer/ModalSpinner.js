@@ -21,10 +21,10 @@ import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {Modal} from '@instructure/ui-modal'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
-const ModalSpinner = (props) => (
+const ModalSpinner = props => (
   <Modal
     open={props.open}
     label={props.label}
@@ -45,14 +45,14 @@ const ModalSpinner = (props) => (
 )
 
 ModalSpinner.defaultProps = {
-  open: true,
+  open: true
 }
 
 ModalSpinner.propTypes = {
   label: PropTypes.string,
   message: PropTypes.string,
   onExited: PropTypes.func,
-  open: PropTypes.bool,
+  open: PropTypes.bool
 }
 
 export default ModalSpinner

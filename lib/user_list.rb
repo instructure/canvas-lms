@@ -79,6 +79,7 @@ class UserList
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
       cc.user = user
       user.workflow_state = 'creation_pending'
+      user.root_account_ids = [@root_account.id]
       user.initial_enrollment_type = User.initial_enrollment_type_from_text(@initial_type)
       user.save!
       user

@@ -25,11 +25,11 @@ import SVGWrapper from 'jsx/shared/SVGWrapper'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
 import {Billboard} from '@instructure/ui-billboard'
-import {FileDrop} from '@instructure/ui-forms'
-import {Link} from '@instructure/ui-elements'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Link} from '@instructure/ui-link'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 export default function ImportGroupsModal(props) {
   const [messages, setMessages] = useState([])

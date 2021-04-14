@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import I18n from 'i18n!feature_flags'
 import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import {groupBy} from 'lodash'
 import FeatureFlagTable from './FeatureFlagTable'

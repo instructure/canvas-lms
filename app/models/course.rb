@@ -54,6 +54,7 @@ class Course < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :template_course, :class_name => 'Course'
   has_many :templated_courses, :class_name => 'Course', :foreign_key => 'template_course_id'
+  has_many :templated_accounts, class_name: 'Account', foreign_key: 'course_template_id'
 
   has_many :course_sections
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
@@ -168,10 +169,10 @@ class Course < ActiveRecord::Base
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :web_conferences, -> { order('created_at DESC') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :context_modules, -> { order(:position, :id) }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :context_modules, -> { ordered }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
   has_many :active_context_modules, -> { where(workflow_state: 'active') }, as: :context, inverse_of: :context, class_name: 'ContextModule'
-  has_many :context_module_tags, -> { order(:position).where(tag_type: 'context_module') }, class_name: 'ContentTag', as: :context, inverse_of: :context, dependent: :destroy
+  has_many :context_module_tags, -> { ordered.where(tag_type: 'context_module') }, class_name: 'ContentTag', as: :context, inverse_of: :context, dependent: :destroy
   has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :page_views, :as => :context, :inverse_of => :context
   has_many :asset_user_accesses, :as => :context, :inverse_of => :context
@@ -253,6 +254,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_dates
   validate :validate_course_image
   validate :validate_default_view
+  validate :validate_template, if: :template_changed?
   validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -302,6 +304,11 @@ class Course < ActiveRecord::Base
       calendar_events.active.preload(:child_events).reject(&:hidden?) +
         assignments.active
     end
+  end
+
+  def self.ensure_dummy_course
+    Account.ensure_dummy_account
+    Course.find_or_create_by!(id: 0) { |c| c.account_id = c.root_account_id = 0 }
   end
 
   def self.skip_updating_account_associations(&block)
@@ -473,6 +480,14 @@ class Course < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def validate_template
+    if template? && !can_become_template?
+      errors.add(:template, t("Courses with enrollments can't become templates"))
+    elsif !template? && !can_stop_being_template?
+      errors.add(:template, t("Courses that are set as a template in any account can't stop being templates"))
+    end
   end
 
   def image
@@ -1360,11 +1375,14 @@ class Course < ActiveRecord::Base
 
   def api_state
     return 'unpublished' if workflow_state == 'created' || workflow_state == 'claimed'
+
     workflow_state
   end
 
-  alias_method :destroy_permanently!, :destroy
+  alias destroy_permanently! destroy
   def destroy
+    return false if template?
+
     self.workflow_state = 'deleted'
     save!
   end
@@ -1530,7 +1548,7 @@ class Course < ActiveRecord::Base
       fetch_on_enrollments("has_active_observer_enrollment", user) { enrollments.for_user(user).active_by_date.where(:type => "ObserverEnrollment").where.not(:associated_user_id => nil).exists? } }
     can :read_grades
 
-    given { |user| self.available? && self.teacherless? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? } }
+    given { |user| available? && !template? && teacherless? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? } }
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
     # Active admins (Teacher/TA/Designer)
@@ -1539,7 +1557,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags and can :read_rubrics
 
     # Teachers and Designers can delete/reset, but not TAs
-    given { |user| !self.deleted? && !self.sis_source_id && user &&
+    given { |user| !self.deleted? && !template? && !self.sis_source_id && user &&
       fetch_on_enrollments("active_content_admin_enrollments", user) { enrollments.for_user(user).of_content_admins.active_by_date.to_a }.any?{|e| e.has_permission_to?(:change_course_state)}
     }
     can :delete
@@ -1578,7 +1596,7 @@ class Course < ActiveRecord::Base
 
     # Teacher or Designer of a concluded course
     given do |user|
-      !self.deleted? && !self.sis_source_id && user &&
+      !self.deleted? && !template? && !self.sis_source_id && user &&
         enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any?{|e| e.has_permission_to?(:change_course_state)}
     end
     can :delete
@@ -1600,13 +1618,13 @@ class Course < ActiveRecord::Base
     given { |user| self.account_membership_allows(user, :manage_courses) }
     can :read_as_admin and can :manage and can :update and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
 
-    given { |user| self.account_membership_allows(user, :manage_courses) && self.grants_right?(user, :change_course_state) }
+    given { |user| !template? && self.account_membership_allows(user, :manage_courses) && self.grants_right?(user, :change_course_state) }
     can :delete
 
     given { |user| self.account_membership_allows(user, :read_course_content) }
     can :read and can :read_outcomes
 
-    given { |user| !self.deleted? && self.sis_source_id && self.account_membership_allows(user, :manage_sis) && self.grants_right?(user, :change_course_state) }
+    given { |user| !self.deleted? && !template? && self.sis_source_id && self.account_membership_allows(user, :manage_sis) && self.grants_right?(user, :change_course_state) }
     can :delete
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
@@ -2422,7 +2440,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course
+      :homeroom_course, :course_color
     ]
   end
 
@@ -2827,6 +2845,8 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     default_tabs = elementary_homeroom_course? ? Course.default_homeroom_tabs : Course.default_tabs
+    # can't manage people in template courses
+    default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
@@ -3087,9 +3107,18 @@ class Course < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :homeroom_course, :boolean => true, :default => false
+  add_setting :course_color
+
+  def elementary_enabled?
+    root_account&.feature_enabled?(:canvas_for_elementary) && account.enable_as_k5_account?
+  end
 
   def elementary_homeroom_course?
-    homeroom_course? && root_account&.feature_enabled?(:canvas_for_elementary)
+    homeroom_course? && elementary_enabled?
+  end
+
+  def elementary_subject_course?
+    !homeroom_course && elementary_enabled?
   end
 
   def lock_all_announcements?
@@ -3613,6 +3642,14 @@ class Course < ActiveRecord::Base
 
   def resolved_outcome_calculation_method
     outcome_calculation_method&.active? ? outcome_calculation_method : account&.resolved_outcome_calculation_method
+  end
+
+  def can_become_template?
+    !enrollments.active.exists?
+  end
+
+  def can_stop_being_template?
+    !templated_accounts.exists?
   end
 
   private

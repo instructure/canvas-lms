@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropUnusedSubmissionColumns < ActiveRecord::Migration[5.1]
   tag :postdeploy
 

@@ -40,6 +40,20 @@
   padding: $ic-sp 0 $ic-sp $ic-sp*1.5 !important;
 }
 
+// Go to full width cards once there is not enough room for 2 cards plus the global nav bar,
+// but go back to 2 cards once the global nav goes away until there is not enough room again.
+@media only screen and (min-width: 768px) and (max-width: 804px),
+       only screen and (max-width: 682px) {
+  .ic-DashboardCard {
+    width: 100% !important;
+    margin-#{direction(left)}: 0 !important;
+  }
+
+  .ic-DashboardCard__box__container {
+    margin-#{direction(left)}: 0 !important;
+  }
+}
+
 // These overrides are required because InstUI Tabs don't natively support icons or
 // themeable "selected" colors. There are also some properties required for the
 // animated sticky header transitions that can't be accomplished easily via InstUI.

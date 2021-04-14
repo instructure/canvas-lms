@@ -37,6 +37,13 @@ describe('PostMessage', () => {
     expect(queryByText('Posts are fun')).toBeTruthy()
   })
 
+  it('displays the children', () => {
+    const {queryByText} = setup({
+      children: <span>Smol children</span>
+    })
+    expect(queryByText('Smol children')).toBeTruthy()
+  })
+
   describe('avatar badge', () => {
     it('displays when isUnread is true', () => {
       const {queryByText, rerender} = setup()

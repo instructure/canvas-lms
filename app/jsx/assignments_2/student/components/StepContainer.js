@@ -22,7 +22,7 @@ import React from 'react'
 import StepItem, {stepLabels} from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
 import {Submission} from '../graphqlData/Submission'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 function renderCollapsedContainer(step) {
   return (

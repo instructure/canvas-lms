@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {stripHtmlTags} from '../../shared/helpers/stripHtmlTags'
 
 const OutcomeDescription = ({description, withExternalControl, truncate, onClickHandler}) => {

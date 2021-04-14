@@ -101,4 +101,43 @@ describe('Assignment Student Content View', () => {
       expect(getByTitle('Loading')).toBeInTheDocument()
     })
   })
+
+  describe('concluded enrollment notice', () => {
+    const concludedMatch = /your enrollment in this course has been concluded/
+
+    let oldEnv
+
+    beforeEach(() => {
+      oldEnv = window.ENV
+      window.ENV = {...window.ENV}
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders when the current enrollment is concluded', async () => {
+      window.ENV.enrollment_state = 'completed'
+
+      const props = await mockAssignmentAndSubmission()
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      expect(getByText(concludedMatch)).toBeInTheDocument()
+    })
+
+    it('does not render when the current enrollment is not concluded', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {queryByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      expect(queryByText(concludedMatch)).not.toBeInTheDocument()
+    })
+  })
 })

@@ -106,8 +106,9 @@ describe "Wiki Pages" do
       driver.execute_script("window.close()")
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      switch_editor_views(wiki_page_body)
-      expect(f('textarea')).to include_text('test')
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_paragraph.text).to include 'test'
+      end
     end
 
     it "blocks linked page from redirecting parent page", priority: "2", test_id: 927147 do
@@ -173,23 +174,6 @@ describe "Wiki Pages" do
     it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
       get "/courses/#{@course.id}/pages/non-existant"
       expect_flash_message :warning
-    end
-  end
-
-  context "Insert RCE File" do
-    before do
-      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
-    end
-
-    it "should insert a file using RCE in the wiki page", priority: "1", test_id: 126673 do
-      stub_rcs_config
-      @course.wiki_pages.create!(:title => "Bar")
-      user_session(@user)
-      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
-      file.context = @course
-      file.save!
-      get "/courses/#{@course.id}/pages/bar/edit"
-      insert_file_from_rce(:wiki_page)
     end
   end
 

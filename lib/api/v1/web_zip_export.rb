@@ -22,12 +22,12 @@ module Api::V1::WebZipExport
   include Api::V1::Attachment
 
   def web_zip_export_json(web_zip_export)
-    api_json(web_zip_export, @current_user, session) do |attrs|
-      attrs.progress_id = web_zip_export.job_progress.id
-      attrs.progress_url = polymorphic_url([:api_v1, web_zip_export.job_progress])
+    api_json(web_zip_export, @current_user, session).tap do |hash|
+      hash['progress_id'] = web_zip_export.job_progress.id
+      hash['progress_url'] = polymorphic_url([:api_v1, web_zip_export.job_progress])
 
       if web_zip_export.zip_attachment.present?
-        attrs[:zip_attachment] = attachment_json(web_zip_export.zip_attachment, @current_user, {}, {
+        hash['zip_attachment'] = attachment_json(web_zip_export.zip_attachment, @current_user, {}, {
           can_view_hidden_files: true
         })
       end

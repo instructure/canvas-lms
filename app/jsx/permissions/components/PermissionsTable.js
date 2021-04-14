@@ -27,9 +27,9 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-elements'
-import {Tooltip} from '@instructure/ui-overlays'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 
 import actions from '../actions'
 import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates'

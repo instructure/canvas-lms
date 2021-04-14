@@ -301,7 +301,9 @@ class Attachment < ActiveRecord::Base
   def clone_for(context, dup=nil, options={})
     if !self.cloned_item && !self.new_record?
       self.cloned_item = ClonedItem.create(:original_item => self) # do we even use this for anything?
-      Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
+      self.shard.activate do
+        Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
+      end
     end
     existing = context.attachments.active.find_by_id(self)
 
@@ -2027,9 +2029,9 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = 'errored'
       case e
       when CanvasHttp::TooManyRedirectsError
-        self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
+        self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects for %{url}", url: url
       when CanvasHttp::InvalidResponseCodeError
-        self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
+        self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", :code => e.code, url: url
         Canvas::Errors.capture(e, clone_url_error_info(e, url))
       when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url

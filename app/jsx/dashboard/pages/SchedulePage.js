@@ -19,7 +19,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 
-import {createPlannerApp} from '@instructure/canvas-planner'
+import {createPlannerApp, renderWeeklyPlannerHeader} from '@instructure/canvas-planner'
 
 const SchedulePage = ({visible = false}) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
@@ -33,9 +33,13 @@ const SchedulePage = ({visible = false}) => {
   return (
     <section
       id="dashboard_page_schedule"
-      style={{display: visible ? 'block' : 'none'}}
+      style={{
+        display: visible ? 'flex' : 'none',
+        flexDirection: 'column'
+      }}
       aria-hidden={!visible}
     >
+      {renderWeeklyPlannerHeader({visible})}
       {isPlannerCreated && plannerApp.current}
     </section>
   )

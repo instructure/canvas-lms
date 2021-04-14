@@ -19,7 +19,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconFeedbackLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!edit_rubricCommentButton'
 
 const CommentButton = ({onClick}) => (

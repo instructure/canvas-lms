@@ -79,7 +79,6 @@ describe "quizzes" do
     end
 
     it "should open and close the send to dialog" do
-      Account.default.enable_feature!(:direct_share)
       @context = @course
       quiz_model
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -92,7 +91,6 @@ describe "quizzes" do
     end
 
     it "should open and close the copy to tray" do
-      Account.default.enable_feature!(:direct_share)
       @context = @course
       quiz_model
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

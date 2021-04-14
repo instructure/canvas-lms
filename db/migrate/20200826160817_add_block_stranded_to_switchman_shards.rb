@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This migration comes from switchman_inst_jobs (originally 20200822014259)
 class AddBlockStrandedToSwitchmanShards < ActiveRecord::Migration[5.2]
   tag :predeploy

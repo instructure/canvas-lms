@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :brand_configs do
   desc "Writes the .css (css variables), .js & .json files that are used to load the theme editor variables for each brand " +
        "Set BRAND_CONFIG_MD5=<whatever> to save just that one, otherwise writes a file for each BrandConfig in db."

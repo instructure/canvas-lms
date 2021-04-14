@@ -105,18 +105,26 @@ describe "outcome gradebook" do
         expect(f('.outcome-gradebook-container .headers_1')).not_to contain_css('.slick-header-column')
       end
 
+      def toggle_lmgb_filter_dropdown
+        f('[data-component="lmgb-student-filter-trigger"]').click
+      end
+
+      def toggle_no_results_students
+        toggle_lmgb_filter_dropdown
+        f('[data-component="lmgb-student-filter-unassessed-students"]').click
+        wait_for_ajax_requests
+      end
+
       it "filter out students without results" do
         get "/courses/#{@course.id}/gradebook"
         select_learning_mastery
-        three_students
-
-        f('#no_results_students').click
-        wait_for_ajax_requests
         no_students
 
-        f('#no_results_students').click
-        wait_for_ajax_requests
+        toggle_no_results_students
         three_students
+
+        toggle_no_results_students
+        no_students
       end
 
       it "filter out outcomes without results" do
@@ -135,30 +143,16 @@ describe "outcome gradebook" do
         get "/courses/#{@course.id}/gradebook"
         select_learning_mastery
         two_outcomes
-        three_students
-
-        f('#no_results_outcomes').click
-        no_outcomes
-        three_students
-
-        f('#no_results_students').click
-        wait_for_ajax_requests
-        no_outcomes
         no_students
 
-        f('#no_results_students').click
-        wait_for_ajax_requests
+        toggle_no_results_students
+        f('#no_results_outcomes').click
         no_outcomes
         three_students
 
         f('#no_results_outcomes').click
         two_outcomes
         three_students
-
-        f('#no_results_students').click
-        wait_for_ajax_requests
-        two_outcomes
-        no_students
       end
 
       it 'outcomes without results filter preserved after page refresh' do
@@ -167,44 +161,11 @@ describe "outcome gradebook" do
         wait_for_ajax_requests
 
         expect(f('#no_results_outcomes').selected?).to be false
-        expect(f('#no_results_students').selected?).to be false
 
         f('#no_results_outcomes').click
         refresh_page
 
         expect(f('#no_results_outcomes').selected?).to be true
-        expect(f('#no_results_students').selected?).to be false
-      end
-
-      it 'students without results filter preserved after page refresh' do
-        get "/courses/#{@course.id}/gradebook"
-        select_learning_mastery
-        wait_for_ajax_requests
-
-        expect(f('#no_results_outcomes').selected?).to be false
-        expect(f('#no_results_students').selected?).to be false
-
-        f('#no_results_students').click
-        refresh_page
-
-        expect(f('#no_results_outcomes').selected?).to be false
-        expect(f('#no_results_students').selected?).to be true
-      end
-
-      it 'outcomes and students without results filter preserved after page refresh' do
-        get "/courses/#{@course.id}/gradebook"
-        select_learning_mastery
-        wait_for_ajax_requests
-
-        expect(f('#no_results_outcomes').selected?).to be false
-        expect(f('#no_results_students').selected?).to be false
-
-        f('#no_results_outcomes').click
-        f('#no_results_students').click
-        refresh_page
-
-        expect(f('#no_results_outcomes').selected?).to be true
-        expect(f('#no_results_students').selected?).to be true
       end
 
       def result(user, alignment, score, opts = {})
@@ -273,11 +234,7 @@ describe "outcome gradebook" do
           expect(means).to contain_exactly("2", "3")
         end
 
-        context 'with inactive_concluded_lmgb_filters enabled' do
-          before(:once) do
-            Account.default.set_feature_flag!('inactive_concluded_lmgb_filters', 'on')
-          end
-
+        context 'inactive/concluded LMGB filters' do
           it 'correctly displays inactive enrollments when the filter option is selected' do
             StudentEnrollment.find_by(user_id: @student_1.id).deactivate
 
@@ -374,7 +331,6 @@ describe "outcome gradebook" do
             result(@student_1, align3, 0)
             result(@student_2, align3, 1)
             result(@student_3, align3, 2)
-
           end
 
         it "Displays the mastery scales and proficiency calculations once enabled" do
@@ -501,6 +457,7 @@ describe "outcome gradebook" do
         f('.assignment-gradebook-container .gradebook-menus button').click
         f('span[data-menu-item-id="learning-mastery"]').click
 
+        toggle_no_results_students
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
         select_section('All Sections')

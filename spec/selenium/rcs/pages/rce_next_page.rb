@@ -319,6 +319,14 @@ module RCENextPage
     fj("[data-testid='instructure_links-Link'] [role='button']:contains('#{title}')")
   end
 
+  def course_item_link_exists?(title)
+    element_exists?("//*[@data-testid = 'instructure_links-Link']//*[text() = '#{title}']", true)
+  end
+
+  def pages_list_item_exists?(title)
+    element_exists?("//a[. = '#{title}']", true)
+  end
+
   def course_item_links_list
     ff('[data-testid="instructure_links-Link"]')
   end
@@ -966,10 +974,6 @@ module RCENextPage
 
   def switch_to_editor_view
     click_editor_view_button
-  end
-
-  def tiny_rce_ifr_id
-    f('.tox-editor-container iframe')['id']
   end
 
   def insert_tiny_text(text = 'hello')

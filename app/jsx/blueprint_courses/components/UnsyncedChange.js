@@ -18,9 +18,9 @@
 
 import React from 'react'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 import {IconLock, IconUnlock} from './BlueprintLocks'
 import propTypes from '../propTypes'

@@ -86,7 +86,6 @@ describe LtiApiController, type: :request do
     post "https://www.example.com#{req.path}",
       params: req.body,
       headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
-
   end
 
   def source_id
@@ -111,6 +110,12 @@ describe LtiApiController, type: :request do
   it "should require a content-type of application/xml" do
     make_call('content-type' => 'application/other')
     assert_status(415)
+  end
+
+  it "fail when the XML encoding is invalid" do
+    body = %{<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    make_call('body' => body)
+    check_failure('unsupported', 'Invalid XML: unknown encoding name - utf8')
   end
 
   context "OAuth Requests" do
@@ -431,9 +436,9 @@ to because the assignment has no points possible.
     end
 
     context "pass_fail zero point assignments" do
-      it "should succeed with incomplete grade when score < 1" do
+      it "should succeed with incomplete grade when score = 0" do
         @assignment.update(:points_possible => 10, :grading_type => 'pass_fail')
-        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        make_call('body' => replace_result(score: '0', sourceid: nil))
         check_success
 
         verify_xml(response)
@@ -447,7 +452,7 @@ to because the assignment has no points possible.
         expect(submission.grade).to eq 'incomplete'
       end
 
-      it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
+      it "should succeed with complete grade when score < 1 for a 0 point assignment" do
         @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
@@ -460,7 +465,7 @@ to because the assignment has no points possible.
         expect(submission).to be_submitted_at
         expect(submission.submission_type).to eql 'external_tool'
         expect(submission.score).to eq 0
-        expect(submission.grade).to eq 'incomplete'
+        expect(submission.grade).to eq 'complete'
       end
 
       it "should succeed with complete grade when score = 1" do
@@ -612,6 +617,15 @@ to because the assignment has no points possible.
     make_call(opts)
 
     check_failure('failure', 'Course is invalid')
+  end
+
+  it "fails if course is concluded" do
+    opts = {'body' => replace_result(score: '0.6')}
+    @course.soft_conclude!
+    @course.save
+    make_call(opts)
+
+    check_failure('failure', 'Course is concluded')
   end
 
   it "fails if assignment is deleted" do

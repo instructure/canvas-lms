@@ -24,14 +24,15 @@ import ImageSearchActions from './actions/ImageSearchActions'
 import ImageSearchStore from './stores/ImageSearchStore'
 import ImageSearchItem from './ImageSearchItem'
 import SVGWrapper from './SVGWrapper'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
-import {View, Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const unsplashParams = {
   w: 262,

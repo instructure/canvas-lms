@@ -22,6 +22,7 @@ import StaffContactInfoLayout from 'jsx/dashboard/layout/StaffContactInfoLayout'
 
 describe('StaffContactInfoLayout', () => {
   const getProps = (overrides = {}) => ({
+    isLoading: false,
     staff: [
       {
         id: '1',
@@ -66,5 +67,15 @@ describe('StaffContactInfoLayout', () => {
   it('renders nothing at all if staff is empty', () => {
     const {container} = render(<StaffContactInfoLayout {...getProps({staff: []})} />)
     expect(container.firstChild).toBeEmpty()
+  })
+
+  it('renders a loading indicator if isLoading set', () => {
+    const {getByText} = render(<StaffContactInfoLayout {...getProps({isLoading: true})} />)
+    expect(getByText('Loading staff...')).toBeInTheDocument()
+  })
+
+  it('renders no loading indicator if isLoading not set', () => {
+    const {queryByText} = render(<StaffContactInfoLayout {...getProps()} />)
+    expect(queryByText('Loading staff...')).not.toBeInTheDocument()
   })
 })

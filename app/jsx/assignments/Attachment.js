@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {IconImageLine, IconTrashLine, IconUploadLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'

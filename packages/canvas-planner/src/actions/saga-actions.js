@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as LA from './loading-actions.js'
-import {anyNewActivityDays, didWeFindToday} from '../utilities/statusUtils'
+import * as LA from './loading-actions'
+import {anyNewActivityDays, didWeFindToday, didWeFindWeekEnd} from '../utilities/statusUtils'
 import {itemsToDays} from '../utilities/daysUtils'
 
 export const mergeFutureItems = (newFutureItems, response) => (dispatch, getState) => {
@@ -62,6 +62,27 @@ export const mergePastItemsForNewActivity = (newPastItems, response) => (dispatc
 
 export const mergePastItemsForToday = (newPastItems, response) => (dispatch, getState) => {
   return mergePastItemsFor(didWeFindToday, newPastItems, response, dispatch, getState)
+}
+
+export const mergeWeekItems = (newWeekItems, response) => (dispatch, getState) => {
+  dispatch(LA.gotPartialWeekDays(itemsToDays(newWeekItems), response))
+  const state = getState()
+  const completeDays = extractCompleteDays(
+    state.loading.partialWeekDays,
+    state.loading.allWeekItemsLoaded,
+    'asc'
+  )
+  if (
+    state.loading.allWeekItemsLoaded ||
+    didWeFindWeekEnd(completeDays, state.weeklyDashboard.weekEnd)
+  ) {
+    const r = mergeCompleteDays(completeDays, dispatch, state.loading.allWeekItemsLoaded, response)
+    if (r) {
+      dispatch(LA.weekLoaded(completeDays))
+    }
+    return r
+  }
+  return false
 }
 
 export const consumePeekIntoPast = (newPastItems, response) => (dispatch, getState) => {

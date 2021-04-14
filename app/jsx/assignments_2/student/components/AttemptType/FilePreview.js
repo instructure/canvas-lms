@@ -25,12 +25,12 @@ import React, {Component} from 'react'
 import {SubmissionFile} from '../../graphqlData/File'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {IconDownloadLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 export default class FilePreview extends Component {
   static propTypes = {

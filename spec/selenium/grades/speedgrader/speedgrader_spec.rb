@@ -398,10 +398,6 @@ describe 'Speedgrader' do
   end
 
   context 'reassigning' do
-    before(:once) do
-      @course.root_account.enable_feature!(:reassign_assignments)
-    end
-
     context 'with assignment' do
       before(:once) do
         @assignment_for_course = @course.assignments.create!(

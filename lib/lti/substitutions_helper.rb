@@ -233,7 +233,7 @@ module Lti
 
     def sis_email
       sis_ps = SisPseudonym.for(@user, @context, type: :trusted, require_sis: true)
-      sis_ps.sis_communication_channel&.path || sis_ps.communication_channels.order(:position).active.first&.path if sis_ps
+      sis_ps.sis_communication_channel&.path || sis_ps.communication_channels.ordered.active.first&.path if sis_ps
     end
 
     def email

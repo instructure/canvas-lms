@@ -26,9 +26,13 @@ function newProps(overrides = {}) {
     toolConfigurationUrl: 'https://www.test.com/config.json',
     validScopes: {},
     validPlacements: [],
+    editing: false,
+    showRequiredMessages: false,
     dispatch: jest.fn(),
     updateConfigurationMethod: jest.fn(),
     configurationMethod: 'json',
+    updateToolConfiguration: Function.prototype,
+    updateToolConfigurationUrl: Function.prototype,
     ...overrides
   }
 }
@@ -51,7 +55,7 @@ describe('when configuration method is by JSON', () => {
   })
 
   it('transitions to configuring by URL when the url option is selected', () => {
-    const select = wrapper.find('Select')
+    const select = wrapper.find('SimpleSelect')
     select.instance().props.onChange({}, {value: 'url'})
     expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
   })
@@ -63,13 +67,13 @@ describe('when configuration method is by URL', () => {
   })
 
   it('renders the tool configuration URL in a text input', () => {
-    const textInput = wrapper.find('TextInput')
+    const textInput = wrapper.find('TextInput').at(1)
     const expectedString = newProps().toolConfigurationUrl
     expect(textInput.html()).toEqual(expect.stringContaining(expectedString))
   })
 
   it('transitions to configuring by JSON when the json option is selected', () => {
-    const select = wrapper.find('Select')
+    const select = wrapper.find('SimpleSelect')
     select.instance().props.onChange({}, {value: 'json'})
     expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
   })

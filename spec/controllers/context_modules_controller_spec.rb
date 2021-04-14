@@ -509,9 +509,9 @@ describe ContextModulesController do
       expect(tagB).to be_published
       tagA = m1.add_item({type: "wiki_page", id: pageA.id}, nil, position: 2)
       expect(tagA).to be_unpublished
-      expect(m1.reload.content_tags.order(:position).pluck(:id)).to eq [tagB.id, tagA.id]
+      expect(m1.reload.content_tags.ordered.pluck(:id)).to eq [tagB.id, tagA.id]
       post 'reorder_items', params: {course_id: @course.id, context_module_id: m1.id, order: "#{tagA.id},#{tagB.id}"}
-      tags = m1.reload.content_tags.order(:position).to_a
+      tags = m1.reload.content_tags.ordered.to_a
       expect(tags.map(&:position)).to eq [1, 2]
       expect(tags.map(&:id)).to eq [tagA.id, tagB.id]
     end

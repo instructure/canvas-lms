@@ -653,7 +653,8 @@ module Canvas::LiveEvents
       context_uuid: context.uuid,
       import_quizzes_next: import_quizzes_next,
       source_course_lti_id: content_migration.source_course&.lti_context_id,
-      destination_course_lti_id: context.lti_context_id
+      destination_course_lti_id: context.lti_context_id,
+      migration_type: content_migration.migration_type
     }
 
     if context.respond_to?(:root_account)
@@ -768,7 +769,8 @@ module Canvas::LiveEvents
       original_mastery: result.original_mastery,
       assessed_at: result.assessed_at,
       title: result.title,
-      percent: result.percent
+      percent: result.percent,
+      workflow_state: result.workflow_state
     }
   end
 

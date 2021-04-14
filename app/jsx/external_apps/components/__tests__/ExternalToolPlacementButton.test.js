@@ -87,6 +87,28 @@ describe('ExternalToolPlacementButton', () => {
     })
   })
 
+  describe('#placementsWithNotice', () => {
+    beforeEach(() => {
+      global.ENV = {
+        CONTEXT_BASE_URL: '/accounts/1',
+        PERMISSIONS: {
+          create_tool_manually: true
+        }
+      }
+    })
+
+    it('renders notice about caching when toggle buttons are shown', () => {
+      const placementsWithNotice = mount(<div>{instance.placementsWithNotice()}</div>)
+      expect(placementsWithNotice.text()).toMatch('It may take some time')
+    })
+
+    it('does not render notice when toggle buttons are hidden', () => {
+      render({version: '1.3'})
+      const placementsWithNotice = mount(<div>{instance.placementsWithNotice()}</div>)
+      expect(placementsWithNotice.text()).not.toMatch('It may take some time')
+    })
+  })
+
   describe('#placements', () => {
     const expectAllPlacements = cb => {
       instance

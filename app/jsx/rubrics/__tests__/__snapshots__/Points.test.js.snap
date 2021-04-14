@@ -8,18 +8,19 @@ exports[`The Points component renders the component when assessing with the expe
     alignItems="end"
     as="span"
     direction="row"
+    display="flex"
     elementRef={[Function]}
-    inline={false}
     justifyItems="start"
-    visualDebug={false}
+    withVisualDebug={false}
+    wrap="no-wrap"
     wrapItems={true}
   >
-    <FlexItem
+    <Item
       as="span"
       elementRef={[Function]}
-      grow={false}
       margin="none small none none"
-      shrink={false}
+      shouldGrow={false}
+      shouldShrink={false}
       size="4rem"
     >
       <TextInput
@@ -45,16 +46,16 @@ exports[`The Points component renders the component when assessing with the expe
         value="1"
         width="4rem"
       />
-    </FlexItem>
-    <FlexItem
+    </Item>
+    <Item
       as="span"
       elementRef={[Function]}
-      grow={false}
       margin="small none none none"
-      shrink={false}
+      shouldGrow={false}
+      shouldShrink={false}
     >
       / 2 pts
-    </FlexItem>
+    </Item>
   </Flex>
 </div>
 `;

@@ -496,13 +496,9 @@ describe SpeedGrader::Assignment do
         assignment.submit_homework(student, attachments: [attachment])
       end
 
-      context 'reassign_assignments feature flag enabled' do
-        before { course.root_account.enable_feature!(:reassign_assignments) }
-
-        it 'includes redo_request field' do
-          json = SpeedGrader::Assignment.new(assignment, teacher).json
-          expect(json.dig('submissions', 0)).to have_key :redo_request
-        end
+      it 'includes redo_request field' do
+        json = SpeedGrader::Assignment.new(assignment, teacher).json
+        expect(json.dig('submissions', 0)).to have_key :redo_request
       end
 
       it 'includes the viewed_at field if the assignment is not anonymized' do

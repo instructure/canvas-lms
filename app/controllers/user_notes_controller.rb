@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -66,7 +68,7 @@ class UserNotesController < ApplicationController
     # entry form is replaced with the rich text editor.
     self.extend TextHelper
     user_note_params[:note] = format_message(user_note_params[:note]).first if user_note_params[:note]
-    user_note_params[:root_account_id] = @domain_root_account&.id
+    user_note_params[:root_account_id] = @domain_root_account.id
     @user_note = user.user_notes.new(user_note_params)
     @user_note.creator = @current_user
 

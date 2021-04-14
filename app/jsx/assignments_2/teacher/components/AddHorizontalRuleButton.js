@@ -20,7 +20,7 @@ import React from 'react'
 import {func, string} from 'prop-types'
 
 import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconPlusLine} from '@instructure/ui-icons'
 import theme from '@instructure/canvas-theme'
 

@@ -705,16 +705,23 @@ describe UserMerge do
   context "sharding" do
     specs_require_sharding
 
-    it "should move past_lti_id to the new user on other shard" do
-      course1 = course_factory(active_all: true)
-      user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
-      UserPastLtiId.create!(user: user1, context: course1, user_uuid: 'fake_uuid', user_lti_id: 'fake_lti_id_from_old_merge')
+    it 'should move past_lti_id to the new user on other shard' do
       @shard1.activate do
         account = Account.create!
-        @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
-        UserMerge.from(user1).into(@user2)
-        expect(@user2.reload.past_lti_ids.shard(@user2).take.user_lti_id).to eq 'fake_lti_id_from_old_merge'
+        @user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1, account: account)
       end
+      course = course_factory(active_all: true)
+      user2 = user_with_pseudonym(username: 'user2@example.com', active_all: 1)
+      UserPastLtiId.create!(
+        user: user2,
+        context: course,
+        user_uuid: 'fake_uuid',
+        user_lti_id: 'fake_lti_id_from_old_merge'
+      )
+      UserMerge.from(user2).into(@user1)
+      expect(
+        UserPastLtiId.shard(course).where(user_id: @user1).take.user_lti_id
+      ).to eq 'fake_lti_id_from_old_merge'
     end
 
     it 'should move prefs over with old format' do
@@ -811,6 +818,24 @@ describe UserMerge do
         UserMerge.from(user2).into(user1)
       end
       expect(user1.favorites.take.context_id).to eq course.id
+    end
+
+    it 'handles duplicate favorites other direction' do
+      user2 = @shard1.activate do
+        user_model
+      end
+      user1 = user_model
+
+      course = course_factory
+      course.enroll_user(user1)
+      course.enroll_user(user2)
+      fav1 = user1.favorites.create!(context: course)
+      fav2 = user2.favorites.create!(context: course)
+
+      @shard1.activate do
+        UserMerge.from(user1).into(user2)
+      end
+      expect(user2.favorites.take.context_id).to eq course.id
     end
 
     it 'should merge with user_services across shards' do

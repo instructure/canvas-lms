@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddSkinnyAuaTables < ActiveRecord::Migration[5.2]
   tag :predeploy
 

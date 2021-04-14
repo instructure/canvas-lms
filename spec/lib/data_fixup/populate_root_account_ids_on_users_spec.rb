@@ -28,7 +28,7 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
     p2 = a2.pseudonyms.create!(user: user, unique_id: 'user')
     expect(p1.root_account_id).to eq a1.id
     expect(p2.root_account_id).to eq a2.id
-    expect(user.reload.root_account_ids).to eq(nil)
+    expect(user.reload.root_account_ids).to eq([])
     DataFixup::PopulateRootAccountIdsOnUsers.populate(user.id, user.id)
     expect(user.reload.root_account_ids).to eq([a1.id, a2.id])
   end
@@ -39,7 +39,7 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
     a2 = Account.create!
     p1 = a1.pseudonyms.create!(user: user, unique_id: 'user')
     expect(p1.root_account_id).to eq a1.id
-    expect(user.reload.root_account_ids).to eq(nil)
+    expect(user.reload.root_account_ids).to eq([])
 
     DataFixup::PopulateRootAccountIdsOnUsers.populate(user.id, user.id)
     expect(user.reload.root_account_ids).to eq([a1.id])
@@ -55,7 +55,7 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
 
     it 'populates root account ids from a different shard' do
       user1 = User.create!
-      a1 =nil
+      a1 = nil
       user2 = @shard2.activate { User.create! }
       @shard1.activate do
         a1 = Account.create!
@@ -66,8 +66,8 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
         p2 = a1.pseudonyms.create!(user: user2, unique_id: 'user2')
         expect(p1.root_account_id).to eq a1.id
         expect(p2.root_account_id).to eq a1.id
-        expect(user1.reload.root_account_ids).to eq(nil)
-        expect(user2.reload.root_account_ids).to eq(nil)
+        expect(user1.reload.root_account_ids).to eq([])
+        expect(user2.reload.root_account_ids).to eq([])
 
         DataFixup::PopulateRootAccountIdsOnUsers.populate_table
       end

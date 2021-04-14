@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!course_nickname_edit'
-import {TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 
 class CourseNicknameEdit extends React.Component {
   // ===============

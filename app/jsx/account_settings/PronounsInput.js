@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {nanoid} from 'nanoid'
 import {IconInfoLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!PronounsInput'
 

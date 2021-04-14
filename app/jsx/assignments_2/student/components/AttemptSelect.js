@@ -53,7 +53,7 @@ export default function AttemptSelect({submission, allSubmissions, onChangeSubmi
   }
 
   return (
-    <View as="div" margin="0 0 medium 0">
+    <View as="div" margin="0">
       <SimpleSelect
         renderLabel={<ScreenReaderContent>{I18n.t('Attempt')}</ScreenReaderContent>}
         width="15rem"

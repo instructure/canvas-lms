@@ -19,7 +19,7 @@ import I18n from 'i18n!assignments_2'
 import {bool, string} from 'prop-types'
 import React from 'react'
 
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 
 export default function SubmissionStatusPill(props) {
   if (props.excused) {

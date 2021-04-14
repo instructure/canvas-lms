@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import I18n from 'i18n!react_developer_keys'

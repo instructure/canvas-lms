@@ -24,7 +24,8 @@ import GenericErrorPage from '../../../../shared/components/GenericErrorPage/ind
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import {Button} from '@instructure/ui-buttons'
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
+import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {Submission} from '../../graphqlData/Submission'
 import {useQuery} from 'react-apollo'
@@ -63,6 +64,8 @@ export default function CommentsTab(props) {
     setIsFetchingMoreComments(false)
   }
 
+  const {allowChangesToSubmission} = useContext(StudentViewContext)
+
   if (loading) return <LoadingIndicator />
   if (error) {
     return (
@@ -73,6 +76,7 @@ export default function CommentsTab(props) {
       />
     )
   }
+
   return (
     <ErrorBoundary
       errorComponent={
@@ -83,7 +87,9 @@ export default function CommentsTab(props) {
       }
     >
       <div data-testid="comments-container">
-        <CommentTextArea assignment={props.assignment} submission={props.submission} />
+        {allowChangesToSubmission && (
+          <CommentTextArea assignment={props.assignment} submission={props.submission} />
+        )}
         <CommentContent
           comments={data.submissionComments.commentsConnection.nodes}
           submission={props.submission}

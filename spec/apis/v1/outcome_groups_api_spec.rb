@@ -346,35 +346,72 @@ describe "Outcome Groups API", type: :request do
         )
       end
 
-      it "outcome is assessed" do
-        course_with_teacher(active_all: true)
-        student_in_course(context: @course)
-        @course.root_outcome_group.add_outcome(@outcome)
-        expect(@outcome).not_to be_assessed(@course)
+      context "outcome is assessed" do
+        before do
+          course_with_teacher(active_all: true)
+          student_in_course(context: @course)
+          @course.root_outcome_group.add_outcome(@outcome)
 
-        course_with_teacher(active_all: true)
-        student_in_course(context: @course)
-        @course.root_outcome_group.add_outcome(@outcome)
-        assess_with(@outcome, @course, @student)
-        expect(@outcome).to be_assessed(@course)
+          course_with_teacher(active_all: true)
+          student_in_course(context: @course)
+          @course.root_outcome_group.add_outcome(@outcome)
+          assess_with(@outcome, @course, @student)
+        end
 
-        json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
-                         controller: 'outcome_groups_api',
-                         action: 'link_index',
-                         account_id: @account.id,
-                         format: 'json')
+        it 'shows outcome assessed' do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
+                          controller: 'outcome_groups_api',
+                          action: 'link_index',
+                          course_id: @course.id,
+                          format: 'json')
 
-        check_outcome.call(json.last["outcome"], false)
+          check_outcome.call(json.last["outcome"], false)
+          check_outcome_link.call(
+            json.last.tap{|j| j.delete("outcome")},
+            @course,
+            @course.root_outcome_group,
+            true, # assessed
+            false,
+            false
+          )
+        end
 
-        # Account context should never be assessed
-        check_outcome_link.call(
-          json.last.tap{ |j| j.delete("outcome") },
-          @account,
-          @account.root_outcome_group,
-          false,
-          false,
-          false
-        )
+        it 'shows outcome unassessed when assessment deleted' do
+          @outcome.learning_outcome_results.where(user: @student).last.destroy!
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
+            controller: 'outcome_groups_api',
+            action: 'link_index',
+            course_id: @course.id,
+            format: 'json')
+
+          check_outcome.call(json.last["outcome"], false)
+          check_outcome_link.call(
+            json.last.tap{|j| j.delete("outcome")},
+            @course,
+            @course.root_outcome_group,
+            false, # assessed
+            false,
+            false
+          )
+        end
+
+        it 'shows outcome unassessed at account level' do
+          # Account context should never be assessed
+          json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+            controller: 'outcome_groups_api',
+            action: 'link_index',
+            account_id: @account.id,
+            format: 'json')
+
+          check_outcome_link.call(
+            json.last.tap{ |j| j.delete("outcome") },
+            @account,
+            @account.root_outcome_group,
+            false, # assessed
+            false,
+            false
+          )
+        end
       end
     end
 

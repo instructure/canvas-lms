@@ -19,9 +19,11 @@
 import React from 'react'
 
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
-import {Link, Text, TruncateText} from '@instructure/ui-elements'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {omitProps} from '@instructure/ui-react-utils'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 class BreadcrumbLinkWithTip extends Breadcrumb.Link {
   renderLink = () => {

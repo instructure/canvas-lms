@@ -124,7 +124,6 @@ export const ADD_CONVERSATION_MESSAGE = gql`
       conversationMessage {
         ...ConversationMessage
       }
-      messageQueued
       errors {
         ...Error
       }

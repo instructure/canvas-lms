@@ -18,7 +18,7 @@
 
 import React from 'react'
 import NoResultsDesert from './SVG/NoResultsDesert.svg'
-import {Text} from '@instructure/ui-text/lib/Text'
+import {Text} from '@instructure/ui-text'
 import AnnouncementsPagination from './AnnouncementPagination'
 import I18n from 'i18n!past_global_announcements'
 

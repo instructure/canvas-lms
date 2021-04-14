@@ -26,8 +26,10 @@ import TeacherViewContext from '../TeacherViewContext'
 import AvailabilityDates from '../../../shared/AvailabilityDates'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 
-import {Flex, View, Responsive} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Responsive} from '@instructure/ui-responsive'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
 export default class OverrideSummary extends React.Component {
   static contextType = TeacherViewContext

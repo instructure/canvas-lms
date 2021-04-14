@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 
 import natcompare from 'compiled/util/natcompare'

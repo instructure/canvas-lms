@@ -25,8 +25,8 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-icons'
 import LoadingIndicator from 'jsx/shared/LoadingIndicator'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 import {direction} from '../../../../shared/helpers/rtlHelper'
 
 export default class TextEntry extends React.Component {

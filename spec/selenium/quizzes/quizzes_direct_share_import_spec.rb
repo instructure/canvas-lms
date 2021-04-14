@@ -22,42 +22,21 @@ require_relative 'page_objects/quizzes_index_page'
 # Note that this is old quizzes in Canvas
 
 describe 'quizzes' do
-    include_context 'in-process server selenium tests'
-    include QuizzesIndexPage
+  include_context 'in-process server selenium tests'
+  include QuizzesIndexPage
 
-    context 'with direct share FF ON' do
-        before(:each) do
-            course_with_teacher_logged_in
-            @course.save!
-            @quiz1 = @course.quizzes.create!(:title => "Math Quiz!")
-            Account.default.enable_feature!(:direct_share)
-            user_session(@teacher)
-            visit_quizzes_index_page(@course.id)
-        end
+  before(:each) do
+    course_with_teacher_logged_in
+    @course.save!
+    @quiz1 = @course.quizzes.create!(:title => "Math Quiz!")
+    user_session(@teacher)
+    visit_quizzes_index_page(@course.id)
+  end
 
-        it 'shows direct share options' do
-            manage_quiz_menu(@quiz1.id).click
+  it 'shows direct share options' do
+    manage_quiz_menu(@quiz1.id).click
 
-            expect(quiz_settings_menu(@quiz1.id).text).to include('Send to...')
-            expect(quiz_settings_menu(@quiz1.id).text).to include('Copy to...')
-        end
-    end
-
-    context 'with direct share FF OFF' do
-        before(:each) do
-            course_with_teacher_logged_in
-            @course.save!
-            @quiz1 = @course.quizzes.create!(:title => "Math Quiz!")
-            Account.default.disable_feature!(:direct_share)
-            user_session(@teacher)
-            visit_quizzes_index_page(@course.id)
-        end
-
-        it 'hides direct share options' do
-            manage_quiz_menu(@quiz1.id).click
-            
-            expect(quiz_settings_menu(@quiz1.id).text).not_to include('Send to...')
-            expect(quiz_settings_menu(@quiz1.id).text).not_to include('Copy to...')
-        end
-    end
+    expect(quiz_settings_menu(@quiz1.id).text).to include('Send to...')
+    expect(quiz_settings_menu(@quiz1.id).text).to include('Copy to...')
+  end
 end
