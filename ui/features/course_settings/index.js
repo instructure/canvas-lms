@@ -17,32 +17,64 @@
  */
 
 import $ from 'jquery'
-import React from 'react'
+import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import NavigationView from './backbone/views/NavigationView'
+import ErrorBoundary from '@canvas/error-boundary'
 import FeatureFlagAdminView from '@canvas/feature-flag-admin-view'
+import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
 import CourseColorSelector from './react/components/CourseColorSelector'
 import CourseImageSelector from './react/components/CourseImageSelector'
-import BlueprintLockOptions from './react/components/BlueprintLockOptions'
-import CourseAvailabilityOptions from './react/components/CourseAvailabilityOptions'
 import configureStore from './react/store/configureStore'
 import initialState from './react/store/initialState'
 import './jquery/index'
 import '@canvas/grading-standards'
 import FeatureFlags from '@canvas/feature-flags'
-import Integrations from '@canvas/integrations/react/Integrations'
+import I18n from 'i18n!course_settings'
+
+const BlueprintLockOptions = React.lazy(() => import('./react/components/BlueprintLockOptions'))
+const CourseTemplateDetails = React.lazy(() => import('./react/components/CourseTemplateDetails'))
+const CourseAvailabilityOptions = React.lazy(() =>
+  import('./react/components/CourseAvailabilityOptions')
+)
+const Integrations = React.lazy(() => import('@canvas/integrations/react/Integrations'))
+
+const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
+const Error = () => (
+  <div className="bcs_check-box">
+    <Text color="warning">{I18n.t('Unable to load this control')}</Text>
+  </div>
+)
 
 const blueprint = document.getElementById('blueprint_menu')
 if (blueprint) {
   ReactDOM.render(
-    <BlueprintLockOptions
-      isMasterCourse={ENV.IS_MASTER_COURSE}
-      disabledMessage={ENV.DISABLED_BLUEPRINT_MESSAGE}
-      generalRestrictions={ENV.BLUEPRINT_RESTRICTIONS}
-      useRestrictionsbyType={ENV.USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
-      restrictionsByType={ENV.BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
-    />,
+    <Suspense fallback={<Loading />}>
+      <ErrorBoundary errorComponent={<Error />}>
+        <BlueprintLockOptions
+          isMasterCourse={ENV.IS_MASTER_COURSE}
+          disabledMessage={ENV.DISABLED_BLUEPRINT_MESSAGE}
+          generalRestrictions={ENV.BLUEPRINT_RESTRICTIONS}
+          useRestrictionsbyType={ENV.USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
+          restrictionsByType={ENV.BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
+        />
+      </ErrorBoundary>
+    </Suspense>,
     blueprint
+  )
+}
+
+const courseTemplate = document.getElementById('course_template_details')
+if (courseTemplate) {
+  const isEditable = courseTemplate.getAttribute('data-is-editable') === 'true'
+  ReactDOM.render(
+    <Suspense fallback={<Loading />}>
+      <ErrorBoundary errorComponent={<Error />}>
+        <CourseTemplateDetails isEditable={isEditable} />
+      </ErrorBoundary>
+    </Suspense>,
+    courseTemplate
   )
 }
 
@@ -71,14 +103,16 @@ if (ENV.COURSE_IMAGES_ENABLED) {
 const availabilityOptionsContainer = document.getElementById('availability_options_container')
 if (availabilityOptionsContainer) {
   ReactDOM.render(
-    <CourseAvailabilityOptions
-      canManage={
-        ENV.PERMISSIONS.manage_courses ||
-        (ENV.PERMISSIONS.manage && !ENV.PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS)
-      }
-      viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
-      viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
-    />,
+    <Suspense fallback={<Loading />}>
+      <CourseAvailabilityOptions
+        canManage={
+          ENV.PERMISSIONS.manage_courses ||
+          (ENV.PERMISSIONS.manage && !ENV.PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS)
+        }
+        viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
+        viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
+      />
+    </Suspense>,
     availabilityOptionsContainer
   )
 }
@@ -95,5 +129,10 @@ if (ENV.COURSE_COLORS_ENABLED) {
 
 const integrationsContainer = document.getElementById('tab-integrations')
 if (integrationsContainer) {
-  ReactDOM.render(<Integrations />, integrationsContainer)
+  ReactDOM.render(
+    <Suspense fallback={<Loading />}>
+      <Integrations />
+    </Suspense>,
+    integrationsContainer
+  )
 }

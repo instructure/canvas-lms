@@ -78,7 +78,7 @@ export default class BlueprintLockOptions extends React.Component {
   }
 
   enableCourse = () => {
-    this.setState({courseEnabled: !this.state.courseEnabled})
+    this.setState(oldState => ({courseEnabled: !oldState.courseEnabled}))
   }
 
   renderGeneralMenu(lock) {

@@ -159,13 +159,7 @@
                    @context.can_become_template? && @context.grants_right?(@current_user, session, :add_course_template)
                  end
             %>
-            <div class="checkbox-flex-container">
-              <%= f.check_box :template, disabled: !editable %>
-              <%= f.label :template, :en => "Enable course as a Course Template" %>
-            </div>
-            <% if @context.template? %>
-              <div><%= t({ one: "One associated account", other: "%{count} associated accounts" }, count: @context.templated_accounts.count) %></div>
-            <% end %>
+            <div id="course_template_details" data-is-editable=<%= editable %> %>></div>
           </div>
         </div>
       <% end %>
