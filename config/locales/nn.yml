@@ -8198,7 +8198,7 @@ nn:
   enrollments_students: Studentar
   enrollments_tas: Undervisingsassistentar
   enrollments_teachers: Faglærarar
-  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Sikrar at lærinigsmål som alt er importert til eit emne ikkje vert duplisert dersom dei vert importert ein gong til."
+  ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Sikrar at læringsmål som alt er importert til eit emne ikkje vert duplisert dersom dei vert importert ein gong til."
   enter_a_course_to_narrow_results_e992f93: "Skriv eit emne for å snevre inn søkeresultatet"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Oppgi ei hex-kode slik at du kan bruke eigendefinert farge."
   enter_a_valid_date_46d77547: "Legg inn ein gyldig dato"
