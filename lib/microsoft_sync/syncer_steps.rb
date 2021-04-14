@@ -54,9 +54,13 @@ module MicrosoftSync
       6.hours
     end
 
-    def cleanup_after_failure
+    def after_failure
       # We can clean up here e.g. (MicrosoftSync::GroupMember.delete_all)
       # when we have retry in getting owners & executing diff
+    end
+
+    def after_complete
+      group.update!(last_synced_at: Time.zone.now)
     end
 
     # This is semi-expected (user disables sync on account-level when jobs are
@@ -183,8 +187,15 @@ module MicrosoftSync
     end
 
     def tenant
-      @tenant ||= group.root_account.settings[:microsoft_sync_tenant] or
-        raise TenantMissingOrSyncDisabled
+      @tenant ||=
+        begin
+          settings = group.root_account.settings
+          enabled = settings[:microsoft_sync_enabled]
+          tenant = settings[:microsoft_sync_tenant]
+          raise TenantMissingOrSyncDisabled unless enabled && tenant
+
+          tenant
+        end
     end
 
     def graph_service_helpers

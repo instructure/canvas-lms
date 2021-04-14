@@ -28,6 +28,7 @@ describe MicrosoftSync::SyncerSteps do
   let(:graph_service) { double('GraphService') }
   let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: graph_service) }
   let(:tenant) { 'mytenant123' }
+  let(:sync_enabled) { true }
 
   def expect_next_step(result, next_step, memory_state=nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::NextStep)
@@ -54,6 +55,7 @@ describe MicrosoftSync::SyncerSteps do
 
   before do
     ra = course.root_account
+    ra.settings[:microsoft_sync_enabled] = sync_enabled
     ra.settings[:microsoft_sync_tenant] = tenant
     ra.save!
 
@@ -74,6 +76,23 @@ describe MicrosoftSync::SyncerSteps do
     subject { syncer_steps.max_retries }
 
     it { is_expected.to eq(4) }
+  end
+
+  describe '#after_failure' do
+    it 'is defined' do
+      # expand once we start using this (will be soon, when we stash
+      # in-progress paginated results when getting group members)
+      expect(syncer_steps.after_failure).to eq(nil)
+    end
+  end
+
+  describe '#after_complete' do
+    it 'sets last_synced_at on the group' do
+      Timecop.freeze do
+        expect { syncer_steps.after_complete }.to \
+          change { group.reload.last_synced_at }.from(nil).to(Time.zone.now)
+      end
+    end
   end
 
   describe '#step_ensure_class_group_exists' do
@@ -119,9 +138,7 @@ describe MicrosoftSync::SyncerSteps do
         end
       end
 
-      context 'when the tenant is not set in the account settings' do
-        let(:tenant) { nil }
-
+      shared_examples_for 'missing the correct account settings' do
         it 'raises a graceful cleanup error with a end-user-friendly name' do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
@@ -132,6 +149,18 @@ describe MicrosoftSync::SyncerSteps do
           expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
           expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
         end
+      end
+
+      context 'when the tenant is not set in the account settings' do
+        let(:tenant) { nil }
+
+        it_behaves_like 'missing the correct account settings'
+      end
+
+      context 'when the microsoft_sync_enabled is false in the account settings' do
+        let(:sync_enabled) { false }
+
+        it_behaves_like 'missing the correct account settings'
       end
     end
 

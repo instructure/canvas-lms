@@ -38,7 +38,7 @@
 #   job_state_record.job_state is information about the step that failed,
 #       and data it may need to continue where it left off. There may be other
 #       temporary data in the DB with retry info (e.g. saved with a stash block
-#       and cleaned up in cleanup_after_failure())
+#       and cleaned up in after_failure())
 # After a job has hit a final error (error raised, or max `Retry`s surpassed):
 #   job_state_record.workflow_state is "errored"
 #   job_state_record.last_error will have a user-friendly/safe error message
@@ -73,8 +73,12 @@ module MicrosoftSync
     #     take 0 or 1 arguments). They should return a NextStep or Retry object
     #     or COMPLETE (see below), or you can raise an error to signal a
     #     unretriable error.
-    #   cleanup_after_failure() -- called when a job fails (unretriable error
-    #   raised, or a Retry happens past max_retries).
+    #   after_failure() -- called when a job fails (unretriable error
+    #     raised, or a Retry happens past max_retries), or when a stale
+    #     job is restarted. Can be used to clean up state, e.g. state stored in
+    #     stash_block
+    #   after_complete() -- called when a step returns COMPLETE. Note: this is
+    #     run even if the state record has been deleted since we last checked.
     attr_reader :steps_object
 
     def initialize(job_state_record, steps_object)
@@ -105,7 +109,7 @@ module MicrosoftSync
     # If the job has already surpassed the max number of retries, `error` will be
     # raised and handled like any non-retriable error (the job will fail, the
     # job_state_record's workflow_state will be set to error and error will be
-    # put in last_error, and we will call cleanup_after_failure()).
+    # put in last_error, and we will call after_failure()).
     #
     # Otherwise, a retry job will be enqueued; job_state_data will be written
     # into the job_state field of the job and passed into the same step when the
@@ -166,7 +170,7 @@ module MicrosoftSync
       updated_at = job_state&.dig(:updated_at)
       if updated_at && updated_at < steps_object.restart_job_after_inactivity.ago
         # Trying to run a new job, old job has possibly stalled. Clean up and start over.
-        steps_object.cleanup_after_failure
+        steps_object.after_failure
         job_state_record.update!(job_state: nil)
         run_main_loop(nil, nil, synchronous)
       end
@@ -201,6 +205,7 @@ module MicrosoftSync
           job_state_record&.update_workflow_state_unless_deleted(
             :completed, job_state: nil, last_error: nil
           )
+          steps_object.after_complete
           return
         when NextStep
           current_step, memory_state = result.next_step, result.memory_state
@@ -239,7 +244,7 @@ module MicrosoftSync
       job_state_record&.update_workflow_state_unless_deleted(
         :errored, last_error: error_msg, job_state: nil
       )
-      steps_object.cleanup_after_failure
+      steps_object.after_failure
     end
 
     # Returns false if workflow_state has since been set to deleted (so we

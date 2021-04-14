@@ -41,7 +41,13 @@ module MicrosoftSync
       6.hours
     end
 
-    def cleanup_after_failure; end
+    def after_failure
+      steps_run << [:after_failure]
+    end
+
+    def after_complete
+      steps_run << [:after_complete]
+    end
   end
 
   # Sample steps object to test functionality of StateMachineJob framework by
@@ -122,6 +128,7 @@ module MicrosoftSync
           [:sleep, 2.seconds],
           [:step_first, nil, 'retry2'],
           [:step_second, 'first_data', nil],
+          [:after_complete],
         ])
       end
     end
@@ -156,6 +163,7 @@ module MicrosoftSync
         expect(steps_object.steps_run).to eq([
           [:step_first, nil, 'retry2'],
           [:step_second, 'first_data', nil],
+          [:after_complete],
         ])
       end
 
@@ -216,7 +224,7 @@ module MicrosoftSync
       end
 
       context 'when an unhandled error occurs' do
-        it 'bubbles up the error and sets the record state to errored' do
+        it 'bubbles up the error, sets the record state to errored, and calls after_failure' do
           subject.send(:run, nil)
           subject.send(:run, :step_first)
 
@@ -227,6 +235,7 @@ module MicrosoftSync
           expect(state_record.reload.job_state).to eq(nil)
           expect(state_record.workflow_state).to eq('errored')
           expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+          expect(steps_object.steps_run.last).to eq([:after_failure])
         end
 
         context 'when the error includes GracefulCancelErrorMixin' do
@@ -234,11 +243,12 @@ module MicrosoftSync
             include MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin
           end
 
-          it 'sets the record state and stops processing but does not bubble up the error' do
+          it 'sets the record state, calls after_failure, and stops processing but does not bubble up the error' do
             error = GracefulCancelTestError.new
             expect(steps_object).to receive(:step_first).and_raise(error)
             subject.send(:run, nil)
-            expect(steps_object.steps_run).to eq([]) # nothing enqueued
+            # nothing enqueued
+            expect(steps_object.steps_run).to eq([[:after_failure]])
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
