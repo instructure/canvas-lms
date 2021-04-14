@@ -345,87 +345,85 @@ pipeline {
               buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
             }
 
-            extendedStage('Builder').obeysAllowStages(false).timings(false).queue(rootStages) {
+            extendedStage('Builder').nodeRequirements('canvas-docker-nospot').obeysAllowStages(false).timings(false).queue(rootStages) {
               // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
               // wait for the current steps to complete (even wait to spin up a node), causing
               // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
-              protectedNode('canvas-docker-nospot') {
-                extendedStage('Setup')
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .timeout(2)
-                  .execute({ setupStage() })
+              extendedStage('Setup')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(2)
+                .execute({ setupStage() })
 
-                extendedStage(FILES_CHANGED_STAGE)
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .timeout(2)
-                  .execute { stageConfig ->
-                    stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
-                    stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
+              extendedStage(FILES_CHANGED_STAGE)
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(2)
+                .execute { stageConfig ->
+                  stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
+                  stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
 
-                    dir(env.LOCAL_WORKDIR) {
-                      stageConfig.value('specFiles', sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)
-                    }
-
-                    // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
-                    // https://issues.jenkins.io/browse/JENKINS-52750
-                    if(env.GERRIT_PROJECT != "canvas-lms") {
-                      sh "rm -vrf $LOCAL_WORKDIR@tmp"
-                    }
-
-                    distribution.stashBuildScripts()
+                  dir(env.LOCAL_WORKDIR) {
+                    stageConfig.value('specFiles', sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)
                   }
 
-                extendedStage('Rebase')
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
-                  .timeout(2)
-                  .execute({ rebaseStage() })
+                  // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
+                  // https://issues.jenkins.io/browse/JENKINS-52750
+                  if(env.GERRIT_PROJECT != "canvas-lms") {
+                    sh "rm -vrf $LOCAL_WORKDIR@tmp"
+                  }
 
-                extendedStage('Build Docker Image (Pre-Merge)')
-                  .obeysAllowStages(false)
+                  distribution.stashBuildScripts()
+                }
+
+              extendedStage('Rebase')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
+                .timeout(2)
+                .execute({ rebaseStage() })
+
+              extendedStage('Build Docker Image (Pre-Merge)')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .required(configuration.isChangeMerged())
+                .timeout(20)
+                .execute(buildDockerImageStage.&premergeCacheImage)
+
+              extendedStage('Build Docker Image')
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(20)
+                .execute(buildDockerImageStage.&patchsetImage)
+
+              extendedStage(RUN_MIGRATIONS_STAGE)
+                .obeysAllowStages(false)
+                .handler(buildSummaryReport)
+                .timeout(10)
+                .execute({ runMigrationsStage() })
+
+              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
+                def stages = [:]
+
+                extendedStage('Linters')
+                  .handler(buildSummaryReport)
+                  .required(!configuration.isChangeMerged())
+                  .queue(stages, { lintersStage() })
+
+                extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
+                  sh 'build/new-jenkins/consumer-smoke-test.sh'
+                }
+
+                extendedStage(JS_BUILD_IMAGE_STAGE)
+                  .handler(buildSummaryReport)
+                  .queue(stages, buildDockerImageStage.&jsImage)
+
+                extendedStage('Dependency Check')
                   .handler(buildSummaryReport)
                   .required(configuration.isChangeMerged())
-                  .timeout(20)
-                  .execute(buildDockerImageStage.&premergeCacheImage)
+                  .queue(stages, { dependencyCheckStage() })
 
-                extendedStage('Build Docker Image')
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .timeout(20)
-                  .execute(buildDockerImageStage.&patchsetImage)
-
-                extendedStage(RUN_MIGRATIONS_STAGE)
-                  .obeysAllowStages(false)
-                  .handler(buildSummaryReport)
-                  .timeout(10)
-                  .execute({ runMigrationsStage() })
-
-                extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
-                  def stages = [:]
-
-                  extendedStage('Linters')
-                    .handler(buildSummaryReport)
-                    .required(!configuration.isChangeMerged())
-                    .queue(stages, { lintersStage() })
-
-                  extendedStage('Consumer Smoke Test').handler(buildSummaryReport).queue(stages) {
-                    sh 'build/new-jenkins/consumer-smoke-test.sh'
-                  }
-
-                  extendedStage(JS_BUILD_IMAGE_STAGE)
-                    .handler(buildSummaryReport)
-                    .queue(stages, buildDockerImageStage.&jsImage)
-
-                  extendedStage('Dependency Check')
-                    .handler(buildSummaryReport)
-                    .required(configuration.isChangeMerged())
-                    .queue(stages, { dependencyCheckStage() })
-
-                  parallel(stages)
-                }
+                parallel(stages)
               }
             }
 

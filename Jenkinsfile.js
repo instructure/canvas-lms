@@ -86,7 +86,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker') {
+          extendedStage('Runner').nodeRequirements('canvas-docker').execute {
             stage('Setup') {
               timeout(time: 3) {
                 sh 'rm -vrf ./tmp/*'

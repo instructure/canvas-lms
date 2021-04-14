@@ -66,7 +66,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker') {
+          extendedStage('Runner').nodeRequirements('canvas-docker').execute {
             stage('Start Docker Images') {
               timeout(time: 3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC

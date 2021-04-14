@@ -40,15 +40,13 @@ def appendStagesAsBuildNodes(nodes,
     // we cant use String.format, so... yea
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
-    extendedStage(stage_name).handler(buildSummaryReport).queue(nodes) {
-      protectedNode("canvas-docker") {
-        echo "Running on node ${env.NODE_NAME}"
-        def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
-        // make sure to unstash
-        unstash name: "build-dir"
-        unstash name: "build-docker-compose"
-        stage_block(index)
-      }
+    extendedStage(stage_name).handler(buildSummaryReport).nodeRequirements('canvas-docker').queue(nodes) {
+      echo "Running on node ${env.NODE_NAME}"
+      def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
+      // make sure to unstash
+      unstash name: "build-dir"
+      unstash name: "build-docker-compose"
+      stage_block(index)
     }
   }
 }
