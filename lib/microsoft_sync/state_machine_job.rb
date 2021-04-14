@@ -186,9 +186,9 @@ module MicrosoftSync
       memory_state = nil
 
       loop do
+        # TODO: consider checking if group object is deleted before every step (INTEROP-6621)
+        log { "running step #{current_step}" }
         begin
-          # TODO: consider checking if group object is deleted before every step (INTEROP-6621)
-          log { "running step #{current_step}" }
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
           update_state_record_to_errored_and_cleanup(e)
@@ -211,9 +211,7 @@ module MicrosoftSync
           current_step, memory_state = result.next_step, result.memory_state
           job_state_data = nil
         when Retry
-          if update_state_record_to_retrying(result, current_step)
-            run_with_delay(current_step, result.delay_amount, synchronous: synchronous)
-          end
+          handle_retry(result, current_step, synchronous)
           return
         else
           raise InternalError, "Step returned #{result.inspect}, expected COMPLETE/NextStep/Retry"
@@ -236,7 +234,7 @@ module MicrosoftSync
         return
       end
 
-      self.delay(strand: strand, run_at: delay_amount&.from_now).run(step)
+      self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now).run(step)
     end
 
     def update_state_record_to_errored_and_cleanup(error)
@@ -247,13 +245,16 @@ module MicrosoftSync
       steps_object.after_failure
     end
 
-    # Returns false if workflow_state has since been set to deleted (so we
-    # should stop)
     # Raises the error if we have passed the retry limit
-    # Otherwise sets the job_state to keep track of (step, data, retries)
-    def update_state_record_to_retrying(retry_object, current_step)
+    # Does nothing if workflow_state has since been set to deleted
+    # Otherwise sets the job_state to keep track of (step, data, retries) and
+    # kicks off a retry
+    def handle_retry(retry_object, current_step, synchronous)
       job_state = job_state_record.reload.job_state
-      retries = job_state&.dig(:retries) || 0
+
+      retries_by_step = job_state&.dig(:retries_by_step) || {}
+      retries = retries_by_step[current_step.to_s] || 0
+
       if retries >= steps_object.max_retries
         update_state_record_to_errored_and_cleanup(retry_object.error)
         raise retry_object.error
@@ -265,14 +266,20 @@ module MicrosoftSync
         step: current_step,
         updated_at: Time.zone.now,
         data: retry_object.job_state_data,
-        retries: retries + 1,
+        retries_by_step: retries_by_step.merge(current_step.to_s => retries + 1),
         # for debugging only:
         retried_on_error: "#{retry_object.error.class}: #{retry_object.error.message}",
       }
 
-      job_state_record&.update_unless_deleted(
+      return unless job_state_record&.update_unless_deleted(
         workflow_state: :retrying, job_state: new_job_state
       )
+
+      delay_amount = retry_object.delay_amount
+      delay_amount = delay_amount[retries] || delay_amount.last if delay_amount.is_a?(Array)
+      log { "handle_retry #{current_step} - #{delay_amount}" }
+
+      run_with_delay(current_step, delay_amount, synchronous: synchronous)
     end
   end
 end

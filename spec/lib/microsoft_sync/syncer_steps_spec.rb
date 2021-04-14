@@ -41,7 +41,10 @@ describe MicrosoftSync::SyncerSteps do
     expect(result).to be_a(MicrosoftSync::StateMachineJob::Retry)
     expect(result.error.class).to eq(error_class)
     expect(result.delay_amount).to eq(delay_amount)
-    expect(result.delay_amount.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
+    # Check that we haven't specified any delays to big for our restart_job_after_inactivity
+    [result.delay_amount].flatten.each do |delay|
+      expect(delay.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
+    end
     expect(result.job_state_data).to eq(job_state_data)
   end
 
@@ -75,7 +78,7 @@ describe MicrosoftSync::SyncerSteps do
   describe '#max_retries' do
     subject { syncer_steps.max_retries }
 
-    it { is_expected.to eq(4) }
+    it { is_expected.to eq(3) }
   end
 
   describe '#after_failure' do
@@ -206,7 +209,7 @@ describe MicrosoftSync::SyncerSteps do
           expect { subject }.to_not change { group.reload.ms_group_id }
           expect_retry(
             subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-            delay_amount: 45.seconds, job_state_data: 'newid'
+            delay_amount: [5, 20, 100], job_state_data: 'newid'
           )
         end
       end
@@ -314,6 +317,16 @@ describe MicrosoftSync::SyncerSteps do
         expect(upns_looked_up).to include("student1@example.com")
       end
     end
+
+    context 'on 404' do
+      it 'retries with a delay' do
+        expect(graph_service_helpers).to receive(:users_upns_to_aads).and_raise(new_http_error(404))
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100]
+        )
+      end
+    end
   end
 
   describe '#step_generate_diff' do
@@ -343,6 +356,17 @@ describe MicrosoftSync::SyncerSteps do
 
       expect_next_step(subject, :step_execute_diff, diff)
       expect(members_and_enrollment_types).to eq([['0', 'TeacherEnrollment']])
+    end
+
+    context 'on 404' do
+      it 'retries with a delay' do
+        expect(graph_service_helpers).to receive(:get_group_users_aad_ids)
+          .and_raise(new_http_error(404))
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100]
+        )
+      end
     end
   end
 
@@ -409,25 +433,25 @@ describe MicrosoftSync::SyncerSteps do
       end
 
       context 'when the Microsoft API errors with "group has no owners"' do
-        it "retries in 1 minute" do
+        it "retries in (30, 90, 270 seconds)" do
           expect(graph_service).to receive(:create_education_class_team).with('mygroupid').
             and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
           expect_retry(
             subject,
             error_class: MicrosoftSync::Errors::GroupHasNoOwners,
-            delay_amount: 1.minute
+            delay_amount: [30, 90, 270]
           )
         end
       end
 
       context "when the Microsoft API errors with a 404 (e.g., group doesn't exist)" do
-        it "retries in 1 minute" do
+        it "retries in (30, 90, 270 seconds)" do
           expect(graph_service).to \
             receive(:create_education_class_team).with('mygroupid').and_raise(new_http_error(404))
           expect_retry(
             subject,
             error_class: MicrosoftSync::Errors::HTTPNotFound,
-            delay_amount: 1.minute
+            delay_amount: [30, 90, 270]
           )
         end
       end
