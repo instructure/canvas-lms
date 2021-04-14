@@ -1,5 +1,6 @@
 #!/bin/bash
 source script/common/utils/spinner.sh
+source script/common/utils/logging.sh
 
 # This file contains commonly used BASH functions for scripting in canvas-lms,
 # particularly script/canvas_update and script/rebase_canvas_and_plugins . As such,
@@ -10,18 +11,6 @@ if [[ -n "${COMMON_LIB_LOADED-}" ]]; then
      return
 fi
 COMMON_LIB_LOADED=i_am_here
-BOLD="$(tput bold)"
-NORMAL="$(tput sgr0)"
-
-function create_log_file {
-  if [ ! -f "$LOG" ]; then
-    echo "" > "$LOG"
-  fi
-}
-
-function echo_console_and_log {
-  echo "$1" |tee -a "$LOG"
-}
 
 function trap_result {
   exit_code=$?
@@ -43,16 +32,6 @@ function is_git_dir {
   [ "$(basename "$(git rev-parse --show-toplevel)")" == "$(basename "$(pwd)")" ]
 }
 
-# Parameter: the name of the script calling this function
-function init_log_file {
-  script_name="$1"
-  echo "  Log file is $LOG"
-
-  echo >>"$LOG"
-  echo "-----------------------------" >>"$LOG"
-  echo "$1 ($(date)):" >>"$LOG"
-  echo "-----------------------------" >>"$LOG"
-}
 
 # If DOCKER var set true, run with docker-compose
 function run_command {
@@ -121,15 +100,6 @@ function _canvas_lms_telemetry_report_status() {
   fi
 }
 
-function prompt {
-  read -r -p "$1 " "$2"
-}
-
-function message {
-  echo ''
-  echo "$BOLD> $*$NORMAL"
-}
-
 function confirm_command {
   if ! is_running_on_jenkins; then
     prompt "OK to run '$*'? [y/n]" confirm
@@ -165,83 +135,6 @@ function check_dependencies {
     message "Some additional dependencies need to be installed before continuing."
     print_missing_dependencies
   fi
-}
-
-function print_missing_dependencies {
-  echo "    Missing Dependencies:"
-  if [[ ${#missing_packages[@]} -gt 0 ]]; then
-    for dep in "${missing_packages[@]}"; do
-      printf "\t%s\n" "$dep"
-    done
-  fi
-  if [[ ${#wrong_version[@]} -gt 0 ]]; then
-    printf -v joined '\t%s\n' "${wrong_version[@]}"
-    echo "${joined%}"
-  fi
-  printf "Once all dependencies are satisfied, rerun this script.\n"
-  exit 1
-}
-
-function display_next_steps {
-  message "You're good to go! Next steps:"
-
-  # shellcheck disable=SC2016
-  [[ $OS == 'Darwin' ]] && echo '
-  First, run:
-
-    eval "$(dinghy env)"
-
-  This will set up environment variables for docker to work with the dinghy VM.'
-
-  [[ $OS == 'Linux' ]] && echo '
-  I have added your user to the docker group so you can run docker commands
-  without sudo. Note that this has security implications:
-
-  https://docs.docker.com/engine/installation/linux/linux-postinstall/
-
-  You may need to logout and login again for this to take effect.'
-
-  echo "
-  Running Canvas:
-
-    docker-compose up -d
-    open http://canvas.docker
-
-  Running the tests:
-
-    docker-compose run --rm web bundle exec rspec
-
-   Running Selenium tests:
-
-    add docker-compose/selenium.override.yml in the .env file
-      echo ':docker-compose/selenium.override.yml' >> .env
-
-    build the selenium container
-      docker-compose build selenium-chrome
-
-    run selenium
-      docker-compose run --rm web bundle exec rspec spec/selenium
-
-    Virtual network remote desktop sharing to selenium container
-      for Firefox:
-        $ open vnc://secret:secret@seleniumff.docker
-      for chrome:
-        $ open vnc://secret:secret@seleniumch.docker:5901
-
-  I'm stuck. Where can I go for help?
-
-    FAQ:           https://github.com/instructure/canvas-lms/wiki/FAQ
-    Dev & Friends: http://instructure.github.io/
-    Canvas Guides: https://guides.instructure.com/
-    Vimeo channel: https://vimeo.com/canvaslms
-    API docs:      https://canvas.instructure.com/doc/api/index.html
-    Mailing list:  http://groups.google.com/group/canvas-lms-users
-    IRC:           http://webchat.freenode.net/?channels=canvas-lms
-
-    Please do not open a GitHub issue until you have tried asking for help on
-    the mailing list or IRC - GitHub issues are for verified bugs only.
-    Thanks and good luck!
-  "
 }
 
 function is_running_on_jenkins() {
