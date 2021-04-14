@@ -161,3 +161,12 @@ export const createOutcome = (contextType, contextId, groupId, outcome) =>
     ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes`,
     outcome
   )
+
+export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) => {
+  return axios.post(
+    `/api/v1/${pluralize(
+      contextType
+    ).toLowerCase()}/${contextId}/outcome_groups/${parentGroupId}/subgroups`,
+    {title}
+  )
+}

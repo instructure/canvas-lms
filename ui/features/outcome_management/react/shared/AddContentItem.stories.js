@@ -16,21 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useContext} from 'react'
-import OutcomesContext from '../contexts/OutcomesContext'
+import React from 'react'
+import AddContentItem from './AddContentItem'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
-const useCanvasContext = () => {
-  const context = useContext(OutcomesContext)
-  const contextType = context?.env?.contextType
-  const contextId = context?.env?.contextId
-  const useRceEnhancements = context?.env?.useRceEnhancements
-  const rootOutcomeGroup = context?.env?.rootOutcomeGroup
-  return {
-    contextType,
-    contextId,
-    useRceEnhancements,
-    rootOutcomeGroup
+export default {
+  title: 'Examples/Outcomes/AddContentItem',
+  component: AddContentItem,
+  contextType: 'Account',
+  contextId: 1,
+  args: {
+    parentGroupId: '1',
+    labelInstructions: 'Add New Group',
+    titleInstructions: 'Enter new group name',
+    showIcon: true,
+    onSaveHandler: () => {}
   }
 }
 
-export default useCanvasContext
+const Template = args => {
+  return (
+    <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+      <AddContentItem {...args} />
+    </OutcomesContext.Provider>
+  )
+}
+export const Default = Template.bind({})

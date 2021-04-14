@@ -26,7 +26,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TreeBrowser from './TreeBrowser'
 import {useGroupMoveModal} from '@canvas/outcomes/react/treeBrowser'
+import AddContentItem from '../shared/AddContentItem'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const MoveModal = ({
   title,
@@ -38,8 +41,36 @@ const MoveModal = ({
   onCloseHandler
 }) => {
   const {error, isLoading, collections, queryCollections, rootId} = useGroupMoveModal(groupId)
-  const {contextType} = useCanvasContext()
+  const {contextType, contextId, rootOutcomeGroup} = useCanvasContext()
   const [targetGroup, setTargetGroup] = useState(null)
+
+  const onCreateGroupHandler = async groupName => {
+    try {
+      // NOTE: For now, a newly added group will be added as a root outcome group.
+      // Once OUT-4370 is complete, an add group component will be rendered at
+      // each level of the tree. We will also need to remove
+      // the FlashAlert and change this to add the newly created group to the Tree browser
+      // or the new responsive designs.  The FlashAlert is merely for verification that
+      // the save to the API was successful.
+      await addOutcomeGroup(contextType, contextId, rootOutcomeGroup.id, groupName)
+      showFlashAlert({
+        message: I18n.t('"%{groupName}" has been created.', {groupName}),
+        type: 'success'
+      })
+    } catch (err) {
+      showFlashAlert({
+        message: err.message
+          ? I18n.t('An error occurred adding group "%{groupName}": %{message}', {
+              groupName,
+              message: err.message
+            })
+          : I18n.t('An error occurred adding group "%{groupName}"', {
+              groupName
+            }),
+        type: 'error'
+      })
+    }
+  }
 
   const onCollectionClick = (_, selectedGroupTreeCollectionObject) => {
     const selectedGroupObject = collections[selectedGroupTreeCollectionObject.id]
@@ -85,13 +116,21 @@ const MoveModal = ({
                   : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}
               </Text>
             ) : (
-              <TreeBrowser
-                selectionType="single"
-                onCollectionToggle={queryCollections}
-                onCollectionClick={onCollectionClick}
-                collections={collections}
-                rootId={rootId}
-              />
+              <>
+                <TreeBrowser
+                  selectionType="single"
+                  onCollectionToggle={queryCollections}
+                  onCollectionClick={onCollectionClick}
+                  collections={collections}
+                  rootId={rootId}
+                />
+                <AddContentItem
+                  labelInstructions={I18n.t('Create New Group')}
+                  onSaveHandler={onCreateGroupHandler}
+                  textInputInstructions={I18n.t('Enter new group name')}
+                  showIcon
+                />
+              </>
             )}
           </View>
         </View>

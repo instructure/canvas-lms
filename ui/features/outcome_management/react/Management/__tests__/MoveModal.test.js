@@ -18,23 +18,29 @@
 import $ from 'jquery'
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
-import {render as rtlRender, act, fireEvent, within} from '@testing-library/react'
-import MoveModal from '../MoveModal'
+import {render as realRender, act, fireEvent, within} from '@testing-library/react'
 import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
+import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
+import MoveModal from '../MoveModal'
 
+jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
+jest.mock('@canvas/outcomes/graphql/Management', () => ({
+  ...jest.requireActual('@canvas/outcomes/graphql/Management'),
+  addOutcomeGroup: jest.fn()
+}))
 
 describe('MoveModal', () => {
   let onCloseHandlerMock
-  let onMoveHandlerMock
   let cache
 
   const defaultProps = (props = {}) => ({
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
-    onMoveHandler: onMoveHandlerMock,
+    onMoveHandler: jest.fn(),
     title: 'Account folder 0',
     type: 'group',
     groupId: '100',
@@ -53,10 +59,15 @@ describe('MoveModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      rootOutcomeGroup = {id: '100'},
+      mocks = accountMocks({childGroupsCount: 0})
+    } = {}
   ) => {
-    return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+    return realRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -168,5 +179,48 @@ describe('MoveModal', () => {
     await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
     expect(getByText(/course/)).toBeInTheDocument()
+  })
+
+  it('renders a create new group link', async () => {
+    const {getByText} = render(<MoveModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Create New Group')).toBeInTheDocument()
+  })
+
+  describe('when the create new group link is expanded', () => {
+    it('calls the addOutcomeGroup api when the create group item is clicked', async () => {
+      addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
+      const {getByText, getByLabelText} = render(<MoveModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Create New Group'))
+      fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
+      fireEvent.click(getByText('Create New Group'))
+      await act(async () => jest.runAllTimers())
+      expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlert).toHaveBeenCalledWith({
+        type: 'success',
+        message: '"new group name" has been created.'
+      })
+    })
+
+    it('displays an error if the group could not be created', async () => {
+      const {getByText, getByLabelText} = render(<MoveModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      addOutcomeGroup.mockReturnValue(Promise.reject(new Error('Server is busy')))
+      fireEvent.click(getByText('Create New Group'))
+      fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
+      fireEvent.click(getByText('Create New Group'))
+      await act(async () => jest.runAllTimers())
+
+      expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlert).toHaveBeenCalledWith({
+        type: 'error',
+        message: 'An error occurred adding group "new group name": Server is busy'
+      })
+    })
   })
 })

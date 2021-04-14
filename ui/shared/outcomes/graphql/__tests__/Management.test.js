@@ -22,7 +22,8 @@ import {
   removeOutcome,
   moveOutcomeGroup,
   updateOutcome,
-  createOutcome
+  createOutcome,
+  addOutcomeGroup
 } from '../Management'
 
 jest.mock('@canvas/axios')
@@ -76,6 +77,22 @@ describe('api', () => {
       moveOutcomeGroup('Course', '1', '2', '3')
       expect(axios.put).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2', {
         parent_outcome_group_id: '3'
+      })
+    })
+  })
+
+  describe('addOutcomeGroup', () => {
+    it('provides correct arguments to request to move group within account context', () => {
+      addOutcomeGroup('Account', '1', '2', 'new group title')
+      expect(axios.post).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/2/subgroups', {
+        title: 'new group title'
+      })
+    })
+
+    it('provides correct arguments to API request to move group within course context', () => {
+      addOutcomeGroup('Course', '1', '2', 'new group title')
+      expect(axios.post).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2/subgroups', {
+        title: 'new group title'
       })
     })
   })
