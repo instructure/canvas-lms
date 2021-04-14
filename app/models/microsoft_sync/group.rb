@@ -32,7 +32,7 @@ require_dependency 'microsoft_sync'
 # then used to keep track of the syncing.
 #
 # See usages in StateMachineJob (workflow_state, job_state, last_error) and
-# Syncer (ms_group_id)
+# SyncerSteps (ms_group_id)
 #
 # Notable fields:
 # * ms_group_id -- Microsoft's ID used in the their Graph API for the group
@@ -101,6 +101,6 @@ class MicrosoftSync::Group < ActiveRecord::Base
   end
 
   def syncer_job
-    MicrosoftSync::StateMachineJob.new(self, MicrosoftSync::Syncer.new(self))
+    MicrosoftSync::StateMachineJob.new(self, MicrosoftSync::SyncerSteps.new(self))
   end
 end

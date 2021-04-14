@@ -180,7 +180,7 @@ describe MicrosoftSync::Group do
       syncer_job = subject.syncer_job
       expect(syncer_job).to be_a(MicrosoftSync::StateMachineJob)
       expect(syncer_job.job_state_record).to eq(subject)
-      expect(syncer_job.steps_object).to be_a(MicrosoftSync::Syncer)
+      expect(syncer_job.steps_object).to be_a(MicrosoftSync::SyncerSteps)
       expect(syncer_job.steps_object.group).to eq(subject)
     end
   end

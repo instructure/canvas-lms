@@ -24,16 +24,15 @@
 #
 # This ideally shouldn't contain much job plumbing, but focus on the business
 # logic about what to do in each step of a sync. For job plumbing, see
-# StateMachineJob. This should normally be used by creating a StateMachineJob;
-# see MicrosoftSync::Group#syncer_job
+# StateMachineJob. This should normally be used by creating a StateMachineJob
+# with this as the steps_object; see MicrosoftSync::Group#syncer_job
 #   group.syncer_job.run_later
 #   group.syncer_job.run_synchronously # e.g. manually in a console
 #
 module MicrosoftSync
-  # TODO: rename this to SyncerSteps in next commit (keep this commit small)
-  class Syncer
+  class SyncerSteps
     # Database batch size for users without AAD ids. Should be an even multiple of
-    # CanvasGraphService::USERS_UPNS_TO_AADS_BATCH_SIZE:
+    # GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE:
     ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
 
     attr_reader :group
@@ -73,7 +72,7 @@ module MicrosoftSync
       # group.ms_group_id and if we get an error know we have to create it.
       # That will save us a API call. But we won't be able to detect if there
       # are multiple; and it makes handling the 404s soon after a creation trickier.
-      remote_ids = canvas_graph_service.list_education_classes_for_course(course).map{|c| c['id']}
+      remote_ids = graph_service_helpers.list_education_classes_for_course(course).map{|c| c['id']}
 
       # If we've created the group previously, we're good to go
       if group.ms_group_id && remote_ids == [group.ms_group_id]
@@ -91,7 +90,7 @@ module MicrosoftSync
       new_group_id = remote_ids.first
 
       unless new_group_id
-        new_group_id = canvas_graph_service.create_education_class(course)['id']
+        new_group_id = graph_service_helpers.create_education_class(course)['id']
       end
 
       StateMachineJob::NextStep.new(:step_update_group_with_course_data, new_group_id)
@@ -99,7 +98,7 @@ module MicrosoftSync
 
     def step_update_group_with_course_data(group_id_from_mem, group_id_from_state)
       group_id = group_id_from_mem || group_id_from_state
-      canvas_graph_service.update_group_with_course_data(group_id, course)
+      graph_service_helpers.update_group_with_course_data(group_id, course)
       group.update! ms_group_id: group_id
       StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
     rescue Errors::HTTPNotFound => e
@@ -117,8 +116,8 @@ module MicrosoftSync
         users_and_upns = CommunicationChannel.
           where(user_id: user_ids, path_type: 'email').pluck(:user_id, :path)
 
-        users_and_upns.each_slice(CanvasGraphService::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
-          upn_to_aad = canvas_graph_service.users_upns_to_aads(slice.map(&:last))
+        users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
+          upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
           user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
           UserMapping.bulk_insert_for_root_account_id(course.root_account_id, user_id_to_aad)
         end
@@ -131,8 +130,8 @@ module MicrosoftSync
     # what needs to be done. This could also be combined with execute_diff()
     # but is conceptually different and makes testing easier.
     def step_generate_diff(_mem_data, _job_state_data)
-      members = canvas_graph_service.get_group_users_aad_ids(group.ms_group_id)
-      owners = canvas_graph_service.get_group_users_aad_ids(group.ms_group_id, owners: true)
+      members = graph_service_helpers.get_group_users_aad_ids(group.ms_group_id)
+      owners = graph_service_helpers.get_group_users_aad_ids(group.ms_group_id, owners: true)
 
       diff = MembershipDiff.new(members, owners)
       UserMapping.enrollments_and_aads(course).find_each do |enrollment|
@@ -188,12 +187,12 @@ module MicrosoftSync
         raise TenantMissingOrSyncDisabled
     end
 
-    def canvas_graph_service
-      @canvas_graph_service ||= tenant && CanvasGraphService.new(tenant)
+    def graph_service_helpers
+      @graph_service_helpers ||= tenant && GraphServiceHelpers.new(tenant)
     end
 
     def graph_service
-      @graph_service ||= canvas_graph_service.graph_service
+      @graph_service ||= graph_service_helpers.graph_service
     end
   end
 end

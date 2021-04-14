@@ -23,7 +23,7 @@
 # functions specific to canvas models and the particular Microsoft API fields we use.
 #
 module MicrosoftSync
-  class CanvasGraphService
+  class GraphServiceHelpers
     attr_reader :graph_service
 
     MAX_MAIL_NICKNAME_LENGTH = 64

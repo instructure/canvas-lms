@@ -19,19 +19,19 @@
 
 require_relative '../../spec_helper'
 
-describe MicrosoftSync::Syncer do
-  let(:syncer) { described_class.new(group) }
+describe MicrosoftSync::SyncerSteps do
+  let(:syncer_steps) { described_class.new(group) }
   let(:course) do
     course_model(name: 'sync test course')
   end
   let(:group) { MicrosoftSync::Group.create(course: course) }
   let(:graph_service) { double('GraphService') }
-  let(:canvas_graph_service) { double('CanvasGraphService', graph_service: graph_service) }
+  let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: graph_service) }
   let(:tenant) { 'mytenant123' }
 
   def expect_next_step(result, next_step, memory_state=nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::NextStep)
-    expect { syncer.method(next_step.to_sym) }.to_not raise_error
+    expect { syncer_steps.method(next_step.to_sym) }.to_not raise_error
     expect(result.next_step).to eq(next_step)
     expect(result.memory_state).to eq(memory_state)
   end
@@ -40,7 +40,7 @@ describe MicrosoftSync::Syncer do
     expect(result).to be_a(MicrosoftSync::StateMachineJob::Retry)
     expect(result.error.class).to eq(error_class)
     expect(result.delay_amount).to eq(delay_amount)
-    expect(result.delay_amount.to_i).to be < syncer.restart_job_after_inactivity.to_i
+    expect(result.delay_amount.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
     expect(result.job_state_data).to eq(job_state_data)
   end
 
@@ -57,30 +57,30 @@ describe MicrosoftSync::Syncer do
     ra.settings[:microsoft_sync_tenant] = tenant
     ra.save!
 
-    allow(MicrosoftSync::CanvasGraphService).to \
-      receive(:new).with(tenant).and_return(canvas_graph_service)
+    allow(MicrosoftSync::GraphServiceHelpers).to \
+      receive(:new).with(tenant).and_return(graph_service_helpers)
   end
 
   describe '#initial_step' do
-    subject { syncer.initial_step }
+    subject { syncer_steps.initial_step }
 
     it { is_expected.to eq(:step_ensure_class_group_exists) }
     it 'references an existing method' do
-      expect { syncer.method(subject.to_sym) }.to_not raise_error
+      expect { syncer_steps.method(subject.to_sym) }.to_not raise_error
     end
   end
 
   describe '#max_retries' do
-    subject { syncer.max_retries }
+    subject { syncer_steps.max_retries }
 
     it { is_expected.to eq(4) }
   end
 
   describe '#step_ensure_class_group_exists' do
-    subject { syncer.step_ensure_class_group_exists(nil, nil) }
+    subject { syncer_steps.step_ensure_class_group_exists(nil, nil) }
 
     before do
-      allow(canvas_graph_service).to receive(:list_education_classes_for_course)
+      allow(graph_service_helpers).to receive(:list_education_classes_for_course)
         .with(course).and_return(education_class_ids.map{|id| {'id' => id}})
     end
 
@@ -91,7 +91,7 @@ describe MicrosoftSync::Syncer do
         # admin deleted the MS group we created, or a group never existed
 
         it 'creates a new MS group and goes to the "update group" step' do
-          expect(canvas_graph_service).to \
+          expect(graph_service_helpers).to \
             receive(:create_education_class).with(course).and_return('id' => 'newid')
 
           expect_next_step(subject, :step_update_group_with_course_data, 'newid')
@@ -102,7 +102,7 @@ describe MicrosoftSync::Syncer do
         let(:education_class_ids) { ['newid2'] }
 
         it 'goes to the "update group" step with the remote group ID' do
-          expect(canvas_graph_service).to_not receive(:create_education_class)
+          expect(graph_service_helpers).to_not receive(:create_education_class)
 
           expect_next_step(subject, :step_update_group_with_course_data, 'newid2')
         end
@@ -123,8 +123,8 @@ describe MicrosoftSync::Syncer do
         let(:tenant) { nil }
 
         it 'raises a graceful cleanup error with a end-user-friendly name' do
-          expect(MicrosoftSync::CanvasGraphService).to_not receive(:new)
-          expect(syncer).to_not receive(:ensure_class_group_exists)
+          expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
+          expect(syncer_steps).to_not receive(:ensure_class_group_exists)
           begin
             subject
           rescue => e
@@ -148,8 +148,8 @@ describe MicrosoftSync::Syncer do
         let(:education_class_ids) { ['oldid'] }
 
         it 'does not modify or create any group' do
-          expect(canvas_graph_service).to_not receive(:create_education_class)
-          expect(canvas_graph_service).to_not receive(:update_group_with_course_data)
+          expect(graph_service_helpers).to_not receive(:create_education_class)
+          expect(graph_service_helpers).to_not receive(:update_group_with_course_data)
           expect { subject }.to_not change { group.reload.ms_group_id }
           expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
         end
@@ -161,7 +161,7 @@ describe MicrosoftSync::Syncer do
     shared_examples_for 'updating group with course data' do
       context 'on success' do
         it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
-          expect(canvas_graph_service).to \
+          expect(graph_service_helpers).to \
             receive(:update_group_with_course_data).with('newid', course)
 
           expect { subject }.to change { group.reload.ms_group_id }.to('newid')
@@ -171,7 +171,7 @@ describe MicrosoftSync::Syncer do
 
       context 'on 404' do
         it 'retries with a delay' do
-          expect(canvas_graph_service).to \
+          expect(graph_service_helpers).to \
             receive(:update_group_with_course_data).with('newid', course)
             .and_raise(new_http_error(404))
           expect { subject }.to_not change { group.reload.ms_group_id }
@@ -184,7 +184,7 @@ describe MicrosoftSync::Syncer do
 
       context 'on other failure' do
         it 'bubbles up the error' do
-          expect(canvas_graph_service).to \
+          expect(graph_service_helpers).to \
             receive(:update_group_with_course_data).with('newid', course)
             .and_raise(new_http_error(400))
           expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
@@ -193,14 +193,14 @@ describe MicrosoftSync::Syncer do
     end
 
     context 'when run for the first time with a new_group_id' do
-      subject { syncer.step_update_group_with_course_data('newid', nil) }
+      subject { syncer_steps.step_update_group_with_course_data('newid', nil) }
 
       it_behaves_like 'updating group with course data'
     end
 
     context 'when retrying' do
       subject do
-        syncer.step_update_group_with_course_data(nil, 'newid')
+        syncer_steps.step_update_group_with_course_data(nil, 'newid')
       end
 
       it_behaves_like 'updating group with course data'
@@ -208,7 +208,7 @@ describe MicrosoftSync::Syncer do
   end
 
   describe '#step_ensure_enrollments_user_mappings_filled' do
-    subject { syncer.step_ensure_enrollments_user_mappings_filled(nil, nil) }
+    subject { syncer_steps.step_ensure_enrollments_user_mappings_filled(nil, nil) }
 
     let(:batch_size) { 4 }
 
@@ -225,7 +225,7 @@ describe MicrosoftSync::Syncer do
     end
 
     before do
-      stub_const('MicrosoftSync::CanvasGraphService::USERS_UPNS_TO_AADS_BATCH_SIZE', batch_size)
+      stub_const('MicrosoftSync::GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE', batch_size)
 
       students.each_with_index do |student, i|
         communication_channel(student, path_type: 'email', username: "student#{i}@example.com")
@@ -234,7 +234,7 @@ describe MicrosoftSync::Syncer do
         communication_channel(teacher, path_type: 'email', username: "teacher#{i}@example.com")
       end
 
-      allow(canvas_graph_service).to receive(:users_upns_to_aads) do |upns|
+      allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
         raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
 
         upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
@@ -249,14 +249,14 @@ describe MicrosoftSync::Syncer do
       )
     end
 
-    it 'batches in sizes of CanvasGraphService::USERS_UPNS_TO_AADS_BATCH_SIZE' do
-      expect(canvas_graph_service).to receive(:users_upns_to_aads).twice.and_return({})
+    it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
+      expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
       expect_next_step(subject, :step_generate_diff)
     end
 
     context "when Microsoft doesn't have AADs for the UPNs" do
       it "doesn't add any UserMappings" do
-        expect(canvas_graph_service).to receive(:users_upns_to_aads).
+        expect(graph_service_helpers).to receive(:users_upns_to_aads).
           at_least(:once).and_return({})
         expect { subject }.to_not \
           change { MicrosoftSync::UserMapping.count }.from(0)
@@ -276,7 +276,7 @@ describe MicrosoftSync::Syncer do
 
       it "doesn't lookup aads for those users" do
         upns_looked_up = []
-        expect(canvas_graph_service).to receive(:users_upns_to_aads) do |upns|
+        expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
           upns_looked_up += upns
           {}
         end
@@ -288,7 +288,7 @@ describe MicrosoftSync::Syncer do
   end
 
   describe '#step_generate_diff' do
-    subject { syncer.step_generate_diff(nil, nil) }
+    subject { syncer_steps.step_generate_diff(nil, nil) }
 
     before do
       course.enrollments.to_a.each_with_index do |enrollment, i|
@@ -301,9 +301,9 @@ describe MicrosoftSync::Syncer do
     end
 
     it 'gets members and owners and builds a diff' do
-      expect(canvas_graph_service).to \
+      expect(graph_service_helpers).to \
         receive(:get_group_users_aad_ids).with('mygroup').and_return(%w[m1 m2])
-      expect(canvas_graph_service).to \
+      expect(graph_service_helpers).to \
         receive(:get_group_users_aad_ids).with('mygroup', owners: true).and_return(%w[o1 o2])
 
       diff = double('MembershipDiff')
@@ -318,7 +318,7 @@ describe MicrosoftSync::Syncer do
   end
 
   describe '#execute_diff' do
-    subject { syncer.step_execute_diff(diff, nil) }
+    subject { syncer_steps.step_execute_diff(diff, nil) }
 
     let(:diff) { double('MembershipDiff') }
 
@@ -346,7 +346,7 @@ describe MicrosoftSync::Syncer do
   end
 
   describe '#ensure_team_exists' do
-    subject { syncer.step_ensure_team_exists(nil, nil) }
+    subject { syncer_steps.step_ensure_team_exists(nil, nil) }
 
     before { group.update!(ms_group_id: 'mygroupid') }
 

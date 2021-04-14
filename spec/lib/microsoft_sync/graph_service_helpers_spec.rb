@@ -19,7 +19,7 @@
 
 require_relative '../../spec_helper'
 
-describe MicrosoftSync::CanvasGraphService do
+describe MicrosoftSync::GraphServiceHelpers do
   subject { described_class.new('mytenant123') }
 
   let(:graph_service) { double('GraphService') }
