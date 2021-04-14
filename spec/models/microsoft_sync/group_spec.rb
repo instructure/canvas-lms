@@ -66,6 +66,14 @@ describe MicrosoftSync::Group do
     end
   end
 
+  describe '#manual_sync_cooldown' do
+    it 'returns the cool down Setting value' do
+      expect(described_class.manual_sync_cooldown).to eq(
+        Setting.get('msft_sync.manual_sync_cooldown', 90.minutes.to_s).to_i
+      )
+    end
+  end
+
   describe '#restore!' do
     context 'with a deleted group' do
       subject do

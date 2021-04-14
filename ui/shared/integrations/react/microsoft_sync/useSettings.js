@@ -66,7 +66,7 @@ function useSettings(courseId) {
     setLoading(false)
   }
 
-  return [group, enabled, loading, error, toggleEnabled]
+  return [group, enabled, loading, error, toggleEnabled, setError, setGroup]
 }
 
 export default useSettings

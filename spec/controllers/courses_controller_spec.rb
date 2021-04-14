@@ -710,9 +710,24 @@ describe CoursesController do
   end
 
   describe "GET 'settings'" do
+    subject do
+      user_session user
+      get 'settings', params: {course_id: course.id}
+    end
+
+    let(:course) { @course }
+    let(:user) { @teacher }
+
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
+    end
+
+    it 'sets MSFT sync cooldown in the JS ENV' do
+      subject
+      expect(controller.js_env[:MANUAL_MSFT_SYNC_COOLDOWN]).to eq(
+        MicrosoftSync::Group.manual_sync_cooldown
+      )
     end
 
     it 'sets the external tools create url' do
