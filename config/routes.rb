@@ -1300,6 +1300,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/microsoft_sync/group", action: :create
       get "courses/:course_id/microsoft_sync/group", action: :show
       delete "courses/:course_id/microsoft_sync/group", action: :destroy
+      post "courses/:course_id/microsoft_sync/schedule_sync", action: :sync
     end
 
     scope(controller: :external_tools) do

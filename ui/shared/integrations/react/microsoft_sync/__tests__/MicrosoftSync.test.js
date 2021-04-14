@@ -29,10 +29,6 @@ describe('MicrosoftSync', () => {
   })
   const subject = overrides => render(<MicrosoftSync {...props(overrides)} />)
 
-  it('renders a sync button', () => {
-    expect(subject().getByText('Sync Now')).toBeTruthy()
-  })
-
   it('displays the last sync time', () => {
     expect(subject().getByText(/Last Sync*/).textContent).toEqual('Last Sync: Mar 30 at 8:44pm')
   })

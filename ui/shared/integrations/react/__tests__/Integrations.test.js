@@ -77,6 +77,21 @@ describe('Integrations', () => {
       expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeTruthy()
     })
 
+    it('renders a sync button', () => {
+      useFetchApi.mockImplementationOnce(({success, loading}) => {
+        success({workflow_state: 'active'})
+        loading(false)
+      })
+
+      const subject = render(<Integrations />)
+
+      act(() => {
+        fireEvent.click(subject.getByText('Show Microsoft Sync details'))
+      })
+
+      expect(subject.getByText('Sync Now')).toBeTruthy()
+    })
+
     describe('when the integration is disabled', () => {
       beforeEach(() => {
         useFetchApi.mockImplementationOnce(({success, loading}) => {

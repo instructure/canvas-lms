@@ -69,4 +69,18 @@ describe('IntegrationRow', () => {
       expect(subject(propOverrides).getByText(expectedError)).toBeInTheDocument()
     })
   })
+
+  describe('when "info" is set', () => {
+    const propOverrides = {info: 'Hello there', expanded: true}
+
+    it('shows the info message', () => {
+      expect(subject(propOverrides).getByText('Hello there')).toBeInTheDocument()
+    })
+  })
+
+  describe('when the "info" is an info object', () => {
+    const propOverrides = {info: {message: 'Hello there', variant: 'success'}, expanded: true}
+
+    expect(subject(propOverrides).getByText('Hello there')).toBeInTheDocument()
+  })
 })

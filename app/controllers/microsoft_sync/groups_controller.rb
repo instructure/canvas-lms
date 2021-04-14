@@ -83,6 +83,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_user
   before_action :validate_user_permissions
   before_action :require_feature
+  before_action :require_cooldown, only: :sync
 
   # Create a new MicrosoftSync::Group for
   # the specified course.
@@ -123,7 +124,33 @@ class MicrosoftSync::GroupsController < ApplicationController
     head :no_content
   end
 
+  # Schedule a sync for the group associated
+  # with the specified course.
+  #
+  # This action counts as a "manual sync"
+  #
+  # Manual syncs require a cooldown period
+  # before another manual sync is allowed.
+  def sync
+    group.syncer_job.run_later
+    group.update_unless_deleted(workflow_state: :scheduled, last_manually_synced_at: Time.zone.now)
+    render json: group.as_json(include_root: false)
+  end
+
   private
+
+  def require_cooldown
+    # Prevents users from queueing a large number
+    # of manual sync jobs by requiring a cooldown
+    # period.
+    #
+    # Site admins can bypass this cooldown period.
+    return if Account.site_admin.account_users_for(@current_user).present?
+    return if group.last_manually_synced_at.blank?
+    return if Time.zone.now.to_i - group.last_manually_synced_at.to_i >= MicrosoftSync::Group.manual_sync_cooldown
+
+    render json: { errors: ['Not enough time elapsed since last manual sync'] }, status: :bad_request
+  end
 
   def require_feature
     return if course.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)

@@ -77,6 +77,51 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
+  describe '#sync' do
+    subject { post :sync, params: params }
+
+    before { user_session(teacher) }
+
+    it_behaves_like 'endpoints that require a user'
+    it_behaves_like 'endpoints that require permissions'
+    it_behaves_like 'endpoints that require a release flag to be on'
+
+    it { is_expected.to be_successful }
+
+    it 'schedules a sync' do
+      expect_any_instance_of(MicrosoftSync::StateMachineJob).to receive(
+        :run_later
+      ).once
+      subject
+    end
+
+    it 'updates the group state to "scheduled"' do
+      subject
+      expect(group.reload.workflow_state).to eq 'scheduled'
+    end
+
+    context 'when the cool down period has not passed' do
+      before { group.update!(last_manually_synced_at: Time.zone.now) }
+
+      it { is_expected.to be_bad_request }
+
+      it 'responds with an error' do
+        subject
+        expect(json_parse['errors']).to match_array [
+          'Not enough time elapsed since last manual sync'
+        ]
+      end
+
+      context 'and the current user is a site admin' do
+        before { user_session(site_admin) }
+
+        let(:site_admin) { site_admin_user(user: user_with_pseudonym(account: Account.site_admin)) }
+
+        it { is_expected.to be_successful }
+      end
+    end
+  end
+
   describe '#create' do
     subject { post :create, params: params }
 

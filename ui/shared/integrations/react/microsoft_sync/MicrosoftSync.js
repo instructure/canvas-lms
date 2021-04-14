@@ -20,13 +20,12 @@ import $ from 'jquery'
 import '@canvas/datetime'
 import I18n from 'i18n!course_settings'
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const MicrosoftSync = ({enabled, group, loading}) => {
+const MicrosoftSync = ({group, loading, children}) => {
   if (loading) {
     return (
       <View as="div" textAlign="center">
@@ -38,16 +37,9 @@ const MicrosoftSync = ({enabled, group, loading}) => {
   return (
     <>
       <Text>{I18n.t('Sync and Provision Microsoft Teams with your Canvas Course')}</Text>
-      <Flex margin="small none none none">
-        <Flex.Item>
-          <Button
-            withBackground={false}
-            color="primary"
-            margin="none small none none"
-            interaction={enabled ? 'enabled' : 'disabled'}
-          >
-            {I18n.t('Sync Now')}
-          </Button>
+      <Flex margin="small 0 0 0">
+        <Flex.Item size="8rem" margin="0 medium 0 0">
+          {children}
         </Flex.Item>
         <Flex.Item>
           <Text fontStyle="italic">
