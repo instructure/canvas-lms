@@ -25,7 +25,8 @@ export const DiscussionThreadContainer = props => {
   return (
     <div
       style={{
-        maxWidth: '55.625rem'
+        maxWidth: '55.625rem',
+        marginTop: '1.5rem'
       }}
     >
       {props.threads?.map(r => {

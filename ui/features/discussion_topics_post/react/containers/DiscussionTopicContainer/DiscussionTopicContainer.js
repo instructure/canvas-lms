@@ -16,65 +16,71 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Flex} from '@instructure/ui-flex'
-import {PostMessage} from '../../PostMessage/PostMessage'
-import DiscussionPostToolbar from '../../DiscussionResponseToolbar/DiscussionPostToolbar'
-import {PostToolbar} from '../../PostToolbar/PostToolbar'
-import I18n from 'i18n!discussion_posts'
-import {Button} from '@instructure/ui-buttons'
 import {Alert} from '../../Alert/Alert'
+import {Button} from '@instructure/ui-buttons'
+import {Discussion} from '../../../graphql/Discussion'
+import DiscussionPostToolbar from '../../DiscussionResponseToolbar/DiscussionPostToolbar'
+import {Flex} from '@instructure/ui-flex'
+import I18n from 'i18n!discussion_posts'
+import {PostMessage} from '../../PostMessage/PostMessage'
+import {PostToolbar} from '../../PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
+import React from 'react'
 
-const DiscussionTopicContainer = props => {
-  const mockedData = {
-    discussionPostToolbar: {
-      selectedView: 'all',
-      sortDirection: 'asc',
-      isCollapsedReplies: true,
-      onSearchChange: () => {},
-      onViewFilter: () => {},
-      onSortClick: () => {},
-      onCollapseRepliesToggle: () => {},
-      onTopClick: () => {}
-    },
-    alert: {
-      contextDisplayText: 'Section 2',
-      dueAtDisplayText: 'Jan 26 11:49pm',
-      pointsPossible: 5
-    },
-    postMessage: {
-      authorName: 'Testy McTest',
-      pillText: I18n.t('Author'),
-      timingDisplay: I18n.t('around yesterday'),
-      message: 'This is a test message. Do not translate.'
-    },
-    PostToolbar: {
-      onReadAll: () => {},
-      onDelete: props.hasTeacherPermissions ? () => {} : null,
-      onToggleComments: props.hasTeacherPermissions ? () => {} : null,
-      infoText: '24 replies, 4 unread',
-      onSend: props.hasTeacherPermissions ? () => {} : null,
-      onCopy: props.hasTeacherPermissions ? () => {} : null,
-      onEdit: props.hasTeacherPermissions ? () => {} : null,
-      onTogglePublish: props.hasTeacherPermissions ? () => {} : null,
-      onToggleSubscription: () => {},
-      isPublished: true,
-      isSubscribed: true,
-      commentsEnabled: true
-    }
+const dateOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric'
+}
+
+export const DiscussionTopicContainer = props => {
+  const discussionTopicData = {
+    title: props.discussionTopic.title || '',
+    authorName: props.discussionTopic.author.name || '',
+    avatarUrl: props.discussionTopic.author.avatarUrl || '',
+    message: props.discussionTopic.message || '',
+    postedAt:
+      Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+        new Date(props.discussionTopic?.postedAt)
+      ) || '',
+    subscribed: props.discussionTopic.subscribed || false,
+    published: props.discussionTopic.published || false,
+    replies: props.discussionTopic.entryCounts.repliesCount || '',
+    unread: props.discussionTopic.entryCounts.unreadCount || '',
+    isGraded: !!props.discussionTopic.assignment && !!props.discussionTopic.assignment.dueAt
+  }
+
+  if (discussionTopicData.isGraded) {
+    discussionTopicData.dueAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+      new Date(props.discussionTopic.assignment.dueAt)
+    )
+    discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
   }
 
   return (
     <Flex as="div" direction="column">
       <Flex.Item margin="0 0 large" overflowY="hidden" overflowX="hidden">
-        <DiscussionPostToolbar {...mockedData.discussionPostToolbar} />
+        <DiscussionPostToolbar
+          selectedView="all"
+          sortDirection="asc"
+          isCollapsedReplies
+          onSearchChange={() => {}}
+          onViewFilter={() => {}}
+          onSortClick={() => {}}
+          onCollapseRepliesToggle={() => {}}
+          onTopClick={() => {}}
+        />
       </Flex.Item>
       <Flex.Item>
         <div style={{border: '1px solid #c7cdd1', borderRadius: '5px'}}>
-          {props.isGraded && (
+          {discussionTopicData.isGraded && (
             <div style={{padding: '0 1.5rem 0'}}>
-              <Alert {...mockedData.alert} />
+              <Alert
+                contextDisplayText="Section 2"
+                dueAtDisplayText={discussionTopicData.dueAt}
+                pointsPossible={discussionTopicData.pointsPossible}
+              />
             </div>
           )}
           <Flex
@@ -84,7 +90,13 @@ const DiscussionTopicContainer = props => {
             alignItems="start"
           >
             <Flex.Item>
-              <PostMessage {...mockedData.postMessage}>
+              <PostMessage
+                authorName={discussionTopicData.authorName}
+                avatarUrl={discussionTopicData.avatarUrl}
+                pillText={I18n.t('Author')}
+                timingDisplay={discussionTopicData.postedAt}
+                message={discussionTopicData.title}
+              >
                 {props.onReply && (
                   <Button
                     color="primary"
@@ -97,7 +109,23 @@ const DiscussionTopicContainer = props => {
               </PostMessage>
             </Flex.Item>
             <Flex.Item>
-              <PostToolbar {...mockedData.PostToolbar} />
+              <PostToolbar
+                onReadAll={() => {}}
+                onDelete={props.hasTeacherPermissions ? () => {} : null}
+                onToggleComments={props.hasTeacherPermissions ? () => {} : null}
+                infoText={I18n.t('%{replies} replies, %{unread} unread', {
+                  replies: discussionTopicData.replies,
+                  unread: discussionTopicData.unread
+                })}
+                onSend={props.hasTeacherPermissions ? () => {} : null}
+                onCopy={props.hasTeacherPermissions ? () => {} : null}
+                onEdit={props.hasTeacherPermissions ? () => {} : null}
+                onTogglePublish={props.hasTeacherPermissions ? () => {} : null}
+                onToggleSubscription={() => {}}
+                isPublished={discussionTopicData.published}
+                isSubscribed={discussionTopicData.subscribed}
+                commentsEnabled
+              />
             </Flex.Item>
           </Flex>
         </div>
@@ -106,15 +134,13 @@ const DiscussionTopicContainer = props => {
   )
 }
 
-export default DiscussionTopicContainer
-
 DiscussionTopicContainer.propTypes = {
   /**
    * Indicates if this Discussion Topic is graded.
    * Providing this property will result in the graded info
    * to be rendered
    */
-  isGraded: PropTypes.bool,
+  discussionTopic: PropTypes.instanceOf(Discussion.shape).isRequired,
   /**
    * Indicates if current user has teacher permissions
    * on this Discussion Post.
@@ -129,3 +155,5 @@ DiscussionTopicContainer.propTypes = {
    */
   onReply: PropTypes.func
 }
+
+export default DiscussionTopicContainer

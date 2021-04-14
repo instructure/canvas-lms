@@ -17,7 +17,7 @@
  */
 
 import {Assignment} from './Assignment'
-import {bool, shape, string} from 'prop-types'
+import {bool, number, shape, string} from 'prop-types'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
@@ -37,6 +37,12 @@ export const Discussion = {
       allowRating
       onlyGradersCanRate
       delayedPostAt
+      subscribed
+      published
+      entryCounts {
+        unreadCount
+        repliesCount
+      }
       author {
         ...User
       }
@@ -68,6 +74,13 @@ export const Discussion = {
     allowRating: bool,
     onlyGradersCanRate: bool,
     delayedPostAt: string,
+    subscribed: bool,
+    published: bool,
+    entryCounts: {
+      unreadCount: number,
+      repliesCount: number
+    },
+    repliesCount: string,
     author: User.shape,
     editor: User.shape,
     assignment: Assignment.shape,

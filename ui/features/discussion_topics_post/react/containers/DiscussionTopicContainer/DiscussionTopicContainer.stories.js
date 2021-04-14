@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import DiscussionTopicContainer from './DiscussionTopicContainer'
 import React from 'react'
 
-import DiscussionTopicContainer from './DiscussionTopicContainer'
-
 export default {
-  title: 'Examples/Discussion Posts/Discussion Topic Contaner',
+  title: 'Examples/Discussion Posts/container/Discussion Topic Contaner',
   component: DiscussionTopicContainer
 }
 
