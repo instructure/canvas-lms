@@ -28,7 +28,8 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {ThreadActions} from '../ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../ThreadingToolbar/ThreadingToolbar'
-import {useQuery} from 'react-apollo'
+import {UPDATE_DISCUSSION_ENTRY_PARTICIPANT} from '../../graphql/Mutations'
+import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const mockThreads = {
@@ -50,7 +51,30 @@ export const mockThreads = {
 }
 
 export const DiscussionThread = props => {
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
+  const [isRead, setRead] = useState(props.read)
+
+  const [toggleUnread] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    onCompleted: data => {
+      if (!data || !data.updateDiscussionEntryParticipant) {
+        return null
+      }
+
+      // Optimistic change mostly done because of testing. The change will
+      //   get reverted if the mutation fails.
+      setRead(!isRead)
+
+      if (!isRead) {
+        setOnSuccess(I18n.t('The entry was successfully marked as unread.'))
+      } else {
+        setOnSuccess(I18n.t('The entry was successfully marked as read.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the entry.'))
+    }
+  })
 
   const marginDepth = 4 * props.depth
 
@@ -89,13 +113,24 @@ export const DiscussionThread = props => {
               avatarUrl={props.author.avatarUrl}
               timingDisplay={createdAt.toDateString()}
               message={props.message}
-              isUnread={!props.read}
+              isUnread={!isRead}
             >
               <ThreadingToolbar>{threadActions}</ThreadingToolbar>
             </PostMessage>
           </Flex.Item>
           <Flex.Item align="stretch">
-            <ThreadActions id={props.id} />
+            <ThreadActions
+              id={props.id}
+              isUnread={!isRead}
+              onToggleUnread={() => {
+                toggleUnread({
+                  variables: {
+                    discussionEntryId: props._id,
+                    read: !isRead
+                  }
+                })
+              }}
+            />
           </Flex.Item>
         </Flex>
       </div>

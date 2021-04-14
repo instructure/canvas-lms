@@ -17,8 +17,8 @@
  */
 
 import gql from 'graphql-tag'
-import {Error} from '../../shared/graphql/Error'
 import {DiscussionEntry} from './DiscussionEntry'
+import {Error} from '../../../shared/graphql/Error'
 
 export const DELETE_DISCUSSION_TOPIC = gql`
   mutation DeleteDiscussionTopic($id: ID!) {
@@ -32,10 +32,16 @@ export const DELETE_DISCUSSION_TOPIC = gql`
   ${Error.fragment}
 `
 
-// TODO: support read state
-export const UPDATE_DISCUSSION_TOPIC_ENTRY_PARTICIPANT = gql`
-  mutation UpdateDiscussionTopicEntryParticipantRating($id: ID!, $rating: RatingInputType) {
-    updateDiscussionEntryParticipant(input: {discussionEntryId: $id, rating: $rating}) {
+// TODO: Support read state
+export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
+  mutation UpdateDiscussionEntryParticipant(
+    $discussionEntryId: ID!
+    $read: Boolean
+    $rating: RatingInputType
+  ) {
+    updateDiscussionEntryParticipant(
+      input: {discussionEntryId: $discussionEntryId, read: $read, rating: $rating}
+    ) {
       discussionEntry {
         ...DiscussionEntry
       }

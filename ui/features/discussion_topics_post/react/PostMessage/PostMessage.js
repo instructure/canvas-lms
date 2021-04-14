@@ -58,6 +58,7 @@ export function PostMessage({...props}) {
             marginLeft: '-24px',
             marginTop: '13px'
           }}
+          data-testid="is-unread"
         >
           <Badge
             type="notification"

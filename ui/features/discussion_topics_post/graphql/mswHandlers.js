@@ -113,5 +113,20 @@ export const handlers = [
         }
       })
     )
+  }),
+  graphql.mutation('UpdateDiscussionEntryParticipant', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        updateDiscussionEntryParticipant: {
+          discussionEntry: {
+            id: req.body.variables.discussionEntryId,
+            read: req.body.variables.read,
+            rating: false,
+            __typename: 'DiscussionEntry'
+          },
+          __typename: 'UpdateDiscussionEntryParticipantPayload'
+        }
+      })
+    )
   })
 ]

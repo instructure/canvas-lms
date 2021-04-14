@@ -24,6 +24,7 @@ import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
+import {waitFor} from '@testing-library/dom'
 
 describe('DiscussionThread', () => {
   const server = mswServer(handlers)
@@ -117,5 +118,26 @@ describe('DiscussionThread', () => {
     fireEvent.click(getByTestId('collapse-replies'))
 
     expect(queryByTestId('collapse-replies')).toBeNull()
+  })
+
+  it('should unread entry when Mark As Unread is clicked', async () => {
+    const {getByTestId, queryByTestId} = setup(defaultProps())
+
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    fireEvent.click(getByTestId('markAsUnread'))
+
+    await waitFor(() => {
+      expect(queryByTestId('is-unread')).toBeTruthy()
+    })
+  })
+
+  it('should read entry when Mark As Read is clicked', async () => {
+    const {getByTestId, queryByTestId} = setup({...defaultProps(), read: false})
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    fireEvent.click(getByTestId('markAsRead'))
+
+    await waitFor(() => {
+      expect(queryByTestId('is-unread')).toBeNull()
+    })
   })
 })
