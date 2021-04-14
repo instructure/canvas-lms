@@ -70,7 +70,7 @@ pipeline {
               }
             ]
 
-            extendedStage('Builder').handler(postBuildHandler).obeysAllowStages(false).execute {
+            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
               stage ('Setup') {
                 timeout(time: 2) {
                  def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC

@@ -86,7 +86,7 @@ pipeline {
               }
             ]
 
-            extendedStage('Provider Verification for API and Live Event Consumers').handler(postBuildHandler).obeysAllowStages(false).execute {
+            extendedStage('Provider Verification for API and Live Event Consumers').hooks(postBuildHandler).obeysAllowStages(false).execute {
               def stages = [:]
 
               stages['Android'] = {

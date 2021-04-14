@@ -106,7 +106,7 @@ pipeline {
               }
             ]
 
-            extendedStage('Run Tests').handler(postBuildHandler).obeysAllowStages(false).execute {
+            extendedStage('Run Tests').hooks(postBuildHandler).obeysAllowStages(false).execute {
               timeout(time: 10) {
                 script {
                   def tests = [:]

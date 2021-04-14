@@ -226,7 +226,7 @@ pipeline {
               }
             ]
 
-            extendedStage('Builder').handler(postBuildHandler).obeysAllowStages(false).execute {
+            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
               stage('Setup') {
                 setupNode()
               }
