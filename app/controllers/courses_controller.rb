@@ -2177,6 +2177,7 @@ class CoursesController < ApplicationController
           js_bundle :syllabus
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
+          js_env(PERMISSIONS: { manage: @context.grants_right?(@current_user, session, :manage) })
           js_env(STUDENT_PLANNER_ENABLED: planner_enabled?)
           js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
 

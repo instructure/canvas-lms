@@ -1581,6 +1581,13 @@ describe CoursesController do
         expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_falsy
       end
 
+      it "sets PERMISSIONS appropriately in js_env" do
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
+      end
+
       it "loads announcements on home page when course is a k5 homeroom course" do
         @course.homeroom_course = true
         @course.save!

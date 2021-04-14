@@ -18,9 +18,10 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
+import {MOCK_COURSE_APPS, MOCK_COURSE_TABS} from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 
 const currentUser = {
@@ -45,22 +46,16 @@ const defaultProps = {
   loadAllOpportunities: () => {},
   name: 'Arts and Crafts',
   id: '30',
-  timeZone: defaultEnv.TIMEZONE
+  timeZone: defaultEnv.TIMEZONE,
+  canManage: false
 }
-const fetchAppsResponse = [
-  {
-    id: '7',
-    course_navigation: {
-      text: 'Studio',
-      icon_url: 'studio.png'
-    }
-  }
-]
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
+const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 
 beforeAll(() => {
   moxios.install()
-  fetchMock.get(FETCH_APPS_URL, JSON.stringify(fetchAppsResponse))
+  fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
+  fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
 })
 
 afterAll(() => {
@@ -99,16 +94,66 @@ describe('K-5 Subject Course', () => {
       expect(getByText(defaultProps.name)).toBeInTheDocument()
     })
 
-    it('shows Overview, Schedule, Modules, Grades, and Resources options', () => {
+    it('shows Home, Schedule, Modules, Grades, and Resources options', () => {
       const {getByText} = render(<K5Course {...defaultProps} />)
-      ;['Overview', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label =>
+      ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label =>
         expect(getByText(label)).toBeInTheDocument()
       )
     })
 
-    it('defaults to the Overview tab', () => {
+    it('defaults to the Home tab', () => {
       const {getByRole} = render(<K5Course {...defaultProps} />)
-      expect(getByRole('tab', {name: 'Overview', selected: true})).toBeInTheDocument()
+      expect(getByRole('tab', {name: 'Home', selected: true})).toBeInTheDocument()
+    })
+  })
+
+  describe('Manage course functionality', () => {
+    it('Shows a manage button when the user has manage permissions', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} canManage />)
+      expect(getByRole('button', {name: 'Manage'})).toBeInTheDocument()
+    })
+
+    it('The manage button opens a slide-out tray with the course navigation tabs when clicked', async () => {
+      const {getByRole} = render(<K5Course {...defaultProps} canManage />)
+      const manageButton = getByRole('button', {name: 'Manage'})
+
+      act(() => manageButton.click())
+
+      const validateLink = (name, href) => {
+        const link = getByRole('link', {name})
+        expect(link).toBeInTheDocument()
+        expect(link.href).toBe(href)
+      }
+
+      await waitFor(() => {
+        validateLink('Home', 'http://localhost/courses/30')
+        validateLink('Modules', 'http://localhost/courses/30/modules')
+        validateLink('Assignments', 'http://localhost/courses/30/assignments')
+        validateLink('Settings', 'http://localhost/courses/30/settings')
+      })
+    })
+
+    it('Displays an icon indicating that a nav link is hidden from students', async () => {
+      const {findAllByTestId, getByRole, getByText} = render(
+        <K5Course {...defaultProps} canManage />
+      )
+      const manageButton = getByRole('button', {name: 'Manage'})
+
+      act(() => manageButton.click())
+
+      const hiddenIcons = await findAllByTestId('k5-course-nav-hidden-icon')
+      // Doesn't show the icon for settings, though
+      expect(hiddenIcons.length).toBe(1)
+
+      fireEvent.mouseOver(hiddenIcons[0])
+      await waitFor(() =>
+        expect(getByText('Disabled. Not visible to students')).toBeInTheDocument()
+      )
+    })
+
+    it('Does not show a manage button when the user does not have manage permissions', () => {
+      const {queryByRole} = render(<K5Course {...defaultProps} />)
+      expect(queryByRole('button', {name: 'Manage'})).not.toBeInTheDocument()
     })
   })
 

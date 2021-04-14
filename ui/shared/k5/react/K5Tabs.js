@@ -64,9 +64,9 @@ const K5Tabs = ({children, currentTab, name, onTabChange, tabs, tabsRef}) => {
       ref={containerRef}
       style={{backgroundColor: k5Theme.variables.colors.background.backgroundLightest}}
     >
-      <View as="div" padding="medium 0 0 0" borderWidth="none none small none">
+      <View as="div" borderWidth="none none small none">
         {name && (
-          <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="0 0 small 0">
+          <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
             {I18n.t('Welcome, %{name}!', {name})}
           </Heading>
         )}

@@ -75,10 +75,10 @@ describe('useTabState hook', () => {
       expect(window.history.replaceState.mock.calls[0][0].id).toBe(TAB_IDS.RESOURCES)
       expect(window.history.replaceState.mock.calls[0][2]).toBe('http://localhost/#resources')
 
-      act(() => result.current.handleTabChange(TAB_IDS.OVERVIEW))
+      act(() => result.current.handleTabChange(TAB_IDS.HOME))
 
-      expect(window.history.replaceState.mock.calls[1][0].id).toBe(TAB_IDS.OVERVIEW)
-      expect(window.history.replaceState.mock.calls[1][2]).toBe('http://localhost/#overview')
+      expect(window.history.replaceState.mock.calls[1][0].id).toBe(TAB_IDS.HOME)
+      expect(window.history.replaceState.mock.calls[1][2]).toBe('http://localhost/#home')
     })
   })
 })

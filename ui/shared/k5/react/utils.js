@@ -105,6 +105,9 @@ export const fetchCourseApps = courseId =>
     )
   )
 
+export const fetchCourseTabs = courseId =>
+  asJson(window.fetch(`/api/v1/courses/${courseId}/tabs`, defaultFetchOptions))
+
 export const readableRoleName = role => {
   const ROLES = {
     TeacherEnrollment: I18n.t('Teacher'),
@@ -126,10 +129,10 @@ export const sendMessage = (recipientId, message, subject) =>
   })
 
 export const TAB_IDS = {
+  HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',
   SCHEDULE: 'tab-schedule',
   GRADES: 'tab-grades',
   RESOURCES: 'tab-resources',
-  OVERVIEW: 'tab-overview',
   MODULES: 'tab-modules'
 }

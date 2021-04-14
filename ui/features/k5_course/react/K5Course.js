@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
 import PropTypes from 'prop-types'
@@ -26,14 +26,17 @@ import {
   store
 } from '@instructure/canvas-planner'
 import {
+  IconBankLine,
   IconCalendarMonthLine,
+  IconEditSolid,
   IconHomeLine,
   IconModuleLine,
-  IconStarLightLine,
-  IconBankLine
+  IconStarLightLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
+import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {Mask} from '@instructure/ui-overlays'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
@@ -43,20 +46,21 @@ import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {TAB_IDS, fetchCourseApps} from '@canvas/k5/react/utils'
+import {fetchCourseApps, fetchCourseTabs, TAB_IDS} from '@canvas/k5/react/utils'
 import k5Theme, {theme} from '@canvas/k5/react/k5-theme'
 import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
+import ManageCourseTray from './ManageCourseTray'
 
 const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
 const HERO_HEIGHT_PX = 400
 
 const COURSE_TABS = [
   {
-    id: TAB_IDS.OVERVIEW,
+    id: TAB_IDS.HOME,
     icon: IconHomeLine,
-    label: I18n.t('Overview')
+    label: I18n.t('Home')
   },
   {
     id: TAB_IDS.SCHEDULE,
@@ -95,8 +99,7 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
         borderRadius: '8px',
         minHeight: '25vh',
         maxHeight: `${HERO_HEIGHT_PX}px`,
-        marginBottom: '1rem',
-        marginTop: '-1.25rem'
+        marginBottom: '1rem'
       }}
       aria-hidden="true"
       data-testid="k5-course-header-hero"
@@ -131,17 +134,20 @@ export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
+  courseOverview,
+  id,
   imageUrl,
   loadAllOpportunities,
   name,
-  id,
   timeZone,
-  defaultTab = TAB_IDS.OVERVIEW,
-  plannerEnabled = false,
-  courseOverview
+  canManage = false,
+  defaultTab = TAB_IDS.HOME,
+  plannerEnabled = false
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
+  const [courseNavLinks, setCourseNavLinks] = useState([])
   const [tabsRef, setTabsRef] = useState(null)
+  const [trayOpen, setTrayOpen] = useState(false)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -169,7 +175,13 @@ export function K5Course({
       .then(setApps)
       .catch(showFlashError(I18n.t('Failed to load apps for %{name}.', {name})))
       .finally(() => setAppsLoading(false))
+    fetchCourseTabs(id)
+      .then(setCourseNavLinks)
+      .catch(showFlashError(I18n.t('Failed to load course navigation for %{name}.', {name})))
   }, [id, name])
+
+  const handleOpenTray = () => setTrayOpen(true)
+  const handleCloseTray = () => setTrayOpen(false)
 
   return (
     <K5DashboardContext.Provider
@@ -181,12 +193,28 @@ export function K5Course({
       }}
     >
       <View as="section">
+        {trayOpen && <Mask onClick={handleCloseTray} fullscreen />}
+        {canManage && (
+          <ManageCourseTray navLinks={courseNavLinks} open={trayOpen} onClose={handleCloseTray} />
+        )}
         <K5Tabs
           currentTab={currentTab}
           onTabChange={handleTabChange}
           tabs={COURSE_TABS}
           tabsRef={setTabsRef}
         >
+          {canManage && (
+            <View
+              as="section"
+              borderWidth="0 0 small 0"
+              padding="0 0 medium 0"
+              margin="0 0 medium 0"
+            >
+              <Button onClick={handleOpenTray} renderIcon={<IconEditSolid />}>
+                {I18n.t('Manage')}
+              </Button>
+            </View>
+          )}
           <CourseHeaderHero name={name} image={imageUrl} backgroundColor={DEFAULT_COLOR} />
         </K5Tabs>
         {currentTab === TAB_IDS.OVERVIEW && <OverviewPage content={courseOverview} />}
@@ -202,10 +230,11 @@ K5Course.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
+  canManage: PropTypes.bool,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,

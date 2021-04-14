@@ -28,10 +28,11 @@ ready(() => {
   if (courseContainer) {
     ReactDOM.render(
       <K5Course
+        canManage={ENV.PERMISSIONS.manage}
         currentUser={ENV.current_user}
-        name={ENV.COURSE.name}
         id={ENV.COURSE.id}
         imageUrl={ENV.COURSE.image_url}
+        name={ENV.COURSE.name}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
