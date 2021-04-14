@@ -54,7 +54,7 @@ module MicrosoftSync
     # job_state_record is assumed to be a model with the following used here:
     #  - job_state
     #  - workflow_state
-    #    -> update_workflow_state_unless_deleted()
+    #    -> update_unless_deleted() -- atomically updates attributes if workflow_state != 'deleted'
     #    -> state can be: pending, running, retrying, errored, completed, deleted
     #    -> deleted? method
     #  - last_error
@@ -180,7 +180,7 @@ module MicrosoftSync
 
     # Only to be used from run(), which does other checks before kicking off main loop:
     def run_main_loop(current_step, job_state_data, synchronous)
-      return unless job_state_record&.update_workflow_state_unless_deleted(:running)
+      return unless job_state_record&.update_unless_deleted(workflow_state: :running)
 
       current_step ||= steps_object.initial_step
       memory_state = nil
@@ -202,8 +202,8 @@ module MicrosoftSync
         log { "step #{current_step} finished with #{result.class.name}" }
         case result
         when Complete
-          job_state_record&.update_workflow_state_unless_deleted(
-            :completed, job_state: nil, last_error: nil
+          job_state_record&.update_unless_deleted(
+            workflow_state: :completed, job_state: nil, last_error: nil
           )
           steps_object.after_complete
           return
@@ -241,8 +241,8 @@ module MicrosoftSync
 
     def update_state_record_to_errored_and_cleanup(error)
       error_msg = MicrosoftSync::Errors.user_facing_message(error)
-      job_state_record&.update_workflow_state_unless_deleted(
-        :errored, last_error: error_msg, job_state: nil
+      job_state_record&.update_unless_deleted(
+        workflow_state: :errored, last_error: error_msg, job_state: nil
       )
       steps_object.after_failure
     end
@@ -270,7 +270,9 @@ module MicrosoftSync
         retried_on_error: "#{retry_object.error.class}: #{retry_object.error.message}",
       }
 
-      job_state_record&.update_workflow_state_unless_deleted(:retrying, job_state: new_job_state)
+      job_state_record&.update_unless_deleted(
+        workflow_state: :retrying, job_state: new_job_state
+      )
     end
   end
 end
