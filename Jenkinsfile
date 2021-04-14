@@ -318,7 +318,7 @@ pipeline {
           maybeSlackSendRetrigger()
 
           def postBuildHandler = [
-            onStageResult: { _, stageConfig ->
+            onStageEnded: { _, stageConfig ->
               postFn(stageConfig.status())
             }
           ]

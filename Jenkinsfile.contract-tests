@@ -81,7 +81,7 @@ pipeline {
             }
 
             def postBuildHandler = [
-              onStageResult: { _, stageConfig ->
+              onStageEnded: { _, stageConfig ->
                 cleanupFn(stageConfig.status())
               }
             ]

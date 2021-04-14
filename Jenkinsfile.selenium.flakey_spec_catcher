@@ -221,7 +221,7 @@ pipeline {
         script {
           extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
             def postBuildHandler = [
-              onStageResult: { _, stageConfig ->
+              onStageEnded: { _, stageConfig ->
                 cleanupFn(stageConfig.status())
               }
             ]
