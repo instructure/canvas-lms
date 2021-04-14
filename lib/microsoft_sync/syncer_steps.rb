@@ -47,7 +47,7 @@ module MicrosoftSync
     end
 
     def max_retries
-      4
+      3
     end
 
     def restart_job_after_inactivity
@@ -106,7 +106,7 @@ module MicrosoftSync
       group.update! ms_group_id: group_id
       StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
     rescue Errors::HTTPNotFound => e
-      StateMachineJob::Retry.new(error: e, delay_amount: 45.seconds, job_state_data: group_id)
+      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100], job_state_data: group_id)
     end
 
     # Gets users enrolled in course, get UPNs (e.g. email addresses) for them,
@@ -128,11 +128,12 @@ module MicrosoftSync
       end
 
       StateMachineJob::NextStep.new(:step_generate_diff)
+    rescue Errors::HTTPNotFound => e
+      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100])
     end
 
     # Get group members/owners from the API and local enrollments and calculate
-    # what needs to be done. This could also be combined with execute_diff()
-    # but is conceptually different and makes testing easier.
+    # what needs to be done.
     def step_generate_diff(_mem_data, _job_state_data)
       members = graph_service_helpers.get_group_users_aad_ids(group.ms_group_id)
       owners = graph_service_helpers.get_group_users_aad_ids(group.ms_group_id, owners: true)
@@ -143,6 +144,8 @@ module MicrosoftSync
       end
 
       StateMachineJob::NextStep.new(:step_execute_diff, diff)
+    rescue Errors::HTTPNotFound => e
+      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100])
     end
 
     # Run the API calls to add/remove users.
@@ -183,7 +186,7 @@ module MicrosoftSync
       # enrollments are in the DB) since we last calculated the diff added them
       # in the generate_diff step. This is rare, but we can also sleep in that
       # case.
-      StateMachineJob::Retry.new(error: e, delay_amount: 1.minute)
+      StateMachineJob::Retry.new(error: e, delay_amount: [30, 90, 270])
     end
 
     def tenant
