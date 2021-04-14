@@ -23,11 +23,11 @@ import DirectShareUserModal from '../../../../../shared/direct-sharing/react/com
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
+import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
-import PropTypes from 'prop-types'
 import {
   PUBLISH_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
@@ -50,6 +50,7 @@ export const DiscussionTopicContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
+  const [expandedReply, setExpandedReply] = useState(false)
 
   const discussionTopicData = {
     _id: props.discussionTopic._id,
@@ -193,74 +194,94 @@ export const DiscussionTopicContainer = props => {
                 />
               </div>
             )}
-            <Flex
-              direction="row"
-              justifyItems="space-between"
-              padding="medium small small"
-              alignItems="start"
-            >
-              <Flex.Item shouldShrink shouldGrow>
-                <PostMessage
-                  authorName={discussionTopicData.authorName}
-                  avatarUrl={discussionTopicData.avatarUrl}
-                  pillText={I18n.t('Author')}
-                  timingDisplay={discussionTopicData.postedAt}
-                  message={discussionTopicData.message}
-                >
-                  {props.onReply && (
-                    <Button
-                      color="primary"
-                      onReply={props.onReply}
-                      data-testid="discussion-topic-reply"
-                    >
-                      {I18n.t('Reply')}
-                    </Button>
-                  )}
-                </PostMessage>
-              </Flex.Item>
+            <Flex direction="column">
               <Flex.Item>
-                <PostToolbar
-                  onReadAll={() => {}}
-                  onToggleComments={canReadAsAdmin ? () => {} : null}
-                  onDelete={
-                    canDelete
-                      ? () => {
-                          if (
-                            // eslint-disable-next-line no-alert
-                            window.confirm(I18n.t('Are you sure you want to delete this topic?'))
-                          ) {
-                            deleteDiscussionTopic({
-                              variables: {
-                                id: discussionTopicData._id
+                <Flex
+                  direction="row"
+                  justifyItems="space-between"
+                  padding="medium small small"
+                  alignItems="start"
+                >
+                  <Flex.Item shouldShrink shouldGrow>
+                    <PostMessage
+                      authorName={discussionTopicData.authorName}
+                      avatarUrl={discussionTopicData.avatarUrl}
+                      pillText={I18n.t('Author')}
+                      timingDisplay={discussionTopicData.postedAt}
+                      message={discussionTopicData.message}
+                    >
+                      <Button
+                        color="primary"
+                        onClick={() => {
+                          setExpandedReply(true)
+                        }}
+                        data-testid="discussion-topic-reply"
+                      >
+                        {I18n.t('Reply')}
+                      </Button>
+                    </PostMessage>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <PostToolbar
+                      onReadAll={() => {}}
+                      onToggleComments={canReadAsAdmin ? () => {} : null}
+                      onDelete={
+                        canDelete
+                          ? () => {
+                              if (
+                                // eslint-disable-next-line no-alert
+                                window.confirm(
+                                  I18n.t('Are you sure you want to delete this topic?')
+                                )
+                              ) {
+                                deleteDiscussionTopic({
+                                  variables: {
+                                    id: discussionTopicData._id
+                                  }
+                                })
                               }
-                            })
-                          }
-                        }
-                      : null
-                  }
-                  repliesCount={discussionTopicData.replies}
-                  unreadCount={discussionTopicData.unread}
-                  onSend={
-                    canReadAsAdmin
-                      ? () => {
-                          setSendToOpen(true)
-                        }
-                      : null
-                  }
-                  onCopy={
-                    canReadAsAdmin
-                      ? () => {
-                          setCopyToOpen(true)
-                        }
-                      : null
-                  }
-                  onEdit={canReadAsAdmin ? () => {} : null}
-                  onTogglePublish={canReadAsAdmin && canUpdate ? onPublish : null}
-                  onToggleSubscription={onSubscribe}
-                  isPublished={discussionTopicData.published}
-                  canUnpublish={canUnpublish}
-                  isSubscribed={discussionTopicData.subscribed}
-                  commentsEnabled
+                            }
+                          : null
+                      }
+                      repliesCount={discussionTopicData.replies}
+                      unreadCount={discussionTopicData.unread}
+                      onSend={
+                        canReadAsAdmin
+                          ? () => {
+                              setSendToOpen(true)
+                            }
+                          : null
+                      }
+                      onCopy={
+                        canReadAsAdmin
+                          ? () => {
+                              setCopyToOpen(true)
+                            }
+                          : null
+                      }
+                      onEdit={canReadAsAdmin ? () => {} : null}
+                      onTogglePublish={canReadAsAdmin && canUpdate ? onPublish : null}
+                      onToggleSubscription={onSubscribe}
+                      isPublished={discussionTopicData.published}
+                      canUnpublish={canUnpublish}
+                      isSubscribed={discussionTopicData.subscribed}
+                      commentsEnabled
+                    />
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+              <Flex.Item
+                shouldShrink
+                shouldGrow
+                padding="none medium medium xx-large"
+                overflowX="hidden"
+                overflowY="hidden"
+              >
+                <DiscussionEdit
+                  show={expandedReply}
+                  onCancel={() => {
+                    setExpandedReply(false)
+                  }}
                 />
               </Flex.Item>
             </Flex>
@@ -279,13 +300,7 @@ DiscussionTopicContainer.propTypes = {
    * Providing this property will result in the graded info
    * to be rendered
    */
-  discussionTopic: Discussion.shape.isRequired,
-  /**
-   * Behavior for clicking the reply button,
-   * Providing this property will result in
-   * rendering the Reply button
-   */
-  onReply: PropTypes.func
+  discussionTopic: Discussion.shape.isRequired
 }
 
 export default DiscussionTopicContainer

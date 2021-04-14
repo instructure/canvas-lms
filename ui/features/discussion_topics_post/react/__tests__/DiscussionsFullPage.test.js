@@ -26,7 +26,9 @@ import {mswServer} from '../../../../shared/msw/mswServer'
 import {graphql} from 'msw'
 import React from 'react'
 
-describe('DiscussionsFullPage', () => {
+jest.mock('@canvas/rce/RichContentEditor')
+
+describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
     // eslint-disable-next-line no-undef

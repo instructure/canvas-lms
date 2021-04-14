@@ -25,6 +25,7 @@ import {
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
+import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -58,6 +59,8 @@ export const mockThreads = {
 export const DiscussionThreadContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editorExpanded, setEditorExpanded] = useState(false)
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -100,7 +103,8 @@ export const DiscussionThreadContainer = props => {
     })
   }
 
-  const marginDepth = 4 * props.depth
+  const marginDepth = `calc(4rem * ${props.depth})`
+  const replyMarginDepth = `calc(3.75rem * (${props.depth + 1}))`
 
   const threadActions = []
   if (!props.deleted) {
@@ -108,7 +112,9 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Reply
         key={`reply-${props.id}`}
         delimiterKey={`reply-delimiter-${props.id}`}
-        onClick={() => {}}
+        onClick={() => {
+          setEditorExpanded(!editorExpanded)
+        }}
       />
     )
     threadActions.push(
@@ -165,6 +171,10 @@ export const DiscussionThreadContainer = props => {
           timingDisplay={createdAt.toDateString()}
           message={props.message}
           isUnread={!props.read}
+          isEditing={isEditing}
+          onCancel={() => {
+            setIsEditing(false)
+          }}
         >
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
         </PostMessage>
@@ -174,7 +184,7 @@ export const DiscussionThreadContainer = props => {
 
   return (
     <>
-      <div style={{marginLeft: marginDepth + 'rem', paddingLeft: '0.75rem'}}>
+      <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}}>
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
             {renderPostMessage()}
@@ -187,10 +197,26 @@ export const DiscussionThreadContainer = props => {
                 onToggleUnread={toggleUnread}
                 onMarkAllAsUnread={() => {}}
                 onDelete={props.permissions?.delete ? onDelete : null}
+                onEdit={() => {
+                  setIsEditing(true)
+                }}
               />
             </Flex.Item>
           )}
         </Flex>
+      </div>
+      <div style={{marginLeft: replyMarginDepth}}>
+        {editorExpanded && (
+          <View
+            display="block"
+            background="primary"
+            borderWidth="none none small none"
+            padding="none none small none"
+            margin="none none xSmall none"
+          >
+            <DiscussionEdit onCancel={() => setEditorExpanded(false)} />
+          </View>
+        )}
       </div>
       {(expandReplies || props.depth > 0) && props.subentriesCount > 0 && (
         <DiscussionSubentries discussionEntryId={props._id} depth={props.depth + 1} />

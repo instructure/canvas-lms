@@ -27,6 +27,7 @@ import {Pill} from '@instructure/ui-pill'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
 
 export function PostMessage({...props}) {
   return (
@@ -41,12 +42,18 @@ export function PostMessage({...props}) {
         </>
       }
       description={
-        <>
-          <div dangerouslySetInnerHTML={{__html: props.message}} />
-          <View display="block" margin="small none none none">
-            {props.children}
+        props.isEditing ? (
+          <View display="inline-block" margin="small none none none" width="100%">
+            <DiscussionEdit onCancel={props.onCancel} value={props.message} />
           </View>
-        </>
+        ) : (
+          <>
+            <div dangerouslySetInnerHTML={{__html: props.message}} />
+            <View display="block" margin="small none none none">
+              {props.children}
+            </View>
+          </>
+        )
       }
       alignContent="top"
       margin="0 0 medium 0"
@@ -104,7 +111,19 @@ PostMessage.propTypes = {
   /**
    * Determines if the unread badge should be displayed
    */
-  isUnread: PropTypes.bool
+  isUnread: PropTypes.bool,
+  /**
+   * Determines if the editor should be displayed
+   */
+  isEditing: PropTypes.bool,
+  /**
+   * Callback for when Editor Save button is pressed
+   */
+  onSave: PropTypes.func.isRequired,
+  /**
+   * Callback for when Editor Cancel button is pressed
+   */
+  onCancel: PropTypes.func.isRequired
 }
 
 export default PostMessage

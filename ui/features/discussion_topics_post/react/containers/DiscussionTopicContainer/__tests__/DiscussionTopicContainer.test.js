@@ -26,6 +26,8 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
 
+jest.mock('@canvas/rce/RichContentEditor')
+
 const discussionTopicMock = {
   discussionTopic: {
     _id: '1',
@@ -99,7 +101,6 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
 
     expect(await container.queryByTestId('graded-discussion-info')).toBeNull()
-    expect(await container.queryByTestId('discussion-topic-reply')).toBeNull()
   })
 
   it('renders infoText only when there are replies', async () => {
