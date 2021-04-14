@@ -75,7 +75,11 @@ const NoOutcomesBillboard = () => {
 
 const OutcomeManagementPanel = () => {
   const {contextType, contextId} = useCanvasContext()
-  const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
+  const {
+    search: searchString,
+    onChangeHandler: onSearchChangeHandler,
+    onClearHandler: onSearchClearHandler
+  } = useSearch()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
   const onSelectOutcomesHandler = id =>
@@ -94,7 +98,9 @@ const OutcomeManagementPanel = () => {
     selectedGroupId,
     selectedParentGroupId
   } = useManageOutcomes()
-  const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
+  const {loading, group, loadMore} = useGroupDetail({
+    id: selectedGroupId
+  })
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()

@@ -19,6 +19,8 @@
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useSearch from '../useSearch'
 
+jest.useFakeTimers()
+
 describe('useSearch', () => {
   const event = {
     target: {
@@ -28,18 +30,35 @@ describe('useSearch', () => {
 
   test('should create custom hook with initial state an empty string', () => {
     const {result} = renderHook(() => useSearch())
-    expect(result.current[0]).toBe('')
+    expect(result.current.search).toBe('')
   })
 
-  test('should update state with event.target.value when first returned fn is called', () => {
-    const {result} = renderHook(() => useSearch())
-    act(() => result.current[1](event))
-    expect(result.current[0]).toBe('123')
+  test('should update state with event.target.value when first returned fn called with debounce disabled', async () => {
+    const {result} = renderHook(() => useSearch(0))
+    act(() => result.current.onChangeHandler(event))
+    expect(result.current.search).toBe('123')
+    expect(result.current.debouncedSearch).toBe('')
+    await act(async () => jest.runAllTimers())
+    expect(result.current.debouncedSearch).toBe('123')
   })
 
-  test('should clear state to empty string when second returned fn is called', () => {
+  test('should clear state to empty string when second returned fn is called', async () => {
     const {result} = renderHook(() => useSearch())
-    act(() => result.current[2]())
-    expect(result.current[0]).toBe('')
+    act(() => result.current.onClearHandler())
+    await act(async () => jest.runAllTimers())
+    expect(result.current.search).toBe('')
+  })
+
+  test('should update state with event.target.value using default debounce', async () => {
+    const {result} = renderHook(() => useSearch())
+    result.current.onChangeHandler(event)
+    expect(result.current.search).toBe('123')
+    expect(result.current.debouncedSearch).toBe('')
+    await act(async () => jest.advanceTimersByTime(100))
+    expect(result.current.debouncedSearch).toBe('')
+    await act(async () => jest.advanceTimersByTime(100))
+    expect(result.current.debouncedSearch).toBe('')
+    await act(async () => jest.advanceTimersByTime(300))
+    expect(result.current.debouncedSearch).toBe('123')
   })
 })

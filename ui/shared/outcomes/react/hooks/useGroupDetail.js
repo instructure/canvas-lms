@@ -16,39 +16,54 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {useApolloClient} from 'react-apollo'
-import {
-  GROUP_DETAIL_QUERY,
-  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
-} from '../../graphql/Management'
 import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {GROUP_DETAIL_QUERY} from '@canvas/outcomes/graphql/Management'
 
-const useGroupDetail = (id, loadOutcomesIsImported = false) => {
+const useGroupDetail = ({
+  query = GROUP_DETAIL_QUERY,
+  loadOutcomesIsImported = false,
+  searchString = '',
+  id
+}) => {
   const {contextType, contextId} = useCanvasContext()
   const client = useApolloClient()
   const [group, setGroup] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const outcomeIsImportedVariables = loadOutcomesIsImported
-    ? {outcomeIsImportedContextType: contextType, outcomeIsImportedContextId: contextId}
-    : {outcomesContextType: contextType, outcomesContextId: contextId}
+  const abortController = useRef(null)
+  const abortLatest = () => abortController.current && abortController.current.abort()
+  const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
 
   const load = currentGroup => {
-    if (id && String(id) !== String(ACCOUNT_FOLDER_ID)) {
+    if (
+      id &&
+      String(id) !== String(ACCOUNT_FOLDER_ID) &&
+      ((searchString || '').length === 0 || searchString.length > 2)
+    ) {
       setLoading(true)
+
+      if (searchString) queryVars.searchQuery = searchString
+
+      abortLatest()
+      const controller = new window.AbortController()
+      abortController.current = controller
+
       client
         .query({
-          query: loadOutcomesIsImported
-            ? GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
-            : GROUP_DETAIL_QUERY,
+          query,
           variables: {
             id,
+            outcomeIsImported: loadOutcomesIsImported,
             outcomesCursor: currentGroup?.outcomes?.pageInfo?.endCursor,
-            ...outcomeIsImportedVariables
+            ...queryVars
+          },
+          context: {
+            fetchOptions: {signal: controller.signal}
           }
         })
         .then(({data}) => {
@@ -75,11 +90,14 @@ const useGroupDetail = (id, loadOutcomesIsImported = false) => {
 
   useEffect(() => {
     setGroup(null)
+  }, [id])
+
+  useEffect(() => {
     setError(null)
     setLoading(true)
     load(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [id, searchString])
 
   useEffect(() => {
     if (error) {
@@ -100,6 +118,7 @@ const useGroupDetail = (id, loadOutcomesIsImported = false) => {
     loading,
     group,
     error,
+    setGroup,
     loadMore
   }
 }

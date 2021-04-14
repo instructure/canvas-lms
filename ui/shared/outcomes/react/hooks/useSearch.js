@@ -16,12 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import {useState, useEffect, useCallback} from 'react'
+import {useDebouncedCallback} from 'use-debounce'
 
-export default function useSearch() {
+const useSearch = (debounceTime = 500) => {
   const [search, setSearch] = useState('')
-  const onChangeHandler = useCallback(event => setSearch(event.target.value), [])
-  const onClearHandler = useCallback(() => setSearch(''), [])
+  const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  return [search, onChangeHandler, onClearHandler]
+  const [debouncedCallback, callPending] = useDebouncedCallback(value => {
+    setDebouncedSearch(value)
+  }, debounceTime)
+
+  const onChangeHandler = useCallback(event => setSearch(event.target.value), [])
+  const onClearHandler = useCallback(() => {
+    setSearch('')
+    callPending()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    debouncedCallback(search)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search])
+
+  return {
+    search,
+    debouncedSearch,
+    onChangeHandler,
+    onClearHandler
+  }
 }
+
+export default useSearch

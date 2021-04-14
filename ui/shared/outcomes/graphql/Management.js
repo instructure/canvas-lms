@@ -117,11 +117,13 @@ export const GROUP_DETAIL_QUERY = gql`
   }
 `
 
-export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
-  query GroupDetailQuery(
+export const FIND_GROUP_OUTCOMES = gql`
+  query GroupDetailWithSearchQuery(
     $id: ID!
-    $outcomeIsImportedContextType: String!
-    $outcomeIsImportedContextId: ID!
+    $outcomesContextId: ID!
+    $outcomesContextType: String!
+    $outcomeIsImported: Boolean!
+    $searchQuery: String
     $outcomesCursor: String
   ) {
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
@@ -129,22 +131,25 @@ export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
         _id
         description
         title
-        outcomesCount
-        outcomes(first: 10, after: $outcomesCursor) {
+        outcomesCount(searchQuery: $searchQuery)
+        canEdit
+        outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
             endCursor
           }
-          nodes {
-            ... on LearningOutcome {
-              _id
-              description
-              title
-              displayName
-              isImported(
-                targetContextType: $outcomeIsImportedContextType
-                targetContextId: $outcomeIsImportedContextId
-              )
+          edges {
+            node {
+              ... on LearningOutcome {
+                _id
+                description
+                title
+                displayName
+                isImported(
+                  targetContextType: $outcomesContextType
+                  targetContextId: $outcomesContextId
+                ) @include(if: $outcomeIsImported)
+              }
             }
           }
         }

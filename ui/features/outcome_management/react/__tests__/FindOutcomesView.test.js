@@ -28,15 +28,17 @@ describe('FindOutcomesView', () => {
   const defaultProps = (props = {}) => ({
     collection: {
       id: '1',
-      name: 'State Standards',
-      outcomesCount: 3
+      name: 'State Standards'
     },
+    outcomesCount: 3,
     outcomes: {
-      nodes: [
+      edges: [
         {
-          _id: '11',
-          title: 'Outcome 1',
-          description: 'Outcome 1 description'
+          node: {
+            _id: '11',
+            title: 'Outcome 1',
+            description: 'Outcome 1 description'
+          }
         }
       ],
       pageInfo: {
@@ -45,7 +47,7 @@ describe('FindOutcomesView', () => {
       }
     },
     loading: false,
-    searchString: '123',
+    searchString: '',
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
     onAddAllHandler: onAddAllHandlerMock,
@@ -82,7 +84,7 @@ describe('FindOutcomesView', () => {
       />
     )
     expect(getByText('Outcome Group')).toBeInTheDocument()
-    expect(getByPlaceholderText('Search within outcome group')).toBeInTheDocument()
+    expect(getByPlaceholderText('Search within Outcome Group')).toBeInTheDocument()
   })
 
   it('renders component with correct number of outcomes', () => {
@@ -94,10 +96,7 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          collection: {
-            ...defaultProps().collection,
-            outcomesCount: null
-          }
+          outcomesCount: 0
         })}
       />
     )
@@ -105,14 +104,16 @@ describe('FindOutcomesView', () => {
   })
 
   it('calls onChangeHandler when users types in searchbar', () => {
-    const {getByDisplayValue} = render(<FindOutcomesView {...defaultProps()} />)
+    const {getByDisplayValue} = render(
+      <FindOutcomesView {...defaultProps({searchString: '123'})} />
+    )
     const input = getByDisplayValue('123')
     fireEvent.change(input, {target: {value: 'test'}})
     expect(onChangeHandlerMock).toHaveBeenCalled()
   })
 
   it('calls onClearHandler on click on clear search button', () => {
-    const {getByText} = render(<FindOutcomesView {...defaultProps()} />)
+    const {getByText} = render(<FindOutcomesView {...defaultProps({searchString: '123'})} />)
     const btn = getByText('Clear search field')
     fireEvent.click(btn)
     expect(onClearHandlerMock).toHaveBeenCalled()
@@ -134,12 +135,14 @@ describe('FindOutcomesView', () => {
   it('shows outcome as added when outcome is already imported', () => {
     const importedOutcome = {
       outcomes: {
-        nodes: [
+        edges: [
           {
-            _id: '11',
-            title: 'Outcome 1',
-            description: 'Outcome 1 description',
-            isImported: true
+            node: {
+              _id: '11',
+              title: 'Outcome 1',
+              description: 'Outcome 1 description',
+              isImported: true
+            }
           }
         ],
         pageInfo: {
@@ -172,14 +175,16 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          collection: {
-            ...defaultProps().collection,
-            outcomesCount: 0
-          }
+          outcomesCount: 0
         })}
       />
     )
-    expect(getByText('Add All Outcomes').closest('button')).toHaveAttribute('disabled')
+    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  })
+
+  it('disables "Add All Outcomes" button if the search is present', () => {
+    const {getByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
+    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
 
   it('shows large loader if data is loading and outcomes are missing/undefined', () => {

@@ -24,6 +24,7 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
+import {findOutcomesMocks} from '@canvas/outcomes/mocks/Management'
 
 jest.useFakeTimers()
 
@@ -64,6 +65,46 @@ describe('FindOutcomesModal', () => {
     const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
+  })
+
+  it('debounces the search string entered by the user', async () => {
+    const {getByText, getByLabelText} = render(<FindOutcomesModal {...defaultProps()} />, {
+      mocks: [...findModalMocks(), ...findOutcomesMocks()]
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account Standards'))
+    fireEvent.click(getByText('Root Account Outcome Group 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('25 Outcomes')).toBeInTheDocument()
+    const input = getByLabelText('Search field')
+    fireEvent.change(input, {target: {value: 'mathemati'}})
+    await act(async () => jest.advanceTimersByTime(100))
+    expect(getByText('25 Outcomes')).toBeInTheDocument()
+    fireEvent.change(input, {target: {value: 'mathematic'}})
+    await act(async () => jest.advanceTimersByTime(300))
+    expect(getByText('25 Outcomes')).toBeInTheDocument()
+    fireEvent.change(input, {target: {value: 'mathematics'}})
+    await act(async () => jest.advanceTimersByTime(500))
+    expect(getByText('15 Outcomes')).toBeInTheDocument()
+  })
+
+  it('should not disable search input and clear search button if there are no results', async () => {
+    const {getByText, getByLabelText, queryByTestId} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        mocks: [...findModalMocks(), ...findOutcomesMocks()]
+      }
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account Standards'))
+    fireEvent.click(getByText('Root Account Outcome Group 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('25 Outcomes')).toBeInTheDocument()
+    const input = getByLabelText('Search field')
+    fireEvent.change(input, {target: {value: 'no results'}})
+    await act(async () => jest.advanceTimersByTime(500))
+    expect(getByLabelText('Search field')).toBeEnabled()
+    expect(queryByTestId('clear-search-icon')).toBeInTheDocument()
   })
 
   it('renders component with "Add Outcomes to Course" title when contextType is Course', async () => {
