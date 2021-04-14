@@ -44,6 +44,9 @@ const discussionTopicMock = {
     assignment: {
       dueAt: '2021-04-05T13:40:50Z',
       pointsPossible: 5
+    },
+    permissions: {
+      readAsAdmin: true
     }
   }
 }
@@ -63,6 +66,9 @@ const discussionTopicMockOptional = {
     entryCounts: {
       repliesCount: 24,
       unreadCount: 4
+    },
+    permissions: {
+      readAsAdmin: true
     }
   }
 }
@@ -70,6 +76,7 @@ const discussionTopicMockOptional = {
 describe('DiscussionTopicContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
+    window.ENV = {context_asset_string: 'course_1'}
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
@@ -118,5 +125,23 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.getByText('Close for Comments')).toBeTruthy()
     expect(await container.getByText('Send To...')).toBeTruthy()
     expect(await container.getByText('Copy To...')).toBeTruthy()
+  })
+
+  it('renders a modal to send content', async () => {
+    const container = setup(discussionTopicMock)
+    const kebob = await container.getByTestId('discussion-post-menu-trigger')
+    fireEvent.click(kebob)
+    const sendToButton = await container.getByText('Send To...')
+    fireEvent.click(sendToButton)
+    expect(await container.findByText('Send to:')).toBeTruthy()
+  })
+
+  it('renders a modal to copy content', async () => {
+    const container = setup(discussionTopicMock)
+    const kebob = await container.getByTestId('discussion-post-menu-trigger')
+    fireEvent.click(kebob)
+    const copyToButton = await container.getByText('Copy To...')
+    fireEvent.click(copyToButton)
+    expect(await container.findByText('Select a Course')).toBeTruthy()
   })
 })
