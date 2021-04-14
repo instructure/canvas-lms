@@ -66,7 +66,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements('canvas-docker').execute {
+          extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
             stage('Start Docker Images') {
               timeout(time: 3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
@@ -86,7 +86,7 @@ pipeline {
               }
             ]
 
-            extendedStage('Provider Verification for API and Live Event Consumers').handler(postBuildHandler).execute {
+            extendedStage('Provider Verification for API and Live Event Consumers').handler(postBuildHandler).obeysAllowStages(false).execute {
               def stages = [:]
 
               stages['Android'] = {

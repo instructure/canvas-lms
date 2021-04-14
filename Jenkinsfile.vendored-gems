@@ -63,14 +63,14 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements('canvas-docker').execute {
+          extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
             def postBuildHandler = [
               onStageResult: { _ ->
                 cleanupFn()
               }
             ]
 
-            extendedStage('Builder').handler(postBuildHandler).execute {
+            extendedStage('Builder').handler(postBuildHandler).obeysAllowStages(false).execute {
               stage ('Setup') {
                 timeout(time: 2) {
                  def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC

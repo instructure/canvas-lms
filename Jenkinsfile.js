@@ -86,7 +86,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements('canvas-docker').execute {
+          extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
             stage('Setup') {
               timeout(time: 3) {
                 sh 'rm -vrf ./tmp/*'
@@ -106,7 +106,7 @@ pipeline {
               }
             ]
 
-            extendedStage('Run Tests').handler(postBuildHandler).execute {
+            extendedStage('Run Tests').handler(postBuildHandler).obeysAllowStages(false).execute {
               timeout(time: 10) {
                 script {
                   def tests = [:]

@@ -323,7 +323,7 @@ pipeline {
             }
           ]
 
-          extendedStage('Root').handler(postBuildHandler).timings(false).execute {
+          extendedStage('Root').handler(postBuildHandler).obeysAllowStages(false).timings(false).execute {
             def rootStages = [:]
 
             buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
