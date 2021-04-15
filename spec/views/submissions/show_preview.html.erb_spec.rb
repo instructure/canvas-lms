@@ -66,16 +66,7 @@ describe "/submissions/show_preview" do
       view_context
     end
 
-    it "renders a DocViewer url that includes the submission id when assignment takes file uploads" do
-      assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
-      submission = assignment.submit_homework(@user, attachments: [@attachment])
-      assign(:assignment, assignment)
-      assign(:submission, submission)
-      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
-      expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
-    end
-
-    it "renders an iframe with a src to canvadoc sessions controller when assignment is an Annotated Document" do
+    it "renders an iframe with a src to canvadoc sessions controller when assignment is a student annotation" do
       assignment = @course.assignments.create!(
         annotatable_attachment: @attachment,
         submission_types: "annotated_document",
