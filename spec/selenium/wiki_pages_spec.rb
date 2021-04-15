@@ -123,6 +123,7 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/link_validator"
       fj('button:contains("Start Link Validation")').click
       run_jobs
+      wait_for_ajaximations
       expect(f('#link_validator')).to contain_jqcss('div:contains("No broken links found")')
     end
   end

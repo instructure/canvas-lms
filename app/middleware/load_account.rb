@@ -18,11 +18,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class LoadAccount
+  class << self
+    def check_schema_cache
+      return if @schema_cache_loaded
+
+      @schema_cache_loaded = true
+      MultiCache.fetch("schema_cache", expires_in: 1.week) do
+        conn = ActiveRecord::Base.connection
+        conn.schema_cache.clear!
+        conn.data_sources.each { |table| conn.schema_cache.add(table) }
+        conn.schema_cache
+      end
+    end
+
+    def schema_cache_loaded!
+      @schema_cache_loaded = true
+    end
+  end
+
   def initialize(app)
     @app = app
   end
 
   def call(env)
+    check_schema_cache
     domain_root_account = ::LoadAccount.default_domain_root_account
     configure_for_root_account(domain_root_account)
 
