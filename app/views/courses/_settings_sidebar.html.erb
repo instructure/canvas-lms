@@ -33,6 +33,15 @@
   </script>
 <% end %>
 <div>
+  <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) && @context.elementary_subject_course? %>
+    <div id="course_status">
+      <h4>
+        <%= t('headers.course_status', %{Course Status}) %>
+      </h4>
+      <%= render :partial => 'publish_buttons', :locals => {redirect_to_settings: true} %>
+    </div>
+  <% end %>
+
   <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "Button Button--link Button--link--has-divider Button--course-settings course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
   <% if can_do(@context, @current_user, :read_reports) %>
     <%= link_to context_url(@context, :context_statistics_url), :class => ' Button Button--link Button--link--has-divider Button--course-settings' do %>
