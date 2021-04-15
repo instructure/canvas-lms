@@ -23,18 +23,19 @@ export function specialFallbackFocusId(type) {
   return `~~~${type}-fallback-focus~~~`
 }
 
-export function handleNothingToday(manager, todayElem, alertScreenReaders = true) {
-  if (alertScreenReaders) {
+export function handleNothingToday(manager, todayElem, focusTarget) {
+  if (!focusTarget) {
     srAlert(formatMessage('There is nothing planned for today.'))
   }
 
   // In the weekly planner the missing assignments will be under Today
   // if there are any.
-  const target =
-    manager.getDocument().getElementById('MissingAssignments') ||
-    manager.getDocument().getElementById('weekly-header-active-button')
-  if (target) {
-    manager.getAnimator().focusElement(target)
+  const missingAssignments = manager.getDocument().getElementById('MissingAssignments')
+  const headerActiveButton = manager.getDocument().getElementById('weekly-header-active-button')
+  if (focusTarget === 'missing-items' && missingAssignments) {
+    manager.getAnimator().focusElement(missingAssignments)
+  } else if (headerActiveButton) {
+    manager.getAnimator().focusElement(headerActiveButton)
   }
 
   if (todayElem) {

@@ -92,6 +92,7 @@
     "moment-timezone": "^0.5.13",
     "parse-link-header": "^1.0.1",
     "prop-types": "^15.5.9",
+    "qs": "^6.6.0",
     "react": "^0.14.7 || ^15 || 16",
     "react-dom": "^0.14.7 || ^15 || 16",
     "react-moment-proptypes": "^1.4.0",

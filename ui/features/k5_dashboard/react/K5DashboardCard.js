@@ -33,7 +33,7 @@ import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
+import {fetchLatestAnnouncement, FOCUS_TARGETS} from '@canvas/k5/react/utils'
 
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 
@@ -134,7 +134,7 @@ export const AssignmentLinks = ({
       {numDueToday > 0 ? (
         <Flex.Item>
           <Link
-            href="/#schedule"
+            href={`/?focusTarget=${FOCUS_TARGETS.TODAY}#schedule`}
             onClick={e => {
               e.preventDefault()
               switchToToday()
@@ -168,7 +168,7 @@ export const AssignmentLinks = ({
           </Flex.Item>
           <Flex.Item>
             <Link
-              href="/#schedule"
+              href={`/?focusTarget=${FOCUS_TARGETS.MISSING_ITEMS}#schedule`}
               onClick={e => {
                 e.preventDefault()
                 switchToMissingItems()

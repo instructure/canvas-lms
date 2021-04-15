@@ -136,3 +136,8 @@ export const TAB_IDS = {
   RESOURCES: 'tab-resources',
   MODULES: 'tab-modules'
 }
+
+export const FOCUS_TARGETS = {
+  TODAY: 'today',
+  MISSING_ITEMS: 'missing-items'
+}

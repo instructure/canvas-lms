@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
+import moment from 'moment-timezone'
 import {render, waitFor} from '@testing-library/react'
-import {WeeklyPlannerHeader} from '../index'
+import {processFocusTarget, WeeklyPlannerHeader} from '../index'
 
 function defaultProps(options) {
   return {
@@ -30,15 +31,34 @@ function defaultProps(options) {
       isLoading: false,
       loadingWeek: false
     },
-    today: '2021-03-21T13:00:00Z',
+    todayMoment: moment('2021-03-21T13:00:00Z'),
     visible: true,
-    weekStartDate: '2021-03-21',
-    weekEndDate: '2021-03-27',
+    weekStartMoment: moment('2021-03-21'),
+    weekEndMoment: moment('2021-03-27'),
     wayPastItemDate: '2021-01-01',
     wayFutureItemDate: '2021-12-31',
     ...options
   }
 }
+
+const {location: savedLocation} = window
+
+beforeEach(() => {
+  delete window.location
+  window.location = {
+    protocol: 'http:',
+    host: 'localhost',
+    pathname: '',
+    search: '',
+    hash: ''
+  }
+  window.history.replaceState = jest.fn()
+})
+
+afterEach(() => {
+  window.location = savedLocation
+  window.history.replaceState.mockClear()
+})
 
 describe('WeeklyPlannerHeader', () => {
   it('renders the component', () => {
@@ -98,21 +118,74 @@ describe('WeeklyPlannerHeader', () => {
     expect(button.hasAttribute('disabled')).toEqual(true)
   })
 
-  it('scrolls to today when it becomes visible', () => {
+  it('scrolls to today when it becomes visible', async () => {
     const callback = jest.fn()
     const props = defaultProps({visible: false, scrollToToday: callback})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     expect(callback).not.toHaveBeenCalled()
 
     rerender(<WeeklyPlannerHeader {...props} visible />)
-    waitFor(() => expect(callback).toHaveBeenCalledWith({focusMissingItems: false, isWeekly: true}))
+    await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
   })
 
-  it('scrolls to missing items instead when it becomes visible if configured', () => {
+  it('sends today as a focus target if passed via query param', async () => {
+    window.location.search = '?focusTarget=today'
     const callback = jest.fn()
-    const props = defaultProps({focusMissingItems: true, visible: false, scrollToToday: callback})
+    const props = defaultProps({visible: false, scrollToToday: callback})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     rerender(<WeeklyPlannerHeader {...props} visible />)
-    waitFor(() => expect(callback).toHaveBeenCalledWith({focusMissingItems: true, isWeekly: true}))
+    await waitFor(() =>
+      expect(callback).toHaveBeenCalledWith({focusTarget: 'today', isWeekly: true})
+    )
+  })
+
+  it('sends missing-items as a focus target if passed via query param', async () => {
+    window.location.search = '?focusTarget=missing-items'
+    const callback = jest.fn()
+    const props = defaultProps({visible: false, scrollToToday: callback})
+    const {rerender} = render(<WeeklyPlannerHeader {...props} />)
+    rerender(<WeeklyPlannerHeader {...props} visible />)
+    await waitFor(() =>
+      expect(callback).toHaveBeenCalledWith({focusTarget: 'missing-items', isWeekly: true})
+    )
+  })
+})
+
+describe('processFocusTarget', () => {
+  it('returns the focusTarget query param, removes it from the url, and updates to the new url', () => {
+    window.location.search = '?focusTarget=not-a-real-one'
+    expect(processFocusTarget()).toBe('not-a-real-one')
+    expect(window.history.replaceState).toHaveBeenCalledWith({}, null, 'http://localhost')
+  })
+
+  it('keeps other query params intact', () => {
+    window.location.search = '?first=yes&focusTarget=not-a-real-one&last=no'
+    expect(processFocusTarget()).toBe('not-a-real-one')
+    expect(window.history.replaceState).toHaveBeenCalledWith(
+      {},
+      null,
+      'http://localhost?first=yes&last=no'
+    )
+  })
+
+  it('returns undefined if no focusTarget query param was present', () => {
+    window.location.search = '?something=else'
+    expect(processFocusTarget()).toBe(undefined)
+    expect(window.history.replaceState).toHaveBeenCalledWith(
+      {},
+      null,
+      'http://localhost?something=else'
+    )
+  })
+
+  it('handles urls with no query params', () => {
+    window.location.pathname = '/courses/5'
+    window.location.hash = '#schedule'
+    expect(processFocusTarget()).toBe(undefined)
+    expect(window.history.replaceState).toHaveBeenCalledWith(
+      {},
+      null,
+      'http://localhost/courses/5#schedule'
+    )
   })
 })

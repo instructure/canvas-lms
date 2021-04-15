@@ -28,9 +28,7 @@ import {
   // SetDismissedOpportunityFocus,
   ScrollToToday,
   ScrollToLoadedToday,
-  JumpScrollToToday,
-  FocusFirstItemOnWeekLoad,
-  FocusFirstItemOnWeekJump
+  JumpScrollToToday
 } from './animations'
 
 export class AnimationCollection {
@@ -82,14 +80,6 @@ export class AnimationCollection {
     {
       expected: ['START_LOADING_PAST_UNTIL_TODAY_SAGA', 'GOT_DAYS_SUCCESS'],
       animation: ScrollToLoadedToday
-    },
-    {
-      expected: ['WEEK_LOADED'],
-      animation: FocusFirstItemOnWeekLoad
-    },
-    {
-      expected: ['JUMP_TO_WEEK'],
-      animation: FocusFirstItemOnWeekJump
     },
     {
       expected: ['JUMP_TO_THIS_WEEK'],

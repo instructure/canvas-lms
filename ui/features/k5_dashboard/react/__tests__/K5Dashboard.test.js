@@ -104,19 +104,19 @@ const gradeCourses = [
 ]
 const opportunities = [
   {
-    id: 1,
+    id: '1',
     course_id: '1',
     name: 'Assignment 1',
-    point_possible: 23,
+    points_possible: 23,
     html_url: '/courses/1/assignments/1',
     due_at: '2021-01-10T05:59:00Z',
     submission_types: ['online_quiz']
   },
   {
-    id: 2,
+    id: '2',
     course_id: '1',
     name: 'Assignment 2',
-    point_possible: 10,
+    points_possible: 10,
     html_url: '/courses/1/assignments/2',
     due_at: '2021-01-15T05:59:00Z',
     submission_types: ['online_url']
