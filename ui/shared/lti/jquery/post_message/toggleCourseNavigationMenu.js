@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const whitelist = [
-  'requestFullWindowLaunch',
-  'lti.resourceImported',
-  'toggleCourseNavigationMenu'
-]
+import {toggleCourseNav} from '@canvas/courses/jquery/toggleCourseNav'
 
-// These are handled elsewhere so ignore them
-export const ignorelist = ['LtiDeepLinkingResponse']
+const handler = () => toggleCourseNav()
+
+export default handler
