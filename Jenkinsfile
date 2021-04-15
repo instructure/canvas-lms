@@ -333,9 +333,12 @@ pipeline {
             buildParameters += string(name: 'CANVAS_RAILS6_0', value: "1")
 
             // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
-            // the gerrit rather than master.
+            // the gerrit rather than master. Stable branches also need to check out the JENKINSFILE_REFSPEC to prevent
+            // the job default from pulling master.
             if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('Jenkinsfile')) {
-                buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
+              buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
+            } else if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('stable')) {
+              buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
             }
 
             if (env.GERRIT_PROJECT != "canvas-lms") {
