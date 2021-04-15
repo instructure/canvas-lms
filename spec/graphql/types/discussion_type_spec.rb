@@ -142,4 +142,13 @@ describe Types::DiscussionType do
     expect(type.resolve('permissions { delete }')).to eq false
     expect(discussion.grants_right?(@student, nil, :delete)).to eq false
   end
+
+  it 'returns the course sections' do
+    section = add_section('Dope Section')
+    topic = discussion_topic_model(context: @course, is_section_specific: true, course_section_ids: [section.id])
+    type = GraphQLTypeTester.new(topic, current_user: @teacher)
+
+    expect(type.resolve('courseSections { _id }')[0]).to eq section.id.to_s
+    expect(type.resolve('courseSections { name }')[0]).to eq section.name
+  end
 end

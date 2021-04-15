@@ -127,5 +127,10 @@ module Types
     def permissions
       Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
     end
+
+    field :course_sections, [Types::SectionType], null: false
+    def course_sections
+      load_association(:course_sections)
+    end
   end
 end
