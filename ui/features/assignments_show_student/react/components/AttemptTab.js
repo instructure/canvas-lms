@@ -42,6 +42,7 @@ export default class AttemptTab extends Component {
     assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func,
     editingDraft: bool,
+    onContentsChanged: func,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
     updateEditingDraft: func,
@@ -77,12 +78,17 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderTextAttempt = () => {
+  renderTextAttempt = context => {
+    const readOnly =
+      !context.allowChangesToSubmission ||
+      ['submitted', 'graded'].includes(this.props.submission.state)
+
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
           createSubmissionDraft={this.props.createSubmissionDraft}
-          editingDraft={this.props.editingDraft}
+          onContentsChanged={this.props.onContentsChanged}
+          readOnly={readOnly}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
@@ -118,12 +124,12 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderByType(submissionType) {
+  renderByType(submissionType, context) {
     switch (submissionType) {
       case 'media_recording':
         return this.renderMediaAttempt()
       case 'online_text_entry':
-        return this.renderTextAttempt()
+        return this.renderTextAttempt(context)
       case 'online_upload':
         return this.renderFileAttempt()
       case 'online_url':
@@ -205,7 +211,7 @@ export default class AttemptTab extends Component {
               this.renderSubmissionTypeSelector()}
 
             {selectedType != null
-              ? this.renderByType(selectedType)
+              ? this.renderByType(selectedType, context)
               : context.allowChangesToSubmission && this.renderUnselectedType()}
           </div>
         )}

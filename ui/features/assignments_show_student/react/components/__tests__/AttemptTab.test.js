@@ -26,7 +26,13 @@ import React from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
+jest.mock('@canvas/rce/RichContentEditor')
+
 describe('ContentTabs', () => {
+  beforeEach(() => {
+    window.ENV.use_rce_enhancements = true
+  })
+
   describe('the assignment is locked aka passed the until date', () => {
     it('renders the availability dates if the submission is unsubmitted', async () => {
       const props = await mockAssignmentAndSubmission({
@@ -124,7 +130,71 @@ describe('ContentTabs', () => {
         })
 
         const {findByTestId} = render(<AttemptTab {...props} />)
-        expect(await findByTestId('text-entry')).toBeInTheDocument()
+        expect(await findByTestId('text-editor')).toBeInTheDocument()
+      })
+
+      // The following tests don't match how the text editor actually works.
+      // The RCE doesn't play nicely with our test environment, so we stub it
+      // out and instead test for the read-only property (and possibly others
+      // eventually) on the TextEntry component's placeholder text-area. This
+      // does not mirror real-world usage but at least lets us verify that our
+      // props are being passed through and correctly on the initial render.
+      describe('text area', () => {
+        it('renders as read-only if the submission has been submitted', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'submitted'
+            }
+          })
+
+          const {findByRole} = render(<AttemptTab {...props} />)
+          const textarea = await findByRole('textbox')
+          expect(textarea).toHaveAttribute('readonly')
+        })
+
+        it('renders as read-only if the submission has been graded', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'graded'
+            }
+          })
+
+          const {findByRole} = render(<AttemptTab {...props} />)
+          const textarea = await findByRole('textbox')
+          expect(textarea).toHaveAttribute('readonly')
+        })
+
+        it('renders as read-only if changes are not allowed to the submission', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'unsubmitted'
+            }
+          })
+
+          const {findByRole} = render(
+            <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+              <AttemptTab {...props} />
+            </StudentViewContext.Provider>
+          )
+          const textarea = await findByRole('textbox')
+          expect(textarea).toHaveAttribute('readonly')
+        })
+
+        it('does not render as read-only if changes are allowed and the submission is not submitted', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'unsubmitted'
+            }
+          })
+
+          const {findByRole} = render(<AttemptTab {...props} />)
+          const textarea = await findByRole('textbox')
+          expect(textarea).not.toHaveAttribute('readonly')
+        })
       })
     })
   })
@@ -188,7 +258,7 @@ describe('ContentTabs', () => {
         <AttemptTab {...props} activeSubmissionType="online_text_entry" />
       )
 
-      expect(await getByTestId('text-entry')).toBeInTheDocument()
+      expect(await getByTestId('text-editor')).toBeInTheDocument()
     })
 
     it('does not render the selector if the submission state is submitted', async () => {

@@ -17,24 +17,25 @@
  */
 
 import {bool, func} from 'prop-types'
-import I18n from 'i18n!assignments_2_text_entry'
 import React from 'react'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {Billboard} from '@instructure/ui-billboard'
-import {Button} from '@instructure/ui-buttons'
-import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {View} from '@instructure/ui-view'
-import {direction} from '@canvas/i18n/rtlHelper'
+
+// This is the interval (in ms) at which we check for changes to the text
+// content
+const checkForChangesIntervalMS = 250
+
+// This is how long we wait to see that changes have stopped before actually
+// saving the draft
+const saveDraftDelayMS = 1000
 
 export default class TextEntry extends React.Component {
   static propTypes = {
     createSubmissionDraft: func,
-    editingDraft: bool,
+    onContentsChanged: func,
     submission: Submission.shape,
-    updateEditingDraft: func
+    readOnly: bool
   }
 
   state = {
@@ -44,36 +45,55 @@ export default class TextEntry extends React.Component {
 
   _isMounted = false
 
+  _saveDraftTimer = null
+
+  _checkForChangesTimer = null
+
+  _lastSavedContent = null
+
   getDraftBody = () => {
-    if (this.props.submission.submissionDraft) {
-      return this.props.submission.submissionDraft.body
-    } else {
-      return null
+    const {submission} = this.props
+    if (['graded', 'submitted'].includes(submission.state)) {
+      // If this attempt has been submitted/graded, use it
+      return submission.body
+    } else if (submission.submissionDraft != null) {
+      // If a draft object exists, get the submission contents from it
+      return submission.submissionDraft.body
     }
+
+    // If the submission is marked as unsubmitted and there's no draft object,
+    // the user has started a new attempt but not entered any text, so return
+    // an empty string. The body attribute may contain the contents of a
+    // previous attempt, which we don't want.
+    return ''
   }
 
   componentDidMount() {
     this._isMounted = true
     window.addEventListener('beforeunload', this.beforeunload.bind(this))
 
-    if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
+    if (this.getDraftBody() != null && !this.state.editorLoaded) {
       this.loadRCE()
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
-      this.loadRCE()
+    if (this._tinyeditor == null) {
+      return
     }
 
-    if (!this.props.editingDraft) {
-      if (['submitted', 'graded'].includes(this.props.submission.state)) {
-        // TODO: attempting to focus on a View doesn't work, need to revisit this after
-        // we discuss how we want to handle focusable elements for higher-order components
-      } else if (prevProps.editingDraft) {
-        this.editTextEntryButton.focus()
-      } else if (this.getDraftBody() === null) {
-        this.startTextEntryButton.focus()
+    if (this.props.readOnly !== prevProps.readOnly) {
+      this._tinyeditor.mode.set(this.props.readOnly ? 'readonly' : 'design')
+    }
+
+    if (this.props.submission.attempt !== prevProps.submission.attempt) {
+      const body = this.getDraftBody()
+      this._tinyeditor.setContent(body)
+      this._lastSavedContent = body
+
+      if (!this.props.readOnly) {
+        this.handleEditorIframeFocus()
+        this.handleEditorFocus()
       }
     }
   }
@@ -87,7 +107,6 @@ export default class TextEntry extends React.Component {
     }
   }
 
-  // Warn the user if they are attempting to leave the page with unsaved data
   beforeunload(e) {
     if (this.state.editorLoaded && this.getDraftBody() !== this.getRCEText()) {
       e.preventDefault()
@@ -129,10 +148,50 @@ export default class TextEntry extends React.Component {
     }
     this._textareaRef = null
     this.setState({editorLoaded: false, renderingEditor: false})
+
+    clearInterval(this._checkForChangesTimer)
+    clearTimeout(this._saveDraftTimer)
+  }
+
+  checkForChanges = () => {
+    // The idea here:
+    // - Every time this function is called (currently several times a second),
+    //   check whether the contents of the editor have changed, assuming we're
+    //   in a state where we care about changes.
+    // - If we see changes, call the onContentsChanged prop, and schedule a
+    //   timer to actually save the draft. Further changes to the content will
+    //   cancel/re-schedule this timer, so that we only actually save the draft
+    //   after the user has stopped making changes for some time.
+    const {submission} = this.props
+
+    const isNewAttempt = submission.submissionDraft == null && submission.state === 'unsubmitted'
+    // If read-only *or* this is a brand new attempt with no content,
+    // we don't want to save a draft, so don't bother comparing
+    if (this.props.readOnly || (this._tinyeditor.getContent() === '' && isNewAttempt)) {
+      return
+    }
+
+    const editorContents = this._tinyeditor.getContent()
+    if (this._lastSavedContent !== editorContents) {
+      this._lastSavedContent = editorContents
+
+      this.props.onContentsChanged()
+
+      clearTimeout(this._saveDraftTimer)
+      this._saveDraftTimer = setTimeout(() => {
+        this.saveSubmissionDraft({attempt: submission.attempt, rceText: editorContents})
+      }, saveDraftDelayMS)
+    }
   }
 
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
+    tinyeditor.mode.set(this.props.readOnly ? 'readonly' : 'design')
+
+    const draftBody = this.getDraftBody()
+    tinyeditor.setContent(draftBody)
+    this._lastSavedContent = draftBody
+    this._checkForChangesTimer = setInterval(this.checkForChanges, checkForChangesIntervalMS)
 
     const documentContent = document.getElementById('content')
     if (documentContent) {
@@ -163,147 +222,29 @@ export default class TextEntry extends React.Component {
     return RichContentEditor.callOnRCE(this._textareaRef, 'get_code')
   }
 
-  updateSubmissionDraft = async rceText => {
+  saveSubmissionDraft = async ({attempt, rceText}) => {
     await this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
         activeSubmissionType: 'online_text_entry',
-        attempt: this.props.submission.attempt || 1,
+        attempt: attempt || 1,
         body: rceText
       }
     })
   }
 
-  handleStartButton = () => {
-    if (this._isMounted) {
-      this.updateSubmissionDraft('')
-      this.props.updateEditingDraft(true)
-    }
-  }
-
-  handleSaveButton = () => {
-    if (this._isMounted) {
-      this.updateSubmissionDraft(this.getRCEText())
-      this.handleExitEditor()
-    }
-  }
-
-  handleDeleteButton = () => {
-    if (this._isMounted) {
-      this.updateSubmissionDraft(null)
-      this.handleExitEditor()
-    }
-  }
-
-  handleExitEditor = () => {
-    if (this._isMounted && this.state.editorLoaded) {
-      this.unloadRCE()
-    }
-    this.props.updateEditingDraft(false)
-  }
-
-  renderButtons() {
-    return (
-      <div style={{textAlign: direction('right')}}>
-        <Button
-          data-testid="cancel-text-entry"
-          margin="0 xx-small 0 0"
-          onClick={this.handleExitEditor}
-        >
-          {I18n.t('Cancel')}
-        </Button>
-        <Button data-testid="save-text-entry" onClick={this.handleSaveButton}>
-          {I18n.t('Save')}
-        </Button>
-      </div>
-    )
-  }
-
-  renderEditor() {
+  render() {
     return (
       <div data-testid="text-editor">
         {this.state.renderingEditor && <LoadingIndicator />}
         <span>
-          <textarea defaultValue={this.getDraftBody()} ref={this.setTextareaRef} />
+          <textarea
+            defaultValue={this.getDraftBody()}
+            readOnly={this.props.readOnly}
+            ref={this.setTextareaRef}
+          />
         </span>
-        {this.renderButtons()}
       </div>
     )
-  }
-
-  renderSubmission() {
-    return (
-      <View as="div" borderWidth="small" padding="xx-small" data-testid="text-submission">
-        <div
-          style={{wordBreak: 'break-word'}}
-          dangerouslySetInnerHTML={{__html: this.props.submission.body}}
-        />
-      </View>
-    )
-  }
-
-  renderSavedDraft() {
-    return (
-      <Billboard
-        heading={I18n.t('Text Entry')}
-        hero={<IconDocumentLine />}
-        message={
-          <div>
-            <Button
-              data-testid="edit-text-draft"
-              ref={el => {
-                this.editTextEntryButton = el
-              }}
-              margin="0 x-small 0 0"
-              onClick={() => {
-                this.props.updateEditingDraft(true)
-              }}
-            >
-              {I18n.t('Edit')}
-            </Button>
-            <Button
-              data-testid="delete-text-draft"
-              icon={IconTrashLine}
-              onClick={this.handleDeleteButton}
-            >
-              <ScreenReaderContent>{I18n.t('Remove submission draft')}</ScreenReaderContent>
-            </Button>
-          </div>
-        }
-      />
-    )
-  }
-
-  renderInitialBox() {
-    return (
-      <View as="div" borderWidth="small" data-testid="text-entry">
-        <Billboard
-          heading={I18n.t('Text Entry')}
-          hero={<IconTextLine color="brand" />}
-          message={
-            <Button
-              data-testid="start-text-entry"
-              id="start-text-entry"
-              onClick={this.handleStartButton}
-              ref={el => {
-                this.startTextEntryButton = el
-              }}
-            >
-              {I18n.t('Start Entry')}
-            </Button>
-          }
-        />
-      </View>
-    )
-  }
-
-  render() {
-    if (['submitted', 'graded'].includes(this.props.submission.state)) {
-      return this.renderSubmission()
-    } else if (this.getDraftBody() === null) {
-      return this.renderInitialBox()
-    } else {
-      return this.props.editingDraft ? this.renderEditor() : this.renderSavedDraft()
-    }
   }
 }

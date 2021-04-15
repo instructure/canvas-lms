@@ -19,6 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   CREATE_SUBMISSION,
+  CREATE_SUBMISSION_DRAFT,
   DELETE_SUBMISSION_DRAFT,
   SET_MODULE_ITEM_COMPLETION
 } from '@canvas/assignments/graphql/student/Mutations'
@@ -27,9 +28,14 @@ import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+
+// Mock the RCE so we can test text entry submissions without loading the whole
+// editor
+jest.mock('@canvas/rce/RichContentEditor')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -145,13 +151,14 @@ describe('SubmissionManager', () => {
 
         const props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_text_entry']
+            submissionTypes: ['online_url']
           },
           Submission: {
             submissionDraft: {
-              activeSubmissionType: 'online_text_entry',
-              body: 'some text here',
-              meetsTextEntryCriteria: true
+              activeSubmissionType: 'online_url',
+              meetsUrlCriteria: true,
+              url: 'http://localhost',
+              type: 'online_url'
             }
           }
         })
@@ -159,8 +166,8 @@ describe('SubmissionManager', () => {
         const variables = {
           assignmentLid: '1',
           submissionID: '1',
-          type: 'online_text_entry',
-          body: 'some text here'
+          type: 'online_url',
+          url: 'http://localhost'
         }
         const createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
         const submissionHistoriesResult = await mockQuery(
@@ -773,6 +780,144 @@ describe('SubmissionManager', () => {
           expect(cancelDraftAction).toHaveBeenCalled()
         })
       })
+    })
+  })
+
+  describe('saving text entry drafts', () => {
+    let editorContent
+    let fakeEditor
+
+    const renderTextAttempt = async ({mocks = []} = {}) => {
+      const submission = {
+        attempt: 1,
+        id: '1',
+        state: 'unsubmitted',
+        submissionDraft: {
+          activeSubmissionType: 'online_text_entry',
+          body: 'some draft text',
+          meetsTextEntryCriteria: true
+        }
+      }
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          id: '1',
+          submissionTypes: ['online_text_entry']
+        },
+        Submission: submission
+      })
+
+      const result = renderInContext(
+        {latestSubmission: submission},
+        <MockedProvider mocks={mocks}>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      // Wait for callbacks to fire and the "editor" to be loaded
+      await waitFor(() => {
+        expect(fakeEditor).not.toBeUndefined()
+      })
+      return result
+    }
+
+    beforeEach(async () => {
+      jest.useFakeTimers()
+
+      jest.spyOn(RichContentEditor, 'callOnRCE').mockImplementation(() => editorContent)
+      jest.spyOn(RichContentEditor, 'loadNewEditor').mockImplementation((_textarea, options) => {
+        fakeEditor = {
+          focus: () => {},
+          getBody: () => {},
+          getContent: jest.fn(() => editorContent),
+          mode: {
+            set: jest.fn()
+          },
+          setContent: jest.fn(content => {
+            editorContent = content
+          }),
+          selection: {
+            collapse: () => {},
+            select: () => {}
+          }
+        }
+
+        options.tinyOptions.init_instance_callback(fakeEditor)
+      })
+    })
+
+    afterEach(async () => {
+      jest.runOnlyPendingTimers()
+      jest.useRealTimers()
+    })
+
+    it('shows a "Saving Draft" label when the contents of a text entry have started changing', async () => {
+      const {getByText} = await renderTextAttempt()
+      act(() => {
+        fakeEditor.setContent('some edited draft text')
+        jest.advanceTimersByTime(500)
+      })
+
+      expect(getByText('Saving Draft')).toBeInTheDocument()
+    })
+
+    it('disables the Submit Assignment button while allegedly saving the draft', async () => {
+      const {getByRole} = await renderTextAttempt()
+      act(() => {
+        fakeEditor.setContent('some edited draft text')
+        jest.advanceTimersByTime(500)
+      })
+
+      expect(getByRole('button', {name: 'Submit Assignment'})).toBeDisabled()
+    })
+
+    it('shows a "Draft Saved" label when a text draft has been successfully saved', async () => {
+      const variables = {
+        activeSubmissionType: 'online_text_entry',
+        attempt: 1,
+        body: 'some edited draft text',
+        id: '1'
+      }
+
+      const successfulResult = await mockQuery(CREATE_SUBMISSION_DRAFT, {}, variables)
+      const mocks = [
+        {
+          request: {query: CREATE_SUBMISSION_DRAFT, variables},
+          result: successfulResult
+        }
+      ]
+
+      const {findByText} = await renderTextAttempt({mocks})
+
+      act(() => {
+        fakeEditor.setContent('some edited draft text')
+        jest.advanceTimersByTime(5000)
+      })
+
+      expect(await findByText('Draft Saved')).toBeInTheDocument()
+    })
+
+    it('shows a "Error Saving Draft" label when a problem has occurred while saving', async () => {
+      const variables = {
+        activeSubmissionType: 'online_text_entry',
+        attempt: 1,
+        body: 'some edited draft text',
+        id: '1'
+      }
+      const mocks = [
+        {
+          request: {query: CREATE_SUBMISSION_DRAFT, variables},
+          result: {data: null, errors: 'yes'}
+        }
+      ]
+
+      const {findByText} = await renderTextAttempt({mocks})
+
+      act(() => {
+        fakeEditor.setContent('some edited draft text')
+        jest.advanceTimersByTime(5000)
+      })
+
+      expect(await findByText('Error Saving Draft')).toBeInTheDocument()
     })
   })
 
