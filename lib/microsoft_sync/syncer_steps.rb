@@ -97,11 +97,12 @@ module MicrosoftSync
         new_group_id = graph_service_helpers.create_education_class(course)['id']
       end
 
-      StateMachineJob::NextStep.new(:step_update_group_with_course_data, new_group_id)
+      StateMachineJob::DelayedNextStep.new(
+        :step_update_group_with_course_data, 2.seconds, new_group_id
+      )
     end
 
-    def step_update_group_with_course_data(group_id_from_mem, group_id_from_state)
-      group_id = group_id_from_mem || group_id_from_state
+    def step_update_group_with_course_data(_mem_state, group_id)
       graph_service_helpers.update_group_with_course_data(group_id, course)
       group.update! ms_group_id: group_id
       StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
@@ -168,24 +169,31 @@ module MicrosoftSync
         graph_service.remove_group_owner(group.ms_group_id, aad)
       end
 
-      StateMachineJob::NextStep.new(:step_ensure_team_exists)
+      StateMachineJob::NextStep.new(:step_check_team_exists)
     end
 
-    def step_ensure_team_exists(_mem_data, _job_state_data)
+    def step_check_team_exists(_mem_data, _job_state_data)
       if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? \
         && !graph_service.team_exists?(group.ms_group_id)
-        graph_service.create_education_class_team(group.ms_group_id)
+        StateMachineJob::DelayedNextStep.new(:step_create_team, 10.seconds)
+      else
+        StateMachineJob::COMPLETE
       end
+    end
 
+    def step_create_team(_mem_data, _job_state_data)
+      graph_service.create_education_class_team(group.ms_group_id)
+      StateMachineJob::COMPLETE
+    rescue MicrosoftSync::Errors::TeamAlreadyExists
       StateMachineJob::COMPLETE
     rescue MicrosoftSync::Errors::GroupHasNoOwners, MicrosoftSync::Errors::HTTPNotFound => e
       # API is eventually consistent: We often have to wait a couple minutes
       # after creating the group and adding owners for the Teams API to see the
       # group and owners.
       # It's also possible for the course to have added owners (so the
-      # enrollments are in the DB) since we last calculated the diff added them
+      # enrollments are in the DB) since we last calculated the diff and added them
       # in the generate_diff step. This is rare, but we can also sleep in that
-      # case.
+      # case. We'll eventually fail but the team will be created next time we sync.
       StateMachineJob::Retry.new(error: e, delay_amount: [30, 90, 270])
     end
 

@@ -44,6 +44,7 @@ module MicrosoftSync
 
     class InvalidRemoteState < PublicError; end
     class GroupHasNoOwners < PublicError; end
+    class TeamAlreadyExists < PublicError; end
 
     # Makes public the status code but not anything about the response body.
     # The internal error message has the response body (truncated)
@@ -57,7 +58,8 @@ module MicrosoftSync
       def self.subclasses_by_status_code
         @subclasses_by_status_code ||= {
           400 => HTTPBadRequest,
-          404 => HTTPNotFound
+          404 => HTTPNotFound,
+          409 => HTTPConflict,
         }
       end
 
@@ -76,5 +78,6 @@ module MicrosoftSync
 
     class HTTPNotFound < HTTPInvalidStatus; end
     class HTTPBadRequest < HTTPInvalidStatus; end
+    class HTTPConflict < HTTPInvalidStatus; end
   end
 end

@@ -118,11 +118,13 @@ module MicrosoftSync
       }
       request(:post, 'teams', body: body)
     rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      if e.response_body =~ /must have one or more owners in order to create a Team/
-        raise MicrosoftSync::Errors::GroupHasNoOwners
-      end
+      raise unless e.response_body =~ /must have one or more owners in order to create a Team/i
 
-      raise
+      raise MicrosoftSync::Errors::GroupHasNoOwners
+    rescue MicrosoftSync::Errors::HTTPConflict => e
+      raise unless e.response_body =~ /group is already provisioned/i
+
+      raise MicrosoftSync::Errors::TeamAlreadyExists
     end
 
     # === Users ===
