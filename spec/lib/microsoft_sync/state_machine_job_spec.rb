@@ -267,6 +267,36 @@ module MicrosoftSync
         end
       end
 
+      context 'when the step returns a DelayedNextStep' do
+        before do
+          subject.send(:run, nil)
+          allow(steps_object).to receive(:step_first).and_return \
+            described_class::DelayedNextStep.new(:step_second, 1.minute, 'abc123')
+          steps_object.steps_run.clear
+        end
+
+        it 'enqueues a job for that step' do
+          subject.send(:run, :step_first)
+          expect(steps_object.steps_run).to eq([
+            [:delay_run, [{run_at: 1.minute.from_now, strand: strand}], [:step_second]],
+          ])
+        end
+
+        it 'leaves retries_by_step untouched' do
+          expect { subject.send(:run, :step_first) }.not_to \
+            change { state_record.reload.job_state[:retries_by_step] }.from('step_first' => 1)
+        end
+
+        it 'sets job_state step, updated_at, and data' do
+          Timecop.freeze(2.minutes.from_now) do
+            expect { subject.send(:run, :step_first) }
+              .to change { state_record.reload.job_state[:data] }.to('abc123')
+              .and change { state_record.reload.job_state[:step] }.to(:step_second)
+              .and change { state_record.reload.job_state[:updated_at] }.to(Time.zone.now)
+          end
+        end
+      end
+
       context 'when an unhandled error occurs' do
         it 'bubbles up the error, sets the record state to errored, and calls after_failure' do
           subject.send(:run, nil)
