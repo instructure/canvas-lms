@@ -24,6 +24,8 @@
     current_host: request.host
   )
 
+  # Calls to doc_preview_attributes will result in this hash getting some
+  # attributes deleted; dup this hash before passing it to any methods.
   preview_url_opts = {
     anonymous_instructor_annotations: @anonymous_instructor_annotations,
     enable_annotations: true,
@@ -214,7 +216,7 @@
               data-attachment_id="<%= attachment.id %>"
               data-submission_id="<%= @submission.id %>"
               data-dialog-title="<%= attachment.display_name %>"
-              <%= doc_preview_attributes(attachment, preview_url_opts) %>
+              <%= doc_preview_attributes(attachment, preview_url_opts.dup) %>
             >
               <%= button_text %>
             </a>
@@ -248,7 +250,7 @@
     <iframe
       allowfullscreen
       title="<%= t "Student Annotation submission" %>"
-      src="<%= annotation_context.attachment.canvadoc_url(@current_user, preview_url_opts) %>"
+      src="<%= annotation_context.attachment.canvadoc_url(@current_user, preview_url_opts.dup) %>"
       class="ef-file-preview-frame annotated-document-submission"
       style="width: 100%;">
     </iframe>
