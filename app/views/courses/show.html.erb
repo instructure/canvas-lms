@@ -32,27 +32,7 @@
           <h3>
             <%= t('headers.course_status', %{Course Status}) %>
           </h3>
-          <div id='course_status_actions' class="ui-buttonset">
-            <%= form_for @context, html: {id: "course_status_form"} do |f| %>
-              <% if @context.created? || @context.claimed? %>
-                <button type="button" class='ui-button btn-unpublish disabled' disabled>
-                  <i class="icon-unpublish"></i><%= t('#buttons.unpublished', %{Unpublished}) %>
-                </button>
-                <button type='submit' class="ui-button btn-publish">
-                  <i class="icon-publish icon-Solid"></i><%= t('#buttons.publish', %{Publish}) %>
-                </button>
-                <input type='hidden' name='course[event]' value='offer' />
-              <% else %>
-                <button type='submit' class="ui-button">
-                  <i class="icon-unpublish"></i>&nbsp;<%= t('#buttons.unpublish', %{Unpublish}) %>
-                </button>
-                <button type="button" class="ui-button disabled btn-published" disabled>
-                  <i class="icon-publish icon-Solid"></i><%= t('#buttons.published', %{Published}) %>
-                </button>
-                <input type='hidden' name='course[event]' value='claim' />
-              <% end %>
-            <% end %>
-          </div>
+          <%= render :partial => 'publish_buttons', :locals => {redirect_to_settings: false} %>
         </div>
       <% end %>
 
