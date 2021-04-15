@@ -1529,12 +1529,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
   def add_replica_identity(model_name, column_name, default_value)
     klass = model_name.constantize
-    # when a batch of migrations includes both adding the `column_name` and
-    # calling this method (e.g. when migrating a newly created db), the cached
-    # column information can be stale, so we have to explicitly reset it here
-    # to avoid a NoMethodError
-    klass.reset_column_information
-    if klass.columns_hash[column_name.to_s].null
+    if columns(klass.table_name).find { |c| c.name == column_name.to_s }.null
       DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
     end
     change_column_null klass.table_name, column_name, false
