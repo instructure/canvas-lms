@@ -226,6 +226,11 @@ describe GradebooksHelper do
           expect(score_display).to eq '-'
         end
       end
+
+      it "shows an 'annotate' icon when the submission is a student annotation" do
+        submission.submission_type = 'student_annotation'
+        expect(score_icon['class']).to include 'icon-annotate'
+      end
     end
   end
 
