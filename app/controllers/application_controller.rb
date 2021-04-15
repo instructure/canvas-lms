@@ -2106,12 +2106,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def require_account_management(on_root_account = false)
+  def require_account_management(on_root_account = false, permissions: [:manage_account_settings])
     if (!@context.root_account? && on_root_account) || !@context.is_a?(Account)
       redirect_to named_context_url(@context, :context_url)
       return false
     else
-      return false unless authorized_action(@context, @current_user, :manage_account_settings)
+      return false unless authorized_action(@context, @current_user, permissions)
     end
     true
   end

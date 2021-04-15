@@ -45,8 +45,12 @@ class SubAccountsController < ApplicationController
     end
   end
 
-  before_action :require_context, :require_account_management
+  before_action :require_context
+  before_action :require_account_management, except: [:index]
+
   def index
+    # accept :manage_courses or :manage_account_settings so the course settings page can query subaccounts
+    return unless require_account_management(permissions: [:manage_account_settings, :manage_courses])
     @query = params[:account] && params[:account][:name] || params[:term]
     if @query
       @accounts = []
