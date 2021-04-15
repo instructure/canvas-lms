@@ -516,7 +516,6 @@ module PostgreSQLAdapterExtensions
 
   class AbortExceptionMatcher
     def self.===(other)
-      return true if other.is_a?(AbortOnDisconnect::DisconnectedError)
       return true if defined?(IRB::Abort) && other.is_a?(IRB::Abort)
 
       false

@@ -1516,7 +1516,6 @@ class ApplicationController < ActionController::Base
   rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
   rescue_from InstFS::ServiceError, with: :rescue_expected_error_type
   rescue_from InstFS::BadRequestError, with: :rescue_expected_error_type
-  rescue_from AbortOnDisconnect::DisconnectedError, with: :rescue_client_disconnect
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)
@@ -1533,14 +1532,6 @@ class ApplicationController < ActionController::Base
     else
       rescue_action_in_public(exception, level: level)
     end
-  end
-
-  def rescue_client_disconnect(exception)
-    info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user)
-    error_info = info.to_h
-    error_info[:tags][:response_code] = response_code
-    Canvas::Errors.capture(exception, error_info, :info)
-    render plain: "", status: 408
   end
 
   def interpret_status(code)
