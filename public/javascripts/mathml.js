@@ -80,8 +80,10 @@ const mathml = {
               }
             })
             window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
-              mathImageHelper.removeStrayEquationImages(message[1])
-              message[1]
+              const elem = message[1]
+              mathImageHelper.removeStrayEquationImages(elem)
+              mathImageHelper.nearlyInfiniteStyleFix(elem)
+              elem
                 .querySelectorAll('.math_equation_latex')
                 .forEach(m => m.classList.add('fade-in-equation'))
             })
@@ -283,6 +285,28 @@ const mathImageHelper = {
     window.dispatchEvent(
       new CustomEvent('process-new-math', {detail: {target: event.target.parentElement}})
     )
+  },
+
+  nearlyInfiniteStyleFix(elem) {
+    elem.querySelectorAll('[style*=clip], [style*=vertical-align]').forEach(e => {
+      let changed = false
+      let s = e.getAttribute('style')
+      const r = e.style.clip
+      if (/[\d.]+e\+?\d/.test(r)) {
+        // e.g. "rect(1e+07em, -9.999e+06em, -1e+07em, -999.997em)"
+        s = s.replace(/clip: rect[^;]+;/, '')
+        changed = true
+      }
+      const v = e.style.verticalAlign
+      if (Math.abs(parseInt(v, 10)) > 10000) {
+        // 10000 is a ridiculously large number
+        s = s.replace(/vertical-align[^;]+;/, '')
+        changed = true
+      }
+      if (changed) {
+        e.setAttribute('style', s)
+      }
+    })
   }
 }
 
