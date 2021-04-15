@@ -109,6 +109,16 @@ export const handlers = [
             update: true,
             __typename: 'DiscussionEntryPermissions'
           },
+          courseSections: [
+            {
+              createdAt: '2020-12-01T12:37:07-07:00',
+              id: 'Q291cnNlU2VjdGlvbi0z',
+              name: 'Dope Section',
+              updatedAt: '2020-12-01T12:37:07-07:00',
+              _id: '3',
+              __typename: 'Section'
+            }
+          ],
           __typename: 'DiscussionEntry'
         }
       })

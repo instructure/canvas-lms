@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {Assignment} from './Assignment'
-import {bool, number, shape, string} from 'prop-types'
+import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
@@ -55,10 +56,14 @@ export const Discussion = {
       permissions {
         ...DiscussionPermissions
       }
+      courseSections {
+        ...Section
+      }
     }
     ${User.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
+    ${Section.fragment}
   `,
 
   shape: shape({
@@ -84,7 +89,8 @@ export const Discussion = {
     author: User.shape,
     editor: User.shape,
     assignment: Assignment.shape,
-    permissions: DiscussionPermissions.shape
+    permissions: DiscussionPermissions.shape,
+    courseSections: arrayOf(Section.shape)
   })
 }
 
