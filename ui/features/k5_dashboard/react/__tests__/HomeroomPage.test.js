@@ -22,9 +22,7 @@ import {HomeroomPage} from '../HomeroomPage'
 
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({
-    requestTabChange: jest.fn(),
     visible: true,
-    cardsLoading: true,
     ...overrides
   })
 

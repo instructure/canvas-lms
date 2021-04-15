@@ -80,7 +80,6 @@ export const HomeroomPage = props => {
         headingLevel: 'h3'
       })
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards])
 
   useEffect(() => {
@@ -141,7 +140,7 @@ export const HomeroomPage = props => {
 }
 
 HomeroomPage.propTypes = {
-  cards: PropTypes.array.isRequired,
+  cards: PropTypes.array,
   visible: PropTypes.bool.isRequired
 }
 

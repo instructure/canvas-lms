@@ -143,14 +143,12 @@ export const K5Dashboard = ({
           tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
-        {cards && (
-          <HomeroomPage
-            cards={cards}
-            isStudent={plannerEnabled}
-            responsiveSize={responsiveSize}
-            visible={currentTab === TAB_IDS.HOMEROOM}
-          />
-        )}
+        <HomeroomPage
+          cards={cards}
+          isStudent={plannerEnabled}
+          responsiveSize={responsiveSize}
+          visible={currentTab === TAB_IDS.HOMEROOM}
+        />
         {plannerInitialized && (
           <SchedulePage
             visible={currentTab === TAB_IDS.SCHEDULE}

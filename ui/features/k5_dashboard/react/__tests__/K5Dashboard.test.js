@@ -352,6 +352,11 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Assignment 1')).toBeInTheDocument()
       expect(getByText('Assignment 2')).toBeInTheDocument()
     })
+
+    it('shows loading skeletons for course cards while they load', () => {
+      const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+    })
   })
 
   describe('Schedule Section', () => {
