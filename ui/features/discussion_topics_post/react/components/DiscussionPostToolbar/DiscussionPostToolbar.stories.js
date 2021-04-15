@@ -15,24 +15,40 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {DiscussionTopicContainer} from './DiscussionTopicContainer'
 import React from 'react'
 
+import {DiscussionPostToolbar, getMenuConfig} from './DiscussionPostToolbar'
+
 export default {
-  title: 'Examples/Discussion Posts/Containers/Discussion Topic Contaner',
-  component: DiscussionTopicContainer
+  title: 'Examples/Discussion Posts/Components/Discussion Post Toolbar',
+  component: DiscussionPostToolbar,
+  parameters: {actions: {argTypesRegex: '^on.*'}},
+  argTypes: {
+    selectedView: {
+      control: {
+        type: 'select',
+        options: Object.keys(getMenuConfig({enableDeleteFilter: true}))
+      }
+    },
+    sortDirection: {
+      control: {
+        type: 'select',
+        options: ['asc', 'desc']
+      }
+    }
+  }
 }
 
-const Template = args => <DiscussionTopicContainer {...args} />
+const Template = args => <DiscussionPostToolbar {...args} />
 
 export const Default = Template.bind({})
-Default.args = {
-  isGraded: false
+
+export const SortedDesc = Template.bind({})
+SortedDesc.args = {
+  sortDirection: 'desc'
 }
 
-export const TeacherViewGraded = Template.bind({})
-TeacherViewGraded.args = {
-  isGraded: true,
-  hasTeacherPermissions: true,
-  onReply: {acton: 'Reply'}
+export const ShowDeleted = Template.bind({})
+ShowDeleted.args = {
+  enableDeleteFilter: true
 }

@@ -15,24 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {DiscussionTopicContainer} from './DiscussionTopicContainer'
+
+// pass in an array of {string: text, bold: true, color: red}
+
+import {Alert} from './Alert'
+
 import React from 'react'
 
 export default {
-  title: 'Examples/Discussion Posts/Containers/Discussion Topic Contaner',
-  component: DiscussionTopicContainer
+  title: 'Examples/Discussion Posts/Components/Alert',
+  component: Alert,
+  argTypes: {}
 }
 
-const Template = args => <DiscussionTopicContainer {...args} />
+const Template = args => (
+  <Alert
+    contextDisplayText="Section 2"
+    pointsPossible="5"
+    dueAtDisplayText="Jan 26 11:49pm"
+    {...args}
+  />
+)
 
 export const Default = Template.bind({})
-Default.args = {
-  isGraded: false
-}
-
-export const TeacherViewGraded = Template.bind({})
-TeacherViewGraded.args = {
-  isGraded: true,
-  hasTeacherPermissions: true,
-  onReply: {acton: 'Reply'}
-}
+Default.args = {}

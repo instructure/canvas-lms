@@ -15,24 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {DiscussionTopicContainer} from './DiscussionTopicContainer'
+
 import React from 'react'
 
+import {ThreadingToolbar} from './ThreadingToolbar'
+
 export default {
-  title: 'Examples/Discussion Posts/Containers/Discussion Topic Contaner',
-  component: DiscussionTopicContainer
+  title: 'Examples/Discussion Posts/Components/ThreadingToolbar/Reply',
+  component: ThreadingToolbar.Reply,
+  argTypes: {}
 }
 
-const Template = args => <DiscussionTopicContainer {...args} />
+const Template = args => <ThreadingToolbar.Reply {...args} />
 
 export const Default = Template.bind({})
-Default.args = {
-  isGraded: false
-}
-
-export const TeacherViewGraded = Template.bind({})
-TeacherViewGraded.args = {
-  isGraded: true,
-  hasTeacherPermissions: true,
-  onReply: {acton: 'Reply'}
-}
+Default.args = {}

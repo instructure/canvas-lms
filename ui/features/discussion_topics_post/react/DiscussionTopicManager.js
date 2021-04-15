@@ -17,8 +17,8 @@
  */
 
 import {DISCUSSION_QUERY} from '../graphql/Queries'
-import DiscussionThreadContainer from './containers/DiscussionThreadContainer/DiscussionThreadContainer'
-import DiscussionTopicContainer from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
+import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
+import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
@@ -54,7 +54,7 @@ const DiscussionTopicManager = props => {
   return (
     <>
       <DiscussionTopicContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
-      <DiscussionThreadContainer
+      <DiscussionThreadsContainer
         threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
       />
     </>

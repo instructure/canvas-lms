@@ -15,24 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {DiscussionTopicContainer} from './DiscussionTopicContainer'
+
 import React from 'react'
 
+import {ThreadingToolbar} from './ThreadingToolbar'
+
 export default {
-  title: 'Examples/Discussion Posts/Containers/Discussion Topic Contaner',
-  component: DiscussionTopicContainer
+  title: 'Examples/Discussion Posts/Components/ThreadingToolbar/Like',
+  component: ThreadingToolbar.Like,
+  argTypes: {}
 }
 
-const Template = args => <DiscussionTopicContainer {...args} />
+const Template = args => <ThreadingToolbar.Like isLiked likeCount={1} {...args} />
 
-export const Default = Template.bind({})
-Default.args = {
-  isGraded: false
-}
+export const Liked = Template.bind({})
+Liked.args = {}
 
-export const TeacherViewGraded = Template.bind({})
-TeacherViewGraded.args = {
-  isGraded: true,
-  hasTeacherPermissions: true,
-  onReply: {acton: 'Reply'}
+export const NotLiked = Template.bind({})
+NotLiked.args = {
+  isLiked: false,
+  likeCount: 0
 }

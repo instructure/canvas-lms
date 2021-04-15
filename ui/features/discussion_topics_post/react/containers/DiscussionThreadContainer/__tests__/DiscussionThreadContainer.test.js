@@ -24,6 +24,7 @@ import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
+import {waitFor} from '@testing-library/dom'
 
 describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
@@ -45,35 +46,31 @@ describe('DiscussionThreadContainer', () => {
 
   const defaultProps = () => {
     return {
-      threads: [
-        {
-          _id: '49',
-          id: '49',
-          createdAt: '2021-04-05T13:40:50-06:00',
-          updatedAt: '2021-04-05T13:40:50-06:00',
-          deleted: false,
-          message: '<p>This is the parent reply</p>',
-          ratingCount: null,
-          ratingSum: null,
-          rating: false,
-          read: true,
-          subentriesCount: 1,
-          rootEntryParticipantCounts: {
-            unreadCount: 1,
-            repliesCount: 1
-          },
-          author: {
-            _id: '1',
-            id: 'VXNlci0x',
-            avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-            name: 'Matthew Lemon'
-          },
-          editor: null,
-          lastReply: {
-            createdAt: '2021-04-05T13:41:42-06:00'
-          }
-        }
-      ]
+      _id: '49',
+      id: '49',
+      createdAt: '2021-04-05T13:40:50-06:00',
+      updatedAt: '2021-04-05T13:40:50-06:00',
+      deleted: false,
+      message: '<p>This is the parent reply</p>',
+      ratingCount: null,
+      ratingSum: null,
+      rating: false,
+      read: true,
+      subentriesCount: 1,
+      rootEntryParticipantCounts: {
+        unreadCount: 1,
+        repliesCount: 1
+      },
+      author: {
+        _id: '1',
+        id: 'VXNlci0x',
+        avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+        name: 'Matthew Lemon'
+      },
+      editor: null,
+      lastReply: {
+        createdAt: '2021-04-05T13:41:42-06:00'
+      }
     }
   }
 
@@ -88,32 +85,59 @@ describe('DiscussionThreadContainer', () => {
   }
 
   it('should render', () => {
-    const {container} = setup()
+    const {container} = setup(defaultProps())
     expect(container).toBeTruthy()
   })
 
-  it('should render when threads are empty', () => {
-    const {container} = setup({
-      threads: []
+  it('should render expand when nested replies are present', () => {
+    const {getByTestId} = setup(defaultProps())
+    expect(getByTestId('expand-button')).toBeTruthy()
+  })
+
+  it('should expand replies when expand button is clicked', () => {
+    const {getByTestId} = setup(defaultProps())
+    fireEvent.click(getByTestId('expand-button'))
+    expect(getByTestId('collapse-replies')).toBeTruthy()
+  })
+
+  it('should collapse replies when expand button is clicked', async () => {
+    const {getByTestId, queryByTestId} = setup(defaultProps())
+    fireEvent.click(getByTestId('expand-button'))
+    expect(getByTestId('collapse-replies')).toBeTruthy()
+
+    fireEvent.click(getByTestId('expand-button'))
+
+    expect(queryByTestId('collapse-replies')).toBeNull()
+  })
+
+  it('should collapse replies when collapse button is clicked', () => {
+    const {getByTestId, queryByTestId} = setup(defaultProps())
+    fireEvent.click(getByTestId('expand-button'))
+    expect(getByTestId('collapse-replies')).toBeTruthy()
+
+    fireEvent.click(getByTestId('collapse-replies'))
+
+    expect(queryByTestId('collapse-replies')).toBeNull()
+  })
+
+  it('should unread entry when Mark As Unread is clicked', async () => {
+    const {getByTestId, queryByTestId} = setup(defaultProps())
+
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    fireEvent.click(getByTestId('markAsUnread'))
+
+    await waitFor(() => {
+      expect(queryByTestId('is-unread')).toBeTruthy()
     })
-    expect(container).toBeTruthy()
   })
 
-  it('should render when threads are null', () => {
-    const {container} = setup({
-      threads: null
+  it('should read entry when Mark As Read is clicked', async () => {
+    const {getByTestId, queryByTestId} = setup({...defaultProps(), read: false})
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    fireEvent.click(getByTestId('markAsRead'))
+
+    await waitFor(() => {
+      expect(queryByTestId('is-unread')).toBeNull()
     })
-    expect(container).toBeTruthy()
-  })
-
-  it('renders discussion entries', async () => {
-    const {queryByText, getByTestId, findByText} = setup(defaultProps())
-    expect(await findByText('This is the parent reply')).toBeTruthy()
-    expect(queryByText('This is the child reply')).toBe(null)
-
-    const expandButton = getByTestId('expand-button')
-    fireEvent.click(expandButton)
-
-    expect(await findByText('This is the child reply')).toBeTruthy()
   })
 })

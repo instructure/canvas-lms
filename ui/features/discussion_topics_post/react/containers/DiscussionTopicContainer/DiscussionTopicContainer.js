@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert} from '../../Alert/Alert'
+import {Alert} from '../../components/Alert/Alert'
 import {Button} from '@instructure/ui-buttons'
 import {Discussion} from '../../../graphql/Discussion'
-import DiscussionPostToolbar from '../../DiscussionResponseToolbar/DiscussionPostToolbar'
+import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_posts'
-import {PostMessage} from '../../PostMessage/PostMessage'
-import {PostToolbar} from '../../PostToolbar/PostToolbar'
+import {PostMessage} from '../../components/PostMessage/PostMessage'
+import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
 import React from 'react'
 

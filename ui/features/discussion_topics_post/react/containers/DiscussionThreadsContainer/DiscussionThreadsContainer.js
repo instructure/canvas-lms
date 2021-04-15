@@ -15,24 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {DiscussionTopicContainer} from './DiscussionTopicContainer'
+
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
+import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
+import PropTypes from 'prop-types'
 import React from 'react'
 
-export default {
-  title: 'Examples/Discussion Posts/Containers/Discussion Topic Contaner',
-  component: DiscussionTopicContainer
+export const DiscussionThreadsContainer = props => {
+  return (
+    <div
+      style={{
+        maxWidth: '55.625rem',
+        marginTop: '1.5rem'
+      }}
+    >
+      {props.threads?.map(r => {
+        return <DiscussionThreadContainer key={`discussion-thread-${r.id}`} {...r} />
+      })}
+    </div>
+  )
 }
 
-const Template = args => <DiscussionTopicContainer {...args} />
-
-export const Default = Template.bind({})
-Default.args = {
-  isGraded: false
+DiscussionThreadsContainer.propTypes = {
+  threads: PropTypes.arrayOf(DiscussionEntry.shape).isRequired
 }
 
-export const TeacherViewGraded = Template.bind({})
-TeacherViewGraded.args = {
-  isGraded: true,
-  hasTeacherPermissions: true,
-  onReply: {acton: 'Reply'}
-}
+export default DiscussionThreadsContainer
