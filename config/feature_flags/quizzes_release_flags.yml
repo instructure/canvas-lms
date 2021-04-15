@@ -34,3 +34,8 @@ new_quizzes_assignment_build_button:
   description: Add a Build button on the Assignment edit page for New Quizzes Assignments
   applies_to: SiteAdmin
   state: hidden
+new_quizzes_bank_migrations:
+  display_name: New Quizzes Banks Migrations
+  description: Enable migrating item banks to New Quizzes during course import/copy
+  applies_to: SiteAdmin
+  state: hidden
