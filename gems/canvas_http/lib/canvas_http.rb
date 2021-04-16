@@ -45,6 +45,7 @@ module CanvasHttp
   class InsecureUriError < CanvasHttp::Error; end
   class UnresolvableUriError < CanvasHttp::Error; end
   class CircuitBreakerError < CanvasHttp::Error; end
+  class ResponseTooLargeError < CanvasHttp::Error; end
 
   def self.put(*args, **kwargs, &block)
     CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &block)
@@ -79,7 +80,7 @@ module CanvasHttp
   #
   # Eventually it may be expanded to optionally do cert verification as well.
   def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
-    streaming: false, body: nil, content_type: nil, redirect_spy: nil)
+    streaming: false, body: nil, content_type: nil, redirect_spy: nil, max_response_body_length: nil)
     last_scheme = nil
     last_host = nil
     current_host = nil
@@ -116,6 +117,8 @@ module CanvasHttp
           logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str} | elapsed: #{elapsed_time} s")
           if block_given?
             yield response
+          elsif max_response_body_length
+            read_body_max_length(response, max_response_body_length)
           else
             # have to read the body before we exit this block, and
             # close the connection
@@ -130,6 +133,17 @@ module CanvasHttp
     raise
   ensure
     increment_cost(request_cost)
+  end
+
+  def self.read_body_max_length(response, max_length)
+    body = nil
+    response.read_body do |chunk|
+      body ||= +''
+      raise ResponseTooLargeError if body.length + chunk.length > max_length
+
+      body << chunk
+    end
+    response.body = body
   end
 
   def self.add_form_data(request, form_data, multipart:, streaming:)
