@@ -1541,15 +1541,52 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     primary_column = klass.primary_key
     index_name = "index_#{klass.table_name}_replica_identity"
     add_index klass.table_name, [column_name, primary_column], name: index_name, algorithm: :concurrently, unique: true, if_not_exists: true
-    execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY USING INDEX #{index_name}])
+    set_replica_identity klass.table_name, index_name
   end
 
   def remove_replica_identity(model_name)
     klass = model_name.constantize
-    execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY DEFAULT])
+    set_replica_identity klass.table_name, :default
     remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
   end
 end
+
+# yes, various versions of rails supports various if_exists/if_not_exists options,
+# but _none_ of them (as of writing) will invert them on reversion. Some will
+# purposely strip the option, but most don't do anything.
+module ExistenceInversions
+  %w{index foreign_key column}.each do |type|
+    # these methods purposely pull the flag from the incoming args,
+    # and assign to the outgoing args, not relying on it getting
+    # passed through. and sometimes they even modify args.
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def invert_add_#{type}(args)
+        orig_args = args.dup
+        result = super
+        if orig_args.last.is_a?(Hash) && orig_args.last[:if_not_exists]
+          result[1] << {} unless result[1].last.is_a?(Hash)
+          result[1].last[:if_exists] = orig_args.last[:if_not_exists]
+          result[1].last.delete(:if_not_exists)
+        end
+        result
+      end
+
+      def invert_remove_#{type}(args)
+        orig_args = args.dup
+        result = super
+        if orig_args.last.is_a?(Hash) && orig_args.last[:if_exists]
+          result[1] << {} unless result[1].last.is_a?(Hash)
+          result[1].last[:if_not_exists] = orig_args.last[:if_exists]
+          result[1].last.delete(:if_exists)
+        end
+        result
+      end
+    RUBY
+  end
+end
+
+ActiveRecord::Migration::CommandRecorder.prepend(ExistenceInversions)
+
 
 ActiveRecord::Associations::CollectionAssociation.class_eval do
   # CollectionAssociation implements uniq for :uniq option, in its

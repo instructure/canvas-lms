@@ -209,7 +209,7 @@ The title of the context.
 ## com.instructure.Editor.contents
 The contents of the text editor associated with the content item launch.
 
-**Availability**: *always*  
+**Availability**: *when the tool is launched from the editor_button placement*  
 **Launch Parameter**: *com_instructure_editor_contents*  
 
 ```
@@ -219,7 +219,7 @@ The contents of the text editor associated with the content item launch.
 The contents the user has selected in the text editor associated
 with the content item launch.
 
-**Availability**: *always*  
+**Availability**: *when the tool is launched from the editor_button placement*  
 **Launch Parameter**: *com_instructure_editor_selection*  
 
 ```

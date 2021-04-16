@@ -41,6 +41,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -50,6 +51,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     key="2017-04-25"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <EmptyDays
@@ -73,6 +75,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     key="2017-04-29"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -134,6 +137,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     key="2017-04-19"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -143,6 +147,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     key="2017-04-23"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -152,6 +157,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -161,6 +167,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     key="2017-04-25"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <EmptyDays
@@ -184,6 +191,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     key="2017-04-29"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -245,6 +253,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -306,6 +315,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -321,6 +331,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     key="2017-04-25"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <EmptyDays
@@ -344,6 +355,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     key="2017-04-29"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -405,6 +417,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     key="2017-04-18"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -420,6 +433,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     key="2017-04-20"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -429,6 +443,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     key="2017-04-23"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -438,6 +453,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -499,6 +515,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -514,6 +531,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     key="2017-04-25"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -523,6 +541,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     key="2017-04-26"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -532,6 +551,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     key="2017-04-27"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -547,6 +567,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     key="2017-04-28"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -608,6 +629,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -669,6 +691,7 @@ exports[`PlannerApp renders base component 1`] = `
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -684,6 +707,7 @@ exports[`PlannerApp renders base component 1`] = `
     key="2017-04-25"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -699,6 +723,7 @@ exports[`PlannerApp renders base component 1`] = `
     key="2017-04-26"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div
@@ -896,6 +921,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     key="2017-04-24"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -911,6 +937,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     key="2017-04-25"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -926,6 +953,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     key="2017-04-26"
     showMissingAssignments={false}
     simplifiedControls={false}
+    singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
   <div

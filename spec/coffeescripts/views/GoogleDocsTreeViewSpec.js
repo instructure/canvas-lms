@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import GoogleDocsTreeView from 'compiled/views/GoogleDocsTreeView'
+import GoogleDocsTreeView from 'ui/features/submit_assignment/backbone/views/GoogleDocsTreeView.coffee'
 
 const file1 = {
   name: 'File 1',

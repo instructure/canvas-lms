@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import MessageView from 'compiled/views/conversations/MessageView'
-import Message from 'compiled/models/Message'
+import MessageView from 'ui/features/conversations/backbone/views/MessageView.js'
+import Message from 'ui/features/conversations/backbone/models/Message.coffee'
 
 QUnit.module('MessageView', {
   setup() {

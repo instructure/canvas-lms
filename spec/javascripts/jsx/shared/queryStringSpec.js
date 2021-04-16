@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {encodeQueryString, decodeQueryString} from 'jsx/shared/queryString'
+import {encodeQueryString, decodeQueryString} from 'query-string-encoding'
 
 QUnit.module('Query String util')
 

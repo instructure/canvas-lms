@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageCollection from 'compiled/collections/WikiPageCollection'
-import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection.js'
+import WikiPageIndexView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexView.js'
 import $ from 'jquery'
-import 'jquery.disableWhileLoading'
+import '@canvas/jquery/jquery.disableWhileLoading'
 import fakeENV from 'helpers/fakeENV'
-import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
-import * as ConfirmDeleteModal from 'jsx/wiki_pages/components/ConfirmDeleteModal'
+import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import * as ConfirmDeleteModal from 'ui/features/wiki_page_index/react/ConfirmDeleteModal.js'
 
 const indexMenuLtiTool = {
   id: '18',

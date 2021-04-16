@@ -64,7 +64,7 @@ module.exports.pitch = function(remainingRequest, precedingRequest, data) {
     : ''
 
   const scopedJavascript = `
-    import I18n from 'i18nObj';
+    import I18n from '@canvas/i18n/i18nObj';
     ${translationDependency}
     import 'translations/_core_en';
 

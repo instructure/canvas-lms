@@ -277,6 +277,47 @@ describe Assignment do
       end
     end
 
+    describe "start_canvadocs_render" do
+      before(:once) do
+        @attachment = attachment_model(context: @course)
+        @canvadoc = Canvadoc.create!(attachment: @attachment)
+      end
+
+      before(:each) do
+        allow(Canvadocs).to receive(:enabled?).and_return true
+      end
+
+      it "does not call submit_to_canvadocs when annotatable_attachment is blank" do
+        assignment = @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: "student_annotation"
+        )
+        expect(@attachment).not_to receive(:submit_to_canvadocs)
+        assignment.update!(annotatable_attachment_id: nil)
+      end
+
+      it "does not call submit_to_canvadocs when a canvadoc is already available" do
+        @canvadoc.update!(document_id: "abc")
+        expect(@attachment).not_to receive(:submit_to_canvadocs)
+
+        @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: "student_annotation"
+        )
+      end
+
+      it "calls submit_to_canvadocs when a canvadoc is not available and annotatable_attachment is present" do
+        @canvadoc.update!(document_id: nil)
+        expected_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
+        expect(@attachment).to receive(:submit_to_canvadocs).with(1, expected_opts)
+
+        @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: "student_annotation"
+        )
+      end
+    end
+
     describe "automatic setting of post policies" do
       let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
 
@@ -464,6 +505,31 @@ describe Assignment do
     it 'excludes submissions for assignments not expecting submissions' do
       assignment_model(submission_types: "none", course: @course)
       expect(Assignment.submittable).to be_empty
+    end
+  end
+
+  describe '#annotated_document?' do
+    before(:once) do
+      @assignment = @course.assignments.build
+    end
+
+    it 'returns true if submission_types equals "student_annotation"' do
+      @assignment.submission_types = 'student_annotation'
+      expect(@assignment).to be_annotated_document
+    end
+
+    it 'returns true if submission_types contains "student_annotation"' do
+      @assignment.submission_types = 'discussion_topic,student_annotation'
+      expect(@assignment).to be_annotated_document
+    end
+
+    it 'returns false if submission_types is nil' do
+      expect(@assignment).not_to be_annotated_document
+    end
+
+    it 'returns false if submission_types does not include student_annotation' do
+      @assignment.submission_types = 'discussion_topic'
+      expect(@assignment).not_to be_annotated_document
     end
   end
 
@@ -1010,6 +1076,13 @@ describe Assignment do
 
         it "returns false when all submissions are posted" do
           @assignment.post_submissions
+          expect(@assignment).not_to be_anonymize_students
+        end
+
+        it "ignores unposted submissions for test students" do
+          @assignment.post_submissions
+
+          @course.student_view_student
           expect(@assignment).not_to be_anonymize_students
         end
       end
@@ -3159,15 +3232,15 @@ describe Assignment do
         points_possible: 10
     end
 
-    context "when submission_type is annotated_document" do
+    context "when submission_type is student_annotation" do
       before(:once) do
         @annotatable_attachment = attachment_model(context: @course)
-        @a.update!(annotatable_attachment: @annotatable_attachment, submission_types: "annotated_document")
+        @a.update!(annotatable_attachment: @annotatable_attachment, submission_types: "student_annotation")
       end
 
       it "raises an error if an attachment id is not present in the options" do
         expect {
-          @a.submit_homework(@user, submission_type: "annotated_document")
+          @a.submit_homework(@user, submission_type: "student_annotation")
         }.to raise_error "Invalid Attachment"
       end
 
@@ -3175,7 +3248,7 @@ describe Assignment do
         @a.update!(submission_types: "online_text_entry")
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "student_annotation")
         }.to raise_error "Invalid submission type"
       end
 
@@ -3183,7 +3256,7 @@ describe Assignment do
         other_attachment = attachment_model(context: @course)
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: other_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: other_attachment.id, submission_type: "student_annotation")
         }.to raise_error "Invalid Attachment"
       end
 
@@ -3193,7 +3266,7 @@ describe Assignment do
         annotation_context = submission.annotation_context(draft: true)
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "student_annotation")
         }.to change {
           annotation_context.reload.submission_attempt
         }.from(nil).to(8)
@@ -3208,7 +3281,7 @@ describe Assignment do
         )
 
         expect {
-          @a.submit_homework(@user, annotated_document_id: @annotatable_attachment.id, submission_type: "annotated_document")
+          @a.submit_homework(@user, annotatable_attachment_id: @annotatable_attachment.id, submission_type: "student_annotation")
         }.not_to change {
           unrelated_annotation_context.reload.submission_attempt
         }
@@ -5934,7 +6007,7 @@ describe Assignment do
       @attachment.content_type = "foo/bar"
       @attachment.size = 10
       @attachment.save!
-
+      
       @submission = @assignment.submit_homework @user, :submission_type => :online_upload, :attachments => [@attachment]
     end
 
@@ -5954,6 +6027,20 @@ describe Assignment do
         :display_name => @attachment.display_name
       })
       expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
+    end
+
+    it "should not ignore file when anonymous grading is enabled" do
+      create_and_submit
+      @assignment.update!(anonymous_grading: true)
+
+      filename = ['LATE', 'anon', @submission.anonymous_id, @attachment.id, @attachment.display_name].join("_")
+
+      expect(@assignment.send(:infer_comment_context_from_filename, filename)).to eq({
+        :user => @user,
+        :submission => @submission,
+        :filename => filename,
+        :display_name => @attachment.display_name
+      })
     end
 
     it "should ignore when assignment.id does not belog to the user" do
@@ -6291,12 +6378,10 @@ describe Assignment do
       end
 
       it "triggers a grade change event with the grader_id as the updating_user" do
-        @assignment.updating_user = @assistant
-
         expect(Auditors::GradeChange).to receive(:record).once do |args|
           expect(args.fetch(:submission).grader_id).to eq @assistant.id
         end
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@assistant)
       end
 
       it "triggers a grade change event using the grader_id on the submission if no updating_user is present" do
@@ -6304,7 +6389,7 @@ describe Assignment do
           expect(args.fetch(:submission).grader_id).to eq @teacher.id
         end
 
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(nil)
       end
     end
 
@@ -6348,7 +6433,7 @@ describe Assignment do
       it "preserves pass/fail grade when changing from 0 to positive points possible" do
         @assignment.grade_student(@user, grade: 'pass', grader: @teacher)
         @assignment.points_possible = 1.0
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@teacher)
 
         submission.reload
         expect(submission.grade).to eql('complete')
@@ -6357,7 +6442,7 @@ describe Assignment do
       it "changes the score of 'complete' pass/fail submissions to match the assignment's possible points" do
         @assignment.grade_student(@user, grade: 'pass', grader: @teacher)
         @assignment.points_possible = 3.0
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@teacher)
 
         submission.reload
         expect(submission.score).to eql(3.0)
@@ -6366,7 +6451,7 @@ describe Assignment do
       it "does not change the score of 'incomplete' pass/fail submissions if assignment points possible has changed" do
         @assignment.grade_student(@user, grade: 'fail', grader: @teacher)
         @assignment.points_possible = 2.0
-        @assignment.update_student_submissions
+        @assignment.update_student_submissions(@teacher)
 
         submission.reload
         expect(submission.score).to eql(0.0)
@@ -7258,18 +7343,14 @@ describe Assignment do
       allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { false }
       assignment.submission_types = 'online_text_entry'
 
-      expect(assignment.a2_enabled?).to be(false)
+      expect(assignment).not_to be_a2_enabled
     end
 
     [
       'discussion_topic',
       'external_tool',
-      'on_paper',
       'online_quiz',
-      'none',
-      'not_graded',
-      'wiki_page',
-      ''
+      'wiki_page'
     ].each do |type|
       it "returns false if submission type is set to #{type}" do
         assignment.build_wiki_page
@@ -7277,18 +7358,22 @@ describe Assignment do
         assignment.build_quiz
         assignment.submission_types = type
 
-        expect(assignment.a2_enabled?).to be(false)
+        expect(assignment).not_to be_a2_enabled
       end
     end
 
     [
       'online_text_entry',
       'online_upload',
-      'online_url'
+      'online_url',
+      'on_paper',
+      'none',
+      'not_graded',
+      ''
     ].each do |type|
       it "returns true if the flag is on and the submission type is #{type}" do
         assignment.submission_types = type
-        expect(assignment.a2_enabled?).to be(true)
+        expect(assignment).to be_a2_enabled
       end
     end
   end
@@ -7531,6 +7616,12 @@ describe Assignment do
       a2 = assignment(@group_category)
       a2.group_category.destroy
       expect(a2.group_category_deleted_with_submissions?).to eq false
+    end
+
+    it "does not let student annotation assignments be group assignments" do
+      assignment = @course.assignments.build(submission_types: "student_annotation", group_category: @group_category)
+      assignment.validate
+      expect(assignment.errors.full_messages).to include "Group category must be blank when annotatable_attachment_id is present"
     end
 
     context 'when anonymous grading is enabled from before' do

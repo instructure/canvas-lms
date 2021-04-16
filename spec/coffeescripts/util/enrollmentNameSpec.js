@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import enrollmentName from 'compiled/util/enrollmentName'
+import enrollmentName from '@canvas/handlebars-helpers/enrollmentName'
 
 QUnit.module('enrollmentName')
 

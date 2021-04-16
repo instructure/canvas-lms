@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import PublishButtonView from 'compiled/views/PublishButtonView'
+import Backbone from '@canvas/backbone'
+import PublishButtonView from '@canvas/publish-button-view'
 import $ from 'jquery'
 import 'helpers/jquery.simulate'
 

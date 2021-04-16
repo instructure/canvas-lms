@@ -18,7 +18,7 @@
 
 import {defer} from 'lodash'
 import $ from 'jquery'
-import LDBLoginPopup from 'compiled/views/quizzes/LDBLoginPopup'
+import LDBLoginPopup from 'ui/features/take_quiz/backbone/views/LDBLoginPopup.js'
 
 let whnd
 let popup

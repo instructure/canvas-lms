@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import userSettings from 'compiled/userSettings'
+import userSettings from '@canvas/user-settings'
 
 const globalObj = window
 

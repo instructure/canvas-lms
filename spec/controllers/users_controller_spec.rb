@@ -2520,6 +2520,32 @@ describe UsersController do
         end
       end
     end
+
+    context "ENV.INITIAL_NUM_K5_CARDS" do
+      before :once do
+        course_with_student
+      end
+
+      before :each do
+        user_session @student
+      end
+
+      it "is set to cached count" do
+        enable_cache do
+          Rails.cache.write(['last_known_k5_cards_count', @student.global_id].cache_key, 3)
+          get 'user_dashboard'
+          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 3
+          Rails.cache.delete(['last_known_k5_cards_count', @student.global_id].cache_key)
+        end
+      end
+
+      it "is set to 5 if not cached" do
+        enable_cache do
+          get 'user_dashboard'
+          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 5
+        end
+      end
+    end
   end
 
   describe "#pandata_events_token" do

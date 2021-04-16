@@ -646,12 +646,7 @@ describe CoursesController do
         user_session(@teacher)
         get 'show', params: {id: @course.id, view: 'notifications'}
         expect(response).to be_successful
-
-        contains_js_bundle = false
-        assigns['js_bundles'].each do |js_bundle|
-          contains_js_bundle = js_bundle.include? :course_notification_settings_show if js_bundle.include? :course_notification_settings_show
-        end
-        expect(contains_js_bundle).to be true
+        expect(assigns[:js_bundles].flatten).to include(:course_notification_settings)
       end
     end
   end
@@ -1554,6 +1549,16 @@ describe CoursesController do
         expect(assigns[:js_env][:K5_MODE]).to be_truthy
       end
 
+      it "registers module-related js and css bundles and sets CONTEXT_MODULE_ASSIGNMENT_INFO_URL in js_env" do
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_bundles].flatten).to include :context_modules
+        expect(assigns[:css_bundles].flatten).to include :content_next
+        expect(assigns[:css_bundles].flatten).to include :context_modules2
+        expect(assigns[:js_env][:CONTEXT_MODULE_ASSIGNMENT_INFO_URL]).to be_truthy
+      end
+
       it "does not render the sidebar navigation or breadcrumbs" do
         user_session(@student)
 
@@ -1576,6 +1581,13 @@ describe CoursesController do
         expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_falsy
       end
 
+      it "sets PERMISSIONS appropriately in js_env" do
+        user_session(@teacher)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
+      end
+
       it "loads announcements on home page when course is a k5 homeroom course" do
         @course.homeroom_course = true
         @course.save!
@@ -1583,7 +1595,7 @@ describe CoursesController do
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:course_home_view]).to eq "announcements"
-        bundle = assigns[:js_bundles].select { |b| b.include? :announcements_index_v2 }
+        bundle = assigns[:js_bundles].select { |b| b.include? :announcements }
         expect(bundle.size).to eq 1
       end
     end
@@ -3283,6 +3295,42 @@ describe CoursesController do
       course.reload
       expect(course.is_public).to eq true
       expect(course.indexed).to eq true
+    end
+  end
+
+  describe "POST 'copy_course'" do
+    let(:course) { Course.create! }
+
+    before do
+      course.wiki_pages.create!(title: 'my page')
+      user_session(site_admin_user)
+    end
+
+    it "copies a course" do
+      post 'copy_course', params: { course_id: course.id,
+        course: { name: 'copied course', course_code: 'copied' } }
+      expect(response).to be_redirect
+      run_jobs
+      new_course = Course.last
+      expect(new_course.name).to eq 'copied course'
+      expect(new_course.wiki_pages.length).to eq 1
+      expect(new_course.wiki_pages.first.title).to eq 'my page'
+    end
+
+    it "does not apply an account's course template" do
+      template = course.account.courses.create!(name: 'Template Course', template: true)
+      template.assignments.create!(title: 'my assignment')
+      course.root_account.enable_feature!(:course_templates)
+      course.account.update!(course_template: template)
+
+      post 'copy_course', params: { course_id: course.id,
+        course: { name: 'copied course', course_code: 'copied' } }
+      expect(response).to be_redirect
+      run_jobs
+      new_course = Course.last
+      expect(new_course.name).to eq 'copied course'
+      expect(new_course.wiki_pages.length).to eq 1
+      expect(new_course.assignments.length).to eq 0
     end
   end
 end

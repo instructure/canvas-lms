@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 
-import RosterUserView from 'compiled/views/courses/roster/RosterUserView'
-import RosterUser from 'compiled/models/RosterUser'
+import RosterUserView from 'ui/features/roster/backbone/views/RosterUserView.js'
+import RosterUser from 'ui/features/roster/backbone/models/RosterUser.coffee'
 
 let rosterViewOne
 let rosterViewTwo

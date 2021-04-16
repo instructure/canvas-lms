@@ -193,6 +193,11 @@ module Types
       load_association(:rubric)
     end
 
+    field :rubric_association, RubricAssociationType, null: true
+    def rubric_association
+      assignment.active_rubric_association? ? load_association(:rubric_association) : nil
+    end
+
     def lock_info
       load_locked_for { |lock_info| lock_info || {} }
     end

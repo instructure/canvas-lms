@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TextHelper from 'compiled/str/TextHelper'
+import TextHelper from '@canvas/util/TextHelper.coffee'
 
 const {delimit, truncateText, formatMessage} = TextHelper
 

@@ -102,9 +102,9 @@ describe MicrosoftSync::Group do
     end
   end
 
-  describe '#update_workflow_state_unless_deleted' do
+  describe '#update_unless_deleted' do
     def run_method!
-      subject.update_workflow_state_unless_deleted('errored', last_error: 'abc')
+      subject.update_unless_deleted(workflow_state: 'errored', job_state: {abc: true})
     end
 
     context 'when state is deleted in the database' do
@@ -114,11 +114,11 @@ describe MicrosoftSync::Group do
 
       it { expect(run_method!).to eq(false) }
 
-      it 'updates the state on the object to match the "deleted" in the DB' do
+      it 'updates the workflow_state on the object to match the "deleted" in the DB' do
         expect { run_method! }.to change { subject.workflow_state }.from('pending').to('deleted')
       end
 
-      it 'does not update the state in the DB' do
+      it 'does not update the workflow_state in the DB' do
         expect { run_method! }.to_not change {
           described_class.find(subject.id).workflow_state
         }.from('deleted')
@@ -126,23 +126,23 @@ describe MicrosoftSync::Group do
 
       it 'does not update the extra attributes in the DB' do
         expect { run_method! }.to_not change {
-          described_class.find(subject.id).last_error
+          described_class.find(subject.id).job_state
         }.from(nil)
       end
 
       it 'does not update the extra attributes on the object' do
-        expect { run_method! }.to_not change { subject.last_error }.from(nil)
+        expect { run_method! }.to_not change { subject.job_state }.from(nil)
       end
     end
 
     context 'when state is not deleted' do
       it { expect(run_method!).to eq(true) }
 
-      it 'updates the state on the object' do
+      it 'updates the workflow_state on the object' do
         expect { run_method! }.to change { subject.workflow_state }.from('pending').to('errored')
       end
 
-      it 'updates the state in the DB' do
+      it 'updates the workflow_state in the DB' do
         expect { run_method! }.to change {
           described_class.find(subject.id).workflow_state
         }.from('pending').to('errored')
@@ -150,19 +150,32 @@ describe MicrosoftSync::Group do
 
       it 'updates the extra attributes in the DB' do
         expect { run_method! }.to change {
-          described_class.find(subject.id).last_error
-        }.from(nil).to('abc')
+          described_class.find(subject.id).job_state
+        }.from(nil).to(abc: true)
       end
 
       it 'updates the extra attributes on the object' do
-        expect { run_method! }.to change { subject.last_error }.from(nil).to('abc')
+        expect { run_method! }.to change { subject.job_state }.from(nil).to(abc: true)
       end
+    end
+  end
 
-      it 'can be called without extra attributes' do
-        expect { subject.update_workflow_state_unless_deleted('errored') }.to change {
-          described_class.find(subject.id).workflow_state
-        }.from('pending').to('errored')
-      end
+  describe '#job_state' do
+    it 'serializes TimeWithZone objects, symbols, and complex data structures' do
+      time = 1.minute.from_now
+      subject.job_state = {a: {'b' => time}}
+      subject.save
+      expect(described_class.find(subject.id).job_state).to eq(a: {'b' => time})
+    end
+  end
+
+  describe '#syncer_job' do
+    it 'creates a StateMachineJob with Syncer as the steps' do
+      syncer_job = subject.syncer_job
+      expect(syncer_job).to be_a(MicrosoftSync::StateMachineJob)
+      expect(syncer_job.job_state_record).to eq(subject)
+      expect(syncer_job.steps_object).to be_a(MicrosoftSync::SyncerSteps)
+      expect(syncer_job.steps_object.group).to eq(subject)
     end
   end
 end

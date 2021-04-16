@@ -19,8 +19,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {Modal} from '@instructure/ui-modal'
-import IndexMenu from 'jsx/assignments/IndexMenu'
-import Actions from 'jsx/assignments/actions/IndexMenuActions'
+import IndexMenu from 'ui/features/assignment_index/react/IndexMenu.js'
+import Actions from 'ui/features/assignment_index/react/actions/IndexMenuActions.js'
 import createFakeStore from './createFakeStore'
 
 QUnit.module('AssignmentsIndexMenu')

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
+import Lti2Permissions from 'ui/features/external_apps/react/components/Lti2Permissions.js'
 
 QUnit.module('ExternalApps.Lti2Permissions')
 

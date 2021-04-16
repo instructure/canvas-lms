@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
-import Assignment from 'compiled/models/Assignment'
-import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
+import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import $ from 'jquery'
 
 /* eslint-disable object-shorthand */

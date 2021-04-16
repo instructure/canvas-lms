@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DueDateList from 'compiled/models/DueDateList'
-import Assignment from 'compiled/models/Assignment'
-import AssignmentOverride from 'compiled/models/AssignmentOverride'
-import AssignmentOverrideCollection from 'compiled/collections/AssignmentOverrideCollection'
-import Section from 'compiled/models/Section'
-import SectionList from 'compiled/collections/SectionCollection'
+import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
+import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection.coffee'
+import Section from '@canvas/sections/backbone/models/Section.coffee'
+import SectionList from '@canvas/sections/backbone/collections/SectionCollection'
 
 QUnit.module('DueDateList', {
   setup() {

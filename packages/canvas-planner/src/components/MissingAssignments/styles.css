@@ -29,9 +29,3 @@
     margin-inline-start: 0;
   }
 }
-
-.moreButton {
-  margin-top: var(--moreButtonMarginVertical);
-  margin-bottom: var(--moreButtonMarginVertical);
-  margin-inline-start: var(--moreButtonMarginStart);
-}

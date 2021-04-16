@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import ModalButtons from '@canvas/modal/react/buttons'
 
 QUnit.module('ModalButtons')
 

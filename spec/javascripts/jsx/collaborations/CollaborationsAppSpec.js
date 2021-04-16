@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CollaborationsApp from 'jsx/collaborations/CollaborationsApp'
+import CollaborationsApp from 'ui/features/lti_collaborations/react/CollaborationsApp.js'
 
 QUnit.module('CollaborationsApp')
 

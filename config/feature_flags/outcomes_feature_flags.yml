@@ -44,3 +44,8 @@ improved_outcomes_management:
   display_name: Improved Outcomes Management
   description: Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
+assignment_comment_library:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Comment Library
+  description: Adds comment bank for assignment comments within speedgrader

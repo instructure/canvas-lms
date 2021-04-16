@@ -70,8 +70,9 @@ var ScopedTranslationHash = require("./scoped_translation_hash");
 // remove path stuff we don't want in the scope
 var pathRegex = new RegExp(
   '.*(' +
-    "app/views/jst" +
-    "|app/coffeescripts/ember" +
+    'ui/shared/jst' +
+    '|ui/features/screenreader_gradebook/jst' +
+    '|packages/[^/]+/src/jst' +
     '|gems/plugins/[^/]+/app/views/jst' +
   ')' +
   '(/plugins/[^/]+)?/' // remove plugins bit once we drop requirejs/handlebars_tasks/plugin symlinks

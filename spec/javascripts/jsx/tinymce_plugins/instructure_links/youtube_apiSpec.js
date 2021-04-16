@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import YouTubeApi from 'tinymce_plugins/instructure_links/youtube_api'
+import YouTubeApi from '@canvas/tinymce-links/youtube_api'
 
 const videoId = 'DgDk50dHbjM'
 const link = {attr: () => {}, text: () => {}}

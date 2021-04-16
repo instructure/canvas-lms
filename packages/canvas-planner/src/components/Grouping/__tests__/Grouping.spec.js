@@ -204,6 +204,13 @@ it('does not render activity badge or colored completed items facade when using 
   expect(wrapper.find('Animatable(CompletedItemsFacade)').prop('theme').labelColor).toBeUndefined()
 })
 
+it('does not render the grouping image and title when using singleCourseView', () => {
+  const wrapper = shallow(<Grouping {...getDefaultProps()} singleCourseView />)
+
+  expect(wrapper.find('.Grouping-styles__overlay')).toHaveLength(0)
+  expect(wrapper.find('.Grouping-styles__title')).toHaveLength(0)
+})
+
 describe('handleFacadeClick', () => {
   it('sets focus to the groupingLink when called', () => {
     const wrapper = mount(<Grouping {...getDefaultProps()} />)

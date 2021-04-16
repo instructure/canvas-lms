@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import SelectContentDialog from 'select_content_dialog'
+import SelectContentDialog from '@canvas/select-content-dialog'
 
 QUnit.module('SelectContentDialog: Dialog options', {
   setup() {

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import OutlierScoreHelper, {isUnusuallyHigh} from 'jsx/grading/helpers/OutlierScoreHelper'
+import OutlierScoreHelper, {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
 
-import GRADEBOOK_TRANSLATIONS from 'jsx/gradebook/GradebookTranslations'
+import GRADEBOOK_TRANSLATIONS from '@canvas/grading/GradebookTranslations'
 
 QUnit.module('#hasWarning', () => {
   test('returns true for exacty 1.5 times points possible', () => {

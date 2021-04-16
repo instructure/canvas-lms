@@ -1,7 +1,7 @@
 # This is a terrible hack
 
 In the interest of time, we originally imported the
-`canvas-lms/app/jsx/shared/rce/FileBrowser` by dot-doting
+`canvas-lms/ui/shared/rce/FileBrowser` by dot-doting
 our way out of the canvas-rce package. While it worked,
 it also prevented canvas-rce from being used outside of
 canvas.

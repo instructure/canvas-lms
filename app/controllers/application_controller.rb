@@ -171,6 +171,7 @@ class ApplicationController < ActionController::Base
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user.try(:prefers_high_contrast?),
+          auto_show_cc: @current_user.try(:auto_show_cc?),
           disable_celebrations: @current_user.try(:prefers_no_celebrations?),
           disable_keyboard_shortcuts: @current_user.try(:prefers_no_keyboard_shortcuts?),
           LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
@@ -222,7 +223,7 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing
+    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing, :expand_cc_languages
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
@@ -2316,7 +2317,7 @@ class ApplicationController < ActionController::Base
   # ensure that the bundle you are requiring isn't simply a dependency of some
   # other bundle.
   #
-  # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
+  # Bundles are defined in ui/bundles/<bundle>.coffee
   #
   # usage: js_bundle :gradebook
   #

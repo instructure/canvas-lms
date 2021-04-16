@@ -19,7 +19,7 @@ import moment from 'moment-timezone'
 import _ from 'lodash'
 import parseLinkHeader from 'parse-link-header'
 
-const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
+const getItemDetailsFromPlannable = apiResponse => {
   const {plannable, plannable_type, planner_override} = apiResponse
   const plannableId = plannable.id || plannable.page_id
 
@@ -212,6 +212,10 @@ export function transformApiToInternalGrade(apiResult) {
   return {courseId, hasGradingPeriods, grade, score}
 }
 
+export function getContextCodesFromState({courses = []}) {
+  return courses?.length ? courses.map(({id}) => `course_${id}`) : undefined
+}
+
 function getCourseContext(course) {
   // shouldn't happen, but if the course data is missing, skip it.
   // this has the effect of a planner note showing up as a vanilla todo not associated with a course
@@ -219,8 +223,8 @@ function getCourseContext(course) {
   return {
     type: 'Course',
     id: course.id,
-    title: course.shortName,
-    image_url: course.image,
+    title: course.shortName || course.name,
+    image_url: course.image || course.image_url,
     color: course.color,
     url: course.href
   }

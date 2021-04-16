@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DateValidator from 'compiled/util/DateValidator'
+import DateValidator from '@canvas/datetime/DateValidator'
 import fakeENV from 'helpers/fakeENV'
 
 const DATE_IN_CLOSED_PERIOD = '2015-07-23T03:59:59Z'

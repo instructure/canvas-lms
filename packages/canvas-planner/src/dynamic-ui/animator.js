@@ -105,8 +105,8 @@ export class Animator {
     })
   }
 
-  scrollToTop() {
-    this.scrollTo(document.documentElement, 0)
+  scrollToTop(onComplete) {
+    this.forceScrollTo(document.documentElement, 0, onComplete)
   }
 
   queueAnimation(fn, pushType = 'push') {
@@ -115,7 +115,7 @@ export class Animator {
   }
 
   isAboveScreen(elt, offset) {
-    return elt.getBoundingClientRect().top < offset
+    return elt?.getBoundingClientRect().top < offset
   }
 
   isBelowScreen(elt) {
@@ -124,7 +124,7 @@ export class Animator {
     // Also, Canvas's footer makes the document always at least as tall as
     // the viewport.
     const doc = this.window.document.documentElement
-    return elt.getBoundingClientRect().bottom + 2 > doc.clientHeight
+    return elt?.getBoundingClientRect().bottom + 2 > doc.clientHeight
   }
 
   isOnScreen(elt, offset) {

@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import DeveloperKeyModal from 'jsx/developer_keys/NewKeyModal'
-import $ from 'compiled/jquery.rails_flash_notifications'
+import DeveloperKeyModal from 'ui/features/developer_keys_v2/react/NewKeyModal.js'
+import $ from '@canvas/rails-flash-notifications'
 
 QUnit.module('NewKeyModal')
 

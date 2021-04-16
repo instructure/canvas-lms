@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ZipFileOptionsForm from 'jsx/files/ZipFileOptionsForm'
+import ZipFileOptionsForm from '@canvas/files/react/components/ZipFileOptionsForm'
 
 QUnit.module('ZipFileOptionsForm')
 

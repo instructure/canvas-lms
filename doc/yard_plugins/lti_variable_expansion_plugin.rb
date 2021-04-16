@@ -126,7 +126,10 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when launched in a course that has a term with a start date"
       when 'STUDENT_ASSIGNMENT_GUARD'
         "when launched as an assignment by a student"
+      when 'EDITOR_GUARD'
+        "when the tool is launched from the editor_button placement"
       end
+
     end.compact
     "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size
   end

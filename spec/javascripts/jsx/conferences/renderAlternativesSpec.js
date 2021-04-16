@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import renderAlternatives from 'jsx/conferences/renderAlternatives'
+import renderAlternatives from 'ui/features/conferences/react/renderAlternatives.js'
 
 QUnit.module('Conferences > .renderAlternatives()', () => {
   test('renders the content the container', () => {

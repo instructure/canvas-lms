@@ -96,18 +96,16 @@ module MicrosoftSync
       private
 
       def settings
-        Rails.application.credentials.microsoft_sync or
-          raise ArgumentError, 'Missing MicrosoftSync creds in microsoft_sync[:client_id] and ' \
-          'microsoft_sync[:client_secret]. Add to vault for this environment, or run rails ' \
-          'credentials:edit in development (see config/credentials.yml.example).'
+        DynamicSettings.find('microsoft-sync') or
+          raise ArgumentError, 'MicrosoftSync not configured'
       end
 
       def client_id
-        settings[:client_id]
+        settings['client-id']
       end
 
       def client_secret
-        settings[:client_secret]
+        settings['client-secret']
       end
     end
   end

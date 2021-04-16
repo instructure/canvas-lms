@@ -17,21 +17,20 @@
  */
 
 import React, {PureComponent} from 'react'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import {arrayOf, func, number, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
 
-import {Button} from '@instructure/ui-buttons'
 import {colors} from '@instructure/canvas-theme'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {themeable} from '@instructure/ui-themeable'
-import {Spinner} from '@instructure/ui-spinner'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
-import {courseShape, opportunityShape} from '../plannerPropTypes'
 
+import {courseShape, opportunityShape} from '../plannerPropTypes'
+import {toggleMissingItems} from '../../actions'
 import formatMessage from '../../format-message'
 import PlannerItem from '../PlannerItem'
 import responsiviser from '../responsiviser'
@@ -109,55 +108,26 @@ MissingAssignment.propTypes = {
   course: shape(courseShape)
 }
 
-// Keeping this around until we're 100% sure we don't need it
-export function NextMissingAssignmentsLink({hasMore, loadMoreOpportunities, loading}) {
-  if (!hasMore) return null
-
-  if (loading)
-    return (
-      <Spinner renderTitle={() => formatMessage('Loading more missing assignments')} size="small" />
-    )
-
-  return (
-    <Button variant="link" onClick={() => loadMoreOpportunities()}>
-      {formatMessage('Show More')}
-    </Button>
-  )
-}
-
-NextMissingAssignmentsLink.propTypes = {
-  hasMore: bool.isRequired,
-  loadMoreOpportunities: func.isRequired,
-  loading: bool.isRequired
-}
-
 // Themeable doesn't support pure functional components
 export class MissingAssignments extends PureComponent {
-  static propTypes = {}
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      expanded: false
-    }
+  static propTypes = {
+    courses: arrayOf(shape(courseShape)).isRequired,
+    opportunities: shape(opportunityShape).isRequired,
+    timeZone: string.isRequired,
+    toggleMissing: func.isRequired,
+    responsiveSize: string
   }
 
   render() {
-    const {
-      courses,
-      loadingOpportunities,
-      opportunities,
-      timeZone,
-      responsiveSize = 'large'
-    } = this.props
-    const {items = []} = opportunities
+    const {courses, opportunities, timeZone, toggleMissing, responsiveSize = 'large'} = this.props
+    const {items = [], missingItemsExpanded: expanded} = opportunities
     if (items.length === 0) {
       return null
     }
 
     return (
       <section className={classnames(styles.root, styles[responsiveSize])}>
-        {!this.state.expanded && (
+        {!expanded && (
           <div className={styles.icon} data-testid="warning-icon">
             <View margin="0 small 0 0">
               <PresentationContent>
@@ -167,12 +137,14 @@ export class MissingAssignments extends PureComponent {
           </div>
         )}
         <ToggleDetails
-          expanded={this.state.expanded}
+          id="MissingAssignments"
+          expanded={expanded}
+          data-testid="missing-item-info"
           fluidWidth
-          onToggle={(_, expanded) => this.setState({expanded})}
+          onToggle={() => toggleMissing()}
           summary={
-            <View margin="0 0 0 x-small">
-              {getMissingItemsText(this.state.expanded, items.length)}
+            <View data-testid="missing-data" margin="0 0 0 x-small">
+              {getMissingItemsText(expanded, items.length)}
             </View>
           }
           theme={{
@@ -190,36 +162,25 @@ export class MissingAssignments extends PureComponent {
               />
             ))}
           </View>
-          <div className={styles.moreButton}>
-            <NextMissingAssignmentsLink
-              hasMore={false}
-              loadMoreOpportunities={() => {}}
-              loading={loadingOpportunities}
-            />
-          </div>
         </ToggleDetails>
       </section>
     )
   }
 }
 
-MissingAssignments.propTypes = {
-  courses: arrayOf(shape(courseShape)).isRequired,
-  loadingOpportunities: bool.isRequired,
-  opportunities: shape(opportunityShape).isRequired,
-  timeZone: string.isRequired,
-  responsiveSize: string
-}
-
-const mapStateToProps = ({courses, loading: {loadingOpportunities}, opportunities}) => ({
+const mapStateToProps = ({courses, opportunities}) => ({
   courses,
-  loadingOpportunities,
   opportunities
 })
 
+const mapDispatchToProps = {toggleMissing: toggleMissingItems}
+
 const ResponsiveMissingAssignment = responsiviser()(MissingAssignments)
 const ThemeableMissingAssignments = themeable(theme, styles)(ResponsiveMissingAssignment)
-const ConnectedMissingAssignments = connect(mapStateToProps)(ThemeableMissingAssignments)
+const ConnectedMissingAssignments = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ThemeableMissingAssignments)
 ConnectedMissingAssignments.theme = ThemeableMissingAssignments.theme
 
 export default ConnectedMissingAssignments

@@ -52,6 +52,14 @@ describe Mailer do
       expect(mail.header['Reply-To']).to be_nil
       expect(mail.header['From'].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
     end
+
+    it 'truncates the message body if it exceeds the maximum text length' do
+      message = message_model()
+      message.body = 'a' * 300.kilobytes
+      message.html_body = 'a' * 300.kilobytes
+      mail = Mailer.create_message(message)
+      expect(mail.message.html_part.body.raw_source).to eq 'message preview unavailable'
+    end
   end
 
   describe 'deliver_now' do

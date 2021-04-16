@@ -508,7 +508,7 @@ class Notification < ActiveRecord::Base
 
   # Translatable display text to use when representing the category to the user.
   # NOTE: If you add a new notification category, update the mapping file for groupings to show up
-  #       on notification preferences page. /app/coffeescripts/notifications/NotificationGroupMappings.js
+  #       on notification preferences page. ui/features/notification_preferences/jquery/NotificationGroupMappings.js
   def category_display_name
     case category
     when 'Announcement'

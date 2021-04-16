@@ -2694,10 +2694,21 @@ describe "Users API", type: :request do
       expect(json.first['course']['name']).to eq(@course.name)
     end
 
+    it "should filter results to the specified course_ids if requested" do
+      @course2 = @course
+      course_with_student(active_all: true, user: @student)
+      @course.assignments.create!(due_at: 5.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+
+      @params['course_ids'] = [@course.id]
+      json = api_call(:get, @path, @params)
+      expect(json.length).to be 1
+      expect(json.first['course_id']).to eq(@course.id)
+    end
+
     it "should not return submitted assignments due in the past" do
       @course.assignments.first.submit_homework @student, :submission_type => "online_text_entry"
       json = api_call(:get, @path, @params)
-      expect(json.length).to eql 1
+      expect(json.length).to be 1
     end
 
     it "should not return assignments that don't expect a submission" do

@@ -24,6 +24,7 @@ if CANVAS_RAILS6_0
 else
   gem 'rails', '6.1.3'
 end
+  gem 'irb', '1.3.5'
 
 gem 'academic_benchmarks', '1.1.0', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
@@ -43,7 +44,7 @@ gem 'aws-sdk-sqs', '1.34.0', require: false
 gem 'aws-sdk-kms', '1.39.0', require: false
 gem 'aws-sigv4', '1.2.2', require: false
 gem 'barby', '0.6.8', require: false
-  gem 'rqrcode', '1.1.2', require: false
+  gem 'rqrcode', '1.2.0', require: false
   gem 'chunky_png', '1.3.14', require: false
 gem 'bcrypt', '3.1.16'
 gem 'brotli', '0.2.3', require: false
@@ -94,7 +95,7 @@ gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.11.0'
 gem 'multi_json', '1.15.0'
 gem 'net-ldap', '0.16.3', require: false
-gem 'nokogiri', '1.11.0', require: false
+gem 'nokogiri', '1.11.3', require: false
 gem 'nokogumbo', '2.0.4'
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
@@ -118,7 +119,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.0.11'
-  gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
+  gem 'nokogiri-xmlsec-instructure', '0.10.1', require: false
 gem 'sanitize', '5.2.3', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'guardrail', '2.0.1'

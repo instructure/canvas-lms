@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradeChangeLoggingCollection from 'compiled/collections/GradeChangeLoggingCollection'
-import GradeChangeLoggingContentView from 'compiled/views/accounts/admin_tools/GradeChangeLoggingContentView'
+import GradeChangeLoggingCollection from 'ui/features/account_admin_tools/backbone/collections/GradeChangeLoggingCollection.js'
+import GradeChangeLoggingContentView from 'ui/features/account_admin_tools/backbone/views/GradeChangeLoggingContentView.js'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

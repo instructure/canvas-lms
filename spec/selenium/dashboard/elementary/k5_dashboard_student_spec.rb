@@ -334,5 +334,80 @@ describe "student k5 dashboard" do
 
       expect(instructor_bio(bio)).to be_displayed
     end
+
+    it 'allows student to send message to teacher', custom_timeout: 20 do
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/#resources"
+
+      click_message_button
+
+      expect(message_modal_displayed?(@teacher.name)).to be_truthy
+
+      expect(is_send_available?).to be_falsey
+
+      replace_content(subject_input, 'need help')
+      replace_content(message_input, 'hey teach, I really need help with these fractions.')
+
+      expect(is_send_available?).to be_truthy
+
+      click_send_button
+
+      wait_for_ajaximations
+
+      expect(is_modal_gone?(@teacher.name)).to be_truthy
+      expect(Conversation.count).to eq(1)
+    end
+
+    it 'allows student to cancel message to teacher' do
+      @course.homeroom_course = true
+      @course.save!
+
+      get "/#resources"
+
+      click_message_button
+
+      expect(is_cancel_available?).to be_truthy
+
+      replace_content(subject_input, 'need help')
+      replace_content(message_input, 'hey teach, I really need help with these fractions.')
+
+      click_cancel_button
+
+      wait_for_ajaximations
+
+      expect(is_modal_gone?(@teacher.name)).to be_truthy
+      expect(Conversation.count).to eq(0)
+    end
+  end
+
+  context 'homeroom dashboard resource panel LTI resources' do
+    before :each do
+      @lti_resource_name = 'Commons'
+      create_lti_resource(@lti_resource_name)
+    end
+
+    it 'shows the LTI resources for account and course on resources page' do
+      get "/#resources"
+
+      expect(k5_app_buttons[0].text).to eq @lti_resource_name
+    end
+
+    it 'shows course modal to choose which LTI resource context when button clicked', ignore_js_errors:true do
+      second_course_title = 'Second Course'
+      course_with_student(
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_course_title,
+        user: @student
+      )
+      get "/#resources"
+
+      click_k5_button(0)
+
+      expect(course_selection_modal).to be_displayed
+      expect(course_list.count).to eq(2)
+    end
   end
 end

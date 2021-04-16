@@ -43,6 +43,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       }
       key="Course128"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -75,6 +76,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       }
       key="Course256"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -129,6 +131,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       key="Course128"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -169,6 +172,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       key="Course256"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -196,6 +200,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       }
       key="Notes"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -250,6 +255,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       key="Course128"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -290,6 +296,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       key="Course256"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -317,6 +324,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       }
       key="Notes"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -372,6 +380,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       key="Course128"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -415,6 +424,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       key="Course256"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",
@@ -448,6 +458,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       key="Group256"
       simplifiedControls={false}
+      singleCourseView={false}
       theme={
         Object {
           "titleColor": "#00AC18",

@@ -193,12 +193,13 @@ describe 'assignments' do
           expect(page_body.text).to include "Preview"
         end
 
-        it 'can be imported into concluded courses', custom_timeout: 30 do
+        it 'cant be imported into concluded courses', custom_timeout: 30 do
           import_content_share.click
           course_search_dropdown.click
           wait_for_ajaximations
 
-          expect(course_dropdown_list[0].text).to include 'Third Course3'
+          expect(course_dropdown_list[0].text).to include 'Second Course2'
+          expect(course_dropdown_list[0].text).not_to include 'Third Course3'
         end
 
         it 'can be imported into a course', custom_timeout: 30 do

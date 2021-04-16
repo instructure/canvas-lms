@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import Toolbar from 'jsx/files/Toolbar'
-import Folder from 'compiled/models/Folder'
-import File from 'compiled/models/File'
+import Toolbar from 'ui/features/files/react/components/Toolbar.js'
+import Folder from '@canvas/files/backbone/models/Folder'
+import File from '@canvas/files/backbone/models/File.coffee'
 
 let file = null
 let courseFolder = null

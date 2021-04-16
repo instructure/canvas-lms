@@ -17,13 +17,13 @@
  */
 
 import $ from 'jquery'
-import usersTemplate from 'jst/accounts/usersList'
-import CommMessageCollection from 'compiled/collections/CommMessageCollection'
-import AccountUserCollection from 'compiled/collections/AccountUserCollection'
-import UserDateRangeSearchFormView from 'compiled/views/accounts/admin_tools/UserDateRangeSearchFormView'
-import InputFilterView from 'compiled/views/InputFilterView'
-import PaginatedCollectionView from 'compiled/views/PaginatedCollectionView'
-import UserView from 'compiled/views/accounts/UserView'
+import usersTemplate from 'ui/features/account_admin_tools/jst/usersList.handlebars'
+import CommMessageCollection from 'ui/features/account_admin_tools/backbone/collections/CommMessageCollection.js'
+import AccountUserCollection from 'ui/features/account_admin_tools/backbone/collections/AccountUserCollection.js'
+import UserDateRangeSearchFormView from 'ui/features/account_admin_tools/backbone/views/UserDateRangeSearchFormView.js'
+import InputFilterView from 'backbone-input-filter-view'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import UserView from 'ui/features/account_admin_tools/backbone/views/UserView.coffee'
 
 QUnit.module('UserDateRangeSearchFormView', {
   setup() {

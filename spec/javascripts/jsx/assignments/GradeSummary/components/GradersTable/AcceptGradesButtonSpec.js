@@ -19,8 +19,8 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import AcceptGradesButton from 'jsx/assignments/GradeSummary/components/GradersTable/AcceptGradesButton'
-import {FAILURE, STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions'
+import AcceptGradesButton from 'ui/features/assignment_grade_summary/react/components/GradersTable/AcceptGradesButton.js'
+import {FAILURE, STARTED, SUCCESS} from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
 
 QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
   let props

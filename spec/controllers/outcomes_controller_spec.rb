@@ -420,6 +420,7 @@ describe OutcomesController do
       end
 
       it "should not return deleted results" do
+        skip('skip due to flakiness, resolve with OUT-4368')
         @outcome.learning_outcome_results.last.destroy
         user_session(@teacher)
         get 'outcome_result',

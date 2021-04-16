@@ -488,6 +488,15 @@ describe GroupCategory do
       # divides into 3 groups
       expect(@category.create_group_count).to eq 3
     end
+
+    it 'calculates correctly for same section groups' do
+      section1 = @course.course_sections.create!(name: 'one')
+      section2 = @course.course_sections.create!(name: 'two')
+      [section1, section2].each { |section| create_users_in_course(@course, 3, section: section) }
+      @category.create_group_member_count = 2
+      @category.calculate_group_count_by_membership(by_section: true)
+      expect(@category.create_group_count).to eq 4
+    end
   end
 
   context "#current_progress" do
@@ -524,9 +533,8 @@ describe GroupCategory do
 
   describe "randomly assigning by section" do
     context "group size distribution" do
-      def test_group_distribution(section_counts, group_count, create_group_member_count = nil)
-        gc = GroupCategory.create!(context: course_model, name: 'gc1') if create_group_member_count
-        calc = GroupCategory::GroupBySectionCalculator.new(gc, create_group_member_count)
+      def test_group_distribution(section_counts, group_count)
+        calc = GroupCategory::GroupBySectionCalculator.new(nil)
         mock_users_by_section = {}
         section_counts.each_with_index do |u_count, idx|
           mock_users_by_section[idx] = double(:count => u_count)
@@ -549,14 +557,12 @@ describe GroupCategory do
         expect(test_group_distribution([2, 3, 14, 11], 10)).to eq [[2], [3], [3, 3, 3, 3, 2], [4, 4, 3]]
       end
 
-      it "should work with sections and create_group_member_count" do
-        # can't keep things perfectly evenly distributed, but we can try our best
-        expect(test_group_distribution([2, 3, 14, 11], 0, 5)).to eq [[2], [3], [5, 5, 4], [4, 4, 3]]
+      it "should adjust based off of how many groups there are" do
+        expect(test_group_distribution([2, 3, 14, 11], 8)).to eq [[2], [3], [5, 5, 4], [4, 4, 3]]
       end
 
-      it "should work with empty sections and create_group_member_count" do
-        # can't keep things perfectly evenly distributed, but we can try our best
-        expect(test_group_distribution([2, 3, 14, 11, 0, 5], 0, 5)).to eq [[2], [3], [5, 5, 4], [4, 4, 3], [0], [5]]
+      it "should try to use max members when it can" do
+        expect(test_group_distribution([6, 10, 12], 10)).to eq [[3, 3], [3, 3, 2, 2], [3, 3, 3, 3]]
       end
 
       it "should not split up groups twice in a row" do

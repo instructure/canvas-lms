@@ -19,7 +19,13 @@
 import axios from 'axios'
 import moment from 'moment-timezone'
 import {select, call, put} from 'redux-saga/effects'
-import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from '../loading-actions'
+import {
+  gotItemsError,
+  sendBasicFetchRequest,
+  sendFetchRequest,
+  gotGradesSuccess,
+  gotGradesError
+} from '../loading-actions'
 import {addOpportunities, allOpportunitiesLoaded} from '..'
 import {
   loadAllOpportunitiesSaga,
@@ -46,6 +52,7 @@ function initialState(overrides = {}) {
   const thisWeekStart = moment.tz(TZ).startOf('week')
   return {
     loading: {seekingNewActivity: true},
+    courses: [],
     days: [],
     opportunities: [],
     timeZone: TZ,
@@ -250,7 +257,7 @@ describe('loadWeekSaga', () => {
         fromMoment: state.weeklyDashboard.weekStart,
         mode: 'week',
         extraParams: {
-          end_date: state.weeklyDashboard.weekEnd.format(),
+          end_date: state.weeklyDashboard.weekEnd.toISOString(),
           per_page: 100
         }
       })
@@ -265,22 +272,28 @@ describe('loadWeekSaga', () => {
 describe('loadAllOpportunitiesSaga', () => {
   it('passes page size param to API call', () => {
     const generator = loadAllOpportunitiesSaga()
-    expect(generator.next().value).toEqual(
-      call(axios.get, '/api/v1/users/self/missing_submissions', {
-        params: {include: ['planner_overrides'], filter: ['submittable'], per_page: 100}
+    generator.next() // select state
+    expect(generator.next(initialState()).value).toEqual(
+      call(sendBasicFetchRequest, '/api/v1/users/self/missing_submissions', {
+        course_ids: undefined,
+        include: ['planner_overrides'],
+        filter: ['submittable'],
+        per_page: 100
       })
     )
   })
 
   it('exhausts pagination', () => {
     const generator = loadAllOpportunitiesSaga()
-    generator.next()
+    generator.next() // start saga
+    generator.next(initialState()) // select state
+    // fetch opportunities
     expect(
       generator.next({
         headers: {link: '<some-url>; rel="next"'},
         data: []
       }).value
-    ).toEqual(call(axios.get, expect.anything(), expect.anything()))
+    ).toEqual(call(sendBasicFetchRequest, expect.anything(), expect.anything()))
     generator.next({headers: {}, data: []}) // add opportunities
     generator.next() // mark all opportunities as loaded
     expect(generator.next().done).toBe(true)
@@ -292,7 +305,9 @@ describe('loadAllOpportunitiesSaga', () => {
       {id: '5', name: 'Assignment 2'}
     ]
     const generator = loadAllOpportunitiesSaga()
-    generator.next()
+    generator.next() // start saga
+    generator.next(initialState()) // select state
+    // fetch opportunities
     const putResult = generator.next({
       data: mockOpps,
       headers: {}
@@ -304,11 +319,22 @@ describe('loadAllOpportunitiesSaga', () => {
     expect(generator.next().done).toBeTruthy()
   })
 
+  it('filters the requests to specific contexts if in singleCourse mode', () => {
+    const overrides = {courses: [{id: '3'}], singleCourse: true}
+    const generator = loadAllOpportunitiesSaga()
+    generator.next() // start saga
+    const callResult = generator.next(initialState(overrides)) // select state
+    expect(callResult.value.CALL.args[1]).toMatchObject({
+      course_ids: ['3']
+    })
+  })
+
   it('alerts if there is a loading error', () => {
     const alertSpy = jest.fn()
     initialize({visualErrorCallback: alertSpy})
     const generator = loadAllOpportunitiesSaga()
-    generator.next()
+    generator.next() // start saga
+    generator.next(initialState()) // select state
     generator.throw('some-error')
     expect(alertSpy).toHaveBeenCalled()
   })

@@ -18,8 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import GradePostingPolicyTabPanel from 'jsx/gradebook/default_gradebook/components/GradePostingPolicyTabPanel'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
+import GradePostingPolicyTabPanel from 'ui/features/gradebook/react/default_gradebook/components/GradePostingPolicyTabPanel.js'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
   let postPoliciesOnChangeStub

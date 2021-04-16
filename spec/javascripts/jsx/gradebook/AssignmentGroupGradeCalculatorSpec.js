@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import AssignmentGroupGradeCalculator from 'jsx/gradebook/AssignmentGroupGradeCalculator'
+import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 let submissions
 let assignments

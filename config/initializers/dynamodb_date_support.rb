@@ -22,9 +22,11 @@
 # so i'm going to do it like this :/
 module DynamoDBDateSupport
   def format(obj)
-    ActiveSupport::TimeWithZone === obj ?
-      {s: obj.iso8601} :
+    if obj.respond_to?(:iso8601)
+      {s: obj.iso8601}
+    else
       super(obj)
+    end
   end
 end
 

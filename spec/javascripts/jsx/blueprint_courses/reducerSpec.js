@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/blueprint_courses/actions'
-import reducer from 'jsx/blueprint_courses/reducer'
-import MigrationStates from 'jsx/blueprint_courses/migrationStates'
-import LoadStates from 'jsx/blueprint_courses/loadStates'
+import actions from '@canvas/blueprint-courses/react/actions'
+import reducer from '@canvas/blueprint-courses/react/reducer'
+import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
+import LoadStates from '@canvas/blueprint-courses/react/loadStates'
 import getSampleData from './getSampleData'
 
 QUnit.module('Blueprint Courses reducer')

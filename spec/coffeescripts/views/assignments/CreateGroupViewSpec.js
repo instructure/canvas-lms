@@ -17,12 +17,12 @@
  */
 
 import {isEmpty, keys} from 'lodash'
-import Backbone from 'Backbone'
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Assignment from 'compiled/models/Assignment'
-import Course from 'compiled/models/Course'
-import CreateGroupView from 'compiled/views/assignments/CreateGroupView'
+import Backbone from '@canvas/backbone'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Course from '@canvas/courses/backbone/models/Course.coffee'
+import CreateGroupView from 'ui/features/assignment_index/backbone/views/CreateGroupView.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

@@ -519,7 +519,7 @@ describe DiscussionTopicsController do
       course_topic(user: @teacher, with_assignment: true)
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
 
-      # this is essentially a unit test for app/coffeescripts/models/Entry.coffee,
+      # this is essentially a unit test for ui/features/discussion_topic/backbone/models/Entry.coffee,
       # making sure that we get back the expected format for this url template
       template = assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]
       url = template.gsub(/%3Astudent_id/, '123')
@@ -875,11 +875,11 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
-    it "js_bundles includes discussion_topics_edit_react when ff is on" do
+    it "js_bundles includes discussion_topic_edit_v2 when ff is on" do
       user_session(@teacher)
       @course.account.enable_feature!(:react_announcement_discussion_edit)
       get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_bundles].first).to include(:discussion_topics_edit_react)
+      expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
     end
   end
 

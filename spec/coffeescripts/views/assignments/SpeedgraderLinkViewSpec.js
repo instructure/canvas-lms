@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SpeedgraderLinkView from 'compiled/views/assignments/SpeedgraderLinkView'
-import Assignment from 'compiled/models/Assignment'
+import SpeedgraderLinkView from 'ui/features/assignment_show/backbone/views/SpeedgraderLinkView.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
 

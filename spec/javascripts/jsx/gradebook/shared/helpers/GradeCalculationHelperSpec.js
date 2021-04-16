@@ -22,7 +22,7 @@ import {
   sumBy,
   toNumber,
   weightedPercent,
-} from 'jsx/gradebook/shared/helpers/GradeCalculationHelper'
+} from '@canvas/grading/GradeCalculationHelper'
 
 QUnit.module('GradeCalculationHelper', () => {
   QUnit.module('.sum()', () => {

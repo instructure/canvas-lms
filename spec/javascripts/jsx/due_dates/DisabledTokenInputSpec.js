@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {scryRenderedDOMComponentsWithTag} from 'react-dom/test-utils'
-import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
+import DisabledTokenInput from '@canvas/due-dates/react/DisabledTokenInput'
 
 const wrapper = document.getElementById('fixtures')
 const tokens = ['John Smith', 'Section 2', 'Group 1']

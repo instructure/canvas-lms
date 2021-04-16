@@ -60,7 +60,7 @@ class AnnouncementsController < ApplicationController
         add_crumb(t(:announcements_crumb, "Announcements"))
         load_announcements
 
-        js_bundle :announcements_index_v2
+        js_bundle :announcements
         css_bundle :announcements_index
 
         set_tutorial_js_env

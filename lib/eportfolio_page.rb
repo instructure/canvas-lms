@@ -55,7 +55,7 @@ module EportfolioPage
     end
 
     js_env({ SKIP_ENHANCING_USER_CONTENT: true })
-    js_bundle :eportfolio, 'legacy/eportfolios_wizard_box'
+    js_bundle :eportfolio, :eportfolios_wizard_box
     css_bundle :tinymce
     @no_left_side_list_view = true
   end

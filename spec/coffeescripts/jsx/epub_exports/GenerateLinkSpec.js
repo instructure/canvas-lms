@@ -21,8 +21,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import GenerateLink from 'jsx/epub_exports/GenerateLink'
-import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
+import GenerateLink from 'ui/features/epub_exports/react/GenerateLink.js'
+import CourseEpubExportStore from 'ui/features/epub_exports/react/CourseStore.js'
 import I18n from 'i18n!epub_exports'
 
 QUnit.module('GenerateLink', {

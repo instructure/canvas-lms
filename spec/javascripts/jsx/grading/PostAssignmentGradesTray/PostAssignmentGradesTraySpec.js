@@ -20,9 +20,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {waitFor} from '@testing-library/react'
 
-import PostAssignmentGradesTray from 'jsx/grading/PostAssignmentGradesTray'
-import * as Api from 'jsx/grading/PostAssignmentGradesTray/Api'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
+import PostAssignmentGradesTray from '@canvas/post-assignment-grades-tray'
+import * as Api from '@canvas/post-assignment-grades-tray/react/Api'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('PostAssignmentGradesTray', suiteHooks => {
   let $container

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moment from 'moment-timezone'
-import {gotItemsSuccess, weekLoaded} from '../../actions/loading-actions'
+import {gotItemsSuccess, weekLoaded, jumpToWeek} from '../../actions/loading-actions'
 import daysReducer from '../days-reducer'
 
 describe('getting new items', () => {
@@ -156,7 +156,7 @@ describe('WEEK_LOADED', () => {
         '2021-03-16': [{id: '5'}, {id: '6'}]
       }
     ]
-    const weekLoadedAction = weekLoaded(weekData)
+    const weekLoadedAction = weekLoaded({weekDays: weekData})
     const newState = daysReducer(initialState, weekLoadedAction)
     expect(newState).toMatchObject(weekData)
   })
@@ -172,8 +172,8 @@ describe('JUMP_TO_WEEK', () => {
         '2021-03-16': [{id: '5'}, {id: '6'}]
       }
     ]
-    const weekLoadedAction = weekLoaded(weekData)
-    const newState = daysReducer(initialState, weekLoadedAction)
+    const jumpAction = jumpToWeek({weekDays: weekData})
+    const newState = daysReducer(initialState, jumpAction)
     expect(newState).toMatchObject(weekData)
   })
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SelectContentDialog from 'select_content_dialog'
+import SelectContentDialog from '@canvas/select-content-dialog'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 

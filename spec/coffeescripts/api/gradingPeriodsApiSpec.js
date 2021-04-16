@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
+import axios from '@canvas/axios'
 import fakeENV from 'helpers/fakeENV'
-import api from 'compiled/api/gradingPeriodsApi'
+import api from '@canvas/grading/jquery/gradingPeriodsApi'
 
 const deserializedPeriods = [
   {

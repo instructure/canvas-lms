@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import helpDialog from 'compiled/helpDialog'
+import helpDialog from '../../ui/boot/initializers/enableHelpDialog.js'
 import fakeENV from 'helpers/fakeENV'
-import 'vendor/jquery.ba-tinypubsub'
+import 'jquery-tinypubsub'
 
 // more tests are in spec/selenium/help_dialog_spec.rb
 

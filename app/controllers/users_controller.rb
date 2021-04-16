@@ -493,7 +493,8 @@ class UsersController < ApplicationController
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
       :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
-      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups)
+      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups),
+      :INITIAL_NUM_K5_CARDS => Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -537,6 +538,7 @@ class UsersController < ApplicationController
     else
       Rails.cache.write(['last_known_dashboard_cards_count', @current_user.global_id].cache_key, dashboard_courses.count)
     end
+    Rails.cache.write(['last_known_k5_cards_count', @current_user.global_id].cache_key, dashboard_courses.reject{|c| c[:isHomeroom]}.count)
     render json: dashboard_courses
   end
 
@@ -1018,6 +1020,10 @@ class UsersController < ApplicationController
   # @argument filter[] [String, "submittable"]
   #   "submittable":: Only return assignments that the current user can submit (i.e. filter out locked assignments)
   #
+  # @argument course_ids[] [String]
+  #   Optionally restricts the list of past-due assignments to only those associated with the specified
+  #   course IDs.
+  #
   # @returns [Assignment]
   def missing_submissions
     GuardRail.activate(:secondary) do
@@ -1030,6 +1036,9 @@ class UsersController < ApplicationController
       only_submittable = filter.include?('submittable')
 
       course_ids = user.participating_student_course_ids
+      included_course_ids = Array(params[:course_ids])
+      course_ids = course_ids.select{ |id| included_course_ids.include?(id.to_s) } unless included_course_ids.empty?
+
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         subs = Submission.active.preload(:assignment).
           missing.

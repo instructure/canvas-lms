@@ -19,9 +19,9 @@
 import React from 'react'
 import $ from 'jquery'
 import {mount} from 'enzyme'
-import GradingPeriodForm from 'jsx/grading/GradingPeriodForm'
+import GradingPeriodForm from 'ui/features/account_grading_standards/react/GradingPeriodForm.js'
 import chicago from 'timezone/America/Chicago'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('GradingPeriodForm', suiteHooks => {

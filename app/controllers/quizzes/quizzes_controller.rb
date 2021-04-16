@@ -367,7 +367,7 @@ class Quizzes::QuizzesController < ApplicationController
       conditional_release_js_env(@quiz.assignment)
       set_master_course_js_env_data(@quiz, @context)
 
-      js_bundle :quizzes_bundle
+      js_bundle :quizzes
       css_bundle :quizzes, :tinymce, :conditional_release_editor
       render :new, stream: can_stream_template?
     end

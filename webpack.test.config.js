@@ -25,7 +25,7 @@ const webpack = require('webpack')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
-const CONTEXT_EMBER_GRADEBOOK_SPEC = 'app/coffeescripts/ember'
+const CONTEXT_EMBER_GRADEBOOK_SPEC = 'ui/features/screenreader_gradebook/ember'
 const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
 
 const RESOURCE_COFFEESCRIPT_SPEC = /Spec$/
@@ -52,6 +52,8 @@ testWebpackConfig.plugins.push(
 testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   JSPEC_PATH: null,
   JSPEC_GROUP: null,
+  JSPEC_RECURSE: '1',
+  JSPEC_VERBOSE: '0',
   A11Y_REPORT: false,
   SENTRY_DSN: null,
   GIT_COMMIT: null
@@ -203,9 +205,7 @@ if (process.env.SENTRY_DSN) {
   testWebpackConfig.plugins.push(new SentryCliPlugin({
     release: process.env.GIT_COMMIT,
     include: [
-      path.resolve(__dirname, 'public/javascripts'),
-      path.resolve(__dirname, 'app/jsx'),
-      path.resolve(__dirname, 'app/coffeescripts'),
+      path.resolve(__dirname, 'ui'),
       path.resolve(__dirname, 'spec/javascripts/jsx'),
       path.resolve(__dirname, 'spec/coffeescripts')
     ],
@@ -220,7 +220,10 @@ testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(__d
 testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(__dirname, CONTEXT_COFFEESCRIPT_SPEC)
 testWebpackConfig.resolve.alias[CONTEXT_JSX_SPEC] = path.resolve(__dirname, CONTEXT_JSX_SPEC)
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
+testWebpackConfig.resolve.alias['ui/features'] = path.resolve(__dirname, 'ui/features')
+testWebpackConfig.resolve.alias['ui/ext'] = path.resolve(__dirname, 'ui/ext')
 testWebpackConfig.resolve.extensions.push('.coffee')
+testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.mode = 'development'
 testWebpackConfig.module.rules.unshift({
   test: [

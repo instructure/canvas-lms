@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Calendar from 'compiled/calendar/Calendar'
-import CalendarEvent from 'compiled/calendar/CommonEvent.CalendarEvent'
+import Calendar from 'ui/features/calendar/jquery/index.js'
+import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
 import I18n from 'i18n!calendar'
-import fcUtil from 'compiled/util/fcUtil'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import moment from 'moment'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
-import {subscribe} from 'vendor/jquery.ba-tinypubsub'
+import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Calendar', {

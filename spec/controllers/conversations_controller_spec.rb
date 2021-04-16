@@ -628,6 +628,15 @@ describe ConversationsController do
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
+
+    it "should refrain from duplicating the RCE-created media_comment" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @student.media_objects.where(media_id: 'm-whatever', media_type: 'video/mp4').first_or_create!
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world", media_comment_id: 'm-whatever', media_comment_type: 'video' }
+      expect(response).to be_successful
+      expect(@student.media_objects.by_media_id('m-whatever').count).to eq 1
+    end
   end
 
   describe "POST 'add_recipients'" do

@@ -40,7 +40,7 @@ module CustomWaitMethods
   def wait_for_ajax_requests
     result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
-      // see code in app/jsx/appBootstrap.js for where
+      // see code in ui/boot/index.js for where
       // __CANVAS_IN_FLIGHT_XHR_REQUESTS__ and 'canvasXHRComplete' come from
       if (typeof window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__  === 'undefined') {
         callback(-1);

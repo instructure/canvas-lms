@@ -17,7 +17,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SelectMenu from 'jsx/grade_summary/SelectMenu'
+import SelectMenu from 'ui/features/grade_summary/react/SelectMenu.js'
 import {
   makeSelection,
   selectedValue,

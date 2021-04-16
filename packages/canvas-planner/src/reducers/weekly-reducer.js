@@ -30,21 +30,22 @@ export default handleActions(
     },
     INITIAL_OPTIONS: (state, action) => {
       const env = action.payload.env
+      state = null
       if (env.K5_MODE) {
         const thisWeekStart = moment.tz(env.TIMEZONE).startOf('week')
-        return {
+        state = {
           weekStart: thisWeekStart,
           weekEnd: moment.tz(env.TIMEZONE).endOf('week'),
           thisWeek: thisWeekStart,
           weeks: {}
         }
       }
-      return null
+      return state
     },
     WEEK_LOADED: (state, action) => {
       const newState = {...state}
       newState.weeks = {...state.weeks}
-      newState.weeks[state.weekStart.format()] = action.payload
+      newState.weeks[state.weekStart.format()] = action.payload.weekDays
       return newState
     },
     GOT_WAY_PAST_ITEM_DATE: (state, action) => {

@@ -58,8 +58,8 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("outcomesCount")).to be_a Integer
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
     expect(outcome_group_type.resolve("canEdit")).to eq true
-    expect(outcome_group_type.resolve("childGroups { nodes { _id } }")).
-      to match_array([@child_group.id.to_s, @child_group3.id.to_s])
+    expect(outcome_group_type.resolve("childGroups { nodes { _id } }"))
+      .to match_array([@child_group.id.to_s, @child_group3.id.to_s])
   end
 
   it "gets outcomes ordered by title" do
@@ -74,6 +74,31 @@ describe Types::LearningOutcomeGroupType do
     ])
   end
 
+  it "returns isImported for a given context" do
+    course = Course.create!
+    root_group = course.root_outcome_group
+
+    query = <<~GQL
+      outcomes() {
+        nodes {
+          ... on LearningOutcome {
+            isImported(targetContextType: "Course", targetContextId: #{course.id})
+          }
+        }
+      }
+    GQL
+
+    expect(outcome_group_type.resolve(query)).to match_array([
+      false, false
+    ])
+
+    root_group.add_outcome(@outcome2)
+
+    expect(outcome_group_type.resolve(query)).to match_array([
+      true, false
+    ])
+  end
+
   context "when doesn't have edit permission" do
     before(:once) do
       RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", :override => false)
@@ -81,6 +106,12 @@ describe Types::LearningOutcomeGroupType do
 
     it "returns false for canEdit" do
       expect(outcome_group_type.resolve("canEdit")).to eq false
+    end
+
+    it "returns false for canUnlink on the outcome edge" do
+      expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+        false, false
+      ])
     end
   end
 
@@ -130,6 +161,64 @@ describe Types::LearningOutcomeGroupType do
 
     it "accepts search_query in outcomes_count" do
       expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 1
+    end
+  end
+
+  describe "content tag links" do
+    it "canUnlink returns false if there are outcome alignments" do
+      @rubric = Rubric.new(context: Account.default)
+      @rubric.data = [
+        {
+          points: 3,
+          description: "Rubric with outcome",
+          id: 1,
+          data: [],
+          learning_outcome_id: @outcome1.id
+        }
+      ]
+      @rubric.save!
+      expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+        true, false
+      ])
+    end
+  end
+
+  describe "global outcomes" do
+    before do
+      @global_group = LearningOutcomeGroup.find_or_create_root(nil, true)
+      outcome_model(outcome_group: @global_group)
+    end
+
+    let(:outcome_group_type) { GraphQLTypeTester.new(@global_group, current_user: @user) }
+
+    describe "without manage_global_outcomes permission" do
+      before do
+        account_admin_user_with_role_changes(
+          account: Account.site_admin,
+          role_changes: {manage_global_outcomes: false}
+        )
+      end
+
+      it "canUnlink returns false" do
+        expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+          false
+        ])
+      end
+    end
+
+    describe "with manage_global_outcomes permission" do
+      before do
+        account_admin_user_with_role_changes(
+          account: Account.site_admin,
+          role_changes: {manage_global_outcomes: true}
+        )
+      end
+
+      it "canUnlink returns true" do
+        expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
+          true
+        ])
+      end
     end
   end
 end

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FeatureFlagView from 'compiled/views/feature_flags/FeatureFlagView'
-import FeatureFlag from 'compiled/models/FeatureFlag'
+import FeatureFlagView from '@canvas/feature-flag-admin-view/backbone/views/FeatureFlagView'
+import FeatureFlag from '@canvas/feature-flag-admin-view/backbone/models/FeatureFlag.coffee'
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'

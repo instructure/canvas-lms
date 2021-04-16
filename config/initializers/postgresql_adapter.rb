@@ -289,7 +289,7 @@ module PostgreSQLAdapterExtensions
       raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
                                  "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
     elsif matching_indexes.none?
-      return if options[:if_exists]
+      return if options.is_a?(Hash) && options[:if_exists]
       raise ArgumentError, "No indexes found on #{table_name} with the options provided."
     else
       matching_indexes.first.name
@@ -502,6 +502,38 @@ module PostgreSQLAdapterExtensions
     else
       select_value("SELECT pg_current_xlog_location()")
     end
+  end
+
+  def set_replica_identity(table, identity)
+    identity_clause = case identity
+                      when :default, :full, :nothing
+                        identity.to_s.upcase
+                      else
+                        "USING INDEX #{quote_column_name(identity)}"
+                      end
+    execute("ALTER TABLE #{quote_table_name(table)} REPLICA IDENTITY #{identity_clause}")
+  end
+
+  class AbortExceptionMatcher
+    def self.===(other)
+      return true if defined?(IRB::Abort) && other.is_a?(IRB::Abort)
+
+      false
+    end
+  end
+
+  def execute(*)
+    super
+  rescue AbortExceptionMatcher
+    @connection.cancel
+    raise
+  end
+
+  def exec_query(*)
+    super
+  rescue AbortExceptionMatcher
+    @connection.cancel
+    raise
   end
 end
 

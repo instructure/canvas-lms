@@ -904,8 +904,8 @@ class GradebooksController < ApplicationController
           outcome_proficiency: outcome_proficiency, # for outcome-based rubrics
           group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
-          show_help_menu_item: show_help_link?,
-          help_url: help_link_url,
+          show_help_menu_item: true,
+          help_url: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader",
           update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string

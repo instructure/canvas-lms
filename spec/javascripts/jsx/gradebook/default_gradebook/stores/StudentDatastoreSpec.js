@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import StudentDatastore from 'jsx/gradebook/default_gradebook/stores/StudentDatastore'
+import StudentDatastore from 'ui/features/gradebook/react/default_gradebook/stores/StudentDatastore.js'
 
 QUnit.module('StudentDatastore', hooks => {
   let studentDatastore

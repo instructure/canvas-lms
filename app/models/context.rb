@@ -255,7 +255,8 @@ module Context
 
   def self.find_asset_by_url(url)
     object = nil
-    params = Rails.application.routes.recognize_path(url)
+    uri = URI.parse(url)
+    params = Rails.application.routes.recognize_path(uri.path)
     course = Course.find(params[:course_id]) if params[:course_id]
     group = Group.find(params[:group_id]) if params[:group_id]
     user = User.find(params[:user_id]) if params[:user_id]
@@ -270,8 +271,7 @@ module Context
       rel_path = params[:file_path]
       object = rel_path && Folder.find_attachment_in_context_with_path(course, CGI.unescape(rel_path))
       file_id = params[:file_id] || params[:id]
-      query = URI.parse(url)&.query
-      file_id ||= query && CGI.parse(URI.parse(url)&.query)&.send(:[], "preview")&.first
+      file_id ||= uri.query && CGI.parse(uri.query).send(:[], "preview")&.first
       object ||= context.attachments.find_by_id(file_id) # attachments.find_by_id uses the replacement hackery
     when 'wiki_pages'
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
@@ -280,7 +280,7 @@ module Context
       end
     when 'external_tools'
       if params[:action] == "retrieve"
-        tool_url = CGI.parse(URI.parse(url).query)["url"].first rescue nil
+        tool_url = CGI.parse(uri.query)["url"].first rescue nil
         object = ContextExternalTool.find_external_tool(tool_url, context) if tool_url
       elsif params[:id]
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)

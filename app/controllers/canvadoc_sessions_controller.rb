@@ -111,7 +111,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:audit_url] = submission_docviewer_audit_events_url(submission_id) if assignment.auditable?
         opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
 
-        # "annotation_context" should be present only when the assignment is an Annotated Document.
+        # "annotation_context" should be present only when the assignment is a student annotation.
         if blob["annotation_context"].present?
           opts[:annotation_context] = blob["annotation_context"]
           annotation_context = submission.canvadocs_annotation_contexts.find_by(launch_id: opts[:annotation_context])

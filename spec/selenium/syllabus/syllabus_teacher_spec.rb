@@ -103,4 +103,60 @@ describe "course syllabus" do
       expect(page_main_content).not_to contain_css(syllabus_container_css)
     end
   end
+
+  context 'mini calendar' do
+    before :each do
+      course_with_teacher_logged_in(active_all: true)
+    end
+
+    it 'starts the week on sunday' do
+      skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+      skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+      @user.locale = 'en-US'
+      @user.save!
+
+      # travel to April 5, 2021 4:30
+      time = Time.zone.local(2021,4,5,4,30)
+      Timecop.travel(time) do
+        visit_syllabus_page(@course.id)
+
+        # first day on the calendar should be Sunday March 28
+        expect(mini_calendar_first_day_of_month_number.text).to eq '28'
+        expect(mini_calendar_first_day_of_month_label.text).to eq '28 March 2021'
+
+        # click to next month (May)
+        mini_calendar_next_month_button.click
+        wait_for_animations
+
+        # first day on the calendar should be Sunday April 25
+        expect(mini_calendar_first_day_of_month_number.text).to eq '25'
+        expect(mini_calendar_first_day_of_month_label.text).to eq '25 April 2021'
+      end
+    end
+
+    it 'starts the week on monday' do
+      skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+      skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+      @user.locale = 'en-GB'
+      @user.save!
+
+      # travel to April 5, 2021 4:30
+      time = Time.zone.local(2021,4,5,4,30)
+      Timecop.travel(time) do
+        visit_syllabus_page(@course.id)
+
+        # first day on the calendar should be Monday March 29
+        expect(mini_calendar_first_day_of_month_number.text).to eq '29'
+        expect(mini_calendar_first_day_of_month_label.text).to eq '29 March 2021'
+
+        # click to next month (May)
+        mini_calendar_next_month_button.click
+        wait_for_animations
+
+        # first day on the calendar should be Monday April 26
+        expect(mini_calendar_first_day_of_month_number.text).to eq '26'
+        expect(mini_calendar_first_day_of_month_label.text).to eq '26 April 2021'
+      end
+    end
+  end
 end

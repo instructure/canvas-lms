@@ -22,8 +22,8 @@ import {
   SUCCESS,
   addStudents,
   setLoadStudentsStatus
-} from 'jsx/assignments/GradeSummary/students/StudentActions'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+} from 'ui/features/assignment_grade_summary/react/students/StudentActions.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 QUnit.module('GradeSummary studentsReducer()', suiteHooks => {
   let store

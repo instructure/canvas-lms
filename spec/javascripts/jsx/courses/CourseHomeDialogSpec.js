@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import createStore from 'jsx/shared/helpers/createStore'
-import CourseHomeDialog from 'jsx/courses/CourseHomeDialog'
+import createStore from '@canvas/util/createStore'
+import CourseHomeDialog from '@canvas/course-homepage/react/Dialog'
 
 const xhrs = []
 let fakeXhr

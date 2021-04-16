@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import StudentContextTray from 'jsx/context_cards/StudentContextTray'
+import StudentContextTray from '@canvas/context-cards/react/StudentContextTray'
 
 QUnit.module('StudentContextTray', hooks => {
   let tray

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as GradingSchemeHelper from 'jsx/gradebook/GradingSchemeHelper'
+import * as GradingSchemeHelper from '@canvas/grading/GradingSchemeHelper'
 
 QUnit.module('GradingSchemeHelper', () => {
   QUnit.module('.gradeToScoreUpperBound()', hooks => {

@@ -21,7 +21,7 @@ import {mount, shallow} from 'enzyme'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
-import {SearchResultsComponent} from 'jsx/gradebook-history/SearchResults'
+import {SearchResultsComponent} from 'ui/features/gradebook_history/react/SearchResults.js'
 
 function defaultHistoryItems() {
   return [

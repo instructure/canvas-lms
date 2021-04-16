@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import FileNotFound from 'jsx/shared/FileNotFound'
+import FileNotFound from 'ui/features/file_not_found/react/FileNotFound.js'
 
 QUnit.module('FileNotFoundSpec', {
   setup() {

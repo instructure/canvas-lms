@@ -58,7 +58,7 @@ module LearningOutcomeContext
         end
       end
 
-      return nil
+      nil
     end
 
     def available_outcomes
@@ -80,6 +80,7 @@ module LearningOutcomeContext
     def update_root_outcome_group_name
       root = root_outcome_group(false)
       return unless root
+
       self.class.connection.after_transaction_commit do
         root.update! title: self.name
       end

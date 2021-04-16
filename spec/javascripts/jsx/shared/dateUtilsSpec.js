@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isPassedDelayedPostAt} from 'jsx/shared/date-utils'
+import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import moment from 'moment'
 
 QUnit.module('Util helpers for shared dates')

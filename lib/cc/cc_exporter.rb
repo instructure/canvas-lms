@@ -111,10 +111,10 @@ module CC
         @logger.error $!
         return false
       ensure
-        @zip_file.close if @zip_file
-        if !@migration_config[:keep_after_complete]
-          @export_dirs.each do |export_dir|
-            FileUtils::rm_rf(export_dir) if File.directory?(export_dir)
+        @zip_file&.close
+        unless @migration_config[:keep_after_complete]
+          @export_dirs&.each do |export_dir|
+            FileUtils.rm_rf(export_dir) if File.directory?(export_dir)
           end
         end
       end
@@ -179,17 +179,15 @@ module CC
       Dir["#{@export_dir}/**/**"].each do |file|
         file_path = file.sub(@export_dir+'/', '')
         next if file_path.starts_with? ZIP_DIR
+
         @zip_file.add(file_path, file)
       end
     end
 
     def create_export_dir
-      slug = "common_cartridge_#{@course.id}_user_#{@user.id}"
-      if @migration_config[:data_folder]
-        folder = @migration_config[:data_folder]
-      else
-        folder = Dir.tmpdir
-      end
+      slug = +"common_cartridge_#{@course.id}"
+      slug << "_user_#{@user.id}" if @user
+      folder = @migration_config[:data_folder] || Dir.tmpdir
 
       @export_dir = File.join(folder, slug)
       i = 1
@@ -198,7 +196,7 @@ module CC
         @export_dir = File.join(folder, "#{slug}_attempt_#{i}")
       end
 
-      FileUtils::mkdir_p @export_dir
+      FileUtils.mkdir_p @export_dir
       @export_dir
     end
 

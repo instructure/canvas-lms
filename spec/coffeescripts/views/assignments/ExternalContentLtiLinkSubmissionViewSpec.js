@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import ExternalContentLtiLinkSubmissionView from 'compiled/views/assignments/ExternalContentLtiLinkSubmissionView'
+import Backbone from '@canvas/backbone'
+import ExternalContentLtiLinkSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentLtiLinkSubmissionView.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 

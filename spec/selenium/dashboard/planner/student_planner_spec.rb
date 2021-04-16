@@ -447,6 +447,7 @@ describe "student planner" do
     end
 
     it "closes the opportunities dropdown.", priority: "1", test_id: 3281711 do
+      skip("Flaky: skip for now LS-2135 to fix")
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown

@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import WikiPageRevision from 'compiled/models/WikiPageRevision'
-import WikiPageRevisionsCollection from 'compiled/collections/WikiPageRevisionsCollection'
-import WikiPageRevisionView from 'compiled/views/wiki/WikiPageRevisionView'
+import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
+import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection.js'
+import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView.js'
 
 QUnit.module('WikiPageRevisionView')
 

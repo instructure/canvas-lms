@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
+import TextAreaInput from 'ui/features/external_apps/react/components/TextAreaInput.js'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')

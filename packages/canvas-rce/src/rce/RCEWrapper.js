@@ -47,6 +47,8 @@ import {
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 
+import getCookie from 'get-cookie'
+
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
 
@@ -824,6 +826,7 @@ class RCEWrapper extends React.Component {
     if (tinyapp) {
       tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
       tinyapp.setAttribute('role', 'document')
+      tinyapp.setAttribute('tabIndex', '-1')
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'

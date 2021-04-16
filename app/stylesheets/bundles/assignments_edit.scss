@@ -99,7 +99,7 @@ div.form-column-right, div.overrides-column-right {
     border-color: #ccc;
     padding: 15px 0px;
     margin-top: 20px;
-    select, .subtitle {
+    select, input[type=text], .subtitle {
       margin-#{direction(left)}: 15px;
     }
   }
@@ -217,6 +217,13 @@ div.form-column-right, div.overrides-column-right {
   }
   #assignment_points_possible[readonly] { // points possible
     margin-top: -3px;   // because it sits too low
+  }
+  #assignment_annotated_document_info {
+    color: $ic-hint-text;
+    margin-inline-start: 42px;
+    margin-inline-end: 8px;
+    margin-block-end: 8px;
+    @include fontSize(14px);
   }
 }
 
@@ -366,5 +373,30 @@ div.form-column-right, div.overrides-column-right {
   }
   h3 {
     font-size: 1.1rem;
+  }
+}
+
+.UsageRightsSelectBox__container.edit-view {
+  .control-group {
+    margin-bottom: 0;
+
+    .controls {
+      margin-#{direction(left)}: auto;
+
+    }
+
+    label.control-label {
+      padding: direction-sides(10px 0px 10px 0px);
+      margin-#{direction(left)}: 15px;
+      text-align: #{direction(left)};
+      margin-bottom: 0;
+      font-weight: bold;
+      width: auto;
+      float: initial;
+    }
+
+    label.control-label:hover {
+      background: none;
+    }
   }
 }

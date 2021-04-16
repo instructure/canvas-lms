@@ -1,0 +1,37 @@
+<div class="message-students-dialog form-dialog-content">
+  <div class="message-recipients-group-container">
+    <label for="message-recipients-group">
+     {{#t}}Recipients:{{/t}}
+    </label>
+
+    {{#ifEqual recipientGroups.length 1}}
+      {{recipientGroups.0.name}}
+      <input type="hidden" name="recipientGroupName" value="{{recipientGroups.0.name}}" />
+    {{else}}
+      <select name="recipientGroupName" id="message-recipients-group">
+        {{#each recipientGroups}}
+          <option value="{{name}}">{{name}}</option>
+        {{/each}}
+      </select>
+    {{/ifEqual}}
+  </div>
+
+  <div id="message-recipients">
+    {{> ui/shared/message-students-dialog/jst/_messageStudentsWhoRecipientList.handlebars this}}
+  </div>
+
+  <textarea name=body></textarea>
+
+</div>
+<div class="form-controls">
+  <button class="btn dialog_closer btn-secondary" type="button"
+    data-text-while-loading='{{#t}}Sending...{{/t}}'>
+    {{#t}}Cancel{{/t}}
+  </button>
+  <button class="btn btn-primary"
+    data-text-while-loading='{{#t}}Sending...{{/t}}'
+    data-text-when-loaded='{{#t}}Sent!{{/t}}'>
+    {{#t}}Send Message{{/t}}
+  </button>
+
+</div>

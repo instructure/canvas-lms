@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Subject from 'compiled/quizzes/log_auditing/event_trackers/page_blurred'
-import K from 'compiled/quizzes/log_auditing/constants'
+import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/page_blurred'
+import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
 
 QUnit.module('Quizzes::LogAuditing::EventTrackers::PageBlurred')
@@ -28,27 +28,30 @@ test('#constructor: it sets up the proper context', () => {
   equal(tracker.priority, K.EVT_PRIORITY_LOW)
 })
 
-test('capturing: it works', () => {
+test('capturing: it works', assert => {
+  const done = assert.async()
   const tracker = new Subject()
   const capture = sinon.stub()
   tracker.install(capture)
   $(window).blur()
-  ok(capture.called, 'it captures page blur')
+  setTimeout(() => {
+    ok(capture.called, 'it captures page blur')
+    done()
+  })
 })
 
 test('capturing: it doesnt send events if in iframe (for RCE focusing)', () => {
   const tracker = new Subject()
   const capture = sinon.stub()
   tracker.install(capture)
-  const iframe = $('<iframe>')
-    .appendTo('body')
-    .focus()
+  const iframe = $('<iframe>').appendTo('body').focus()
   $(window).blur()
   ok(capture.notCalled, 'it does not mark iframe focus as page blur')
   return iframe.remove()
 })
 
-test('capturing: it throttles captures', () => {
+test('capturing: it throttles captures', assert => {
+  const done = assert.async()
   const capture = sinon.spy()
   const tracker = new Subject()
   tracker.install(capture)
@@ -57,5 +60,8 @@ test('capturing: it throttles captures', () => {
   $(window).blur()
   $(window).focus()
   $(window).blur()
-  equal(capture.callCount, 1, 'it ignores rapidly repetitive blurs')
+  setTimeout(() => {
+    equal(capture.callCount, 1, 'it ignores rapidly repetitive blurs')
+    done()
+  })
 })

@@ -19,7 +19,7 @@
 import React from 'react'
 import {shallow, mount} from 'enzyme'
 
-import IndexHeader from 'jsx/announcements/components/IndexHeader'
+import IndexHeader from 'ui/features/announcements/react/components/IndexHeader.js'
 
 function makeProps() {
   return {

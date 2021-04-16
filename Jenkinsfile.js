@@ -50,14 +50,10 @@ def makeKarmaStage(group, ciNode, ciTotal) {
 
 def cleanupFn() {
   timeout(time: 2) {
-    try {
-      if(env.TEST_SUITE != 'upload') {
-        archiveArtifacts artifacts: 'tmp/**/*.xml'
-        junit "tmp/**/*.xml"
-        sh 'find ./tmp -path "*.xml"'
-      }
-    } finally {
-      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+    if(env.TEST_SUITE != 'upload') {
+      archiveArtifacts artifacts: 'tmp/**/*.xml'
+      junit "tmp/**/*.xml"
+      sh 'find ./tmp -path "*.xml"'
     }
   }
 }
@@ -90,9 +86,8 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { cleanupFn() }) {
+          extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
             stage('Setup') {
-              cleanAndSetup()
               timeout(time: 3) {
                 sh 'rm -vrf ./tmp/*'
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
@@ -105,7 +100,13 @@ pipeline {
               }
             }
 
-            stage('Run Tests') {
+            def postBuildHandler = [
+              onStageEnded: { _ ->
+                cleanupFn()
+              }
+            ]
+
+            extendedStage('Run Tests').hooks(postBuildHandler).obeysAllowStages(false).execute {
               timeout(time: 10) {
                 script {
                   def tests = [:]

@@ -154,7 +154,7 @@ class SubmissionsController < SubmissionsBaseController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
-  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"]
+  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"|"student_annotation"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
@@ -196,6 +196,12 @@ class SubmissionsController < SubmissionsBaseController
   #
   # @argument submission[user_id] [Integer]
   #   Submit on behalf of the given user. Requires grading permission.
+  #
+  # @argument submission[annotatable_attachment_id] [Integer]
+  #   The Attachment ID of the document being annotated. This should match
+  #   the annotatable_attachment_id on the assignment.
+  #
+  #   Requires a submission_type of "student_annotation".
   #
   # @argument submission[submitted_at] [DateTime]
   #   Choose the time the submission is listed as submitted at.  Requires grading permission.
@@ -248,8 +254,8 @@ class SubmissionsController < SubmissionsBaseController
       elsif is_media_recording? && !has_media_recording?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-      elsif params[:submission][:submission_type] == 'annotated_document' && params[:submission][:annotated_document_id].blank?
-        flash[:error] = t("Annotated Document submissions require an annotated_document_id to submit")
+      elsif params[:submission][:submission_type] == 'student_annotation' && params[:submission][:annotatable_attachment_id].blank?
+        flash[:error] = t("Student Annotation submissions require an annotatable_attachment_id to submit")
         return redirect_to(course_assignment_url(@context, @assignment))
       end
     end
@@ -261,7 +267,7 @@ class SubmissionsController < SubmissionsBaseController
     submission_params = params[:submission].permit(
       :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
-      :resource_link_lookup_uuid, :annotated_document_id, attachment_ids: []
+      :resource_link_lookup_uuid, :annotatable_attachment_id, attachment_ids: []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)

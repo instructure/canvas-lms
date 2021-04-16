@@ -2079,7 +2079,8 @@ class CoursesController < ApplicationController
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
                    is_student: @context.user_is_student?(@current_user),
-                   is_instructor: @context.user_is_instructor?(@current_user)
+                   is_instructor: @context.user_is_instructor?(@current_user),
+                   course_overview: @context&.wiki&.front_page&.body
                  }
                })
 
@@ -2130,7 +2131,7 @@ class CoursesController < ApplicationController
           ).to_a
           @syllabus_body = syllabus_user_content
         when 'k5_dashboard'
-          # don't do any of this stuff for now
+          load_modules # hidden until the modules tab of the k5 course is active
         when 'announcements'
           add_crumb(t('Announcements'))
           set_active_tab 'announcements'
@@ -2176,18 +2177,20 @@ class CoursesController < ApplicationController
           js_bundle :syllabus
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
+          js_env(PERMISSIONS: { manage: @context.grants_right?(@current_user, session, :manage) })
           js_env(STUDENT_PLANNER_ENABLED: planner_enabled?)
+          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
 
-          js_bundle :k5_course
-          css_bundle :k5_dashboard
+          js_bundle :k5_course, :context_modules
+          css_bundle :k5_dashboard, :content_next, :context_modules2
         when 'announcements'
-          js_bundle :announcements_index_v2
+          js_bundle :announcements
           css_bundle :announcements_index
         else
           js_bundle :dashboard
         end
 
-        js_bundle :course, 'legacy/courses_show'
+        js_bundle :course, :course_show
         css_bundle :course_show
 
         if @context_enrollment
@@ -2219,7 +2222,7 @@ class CoursesController < ApplicationController
         send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@current_user, @domain_root_account)
       }
     )
-    js_bundle :course_notification_settings_show
+    js_bundle :course_notification_settings
     render html: '', layout: true
   end
 
@@ -2450,20 +2453,24 @@ class CoursesController < ApplicationController
       @course.start_at = DateTime.parse(params[:course][:start_at]).utc rescue nil
       @course.conclude_at = DateTime.parse(params[:course][:conclude_at]).utc rescue nil
       @course.workflow_state = 'claimed'
-      @course.save!
+
+      Course.suspend_callbacks(:copy_from_course_template) do
+        @course.save!
+      end
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
       @content_migration = @course.content_migrations.build(
         :user => @current_user, :source_course => @context,
         :context => @course, :migration_type => 'course_copy_importer',
-        :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual)
+        :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual
+      )
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.migration_settings[:import_quizzes_next] = true if params.dig(:settings, :import_quizzes_next)
       @content_migration.workflow_state = 'created'
       if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = '1'
       end
-      @content_migration.set_date_shift_options(params[:date_shift_options].to_unsafe_h)
+      @content_migration.set_date_shift_options(params[:date_shift_options].to_unsafe_h) if params[:date_shift_options]
 
       if Canvas::Plugin.value_to_boolean(params[:selective_import])
         @content_migration.migration_settings[:import_immediately] = false

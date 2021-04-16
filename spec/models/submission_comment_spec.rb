@@ -570,7 +570,7 @@ This text has a http://www.google.com link in it...
         let(:course) { Course.create! }
         let(:assignment) { course.assignments.create!(title: "hi") }
         let(:ta) { course.enroll_ta(User.create!, active_all: true).user }
-        let(:student) { course.enroll_student(User.create!, active_all: true).user }
+        let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
         let(:submission) { assignment.submission_for_student(student) }
         let(:comment) do
           assignment.update_submission(student, commenter: student, comment: 'ok')
@@ -584,6 +584,18 @@ This text has a http://www.google.com link in it...
         it "submitter comments can be read by an instructor who cannot manage assignments but can view the submitter's grades" do
           RoleOverride.create!(context: course.account, permission: :manage_assignments, role: ta_role, enabled: false)
           expect(comment.grants_right?(ta, :read)).to be true
+        end
+
+        it "does not allow author to be read if current_user is not present" do
+          expect(comment.grants_right?(nil, :read_author)).to be false
+        end
+
+        describe "anonymous assignments" do
+          let(:assignment) { course.assignments.create!(title: "hi", anonymous_grading: true) }
+
+          it "allows students to read the author of their own comments" do
+            expect(comment.grants_right?(student, :read_author)).to be true
+          end
         end
       end
     end

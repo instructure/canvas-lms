@@ -21,16 +21,16 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
 
-import SpeedGrader from 'speed_grader'
-import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
-import SpeedGraderHelpers from 'speed_grader_helpers'
-import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache'
+import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader.js'
+import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts.js'
+import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
+import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache.js'
 import fakeENV from 'helpers/fakeENV'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
-import userSettings from 'compiled/userSettings'
-import htmlEscape from 'str/htmlEscape'
+import numberHelper from '@canvas/i18n/numberHelper'
+import userSettings from '@canvas/user-settings'
+import htmlEscape from 'html-escape'
 
-import 'jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 const {unescape} = htmlEscape
 
@@ -381,6 +381,24 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.currentStudent.submission = {workflow_state: 'unsubmitted'}
       SpeedGrader.EG.showSubmissionDetails()
       strictEqual($('#submission_details').is(':visible'), false)
+    })
+
+    test('shows submission details if submission in submission history and missing', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{submission: {missing: true}}]
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#submission_details').is(':visible'), true)
+    })
+
+    test('shows submission details if submission is missing', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{missing: true}]
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#submission_details').is(':visible'), true)
     })
   })
 
@@ -5736,6 +5754,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             {user_id: '40', anonymous_id: 'vvvvv', score: 20, workflow_state: 'graded'}
           ]
         }
+
         setupFixtures(`
         <div id="combo_box_container"></div>
       `)
@@ -5856,6 +5875,20 @@ QUnit.module('SpeedGrader', rootHooks => {
           queryParamsStub.returns({anonymous_id: 'vvvvv'})
           SpeedGrader.EG.setInitiallyLoadedStudent()
           strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'zzzzz')
+        })
+      })
+
+      QUnit.module('when moderated grading is active', moderatedHooks => {
+        moderatedHooks.beforeEach(() => {
+          window.jsonData.moderated_grading = true
+          SpeedGrader.EG.jsonReady()
+        })
+        moderatedHooks.afterEach(() => {
+          delete window.jsonData.moderated_grading
+        })
+        test('defaults to the first ungraded student', () => {
+          SpeedGrader.EG.setInitiallyLoadedStudent()
+          strictEqual(SpeedGrader.EG.currentStudent.id, '20')
         })
       })
     })

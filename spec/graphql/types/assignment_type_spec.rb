@@ -106,6 +106,22 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("rubric { _id }")).to eq @rubric.id.to_s
   end
 
+  describe "rubric association" do
+    before(:each) do
+      rubric_for_course
+      rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')
+    end
+
+    it "is returned if an association exists and is active" do
+      expect(assignment_type.resolve("rubricAssociation { _id }")).to eq @rubric_association.id.to_s
+    end
+
+    it "is not returned if the association is soft-deleted" do
+      @rubric_association.destroy!
+      expect(assignment_type.resolve("rubricAssociation { _id }")).to eq nil
+    end
+  end
+
   it "works with moderated grading" do
     assignment.moderated_grading = true
     assignment.grader_count = 1
