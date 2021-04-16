@@ -45,7 +45,7 @@ describe MicrosoftSync::SyncerSteps do
     expect(result.job_state_data).to eq(job_state_data)
   end
 
-  def expect_retry(result, error_class:, delay_amount: nil, job_state_data: nil)
+  def expect_retry(result, error_class:, delay_amount: nil, job_state_data: nil, step: nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::Retry)
     expect(result.error.class).to eq(error_class)
     expect(result.delay_amount).to eq(delay_amount)
@@ -54,6 +54,10 @@ describe MicrosoftSync::SyncerSteps do
       expect(delay.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
     end
     expect(result.job_state_data).to eq(job_state_data)
+    expect(result.step).to eq(step)
+    if step
+      expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+    end
   end
 
   def new_http_error(code)
@@ -375,17 +379,19 @@ describe MicrosoftSync::SyncerSteps do
 
     let(:diff) { double('MembershipDiff') }
 
-    before { group.update!(ms_group_id: 'mygroup') }
+    before do
+      group.update!(ms_group_id: 'mygroup')
 
-    it 'adds/removes users based on the diff' do
-      expect(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
-      expect(diff).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
-      expect(diff).to \
+      allow(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
+      allow(diff).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
+      allow(diff).to \
         receive(:additions_in_slices_of).
         with(MicrosoftSync::GraphService::GROUP_USERS_ADD_BATCH_SIZE).
         and_yield(owners: %w[o3], members: %w[o1 o2]).
         and_yield(members: %w[o3])
+    end
 
+    it 'adds/removes users based on the diff' do
       expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm1')
       expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm2')
       expect(graph_service).to receive(:remove_group_owner).once.with('mygroup', 'o1')
@@ -395,6 +401,16 @@ describe MicrosoftSync::SyncerSteps do
         receive(:add_users_to_group).with('mygroup', members: %w[o3])
 
       expect_next_step(subject, :step_check_team_exists)
+    end
+
+    context 'on 404' do
+      it 'goes back to step_generate_diff with a delay' do
+        expect(graph_service).to receive(:add_users_to_group).and_raise(new_http_error(404))
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100], step: :step_generate_diff
+        )
+      end
     end
   end
 
