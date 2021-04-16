@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
 
+  include ManyRootAccounts
   include TurnitinID
   include Pronouns
 
@@ -441,12 +442,6 @@ class User < ActiveRecord::Base
 
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
-  end
-
-  def global_root_account_ids
-    root_account_ids&.map do |id|
-      Shard.global_id_for(id, self.shard)
-    end
   end
 
   # Update the root_account_ids column on the user

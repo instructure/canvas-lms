@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,19 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::UpdateOutcomeProficiency < Mutations::OutcomeProficiencyBase
-  graphql_name "UpdateOutcomeProficiency"
-
-  # input arguments
-  argument :id, ID, required: true
-  argument :proficiency_ratings, [Mutations::OutcomeProficiencyRatingCreate], required: false
-
-  def resolve(input:)
-    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeProficiency")
-    record = OutcomeProficiency.find_by(id: record_id)
-    raise GraphQL::ExecutionError, "Unable to find OutcomeProficiency" if record.nil?
-
-    check_permission(record.context)
-    upsert(input, existing_record: record)
+module ManyRootAccounts
+  def global_root_account_ids
+    root_account_ids&.map do |id|
+      Shard.global_id_for(id, self.shard)
+    end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,19 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::UpdateOutcomeProficiency < Mutations::OutcomeProficiencyBase
-  graphql_name "UpdateOutcomeProficiency"
+module GraphQLHelpers::ContextFetcher
+  def context_fetcher(input, valid_context_types=[])
+    if valid_context_types.exclude?(input[:context_type])
+      raise GraphQL::ExecutionError, I18n.t("invalid context type")
+    end
 
-  # input arguments
-  argument :id, ID, required: true
-  argument :proficiency_ratings, [Mutations::OutcomeProficiencyRatingCreate], required: false
+    context =
+      begin
+        context_type = Object.const_get(input[:context_type])
+        context_type.find_by(id: input[:context_id])
+      rescue
+        raise GraphQL::ExecutionError, I18n.t("invalid context type")
+      end
+    raise GraphQL::ExecutionError, I18n.t("context not found") if context.nil?
 
-  def resolve(input:)
-    record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeProficiency")
-    record = OutcomeProficiency.find_by(id: record_id)
-    raise GraphQL::ExecutionError, "Unable to find OutcomeProficiency" if record.nil?
-
-    check_permission(record.context)
-    upsert(input, existing_record: record)
+    context
   end
 end
