@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.MOD
  *
  * This file is part of Canvas.
  *

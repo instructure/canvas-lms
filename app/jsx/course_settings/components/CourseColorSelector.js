@@ -115,7 +115,11 @@ function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}) {
   )
 }
 
-const validateColorString = color => {
+const validateColorString = (oldColor, color) => {
+  // Allow the auto-populated pound sign to be deleted
+  if (oldColor.length === 1 && !color) {
+    return ''
+  }
   const newColor = color
     .replace(/#/g, '')
     .replace(/[^\da-fA-F]/g, '')
@@ -143,7 +147,7 @@ export default function CourseColorSelector({courseColor = ''}) {
         }
         name="course[course_color]"
         value={color}
-        onChange={(_, newColor) => setColor(validateColorString(newColor))}
+        onChange={(_, newColor) => setColor(validateColorString(color, newColor))}
         display="inline-block"
         width="10rem"
         shouldNotWrap
