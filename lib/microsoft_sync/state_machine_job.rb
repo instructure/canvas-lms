@@ -126,13 +126,16 @@ module MicrosoftSync
     # job_state, you can pass in a block, which will run only if the max number
     # of retries has not been exceeded.
     #
+    # To retry starting at a different step, you can also pass in "step".
+    #
     class Retry
-      attr_reader :error, :delay_amount, :job_state_data, :stash_block
-      def initialize(error:, delay_amount: nil, job_state_data: nil, &stash_block)
+      attr_reader :error, :delay_amount, :job_state_data, :step, :stash_block
+      def initialize(error:, delay_amount: nil, job_state_data: nil, step: nil, &stash_block)
         @error = error
         @delay_amount = delay_amount
         @job_state_data = job_state_data
         @stash_block = stash_block
+        @step = step
       end
     end
 
@@ -281,6 +284,8 @@ module MicrosoftSync
     # Otherwise sets the job_state to keep track of (step, data, retries) and
     # kicks off a retry
     def handle_retry(retry_object, current_step, synchronous)
+      current_step = retry_object.step if retry_object.step
+
       job_state = job_state_record.reload.job_state
 
       retries_by_step = job_state&.dig(:retries_by_step) || {}

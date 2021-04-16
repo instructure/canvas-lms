@@ -170,6 +170,8 @@ module MicrosoftSync
       end
 
       StateMachineJob::NextStep.new(:step_check_team_exists)
+    rescue Errors::HTTPNotFound => e
+      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100], step: :step_generate_diff)
     end
 
     def step_check_team_exists(_mem_data, _job_state_data)

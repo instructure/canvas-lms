@@ -265,6 +265,53 @@ module MicrosoftSync
             end
           end
         end
+
+        context 'when Retry points to a different step' do
+          let(:steps_object) { StateMachineJobTestSteps2.new(4) }
+
+          context 'when the number of retries has not surpassed max_retries for the destination step' do
+            before do
+              allow(steps_object).to receive(:step_first).and_return(
+                described_class::Retry.new(
+                  error: StandardError.new, step: :step_second, delay_amount: 123
+                )
+              )
+              subject.send(:run, nil)
+            end
+
+            it 'enqueues a job starting at that step' do
+              expect(steps_object.steps_run).to eq([
+                [:delay_run, [{run_at: 123.seconds.from_now, strand: strand}], [:step_second]],
+              ])
+            end
+
+            it 'sets step in job' do
+              expect(state_record.reload.job_state).to include(step: :step_second)
+            end
+
+            it 'keeps track of retries under that step' do
+              expect(state_record.reload.job_state).to include(retries_by_step: {'step_second' => 1})
+            end
+          end
+
+          context 'when the number of retries has surpassed max_retries for the destination step' do
+            before do
+              subject.send(:run, nil)
+              4.times { subject.send(:run, :step_first) }
+              # now, retries are exhausted for step_first
+              allow(steps_object).to receive(:step_second).and_return(
+                described_class::Retry.new(
+                  error: StandardError.new('foo'), step: :step_first, delay_amount: 123
+                )
+              )
+            end
+
+            it 'bubbles up the retry' do
+              expect { subject.send(:run, :step_second) }.to raise_error(StandardError, 'foo')
+              expect(state_record.reload.workflow_state).to eq('errored')
+            end
+          end
+        end
       end
 
       context 'when the step returns a DelayedNextStep' do
