@@ -126,8 +126,8 @@ module MicrosoftSync
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
         course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
       ) do |user_ids|
-        users_and_upns = CommunicationChannel.
-          where(user_id: user_ids, path_type: 'email').pluck(:user_id, :path)
+        users_upns_finder = MicrosoftSync::UsersUpnsFinder.new(user_ids, group.root_account)
+        users_and_upns = users_upns_finder.call
 
         users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
           upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
