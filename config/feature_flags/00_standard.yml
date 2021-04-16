@@ -214,8 +214,8 @@ disable_keyboard_shortcuts:
   state: hidden
   display_name: Disable Keyboard Shortcuts
   description: |-
-      Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
-      will have an improved experience with these shortcuts turned off.
+    Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
+    will have an improved experience with these shortcuts turned off.
   applies_to: User
   autoexpand: true
 include_byte_order_mark_in_gradebook_exports:
@@ -423,3 +423,11 @@ new_course_availability_ui:
   applies_to: RootAccount
   display_name: New Course Availability UI
   description: Refreshes the section of the UI on the course settings page controlling course availability options.
+strip_origin_from_quiz_answer_file_references:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: 'Classic Quizzes: Strip origin from Canvas file URLs in answers'
+  description: |-
+    This was already happening for images in the question, but not answers
+    causing CORS failures when a quiz is created in one domain and
+    taken in another (like a vanity domain).
