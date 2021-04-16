@@ -110,10 +110,12 @@ module MicrosoftSync
       StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100], job_state_data: group_id)
     end
 
-    # Gets users enrolled in course, get UPNs (e.g. email addresses) for them,
-    # looks up the AADs from Microsoft, and writes the User->AAD mapping into
-    # the UserMapping table.  If a user doesn't have a UPN or Microsoft doesn't
-    # have an AAD for them, skips that user.
+    # Gets users enrolled in course, get UPNs ("userPrincipalName"s, e.g. email
+    # addresses, username) for them, looks up the AADs (Azure Active Directory
+    # object IDs -- Microsoft's internal ID for the user) from Microsoft, and
+    # writes the User->AAD mapping into the UserMapping table.  If a user
+    # doesn't have a UPN or Microsoft doesn't have an AAD for them, skips that
+    # user.
     def step_ensure_enrollments_user_mappings_filled(_mem_data, _job_state_data)
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
         course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
