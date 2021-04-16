@@ -28,5 +28,8 @@
 # this gem and you don't think you need pulsar, then you should actually
 # be running `bundle install --without pulsar` to just skip it.
 group :pulsar do
-  gem "pulsar-client", "2.6.1.pre.beta.2"
+  # TODO: this dependency is blocking the build because
+  # the bundle caching process can't seem to find it.
+  # unblock the build for now.
+  # gem "pulsar-client", "2.6.1.pre.beta.2"
 end
