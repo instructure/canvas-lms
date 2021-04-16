@@ -23,8 +23,15 @@ require_dependency 'microsoft_sync'
 #
 # See MicrosoftSync::Group for more info on Microsoft sync. This model is
 # essentially a cache between a Canvas user, and their Microsoft AAD object ID
-# (internal Microsoft user ID) which is used in all of Microsoft's APIs, so we
-# don't have to look it up every time we use Microsoft's APIs.
+# (internal Microsoft user ID, also called just an "AAD" in this code) which is
+# used in all of Microsoft's APIs, so we don't have to look it up every time we
+# use Microsoft's APIs.
+#
+# Typically, a user's AAD is looked up by asking Microsoft for the AAD for a given
+# "UPN" (see SyncerSteps#ensure_enrollments_user_mappings_filled). A UPN, or
+# "userPrincipalName", is a field Microsoft has on their users that corresponds
+# to a Canvas user's email address, username, or other field, as chosen by the
+# admin (see microsoft_sync_login_attribute in the root account settings)
 #
 class MicrosoftSync::UserMapping < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
