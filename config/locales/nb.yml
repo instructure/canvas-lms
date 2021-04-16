@@ -3141,7 +3141,7 @@ nb:
       gpa_scale: "Tallkarakter (GPA)-skala"
       letter_grade: Bokstavkarakter
       not_graded: "Ikke karaktersatt"
-      pass_fail: "Fullført/Ikke fullført"
+      pass_fail: "Godkjent/Ikke godkjent"
       percent: Prosent
       points: Poeng
     titles: 
@@ -8912,7 +8912,7 @@ nb:
   display_filter_options_34fb6be2: "Vis filteralternativer"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
       Vis karakteren som
-            poeng, prosent, fullført/ikke fullført eller andre metoder som passer
+            poeng, prosent, godkjent/ikke godkjent eller andre metoder som passer
             ditt emnets vurderingsskala, og filtrer oppføringer og sett opp Karakteroversikt
             i samsvar med dine preferanser. Legg automatisk til en karakter for manglende eller
             for sent innleverte oppgaver til du er klar for at studenten
