@@ -58,6 +58,14 @@ describe('CourseColorSelector', () => {
     expect(textBox.value).toBe('#159Aeb')
   })
 
+  it('allows the leading pound sign to be deleted', () => {
+    const {getByLabelText} = render(<CourseColorSelector />)
+    const textBox = getByLabelText('Set course color to a custom hexadecimal code')
+
+    userEvent.type(textBox, 'abc{backspace}{backspace}{backspace}{backspace}')
+    expect(textBox.value).toBe('')
+  })
+
   describe('ColorOptions', () => {
     it('renders a set of buttons for preset colors', () => {
       const {getAllByRole} = render(<CourseColorSelector />)
