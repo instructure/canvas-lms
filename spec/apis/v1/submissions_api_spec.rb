@@ -4300,6 +4300,13 @@ describe 'Submissions API', type: :request do
         expect(json['body']).to eq @submission.body
       end
 
+      it "creates a student annotation submission" do
+        a1 = attachment_model(:context => @course)
+        @assignment.update(submission_types: 'student_annotation', annotatable_attachment_id: a1.id)
+        json = api_call(:post, @url, @args, { :submission => { submission_type: "student_annotation", annotatable_attachment_id: a1.id } }, {}, expected_status: 201)
+        expect(json['workflow_state']).to eq 'submitted'
+      end
+
       it "processs html content in body" do
         @assignment.update(:submission_types => 'online_text_entry')
         should_process_incoming_user_content(@course) do |content|
