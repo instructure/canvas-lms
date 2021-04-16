@@ -2828,9 +2828,13 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params[:course][:course_color]
-        if valid_hexcode?(params[:course][:course_color])
-          @course.course_color = normalize_hexcode(params[:course][:course_color])
+      color = params[:course][:course_color]
+      if color
+        if color.strip.empty? || color.length == 1
+          @course.course_color = nil
+          params_for_update.delete :course_color
+        elsif valid_hexcode?(color)
+          @course.course_color = normalize_hexcode(color)
           params_for_update.delete :course_color
         else
           @course.errors.add(:course_color, t("Invalid hexcode provided"))
