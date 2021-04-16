@@ -786,6 +786,42 @@ describe Canvadocs do
             end
           end
 
+          context 'when a peer reviewer is viewing' do
+            let(:peer_reviewer) { course.enroll_student(User.create!(name: "Percy the Peer Reviewer")).user }
+            let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer"} }
+            let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: "Sev the Student"} }
+
+            before(:each) do
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+
+              @current_user = peer_reviewer
+            end
+
+            it 'sets the user_filter to themself and the submission user if submission is posted' do
+              expect(user_filter).to eq [peer_reviewer_real_data, student_real_data]
+            end
+
+            it 'sets restrict_annotations_to_user_filter to true if submission is posted' do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it 'sets the user_filter to themself and the submission user if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(user_filter).to eq [peer_reviewer_real_data, student_real_data]
+            end
+
+            it 'sets restrict_annotations_to_user_filter to true if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+          end
+
           context 'when an instructor is viewing' do
             before(:each) do
               @current_user = teacher
