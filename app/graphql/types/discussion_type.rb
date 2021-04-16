@@ -43,6 +43,7 @@ module Types
 
     global_id_field :id
     field :title, String, null: true
+    field :message, String, null: true
     field :delayed_post_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
     field :locked, Boolean, null: false

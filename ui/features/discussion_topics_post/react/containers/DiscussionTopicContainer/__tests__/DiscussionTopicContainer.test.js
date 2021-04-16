@@ -37,6 +37,8 @@ const discussionTopicMock = {
     message: '<p> This is the Discussion Topic. </p>',
     postedAt: '2021-04-05T13:40:50Z',
     subscribed: true,
+    published: true,
+    canUnpublish: true,
     entryCounts: {
       repliesCount: 24,
       unreadCount: 4
@@ -46,7 +48,8 @@ const discussionTopicMock = {
       pointsPossible: 5
     },
     permissions: {
-      readAsAdmin: true
+      readAsAdmin: true,
+      update: true
     }
   }
 }
@@ -68,7 +71,8 @@ const discussionTopicMockOptional = {
       unreadCount: 0
     },
     permissions: {
-      readAsAdmin: false
+      readAsAdmin: true,
+      update: true
     }
   }
 }
@@ -101,10 +105,20 @@ describe('DiscussionTopicContainer', () => {
       </ApolloProvider>
     )
   }
+  it('publish button is readonly if canUnpublish is false', async () => {
+    const {getByText} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, canUnpublish: false}
+    })
+
+    expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
+  })
 
   it('renders without optional props', async () => {
-    const container = setup(discussionTopicMockOptional)
-    expect(await container.queryByTestId('replies-counter')).toBeNull()
+    const container = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, assignment: {}}
+    })
+    expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
+
     expect(await container.queryByTestId('graded-discussion-info')).toBeNull()
     expect(await container.queryByTestId('discussion-topic-reply')).toBeNull()
   })

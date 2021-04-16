@@ -25,7 +25,7 @@ import {mswClient} from '../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../shared/msw/mswServer'
 import React from 'react'
 
-describe('DiscussionFullPage', () => {
+describe('DiscussionsFullPage', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
     // eslint-disable-next-line no-undef
@@ -99,6 +99,38 @@ describe('DiscussionFullPage', () => {
       fireEvent.click(actionsButton)
       fireEvent.click(container.getByTestId('markAsRead'))
       await waitFor(() => expect(container.queryByTestId('is-unread')).not.toBeInTheDocument())
+    })
+  })
+
+  describe('discussion topic', () => {
+    it('should render', async () => {
+      const container = setup()
+
+      await waitFor(() => expect(container.getAllByText('Matthew Lemon')).toBeTruthy())
+      expect(await container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+    })
+
+    it('toggles a topics subscribed state when subscribed is clicked', async () => {
+      const container = setup()
+      await waitFor(() =>
+        expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      )
+      const actionsButton = container.getByText('Subscribed')
+      fireEvent.click(actionsButton)
+      expect(await container.findByText('Unsubscribed')).toBeInTheDocument()
+      fireEvent.click(actionsButton)
+      expect(await container.findByText('Subscribed')).toBeInTheDocument()
+    })
+
+    it('renders a readonly publish button if canUnpublish is false', async () => {
+      const container = setup()
+      await waitFor(() =>
+        expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      )
+      expect(await container.findByText('Published')).toBeInTheDocument()
+      expect(
+        await container.getByText('Published').closest('button').hasAttribute('disabled')
+      ).toBeTruthy()
     })
   })
 })

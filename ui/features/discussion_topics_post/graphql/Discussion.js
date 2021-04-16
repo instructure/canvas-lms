@@ -29,6 +29,7 @@ export const Discussion = {
       id
       _id
       title
+      message
       createdAt
       updatedAt
       postedAt
@@ -40,6 +41,7 @@ export const Discussion = {
       delayedPostAt
       subscribed
       published
+      canUnpublish
       entryCounts {
         unreadCount
         repliesCount
@@ -70,6 +72,7 @@ export const Discussion = {
     id: string,
     _id: string,
     title: string,
+    message: string,
     createdAt: string,
     updatedAt: string,
     postedAt: string,
@@ -81,6 +84,7 @@ export const Discussion = {
     delayedPostAt: string,
     subscribed: bool,
     published: bool,
+    canUnpublish: bool,
     entryCounts: {
       unreadCount: number,
       repliesCount: number

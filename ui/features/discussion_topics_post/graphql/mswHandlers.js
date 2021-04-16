@@ -132,6 +132,7 @@ export const handlers = [
             _id: '1',
             __typename: 'User'
           },
+          canUnpublish: false,
           courseSections: [],
           createdAt: '2020-11-23T11:40:44-07:00',
           delayedPostAt: null,
@@ -166,6 +167,7 @@ export const handlers = [
           },
           postedAt: '2020-11-23T11:40:44-07:00',
           published: true,
+          subscribed: true,
           requireInitialPost: false,
           rootDiscussionEntriesConnection: {
             nodes: [
@@ -220,8 +222,8 @@ export const handlers = [
             },
             __typename: 'DiscussionEntryConnection'
           },
-          subscribed: true,
           title: 'Cookie Cat',
+          message: 'This is a Discussion Topic Message',
           updatedAt: '2021-04-13T17:49:23-06:00',
           _id: '1',
           __typename: 'Discussion'
@@ -304,6 +306,34 @@ export const handlers = [
           },
           errors: null,
           __typename: 'DeleteDiscussionEntryPayload'
+        }
+      })
+    )
+  }),
+  graphql.mutation('updateDiscussionTopic', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        updateDiscussionTopic: {
+          discussionTopic: {
+            id: 'RGlzY3Vzc2lvbi0x',
+            published: req.body.variables.published,
+            __typename: 'Discussion'
+          },
+          __typename: 'UpdateDiscussionTopicPayload'
+        }
+      })
+    )
+  }),
+  graphql.mutation('subscribeToDiscussionTopic', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        subscribeToDiscussionTopic: {
+          discussionTopic: {
+            id: 'RGlzY3Vzc2lvbi0x',
+            subscribed: req.body.variables.subscribed,
+            __typename: 'Discussion'
+          },
+          __typename: 'SubscribeToDiscussionTopicPayload'
         }
       })
     )

@@ -49,6 +49,19 @@ describe('ToggleButton', () => {
     })
   })
 
+  describe('interaction', () => {
+    it('renders as readonly', () => {
+      const {queryByText, queryByTestId} = setup({interaction: 'readonly'})
+      expect(queryByTestId('enabled-icon').closest('button').hasAttribute('disabled')).toBeTruthy()
+      expect(queryByTestId('enabled-icon')).toBeTruthy()
+      expect(queryByTestId('disabled-icon')).toBeFalsy()
+      expect(queryByText('enabled tooltip')).toBeTruthy()
+      expect(queryByText('disabled tooltip')).toBeFalsy()
+      expect(queryByText('enabled label')).toBeTruthy()
+      expect(queryByText('disabled label')).toBeFalsy()
+    })
+  })
+
   describe('disabled', () => {
     it('renders as disabled', () => {
       const {queryByText, queryByTestId} = setup({isEnabled: false})

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Alert} from '../../components/Alert/Alert'
 import {Button} from '@instructure/ui-buttons'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
@@ -27,7 +28,9 @@ import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import {PUBLISH_DISCUSSION_TOPIC, SUBSCRIBE_TO_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
+import React, {useContext, useState} from 'react'
+import {useMutation} from 'react-apollo'
 
 const dateOptions = {
   month: 'short',
@@ -43,18 +46,24 @@ export const DiscussionTopicContainer = props => {
   const discussionTopicData = {
     authorName: props.discussionTopic?.author?.name || '',
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
-    title: props.discussionTopic?.title || '',
+    can_unpublish: props.discussionTopic.canUnpublish || false,
+    _id: props.discussionTopic._id,
+    isGraded: !!props.discussionTopic?.assignment && !!props.discussionTopic.assignment.dueAt,
+    message: props.discussionTopic.message || '',
+    permissions: {
+      update: props.discussionTopic.permissions.update
+    },
     postedAt: props.discussionTopic?.postedAt
       ? Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
           new Date(props.discussionTopic?.postedAt)
         )
       : '',
-    subscribed: props.discussionTopic?.subscribed || false,
     published: props.discussionTopic?.published || false,
+    readAsAdmin: !!props.discussionTopic?.permissions?.readAsAdmin,
     replies: props.discussionTopic?.entryCounts?.repliesCount || 0,
-    unread: props.discussionTopic?.entryCounts?.unreadCount || 0,
-    isGraded: !!props.discussionTopic?.assignment && !!props.discussionTopic.assignment.dueAt,
-    readAsAdmin: !!props.discussionTopic?.permissions?.readAsAdmin
+    subscribed: props.discussionTopic?.subscribed || false,
+    title: props.discussionTopic?.title || '',
+    unread: props.discussionTopic?.entryCounts?.unreadCount || 0
   }
 
   if (discussionTopicData.isGraded) {
@@ -106,6 +115,60 @@ export const DiscussionTopicContainer = props => {
     }
   }
 
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
+  const [publishDiscussionTopic] = useMutation(PUBLISH_DISCUSSION_TOPIC, {
+    onCompleted: data => {
+      if (!data.updateDiscussionTopic.errors) {
+        setOnSuccess(
+          data.updateDiscussionTopic.discussionTopic.published
+            ? I18n.t('You have successfully published the discussion topic.')
+            : I18n.t('You have successfully unpublished the discussion topic.')
+        )
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
+    }
+  })
+
+  const onPublish = () => {
+    publishDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        published: !discussionTopicData.published
+      }
+    })
+  }
+
+  const [subscribeToDiscussionTopic] = useMutation(SUBSCRIBE_TO_DISCUSSION_TOPIC, {
+    onCompleted: data => {
+      if (!data.subscribeToDiscussionTopic.errors) {
+        setOnSuccess(
+          data.subscribeToDiscussionTopic.discussionTopic.subscribed
+            ? I18n.t('You have successfully subscribed to the discussion topic.')
+            : I18n.t('You have successfully unsubscribed from the discussion topic.')
+        )
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
+    }
+  })
+
+  const onSubscribe = () => {
+    subscribeToDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        subscribed: !discussionTopicData.subscribed
+      }
+    })
+  }
+
   return (
     <>
       <Flex as="div" direction="column">
@@ -144,7 +207,7 @@ export const DiscussionTopicContainer = props => {
                   avatarUrl={discussionTopicData.avatarUrl}
                   pillText={I18n.t('Author')}
                   timingDisplay={discussionTopicData.postedAt}
-                  message={discussionTopicData.title}
+                  message={discussionTopicData.message}
                 >
                   {props.onReply && (
                     <Button
@@ -178,9 +241,14 @@ export const DiscussionTopicContainer = props => {
                       : null
                   }
                   onEdit={discussionTopicData.readAsAdmin ? () => {} : null}
-                  onTogglePublish={discussionTopicData.readAsAdmin ? () => {} : null}
-                  onToggleSubscription={() => {}}
+                  onTogglePublish={
+                    discussionTopicData.permissions.update && discussionTopicData.readAsAdmin
+                      ? onPublish
+                      : null
+                  }
+                  onToggleSubscription={onSubscribe}
                   isPublished={discussionTopicData.published}
+                  canUnpublish={discussionTopicData.can_unpublish}
                   isSubscribed={discussionTopicData.subscribed}
                   commentsEnabled
                 />

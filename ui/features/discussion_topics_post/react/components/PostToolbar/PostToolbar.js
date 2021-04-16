@@ -64,6 +64,7 @@ export function PostToolbar({...props}) {
           enabledScreenReaderLabel={I18n.t('Published')}
           disabledScreenReaderLabel={I18n.t('Unpublished')}
           onClick={props.onTogglePublish}
+          interaction={props.canUnpublish ? 'enabled' : 'readonly'}
         />
       )}
       {props.onToggleSubscription && (
@@ -199,6 +200,10 @@ const renderMenuItem = ({selectionCallback, icon, label, key}) => {
 }
 
 PostToolbar.propTypes = {
+  /**
+   * Indicates whether a post can be unpublished.
+   */
+  canUnpublish: PropTypes.bool,
   /**
    * Behavior for marking the thread as read
    */
