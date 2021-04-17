@@ -357,6 +357,7 @@ class DiscussionTopicsController < ApplicationController
     if @context.is_a?(Group) || request.format.json?
       @topics = Api.paginate(scope, self, topic_pagination_url)
       if params[:exclude_context_module_locked_topics]
+        ActiveRecord::Associations::Preloader.new.preload(@topics, context_module_tags: :context_module)
         @topics = DiscussionTopic.reject_context_module_locked_topics(@topics, @current_user)
       end
 
@@ -376,6 +377,7 @@ class DiscussionTopicsController < ApplicationController
                   named_context_url(@context, :context_discussion_topics_url))
 
         if @context.is_a?(Group)
+          ActiveRecord::Associations::Preloader.new.preload(@topics, context_module_tags: :context_module)
           locked_topics, open_topics = @topics.partition do |topic|
             locked = topic.locked? || topic.locked_for?(@current_user)
             locked.is_a?(Hash) ? locked[:can_view] : locked

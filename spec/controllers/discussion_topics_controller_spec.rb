@@ -700,6 +700,17 @@ describe DiscussionTopicsController do
         expect(response.location).to include "/groups/#{@group1.id}/discussion_topics/#{@topic.child_topic_for(@student).id}?"
         expect(response.location).to include "module_item_id=789"
       end
+
+      it "should exclude locked modules" do
+        user_session(@student)
+        course_topic(skip_set_user: true)
+        mod = @course.context_modules.create! name: 'no soup for you', unlock_at: 1.year.from_now
+        mod.add_item(type: 'discussion_topic', id: @topic.id)
+        mod.save!
+        expect(@topic.read_state(@student)).to eq 'unread'
+        get 'index', params: { course_id: @course.id, exclude_context_module_locked_topics: true}, format: 'json'
+        expect(response.parsed_body.map{ |t| t['id'] }).to_not include @topic.id
+      end
     end
 
     context 'publishing' do
