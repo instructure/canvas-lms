@@ -109,8 +109,9 @@ function confirm_command {
 }
 
 function docker_compose_up {
-  message "Starting docker containers..."
+  start_spinner "Starting docker containers..."
   _canvas_lms_track_with_log docker-compose up -d web
+  stop_spinner
 }
 
 function check_dependencies {
