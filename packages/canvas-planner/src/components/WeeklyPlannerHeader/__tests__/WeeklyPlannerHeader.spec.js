@@ -64,7 +64,7 @@ describe('WeeklyPlannerHeader', () => {
   it('renders the component', () => {
     const {getByLabelText, getByText} = render(<WeeklyPlannerHeader {...defaultProps()} />)
     expect(getByText('View previous week')).toBeInTheDocument()
-    expect(getByText('Today')).toBeInTheDocument()
+    expect(getByText('Jump to Today')).toBeInTheDocument()
     expect(getByText('View next week')).toBeInTheDocument()
     expect(getByLabelText('Weekly schedule navigation')).toBeInTheDocument()
   })

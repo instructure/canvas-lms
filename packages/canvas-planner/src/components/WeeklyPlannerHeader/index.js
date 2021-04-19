@@ -22,6 +22,7 @@ import {momentObj} from 'react-moment-proptypes'
 import {connect} from 'react-redux'
 import keycode from 'keycode'
 import qs from 'qs'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {themeable} from '@instructure/ui-themeable'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
@@ -290,7 +291,9 @@ export class WeeklyPlannerHeader extends Component {
             ref={this.todayButtonRef}
             tabIndex={this.getButtonTabIndex('today')}
           >
-            {formatMessage('Today')}
+            <AccessibleContent alt={formatMessage('Jump to Today')}>
+              {formatMessage('Today')}
+            </AccessibleContent>
           </Button>
           <IconButton
             id={nextButtonId}
