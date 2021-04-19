@@ -5570,6 +5570,35 @@ describe Submission do
     end
   end
 
+  describe "#comments_excluding_drafts_for" do
+    before(:each) do
+      @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
+      ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
+      student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
+      assignment = @course.assignments.create!(name: "plain assignment")
+      assignment.ensure_post_policy(post_manually: true)
+      @submission = assignment.submissions.find_by(user: student)
+      @student_comment = @submission.add_comment(author: student, comment: "Student comment")
+      @teacher_comment = @submission.add_comment(author: @teacher, comment: "Teacher comment", draft_comment: true)
+      @ta_comment = @submission.add_comment(author: ta, comment: "Ta comment")
+    end
+
+    it "returns non-draft comments, filtering out draft comments" do
+      comments = @submission.comments_excluding_drafts_for(@teacher)
+      expect(comments).to include @student_comment, @ta_comment
+      expect(comments).not_to include @teacher_comment
+    end
+
+    context "when comments are preloaded" do
+      it "returns non-draft comments, filtering out draft comments" do
+        preloaded_submission = Submission.where(id: @submission.id).preload(:submission_comments).first
+        comments = preloaded_submission.comments_excluding_drafts_for(@teacher)
+        expect(comments).to include @student_comment, @ta_comment
+        expect(comments).not_to include @teacher_comment
+      end
+    end
+  end
+
   describe "#visible_submission_comments_for" do
     before(:once) do
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
