@@ -64,11 +64,11 @@ const discussionTopicMockOptional = {
     postedAt: '2021-04-05T13:40:50Z',
     subscribed: true,
     entryCounts: {
-      repliesCount: 24,
-      unreadCount: 4
+      repliesCount: 0,
+      unreadCount: 0
     },
     permissions: {
-      readAsAdmin: true
+      readAsAdmin: false
     }
   }
 }
@@ -104,19 +104,31 @@ describe('DiscussionTopicContainer', () => {
 
   it('renders without optional props', async () => {
     const container = setup(discussionTopicMockOptional)
-    expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
+    expect(await container.queryByTestId('replies-counter')).toBeNull()
     expect(await container.queryByTestId('graded-discussion-info')).toBeNull()
     expect(await container.queryByTestId('discussion-topic-reply')).toBeNull()
   })
 
-  it('renders Graded info when isGraded', async () => {
+  it('renders infoText only when there are replies', async () => {
+    const container = setup(discussionTopicMock)
+    const infoText = await container.findByTestId('replies-counter')
+    expect(infoText).toHaveTextContent('24 replies, 4 unread')
+  })
+
+  it('does not render unread when there are none', async () => {
+    discussionTopicMock.discussionTopic.unreadCount = 0
+    const container = setup(discussionTopicMock)
+    const infoText = await container.findByTestId('replies-counter')
+    expect(infoText).toHaveTextContent('24 replies')
+  })
+
+  it('renders Graded info when assignment info exists', async () => {
     const container = setup(discussionTopicMock)
     const gradedDiscussionInfo = await container.findByTestId('graded-discussion-info')
     expect(gradedDiscussionInfo).toHaveTextContent('This is a graded discussion: 5 points possible')
   })
 
-  it('renders teacher components when hasTeacherPermissions', async () => {
-    discussionTopicMock.hasTeacherPermissions = true
+  it('renders teacher components when can readAsAdmin', async () => {
     const container = setup(discussionTopicMock)
     const manageButton = await container.getByText('Manage Discussion').closest('button')
     fireEvent.click(manageButton)

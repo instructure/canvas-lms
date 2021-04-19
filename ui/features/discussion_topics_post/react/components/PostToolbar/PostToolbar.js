@@ -49,7 +49,7 @@ export function PostToolbar({...props}) {
     <>
       {props.infoText && (
         <View padding="0 x-small 0 0">
-          <Text weight="light" size="small">
+          <Text weight="light" size="small" data-testid="replies-counter">
             {props.infoText}
           </Text>
         </View>

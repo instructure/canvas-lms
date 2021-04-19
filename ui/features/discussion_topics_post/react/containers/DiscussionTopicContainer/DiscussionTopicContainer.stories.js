@@ -27,12 +27,42 @@ const Template = args => <DiscussionTopicContainer {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  isGraded: false
+  isGraded: false,
+  discussionTopic: {
+    title: 'This is an Example Discussion',
+    author: {
+      name: 'Gunnar Gunderson Gunn',
+      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    },
+    message: 'Please introduce yourselves.'
+  }
 }
 
 export const TeacherViewGraded = Template.bind({})
 TeacherViewGraded.args = {
   isGraded: true,
-  hasTeacherPermissions: true,
-  onReply: {acton: 'Reply'}
+  onReply: {acton: 'Reply'},
+  discussionTopic: {
+    _id: '1',
+    id: 'VXNlci0x',
+    title: 'Graded Teacher View Discussion',
+    author: {
+      name: 'Mister Teacher',
+      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    },
+    message: '<p> This is the Discussion Topic. It will be graded.</p>',
+    postedAt: '2021-04-05T13:40:50Z',
+    subscribed: true,
+    entryCounts: {
+      repliesCount: 24,
+      unreadCount: 4
+    },
+    assignment: {
+      dueAt: '2021-04-05T13:40:50Z',
+      pointsPossible: 5
+    },
+    permissions: {
+      readAsAdmin: true
+    }
+  }
 }

@@ -85,7 +85,6 @@ export const Discussion = {
       unreadCount: number,
       repliesCount: number
     },
-    repliesCount: string,
     author: User.shape,
     editor: User.shape,
     assignment: Assignment.shape,

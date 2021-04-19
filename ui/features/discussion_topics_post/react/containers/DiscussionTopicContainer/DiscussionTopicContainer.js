@@ -41,19 +41,20 @@ export const DiscussionTopicContainer = props => {
   const [copyToOpen, setCopyToOpen] = useState(false)
 
   const discussionTopicData = {
-    title: props.discussionTopic.title || '',
-    authorName: props.discussionTopic.author.name || '',
-    avatarUrl: props.discussionTopic.author.avatarUrl || '',
-    message: props.discussionTopic.message || '',
-    postedAt:
-      Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-        new Date(props.discussionTopic?.postedAt)
-      ) || '',
-    subscribed: props.discussionTopic.subscribed || false,
-    published: props.discussionTopic.published || false,
-    replies: props.discussionTopic.entryCounts.repliesCount || '',
-    unread: props.discussionTopic.entryCounts.unreadCount || '',
-    isGraded: !!props.discussionTopic.assignment && !!props.discussionTopic.assignment.dueAt
+    authorName: props.discussionTopic?.author?.name || '',
+    avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
+    title: props.discussionTopic?.title || '',
+    postedAt: props.discussionTopic?.postedAt
+      ? Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+          new Date(props.discussionTopic?.postedAt)
+        )
+      : '',
+    subscribed: props.discussionTopic?.subscribed || false,
+    published: props.discussionTopic?.published || false,
+    replies: props.discussionTopic?.entryCounts?.repliesCount || 0,
+    unread: props.discussionTopic?.entryCounts?.unreadCount || 0,
+    isGraded: !!props.discussionTopic?.assignment && !!props.discussionTopic.assignment.dueAt,
+    readAsAdmin: !!props.discussionTopic?.permissions?.readAsAdmin
   }
 
   if (discussionTopicData.isGraded) {
@@ -61,6 +62,22 @@ export const DiscussionTopicContainer = props => {
       new Date(props.discussionTopic.assignment.dueAt)
     )
     discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
+  }
+
+  const infoTextStrings = {
+    replies: I18n.t('%{replies} replies', {replies: discussionTopicData.replies}),
+    unread: I18n.t(', %{unread} unread', {unread: discussionTopicData.unread})
+  }
+
+  const getInfoText = () => {
+    let infoText = ''
+    if (discussionTopicData.replies && discussionTopicData.replies > 0) {
+      infoText = infoTextStrings.replies
+      if (discussionTopicData.unread && discussionTopicData.unread > 0) {
+        infoText += infoTextStrings.unread
+      }
+    }
+    return infoText
   }
 
   const course = {
@@ -143,28 +160,25 @@ export const DiscussionTopicContainer = props => {
               <Flex.Item>
                 <PostToolbar
                   onReadAll={() => {}}
-                  onDelete={props.hasTeacherPermissions ? () => {} : null}
-                  onToggleComments={props.hasTeacherPermissions ? () => {} : null}
-                  infoText={I18n.t('%{replies} replies, %{unread} unread', {
-                    replies: discussionTopicData.replies,
-                    unread: discussionTopicData.unread
-                  })}
+                  onDelete={discussionTopicData.readAsAdmin ? () => {} : null}
+                  onToggleComments={discussionTopicData.readAsAdmin ? () => {} : null}
+                  infoText={getInfoText()}
                   onSend={
-                    props.discussionTopic.permissions.readAsAdmin
+                    discussionTopicData.readAsAdmin
                       ? () => {
                           setSendToOpen(true)
                         }
                       : null
                   }
                   onCopy={
-                    props.discussionTopic.permissions.readAsAdmin
+                    discussionTopicData.readAsAdmin
                       ? () => {
                           setCopyToOpen(true)
                         }
                       : null
                   }
-                  onEdit={props.hasTeacherPermissions ? () => {} : null}
-                  onTogglePublish={props.hasTeacherPermissions ? () => {} : null}
+                  onEdit={discussionTopicData.readAsAdmin ? () => {} : null}
+                  onTogglePublish={discussionTopicData.readAsAdmin ? () => {} : null}
                   onToggleSubscription={() => {}}
                   isPublished={discussionTopicData.published}
                   isSubscribed={discussionTopicData.subscribed}
@@ -188,13 +202,6 @@ DiscussionTopicContainer.propTypes = {
    * to be rendered
    */
   discussionTopic: PropTypes.instanceOf(Discussion.shape).isRequired,
-  /**
-   * Indicates if current user has teacher permissions
-   * on this Discussion Post.
-   * Providing this property will result in manage Actions
-   * to be rendered
-   */
-  hasTeacherPermissions: PropTypes.bool,
   /**
    * Behavior for clicking the reply button,
    * Providing this property will result in
