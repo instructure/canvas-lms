@@ -151,4 +151,9 @@ describe Types::DiscussionType do
     expect(type.resolve('courseSections { _id }')[0]).to eq section.id.to_s
     expect(type.resolve('courseSections { name }')[0]).to eq section.name
   end
+
+  it 'returns if the discussion is able to be unpublished' do
+    result = discussion_type.resolve('canUnpublish')
+    expect(result).to eq discussion.can_unpublish?
+  end
 end

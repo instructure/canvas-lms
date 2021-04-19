@@ -113,7 +113,7 @@ module Types
       end
     end
 
-    field :author, Types::UserType, null: false
+    field :author, Types::UserType, null: true
     def author
       load_association(:user)
     end
@@ -131,6 +131,11 @@ module Types
     field :course_sections, [Types::SectionType], null: false
     def course_sections
       load_association(:course_sections)
+    end
+
+    field :can_unpublish, Boolean, null: false
+    def can_unpublish
+      object.can_unpublish?
     end
   end
 end
