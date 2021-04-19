@@ -53,3 +53,28 @@ export const MOCK_COURSE_TABS = [
     visibility: 'admins'
   }
 ]
+
+export const MOCK_ASSIGNMENT_GROUPS = [
+  {
+    id: '51',
+    name: 'Reports',
+    assignments: [
+      {
+        id: '1',
+        name: 'WWII Report',
+        html_url: 'http://localhost/wwii-report',
+        due_at: '2020-04-18T05:59:59Z',
+        points_possible: 10.0,
+        grading_type: 'points',
+        submission: {
+          score: 9.5,
+          grade: '9.5',
+          submitted_at: '2020-04-15T05:59:59Z',
+          late: false,
+          excused: false,
+          missing: false
+        }
+      }
+    ]
+  }
+]

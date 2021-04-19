@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React, {useEffect, useRef, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
@@ -57,6 +58,7 @@ import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import ManageCourseTray from './ManageCourseTray'
+import {GradesPage} from './GradesPage'
 
 const HERO_HEIGHT_PX = 400
 
@@ -233,6 +235,7 @@ export function K5Course({
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
+        {currentTab === TAB_IDS.GRADES && <GradesPage courseId={id} courseName={name} />}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
       </View>
     </K5DashboardContext.Provider>
