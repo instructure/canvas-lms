@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -266,8 +268,23 @@ class OutcomesApiController < ApplicationController
   def update
     return unless authorized_action(@outcome, @current_user, :update)
 
+    if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      error_msg = nil
+      if params[:mastery_points]
+        error_msg = t('Individual outcome mastery points cannot be modified.')
+      elsif params[:ratings]
+        error_msg = t('Individual outcome ratings cannot be modified.')
+      elsif params[:calculation_method] || params[:calculation_int]
+        error_msg = t('Individual outcome calculation values cannot be modified.')
+      end
+      if error_msg
+        render json: { error: error_msg }, status: :forbidden
+        return
+      end
+    end
+
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
-    if @outcome.update_attributes(params.permit(*DIRECT_PARAMS))
+    if @outcome.update(params.permit(*DIRECT_PARAMS))
       render :json => outcome_json(@outcome, @current_user, session)
     else
       render :json => @outcome.errors, :status => :bad_request
@@ -300,7 +317,7 @@ class OutcomesApiController < ApplicationController
         joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'").
         joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'").
         where('assignments.workflow_state NOT IN (?)', assignment_states).
-        to_sql).to_hash
+        to_sql).to_a
       alignments.each{|a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}"}
 
       quizzes = Quizzes::Quiz.active

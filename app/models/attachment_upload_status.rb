@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -43,10 +45,15 @@ class AttachmentUploadStatus < ApplicationRecord
   # If Rails.cache has a status, use that. Otherwise check for AttachmentUploadStatus in db.
   # If everything is empty, means the upload was a success.
   def self.upload_status(attachment)
-    status = Rails.cache.read(cache_key(attachment))
-    return status if status
+    if attachment.created_at > 1.day.ago # seems like we can skip the cache check if it's old enough
+      status = Rails.cache.read(cache_key(attachment))
+      return status if status
+    end
 
-    return 'failed' if where(attachment: attachment).exists?
+    failed = attachment.attachment_upload_statuses.loaded? ?
+      attachment.attachment_upload_statuses.any? :
+      attachment.attachment_upload_statuses.exists?
+    return 'failed' if failed
 
     'success'
   end

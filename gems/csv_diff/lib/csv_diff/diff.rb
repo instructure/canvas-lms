@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -24,6 +26,7 @@ module CsvDiff
       @key_fields = Array(key_fields).map(&:to_s)
       @db_file = Tempfile.new(['csv_diff', '.sqlite3'])
       @db = SQLite3::Database.new(@db_file.path)
+      @row_count = 0
       setup_database
     end
 
@@ -33,20 +36,26 @@ module CsvDiff
       row_current = current_csv.shift
 
       check_headers(previous_csv, current_csv)
-      setup_output(current_csv.headers)
+      canonical_headers = current_csv.headers.compact
+      setup_output(canonical_headers)
 
       @db.transaction do
-        insert("previous", row_previous, previous_csv, current_csv.headers) if row_previous
-        insert("current", row_current, current_csv, nil) if row_current
+        insert("previous", row_previous, previous_csv, canonical_headers) if row_previous
+        insert("current", row_current, current_csv, canonical_headers) if row_current
       end
 
       find_updates
       if options[:deletes]
-        find_deletes(current_csv.headers, options[:deletes])
+        find_deletes(canonical_headers, options[:deletes])
       end
 
       @output.close
-      @output_file.tap(&:rewind)
+      io = @output_file.tap(&:rewind)
+      if options[:return_count]
+        {:file_io => io, :row_count => @row_count}
+      else
+        io
+      end
     end
 
     protected
@@ -56,11 +65,7 @@ module CsvDiff
         # We need to turn this row into an array of known order, so that fields
         # are guaranteed to be in the same order from both csvs.
         key = Marshal.dump(row.fields(*@key_fields))
-        fields = if header_order
-          row.fields(*header_order)
-        else
-          row.fields
-        end
+        fields = row.fields(*header_order)
         data = Marshal.dump(fields)
         @db.execute("insert or replace into #{table} (key, data) values (?, ?)", [key, data])
       }
@@ -77,6 +82,7 @@ module CsvDiff
             where current.data <> previous.data or previous.key is null
             SQL
         row = Marshal.load(data)
+        @row_count += 1
         @output << row
       end
     end
@@ -90,6 +96,7 @@ module CsvDiff
         row = CSV::Row.new(headers, Marshal.load(data))
         # Allow the caller to munge the row to indicate deletion.
         cb.(row)
+        @row_count += 1
         @output << row
       end
     end
@@ -99,7 +106,7 @@ module CsvDiff
         raise(CsvDiff::Failure, "CSVs given must have headers enabled, pass :headers => true to CSV constructor")
       end
 
-      if a.headers.sort != b.headers.sort
+      if a.headers.compact.sort != b.headers.compact.sort
         raise(CsvDiff::Failure, "CSV headers do not match, cannot diff")
       end
 

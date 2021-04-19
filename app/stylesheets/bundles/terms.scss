@@ -19,7 +19,9 @@
 @import 'base/environment';
 
 .ic-Layout-wrapper {
-  min-width: 1100px;
+  @include desktop-only {
+    min-width: 1100px;
+  }
 }
 .term .edit_term {
   display: none;
@@ -40,19 +42,42 @@
   font-size: 1.2em;
   padding-#{direction(right)}: 20px;
 }
+#terms .term td.header {
+  word-wrap: break-word;
+}
 .term .permissions {
   font-size: 0.8em;
 }
 #terms {
   border-collapse: collapse;
   width: 100%;
+  @include mobile-only {
+    display: block;
+  }
+}
+@include mobile-only {
+  #terms > tbody {
+    display: block;
+  }
+  #terms > tbody > tr.term > td {
+    display: block;
+  }
+  td.permissions > table > tbody > tr > td:not(.edit_term_buttons) {
+    display: block;
+  }
+  td.permissions > table > tbody > tr > td:first-child {
+    display: inline-block;
+  }
 }
 #terms td {
   vertical-align: top;
 }
-#terms td.header, #terms td.permissions, #terms td.links {
+#terms > tbody > tr.term {
   border-bottom: 1px solid #aaa;
   padding: 2px 0;
+  @include mobile-only {
+    display: block;
+  }
 }
 #terms td.links {
   padding-#{direction(left)}: 5px;

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -19,12 +21,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe CourseForMenuPresenter do
-  let_once(:course) { course_model }
-  let_once(:user) { user_model }
+  let_once(:account) { Account.default }
+  let_once(:course) { Course.create!(account: account) }
+  let_once(:user) { User.create! }
+
   let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
 
   let_once(:presenter) do
-    CourseForMenuPresenter.new(course, user, nil, nil, {tabs: dashboard_card_tabs})
+    CourseForMenuPresenter.new(course, user, account, nil, {tabs: dashboard_card_tabs})
   end
 
   describe '#to_h' do
@@ -63,50 +67,83 @@ describe CourseForMenuPresenter do
     end
 
     it 'returns the course nickname if one is set' do
-      user.course_nicknames[course.id] = 'nickname'
-      user.save!
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      user.set_preference(:course_nicknames, course.id, 'nickname')
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:originalName]).to eq course.name
       expect(h[:shortName]).to eq 'nickname'
     end
 
-    context 'Dashcard Reordering' do
-      before(:each) do
-        @account = Account.default
+    it 'sets isFavorited to true if course is favorited' do
+      course.enroll_student(user)
+      Favorite.create!(user: user, context: course)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      h = cs_presenter.to_h
+      expect(h[:isFavorited]).to eq true
+    end
+
+    it 'sets isFavorited to false if course is unfavorited' do
+      course.enroll_student(user)
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      h = cs_presenter.to_h
+      expect(h[:isFavorited]).to eq false
+    end
+
+    context 'with `homeroom_course` setting enabled' do
+      before do
+        course.update! settings: course.settings.merge(homeroom_course: true)
       end
 
+      it 'sets `isHomeroom` to `true`' do
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
+        h = cs_presenter.to_h
+        expect(h[:isHomeroom]).to eq true
+      end
+    end
+
+    context 'with the `unpublished_courses` FF enabled' do
+      before(:each) do
+        course.root_account.enable_feature!(:unpublished_courses)
+      end
+
+      it 'sets additional keys' do
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
+        h = cs_presenter.to_h
+        expect(h.key?(:published)).to eq true
+        expect(h.key?(:canChangeCourseState)).to eq true
+        expect(h.key?(:defaultView)).to eq true
+        expect(h.key?(:pagesUrl)).to eq true
+        expect(h.key?(:frontPageTitle)).to eq true
+      end
+    end
+
+    context 'Dashcard Reordering' do
       it 'returns a position if one is set' do
-        user.dashboard_positions[course.asset_string] = 3
-        user.save!
-        cs_presenter = CourseForMenuPresenter.new(course, user, @account)
+        user.set_dashboard_positions(course.asset_string => 3)
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq 3
       end
 
       it 'returns nil when no position is set' do
-        cs_presenter = CourseForMenuPresenter.new(course, user, @account)
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq nil
       end
     end
 
-  end
+    context 'Using courses from a trusted account' do
+      it 'returns correct published value if the current account has FF enabled' do
+        account.enable_feature!(:unpublished_courses)
+        a2 = account_model(name: "second account")
+        a2.trust_links.create!(managing_account: account)
+        account.trust_links.create!(managing_account: a2)
+        course2 = a2.courses.create!(name: "course02")
 
-  describe '#role' do
-    specs_require_sharding
-    it "should retrieve the correct role for cross-shard enrollments" do
-      @shard1.activate do
-        account = Account.create
-        @role = account.roles.create :name => "1337 Student"
-        @role.base_role_type = 'StudentEnrollment'
-        @role.save!
-
-        @cs_course = account.courses.create!
-        @cs_course.primary_enrollment_role_id = @role.local_id
+        cs_presenter = CourseForMenuPresenter.new(course2, user, account)
+        h = cs_presenter.to_h
+        expect(h.key?(:published)).to eq true
       end
-      cs_presenter = CourseForMenuPresenter.new(@cs_course)
-      expect(cs_presenter.send(:role)).to eq @role
     end
   end
 end

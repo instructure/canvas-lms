@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -102,6 +104,18 @@ describe BookmarkedCollection::Proxy do
         expect(pager).to eq [@scope.first, @scope.last]
         expect(pager.next_bookmark).to be_nil
       end
+    end
+
+    it "doesn't blow up when filtering everything out" do
+      bookmarker = BookmarkedCollection::SimpleBookmarker.new(@scope.klass, :id)
+      @proxy = BookmarkedCollection.wrap(bookmarker, @scope)
+      @proxy = BookmarkedCollection.filter(@proxy) do |item|
+        false
+      end
+      collection = @proxy.instance_variable_get(:@collection)
+      expect(collection).to receive(:execute_pager).exactly(2).times.and_call_original
+      pager = @proxy.paginate(per_page: 1)
+      expect(pager).to eq []
     end
 
     context 'transforming' do

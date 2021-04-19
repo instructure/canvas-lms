@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -212,8 +214,9 @@ module PlannerPageObject
     f(dismiss_opportunity_button_selector(item_name))
   end
 
-  def list_view_planner_items
-    ff('div.planner-item')
+  # finds planner item by any unique text within it (header is usually good)
+  def list_view_planner_item(text)
+    fj("div.planner-item:contains('#{text}')")
   end
 
   def planner_item_status_checkbox(object_type, object_name)
@@ -454,7 +457,8 @@ module PlannerPageObject
     old = graded_discussion_in_the_past
     older = graded_discussion_in_the_past(Time.zone.now-4.days, 'older')
     oldest = graded_discussion_in_the_past(Time.zone.now-6.days, 'oldest')
-    [old, older, oldest]
+    ancient = graded_discussion_in_the_past(Time.zone.now-8.days, 'ancient')
+    [old, older, oldest, ancient]
   end
 
   def create_new_todo
@@ -471,5 +475,14 @@ module PlannerPageObject
 
   def scroll_height
     driver.execute_script("return window.pageYOffset")
+  end
+
+  def item_top_position(index)
+    items_displayed[index].location.y
+  end
+
+  def header_bottom_position
+    header = planner_header_container
+    header.location.y + header.size.height
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -40,16 +42,32 @@ module Importers
     end
 
     def self.add_groups_for_imported_assignments(data, migration)
-      return unless data['assignments'] && migration.migration_settings[:migration_ids_to_import] &&
+      return unless migration.migration_settings[:migration_ids_to_import] &&
           migration.migration_settings[:migration_ids_to_import][:copy] &&
           migration.migration_settings[:migration_ids_to_import][:copy].length > 0
 
       migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'] ||= {}
-      data['assignments'].each do |assignment_hash|
+      data['assignments']&.each do |assignment_hash|
         a_hash = assignment_hash.with_indifferent_access
         if migration.import_object?("assignments", a_hash['migration_id']) &&
             group_mig_id = a_hash['assignment_group_migration_id']
           migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true
+        end
+      end
+      other_objects = {
+        'discussion_topics' => data['discussion_topics'],
+        'quizzes' => data.dig('assessments', 'assessments')
+      }
+      other_objects.each do |key, objects|
+        objects&.each do |obj_hash|
+          obj_hash = obj_hash.with_indifferent_access
+          a_hash = obj_hash["assignment"]
+          if a_hash && migration.import_object?(key, obj_hash['migration_id']) &&
+              group_mig_id = a_hash['assignment_group_migration_id']
+            # auto import the assignment group even if it's not actually in the top-level assignments list
+            # and just nested inside the topic or quiz
+            migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true
+          end
         end
       end
     end
@@ -59,10 +77,11 @@ module Importers
       return nil if hash[:migration_id] && hash[:assignment_groups_to_import] && !hash[:assignment_groups_to_import][hash[:migration_id]]
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.assignment_groups.where(name: hash[:title], migration_id: nil).first
+      item ||= match_assignment_group_by_name(context, migration, hash[:title])
       item ||= context.assignment_groups.temp_record
       migration.add_imported_item(item)
       item.saved_by = :migration
+      item.mark_as_importing!(migration)
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'available' if item.deleted?
       item.name = hash[:title]
@@ -88,6 +107,22 @@ module Importers
 
       item.save!
       item
+    end
+
+    def self.match_assignment_group_by_name(context, migration, name)
+      ag = context.assignment_groups.where(name: name, migration_id: nil).first
+      if ag && migration.for_master_course_import?
+        # prevent overwriting assignment group settings in a pre-existing group that was matched by name
+        downstream_changes = []
+        downstream_changes << 'group_weight' if ag.group_weight&.> 0
+        downstream_changes << 'rules' if ag.rules.present?
+        if downstream_changes.any?
+          tag = migration.master_course_subscription&.content_tag_for(ag)
+          tag.downstream_changes |= downstream_changes
+          tag.save!
+        end
+      end
+      ag
     end
   end
 end

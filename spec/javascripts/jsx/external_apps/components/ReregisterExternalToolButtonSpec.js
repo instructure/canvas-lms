@@ -19,14 +19,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import Modal from 'react-modal'
-import ReregisterExternalToolButton from 'jsx/external_apps/components/ReregisterExternalToolButton'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import Modal from '@canvas/react-modal'
+import ReregisterExternalToolButton from 'ui/features/external_apps/react/components/ReregisterExternalToolButton.js'
+import store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
 
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 
-const createElement = data => <ReregisterExternalToolButton tool={data.tool} canAddEdit returnFocus={()=>{}} />
+const createElement = data => (
+  <ReregisterExternalToolButton tool={data.tool} canAddEdit returnFocus={() => {}} />
+)
 
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 

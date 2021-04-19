@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -28,9 +30,9 @@ module Multipart
     def to_multipart_stream(boundary)
       SequencedStream.new([
         StringIO.new("--#{boundary}\r\n" \
-                     "Content-Disposition: form-data; name=\"#{k}\"; filename=\"#{filename}\"\r\n" \
+                     "Content-Disposition: form-data; name=\"#{URI::encode(k.to_s)}\"; filename=\"#{URI::encode(filename.to_s)}\"\r\n" \
                      "Content-Transfer-Encoding: binary\r\n" \
-                     "Content-Type: #{MIME::Types.type_for(filename).first}\r\n" \
+                     "Content-Type: #{MIME::Types.type_for(filename).first || MIME::Types.type_for(k.to_s).first}\r\n" \
                      "\r\n"),
         content,
         StringIO.new("\r\n")

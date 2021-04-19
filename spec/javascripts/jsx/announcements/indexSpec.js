@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnIndex from 'jsx/announcements/index'
+import createAnnIndex from 'ui/features/announcements/react/index.js'
 
 let app = null
 const container = document.getElementById('fixtures')
@@ -32,7 +32,7 @@ QUnit.module('Announcements app', {
 })
 
 const defaultData = () => ({
-  contextCodes: ['course_1'],
+  contextCodes: ['course_1']
 })
 
 test('mounts Announcements to container component', () => {

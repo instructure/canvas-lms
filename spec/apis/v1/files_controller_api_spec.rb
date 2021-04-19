@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -24,6 +26,15 @@ RSpec.configure do |config|
 end
 
 describe "Files API", type: :request do
+  before :once do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+  end
+
+  before :each do
+    # granular permissions disabled by default
+    @course.root_account.disable_feature!(:granular_permissions_course_files)
+  end
+
   context 'locked api item' do
     let(:item_type) { 'file' }
 
@@ -41,10 +52,6 @@ describe "Files API", type: :request do
     end
 
     include_examples 'a locked api item'
-  end
-
-  before :once do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
   describe 'create file' do
@@ -79,11 +86,94 @@ describe "Files API", type: :request do
     it 'includes include capture param in inst_fs token' do
       secret = 'secret'
       allow(InstFS).to receive(:enabled?).and_return true
-      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+      allow(InstFS).to receive(:jwt_secrets).and_return([secret])
       json = call_course_create_file
       query = Rack::Utils.parse_nested_query(URI(json['upload_url']).query)
       payload = Canvas::Security.decode_jwt(query['token'], [secret])
       expect(payload['capture_params']['include']).to include('avatar')
+    end
+
+    context 'with granular permissions enabled' do
+      before :each do
+        @course.root_account.enable_feature!(:granular_permissions_course_files)
+      end
+
+      context "as teacher having manage_files_add permission" do
+        it "should create a course file" do
+          api_call(
+            :post, "/api/v1/courses/#{@course.id}/files",
+            {
+              controller: 'courses',
+              action: 'create_file',
+              course_id: @course.id,
+              format: 'json',
+              name: 'test_file.png',
+              size: '12345',
+              content_type: 'image/png',
+              success_include: ['avatar'],
+              no_redirect: 'true'
+            },
+            {},
+            :expected_status => 200
+          )
+        end
+      end
+
+      context "as teacher without manage_files_add permission" do
+        before do
+          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+          RoleOverride.create!(
+            permission: 'manage_files_add',
+            enabled: false,
+            role: teacher_role,
+            account: @course.root_account
+          )
+        end
+
+        it "should disallow creating a course file" do
+          api_call(
+            :post, "/api/v1/courses/#{@course.id}/files",
+            {
+              controller: 'courses',
+              action: 'create_file',
+              course_id: @course.id,
+              format: 'json',
+              name: 'test_file.png',
+              size: '12345',
+              content_type: 'image/png',
+              success_include: ['avatar'],
+              no_redirect: 'true'
+            },
+            {},
+            :expected_status => 401
+          )
+        end
+      end
+
+      context "as student" do
+        before do
+          course_with_student_logged_in(:course => @course)
+        end
+
+        it "should return unauthorized error" do
+          api_call(
+            :post, "/api/v1/courses/#{@course.id}/files",
+            {
+              controller: 'courses',
+              action: 'create_file',
+              course_id: @course.id,
+              format: 'json',
+              name: 'test_file.png',
+              size: '12345',
+              content_type: 'image/png',
+              success_include: ['avatar'],
+              no_redirect: 'true'
+            },
+            {},
+            :expected_status => 401
+          )
+        end
+      end
     end
   end
 
@@ -91,7 +181,7 @@ describe "Files API", type: :request do
     it 'includes success_include as include when redirecting' do
       local_storage!
       a = attachment_model(workflow_state: :unattached)
-      params = a.ajax_upload_params(@pseudonym, '/url', '/s3')[:upload_params]
+      params = a.ajax_upload_params('/url', '/s3')[:upload_params]
       raw_api_call(:post, "/files_api", params.merge({
         controller: 'files',
         action: 'api_create',
@@ -150,7 +240,6 @@ describe "Files API", type: :request do
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
         'display_name' => 'test.txt',
-        'workflow_state' => 'processed',
         'filename' => @attachment.filename,
         'size' => @attachment.size,
         'unlock_at' => nil,
@@ -190,7 +279,6 @@ describe "Files API", type: :request do
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
         'display_name' => 'test.txt',
-        'workflow_state' => 'processed',
         'filename' => @attachment.filename,
         'size' => @attachment.size,
         'unlock_at' => nil,
@@ -332,7 +420,7 @@ describe "Files API", type: :request do
 
     before do
       allow(InstFS).to receive(:enabled?).and_return true
-      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+      allow(InstFS).to receive(:jwt_secrets).and_return([secret])
     end
 
     it "is not available without the InstFS feature" do
@@ -369,7 +457,8 @@ describe "Files API", type: :request do
     end
 
     it "creates file locked when usage rights required" do
-      @course.enable_feature!(:usage_rights_required)
+      @course.usage_rights_required = true
+      @course.save!
       api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
@@ -377,7 +466,8 @@ describe "Files API", type: :request do
     end
 
     it "creates file unlocked when usage rights not required" do
-      @course.disable_feature!(:usage_rights_required)
+      @course.usage_rights_required = false
+      @course.save!
       api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
@@ -414,6 +504,35 @@ describe "Files API", type: :request do
         )
       )
       expect(redirect_params['include']).to include('preview_url')
+      expect(redirect_params['include']).not_to include('enhanced_preview_url')
+    end
+
+    it "includes enhanced_preview_url in course context" do
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{base_params.to_query}",
+        base_params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json"
+        )
+      )
+      expect(redirect_params['include']).to include('enhanced_preview_url')
+    end
+
+    it "includes enhanced_preview_url in group context" do
+      group = @course.groups.create!
+      params = base_params.merge(context_type: Group, context_id: group.id)
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{params.to_query}",
+        params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json"
+        )
+      )
+      expect(redirect_params['include']).to include('enhanced_preview_url')
     end
   end
 
@@ -561,7 +680,8 @@ describe "Files API", type: :request do
           "id" => @user.id,
           "display_name" => @user.short_name,
           "avatar_image_url" => User.avatar_fallback_url(nil, request),
-          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+          "pronouns"=>nil
         }
       ]
     end
@@ -582,36 +702,76 @@ describe "Files API", type: :request do
       ]
     end
 
-    it "should include user even for user files" do
-      my_root_folder = Folder.root_folders(@user).first
-      my_file = Attachment.create! :filename => 'ztest.txt',
-                                   :display_name => "ztest.txt",
-                                   :position => 1,
-                                   :uploaded_data => StringIO.new('file'),
-                                   :folder => my_root_folder,
-                                   :context => @user,
-                                   :user => @user
-
-      json = api_call(:get, "/api/v1/folders/#{my_root_folder.id}/files?include[]=user", {
-        :controller => "files",
-        :action => "api_index",
-        :format => "json",
-        :id => my_root_folder.id.to_param,
-        :include => ['user']
-      })
-      expect(json.map{|f|f['user']}).to eql [
-        {
-          "id" => @user.id,
-          "display_name" => @user.short_name,
-          "avatar_image_url" => User.avatar_fallback_url(nil, request),
-          "html_url" => "http://www.example.com/about/#{@user.id}"
-        }
-      ]
-    end
-
     it "includes an instfs_uuid if ?include[]-ed" do
       json = api_call(:get, @files_path, @files_path_options.merge(include: ['instfs_uuid']))
       expect(json[0].key? "instfs_uuid").to be true
+    end
+
+    context 'when the context is a user' do
+      subject do
+        api_call(:get, request_url, request_params)
+      end
+
+      let(:user) { @user }
+      let(:root_folder) { Folder.root_folders(user).first }
+      let(:request_url) { "/api/v1/folders/#{root_folder.id}/files?include[]=user" }
+      let(:file) do
+        Attachment.create!(
+          :filename => 'ztest.txt',
+          :display_name => "ztest.txt",
+          :position => 1,
+          :uploaded_data => StringIO.new('file'),
+          :folder => root_folder,
+          :context => user,
+          :user => user
+        )
+      end
+      let(:request_params) do
+        {
+          :controller => "files",
+          :action => "api_index",
+          :format => "json",
+          :id => root_folder.id.to_param,
+          :include => ['user']
+        }
+      end
+
+      before { file }
+
+      it "should include user even for user files" do
+        expect(subject.map{|f|f['user']}).to eql [
+          {
+            "id" => user.id,
+            "display_name" => user.short_name,
+            "avatar_image_url" => User.avatar_fallback_url(nil, request),
+            "html_url" => "http://www.example.com/about/#{user.id}",
+            "pronouns"=>nil
+          }
+        ]
+      end
+
+      context 'when the request url contains the user id' do
+        let(:request_url) { "/api/v1/users/#{user.id}/files" }
+        let(:request_params) do
+          {
+            :controller => "files",
+            :action => "api_index",
+            :format => "json",
+            :user_id => user.to_param
+          }
+        end
+
+        it 'triggers a user asset access live event' do
+          expect(Canvas::LiveEvents).to receive(:asset_access).with(
+            ['files', user],
+            'files',
+            'User',
+            nil,
+            {context: nil, context_membership: @user}
+          )
+          subject
+        end
+      end
     end
 
   end
@@ -823,7 +983,6 @@ describe "Files API", type: :request do
               'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
               'content-type' => "image/png",
               'display_name' => 'test-frd.png',
-              'workflow_state' => 'processed',
               'filename' => @att.filename,
               'size' => @att.size,
               'unlock_at' => nil,
@@ -962,7 +1121,8 @@ describe "Files API", type: :request do
         "id" => @user.id,
         "display_name" => @user.short_name,
         "avatar_image_url" => User.avatar_fallback_url(nil, request),
-        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+        "pronouns"=>nil
       })
     end
 
@@ -998,7 +1158,31 @@ describe "Files API", type: :request do
       account_admin_user(account: @account)
       @att.context = u
       @att.save!
-      expect_any_instance_of(Attachment).to receive(:destroy_content_and_replace).once
+      expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+      @file_path_options[:replace] = true
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+    end
+
+    it 'should delete/replace a file tied to an assignment' do
+      assignment = @course.assignments.create!(title: 'one')
+      account_admin_user(account: @account)
+      @att.context = assignment
+      @att.save!
+      expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+      @file_path_options[:replace] = true
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+    end
+
+    it 'should delete/replace a file tied to a quiz submission' do
+      course_with_student(:active_all => true)
+      quiz_model(:course => @course)
+      @quiz.update_attribute :one_question_at_a_time, true
+      @qs = @quiz.generate_submission(@student, false)
+
+      account_admin_user(account: @account)
+      @att.context = @qs
+      @att.save!
+      expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
       @file_path_options[:replace] = true
       api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
     end
@@ -1017,6 +1201,145 @@ describe "Files API", type: :request do
       course_with_student(:course => @course)
       api_call(:delete, @file_path, @file_path_options, {}, {}, :expected_status => 401)
     end
+
+    context 'with granular permissions enabled' do
+      before :each do
+        @course.root_account.enable_feature!(:granular_permissions_course_files)
+      end
+
+      context "having manage_files_edit permission" do
+        it "should delete a file" do
+          api_call(:delete, @file_path, @file_path_options)
+          @att.reload
+          expect(@att.file_state).to eq 'deleted'
+        end
+
+        it 'should delete/replace a file' do
+          u = user_with_pseudonym(account: @account)
+          account_admin_user(account: @account)
+          @att.context = u
+          @att.save!
+          expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+          @file_path_options[:replace] = true
+          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+        end
+
+        it 'should delete/replace a file tied to an assignment' do
+          assignment = @course.assignments.create!(title: 'one')
+          account_admin_user(account: @account)
+          @att.context = assignment
+          @att.save!
+          expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+          @file_path_options[:replace] = true
+          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+        end
+
+        it 'should delete/replace a file tied to a quiz submission' do
+          course_with_student(:active_all => true)
+          quiz_model(:course => @course)
+          @quiz.update_attribute :one_question_at_a_time, true
+          @qs = @quiz.generate_submission(@student, false)
+
+          account_admin_user(account: @account)
+          @att.context = @qs
+          @att.save!
+          expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+          @file_path_options[:replace] = true
+          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+        end
+
+        it "should not be authorized to delete/replace a file" do
+          course_with_teacher(active_all: true, user: user_with_pseudonym)
+          @file_path_options[:replace] = true
+          api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 401)
+        end
+      end
+
+      context "as teacher without manage_files_delete permission" do
+        before do
+          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+          RoleOverride.create!(
+            permission: 'manage_files_delete',
+            enabled: false,
+            role: teacher_role,
+            account: @course.root_account
+          )
+        end
+
+        it "should disallow deleting a file" do
+          course_with_teacher(active_all: true, user: user_with_pseudonym, course: @course)
+          @file_path_options[:replace] = false
+          api_call(:delete, @file_path, @file_path_options,
+                   {}, {}, expected_status: 401)
+        end
+      end
+
+      context "as student" do
+        before do
+          course_with_student_logged_in(course: @course)
+        end
+
+        it "should return unauthorized error if not authorized to delete" do
+          api_call(:delete, @file_path, @file_path_options, {}, {}, :expected_status => 401)
+        end
+      end
+    end
+  end
+
+  describe "#reset_verifier" do
+    before :once do
+      @root = Folder.root_folders(@course).first
+      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @file_path = "/api/v1/files/#{@att.id}/reset_verifier"
+      @file_path_options = { :controller => "files", :action => "reset_verifier", :format => "json", :id => @att.id.to_param }
+    end
+
+    it "should let admin users reset verifiers" do
+      old_uuid = @att.uuid
+      account_admin_user(account: @account)
+      api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 200)
+      expect(@att.reload.uuid).to_not eq old_uuid
+    end
+
+    it "should not let non-admin users reset verifiers" do
+      course_with_teacher(course: @course, active_all: true, user: user_with_pseudonym)
+      api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+    end
+
+    context 'with granular permissions enabled' do
+      before :each do
+        @course.root_account.enable_feature!(:granular_permissions_course_files)
+      end
+
+      context "as an admin having manage_files_edit or manage_files_delete permission" do
+        it "should let admin users reset verifiers" do
+          old_uuid = @att.uuid
+          account_admin_user(account: @course.root_account)
+          api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 200)
+          expect(@att.reload.uuid).to_not eq old_uuid
+        end
+
+        it "should not let non-admin users reset verifiers" do
+          course_with_teacher(course: @course, active_all: true, user: user_with_pseudonym)
+          api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+        end
+      end
+
+      context "as an admin without manage_files_edit or manage_files_delete permission" do
+        before do
+          @course.account.account_users.create(user: User.create!(name: 'billy bob'))
+          admin = admin_role(root_account_id: @course.account.resolved_root_account_id)
+          @course.account.role_overrides.create(role: admin, enabled: false, permission: :manage_files_edit)
+          @course.account.role_overrides.create(role: admin, enabled: false, permission: :manage_files_delete)
+        end
+
+        it "should disallow letting admin users reset verifiers" do
+          old_uuid = @att.uuid
+          api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+          expect(@att.reload.uuid).to eq old_uuid
+        end
+      end
+    end
   end
 
   describe "#update" do
@@ -1028,7 +1351,7 @@ describe "Files API", type: :request do
     end
 
     it "should update" do
-      unlock = 1.days.from_now
+      unlock = 1.day.from_now
       lock = 3.days.from_now
       new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
       json = api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
@@ -1153,7 +1476,8 @@ describe "Files API", type: :request do
 
     context "with usage_rights_required" do
       before do
-        @course.enable_feature! :usage_rights_required
+        @course.usage_rights_required = true
+        @course.save!
         user_session(@teacher)
         @att.update_attribute(:locked, true)
       end
@@ -1168,6 +1492,65 @@ describe "Files API", type: :request do
         @att.save!
         api_call(:put, @file_path, @file_path_options, {:locked => false}, {}, :expected_status => 200)
         expect(@att.reload).not_to be_locked
+      end
+    end
+
+    context 'with granular permissions enabled' do
+      before :each do
+        @course.root_account.enable_feature!(:granular_permissions_course_files)
+      end
+
+      context "as teacher having manage_files_edit permission" do
+        it "should update" do
+          unlock = 1.day.from_now
+          lock = 3.days.from_now
+          new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
+          json = api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 200)
+          expect(json['url']).to include 'verifier='
+          @att.reload
+          expect(@att.display_name).to eq "newname.txt"
+          expect(@att.locked).to be_truthy
+          expect(@att.hidden).to be_truthy
+          expect(@att.unlock_at.to_i).to eq unlock.to_i
+          expect(@att.lock_at.to_i).to eq lock.to_i
+        end
+
+        it "should move to another folder" do
+          @sub = @root.sub_folders.create!(:name => "sub", :context => @course)
+          api_call(:put, @file_path, @file_path_options, {:parent_folder_id => @sub.id.to_param}, {}, :expected_status => 200)
+          @att.reload
+          expect(@att.folder_id).to eq @sub.id
+        end
+      end
+
+      context "as teacher without manage_files_edit permission" do
+        before do
+          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+          RoleOverride.create!(
+            permission: 'manage_files_edit',
+            enabled: false,
+            role: teacher_role,
+            account: @course.root_account
+          )
+        end
+
+        it "should disallow an update" do
+          unlock = 1.day.from_now
+          lock = 3.days.from_now
+          new_params = {:name => "newname.txt", :locked => 'true', :hidden => true, :unlock_at => unlock.iso8601, :lock_at => lock.iso8601}
+          api_call(:put, @file_path, @file_path_options, new_params, {}, :expected_status => 401)
+        end
+      end
+
+      context "as student" do
+        before do
+          course_with_student_logged_in(course: @course)
+        end
+
+        it "should return unauthorized error" do
+          api_call(:put, @file_path, @file_path_options, {:name => "new name"},
+                   {}, :expected_status => 401)
+        end
       end
     end
   end

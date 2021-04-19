@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -101,7 +103,7 @@
 #         "type": "string"
 #       },
 #       "answer_weight": {
-#         "description": "An integer to determine correctness of the answer. Incorrect answers should be 0, correct answers should be non-negative.",
+#         "description": "An integer to determine correctness of the answer. Incorrect answers should be 0, correct answers should be 100.",
 #         "example": 100,
 #         "type": "integer",
 #         "format": "int64"

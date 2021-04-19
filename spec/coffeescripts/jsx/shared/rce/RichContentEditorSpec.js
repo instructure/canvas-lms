@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
-import RCELoader from 'jsx/shared/rce/serviceRCELoader'
-import Sidebar from 'jsx/shared/rce/Sidebar'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
+import * as RceCommandShim from '@canvas/rce/RceCommandShim'
+import RCELoader from '@canvas/rce/serviceRCELoader'
+import Sidebar from '@canvas/rce/Sidebar'
 import fakeENV from 'helpers/fakeENV'
 import editorUtils from 'helpers/editorUtils'
 import fixtures from 'helpers/fixtures'
@@ -60,6 +60,13 @@ test("freshNode returns the given element if it's not on the dom", () => {
   const $el = $('<div id="test"/>')
   const $fresh = RichContentEditor.freshNode($el)
   equal($el, $fresh)
+})
+
+test("node2jquery returns the given element is null'", () => {
+  const $el = null
+  const $empty_node = $()
+  const $fresh = RichContentEditor.node2jquery($el)
+  deepEqual($empty_node, $fresh)
 })
 
 QUnit.module('RichContentEditor - preloading', {

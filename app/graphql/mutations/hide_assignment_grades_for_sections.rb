@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -36,7 +38,6 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
     end
 
     verify_authorized_action!(assignment, :grade)
-    raise GraphQL::ExecutionError, "Post Policies feature not enabled" unless course.feature_enabled?(:post_policies)
 
     unless assignment.grades_published?
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be hidden by section before grades are published"
@@ -47,8 +48,11 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "Invalid section ids"
     end
 
-    student_ids = course.student_enrollments.where(course_section: sections).pluck(:user_id)
-    submission_ids = assignment.submissions.active.where(user_id: student_ids).pluck(:id)
+    visible_enrollments = course.apply_enrollment_visibility(course.student_enrollments, current_user, sections)
+
+    submissions_scope = input[:graded_only] ? assignment.submissions.graded : assignment.submissions
+    submissions_scope = submissions_scope.joins(user: :enrollments).merge(visible_enrollments)
+
     progress = course.progresses.new(tag: "hide_assignment_grades_for_sections")
 
     if progress.save
@@ -57,7 +61,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
         :hide_submissions,
         {preserve_method_args: true},
         progress: progress,
-        submission_ids: submission_ids
+        submission_ids: submissions_scope.pluck(:id)
       )
       return {assignment: assignment, progress: progress, sections: sections}
     else

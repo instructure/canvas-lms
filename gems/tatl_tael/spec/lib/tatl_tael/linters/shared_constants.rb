@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Consts
   APP_COFFEE_PATH = "app/coffeescripts/calendar/CalendarEvent.coffee".freeze
   APP_COFFEE_BUNDLE_PATH = "app/coffeescripts/bundles/authentication_providers.coffee".freeze

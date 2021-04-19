@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -32,7 +34,7 @@ class Login::CasController < ApplicationController
     # CAS sends a GET with a ticket when it's doing a login
     return create if params[:ticket]
 
-    redirect_to delegated_auth_redirect_uri(client.add_service_to_login_url(cas_login_url))
+    redirect_to client.add_service_to_login_url(cas_login_url)
   end
 
   def create
@@ -66,7 +68,10 @@ class Login::CasController < ApplicationController
 
       if pseudonym
         # Successful login and we have a user
-        @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
+
+        @domain_root_account.pseudonyms.scoping do
+          PseudonymSession.create!(pseudonym, false)
+        end
         session[:cas_session] = params[:ticket]
         session[:login_aac] = aac.id
 

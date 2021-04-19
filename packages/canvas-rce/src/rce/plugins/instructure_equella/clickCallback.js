@@ -17,7 +17,7 @@
  */
 
 export default function(ed, document) {
-  var ev = document.createEvent("CustomEvent");
-  ev.initCustomEvent("tinyRCE/initEquella", true, true, { ed: ed });
-  document.dispatchEvent(ev);
+  const ev = document.createEvent('CustomEvent')
+  ev.initCustomEvent('tinyRCE/initEquella', true, true, {ed})
+  document.dispatchEvent(ev)
 }

@@ -20,22 +20,13 @@
 @import "base/mixins/misc";
 
 /* header */
-.header-bar-right {
-  margin-bottom: $ic-sp;  // the buttons need some space between the input
-}
-
-#edit_assignment_header-cr {
-  padding: 0;
-  border: none;
+.assignment-edit-header {
+  margin-bottom: 12px;
 }
 
 #edit-assignment-header-cr-tab-nav {
   display: flex;
   align-items: flex-end;
-}
-
-#edit-assignment-header-cr-spacer {
-  flex: 1;
 }
 
 #assignment-draft-state-cr {
@@ -66,6 +57,17 @@ div.form-column-left {
     /* for labels that correspond to an un-grouped form el */
     margin-top: 0px;
   }
+
+  body.responsive_misc & {
+    text-align: direction(left);
+    padding: 5px 0px;
+    label { margin-bottom: 0px }
+    @include breakpoint(mini-tablet) {
+      text-align: direction(right);
+      padding: 5px 10px;
+      label { margin-bottom: 5px }
+    }
+  }
 }
 #discussion_point_change_warning {
   margin-top: 15px;
@@ -77,7 +79,17 @@ div.form-column-left {
 /* for grouped and un-grouped form els */
 div.form-column-right, div.overrides-column-right {
   display: inline-block;
-  width: 380px;
+
+  body:not(.responsive_misc) & {
+    width: 380px;
+  }
+
+  body.responsive_misc & {
+    width: 100%;
+    @include breakpoint(mini-tablet) {
+      width: 380px;
+    }
+  }
 
   /* for groups of form els ONLY */
   .border {
@@ -87,7 +99,7 @@ div.form-column-right, div.overrides-column-right {
     border-color: #ccc;
     padding: 15px 0px;
     margin-top: 20px;
-    select, .subtitle {
+    select, input[type=text], .subtitle {
       margin-#{direction(left)}: 15px;
     }
   }
@@ -165,8 +177,25 @@ div.form-column-right, div.overrides-column-right {
 
   .ContainerDueDate { // date inputs
     .Available-from-to {
-      .from, .to {  // or the from and to collapse on each other in ie11
-        width: 50%;
+      body.responsive_misc & {
+        flex-direction: column;
+        .from {
+          margin-bottom: 18px;
+        }
+        @include breakpoint(mini-tablet) {
+          flex-direction: row;
+          .from {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+    body.responsive_misc & {
+      .input-append {
+        display: flex;
+        @include breakpoint(mini-tablet) {
+          display: inline-block;
+        }
       }
     }
     // make the box of dates layout look right
@@ -189,6 +218,13 @@ div.form-column-right, div.overrides-column-right {
   #assignment_points_possible[readonly] { // points possible
     margin-top: -3px;   // because it sits too low
   }
+  #assignment_annotated_document_info {
+    color: $ic-hint-text;
+    margin-inline-start: 42px;
+    margin-inline-end: 8px;
+    margin-block-end: 8px;
+    @include fontSize(14px);
+  }
 }
 
 
@@ -199,6 +235,15 @@ div.form-column-right, div.overrides-column-right {
 
   #discussion_topic_assignment_points_possible[readonly] {
     margin-top: -3px;
+  }
+
+  // File inputs can take up 205px of width as of this comment. Issues can arise
+  // when width: auto; was set by bootstrap. This fixes the file input from
+  // creating a horizontal scrollbar.
+  @media (max-width: 400px) {
+    input[type="file"] {
+      width: 100%;
+    }
   }
 }
 
@@ -276,5 +321,82 @@ div.form-column-right, div.overrides-column-right {
   .ModeratedGrading__GraderCountInputLabelText {
     font-size: 15px;
     width: initial;
+  }
+}
+
+#allowed-attempts-target {
+  margin: 15px;
+
+  select {
+    margin: 0
+  }
+
+  label {
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+
+  // The hover looks weird in this case
+  label:hover {
+    background: none;
+  }
+}
+// Increased specificity to override common styles
+#edit_assignment_form .form-actions {
+  padding-#{direction(left)}: 10px;
+  .pull-left {
+    min-width: 300px;
+  }
+  body.responsive_misc & {
+    .assignment__action-buttons {
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      button {
+        margin-top: 10px;
+      }
+      @include breakpoint(mini-tablet) {
+        display: inline-block;
+        width: unset;
+        button {
+          margin-top: 0px;
+        }
+      }
+    }
+  }
+}
+
+#assignment_submission_type_selection_tool_launch_container {
+  h2 {
+    font-size: 1.3rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+  }
+}
+
+.UsageRightsSelectBox__container.edit-view {
+  .control-group {
+    margin-bottom: 0;
+
+    .controls {
+      margin-#{direction(left)}: auto;
+
+    }
+
+    label.control-label {
+      padding: direction-sides(10px 0px 10px 0px);
+      margin-#{direction(left)}: 15px;
+      text-align: #{direction(left)};
+      margin-bottom: 0;
+      font-weight: bold;
+      width: auto;
+      float: initial;
+    }
+
+    label.control-label:hover {
+      background: none;
+    }
   }
 }

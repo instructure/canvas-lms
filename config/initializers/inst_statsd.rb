@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@
 
 Rails.configuration.to_prepare do
   settings = YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['statsd.yml'] || '')
-  settings ||= ConfigFile.load("statsd")
+  settings ||= ConfigFile.load("statsd").dup
   settings ||= {}
   InstStatsd.settings = settings
 end

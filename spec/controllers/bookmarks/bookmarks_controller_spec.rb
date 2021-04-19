@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@ describe Bookmarks::BookmarksController do
       end
 
       it "includes data" do
-        bookmark.update_attributes(data: {foo: "bar"})
+        bookmark.update(data: {foo: "bar"})
         get 'show', params: {id: bookmark.id}, format: 'json'
         json = json_parse
         expect(json["data"]["foo"]).to eq("bar")

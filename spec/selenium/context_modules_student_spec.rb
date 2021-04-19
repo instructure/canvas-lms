@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -327,13 +329,13 @@ describe "context modules" do
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
-        prev = f('.module-sequence-footer-button--previous')
+        prev = f('.module-sequence-footer-button--previous a')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
-        prev = f('.module-sequence-footer-button--previous')
+        prev = f('.module-sequence-footer-button--previous a')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
         nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
@@ -351,7 +353,7 @@ describe "context modules" do
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        prev = f('.module-sequence-footer-button--previous')
+        prev = f('.module-sequence-footer-button--previous a')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
@@ -495,8 +497,9 @@ describe "context modules" do
       end
 
       it "should show a tooltip for locked icon when module is locked", priority:"1", test_id: 255918 do
+        skip "flaky, LS-1297 (8/23/2020)"
         go_to_modules
-        driver.mouse.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0)
+        driver.action.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0).perform
         expect(fj('.ui-tooltip:visible')).to include_text('Locked')
       end
 
@@ -523,9 +526,10 @@ describe "context modules" do
       end
 
       it "shows a tooltip when hovering over a completed icon", priority: "1", test_id: 255915 do
+        skip "flaky, LS-1297 (8/23/2020)"
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
-        driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0)
+        driver.action.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0).perform
         expect(fj('.ui-tooltip:visible')).to include_text('Completed')
       end
 
@@ -569,16 +573,18 @@ describe "context modules" do
         end
 
         it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1", test_id: 255916 do
+          skip "flaky, LS-1297 (8/23/2020)"
           grade_assignment(50)
           go_to_modules
-          driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0)
+          driver.action.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0).perform
           expect(fj('.ui-tooltip:visible')).to include_text('Started')
         end
 
         it "shows tooltip warning for a min score assignemnt", priority: "1", test_id: 255917 do
+          skip "flaky, LS-1297 (8/23/2020)"
           grade_assignment(50)
           go_to_modules
-          driver.mouse.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0)
+          driver.action.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0).perform
           expect(fj('.ui-tooltip:visible')).to include_text('You scored a 50. Must score at least a 90.0.')
         end
 

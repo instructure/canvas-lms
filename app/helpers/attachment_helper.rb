@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ module AttachmentHelper
     url_opts = {
       anonymous_instructor_annotations: attrs.delete(:anonymous_instructor_annotations),
       enable_annotations: attrs.delete(:enable_annotations),
-      moderated_grading_whitelist: attrs[:moderated_grading_whitelist],
+      moderated_grading_allow_list: attrs[:moderated_grading_allow_list],
       submission_id: attrs.delete(:submission_id)
     }
     url_opts[:enrollment_type] = attrs.delete(:enrollment_type) if url_opts[:enable_annotations]
@@ -41,7 +43,7 @@ module AttachmentHelper
     context_name = url_helper_context_from_object(attachment.context)
     url_helper = "#{context_name}_file_inline_view_url"
     if self.respond_to?(url_helper)
-      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id)
+      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id, {:verifier => params[:verifier]})
     end
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
@@ -55,7 +57,7 @@ module AttachmentHelper
     attrs[:type] = attachment.content_type.match(/video/) ? 'video' : 'audio'
     attrs[:download_url] = context_url(attachment.context, :context_file_download_url, attachment.id)
     attrs[:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
-    attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
+    attrs.inject(+"") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
   end
 
   def doc_preview_json(attachment, user)
@@ -66,23 +68,34 @@ module AttachmentHelper
   end
 
   def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
-    set_cache_header(attachment, inline)
+    can_proxy = inline && attachment.can_be_proxied?
+    must_proxy = inline && csp_enforced? && attachment.mime_class == 'html'
+    direct = attachment.stored_locally? || can_proxy || must_proxy
+
+    # up here to preempt files domain redirect
+    if attachment.instfs_hosted? && file_location_mode? && !direct
+      url = inline ?
+        authenticated_inline_url(attachment) :
+        authenticated_download_url(attachment)
+      render_file_location(url)
+      return
+    end
+
+    set_cache_header(attachment, direct)
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, host_and_shard: @safer_domain_host,
         verifier: verifier, download: !inline)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
-    elsif inline && attachment.can_be_proxied?
+    elsif can_proxy
       body = attachment.open.read
       add_csp_for_file if attachment.mime_class == 'html'
       send_file_headers!(length: body.length, filename: attachment.filename, disposition: 'inline', type: attachment.content_type_with_encoding)
       render body: body
+    elsif must_proxy
+      return render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
-      if attachment.mime_class == 'html' && csp_enforced?
-        return render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
-      end
-
       redirect_to authenticated_inline_url(attachment)
     else
       redirect_to authenticated_download_url(attachment)
@@ -100,7 +113,7 @@ module AttachmentHelper
     !!@safer_domain_host
   end
 
-  def set_cache_header(attachment, inline)
+  def set_cache_header(attachment, direct)
     # TODO [RECNVS-73]
     # instfs JWTs cannot be shared across users, so we cannot cache them across
     # users. while most browsers will only service one user and caching
@@ -109,10 +122,10 @@ module AttachmentHelper
     # investigate opportunities to reuse JWTs when the same user requests the
     # same file within a reasonable window of time, so that the URL redirected
     # too can still take advantage of browser caching.
-    unless attachment.instfs_hosted? || attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
+    unless (attachment.instfs_hosted? && !direct) || attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
       cancel_cache_buster
       # set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
-      ttl = attachment.stored_locally? || (inline && attachment.can_be_proxied?) ? 1.day : attachment.url_ttl
+      ttl = direct ? 1.day : attachment.url_ttl
       response.headers["Cache-Control"] = "private, max-age=#{ttl.seconds.to_s}"
       response.headers["Expires"] = ttl.from_now.httpdate
     end

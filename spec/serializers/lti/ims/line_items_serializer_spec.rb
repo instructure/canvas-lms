@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 require 'spec_helper'
 
 RSpec.describe Lti::Ims::LineItemsSerializer do
-  let(:resource_link) { resource_link_model(overrides: {resource_link_id: assignment.lti_context_id}) }
+  let(:resource_link) { resource_link_model(overrides: {resource_link_uuid: assignment.lti_context_id}) }
   let_once(:course) { course_model }
   let(:tool) {
     ContextExternalTool.create!(
@@ -70,13 +72,13 @@ RSpec.describe Lti::Ims::LineItemsSerializer do
           label: line_item.label,
           resourceId: line_item.resource_id,
           tag: line_item.tag,
-          resourceLinkId: line_item.resource_link&.resource_link_id
+          resourceLinkId: line_item.resource_link&.resource_link_uuid
         }
       )
     end
 
     it 'does not incude values that are nil' do
-      line_item.update_attributes!(resource_link: nil, tag: nil)
+      line_item.update!(resource_link: nil, tag: nil)
       expect(described_class.new(line_item, line_item_id).as_json).to eq(
         {
           id: line_item_id,

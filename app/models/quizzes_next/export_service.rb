@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -75,7 +77,8 @@ module QuizzesNext
             {
               original_course_uuid: imported_content[:original_course_uuid],
               new_course_uuid: new_course.uuid,
-              new_course_resource_link_id: new_course.lti_context_id
+              new_course_resource_link_id: new_course.lti_context_id,
+              domain: new_course.root_account&.domain(ApplicationController.test_cluster_name)
             }
           )
         end

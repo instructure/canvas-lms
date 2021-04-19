@@ -21,10 +21,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {every, keys, isEmpty, intersection, map} from 'lodash'
-import DueDates from 'jsx/due_dates/DueDates'
-import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
-import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
-import AssignmentOverride from 'compiled/models/AssignmentOverride'
+import DueDates from '@canvas/due-dates/react/DueDates'
+import OverrideStudentStore from '@canvas/due-dates/react/OverrideStudentStore'
+import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 const findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag
@@ -295,11 +295,43 @@ QUnit.module('DueDates with grading periods', {
       })
     ]
     const sections = [
-      { attributes: { id: "0", name: "Everyone" } },
-      { attributes: { id: "19", name: "Section 1", start_at: null, end_at: null, override_course_and_term_dates: null } },
-      { attributes: { id: "4", name: "Section 2", start_at: null, end_at: null, override_course_and_term_dates: null } },
-      { attributes: { id: "7", name: "Section 3", start_at: null, end_at: null, override_course_and_term_dates: null } },
-      { attributes: { id: "8", name: "Section 4", start_at: null, end_at: null, override_course_and_term_dates: null } },
+      {attributes: {id: '0', name: 'Everyone'}},
+      {
+        attributes: {
+          id: '19',
+          name: 'Section 1',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      },
+      {
+        attributes: {
+          id: '4',
+          name: 'Section 2',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      },
+      {
+        attributes: {
+          id: '7',
+          name: 'Section 3',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      },
+      {
+        attributes: {
+          id: '8',
+          name: 'Section 4',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      }
     ]
     const gradingPeriods = [
       {

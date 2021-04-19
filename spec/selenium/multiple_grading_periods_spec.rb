@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 require_relative './common'
+require_relative './grades/pages/gradebook_page'
 require_relative './helpers/gradebook_common'
 
 describe "interaction with grading periods" do
@@ -30,6 +33,13 @@ describe "interaction with grading periods" do
   context "gradebook" do
     before :once do
       gradebook_data_setup(grading_periods: [:future, :current])
+
+      # Remove sections, as there is a bug when attempting to click on the
+      # Grading Period filter option. The Section filter option is clicked
+      # instead, for reasons unknown.
+      @course.course_sections.each do |section|
+        section.destroy unless section.default_section?
+      end
     end
 
     before :each do
@@ -43,18 +53,27 @@ describe "interaction with grading periods" do
     it "should display the correct grading period based on the GET param" do
       future_period = @course.grading_periods.detect{|gp| gp.start_date.future?}
       get "/courses/#{@course.id}/gradebook?grading_period_id=#{future_period.id}"
-      expect(f('.grading-period-select-button')).to include_text(future_period.title)
+      Gradebook.select_view_dropdown
+      Gradebook.select_filters
+      Gradebook.select_view_filter("Grading Periods")
+      expect(Gradebook.grading_period_dropdown).to have_value(future_period.title)
     end
 
     it "should display All Grading Periods when grading period id is set to 0" do
       get "/courses/#{@course.id}/gradebook?grading_period_id=0"
-      expect(f('.grading-period-select-button')).to include_text("All Grading Periods")
+      Gradebook.select_view_dropdown
+      Gradebook.select_filters
+      Gradebook.select_view_filter("Grading Periods")
+      expect(Gradebook.grading_period_dropdown).to have_value("All Grading Periods")
     end
 
     it "should display the current grading period without a GET param" do
       current_period = @course.grading_periods.detect{|gp| gp.start_date.past? && gp.end_date.future?}
       get "/courses/#{@course.id}/gradebook"
-      expect(f('.grading-period-select-button')).to include_text(current_period.title)
+      Gradebook.select_view_dropdown
+      Gradebook.select_filters
+      Gradebook.select_view_filter("Grading Periods")
+      expect(Gradebook.grading_period_dropdown).to have_value(current_period.title)
     end
 
     context "using grading period dropdown" do
@@ -66,18 +85,20 @@ describe "interaction with grading periods" do
 
       it 'filters assignments when different grading periods selected', test_id: 2528635, priority: "2" do
         get_gradebook
-        f('.grading-period-select-button').click
-        fj('.ui-menu-item label:contains("Course Period 1: future period")').click
-        wait_for_ajaximations
+        Gradebook.select_view_dropdown
+        Gradebook.select_filters
+        Gradebook.select_view_filter("Grading Periods")
+        Gradebook.select_grading_period("Course Period 1: future period")
         element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
         expect(element.first).to be_displayed
       end
 
       it 'displays all assignments when all grading periods selected', test_id: 2528636, priority: "2" do
         get_gradebook
-        f('.grading-period-select-button').click
-        fj('.ui-menu-item label:contains("All Grading Periods")').click
-        wait_for_ajaximations
+        Gradebook.select_view_dropdown
+        Gradebook.select_filters
+        Gradebook.select_view_filter("Grading Periods")
+        Gradebook.select_grading_period("All Grading Periods")
 
         element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
         expect(element.first).to be_displayed
@@ -144,7 +165,7 @@ describe "interaction with grading periods" do
       end
 
       it 'should list an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
-        assignment.update_attributes(due_at: 3.days.from_now(now))
+        assignment.update(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
         expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
@@ -185,18 +206,18 @@ describe "interaction with grading periods" do
     end
 
     it 'should display the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
-      expect(fj("#grading_period_select_menu option:selected")).to include_text('Course Grading Period 1')
+      expect(f("#grading_period_select_menu").attribute('value')).to eq "Course Grading Period 1"
       expect(f("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
     end
 
     it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
-      fj("#grading_period_select_menu option:nth-child(3)").click
+      click_option('#grading_period_select_menu', 'Course Grading Period 2')
       expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end
 
     it 'should update assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
-      fj("#grading_period_select_menu option:nth-child(1)").click
+      click_option("#grading_period_select_menu", 'All Grading Periods')
       expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')

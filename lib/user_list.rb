@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -79,6 +79,7 @@ class UserList
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
       cc.user = user
       user.workflow_state = 'creation_pending'
+      user.root_account_ids = [@root_account.id]
       user.initial_enrollment_type = User.initial_enrollment_type_from_text(@initial_type)
       user.save!
       user
@@ -92,6 +93,9 @@ class UserList
   def parse_single_user(path)
     return if path.blank?
 
+    unique_id_regex = Pseudonym.validators.
+      find { |v| v.attributes.include?(:unique_id) && v.is_a?(ActiveModel::Validations::FormatValidator) }.
+      options[:with]
     # look for phone numbers by searching for 10 digits, allowing
     # any non-word characters
     if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
@@ -99,7 +103,7 @@ class UserList
     elsif path.include?('@') && (email = parse_email(path))
       type = :email
       name, path = email
-    elsif path =~ Pseudonym.validates_format_of_login_field_options[:with]
+    elsif path =~ unique_id_regex
       type = :pseudonym
     else
       @errors << { :address => path, :details => :unparseable }

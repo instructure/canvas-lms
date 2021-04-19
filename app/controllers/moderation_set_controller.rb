@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -87,6 +89,6 @@ class ModerationSetController < ApplicationController
 
   def load_assignment
     @context = api_find(Course, params[:course_id])
-    @assignment = @context.assignments.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments, params[:assignment_id])
   end
 end

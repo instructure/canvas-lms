@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -70,7 +72,7 @@ module CC::Exporter::Epub
 
     # View helpers
     def convert_placeholder_paths_from_string!(html_string)
-      html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
+      html_node = Nokogiri::HTML5.fragment(html_string)
       html_node.tap do |node|
         convert_media_from_node!(node)
         convert_object_paths!(node)
@@ -94,7 +96,7 @@ module CC::Exporter::Epub
       if item[:href].present?
         content_tag(:a, content, href: item[:href])
       else
-        content
+        HtmlTextHelper.escape_html(content)
       end
     end
 

@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -18,13 +18,14 @@
 
 module Utils
   class DatePresenter
-    attr_reader :date, :raw_date, :zone
+    attr_reader :date, :raw_date, :zone, :with_weekday
 
-    def initialize(date, zone=nil)
+    def initialize(date, zone=nil, with_weekday: false)
       zone ||= Time.zone
       @raw_date = date
       @date = RelativeDate.new(date, zone)
       @zone = zone
+      @with_weekday = with_weekday
     end
 
     def as_string(style=:normal)
@@ -52,7 +53,8 @@ module Utils
     end
 
     def i18n_date(format)
-      I18n.l(raw_date, format: I18n.send(:t, :"date.formats.#{format}"))
+      # Use send to prevent i18nliner trying to parse this
+      I18n.l(raw_date, format: I18n.send(:t, "date.formats.#{format}#{with_weekday ? '_with_weekday' : ''}"))
     end
 
     def special_value_type

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 Instructure, Inc.
 #
@@ -28,6 +30,7 @@ describe "Group Categories API", type: :request do
       'self_signup' => category.self_signup,
       'context_type' => category.context_type,
       "#{category.context_type.downcase}_id" => category.context_id,
+      'created_at' => category.created_at.iso8601,
       'group_limit' => category.group_limit,
       'groups_count' => category.groups.size,
       'unassigned_users_count' => category.unassigned_users.count(:all),
@@ -50,6 +53,90 @@ describe "Group Categories API", type: :request do
     before :once do
       @course = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
       @category = GroupCategory.student_organized_for(@course)
+    end
+
+    describe "export" do
+      let(:api_url) { "/api/v1/group_categories/#{@category.id}/export" }
+      let(:api_route) do
+        {
+          controller: 'group_categories',
+          action: 'export',
+          group_category_id: @category.to_param,
+          format: 'csv'
+        }
+      end
+
+      before :once do
+        5.times do |n|
+          @course.enroll_user(user_with_pseudonym(sis_user_id: "user_#{n}", username: "login_#{n}"), "StudentEnrollment", enrollment_state: 'active')
+          @course.enroll_user(user_factory,'TeacherEnrollment',:enrollment_state => :active)
+        end
+      end
+
+      context 'basic roster' do
+        shared_examples 'basic course roster' do
+          it "should return users for a group_category" do
+            status = raw_api_call(:get, api_url, api_route)
+            expect(status).to eq 200
+            csv = CSV.parse(response.body)
+            expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
+            expect(csv.count).to eq(5)
+            5.times do
+              p = Pseudonym.by_unique_id(csv.first[3]).take
+              expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil])
+            end
+          end
+        end
+
+        context 'future course should work' do
+          before do
+            @course.start_at = 1.week.from_now
+            @course.restrict_enrollments_to_course_dates = true
+            @course.save!
+          end
+
+          include_examples 'basic course roster'
+        end
+
+        context 'normal course' do
+          include_examples 'basic course roster'
+        end
+      end
+
+      it "should return active group_memberships" do
+        g1 = @category.groups.create!(name: 'g1', context: @course)
+        g2 = @category.groups.create!(name: 'g2', sis_source_id: 'g2sis', context: @course)
+        u1 = Pseudonym.by_unique_id('login_0').take.user
+        gm1 = g1.add_user(u1)
+        gm1.destroy
+        g2.add_user(u1)
+        status = raw_api_call(:get, api_url, api_route)
+        expect(status).to eq 200
+        csv = CSV.parse(response.body)
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
+        expect(csv.count).to eq(5)
+        5.times do
+          p = Pseudonym.by_unique_id(csv.first[3]).take
+          next unless p.unique_id == 'login_0'
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, 'g2', g2.id.to_s, 'g2sis'])
+        end
+      end
+
+      it "should return group_memberships in active groups" do
+        g1 = @category.groups.create!(name: 'g1', context: @course)
+        u1 = Pseudonym.by_unique_id('login_0').take.user
+        g1.add_user(u1)
+        g1.destroy
+        status = raw_api_call(:get, api_url, api_route)
+        expect(status).to eq 200
+        csv = CSV.parse(response.body)
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
+        expect(csv.count).to eq(5)
+        5.times do
+          p = Pseudonym.by_unique_id(csv.first[3]).take
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil])
+        end
+      end
     end
 
     describe "users" do
@@ -108,10 +195,10 @@ describe "Group Categories API", type: :request do
         expect(response.code).to eq '401'
       end
 
-      it "returns an error when search_term is fewer than 3 characters" do
-        json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+      it "returns an error when search_term is fewer than 2 characters" do
+        json = api_call(:get, api_url, api_route, {:search_term => 'a'}, {}, :expected_status => 400)
         error = json["errors"].first
-        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+        verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
       end
 
       it "returns a list of users" do
@@ -164,6 +251,18 @@ describe "Group Categories API", type: :request do
         expect(category.self_signup).to eq "enabled"
         groups = @category.groups.active
         expect(groups.count).to eq 3
+      end
+
+      it "should not allow a teacher to update a category in other courses" do
+        og_course = @course
+        course = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
+        category2 = GroupCategory.student_organized_for(course)
+        json = api_call(:put, "/api/v1/group_categories/#{category2.id}",
+                        @category_path_options.merge(action: 'update', group_category_id: category2.to_param),
+                        { name: @name, self_signup: 'enabled', 'create_group_count' => 3, course_id: og_course.id},
+                        {}, {expected_status: 401})
+        expect(json['status']).to eq 'unauthorized'
+        expect(category2.reload.name).to_not eq @name
       end
 
       it "should allow a teacher to update a category and distribute students to new groups" do
@@ -613,7 +712,7 @@ describe "Group Categories API", type: :request do
         let(:json) { api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                               @category_path_options.merge(action:'index',
                                                            account_id: @account.to_param)) }
-        let(:admin) { Role.get_built_in_role("AccountAdmin") }
+        let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
         before :each do
           @user = User.create!(name: 'billy')

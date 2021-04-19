@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -146,7 +148,7 @@ class AdminsController < ApplicationController
     @role = Role.get_role_by_id(params[:role_id]) if params[:role_id]
     @context.shard.activate do
       @role ||= @context.get_account_role_by_name(params[:role]) if params[:role]
-      @role ||= Role.get_built_in_role("AccountAdmin")
+      @role ||= Role.get_built_in_role("AccountAdmin", root_account_id: @context.resolved_root_account_id)
     end
   end
 end

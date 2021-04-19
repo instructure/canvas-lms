@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -27,7 +29,7 @@ describe 'quizzes with draft state' do
 
   before(:each) do
     course_with_student_logged_in
-    @course.update_attributes(name: 'teacher course')
+    @course.update(name: 'teacher course')
     @course.save!
     @course.reload
 

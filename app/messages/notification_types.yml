@@ -12,16 +12,14 @@
 #    - name: Old Notification
 #      delay_for: <%= 3 * 60 %>
 #
+- category: Account Notification
+  notifications:
+    - name: Account Notification
+
 - category: Added To Conversation
   notifications:
     - name: Added To Conversation
       delay_for: 0
-
-- category: Conversation Created
-  notifications:
-    - name: Conversation Created
-      delay_for: 0
-
 
 - category: Alert
   notifications:
@@ -68,12 +66,28 @@
     - name: Appointment Reserved For User
       delay_for: 0
 
+- category: Blueprint
+  notifications:
+    - name: Blueprint Content Added
+      delay_for: 0
+    - name: Blueprint Sync Complete
+      delay_for: 0
+
 - category: Calendar
   notifications:
     - name: New Event Created
       delay_for: 0
     - name: Event Date Changed
       delay_for: <%= 15*60 %>
+
+- category: Content Link Error
+  notifications:
+    - name: Content Link Error
+
+- category: Conversation Created
+  notifications:
+    - name: Conversation Created
+      delay_for: 0
 
 - category: Conversation Message
   notifications:
@@ -114,6 +128,8 @@
       delay_for: 0
     - name: Assignment Due Date Override Changed
       delay_for: <%= 2*60 %>
+    - name: Upcoming Assignment Alert
+      delay_for: 0
 
 - category: Files
   notifications:
@@ -126,12 +142,14 @@
   notifications:
     - name: Assignment Graded
       delay_for: <%= 15*60 %>
-    - name: Assignment Unmuted
-      delay_for: 0
     - name: Submission Graded
       delay_for: <%= 60*60 %>
     - name: Submission Grade Changed
       delay_for: <%= 5*60 %>
+    - name: Submission Posted
+      delay_for: 0
+    - name: Submissions Posted
+      delay_for: 0
     - name: Quiz Regrade Finished
       delay_for: 0
 
@@ -203,6 +221,11 @@
     - name: Enrollment Accepted
       delay_for: 0
 
+- category: Recording Ready
+  notifications:
+    - name: Web Conference Recording Ready
+      delay_for: 0
+
 - category: Registration
   notifications:
     - name: Confirm Email Communication Channel
@@ -229,6 +252,8 @@
       delay_for: 0
     - name: Enrollment Notification
       delay_for: 0
+    - name: Manually Created Access Token Created
+      delay_for: 0
 
 - category: Student Appointment Signups
   notifications:
@@ -243,23 +268,12 @@
       delay_for: 0
     - name: Submission Comment For Teacher
       delay_for: 0
+    - name: Annotation Notification
+      delay_for: 0
+    - name: Annotation Teacher Notification
+      delay_for: 0
 
 - category: Summaries
   notifications:
     - name: Summaries
       delay_for: 0
-
-- category: Recording Ready
-  notifications:
-    - name: Web Conference Recording Ready
-      delay_for: 0
-
-- category: Blueprint
-  notifications:
-    - name: Blueprint Content Added
-      delay_for: 0
-    - name: Blueprint Sync Complete
-      delay_for: 0
-- category: Content Link Error
-  notifications:
-    - name: Content Link Error

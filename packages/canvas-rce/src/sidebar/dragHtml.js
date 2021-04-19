@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as browser from "../common/browser";
+import * as browser from '../common/browser'
 
 export default function(ev, html) {
   // default data to store
-  let format = "text/html";
-  let data = html;
+  let format = 'text/html'
+  let data = html
 
   // special handling for IE and Edge
   if (browser.edge()) {
@@ -29,7 +29,7 @@ export default function(ev, html) {
     // (e.g. when dragging an image) that confuses tinymce's onDrop handler
     // into suppressing the drop event. fortunately, calling clear() on the
     // items will also clear the ev.dataTransfer.files.
-    ev.dataTransfer.items.clear();
+    ev.dataTransfer.items.clear()
   } else if (browser.ie()) {
     // pre-Edge Internet Explorer doesn't like setData with a type other than
     // 'Text' or 'URL'. fortunately tinymce already provides a workaround
@@ -43,10 +43,10 @@ export default function(ev, html) {
     //    there suffices.
     //  * the third part is the encoded html
     //
-    format = "Text";
-    data = `data:text/mce-internal,rcs-sidebar,${escape(html)}`;
+    format = 'Text'
+    data = `data:text/mce-internal,rcs-sidebar,${escape(html)}`
   }
 
   // place the data into the dataTransfer so it's available for the drop event
-  ev.dataTransfer.setData(format, data);
+  ev.dataTransfer.setData(format, data)
 }

@@ -16,57 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  CHANGE_TAB,
-  CHANGE_ACCORDION,
-  RESET_UI,
-  HIDE_SIDEBAR,
-  SHOW_SIDEBAR
-} from "../actions/ui";
-import { combineReducers } from "redux";
+import {CHANGE_TAB, CHANGE_ACCORDION, RESET_UI, HIDE_SIDEBAR, SHOW_SIDEBAR} from '../actions/ui'
+import {combineReducers} from 'redux'
 
 function hidden(state = false, action) {
   switch (action.type) {
     case HIDE_SIDEBAR:
-      return true;
+      return true
 
     case RESET_UI:
     case SHOW_SIDEBAR:
-      return false;
+      return false
 
     default:
-      return state;
+      return state
   }
 }
 
 function selectedTabIndex(state = 0, action) {
   switch (action.type) {
     case RESET_UI:
-      return 0;
+      return 0
 
     case CHANGE_TAB:
-      return action.index;
+      return action.index
 
     default:
-      return state;
+      return state
   }
 }
 
-function selectedAccordionIndex(state = "", action) {
+function selectedAccordionIndex(state = '', action) {
   switch (action.type) {
     case RESET_UI:
-      return "";
+      return ''
 
     case CHANGE_TAB:
       // switch links panel accordion tab back to first tab any time we
       // switch _back to_ links panel
-      return "";
+      return ''
 
     case CHANGE_ACCORDION:
-      return action.index;
+      return action.index
 
     default:
-      return state;
+      return state
   }
 }
 
@@ -74,4 +68,4 @@ export default combineReducers({
   hidden,
   selectedTabIndex,
   selectedAccordionIndex
-});
+})

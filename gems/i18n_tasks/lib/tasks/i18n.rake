@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'i18n_tasks'
 require 'i18n_extraction'
 require 'shellwords'
@@ -38,6 +40,22 @@ namespace :i18n do
 
   desc "Generates a new en.yml file for all translations"
   task :generate => :check do
+    def deep_sort_hash_by_keys(value)
+      sort = ->(node) do
+        case node
+        when Hash
+          node.keys.sort.reduce({}) do |acc, key|
+            acc[key] = sort[node[key]]
+            acc
+          end
+        else
+          node
+        end
+      end
+
+      sort[value]
+    end
+
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
@@ -45,14 +63,17 @@ namespace :i18n do
       locales
       crowdsourced
       custom
-      deprecated_for
       bigeasy_locale
       fullcalendar_locale
       moment_locale
     }.freeze
 
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except(*special_keys)}.to_yaml(line_width: -1))
+      file.write(
+        {
+          'en' => deep_sort_hash_by_keys(@translations.except(*special_keys))
+        }.to_yaml(line_width: -1)
+      )
     end
     print "Wrote new #{yaml_file}\n\n"
   end
@@ -95,13 +116,6 @@ namespace :i18n do
 
     locales = I18n.available_locales - [:en]
     all_translations = I18n.backend.send(:translations)
-
-    # copy "real" translations from deprecated locales
-    I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.send(:lookup, locale.to_s, 'deprecated_for'))
-        all_translations[locale] = all_translations[deprecated_for.to_sym]
-      end
-    end
 
     flat_translations = all_translations.flatten_keys
 
@@ -363,6 +377,8 @@ namespace :i18n do
 
   def remove_unwanted_translations(translations)
     translations['date'].delete('order')
+    translations['number'].fetch('nth', {}).delete('ordinals')
+    translations['number'].fetch('nth', {}).delete('ordinalized')
   end
 
   def autoimport(source_translations, new_translations)

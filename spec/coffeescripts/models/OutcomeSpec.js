@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Outcome from 'compiled/models/Outcome'
+import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Course Outcomes', {
@@ -67,13 +67,13 @@ test('CanManage returns true for an account outcome on the course level', functi
 
 test('default calculation method settings not set if calculation_method exists', function() {
   const spy = sandbox.spy(Outcome.prototype, 'setDefaultCalcSettings')
-  const outcome = new Outcome(this.importedOutcome, {parse: true})
+  new Outcome(this.importedOutcome, {parse: true})
   ok(!spy.called)
 })
 
 test('default calculation method settings set if calculation_method is null', function() {
   const spy = sandbox.spy(Outcome.prototype, 'setDefaultCalcSettings')
-  const outcome = new Outcome(this.courseOutcome, {parse: true})
+  new Outcome(this.courseOutcome, {parse: true})
   ok(spy.calledOnce)
 })
 
@@ -125,4 +125,55 @@ QUnit.module('Global Outcomes in a course', {
 test('CanManage returns true for a global outcome on the course level', function() {
   const outcome = new Outcome(this.globalOutcome, {parse: true})
   equal(outcome.canManage(), true)
+})
+
+QUnit.module('With the account_level_mastery_scales FF enabled', {
+  setup() {
+    this.importedOutcome = {
+      context_type: 'Account',
+      context_id: 1,
+      outcome: {
+        title: 'Account Outcome',
+        context_type: 'Course',
+        context_id: 1,
+        calculation_method: 'decaying_average',
+        calculation_int: 65
+      }
+    }
+    fakeENV.setup()
+    this.ratings = [
+      {description: 'Exceeds Mastery', points: 4.0, mastery: false, color: '127A1B'},
+      {description: 'Mastery', points: 3.0, mastery: true, color: '00AC18'},
+      {description: 'Near Mastery', points: 2.0, mastery: false, color: 'FAB901'},
+      {description: 'Below Mastery', points: 1.0, mastery: false, color: 'FD5D10'},
+      {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'EE0612'}
+    ]
+    ENV.PERMISSIONS = {manage_outcomes: true}
+    ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
+    ENV.MASTERY_SCALE = {
+      outcome_proficiency: {ratings: this.ratings}
+    }
+    ENV.ACCOUNT_LEVEL_MASTERY_SCALES = true
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('it uses the ENV.MASTERY_SCALES ratings', function() {
+  const outcome = new Outcome(this.importedOutcome, {parse: true})
+  equal(outcome.get('ratings'), this.ratings)
+  equal(outcome.get('mastery_points'), 3)
+  equal(outcome.get('points_possible'), 4)
+})
+
+test('ignores proficiency attributes during saving', function() {
+  const outcome = new Outcome(this.importedOutcome, {parse: true})
+  sinon.stub(outcome, 'url').returns('fake-url')
+  outcome.save({}, {})
+  equal(outcome.get('mastery_points'), null)
+  equal(outcome.get('points_possible'), null)
+  equal(outcome.get('ratings'), null)
+  equal(outcome.get('calculation_method'), null)
+  equal(outcome.get('calculation_int'), null)
 })

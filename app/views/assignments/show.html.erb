@@ -16,36 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<style>
+  #right-side-wrapper {
+    height: 100%;
+  }
+</style>
 
-<% if @context.root_account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2]) %>
-  <% if can_do(@context, @current_user, :read_as_admin) %>
-    <% css_bundle :assignments_2_teacher %>
-    <% js_bundle :assignments_2_show_teacher %>
-  <% else %>
+<% provide :page_title, @assignment.title %>
+<% provide :right_side, render(:partial => "assignment_sidebar") %>
 
-    <% css_bundle :assignments_2_student %>
-    <% js_bundle :assignments_2_show_student %>
-  <% end %>
-  <div id="assignments_2"></div>
-<% else %>
-
-<%
-  content_for :page_title, @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title
-  content_for :right_side, render(:partial => "assignment_sidebar")
-%>
-
-<% if @locked && !@locked[:can_view] %>
-  <% js_bundle :module_sequence_footer %>
+<% if @show_locked_page %>
 
   <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
 <% else %>
-
-<%
-  css_bundle :assignments
-  js_bundle :assignment_show
-%>
 
 <% if @assignment.omit_from_final_grade %>
   <div class="alert alert-info omit-from-final-warning">
@@ -61,9 +46,6 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
-        <% if @context.root_account.feature_enabled?(:assignments_2) %>
-          <a id="toggle_assignments_2" class="btn" href="<%= course_assignment_path(@context, @assignment)%>?assignments_2=true"><%= t("Assignments 2") %></a>
-        <% end %>
         <button
           id="assignment_publish_button"
           data-id='<%= @assignment.id %>'
@@ -89,19 +71,31 @@
           </a>
         <% end %>
 
-        <% if @assignment_menu_tools.present? %>
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+        <% if @assignment_menu_tools.present? || @can_direct_share %>
+          <button class="al-trigger btn" aria-haspopup="true" aria-owns="toolbar-1">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
-          </a>
+          </button>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+            <% if @can_direct_share %>
+              <li role="presentation">
+                <a href="#" class="icon-user direct-share-send-to-menu-item"><%= t("Send To...") %></a>
+              </li>
+              <li role="presentation">
+                <a href="#" class="icon-duplicate direct-share-copy-to-menu-item"><%= t("Copy To...") %></a>
+              </li>
+            <% end %>
             <%= external_tools_menu_items(@assignment_menu_tools, {link_class: "menu_tool_link", settings_key: :assignment_menu, in_list: true, url_params: {:assignments => [@assignment.id]}}) %>
           </ul>
         <% end %>
       </div>
     </div>
+    <div id="direct-share-mount-point"></div>
   <% else %>
     <!--Student View-->
+    <% if show_confetti %>
+      <%= render partial: "confetti" %>
+    <% end %>
     <div class='assignment-title'>
       <div class='title-content'>
         <h1 class="title">
@@ -109,61 +103,11 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
-        <% if @context.root_account.feature_enabled?(:assignments_2) %>
-          <a id="toggle_assignments_2" class="btn" href="<%= course_assignment_path(@context, @assignment)%>?assignments_2=true"><%= t("Assignments 2") %></a>
-        <% end %>
         <%= render "shared/mark_as_done" %>
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
       </div>
     </div>
-    <ul class='student-assignment-overview'>
-      <li>
-        <span class='title'><%= t :due_at, 'Due' %></span>
-        <span class='value'>
-          <span class="date_text">
-            <% if @assignment.multiple_due_dates? %>
-              <%= multiple_due_date_tooltip(@assignment, @current_user) %>
-            <% elsif @assignment.due_at %>
-              <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
-                <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
-                <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
-            <% else %>
-              <%= t :no_due_date, 'No Due Date' %>
-            <% end %>
-          </span>
-        </span>
-      </li>
-      <li>
-        <span class='title'><%= t :points, 'Points' %></span>
-        <span class='value'><%= n(round_if_whole(@assignment.points_possible)) || t(:no_points, 'None') %></span>
-      </li>
-      <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
-        <% turnitin_text = turnitin_active? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
-        <% vericite_text = vericite_active? ? ' ' + t(:vericite_enabled_short, '(VeriCite enabled)') : '' %>
-        <li>
-          <span class='title'><%= t :submitting, 'Submitting' %></span>
-          <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
-        </li>
-        <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
-          <li>
-            <span class='title'><%= t :submission_types, 'File Types' %></span>
-            <span class='value'><%= @assignment.allowed_extensions.to_sentence %></span>
-          </li>
-        <% end %>
-      <% end %>
-      <% if @assignment.allowed_attempts&.> 0 %>
-        <li>
-          <span class='title'><%= t :attempts, 'Attempts' %></span>
-          <span class='value'><%= @current_user_submission&.attempt || 0 %></span>
-        </li>
-        <li>
-          <span class='title'><%= t :allowed_attempts, 'Allowed Attempts' %></span>
-          <span class='value'><%= @assignment.allowed_attempts + (@current_user_submission&.extra_attempts || 0) %></span>
-        </li>
-      <% end %>
-      <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
-      <div class="clear"></div>
-    </ul>
+    <%= render "student_assignment_overview" %>
   <% end %>
 
   <div class="clear"></div>
@@ -175,7 +119,7 @@
   <div class="clear"></div>
 
   <% description = !@assignment.description.blank? ? public_user_content(@assignment.description) : t('defaults.no_content', "No Content") %>
-  <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "student-version" %>"><%= description %></div>
+  <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "" %>"><%= description %></div>
 
   <% if can_do(@context, @current_user, :read_as_admin) %>
     <!--Teacher view-->
@@ -249,8 +193,7 @@
         <a
           href="<%= context_url(@context, :context_rubrics_url) %>"
           class="add_rubric_link Button icon-plus"
-          style="<%= hidden if @assignment.rubric_association %>"
-          role="button"
+          style="<%= hidden if @assignment.active_rubric_association? %>"
         >
           <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
           <span class="screenreader-only"><%= t('Add Rubric') %></span>
@@ -276,5 +219,3 @@
 <% end %>
 
 <%= render partial: "shared/rubrics_component" %>
-
-<% end %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -52,7 +54,9 @@ class Enrollment
     end
 
     def update_with(options)
-      all_enrollments_scope.update_all(options)
+      all_enrollments_scope.
+        where("last_activity_at IS NULL OR last_activity_at < ?", options[:last_activity_at] - last_threshold).
+        update_all_locked_in_order(options)
     end
 
     def increment_total_activity?(as_of)

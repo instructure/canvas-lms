@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,6 @@ module SIS
   class SectionImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       CourseSection.suspend_callbacks(:delete_enrollments_later_if_deleted) do
         Course.skip_updating_account_associations do
@@ -34,12 +35,12 @@ module SIS
         CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end
       # there could be a ton of deleted sections, and it would be really slow to do a normal find_each
-      # that would order by id. So do it on the slave, to force a cursor that avoids the sort so that
+      # that would order by id. So do it on the secondary, to force a cursor that avoids the sort so that
       # it can run really fast
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         # ideally we change this to find_in_batches, and call (the currently non-existent) Enrollment.destroy_batch
         Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_in_batches do |enrollments|
-          Shackles.activate(:master) do
+          GuardRail.activate(:primary) do
             new_data = Enrollment::BatchStateUpdater.destroy_batch(enrollments, sis_batch: @batch)
             importer.roll_back_data.push(*new_data)
             SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
@@ -47,7 +48,7 @@ module SIS
           end
         end
       end
-      @logger.debug("Sections took #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -72,8 +73,6 @@ module SIS
       end
 
       def add_section(section_id, course_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
-        @logger.debug("Processing Section #{[section_id, course_id, name, status, start_date, end_date].inspect}")
-
         raise ImportError, "No section_id given for a section in course #{course_id}" if section_id.blank?
         raise ImportError, "No course_id given for a section #{section_id}" if course_id.blank?
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && status =~ /\Aactive/i
@@ -101,13 +100,13 @@ module SIS
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               @course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id]
-              section.uncrosslist(run_jobs_immediately: true)
-              section.move_to_course(course, run_jobs_immediately: true)
+              section.uncrosslist
+              section.move_to_course(course)
             end
           elsif !section.stuck_sis_fields.include?(:course_id)
             # this section isn't crosslisted and lives on the wrong course. move
             @course_ids_to_update_associations.merge [section.course_id, course.id]
-            section.move_to_course(course, run_jobs_immediately: true)
+            section.move_to_course(course)
           end
         end
         if section.course_id_changed?
@@ -131,6 +130,12 @@ module SIS
         end
 
         if section.changed?
+          if section.workflow_state_changed? && section.workflow_state_was == "deleted"
+            if section.default_section? && CourseSection.active.where(:course_id => section.course_id, :default_section => true).exists?
+              # trying to restore a previously default section but there's one already so undefault the restored one
+              section.default_section = false
+            end
+          end
           section.sis_batch_id = @batch.id
           if section.valid?
             section.save

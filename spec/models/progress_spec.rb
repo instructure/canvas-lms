@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -48,7 +50,7 @@ describe Progress do
     end
 
     it "should fail the progress if the job fails" do
-      progress.process_job(Jerbs, :fail)
+      progress.process_job(Jerbs, :fail, {})
       run_jobs
       expect(progress.reload).to be_failed
     end
@@ -62,6 +64,30 @@ describe Progress do
       it "should be set to high priortiy" do
         job = progress.process_job(Jerbs, :succeed, { priority: Delayed::HIGH_PRIORITY }, :flag)
         expect(job.priority).to eq Delayed::HIGH_PRIORITY
+      end
+    end
+
+    context "running totals" do
+      it "calculates increments correctly" do
+        progress.calculate_completion!(2, 50)
+        expect(progress.completion).to eq 4.0
+        expect(progress).not_to be_changed
+        progress.increment_completion!(1)
+        expect(progress.completion).to eq 6.0
+        expect(progress).not_to be_changed
+      end
+
+      it "does not update for very tiny increments" do
+        progress.calculate_completion!(2, 5000)
+        expect(progress.completion).to eq 0.04
+        expect(progress).not_to be_changed
+        progress.increment_completion!(1)
+        expect(progress.completion).to eq 0.06
+        # it didn't actually save it to the db
+        expect(progress).to be_changed
+        progress.increment_completion!(1000)
+        expect(progress.completion).to eq 20.06
+        expect(progress).not_to be_changed
       end
     end
   end

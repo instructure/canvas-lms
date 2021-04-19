@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Animation from '../animation';
-import {continueLoadingInitialItems, loadFutureItems} from '../../actions';
+import Animation from '../animation'
+import {continueLoadingInitialItems, loadFutureItems} from '../../actions'
 
 export class ContinueInitialLoad extends Animation {
-  uiDidUpdate () {
-    const moreItemsToLoad = !this.store().getState().loading.allFutureItemsLoaded;
-    const keepLoading = moreItemsToLoad && this.animator().isOnScreen(this.app().fixedElementForItemScrolling(), this.stickyOffset());
+  uiDidUpdate() {
+    const moreItemsToLoad = !this.store().getState().loading.allFutureItemsLoaded
+    const keepLoading =
+      moreItemsToLoad &&
+      this.animator().isOnScreen(this.app().fixedElementForItemScrolling(), this.stickyOffset())
     if (keepLoading) {
       // we have to do this after this animation is complete,
       // because these actions can't be received recursively.
       this.window().setTimeout(() => {
-        this.store().dispatch(continueLoadingInitialItems()); // so we can invoke this animation again
-        this.store().dispatch(loadFutureItems());
-      }, 0);
+        this.store().dispatch(continueLoadingInitialItems()) // so we can invoke this animation again
+        this.store().dispatch(loadFutureItems())
+      }, 0)
     }
   }
 }

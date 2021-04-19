@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -17,18 +19,56 @@
 #
 
 module Types
+  class ExternalToolStateType < Types::BaseEnum
+    graphql_name 'ExternalToolState'
+    description 'States that an External Tool can be in'
+    value 'anonymous'
+    value 'name_only'
+    value 'email_only'
+    value 'public'
+  end
+
+  # We can add additional placements to this filter as they are needed. Currently we
+  # only need to filter to `homework_submission` as that is the only place that this
+  # graphql type is being queried and used in.
+  class ExternalToolPlacementType < Types::BaseEnum
+    graphql_name 'ExternalToolPlacement'
+    description 'Placements that an External Tool can have'
+    value 'homework_submission'
+  end
+
+  class ExternalToolFilterInputType < Types::BaseInputObject
+    graphql_name 'ExternalToolFilterInput'
+
+    argument :state, ExternalToolStateType, required: false, default_value: nil
+
+    argument :placement, ExternalToolPlacementType, required: false, default_value: nil
+  end
+
   # This is a little funky. External tools can either be backed by a `ContextExternalTool`
   # in the database, or directly by data in a `ContentTag`. Because there could
   # be conflicting legacy id for these, we are seperating them into two concrete
   # types in graphql. ModuleExternalToolType is the one backed by `ContentTag`,
   # and `ExternalToolType` is backed by `ContextExternalTool`.
   class ExternalToolType < ApplicationObjectType
-    graphql_name "ExternalTool"
+    graphql_name 'ExternalTool'
 
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, "legacy canvas id", null: false, method: :id
+    field :url, Types::UrlType, null: true
+    def url
+      object.login_or_launch_url()
+    end
+
+    field :name, String, null: true
+
+    field :description, String, null: true
+
+    field :settings, ExternalToolSettingsType, null: true
+
+    field :state, ExternalToolStateType, method: :workflow_state, null: true
 
     # TODO: This is currently just a placeholder so that it can be used in
     #       ModuleItemType. Once we start exporting actual fields for this,

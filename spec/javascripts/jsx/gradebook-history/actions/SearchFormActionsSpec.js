@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import environment from 'jsx/gradebook-history/environment'
-import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore'
-import * as HistoryActions from 'jsx/gradebook-history/actions/HistoryActions'
-import HistoryApi from 'jsx/gradebook-history/api/HistoryApi'
+import environment from 'ui/features/gradebook_history/react/environment.js'
+import GradebookHistoryStore from 'ui/features/gradebook_history/react/store/GradebookHistoryStore.js'
+import * as HistoryActions from 'ui/features/gradebook_history/react/actions/HistoryActions.js'
+import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi.js'
 import SearchFormActions, {
   CLEAR_RECORDS,
   FETCH_RECORDS_START,
@@ -28,11 +28,11 @@ import SearchFormActions, {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE
-} from 'jsx/gradebook-history/actions/SearchFormActions'
-import UserApi from 'jsx/gradebook-history/api/UserApi'
+} from 'ui/features/gradebook_history/react/actions/SearchFormActions.js'
+import UserApi from 'ui/features/gradebook_history/react/api/UserApi.js'
 import Fixtures from '../Fixtures'
 
-QUnit.module('SearchFormActions', function() {
+QUnit.module('SearchFormActions', () => {
   const response = {
     data: Fixtures.userArray(),
     headers: {
@@ -41,7 +41,7 @@ QUnit.module('SearchFormActions', function() {
     }
   }
 
-  test('fetchRecordsStart creates an action with type FETCH_RECORDS_START', function() {
+  test('fetchRecordsStart creates an action with type FETCH_RECORDS_START', () => {
     const recordType = 'graders'
     const expectedValue = {
       type: FETCH_RECORDS_START,
@@ -51,7 +51,7 @@ QUnit.module('SearchFormActions', function() {
     deepEqual(SearchFormActions.fetchRecordsStart(recordType), expectedValue)
   })
 
-  test('fetchRecordsFailure creates an action with type FETCH_RECORDS_SUCCESS', function() {
+  test('fetchRecordsFailure creates an action with type FETCH_RECORDS_SUCCESS', () => {
     const recordType = 'graders'
     const expectedValue = {
       type: FETCH_RECORDS_SUCCESS,
@@ -61,7 +61,7 @@ QUnit.module('SearchFormActions', function() {
     deepEqual(SearchFormActions.fetchRecordsSuccess(response, recordType), expectedValue)
   })
 
-  test('fetchRecordsFailure creates an action with type FETCH_RECORDS_FAILURE', function() {
+  test('fetchRecordsFailure creates an action with type FETCH_RECORDS_FAILURE', () => {
     const recordType = 'graders'
     const expectedValue = {
       type: FETCH_RECORDS_FAILURE,
@@ -71,7 +71,7 @@ QUnit.module('SearchFormActions', function() {
     deepEqual(SearchFormActions.fetchRecordsFailure(recordType), expectedValue)
   })
 
-  test('fetchRecordsNextPageStart creates an action with type FETCH_RECORDS_NEXT_PAGE_START', function() {
+  test('fetchRecordsNextPageStart creates an action with type FETCH_RECORDS_NEXT_PAGE_START', () => {
     const recordType = 'graders'
     const expectedValue = {
       type: FETCH_RECORDS_NEXT_PAGE_START,
@@ -81,7 +81,7 @@ QUnit.module('SearchFormActions', function() {
     deepEqual(SearchFormActions.fetchRecordsNextPageStart(recordType), expectedValue)
   })
 
-  test('fetchRecordsNextPageSuccess creates an action with type FETCH_RECORDS_NEXT_PAGE_SUCCESS', function() {
+  test('fetchRecordsNextPageSuccess creates an action with type FETCH_RECORDS_NEXT_PAGE_SUCCESS', () => {
     const recordType = 'graders'
     const expectedValue = {
       type: FETCH_RECORDS_NEXT_PAGE_SUCCESS,
@@ -91,7 +91,7 @@ QUnit.module('SearchFormActions', function() {
     deepEqual(SearchFormActions.fetchRecordsNextPageSuccess(response, recordType), expectedValue)
   })
 
-  test('fetchRecordsNextPageFailure creates an action with type FETCH_RECORDS_NEXT_PAGE_FAILURE', function() {
+  test('fetchRecordsNextPageFailure creates an action with type FETCH_RECORDS_NEXT_PAGE_FAILURE', () => {
     const recordType = 'graders'
     const expectedValue = {
       type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
@@ -101,7 +101,7 @@ QUnit.module('SearchFormActions', function() {
     deepEqual(SearchFormActions.fetchRecordsNextPageFailure(recordType), expectedValue)
   })
 
-  test('clearSearchOptions creates an action with type CLEAR_RECORDS', function() {
+  test('clearSearchOptions creates an action with type CLEAR_RECORDS', () => {
     const recordType = 'assignments'
     const expectedValue = {
       type: CLEAR_RECORDS,
@@ -152,6 +152,10 @@ test('dispatches fetchHistoryFailure on failure', function() {
 
 QUnit.module('SearchFormActions getSearchOptions', {
   setup() {
+    // Some requests are still hitting the network.
+    // They must resolve so that specs can continue.
+    sandbox.server.respondImmediately = true
+
     this.userResponse = {
       data: Fixtures.userArray(),
       headers: {link: 'http://example.com/link-to-next-page'}
@@ -223,6 +227,10 @@ test('calls getUsersByName with enrollmentStates of ["completed"] if course is c
 
 QUnit.module('SearchFormActions getSearchOptionsNextPage', function(hooks) {
   hooks.beforeEach(function() {
+    // Some requests are still hitting the network.
+    // They must resolve so that specs can continue.
+    sandbox.server.respondImmediately = true
+
     this.userResponse = {
       data: Fixtures.userArray(),
       headers: {link: 'http://example.com/link-to-next-page'}

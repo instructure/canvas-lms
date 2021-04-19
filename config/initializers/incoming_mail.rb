@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 
 # Initialize incoming email configuration. See config/incoming_mail.yml.example.
 
-config = ConfigFile.load("incoming_mail") || {}
+config = ConfigFile.load("incoming_mail").dup || {}
 
 Rails.configuration.to_prepare do
   IncomingMailProcessor::IncomingMessageProcessor.configure(config)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -162,7 +164,6 @@ describe "Alerts" do
 
   context "recipients" do
     it "should hide the add link when all recipients are added" do
-      skip_if_chrome('fragile in chrome')
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 module TatlTael
@@ -21,17 +23,17 @@ module TatlTael
       ### core
       def changes_matching(statuses: %w[added modified], # excludes "deleted",
                            include: ["*"], # include everything
-                           whitelist: []) # don't whitelist anything
+                           allowlist: []) # don't allowlist anything
         changes.select do |change|
           statuses.include?(change.status) &&
             include.any? { |pattern| File.fnmatch(pattern, change.path) } &&
-            whitelist.all? { |pattern| !File.fnmatch(pattern, change.path) }
+            allowlist.all? { |pattern| !File.fnmatch(pattern, change.path) }
         end
       end
 
       # convenience
       def changes_exist?(query)
-        !changes_matching(query).empty?
+        !changes_matching(**query).empty?
       end
     end
 

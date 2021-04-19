@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CollaborationsApp from 'jsx/collaborations/CollaborationsApp'
+import CollaborationsApp from 'ui/features/lti_collaborations/react/CollaborationsApp.js'
 
 QUnit.module('CollaborationsApp')
 
@@ -47,6 +47,7 @@ const applicationState = {
 function setEnvironment() {
   ENV.context_asset_string = 'courses_1'
   ENV.current_user_roles = 'teacher'
+  ENV.CREATE_PERMISSION = true
 }
 
 test('renders the getting started component when there are no collaborations', () => {

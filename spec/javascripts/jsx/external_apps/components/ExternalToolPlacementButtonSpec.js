@@ -17,27 +17,53 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
-import ExternalToolPlacementButton from  'jsx/external_apps/components/ExternalToolPlacementButton'
+import {shallow} from 'enzyme'
+import ExternalToolPlacementButton from 'ui/features/external_apps/react/components/ExternalToolPlacementButton.js'
 
 QUnit.module('ExternalToolPlacementButton')
 
 test('normally renders with a menuitem role', () => {
-  const wrapper = shallow(<ExternalToolPlacementButton tool={{
-    app_type: 'ContextExternalTool',
-    name: 'A Tool',
-  }}
-  returnFocus={()=>{}}
-  />)
-  equal(wrapper.find('a').props().role, 'menuitem');
+  const wrapper = shallow(
+    <ExternalToolPlacementButton
+      tool={{
+        app_type: 'ContextExternalTool',
+        name: 'A Tool'
+      }}
+      returnFocus={() => {}}
+      onSuccess={() => {}}
+    />
+  )
+  equal(wrapper.find('a').props().role, 'menuitem')
 })
 
 test('renders as a button when specified', () => {
-  const wrapper = shallow(<ExternalToolPlacementButton type="button" tool={{
-    app_type: 'ContextExternalTool',
-    name: 'A Tool',
-  }}
-  returnFocus={()=>{}}
-  />)
-  equal(wrapper.find('a').props().role, 'button');
+  const wrapper = shallow(
+    <ExternalToolPlacementButton
+      type="button"
+      tool={{
+        app_type: 'ContextExternalTool',
+        name: 'A Tool'
+      }}
+      returnFocus={() => {}}
+      onSuccess={() => {}}
+    />
+  )
+  equal(wrapper.find('a').props().role, 'button')
+})
+
+test('does not attempt to open an opened modal', () => {
+  const wrapper = shallow(
+    <ExternalToolPlacementButton
+      type="button"
+      tool={{
+        app_type: 'ContextExternalTool',
+        name: 'A Tool'
+      }}
+      returnFocus={() => {}}
+      onSuccess={() => {}}
+    />
+  )
+
+  wrapper.setState({modalIsOpen: true})
+  ok(wrapper.find('a').simulate('click', {preventDefault: () => {}}))
 })

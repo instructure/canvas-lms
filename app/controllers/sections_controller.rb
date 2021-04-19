@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -113,7 +115,7 @@ class SectionsController < ApplicationController
 
       includes = Array(params[:include])
 
-      sections = @context.active_course_sections.order(CourseSection.best_unicode_collation_key('name'))
+      sections = @context.active_course_sections.order(CourseSection.best_unicode_collation_key('name'), :id)
 
       unless params[:all].present?
         sections = Api.paginate(sections, self, api_v1_course_sections_url)
@@ -280,7 +282,7 @@ class SectionsController < ApplicationController
       end
 
       respond_to do |format|
-        if @section.update_attributes(course_section_params)
+        if @section.update(course_section_params)
           @context.touch
           flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }
@@ -317,14 +319,9 @@ class SectionsController < ApplicationController
           @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
           @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
-          can_manage_students = @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users)
-          js_env(
-            :PERMISSIONS => {
-              :manage_students => can_manage_students,
-              :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
-            })
+          js_env
           if @context.grants_right?(@current_user, session, :manage)
-            js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+            set_student_context_cards_js_env
           end
         end
         format.json { render :json => section_json(@section, @current_user, session, Array(params[:include])) }

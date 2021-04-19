@@ -17,11 +17,10 @@
  */
 
 import $ from 'jquery'
-import SisValidationHelper from 'compiled/util/SisValidationHelper'
-import Backbone from 'Backbone'
+import SisValidationHelper from '@canvas/sis/SisValidationHelper'
+import Backbone from '@canvas/backbone'
 
 class AssignmentStub extends Backbone.Model {
-
   postToSIS = postToSisBoolean => {
     if (typeof postToSisBoolean === 'undefined') {
       return this.get('post_to_sis')

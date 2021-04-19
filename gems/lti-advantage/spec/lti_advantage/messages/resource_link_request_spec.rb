@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 
 require 'lti_advantage'
 
-require File.expand_path(File.dirname(__FILE__) + '/typed_attribute_examples')
+require File.expand_path(File.dirname(__FILE__) + '/message_claims_examples')
 
 module LtiAdvantage::Messages
   RSpec.describe ResourceLinkRequest do
@@ -34,7 +36,8 @@ module LtiAdvantage::Messages
         nonce: '5a234202-6f0e-413d-8793-809db7a95930',
         resource_link: LtiAdvantage::Claims::ResourceLink.new(id: 1),
         roles: ['foo'],
-        target_link_uri: 'https://www.example.com'
+        target_link_uri: 'https://www.example.com',
+        lti11_legacy_user_id: 'bcf1466791073638f61073818abf1d32331fc893'
       )
     end
 
@@ -81,9 +84,11 @@ module LtiAdvantage::Messages
     end
 
     describe 'validations' do
-      include_context 'typed_attribute_examples'
+      include_context 'message_claims_examples'
 
-      it_behaves_like 'validations for a JWT LTI message'
+      it_behaves_like 'validations for claims types'
+
+      it_behaves_like 'validations for optional claims'
 
       it 'is not valid if required claims are missing' do
         expect(message).to be_invalid

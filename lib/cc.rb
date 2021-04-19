@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -38,5 +40,5 @@ require_dependency "cc/web_resources"
 require_dependency "cc/web_links"
 require_dependency 'cc/resource'
 require_dependency 'cc/organization'
-require_dependency 'cc/qti/qti'
+require_dependency 'cc/qti'
 require_dependency 'cc/importer'

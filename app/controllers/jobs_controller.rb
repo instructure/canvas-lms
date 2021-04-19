@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ class JobsController < ApplicationController
   def index
     @flavor = params[:flavor] || 'current'
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       respond_to do |format|
         format.html do
           @running_jobs_refresh_seconds = Setting.get('running_jobs_refresh_seconds', 2.seconds.to_s).to_f
@@ -108,7 +110,7 @@ class JobsController < ApplicationController
   end
 
   def set_navigation
-    @active_tab = 'jobs'
+    set_active_tab 'jobs'
     add_crumb t('#crumbs.jobs', "Jobs")
   end
 end

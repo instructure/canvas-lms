@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 class AssessmentQuestionBank < ActiveRecord::Base
+  extend RootAccountResolver
   include Workflow
 
   belongs_to :context, polymorphic: [:account, :course]
@@ -27,6 +30,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   before_save :infer_defaults
   after_save :update_alignments
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  resolves_root_account through: :context
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title]

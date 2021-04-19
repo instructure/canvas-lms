@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -153,7 +155,7 @@ describe "User Profile API", type: :request do
 
   it "respects :read_email_addresses permission" do
     RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
-                         :role => Role.get_built_in_role('AccountAdmin'), :enabled => false)
+                         :role => admin_role, :enabled => false)
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
              :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     expect(json['id']).to eq @student.id
@@ -179,6 +181,11 @@ describe "User Profile API", type: :request do
     before :once do
       @student.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => false
       @student.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => true
+      @student.user_services.create! :service => 'somethingthatdoesntexistanymore', :service_user_name => 'user', :service_user_id => 'user', :visible => true
+    end
+
+    before :each do
+      allow(Twitter::Connection).to receive(:config).and_return({:some_hash => "fullofstuff"})
     end
 
     it "should return user_services, if requested" do
@@ -189,7 +196,7 @@ describe "User Profile API", type: :request do
                       :include => ["user_services"])
       expect(json["user_services"]).to eq [
         {"service" => "skype", "visible" => false, "service_user_link" => "skype:user?add"},
-        {"service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user"},
+        {"service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user"}
       ]
     end
 

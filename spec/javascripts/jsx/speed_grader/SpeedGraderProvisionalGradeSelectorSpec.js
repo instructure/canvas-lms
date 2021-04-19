@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import SpeedGraderProvisionalGradeSelector from 'ui/features/speed_grader/react/SpeedGraderProvisionalGradeSelector.js'
 
 QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   let $container
@@ -29,6 +29,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   hooks.beforeEach(() => {
     props = {
       detailsInitiallyVisible: true,
+      finalGraderId: '2',
       gradingType: 'points',
       onGradeSelected: () => {},
       pointsPossible: 123,
@@ -86,7 +87,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   }
 
   function mountComponent(additionalProps = {}, customState = {}) {
-    const allProps = Object.assign({}, props, additionalProps)
+    const allProps = {...props, ...additionalProps}
     wrapper = mount(<SpeedGraderProvisionalGradeSelector {...allProps} />, {appendTo: $container})
 
     wrapper.setState({detailsVisible: true, ...customState})
@@ -124,7 +125,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         .find('input')
         .first()
         .prop('value'),
-      '3'
+      '2'
     )
   })
 
@@ -238,12 +239,10 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
-    deepEqual(wrapper.find('RadioInput').map(input => input.prop('value')), [
-      'custom',
-      '2',
-      '3',
-      '1'
-    ])
+    deepEqual(
+      wrapper.find('RadioInput').map(input => input.prop('value')),
+      ['custom', '2', '3', '1']
+    )
   })
 
   test('sorts provisional grades by scorer ID if anonymous grader ID is not present', () => {
@@ -270,12 +269,10 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
-    deepEqual(wrapper.find('RadioInput').map(input => input.prop('value')), [
-      'custom',
-      '3',
-      '2',
-      '1'
-    ])
+    deepEqual(
+      wrapper.find('RadioInput').map(input => input.prop('value')),
+      ['custom', '3', '2', '1']
+    )
   })
 
   test('calls formatSubmissionGrade to render a provisional grade', () => {

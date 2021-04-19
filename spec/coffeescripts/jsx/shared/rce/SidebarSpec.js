@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Sidebar from 'jsx/shared/rce/Sidebar'
-import RCELoader from 'jsx/shared/rce/serviceRCELoader'
+import Sidebar from '@canvas/rce/Sidebar'
+import RCELoader from '@canvas/rce/serviceRCELoader'
 import fakeENV from 'helpers/fakeENV'
 import editorUtils from 'helpers/editorUtils'
 
@@ -33,7 +33,7 @@ QUnit.module('Sidebar - init', {
   }
 })
 
-test('loads remote sidebar when feature flag on', function() {
+test('loads remote sidebar when feature flag on', () => {
   const remoteSidebar = {is_a: 'remote_sidebar'}
   sandbox.stub(RCELoader, 'loadSidebarOnTarget').callsArgWith(1, remoteSidebar)
   Sidebar.pendingShow = false

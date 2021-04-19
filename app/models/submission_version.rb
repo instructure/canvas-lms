@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -19,6 +21,7 @@
 class SubmissionVersion < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :context, polymorphic: [:course]
+  belongs_to :root_account, class_name: "Account"
   belongs_to :version
 
   validates_presence_of :context_id, :version_id, :user_id, :assignment_id
@@ -36,10 +39,10 @@ class SubmissionVersion < ActiveRecord::Base
 
     private
     def extract_version_attributes(version, options = {})
-      # TODO make context extraction more efficient in bulk case
       model = if options[:ignore_errors]
         begin
           return nil unless Submission.active.where(id: version.versionable_id).exists?
+
           version.model
         rescue Psych::SyntaxError
           return nil
@@ -47,14 +50,15 @@ class SubmissionVersion < ActiveRecord::Base
       else
         version.model
       end
-      assignment = model.assignment
-      return nil unless assignment
+    return nil unless model.assignment_id
+
       {
-        :context_id => assignment.context_id,
-        :context_type => assignment.context_type,
+        :context_id => model.course_id,
+        :context_type => 'Course',
         :user_id => model.user_id,
         :assignment_id => model.assignment_id,
-        :version_id => version.id
+        :version_id => version.id,
+        :root_account_id => model.root_account_id
       }
     end
   end

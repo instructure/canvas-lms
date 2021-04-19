@@ -27,7 +27,6 @@
 
 .comment-row-container {
   display: flex;
-  padding-top: 12px;
 }
 
 .comment-text-comment-container {
@@ -35,4 +34,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.load-more-comments-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
 }

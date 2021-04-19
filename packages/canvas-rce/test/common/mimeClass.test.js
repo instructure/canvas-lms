@@ -16,73 +16,71 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-"use strict";
+import assert from 'assert'
+import {fileEmbed, mimeClass} from '../../src/common/mimeClass'
 
-import assert from "assert";
-import { fileEmbed, mimeClass } from "../../src/common/mimeClass";
-
-describe("fileEmbed", () => {
-  let base_file = { preview_url: "some_url" };
+describe('fileEmbed', () => {
+  const base_file = {preview_url: 'some_url'}
 
   function getBaseFile(...args) {
-    return Object.assign({}, base_file, ...args);
+    return Object.assign({}, base_file, ...args)
   }
 
-  it("defaults to file", () => {
-    assert.equal(fileEmbed({}).type, "file");
-  });
+  it('defaults to file', () => {
+    assert.strictEqual(fileEmbed({}).type, 'file')
+  })
 
-  it("uses content-type to identify video and audio", () => {
-    let video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
-    let audio = fileEmbed(getBaseFile({ "content-type": "audio/mpeg" }));
-    assert.equal(video.type, "video");
-    assert.equal(video.id, "maybe");
-    assert.equal(audio.type, "audio");
-    assert.equal(audio.id, "maybe");
-  });
+  it('uses content-type to identify video and audio', () => {
+    const video = fileEmbed(getBaseFile({'content-type': 'video/mp4'}))
+    const audio = fileEmbed(getBaseFile({'content-type': 'audio/mpeg'}))
+    const notaudio = fileEmbed(
+      getBaseFile({'content-type': 'x-audio/mpeg', preview_url: undefined})
+    )
+    const notvideo = fileEmbed(getBaseFile({'content-type': 'x-video/mp4', preview_url: undefined}))
 
-  it("returns media entry id if provided", () => {
-    let video = fileEmbed(
-      getBaseFile({
-        "content-type": "video/mp4",
-        media_entry_id: "42"
-      })
-    );
-    assert.equal(video.id, "42");
-  });
+    assert.strictEqual(video.type, 'video')
+    assert.strictEqual(audio.type, 'audio')
+    assert.strictEqual(notaudio.type, 'file')
+    assert.strictEqual(notvideo.type, 'file')
+  })
 
-  it("returns maybe in place of media entry id if not provided", () => {
-    let video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
-    assert.equal(video.id, "maybe");
-  });
+  it('picks scribd if there is a preview_url', () => {
+    const scribd = fileEmbed(getBaseFile({preview_url: 'some-url'}))
+    assert.strictEqual(scribd.type, 'scribd')
+  })
 
-  it("picks scribd if there is a preview_url", () => {
-    let scribd = fileEmbed(getBaseFile({ preview_url: "some-url" }));
-    assert.equal(scribd.type, "scribd");
-  });
+  it('uses content-type to identify images', () => {
+    const png = fileEmbed(getBaseFile({'content-type': 'image/png'}))
+    const svg = fileEmbed(getBaseFile({'content-type': 'image/svg+xml'}))
 
-  it("uses content-type to identify images", () => {
-    let image = fileEmbed(
-      getBaseFile({
-        "content-type": "image/png",
-        canvadoc_session_url: "some-url"
-      })
-    );
-    assert.equal(image.type, "image");
-  });
-});
+    assert.strictEqual(png.type, 'image')
+    assert.strictEqual(svg.type, 'image')
+  })
+})
 
-describe("mimeClass", () => {
-  it("returns mime_class attribute if present", () => {
-    let mime_class = "wooper";
-    assert.equal(mimeClass({ mime_class: mime_class }), mime_class);
-  });
+describe('mimeClass', () => {
+  it('returns mime_class attribute if present', () => {
+    const mime_class = 'wooper'
+    assert.strictEqual(mimeClass({mime_class}), mime_class)
+  })
 
-  it("returns value corresponding to provided `content-type`", () => {
-    assert.equal(mimeClass({ "content-type": "video/mp4" }), "video");
-  });
+  it('returns value corresponding to provided `content-type`', () => {
+    assert.strictEqual(mimeClass({'content-type': 'video/mp4'}), 'video')
+    assert.strictEqual(mimeClass({'content-type': 'video/*'}), 'video')
+    assert.strictEqual(mimeClass({'content-type': 'video'}), 'video')
+    assert.strictEqual(mimeClass({'content-type': 'audio/webm'}), 'audio')
+    assert.strictEqual(mimeClass({'content-type': 'audio/*'}), 'audio')
+    assert.strictEqual(mimeClass({'content-type': 'audio'}), 'audio')
+    assert.strictEqual(mimeClass({'content-type': 'image/svg+xml'}), 'image')
+    assert.strictEqual(mimeClass({'content-type': 'image/webp'}), 'file')
+    assert.strictEqual(mimeClass({'content-type': 'application/vnd.ms-powerpoint'}), 'ppt')
+  })
 
-  it("returns value corresponding to provided `type`", () => {
-    assert.equal(mimeClass({ type: "video/mp4" }), "video");
-  });
-});
+  it('returns value corresponding to provided `type`', () => {
+    assert.strictEqual(mimeClass({type: 'video/mp4'}), 'video')
+    assert.strictEqual(mimeClass({type: 'audio/webm'}), 'audio')
+    assert.strictEqual(mimeClass({type: 'image/svg+xml'}), 'image')
+    assert.strictEqual(mimeClass({type: 'image/webp'}), 'file')
+    assert.strictEqual(mimeClass({type: 'application/vnd.ms-powerpoint'}), 'ppt')
+  })
+})

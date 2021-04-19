@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -58,6 +60,7 @@ describe "submissions" do
   context "student view" do
 
     before(:each) do
+      Account.default.enable_feature!(:rce_enhancements)
       course_with_teacher_logged_in
     end
 

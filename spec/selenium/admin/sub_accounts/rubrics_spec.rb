@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -27,7 +29,7 @@ describe "sub account shared rubric specs" do
   let(:who_to_login) { 'admin' }
 
   before(:each) do
-    resize_screen_to_normal
+
     course_with_admin_logged_in
   end
 
@@ -48,7 +50,7 @@ describe "sub account shared rubric specs" do
   end
 
   it "should round to an integer when splitting" do
-    resize_screen_to_default
+
     should_round_to_an_integer_when_splitting
   end
 

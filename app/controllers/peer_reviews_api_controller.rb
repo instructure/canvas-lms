@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -143,7 +145,7 @@ class PeerReviewsApiController < ApplicationController
   private
 
   def require_assignment
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
     raise ActiveRecord::RecordNotFound unless @assignment
   end
 

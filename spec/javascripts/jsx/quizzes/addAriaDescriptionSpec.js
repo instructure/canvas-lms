@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import addAriaDescription from 'quiz_labels'
+import addAriaDescription from 'ui/features/quizzes/jquery/quiz_labels.js'
 import fixtures from 'helpers/fixtures'
 
-var $elem = null
+let $elem = null
 
-QUnit.module("Add aria descriptions", {
+QUnit.module('Add aria descriptions', {
   setup() {
     $elem = $(
       '<div>' +
@@ -30,7 +30,7 @@ QUnit.module("Add aria descriptions", {
         '<div class="editAnswerId"></div>' +
         '<div class="commentAnswerId"></div>' +
         '<div class="selectAsCorrectAnswerId"></div>' +
-      '</div>'
+        '</div>'
     )
 
     $('#fixtures').html($elem[0])
@@ -39,7 +39,7 @@ QUnit.module("Add aria descriptions", {
   teardown() {
     $('#fixtures').empty()
   }
-});
+})
 
 test('add aria descriptions to quiz answer options', () => {
   addAriaDescription($elem, '1')

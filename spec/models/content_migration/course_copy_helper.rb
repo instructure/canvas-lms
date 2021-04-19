@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -85,7 +87,7 @@ shared_examples_for "course copy" do
   end
 
   def mig_id(obj)
-    CC::CCHelper.create_key(obj)
+    CC::CCHelper.create_key(obj, global: true)
   end
 
   def create_outcome(context, group=nil)

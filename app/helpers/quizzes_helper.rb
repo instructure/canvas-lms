@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -62,11 +64,21 @@ module QuizzesHelper
     quiz.available? && can_publish(quiz)
   end
 
+  def render_number(num)
+    # if the string representation of this number uses scientific notation,
+    return format('%g', num) if num.to_s =~ /e/ # short circuit if scientific notation
+    if num.to_s =~ /%/
+      I18n.n(round_if_whole(num.delete('%'))) + '%'
+    else
+      I18n.n(round_if_whole(num))
+    end
+  end
+
   def render_score(score, precision=2)
     if score.nil?
       '_'
     else
-      I18n.n(round_if_whole(score.to_f.round(precision)))
+      render_number(score.to_f.round(precision))
     end
   end
 
@@ -399,7 +411,7 @@ module QuizzesHelper
     html = hash_get(hash, "#{field}_html".to_sym)
 
     if html
-      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE))
+      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE), nil, controller.try(:use_new_math_equation_handling?))
     else
       hash_get(hash, field)
     end
@@ -412,7 +424,7 @@ module QuizzesHelper
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers).dup
     answer_list = hash_get(options, :answer_list, [])
-    res      = user_content hash_get(question, :question_text)
+    res      = user_content hash_get(question, :question_text).dup
     readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
     label_attr = "aria-label='#{I18n.t("Fill in the blank, read surrounding text")}'"
 
@@ -454,7 +466,7 @@ module QuizzesHelper
     editable = hash_get(options, :editable)
     res      = user_content hash_get(question, :question_text)
     index  = 0
-    doc = Nokogiri::HTML.fragment(res)
+    doc = Nokogiri::HTML5.fragment(res)
     selects = doc.css(".question_input")
     selects.each do |s|
       if answer_list && !answer_list.empty?
@@ -473,9 +485,9 @@ module QuizzesHelper
       else
         # If existing answer is one of the options, replace it with a span
         if (opt_tag = s.children.css("option[value='#{a}']").first)
-          s.replace(<<-HTML)
-            <span>#{opt_tag.content}</span>
-          HTML
+          span = doc.fragment("<span />").children.first
+          span.children = opt_tag.children
+          s.swap(span)
         end
       end
 
@@ -684,8 +696,8 @@ module QuizzesHelper
     end
   end
 
-  def points_possible_display
-    @quiz.quiz_type == "survey" ? "" : round_if_whole(@quiz.points_possible)
+  def points_possible_display(quiz=@quiz)
+    quiz.quiz_type == "survey" ? "" : render_score(quiz.points_possible)
   end
 
   def label_for_question_type(question_type)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -26,7 +28,7 @@ module I18nTasks
       super(key, options)
     end
 
-    # see also app/coffeescripts/str/i18nLolcalize.coffee
+    # see also ui/shared/i18n/i18nLolcalize.js
     def let_there_be_lols(str)
       # don't want to mangle placeholders, wrappers, etc.
       pattern = /(\s*%h?\{[^\}]+\}\s*|\s*[\n\\`\*_\{\}\[\]\(\)\#\+\-!]+\s*|^\s+)/
@@ -34,7 +36,7 @@ module I18nTasks
         if token =~ pattern
           token
         else
-          s = ''
+          s = +''
           token.chars.each_with_index do |c, i|
             s << (i % 2 == 1 ? c.upcase : c.downcase)
           end

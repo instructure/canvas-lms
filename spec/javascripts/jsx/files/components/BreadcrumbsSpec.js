@@ -20,10 +20,10 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Breadcrumbs from 'jsx/files/Breadcrumbs'
-import Folder from 'compiled/models/Folder'
+import Breadcrumbs from 'ui/features/files/react/components/Breadcrumbs.js'
+import Folder from '@canvas/files/backbone/models/Folder'
 import fakeENV from '../../../../coffeescripts/helpers/fakeENV'
-import filesEnv from 'compiled/react_files/modules/filesEnv'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 QUnit.module('Files Breadcrumbs Component', {
   setup() {
@@ -54,6 +54,10 @@ test('generates the home, rootFolder, and other links', () => {
   ok(links.length === 4)
   equal(new URL(links[0].href).pathname, '/', 'correct home url')
   equal(new URL(links[2].href).pathname, '/courses/1/files', 'rootFolder link has correct url')
-  equal(new URL(links[3].href).pathname, '/courses/1/files/folder/test_folder_name', 'correct url for child')
+  equal(
+    new URL(links[3].href).pathname,
+    '/courses/1/files/folder/test_folder_name',
+    'correct url for child'
+  )
   equal(ReactDOM.findDOMNode(links[3]).text, 'test_folder_name', 'shows folder names')
 })

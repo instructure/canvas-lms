@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json/jwt'
 
 module LtiAdvantage::Messages
@@ -14,9 +16,13 @@ module LtiAdvantage::Messages
       iss
       message_type
       nonce
-      sub
       version
       target_link_uri
+    ].freeze
+
+    OPTIONAL_CLAIMS = %i[
+      lti11_legacy_user_id
+      sub
     ].freeze
 
     TYPED_ATTRIBUTES = {
@@ -30,10 +36,11 @@ module LtiAdvantage::Messages
       assignment_and_grade_service: LtiAdvantage::Claims::AssignmentAndGradeService,
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
-      role_scope_mentor: Array
+      role_scope_mentor: Array,
+      lti1p1: LtiAdvantage::Claims::Lti1p1
     }.freeze
 
-    attr_accessor *REQUIRED_CLAIMS
+    attr_accessor *(REQUIRED_CLAIMS + OPTIONAL_CLAIMS)
     attr_accessor *TYPED_ATTRIBUTES.keys
     attr_accessor :address,
                   :birthdate,
@@ -101,6 +108,10 @@ module LtiAdvantage::Messages
 
     def tool_platform
       @tool_platform ||= TYPED_ATTRIBUTES[:tool_platform].new
+    end
+
+    def lti1p1
+      @lti1p1 ||= TYPED_ATTRIBUTES[:lti1p1].new
     end
 
     def read_attribute(attribute)

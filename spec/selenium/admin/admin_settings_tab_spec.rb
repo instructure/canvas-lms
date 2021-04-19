@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -147,6 +149,10 @@ describe "admin settings tab" do
 
     it "should click on don't let teachers rename their courses" do
       check_box_verifier("#account_settings_prevent_course_renaming_by_teachers", :prevent_course_renaming_by_teachers)
+    end
+
+    it "should click on don't let teachers change availability on their courses" do
+      check_box_verifier("#account_settings_prevent_course_availability_editing_by_teachers", :prevent_course_availability_editing_by_teachers)
     end
 
     it "should uncheck 'students can opt-in to receiving scores in email notifications' " do
@@ -415,8 +421,9 @@ describe "admin settings tab" do
 
       help_links = Account.default.help_links
       expect(help_links).to include(help_link.merge(:type => "custom"))
-      expect(help_links & Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links)).to eq(
-        Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links))
+      expect(help_links & Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)).to eq(
+        Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)
+      )
 
       get "/accounts/#{Account.default.id}/settings"
 
@@ -427,24 +434,57 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links.map { |x| x[:id] }).to_not include(Account::HelpLinks.default_links.first[:id].to_s)
-      expect(new_help_links.map { |x| x[:id] }).to include(Account::HelpLinks.default_links.last[:id].to_s)
+      expect(new_help_links.map { |x| x[:id] }).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
+      expect(new_help_links.map { |x| x[:id] }).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
 
     it "adds a custom link" do
+      Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
       f('.HelpMenuOptions__Container button').click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       expect(fj('.ic-Sortable-item:first .ic-Sortable-item__Text')).to include_text('text')
       form = f('#account_settings')
       form.submit
       cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
-      expect(cl).to include({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin", "observer", "unenrolled"]})
+      expect(cl).to include(
+        {
+          "text"=>"text",
+          "subtext"=>"subtext",
+          "url"=>"https://url.example.com",
+          "type"=>"custom",
+          "is_featured"=>true,
+          "is_new"=>false,
+          "available_to"=>["user", "student", "teacher", "admin", "observer", "unenrolled"]
+        }
+      )
+    end
+
+    it "adds a custom link with New designation" do
+      Account.site_admin.enable_feature! :featured_help_links
+      get "/accounts/#{Account.default.id}/settings"
+      f('.HelpMenuOptions__Container button').click
+      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://newurl.example.com'
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
+      f('#custom_help_link_settings button[type="submit"]').click
+      form = f('#account_settings')
+      form.submit
+      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://newurl.example.com' }
+      expect(cl).to include(
+        {
+          "is_featured"=>false,
+          "is_new"=>true,
+        }
+      )
     end
 
     it "edits a custom link" do
@@ -547,7 +587,32 @@ describe "admin settings tab" do
 
     Feature.applicable_features(Account.site_admin).each do |feature|
       next if feature.visible_on && !feature.visible_on.call(Account.site_admin)
-      expect(f(".feature.#{feature.feature}")).to be_displayed
+      # We don't want flags that are enabled in code to appear in the UI
+      if feature.enabled?
+        expect(f(".feature")).to_not contain_jqcss(".#{feature.feature}")
+      else
+        expect(f(".feature.#{feature.feature}")).to be_displayed
+      end
+    end
+  end
+
+  context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
+    before :once do
+      @account = Account.default
+      @account.enable_feature! :canvas_for_elementary
+      @subaccount = Account.create!(name: "subaccount1", parent_account_id: @account.id)
+    end
+
+    it "is locked and enabled for subaccounts of an account where setting is enabled" do
+      account_admin_user(:account => @account)
+      user_session(@admin)
+      get "/accounts/#{@account.id}/settings"
+      checkbox = "#account_settings_enable_as_k5_account_value"
+      f(checkbox).click
+      click_submit
+      get "/accounts/#{@subaccount.id}/settings"
+      expect(is_checked(checkbox)).to be_truthy
+      expect(f(checkbox)).to be_disabled
     end
   end
 end

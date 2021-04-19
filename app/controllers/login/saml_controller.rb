@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -26,9 +28,9 @@ class Login::SamlController < ApplicationController
   before_action :fix_ms_office_redirects, only: :new
 
   def new
-    redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                parent_registration: session[:parent_registration],
-                                                                                relay_state: Rails.env.development? && params[:RelayState]))
+    redirect_to aac.generate_authn_request_redirect(host: request.host_with_port,
+                                                    parent_registration: session[:parent_registration],
+                                                    relay_state: Rails.env.development? && params[:RelayState])
   end
 
   def create
@@ -36,6 +38,11 @@ class Login::SamlController < ApplicationController
                             institution: @domain_root_account.display_name)
 
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
+    unless response.is_a?(SAML2::Response)
+      # something confusing and wrong has happened
+      logger.error "[SAML] Attempted invalid SAML operation via login endpoint... #{response.class.name}"
+      return render status: :bad_request, plain: "Invalid SAML operation for this endpoint: #{response.class.name}"
+    end
 
     issuer = response.issuer&.id || response.assertions.first&.issuer&.id
 
@@ -127,7 +134,9 @@ class Login::SamlController < ApplicationController
 
     if pseudonym
       # Successful login and we have a user
-      @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
+      @domain_root_account.pseudonyms.scoping do
+        PseudonymSession.create!(pseudonym, false)
+      end
       user = pseudonym.login_assertions_for_user
 
       if debugging
@@ -175,9 +184,16 @@ class Login::SamlController < ApplicationController
   end
 
   rescue_from SAML2::InvalidMessage, with: :saml_error
+  rescue_from SAML2::InvalidSignature, with: :saml_error
+  rescue_from OpenSSL::X509::CertificateError, with: :saml_config_error
   def saml_error(error)
-    Canvas::Errors.capture_exception(:saml, error)
+    Canvas::Errors.capture_exception(:saml, error, :warn)
     render status: :bad_request, plain: error.to_s
+  end
+
+  def saml_config_error(error)
+    Canvas::Errors.capture_exception(:saml, error, :warn)
+    render status: :unprocessable_entity, plain: error.to_s
   end
 
   def destroy
@@ -188,24 +204,39 @@ class Login::SamlController < ApplicationController
       logger.info "Received signed SAML LogoutRequest from #{message.issuer.id} using certificate #{fingerprint}"
     end
 
-    message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url, public_key_used: log_key_used) do |m|
-      message = m
+    if request.post?
+      message, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
       aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
       return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
       # only require signatures for LogoutRequests, and only if the provider has a certificate on file
-      next unless message.is_a?(SAML2::LogoutRequest)
-      next if (certificates = aac.signing_certificates).blank?
-      certificates.map do |cert_base64|
-        certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
-        key = certificate.public_key
-        key_to_certificate[key] = certificate
-        key
+      if message.is_a?(SAML2::LogoutRequest) && (certificates = aac.signing_certificates)
+        raise SAML2::UnsignedMessage unless message.signed?
+        unless (signature_errors = message.validate_signature(cert: certificates)).empty?
+          logger.debug("Failed to validate signature: #{signature_errors}")
+          raise SAML2::InvalidSignature
+        end
       end
+    else
+      message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url, public_key_used: log_key_used) do |m|
+        message = m
+        aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
+        return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+
+        # only require signatures for LogoutRequests, and only if the provider has a certificate on file
+        next unless message.is_a?(SAML2::LogoutRequest)
+        next if (certificates = aac.signing_certificates).blank?
+        certificates.map do |cert_base64|
+          certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
+          key = certificate.public_key
+          key_to_certificate[key] = certificate
+          key
+        end
+      end
+      # the above block may have been skipped in specs due to stubbing
+      aac ||= @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
+      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
     end
-    # the above block may have been skipped in specs due to stubbing
-    aac ||= @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-    return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
     case message
     when SAML2::LogoutResponse
@@ -270,7 +301,10 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:idp_logout_request_destination, message.destination)
         aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
       end
-
+      sso_idp = aac.idp_metadata.identity_providers.first
+      if sso_idp.single_logout_services.empty?
+        return render status: :bad_request, plain: "IDP Metadata contains no destination to send a logout response"
+      end
       logout_response = SAML2::LogoutResponse.respond_to(message,
                                                          aac.idp_metadata.identity_providers.first,
                                                          SAML2::NameID.new(aac.entity_id))
@@ -296,7 +330,7 @@ class Login::SamlController < ApplicationController
       return redirect_to(forward_url)
     else
       error = "Unexpected SAML message: #{message.class}"
-      Canvas::Errors.capture_exception(:saml, error)
+      Canvas::Errors.capture_exception(:saml, error, :warn)
       return render status: :bad_request, plain: error
     end
   end
@@ -305,15 +339,14 @@ class Login::SamlController < ApplicationController
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
-    metadata = AuthenticationProvider::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port)
+    metadata = AuthenticationProvider::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port, include_all_encryption_certificates: false)
     render xml: metadata.to_xml
   end
 
   def observee_validation
-    redirect_to delegated_auth_redirect_uri(
-      @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                   parent_registration: session[:parent_registration])
-    )
+    redirect_to
+      @domain_root_account.parent_registration_ap.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                  parent_registration: session[:parent_registration])
   end
 
   protected

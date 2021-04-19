@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -19,6 +21,8 @@
 # This model is used internally by DiscussionTopic, it's not intended to be
 # queried directly by other code.
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
+  class ReplicationTimeoutError < StandardError; end
+
   include Api::V1::DiscussionTopics
   include Api
   include Rails.application.routes.url_helpers
@@ -35,9 +39,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
 
   def self.for(discussion_topic)
     discussion_topic.shard.activate do
-      # first try to pull the view from the slave. we can't just do this in the
+      # first try to pull the view from the secondary. we can't just do this in the
       # unique_constraint_retry since it begins a transaction.
-      view = Shackles.activate(:slave) { self.where(discussion_topic_id: discussion_topic).first }
+      view = GuardRail.activate(:secondary) { self.where(discussion_topic_id: discussion_topic).first }
       if !view
         # if the view wasn't found, drop into the unique_constraint_retry
         # transaction loop on master.
@@ -135,12 +139,13 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
 
   def update_materialized_view(xlog_location: nil, use_master: false)
     unless use_master
-      if !self.class.wait_for_replication(start: xlog_location, timeout: 1.minute)
+      timeout = Setting.get("discussion_materialized_view_replication_timeout", "60").to_i.seconds
+      if !self.class.wait_for_replication(start: xlog_location, timeout: timeout)
         # failed to replicate - requeue later
-        self.send_later_enqueue_args(:update_materialized_view_without_send_later,
-          {:singleton => "materialized_discussion:#{ Shard.birth.activate { self.discussion_topic_id } }", :run_at => 5.minutes.from_now},
-          xlog_location: xlog_location, use_master: use_master)
-        raise "timed out waiting for replication"
+        run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
+        delay(singleton: "materialized_discussion:#{ Shard.birth.activate { self.discussion_topic_id } }", run_at: run_at).
+          update_materialized_view(synchronous: true, xlog_location: xlog_location, use_master: use_master)
+        raise ReplicationTimeoutError, "timed out waiting for replication"
       end
     end
     self.generation_started_at = Time.zone.now
@@ -150,26 +155,36 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     self.participants_array = user_ids
     self.entry_ids_array = entry_lookup
     self.save!
+  rescue ReplicationTimeoutError => e
+    Canvas::Errors.capture_exception(:discussion_materialization, e, :warn)
+    raise Delayed::RetriableError, e.message
   end
 
   handle_asynchronously :update_materialized_view,
-    :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
+    singleton: proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
 
   def build_materialized_view(use_master: false)
     entry_lookup = {}
     view = []
     user_ids = Set.new
-    Shackles.activate(use_master ? :master : :slave) do
-      all_entries.find_each do |entry|
-        json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
-        entry_lookup[entry.id] = json
-        user_ids << entry.user_id
-        user_ids << entry.editor_id if entry.editor_id
-        if parent = entry_lookup[entry.parent_id]
-          parent['replies'] ||= []
-          parent['replies'] << json
-        else
-          view << json
+    GuardRail.activate(use_master ? :primary : :secondary) do
+      # this process can take some time, and doing the "find_each"
+      # approach holds the connection open the whole time, which
+      # is a problem if the bouncer pool is small.  By grabbing
+      # ids and querying in batches with the ":pluck_ids" strategy,
+      # the connection gets recycled properly in between postgres queries.
+      all_entries.find_in_batches(strategy: :pluck_ids) do |entry_batch|
+        entry_batch.each do |entry|
+          json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
+          entry_lookup[entry.id] = json
+          user_ids << entry.user_id
+          user_ids << entry.editor_id if entry.editor_id
+          if parent = entry_lookup[entry.parent_id]
+            parent['replies'] ||= []
+            parent['replies'] << json
+          else
+            view << json
+          end
         end
       end
     end
@@ -184,7 +199,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   def self.include_mobile_overrides(entries, overrides)
     entries.each do |entry|
       if entry["message"]
-        parsed_html = Nokogiri::HTML::DocumentFragment.parse(entry["message"])
+        parsed_html = Nokogiri::HTML5.fragment(entry["message"])
         Api::Html::Content.add_overrides_to_html(parsed_html, overrides)
         entry["message"] = parsed_html.to_s
       end

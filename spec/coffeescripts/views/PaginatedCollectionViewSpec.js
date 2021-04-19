@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import PaginatedCollection from 'compiled/collections/PaginatedCollection'
-import PaginatedCollectionView from 'compiled/views/PaginatedCollectionView'
+import Backbone from '@canvas/backbone'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
 import fakePage from 'helpers/getFakePage'
 import fakeENV from 'helpers/fakeENV'
 
@@ -28,7 +28,6 @@ let clock = null
 let collection = null
 let view = null
 const fixtures = $('#fixtures')
-
 
 function createServer() {
   server = sinon.fakeServer.create()
@@ -94,7 +93,8 @@ function assertItemRendered(id) {
 
 function scrollToBottom() {
   // scroll within 100px of the bottom of the current list (<500 triggers a fetch)
-  fixtures[0].scrollTop = view.$el.position().top + view.$el.height() - fixtures.position().top - 100
+  fixtures[0].scrollTop =
+    view.$el.position().top + view.$el.height() - fixtures.position().top - 100
   ok(fixtures[0].scrollTop > 0)
 }
 test('renders items', () => {
@@ -125,7 +125,7 @@ test('fetches the next page on scroll', () => {
   assertItemRendered('4')
 })
 
-test("doesn't fetch if already fetching", function() {
+test("doesn't fetch if already fetching", () => {
   sandbox.spy(collection, 'fetch')
   sandbox.spy(view, 'hideLoadingIndicator')
   collection.fetch()

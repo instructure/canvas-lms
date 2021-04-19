@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -18,8 +20,9 @@
 
 module Messages::SubmissionCommentForTeacher
   class Presenter
-    def initialize(message)
+    def initialize(message, data: {})
       @message = message
+      @data = data
     end
 
     def link

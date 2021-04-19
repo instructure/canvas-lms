@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
@@ -58,11 +60,11 @@ describe "Standard Common Cartridge importing" do
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
 
     dt =  @course.discussion_topics.where(migration_id: "I_00006_R").first
-    expect(dt.message).to match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
+    expect(dt.message).to match_ignoring_whitespace(%{Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview">})
     dt.attachment_id = file2_id
 
     dt =  @course.discussion_topics.where(migration_id: "I_00009_R").first
-    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>}
+    expect(dt.message).to match_ignoring_whitespace(%{Monkeys: Go!\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>})
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
@@ -715,6 +717,18 @@ describe "other cc files" do
     it "should import" do
       import_cc_file("cc_syllabus.zip")
       expect(@course.reload.syllabus_body).to include("<p>beep beep</p>")
+    end
+  end
+
+  describe "empty file link name inference" do
+    it "should add the file name to empty links in html content" do
+      import_cc_file("cc_empty_link.zip")
+      assmt = @course.assignments.where(:migration_id => "assignment1").first
+      file = @course.attachments.where(:migration_id => "file1").first
+      doc = Nokogiri::HTML::DocumentFragment.parse(assmt.description)
+      link = doc.at_css("a")
+      expect(link.attr('href')).to include("courses/#{@course.id}/files/#{file.id}")
+      expect(link.text.strip).to eq file.display_name
     end
   end
 end

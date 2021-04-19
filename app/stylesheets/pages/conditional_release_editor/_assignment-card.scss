@@ -1,0 +1,132 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$checkbox-bg-color:     $ic-color-light;
+$card-fg-color:         $ic-color-dark;
+$icon-fg-color:         $ic-color-light;
+$icon-default-color:    $ic-color-dark;
+$icon-assignment-color: $ic-color-action;
+$icon-quiz-color:       $ic-color-danger;
+$icon-discussion-color: $ic-color-alert;
+
+.cr-assignment-card {
+  height: 156px;
+  width: 180px;
+  border: 1px solid $ic-border-color;
+  background: $ic-color-medium-light;
+  position: relative;
+  transition: all .2s;
+
+  &:focus {
+    z-index: 2;
+  }
+
+  &.cr-assignment-card__loading {
+    opacity: .5;
+  }
+
+  &.cr-assignment-card__dragging {
+    opacity: .3;
+    transform: scale(.95);
+    outline: none;
+
+    & + .cr-condition-toggle__and {
+      opacity: 0;
+    }
+  }
+
+  .cr-assignment-card__content {
+    box-sizing: border-box;
+    height: 100%;
+    padding: 13px 24px 0;
+    word-wrap: break-word;
+    margin: auto;
+    cursor: pointer;
+    position: relative;
+
+    &:focus {
+      z-index: 2;
+
+      & + .cr-assignment-options {
+        z-index: 5;
+      }
+    }
+
+    i[class*="icon-"] {
+      background: $icon-default-color;
+      width: 32px;
+      height: 32px;
+      text-align: center;
+      line-height: 32px;
+      border-radius: 50%;
+      color: $icon-fg-color;
+      float: direction(left);
+      margin-#{direction(right)}: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:before {
+        font-size: 14px;
+      }
+    }
+
+    i.icon-assignment {
+      background: $icon-assignment-color;
+    }
+
+    i.icon-quiz {
+      background: $icon-quiz-color;
+    }
+
+    i.icon-discussion {
+      background: $icon-discussion-color;
+    }
+
+     p {
+      margin: 10px 0 0;
+     }
+
+     .cr-assignment-card__points {
+       float: direction(left);
+       font-size: 14px;
+     }
+
+    .cr-assignment-card__title {
+      font-weight: bold;
+      color: $card-fg-color;
+      margin-top: 15px;
+      font-size: 14px;
+      clear: both;
+      max-height: 84px;
+      overflow-y: hidden;
+    }
+  }
+
+  button {
+    position: absolute;
+    top: 0px;
+    #{direction(right)}: 0;
+    width: 32px;
+  }
+}
+
+label.cr_label__abox {
+  margin-bottom: 0 !important;
+}

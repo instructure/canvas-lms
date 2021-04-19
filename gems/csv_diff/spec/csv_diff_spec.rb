@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -82,6 +84,22 @@ pk1,col1,pk2,col2
 CSV
   end
 
+  def with_trailing_commas
+    CSV.new(<<CSV, headers: true)
+pk1,col1,pk2,col2,
+a,b,c,d,
+1,2,3,4,
+CSV
+  end
+
+  def with_nil_column
+    CSV.new(<<CSV, headers: true)
+pk1,,col1,pk2,col2,
+a,,b,c,d,
+1,,2,3,4,
+CSV
+  end
+
   context 'validation' do
     it 'rejects csvs without headers' do
       expect { subject.generate(csv1(headers: false), csv1) }.to raise_error(CsvDiff::Failure, /headers/)
@@ -107,6 +125,16 @@ CSV
   context 'creates and updates' do
     it 'generates an empty diff' do
       output = subject.generate(csv1, csv1)
+      expect(output.read).to eq "pk1,col1,pk2,col2\n"
+    end
+
+    it 'generates an empty diff, even with extra commas' do
+      output = subject.generate(csv1, with_trailing_commas)
+      expect(output.read).to eq "pk1,col1,pk2,col2\n"
+    end
+
+    it 'generates an empty diff, even with a nil column in the middle' do
+      output = subject.generate(csv1, with_nil_column)
       expect(output.read).to eq "pk1,col1,pk2,col2\n"
     end
 
@@ -157,5 +185,17 @@ CSV
     sorted_output = CSV.new(output, headers: true).read.to_a.sort
     expected_output = CSV.open(files+"/1.out.csv", headers: true).read.to_a.sort
     expect(sorted_output).to eq expected_output
+  end
+
+  it "returns a hash with a count if requested" do
+    subject = described_class.new(%w[user_id])
+    files = File.dirname(__FILE__)+"/files"
+    previous = CSV.open(files+"/1.prev.csv", headers: true)
+    current  = CSV.open(files+"/1.curr.csv", headers: true)
+    cb = ->(row) { row['state'] = 'deleted' }
+
+    hash = subject.generate(previous, current, deletes: cb, return_count: true)
+    expect(hash[:file_io].is_a?(Tempfile)).to be_truthy
+    expect(hash[:row_count]).to eq 29
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -45,7 +47,7 @@ describe ConversationsController do
       conversation
 
       term = @course.root_account.enrollment_terms.create! :name => "Fall"
-      @course.update_attributes! :enrollment_term => term
+      @course.update! :enrollment_term => term
 
       get 'index'
       expect(response).to be_successful
@@ -195,6 +197,18 @@ describe ConversationsController do
         expect(@user.unread_conversations_count).to eq 0
       end
     end
+
+    context "starred conversations" do
+      it "returns starred conversations with no received messages" do
+        course_with_student_logged_in(:active_all => true)
+        conv = @user.initiate_conversation([])
+        conv.update(starred: true, message_count: 1)
+
+        get 'index', params: {:scope => 'starred'}, :format => 'json'
+        expect(response).to be_successful
+        expect(assigns[:conversations_json].size).to be 1
+      end
+    end
   end
 
   describe "GET 'show'" do
@@ -233,6 +247,25 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', params: { recipients: [new_user.id.to_s], body: "yo" }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
+    it 'should not allow creating conversations in concluded courses for students' do
+      user_session(@student)
+      @course.update!(workflow_state: 'completed')
+
+      post 'create', params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
+      expect(response).not_to be_successful
+      expect(response.body).to include('Unable to send messages')
+    end
+
+    it 'should allow creating conversations in concluded courses for teachers' do
+      user_session(@teacher)
+      teacher2 = teacher_in_course(active_all: true).user
+      @course.update!(workflow_state: 'claimed')
+
+      post 'create', params: { recipients: [teacher2.id.to_s], body: "yo", context_code: @course.asset_string }
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
@@ -314,6 +347,14 @@ describe ConversationsController do
       expect(assigns[:conversation].messages.first.forwarded_message_ids).to eql(@conversation.messages.first.id.to_s)
     end
 
+    it "allows Observers to message linked students" do
+      observer = user_with_pseudonym
+      add_linked_observer(@student, observer, root_account: @course.root_account)
+      user_session(observer)
+      post 'create', params: { recipients: [@student.id.to_s], body: "Hello there", context_code: @course.asset_string }
+      expect(response).to be_successful
+    end
+
     context "group conversations" do
       before :once do
         @old_count = Conversation.count
@@ -357,7 +398,7 @@ describe ConversationsController do
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            expect(cp.root_account_ids).to eq @account_id.to_s
+            expect(cp.root_account_ids).to eq [@account_id]
           end
         end
       end
@@ -370,9 +411,17 @@ describe ConversationsController do
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            expect(cp.root_account_ids).to eq @account_id.to_s
+            expect(cp.root_account_ids).to eq [@account_id]
           end
         end
+      end
+
+      it 'does not allow sending messages to other users in a group if the permission is disabled' do
+        user_session(@new_user1)
+        @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+        post 'create', params: { recipients: [@new_user2.id.to_s], body: 'ooo eee', group_conversation: 'true', context_code: @course.asset_string }
+
+        expect(response).not_to be_successful
       end
     end
 
@@ -464,6 +513,28 @@ describe ConversationsController do
         post 'create', params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: '1' }
         @students.each{|x| expect(x.user_notes.size).to be(1)}
       end
+
+      it "should include the domain root account in the user note" do
+        post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
+        note = UserNote.last
+        expect(note.root_account_id).to eql Account.default.id
+      end
+    end
+
+    describe "for recipients the sender has no relationship with" do
+      it "should fail" do
+        user_session(@student)
+        post 'create', params: { recipients: [User.create.id.to_s], body: "foo" }
+        expect(response.status).to eq 400
+      end
+
+      context "as a siteadmin user with send_messages grants" do
+        it "should succeed" do
+          user_session(site_admin_user)
+          post 'create', params: { recipients: [User.create.id.to_s], body: "foo" }
+          expect(response.status).to eq 201
+        end
+      end
     end
   end
 
@@ -537,6 +608,34 @@ describe ConversationsController do
       message = @conversation.messages.first
       student = message.recipients.first
       expect(student.user_notes.size).to eq 1
+    end
+
+    it "should not allow new messages in concluded courses for students" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @course.update!({workflow_state: 'completed'})
+
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      assert_unauthorized
+    end
+
+    it "should allow new messages in concluded courses for teachers" do
+      course_with_teacher_logged_in(:active_all => true)
+      conversation
+      @course.update!({workflow_state: 'completed'})
+
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
+    it "should refrain from duplicating the RCE-created media_comment" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @student.media_objects.where(media_id: 'm-whatever', media_type: 'video/mp4').first_or_create!
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world", media_comment_id: 'm-whatever', media_comment_type: 'video' }
+      expect(response).to be_successful
+      expect(@student.media_objects.by_media_id('m-whatever').count).to eq 1
     end
   end
 
@@ -677,18 +776,6 @@ describe ConversationsController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries.first.content).to match(/somefile\.doc/)
-    end
-  end
-
-  describe "POST 'toggle_new_conversations'" do
-    before :each do
-      course_with_student_logged_in(:active_all => true)
-    end
-
-    it "should not disable new conversations for a user anymore" do
-      post 'toggle_new_conversations'
-      @user.reload
-      expect(@user.use_new_conversations?).to be_truthy
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -29,7 +31,7 @@ describe "course sections" do
     ff('#enrollment_table tr')
   end
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @section = @course.default_section
   end
@@ -99,7 +101,7 @@ describe "course sections" do
 
   context "account admin" do
     before do
-      Account.default.role_overrides.create! role: Role.get_built_in_role('AccountAdmin'), permission: 'manage_sis', enabled: true
+      Account.default.role_overrides.create! role: admin_role, permission: 'manage_sis', enabled: true
       @subaccount = Account.default.sub_accounts.create! name: 'sub'
       course_factory account: @subaccount
       @section = @course.course_sections.create! name: 'sec'
@@ -127,9 +129,7 @@ describe "course sections" do
   end
 
   context "student tray" do
-
     before(:each) do
-      preload_graphql_schema
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -59,7 +61,7 @@ describe "settings tabs" do
     def edit_announcement(notification)
       f("#notification_edit_#{notification.id}").click
       replace_content f("#account_notification_subject_#{notification.id}"), "edited subject"
-      f("#account_notification_icon .warning").click
+      f("#account_notification_icon_#{notification.id} .warning").click
       textarea_selector = "textarea#account_notification_message_#{notification.id}"
       type_in_tiny(textarea_selector, "edited message", clear: true)
 
@@ -75,7 +77,6 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
-      make_full_screen
     end
 
     it "should add and delete an announcement" do
@@ -85,6 +86,18 @@ describe "settings tabs" do
       accept_alert
       wait_for_ajaximations
       expect(AccountNotification.count).to eq 0
+    end
+
+    it "should check title length" do
+      get "/accounts/#{Account.default.id}/settings"
+      wait_for_ajaximations
+      f("#tab-announcements-link").click
+      fj(".element_toggler:visible").click
+      long_subject = "yikers " * 42
+      f("#account_notification_subject").send_keys(long_subject)
+      submit_form("#add_notification_form")
+      wait_for_ajaximations
+      assert_error_box("#account_notification_subject")
     end
 
     it "should edit an announcement" do
@@ -100,6 +113,89 @@ describe "settings tabs" do
       expect(notification.account_notification_roles.count).to eq 1
       expect(notification.start_at.day).to eq 2
       expect(notification.end_at.day).to eq 16
+    end
+
+    context "messages" do
+      it "should let you mark the checkbox to send messages for a new announcement" do
+        get "/accounts/#{Account.default.id}/settings"
+        wait_for_ajaximations
+        f("#tab-announcements-link").click
+        fj(".element_toggler:visible").click
+
+        f("#account_notification_subject").send_keys("some name")
+        type_in_tiny "textarea", "this is a message"
+        f("#account_notification_start_at").send_keys(2.days.from_now.to_date.to_s)
+        f("#account_notification_end_at").send_keys(3.days.from_now.to_date.to_s)
+
+        f("label[for=account_notification_send_message]").click
+        submit_form("#add_notification_form")
+        wait_for_ajax_requests
+        notification = AccountNotification.last
+        expect(notification.send_message).to eq true
+        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
+        expect(job.run_at.to_i).to eq notification.start_at.to_i
+      end
+
+      it "should not show option for site admins" do
+        user_session(site_admin_user)
+        get "/accounts/#{Account.site_admin.id}/settings"
+        wait_for_ajaximations
+        f("#tab-announcements-link").click
+        fj(".element_toggler:visible").click
+
+        expect(f("#add_notification_form")).to_not contain_css("label[for=account_notification_send_message]")
+      end
+
+      it "should be able to send messages for an existing announcement" do
+        notification = account_notification(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+
+        get "/accounts/#{Account.default.id}/settings"
+        wait_for_ajaximations
+        f("#tab-announcements-link").click
+        wait_for_ajaximations
+        f("#notification_edit_#{notification.id}").click
+        replace_content f("#account_notification_subject_#{notification.id}"), "edited subject"
+
+        f("label[for=account_notification_send_message_#{notification.id}]").click
+        f("#edit_notification_form_#{notification.id}").submit
+        wait_for_ajax_requests
+        notification.reload
+        expect(notification.send_message).to eq true
+        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
+        expect(job.run_at.to_i).to eq notification.start_at.to_i
+      end
+
+      it "should mark the checkbox already for a pending announcement already slated to send messages" do
+        old_start_at = 1.day.from_now
+        notification = account_notification(:start_at => old_start_at, :end_at => 5.days.from_now, :send_message => true)
+        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
+        expect(job.run_at.to_i).to eq old_start_at.to_i
+
+        get "/accounts/#{Account.default.id}/settings"
+        wait_for_ajaximations
+        f("#tab-announcements-link").click
+        wait_for_ajaximations
+        f("#notification_edit_#{notification.id}").click
+        expect(is_checked("#account_notification_send_message_#{notification.id}")).to be_truthy # checked still
+      end
+
+      it "should be able to re-send messages for an announcement" do
+        notification = account_notification(:start_at => 1.day.from_now, :end_at => 5.days.from_now)
+        AccountNotification.where(:id => notification).update_all(:send_message => true, :messages_sent_at => 1.day.ago)
+        get "/accounts/#{Account.default.id}/settings"
+        wait_for_ajaximations
+        f("#tab-announcements-link").click
+        wait_for_ajaximations
+        f("#notification_edit_#{notification.id}").click
+        expect(is_checked("#account_notification_send_message_#{notification.id}")).to be_falsey # it doesn't mark if it already sent
+        label = f("label[for=account_notification_send_message_#{notification.id}]")
+        expect(label).to include_text("Re-send notification")
+        label.click
+
+        f("#edit_notification_form_#{notification.id}").submit
+        wait_for_ajax_requests
+        expect(AccountNotification.where(:id => notification).last.updated_at).to be > notification.updated_at
+      end
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - 2015 Instructure, Inc.
 #
@@ -36,7 +38,7 @@ module AccountReports
     end
 
     def csv
-      files = ""
+      files = +""
       @reports.each do |report_name|
         files << "#{report_name} "
       end
@@ -63,13 +65,30 @@ module AccountReports
     end
 
     def users
+      headers = user_headers
+      users = user_query
+      users = user_query_options(users)
+
+      generate_and_run_report headers do |csv|
+        users.find_in_batches do |batch|
+          emails = emails_by_user_id(batch.map(&:user_id))
+
+          batch.each do |u|
+            csv << user_row(u, emails)
+          end
+        end
+      end
+    end
+
+    def user_headers
+      headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['user_id', 'integration_id', 'authentication_provider_id',
                    'login_id', 'password', 'first_name', 'last_name', 'full_name',
                    'sortable_name', 'short_name', 'email', 'status']
+        headers << 'pronouns' if should_add_pronouns?
       else # provisioning_report
-        headers = []
         headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
         headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
         headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
@@ -83,18 +102,36 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_email', 'email')
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('created_by_sis')
+        headers << I18n.t('pronouns') if should_add_pronouns?
       end
+      headers
+    end
 
-      users = root_account.pseudonyms.except(:preload).joins(:user).select(
+    def should_add_pronouns?
+      return @should_add_pronouns if defined?(@should_add_pronouns)
+
+      # if root_account.can_add_pronouns? is true, that means the account is using pronouns
+      # if we decided to turn off this column for everyone via Setting, we should not include them
+      # if one root_account has pronouns enabled, but does not want to have them in the report, we can disable for the one account
+      # if any return false, don't export
+      @should_add_pronouns = ![root_account.can_add_pronouns?.to_s,
+                               Setting.get('enable_sis_export_pronouns', 'true'),
+                               root_account.enable_sis_export_pronouns?.to_s].include?('false')
+    end
+
+    def user_query
+      root_account.pseudonyms.except(:preload).joins(:user).select(
         "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
          pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
          pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-         users.name, users.short_name").
-        where("NOT EXISTS (SELECT user_id
+         users.name, users.short_name, users.pronouns"
+      ).where("NOT EXISTS (SELECT user_id
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = pseudonyms.user_id)")
+    end
 
+    def user_query_options(users)
       users = users.where.not(sis_user_id: nil) if @sis_format
       users = users.where.not(pseudonyms: {sis_batch_id: nil}) if @created_by_sis
 
@@ -104,49 +141,48 @@ module AccountReports
         users.where!("pseudonyms.workflow_state<>'deleted'")
       end
 
-      users = add_user_sub_account_scope(users)
+      add_user_sub_account_scope(users)
+    end
+
+    def user_row(user, emails)
+      row = []
+      row << user.user_id unless @sis_format
+      row << user.sis_user_id
+      row << user.integration_id
+      row << user.authentication_provider_id
+      row << user.unique_id
+      row << nil if @sis_format
+      name_parts = User.name_parts(user.sortable_name, likely_already_surname_first: true)
+      row << name_parts[0] || '' # first name
+      row << name_parts[1] || '' # last name
+      row << user.name
+      row << user.sortable_name
+      row << user.short_name
+      row << emails[user.user_id].try(:path)
+      row << user.workflow_state
+      row << user.sis_batch_id? unless @sis_format
+      row << user.pronouns if should_add_pronouns?
+      row
+    end
+
+    def accounts
+      headers = account_headers
+      accounts = account_query
+      accounts = account_query_options(accounts)
 
       generate_and_run_report headers do |csv|
-        users.find_in_batches do |batch|
-          emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
-            CommunicationChannel.
-              email.
-              unretired.
-              select([:user_id, :path]).
-              where(user_id: user_ids).
-              order('user_id, position ASC').
-              distinct_on(:user_id)
-          end.index_by(&:user_id)
-
-          batch.each do |u|
-            row = []
-            row << u.user_id unless @sis_format
-            row << u.sis_user_id
-            row << u.integration_id
-            row << u.authentication_provider_id
-            row << u.unique_id
-            row << nil if @sis_format
-            name_parts = User.name_parts(u.sortable_name, likely_already_surname_first: true)
-            row << name_parts[0] || '' # first name
-            row << name_parts[1] || '' # last name
-            row << u.name
-            row << u.sortable_name
-            row << u.short_name
-            row << emails[u.user_id].try(:path)
-            row << u.workflow_state
-            row << u.sis_batch_id? unless @sis_format
-            csv << row
-          end
+        accounts.find_each do |a|
+          csv << account_row(a)
         end
       end
     end
 
-    def accounts
+    def account_headers
+      headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['account_id', 'parent_account_id', 'name', 'status']
       else
-        headers = []
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
         headers << I18n.t('#account_reports.report_header_canvas_parent_id', 'canvas_parent_id')
@@ -155,11 +191,17 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('created_by_sis')
       end
+      headers
+    end
+
+    def account_query
       accounts = root_account.all_accounts.
         select("accounts.*, pa.id AS parent_id,
                 pa.sis_source_id AS parent_sis_source_id").
         joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
+    end
 
+    def account_query_options(accounts)
       accounts = accounts.where.not(accounts: {sis_source_id: nil}) if @sis_format
       accounts = accounts.where.not(accounts: {sis_batch_id: nil}) if @created_by_sis
 
@@ -173,20 +215,19 @@ module AccountReports
         # this does not give the full tree pf sub accounts, just the direct children.
         accounts.where!(:accounts => {:parent_account_id => account})
       end
+      accounts
+    end
 
-      generate_and_run_report headers do |csv|
-        accounts.find_each do |a|
-          row = []
-          row << a.id unless @sis_format
-          row << a.sis_source_id
-          row << a.parent_id unless @sis_format
-          row << a.parent_sis_source_id
-          row << a.name
-          row << a.workflow_state
-          row << a.sis_batch_id? unless @sis_format
-          csv << row
-        end
-      end
+    def account_row(a)
+      row = []
+      row << a.id unless @sis_format
+      row << a.sis_source_id
+      row << a.parent_id unless @sis_format
+      row << a.parent_sis_source_id
+      row << a.name
+      row << a.workflow_state
+      row << a.sis_batch_id? unless @sis_format
+      row
     end
 
     def terms
@@ -204,14 +245,7 @@ module AccountReports
         headers << I18n.t('created_by_sis')
       end
       terms = root_account.enrollment_terms
-      terms = terms.where.not(sis_source_id: nil) if @sis_format
-      terms = terms.where.not(enrollment_terms: {sis_batch_id: nil}) if @created_by_sis
-
-      if @include_deleted
-        terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
-      else
-        terms = terms.where("workflow_state<>'deleted'")
-      end
+      terms = term_query_options(terms)
 
       generate_and_run_report headers do |csv|
         terms.find_each do |t|
@@ -228,46 +262,22 @@ module AccountReports
       end
     end
 
-    def courses
-      if @sis_format
-        # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
-                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
-                   'blueprint_course_id']
-      else
-        headers = []
-        headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
-        headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
-        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
-        headers << I18n.t('#account_reports.report_header_short__name', 'short_name')
-        headers << I18n.t('#account_reports.report_header_long__name', 'long_name')
-        headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
-        headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
-        headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
-        headers << I18n.t('#account_reports.report_header_term__id', 'term_id')
-        headers << I18n.t('#account_reports.report_header_status', 'status')
-        headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
-        headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
-        headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
-        headers << I18n.t('blueprint_course_id')
-        headers << I18n.t('created_by_sis')
-      end
-
-      courses = root_account.all_courses.preload(:account, :enrollment_term)
-      courses = courses.where.not(courses: {sis_source_id: nil}) if @sis_format
-      courses = courses.where.not(courses: {sis_batch_id: nil}) if @created_by_sis
+    def term_query_options(terms)
+      terms = terms.where.not(sis_source_id: nil) if @sis_format
+      terms = terms.where.not(enrollment_terms: {sis_batch_id: nil}) if @created_by_sis
 
       if @include_deleted
-        courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
-                          OR courses.workflow_state<>'deleted'
-                          OR courses.sis_source_id IS NOT NULL", 120.days.ago)
+        terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
       else
-        courses.where!("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
+        terms = terms.where("workflow_state<>'deleted'")
       end
+      terms
+    end
 
-      courses = add_course_sub_account_scope(courses)
-      courses = add_term_scope(courses)
-
+    def courses
+      headers = course_headers
+      courses = course_query
+      courses = course_query_options(courses)
       course_state_sub = {'claimed' => 'unpublished', 'created' => 'unpublished',
                           'completed' => 'concluded', 'deleted' => 'deleted',
                           'available' => 'active'}
@@ -289,49 +299,112 @@ module AccountReports
           end
 
           batch.each do |c|
-            row = []
-            row << c.id unless @sis_format
-            row << c.sis_source_id
-            row << c.integration_id
-            row << c.course_code
-            row << c.name
-            row << c.account_id unless @sis_format
-            row << c.account.try(:sis_source_id)
-            row << c.enrollment_term_id unless @sis_format
-            row << c.enrollment_term.try(:sis_source_id)
-            # for sis import format 'claimed', 'created', and 'available' are all considered active
-            if @sis_format
-              if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-                row << c.workflow_state
-              else
-                row << 'active'
-              end
-            else
-              row << course_state_sub[c.workflow_state]
-            end
-            if c.restrict_enrollments_to_course_dates
-              row << default_timezone_format(c.start_at)
-              row << default_timezone_format(c.conclude_at)
-            else
-              row << nil
-              row << nil
-            end
-            row << c.course_format
-            row << blueprint_map[c.id]
-            row << c.sis_batch_id? unless @sis_format
-            csv << row
+            csv << course_row(c, course_state_sub, blueprint_map)
           end
         end
       end
     end
 
+    def course_headers
+      headers = []
+      if @sis_format
+        # headers are not translated on sis_export to maintain import compatibility
+        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
+                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
+                   'blueprint_course_id']
+      else
+        headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
+        headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
+        headers << I18n.t('#account_reports.report_header_short__name', 'short_name')
+        headers << I18n.t('#account_reports.report_header_long__name', 'long_name')
+        headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
+        headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
+        headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
+        headers << I18n.t('#account_reports.report_header_term__id', 'term_id')
+        headers << I18n.t('#account_reports.report_header_status', 'status')
+        headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
+        headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
+        headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
+        headers << I18n.t('blueprint_course_id')
+        headers << I18n.t('created_by_sis')
+      end
+      headers
+    end
+
+    def course_query
+      courses = root_account.all_courses.preload(:account, :enrollment_term)
+    end
+
+    def course_query_options(courses)
+      courses = courses.where.not(courses: {sis_source_id: nil}) if @sis_format
+      courses = courses.where.not(courses: {sis_batch_id: nil}) if @created_by_sis
+
+      if @include_deleted
+        courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
+                          OR courses.workflow_state<>'deleted'
+                          OR courses.sis_source_id IS NOT NULL", 120.days.ago)
+      else
+        courses.where!("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
+      end
+
+      courses = add_course_sub_account_scope(courses)
+      courses = add_term_scope(courses)
+    end
+
+    def course_row(c, course_state_sub, blueprint_map)
+      row = []
+      row << c.id unless @sis_format
+      row << c.sis_source_id
+      row << c.integration_id
+      row << c.course_code
+      row << c.name
+      row << c.account_id unless @sis_format
+      row << c.account.try(:sis_source_id)
+      row << c.enrollment_term_id unless @sis_format
+      row << c.enrollment_term.try(:sis_source_id)
+      # for sis import format 'claimed', 'created', and 'available' are all considered active
+      if @sis_format
+        if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
+          row << c.workflow_state
+        else
+          row << 'active'
+        end
+      else
+        row << course_state_sub[c.workflow_state]
+      end
+      if c.restrict_enrollments_to_course_dates
+        row << default_timezone_format(c.start_at)
+        row << default_timezone_format(c.conclude_at)
+      else
+        row << nil
+        row << nil
+      end
+      row << c.course_format
+      row << blueprint_map[c.id]
+      row << c.sis_batch_id? unless @sis_format
+      row
+    end
+
     def sections
+      headers = section_headers
+      sections = section_query
+      sections = section_query_options(sections)
+
+      generate_and_run_report headers do |csv|
+        sections.find_each do |s|
+          csv << section_row(s)
+        end
+      end
+    end
+
+    def section_headers
+      headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['section_id', 'course_id', 'integration_id', 'name', 'status',
                    'start_date', 'end_date']
       else
-        headers = []
         headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
         headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -345,13 +418,19 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
         headers << I18n.t('created_by_sis')
       end
+      headers
+    end
+
+    def section_query
       sections = root_account.course_sections.
         select("course_sections.*,
                 rc.sis_source_id AS course_sis_id,
                 ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id").
         joins("INNER JOIN #{Course.quoted_table_name} AS rc ON course_sections.course_id = rc.id
                INNER JOIN #{Account.quoted_table_name} AS ra ON rc.account_id = ra.id")
+    end
 
+    def section_query_options(sections)
       if @include_deleted
         sections.where!("course_sections.workflow_state<>'deleted'
                            OR
@@ -370,32 +449,30 @@ module AccountReports
       sections = sections.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
       sections = add_course_sub_account_scope(sections, 'rc')
       sections = add_term_scope(sections, 'rc')
+    end
 
-      generate_and_run_report headers do |csv|
-        sections.find_each do |s|
-          row = []
-          row << s.id unless @sis_format
-          row << s.sis_source_id
-          row << s.course_id unless @sis_format
-          row << s.course_sis_id
-          row << s.integration_id
-          row << s.name
-          row << s.workflow_state
-          if s.restrict_enrollments_to_section_dates
-            row << default_timezone_format(s.start_at)
-            row << default_timezone_format(s.end_at)
-          else
-            row << nil
-            row << nil
-          end
-          unless @sis_format
-            row << s.r_account_id
-            row << s.r_account_sis_id
-            row << s.sis_batch_id?
-          end
-          csv << row
-        end
+    def section_row(s)
+      row = []
+      row << s.id unless @sis_format
+      row << s.sis_source_id
+      row << s.course_id unless @sis_format
+      row << s.course_sis_id
+      row << s.integration_id
+      row << s.name
+      row << s.workflow_state
+      if s.restrict_enrollments_to_section_dates
+        row << default_timezone_format(s.start_at)
+        row << default_timezone_format(s.end_at)
+      else
+        row << nil
+        row << nil
       end
+      unless @sis_format
+        row << s.r_account_id
+        row << s.r_account_sis_id
+        row << s.sis_batch_id?
+      end
+      row
     end
 
     def enrollments
@@ -413,7 +490,7 @@ module AccountReports
         # the "start" parameter is purely to
         # force activerecord to use LIMIT/OFFSET
         # rather than a cursor for this iteration
-        # because it often is big enough that the slave
+        # because it often is big enough that the secondary
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
         enrol.preload(:root_account, :sis_pseudonym).find_in_batches(start: 0) do |batch|
           users = batch.map {|e| User.new(id: e.user_id)}.compact
@@ -544,7 +621,6 @@ module AccountReports
         headers << I18n.t('created_by_sis')
         headers << I18n.t('context_id')
         headers << I18n.t('context_type')
-        headers << I18n.t('group_category_id')
         headers << I18n.t('max_membership')
       end
 
@@ -556,24 +632,7 @@ module AccountReports
                LEFT JOIN #{Course.quoted_table_name} ON courses.id = groups.context_id AND context_type='Course'
                LEFT JOIN #{GroupCategory.quoted_table_name} ON groups.group_category_id=group_categories.id")
 
-      groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
-      groups = groups.where.not(groups: {sis_batch_id: nil}) if @created_by_sis
-
-      if @include_deleted
-        groups.where!("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
-      else
-        groups.where!("groups.workflow_state<>'deleted'")
-      end
-
-      if account != root_account
-        groups.where!("(groups.context_type = 'Account'
-                         AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                           OR accounts.id = :account_id))
-                       OR (groups.context_type = 'Course'
-                         AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                           OR courses.account_id = :account_id))", { account_id: account.id })
-      end
-
+      groups = group_query_options(groups)
       generate_and_run_report headers do |csv|
         groups.find_each do |g|
           row = []
@@ -590,11 +649,30 @@ module AccountReports
           row << g.sis_batch_id? unless @sis_format
           row << g.context_id unless @sis_format
           row << g.context_type unless @sis_format
-          row << g.group_category_id unless @sis_format
           row << g.max_membership unless @sis_format
           csv << row
         end
       end
+    end
+
+    def group_query_options(groups)
+      groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
+      groups = groups.where.not(groups: {sis_batch_id: nil}) if @created_by_sis
+      if @include_deleted
+        groups.where!("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
+      else
+        groups.where!("groups.workflow_state<>'deleted'")
+      end
+
+      if account != root_account
+        groups.where!("(groups.context_type = 'Account'
+                         AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR accounts.id = :account_id))
+                       OR (groups.context_type = 'Course'
+                         AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR courses.account_id = :account_id))", { account_id: account.id })
+      end
+      groups
     end
 
     def group_categories
@@ -632,12 +710,7 @@ module AccountReports
                    LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
                      AND group_categories.context_type = 'Course'")
         end
-        group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
-        if @sis_format
-          group_categories = group_categories.
-            select("group_categories.*, a.sis_source_id AS account_sis_id, c.sis_source_id AS course_sis_id").
-            where.not(sis_batch_id: nil)
-        end
+        group_categories = group_category_query_options(group_categories)
 
         generate_and_run_report headers do |csv|
           group_categories.order('group_categories.id ASC').find_each do |g|
@@ -658,6 +731,16 @@ module AccountReports
           end
         end
       end
+    end
+
+    def group_category_query_options(group_categories)
+      group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
+      if @sis_format
+        group_categories = group_categories.
+          select("group_categories.*, a.sis_source_id AS account_sis_id, c.sis_source_id AS course_sis_id").
+          where.not(sis_batch_id: nil)
+      end
+      group_categories
     end
 
     def group_membership
@@ -683,16 +766,7 @@ module AccountReports
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = group_memberships.user_id)")
 
-      gm = gm.where.not(group_memberships: {sis_batch_id: nil}) if @sis_format || @created_by_sis
-
-      if @include_deleted
-        gm.where!("(groups.workflow_state<>'deleted'
-                     AND group_memberships.workflow_state<>'deleted')
-                     OR
-                     (group_memberships.sis_batch_id IS NOT NULL)")
-      else
-        gm.where!("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
-      end
+      gm = group_membership_query_options(gm)
 
       if account != root_account
         gm = gm.joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id
@@ -729,6 +803,20 @@ module AccountReports
       end
     end
 
+    def group_membership_query_options(gm)
+      gm = gm.where.not(group_memberships: {sis_batch_id: nil}) if @sis_format || @created_by_sis
+
+      if @include_deleted
+        gm.where!("(groups.workflow_state<>'deleted'
+                     AND group_memberships.workflow_state<>'deleted')
+                     OR
+                     (group_memberships.sis_batch_id IS NOT NULL)")
+      else
+        gm.where!("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
+      end
+      gm
+    end
+
     def xlist
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
@@ -751,8 +839,25 @@ module AccountReports
                INNER JOIN #{Course.quoted_table_name} nxc ON course_sections.nonxlist_course_id = nxc.id").
         where("course_sections.nonxlist_course_id IS NOT NULL")
 
+      xl = xlist_query_options(xl)
+      generate_and_run_report headers do |csv|
+        xl.find_each do |x|
+          row = []
+          row << x.course_id unless @sis_format
+          row << x.course_sis_id
+          row << x.id unless @sis_format
+          row << x.sis_source_id
+          row << x.workflow_state
+          row << x.nonxlist_course_id unless @sis_format
+          row << x.nxc_sis_id unless @sis_format
+          csv << row
+        end
+      end
+    end
+
+    def xlist_query_options(xl)
       xl = xl.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
-      xl = xl.where.not(courses: {sis_source_id: nil}, course_sections: {sis_source_id: nil}) if @sis_format
+      xl = xl.where.not(courses: {sis_source_id: nil}).where.not(course_sections: {sis_source_id: nil}) if @sis_format
 
       if @include_deleted
         xl.where!("(courses.workflow_state<>'deleted'
@@ -768,20 +873,6 @@ module AccountReports
 
       xl = add_course_sub_account_scope(xl)
       xl = add_term_scope(xl)
-
-      generate_and_run_report headers do |csv|
-        xl.find_each do |x|
-          row = []
-          row << x.course_id unless @sis_format
-          row << x.course_sis_id
-          row << x.id unless @sis_format
-          row << x.sis_source_id
-          row << x.workflow_state
-          row << x.nonxlist_course_id unless @sis_format
-          row << x.nxc_sis_id unless @sis_format
-          csv << row
-        end
-      end
     end
 
     def user_observers
@@ -809,15 +900,7 @@ module AccountReports
         where("p2.account_id=pseudonyms.account_id").
         where(:user_observers => {:root_account_id => root_account})
 
-      observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
-      observers = observers.active.where.not(user_observers: {workflow_state: 'deleted'}) unless @include_deleted
-
-      if account != root_account
-        observers = observers.
-          where("EXISTS (SELECT user_id FROM #{UserAccountAssociation.quoted_table_name} uaa
-                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)", account)
-      end
-
+      observers = user_observer_query_options(observers)
       generate_and_run_report headers do |csv|
         observers.find_each do |observer|
           row = []
@@ -830,6 +913,18 @@ module AccountReports
           csv << row
         end
       end
+    end
+
+    def user_observer_query_options(observers)
+      observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
+      observers = observers.active.where.not(user_observers: {workflow_state: 'deleted'}) unless @include_deleted
+
+      if account != root_account
+        observers = observers.
+          where("EXISTS (SELECT user_id FROM #{UserAccountAssociation.quoted_table_name} uaa
+                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)", account)
+      end
+      observers
     end
 
     def admins
@@ -864,9 +959,7 @@ module AccountReports
           where("account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
                  OR account_users.account_id= :account_id", {account_id: account.id})
 
-        admins = admins.where.not(account_users: {sis_batch_id: nil}) if @sis_format
-        admins = admins.where.not(account_users: {workflow_state: 'deleted'}) unless @include_deleted
-
+        admins = admin_query_options(admins)
         generate_and_run_report headers do |csv|
           admins.find_in_batches do |batch|
             users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
@@ -894,6 +987,12 @@ module AccountReports
           end
         end
       end
+    end
+
+    def admin_query_options(admins)
+      admins = admins.where.not(account_users: {sis_batch_id: nil}) if @sis_format
+      admins = admins.where.not(account_users: {workflow_state: 'deleted'}) unless @include_deleted
+      admins
     end
   end
 end

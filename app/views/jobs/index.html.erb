@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t :title, "Jobs CP" %><% end %>
-<% content_for :stylesheets do %>
+<% provide :page_title do %><%= t :title, "Jobs CP" %><% end %>
+
 <style type="text/css">
   #content {
     position: relative;
@@ -70,7 +70,7 @@
   textarea.show-field { width: 850px; height: 630px; }
   .unloaded-id { color: #aaa; }
 </style>
-<% end %>
+
 <% css_bundle :slickgrid %>
 <% js_bundle :jobs %>
 

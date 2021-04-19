@@ -16,5 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jest-dom/extend-expect'
-import 'react-testing-library/cleanup-after-each'
+import '@testing-library/jest-dom/extend-expect'

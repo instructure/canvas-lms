@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -91,14 +93,18 @@ describe Wiki do
       expect(@course.wiki.grants_right?(@user, :read)).to be_falsey
     end
 
-    it 'should give manage rights to teachers' do
-      course_with_teacher
-      expect(@course.wiki.grants_right?(@teacher, :manage)).to be_truthy
-    end
+    context 'default permissions' do
+      [:update, :create_page, :delete_page, :update_page, :view_unpublished_items].each do |perm|
+        it "should give #{perm} rights to teachers" do
+          course_with_teacher
+          expect(@course.wiki.grants_right?(@teacher, perm)).to be_truthy
+        end
 
-    it 'should give manage rights to admins' do
-      account_admin_user
-      expect(@course.wiki.grants_right?(@admin, :manage)).to be_truthy
+        it "should give #{perm} rights to admins" do
+          account_admin_user
+          expect(@course.wiki.grants_right?(@admin, perm)).to be_truthy
+        end
+      end
     end
 
     it 'should give publish page rights to admins' do
@@ -151,10 +157,6 @@ describe Wiki do
       it 'should give update_page rights to students' do
         expect(@course.wiki.grants_right?(@user, :update_page)).to be_truthy
       end
-
-      it 'should give update_page_content rights to students' do
-        expect(@course.wiki.grants_right?(@user, :update_page_content)).to be_truthy
-      end
     end
   end
 
@@ -188,6 +190,14 @@ describe Wiki do
     it "should find the wiki's context from another shard" do
       @shard1.activate do
         expect(@wiki.context).to eq @course
+      end
+    end
+  end
+
+  context 'before save' do
+    describe 'set_root_account_id' do
+      it 'sets root_account_id using context' do
+        expect(@wiki.root_account_id).to eq @course.root_account_id
       end
     end
   end

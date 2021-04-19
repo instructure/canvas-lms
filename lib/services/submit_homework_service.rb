@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -36,7 +38,7 @@ module Services
       end
     end
 
-    CopyWorker = Struct.new(:attachment_id, :progress_id, :eula_agreement_timestamp, :clone_url_executor) do
+    CopyWorker = Struct.new(:attachment_id, :progress_id, :clone_url_executor) do
       def progress
         @progress ||= Progress.find(progress_id)
       end
@@ -70,7 +72,7 @@ module Services
       end
     end
 
-    SubmitWorker = Struct.new(:attachment_id, :progress_id, :eula_agreement_timestamp, :clone_url_executor) do
+    SubmitWorker = Struct.new(:attachment_id, :progress_id, :eula_agreement_timestamp, :comment, :clone_url_executor) do
       def progress
         @progress ||= Progress.find(progress_id)
       end
@@ -90,7 +92,7 @@ module Services
 
         raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == 'errored'
 
-        homework_service.submit(eula_agreement_timestamp)
+        homework_service.submit(eula_agreement_timestamp, comment)
         homework_service.success!
       rescue => error
         mark_as_failure(error)
@@ -112,14 +114,14 @@ module Services
         CloneUrlExecutor.new(url, duplicate_handling, check_quota, opts)
       end
 
-      def submit_job(attachment, progress, eula_agreement_timestamp, executor)
-        if progress.context.is_a? Assignment
+      def submit_job(attachment, progress, eula_agreement_timestamp, comment, executor, submit_assignment)
+        if progress.context.is_a?(Assignment) && submit_assignment
           SubmitWorker.
-            new(attachment.id, progress.id, eula_agreement_timestamp, executor).
+            new(attachment.id, progress.id, eula_agreement_timestamp, comment, executor).
             tap { |worker| enqueue_attachment_job(worker) }
         else
           CopyWorker.
-            new(attachment.id, progress.id, eula_agreement_timestamp, executor).
+            new(attachment.id, progress.id, executor).
             tap { |worker| enqueue_attachment_job(worker) }
         end
       end
@@ -138,7 +140,7 @@ module Services
       @progress = progress
     end
 
-    def submit(eula_agreement_timestamp)
+    def submit(eula_agreement_timestamp, comment)
       start!
 
       if @attachment
@@ -146,7 +148,8 @@ module Services
           submission_type: 'online_upload',
           submitted_at: @progress.created_at,
           attachments: [@attachment],
-          eula_agreement_timestamp: eula_agreement_timestamp
+          eula_agreement_timestamp: eula_agreement_timestamp,
+          comment: comment
         }
 
         @progress.context.submit_homework(@progress.user, opts)

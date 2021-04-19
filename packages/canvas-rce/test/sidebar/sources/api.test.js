@@ -27,17 +27,23 @@ describe('sources/api', () => {
   const props = {
     host: 'example.host',
     contextType: 'group',
-    contextId: 123
+    contextId: 123,
+    sortBy: {sort: 'date_added', dir: 'desc'},
+    searchString: ''
   }
   let apiSource
+  let alertFuncSpy
 
   beforeEach(() => {
+    alertFuncSpy = sinon.spy()
     apiSource = new RceApiSource({
       jwt: 'theJWT',
       refreshToken: callback => {
         callback('freshJWT')
-      }
+      },
+      alertFunc: alertFuncSpy
     })
+    fetchMock.mock('/api/session', '{}')
   })
 
   afterEach(() => {
@@ -55,56 +61,106 @@ describe('sources/api', () => {
     })
 
     it('creates a collection with a bookmark derived from props', () => {
-      assert.equal(
+      assert.strictEqual(
         collection.bookmark,
         `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123`
       )
     })
 
     it('bookmark omits host if not in props', () => {
-      let noHostProps = Object.assign({}, props, {host: undefined})
+      const noHostProps = {...props, host: undefined}
       collection = apiSource.initializeCollection(endpoint, noHostProps)
-      assert.equal(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
+      assert.strictEqual(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
     })
 
     it('creates a collection that is not initially loading', () => {
-      assert.equal(collection.loading, false)
+      assert.strictEqual(collection.isLoading, false)
+    })
+
+    it('creates a collection that initially has more', () => {
+      assert.strictEqual(collection.hasMore, true)
     })
   })
 
   describe('initializeImages', () => {
-    it('sets requested to false', () => {
-      assert.equal(apiSource.initializeImages().requested, false)
+    it('sets hasMore to true', () => {
+      assert.strictEqual(apiSource.initializeImages(props)[props.contextType].hasMore, true)
     })
   })
 
-  describe('URI construction', () => {
+  describe('URI construction (baseUri)', () => {
     it('uses a protocol relative url when no window', () => {
-      let uri = apiSource.baseUri('files', 'example.instructure.com', {})
-      assert.equal(uri, '//example.instructure.com/api/files')
+      const uri = apiSource.baseUri('files', 'example.instructure.com', {})
+      assert.strictEqual(uri, '//example.instructure.com/api/files')
     })
 
     it('uses a path for no-host url construction', () => {
-      let uri = apiSource.baseUri('files')
-      assert.equal(uri, '/api/files')
+      const uri = apiSource.baseUri('files')
+      assert.strictEqual(uri, '/api/files')
     })
 
     it('gets protocol from window if available', () => {
-      let fakeWindow = {location: {protocol: 'https:'}}
-      let uri = apiSource.baseUri('files', 'example.instructure.com', fakeWindow)
-      assert.equal(uri, 'https://example.instructure.com/api/files')
+      const fakeWindow = {location: {protocol: 'https:'}}
+      const uri = apiSource.baseUri('files', 'example.instructure.com', fakeWindow)
+      assert.strictEqual(uri, 'https://example.instructure.com/api/files')
     })
 
     it('never applies protocol to path', () => {
-      let fakeWindow = {location: {protocol: 'https:'}}
-      let uri = apiSource.baseUri('files', null, fakeWindow)
-      assert.equal(uri, '/api/files')
+      const fakeWindow = {location: {protocol: 'https:'}}
+      const uri = apiSource.baseUri('files', null, fakeWindow)
+      assert.strictEqual(uri, '/api/files')
     })
 
     it("will replace protocol if there's a mismatch from http to https", () => {
-      let fakeWindow = {location: {protocol: 'https:'}}
-      let uri = apiSource.normalizeUriProtocol('http://something.com', fakeWindow)
-      assert.equal(uri, 'https://something.com')
+      const fakeWindow = {location: {protocol: 'https:'}}
+      const uri = apiSource.normalizeUriProtocol('http://something.com', fakeWindow)
+      assert.strictEqual(uri, 'https://something.com')
+    })
+  })
+
+  describe('more URI construction (uriFor)', () => {
+    let props = {}
+    beforeEach(() => {
+      props = {
+        host: undefined,
+        contextType: 'course',
+        contextId: '17',
+        sortBy: {sort: 'alphabetical', dir: 'asc'},
+        searchString: 'hello world'
+      }
+    })
+
+    it('gets documents', () => {
+      const uri = apiSource.uriFor('documents', props)
+      assert.strictEqual(
+        uri,
+        '/api/documents?contextType=course&contextId=17&exclude_content_types=image,video,audio&sort=name&order=asc&search_term=hello%20world'
+      )
+    })
+
+    it('gets images', () => {
+      const uri = apiSource.uriFor('images', props)
+      assert.strictEqual(
+        uri,
+        '/api/documents?contextType=course&contextId=17&content_types=image&sort=name&order=asc&search_term=hello%20world'
+      )
+    })
+
+    // this endpoint isn't actually used yet, but could be if media_objects all had associated Attachments
+    it('gets media', () => {
+      const uri = apiSource.uriFor('media', props)
+      assert.strictEqual(
+        uri,
+        '/api/documents?contextType=course&contextId=17&content_types=video,audio&sort=name&order=asc&search_term=hello%20world'
+      )
+    })
+
+    it('gets media_objects', () => {
+      const uri = apiSource.uriFor('media_objects', props)
+      assert.strictEqual(
+        uri,
+        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc&search_term=hello%20world'
+      )
     })
   })
 
@@ -120,7 +176,7 @@ describe('sources/api', () => {
       apiSource
         .fetchPage(uri)
         .then(() => {
-          assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+          assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
           done()
         })
         .catch(done)
@@ -135,7 +191,7 @@ describe('sources/api', () => {
           throw new Error('No error raised')
         })
         .catch(error => {
-          assert.equal(error.message, 'Forbidden')
+          assert.strictEqual(error.message, 'Forbidden')
           done()
         })
         .catch(done)
@@ -147,19 +203,10 @@ describe('sources/api', () => {
       return apiSource.fetchPage(uri).then(page => {
         assert.deepEqual(page, {
           bookmark: 'newBookmark',
-          links: [{href: 'link1', title: 'Link 1'}, {href: 'link2', title: 'Link 2'}]
-        })
-      })
-    })
-
-    it('can parse while-wrapped page data', () => {
-      let whileFakePageBody = 'while(1);' + fakePageBody
-      const uri = 'theURI'
-      fetchMock.mock(uri, whileFakePageBody)
-      return apiSource.fetchPage(uri).then(page => {
-        assert.deepEqual(page, {
-          bookmark: 'newBookmark',
-          links: [{href: 'link1', title: 'Link 1'}, {href: 'link2', title: 'Link 2'}]
+          links: [
+            {href: 'link1', title: 'Link 1'},
+            {href: 'link2', title: 'Link 2'}
+          ]
         })
       })
     })
@@ -168,16 +215,16 @@ describe('sources/api', () => {
       const uri = 'theURI'
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, fakePageBody)
 
       return apiSource.fetchPage(uri, 'theJWT').then(page => {
-        assert.equal(page.bookmark, 'newBookmark')
-        assert.equal(apiSource.jwt, 'freshJWT')
+        assert.strictEqual(page.bookmark, 'newBookmark')
+        assert.strictEqual(apiSource.jwt, 'freshJWT')
       })
     })
   })
@@ -203,7 +250,7 @@ describe('sources/api', () => {
       const uri = 'files-uri'
       return apiSource.fetchFiles(uri).then(body => {
         sinon.assert.calledWith(apiSource.fetchPage, uri)
-        assert.equal(body.bookmark, bookmark)
+        assert.strictEqual(body.bookmark, bookmark)
       })
     })
 
@@ -211,50 +258,98 @@ describe('sources/api', () => {
       return apiSource.fetchFiles('foo').then(body => {
         files.forEach((file, i) => {
           sinon.assert.calledWith(fileUrl.downloadToWrap, file.url)
-          assert.equal(body.files[i].url, wrapUrl)
+          assert.strictEqual(body.files[i].href, wrapUrl)
         })
       })
     })
   })
 
+  describe('fetchMediaFolder', () => {
+    let files
+    beforeEach(() => {
+      files = [{id: 24}]
+      const body = {files}
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+    it('calls fetchPage with the proper params', () => {
+      return apiSource
+        .fetchMediaFolder({
+          contextType: 'course',
+          contextId: '22'
+        })
+        .then(() => {
+          sinon.assert.calledWith(
+            apiSource.fetchPage,
+            '/api/folders/media?contextType=course&contextId=22'
+          )
+        })
+    })
+  })
+
   describe('preflightUpload', () => {
     const uri = '/api/upload'
-    let fileProps = {}
-    let apiProps = {}
+    const fileProps = {}
+    const apiProps = {}
 
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
 
     it('retries once with fresh token on 401', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(response => {
-        assert.equal(response.upload, 'done')
+        assert.strictEqual(response.upload, 'done')
       })
     })
 
     it('notifies a provided callback when a new token is fetched', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        assert.equal(apiSource.jwt, 'freshJWT')
+        assert.strictEqual(apiSource.jwt, 'freshJWT')
+      })
+    })
+
+    it('calls alertFunc when an error occurs', () => {
+      fetchMock.mock(uri, 500)
+      return apiSource
+        .preflightUpload(fileProps, apiProps)
+        .then(() => {
+          sinon.assert.calledWith(alertFuncSpy, {
+            text: 'Something went wrong uploading, check your connection and try again.',
+            variant: 'error'
+          })
+        })
+        .catch(() => {
+          // This will re-throw so we just catch it here.
+        })
+    })
+
+    it('throws an exception when an error occurs', () => {
+      fetchMock.mock(uri, 500)
+      return apiSource.preflightUpload(fileProps, apiProps).catch(e => {
+        assert(e)
       })
     })
   })
@@ -277,22 +372,37 @@ describe('sources/api', () => {
       fetchMock.restore()
     })
 
+    it('calls alertFunc if there is a problem', () => {
+      fetchMock.once(uploadUrl, 500, {overwriteRoutes: true})
+      return apiSource
+        .uploadFRD(fileDomObject, preflightProps)
+        .then(() => {
+          sinon.assert.calledWith(alertFuncSpy, {
+            text: 'Something went wrong uploading, check your connection and try again.',
+            variant: 'error'
+          })
+        })
+        .catch(() => {})
+    })
+
     describe('files', () => {
       beforeEach(() => {
-        wrapUrl = '/path?wrap=1'
+        wrapUrl = '/groups/123/path?wrap=1'
         sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
+        sinon.stub(fileUrl, 'fixupFileUrl').returns(wrapUrl)
         sinon.stub(apiSource, 'getFile').returns(Promise.resolve(file))
       })
 
       afterEach(() => {
         fileUrl.downloadToWrap.restore()
+        fileUrl.fixupFileUrl.restore()
         apiSource.getFile.restore()
       })
 
       it('includes credentials in non-S3 upload', () => {
         preflightProps.upload_params.success_url = undefined
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.equal(fetchMock.lastOptions(uploadUrl).credentials, 'include')
+          assert.strictEqual(fetchMock.lastOptions(uploadUrl).credentials, 'include')
         })
       })
 
@@ -302,64 +412,63 @@ describe('sources/api', () => {
         const s3File = {url: 's3-file-url'}
         fetchMock.mock(preflightProps.upload_params.success_url, s3File)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.equal(fetchMock.lastOptions(uploadUrl).credentials, undefined)
+          assert.strictEqual(fetchMock.lastOptions(uploadUrl).credentials, undefined)
         })
       })
 
-      it('converts returned file url from download to wrap', () => {
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(body => {
-          sinon.assert.calledWith(fileUrl.downloadToWrap, file.url)
-          assert.equal(body.url, wrapUrl)
-        })
-      })
-
-      it('handles s3 post-flight', () => {
+      it('handles s3 post-flight', async () => {
         preflightProps.upload_params.success_url = 'success-url'
         const s3File = {url: 's3-file-url'}
         fetchMock.mock(preflightProps.upload_params.success_url, s3File)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          sinon.assert.calledWith(fileUrl.downloadToWrap, s3File.url)
-        })
+        const result = await apiSource.uploadFRD(fileDomObject, preflightProps)
+        assert.deepEqual(result, s3File)
       })
 
       it('handles inst-fs post-flight', () => {
         preflightProps.upload_url = 'instfs-upload-url'
         const fileId = '123'
         const response = {
-          location: `http://canvas/api/v1/files/${fileId}?foo=bar`
+          location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
+          uuid: 'xyzzy'
         }
         fetchMock.mock(preflightProps.upload_url, response)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          sinon.assert.calledWith(fileUrl.downloadToWrap, file.url)
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
           sinon.assert.calledWith(apiSource.getFile, fileId)
+          assert.strictEqual(response.uuid, 'xyzzy')
+          assert.strictEqual(response.url, 'file-url')
         })
       })
-    })
 
-    describe('images', () => {
-      let tabContext
-
-      beforeEach(() => {
-        tabContext = 'images'
-        wrapUrl = '/path?wrap=1'
-        sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
-      })
-
-      afterEach(() => {
-        fileUrl.downloadToWrap.restore()
-      })
-
-      it('converts returned image url from download to wrap', () => {
-        return apiSource.uploadFRD(fileDomObject, preflightProps, tabContext).then(body => {
-          sinon.assert.calledWith(fileUrl.downloadToWrap, file.url)
-          assert.equal(body.url, wrapUrl)
+      it('handles inst-fs post-flight with global file id', () => {
+        preflightProps.upload_url = 'instfs-upload-url'
+        const fileId = '1023~789'
+        const response = {
+          location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
+          uuid: 'xyzzy'
+        }
+        fetchMock.mock(preflightProps.upload_url, response)
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
+          sinon.assert.calledWith(apiSource.getFile, fileId)
+          assert.strictEqual(response.uuid, 'xyzzy')
+          assert.strictEqual(response.url, 'file-url')
         })
       })
     })
   })
 
   describe('api mapping', () => {
-    const body = {foo: 'bar'}
+    const body = {
+      bookmark: 'mo.images',
+      files: [{href: '/some/where', uuid: 'xyzzy'}]
+    }
+    props.images = {
+      group: {
+        isLoading: false,
+        hasMore: true,
+        bookmark: null,
+        files: []
+      }
+    }
 
     it('can fetch folders', () => {
       fetchMock.mock(/\/folders\?/, {body})
@@ -370,24 +479,36 @@ describe('sources/api', () => {
     })
 
     it('requests images from API', () => {
-      fetchMock.mock(/\/images\?/, {body})
+      fetchMock.mock(/\/documents\?.*content_types=image/, {body})
       return apiSource.fetchImages(props).then(page => {
-        assert.deepEqual(page, body)
+        assert.deepStrictEqual(page, {
+          bookmark: 'mo.images',
+          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}]
+        })
+        fetchMock.restore()
+      })
+    })
+
+    it('requests subsequent page of images from API', () => {
+      props.images.group.bookmark = 'mo.images'
+      fetchMock.mock(/\/documents\?.*content_types=image/, 'should not get here')
+      fetchMock.mock(/mo.images/, {body})
+      return apiSource.fetchImages(props).then(page => {
+        assert.deepEqual(page, {
+          bookmark: 'mo.images',
+          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}]
+        })
         fetchMock.restore()
       })
     })
   })
 
   describe('getSession', () => {
-    const uri = '/api/session'
-
-    beforeEach(() => {
-      fetchMock.mock(uri, '{}')
-    })
+    const uri = '/api/session' // already mocked
 
     it('includes jwt in Authorization header', () => {
       return apiSource.getSession().then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
   })
@@ -403,7 +524,7 @@ describe('sources/api', () => {
 
     it('includes jwt in Authorization header', () => {
       return apiSource.setUsageRights(fileId, usageRights).then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
 
@@ -422,47 +543,47 @@ describe('sources/api', () => {
     const id = 47
     const uri = `/api/file/${id}`
     const url = '/file/url'
-    let props = {}
+    const props = {}
 
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, {url})
 
       return apiSource.getFile(id, props).then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
 
     it('retries once with fresh token on 401', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock(
         (fetchUrl, opts) => {
-          return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+          return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
         },
         {upload: 'done', url}
       )
 
       return apiSource.getFile(id, props).then(response => {
-        assert.equal(response.upload, 'done')
+        assert.strictEqual(response.upload, 'done')
       })
     })
 
     it('notifies a provided callback when a new token is fetched', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock(
         (fetchUrl, opts) => {
-          return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+          return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
         },
         {upload: 'done', url}
       )
 
       return apiSource.getFile(id, props).then(() => {
-        assert.equal(apiSource.jwt, 'freshJWT')
+        assert.strictEqual(apiSource.jwt, 'freshJWT')
       })
     })
 
@@ -473,21 +594,48 @@ describe('sources/api', () => {
       sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
       return apiSource.getFile(id).then(file => {
         sinon.assert.calledWith(fileUrl.downloadToWrap, url)
-        assert.equal(file.url, wrapUrl)
+        assert.strictEqual(file.href, wrapUrl)
         fileUrl.downloadToWrap.restore()
         fetchMock.restore()
       })
     })
 
-    it("defaults display_name to name", () => {
-      const url = "/file/url?download_frd=1"
-      const name = "filename"
-      fetchMock.mock("*", {url, name})
-      sinon.stub(fileUrl, "downloadToWrap")
+    it('defaults display_name to name', () => {
+      const url = '/file/url?download_frd=1'
+      const name = 'filename'
+      fetchMock.mock('*', {url, name})
+      sinon.stub(fileUrl, 'downloadToWrap')
       return apiSource.getFile(id).then(file => {
-        assert.equal(file.display_name, name)
+        assert.strictEqual(file.display_name, name)
         fileUrl.downloadToWrap.restore()
         fetchMock.restore()
+      })
+    })
+  })
+
+  describe('pingbackUnsplash', () => {
+    it('sends the given id to the proper route', () => {
+      const expectedUrl = '/api/unsplash/pingback?id=123'
+      fetchMock.mock(expectedUrl, 200)
+      return apiSource.pingbackUnsplash(123).then(() => {
+        assert.ok(fetchMock.done())
+        assert.ok(fetchMock.lastUrl() === expectedUrl)
+        fetchMock.restore()
+      })
+    })
+  })
+
+  describe('media object apis', () => {
+    describe('updateMediaObject', () => {
+      it('PUTs to the media_object endpoint', async () => {
+        const uri = `/api/media_objects/m-id?user_entered_title=${encodeURIComponent('new title')}`
+        fetchMock.put(uri, '{"media_id": "m-id", "title": "new title"}')
+        const response = await apiSource.updateMediaObject(
+          {},
+          {media_object_id: 'm-id', title: 'new title'}
+        )
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
       })
     })
   })

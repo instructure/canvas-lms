@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -30,6 +32,66 @@ module Lti
     end
 
     describe "#launch_definitions" do
+      describe 'selection properties' do
+        subject do
+          Lti::AppLaunchCollator.launch_definitions(
+            [tool],
+            [placement]
+          ).first
+        end
+
+        let(:placement) { :assignment_selection }
+        let(:settings) { {} }
+        let(:tool) do
+          ContextExternalTool.new(
+            name: "Selection Test Tool",
+            url: 'https://www.test.tool.com',
+            consumer_key: "key",
+            shared_secret: "secret",
+            settings: settings
+          )
+        end
+
+        context 'with a message type that allows content selection' do
+          let(:settings) do
+            {
+              assignment_selection: {
+                message_type: 'LtiDeepLinkingRequest',
+                selection_width: 1000
+              },
+              resource_selection: {
+                message_type: 'LtiDeepLinkingRequest',
+                selection_width: 500
+              }
+            }
+          end
+
+          it 'returns the property from the "resource_selection" placement' do
+            expect(subject.dig(:placements, :assignment_selection, :selection_width)).to eq 500
+          end
+
+          context 'when "resource_selection" is not set' do
+            let(:settings) do
+              {
+                assignment_selection: {
+                  message_type: 'LtiDeepLinkingRequest',
+                  selection_width: 1000
+                }
+              }
+            end
+
+            it 'returns the placement property if "resource_selection" is not set' do
+              expect(subject.dig(:placements, :assignment_selection, :selection_width)).to eq 1000
+            end
+          end
+        end
+
+        context 'whith a message type that does not allow content selection' do
+          it 'does not set selection properties' do
+            expect(subject.dig(:placements, :assignment_selection, :selection_width)).to be_nil
+          end
+        end
+      end
 
       it 'returns lti2 launch definitions' do
         tp = create_tool_proxy
@@ -37,7 +99,7 @@ module Lti
         rh = create_resource_handler(tp)
         mh = create_message_handler(rh)
 
-        placements = ResourcePlacement::DEFAULT_PLACEMENTS
+        placements = ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS
         placements.each { |p| mh.placements.create!(placement: p) }
 
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
@@ -161,7 +223,7 @@ module Lti
         tp.bindings.create(context: account)
         rh = create_resource_handler(tp)
         mh = create_message_handler(rh)
-        ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
+        ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
         new_valid_external_tool(account)
 
         placements = %w(assignment_selection link_selection resource_selection)
@@ -182,7 +244,7 @@ module Lti
             tp.bindings.create(context: account)
             rh = create_resource_handler(tp)
             mh = create_message_handler(rh)
-            ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
+            ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
           end
           3.times { |_| new_valid_external_tool(account) }
 

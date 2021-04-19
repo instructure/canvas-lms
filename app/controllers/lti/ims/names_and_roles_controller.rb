@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 # rubocop:disable Metrics/LineLength
 module Lti::Ims
   # @API Names and Role
-  # @internal
+  #
   # API for IMS Names and Role Provisioning Service version 2 .
   #
   # Official specification: https://www.imsglobal.org/spec/lti-nrps/v2p0
@@ -277,7 +279,7 @@ module Lti::Ims
     #   If the `rlid` parameter is also present, it will be 'and-ed' together with this parameter
     #
     # @argument limit [String]
-    #   May be used to limit the number of NamesAndRoleMemberships returned in a page
+    #   May be used to limit the number of NamesAndRoleMemberships returned in a page. Defaults to 50.
     #
     # @returns NamesAndRoleMemberships
     def course_index
@@ -300,7 +302,7 @@ module Lti::Ims
     #   If the `rlid` parameter is also present, it will be 'and-ed' together with this parameter
     #
     # @argument limit [String]
-    #   May be used to limit the number of NamesAndRoleMemberships returned in a page
+    #   May be used to limit the number of NamesAndRoleMemberships returned in a page. Defaults to 50.
     #
     # @returns NamesAndRoleMemberships
     def group_index

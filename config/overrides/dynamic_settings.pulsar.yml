@@ -1,0 +1,11 @@
+# This file gets used by the build
+# for running tests that depend upon having
+# a pulsar standalone cluster running in a sibling
+# container.  See the "Run Pulsar specs" stage
+# in Jenkinsfile.vendored-gems for how it gets used.
+test:
+  private:
+    canvas:
+      pulsar.yml: |
+        PULSAR_BROKER_URI: 'pulsar://pulsar:6650'
+        PULSAR_TENANT: 'canvas'

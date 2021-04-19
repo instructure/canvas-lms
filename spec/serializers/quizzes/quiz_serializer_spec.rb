@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -78,6 +80,9 @@ describe Quizzes::QuizSerializer do
     expect(json[:html_url]).to eq 'http://example.com/courses/1/quizzes/1'
   end
 
+  it "serializes timer_autosubmit_disabled" do
+    expect(json[:timer_autosubmit_disabled]).to eq quiz.send(:timer_autosubmit_disabled?)
+  end
 
   describe "description" do
     it "serializes description with a formatter if given" do

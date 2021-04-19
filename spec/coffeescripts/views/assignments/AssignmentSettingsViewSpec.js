@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import Course from 'compiled/models/Course'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import AssignmentSettingsView from 'compiled/views/assignments/AssignmentSettingsView'
-import AssignmentGroupWeightsView from 'compiled/views/assignments/AssignmentGroupWeightsView'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import Course from '@canvas/courses/backbone/models/Course.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView.coffee'
+import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
@@ -28,7 +28,8 @@ import 'helpers/jquery.simulate'
 
 const group = (opts = {}) => new AssignmentGroup({group_weight: 50, ...opts})
 
-const assignmentGroups = () => new AssignmentGroupCollection([group({name: "G1"}), group({name: "G2"})])
+const assignmentGroups = () =>
+  new AssignmentGroupCollection([group({name: 'G1'}), group({name: 'G2'})])
 
 const createView = function(opts = {}) {
   const course = new Course({apply_assignment_group_weights: opts.weighted})
@@ -96,7 +97,7 @@ test('changes the apply_assignment_group_weights flag', () => {
 })
 
 test('onSaveSuccess triggers weightedToggle event with expected argument', () => {
-  const sandbox = sinon.sandbox.create()
+  const sandbox = sinon.createSandbox()
   const stub1 = sandbox.stub()
   let view = createView({weighted: true})
   view.on('weightedToggle', stub1)
@@ -219,7 +220,7 @@ test('disables the Save and Cancel buttons', () => {
   view.remove()
 })
 
-test('disables the Save and Cancel button handlers', function() {
+test('disables the Save and Cancel button handlers', () => {
   const closed_group = group({any_assignment_in_closed_grading_period: true})
   const groups = new AssignmentGroupCollection([group(), closed_group])
   const view = createView({

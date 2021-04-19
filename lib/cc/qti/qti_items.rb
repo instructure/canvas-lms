@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -18,8 +20,8 @@
 require 'bigdecimal'
 
 module CC
-  module QTI
-    module QTIItems
+  module Qti
+    module QtiItems
 
       CC_SUPPORTED_TYPES = ['multiple_choice_question',
                             'multiple_answers_question',

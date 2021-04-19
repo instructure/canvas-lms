@@ -18,8 +18,8 @@
 
 import 'react'
 import ReactDOM from 'react-dom'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-import StatusPill from 'jsx/grading/StatusPill'
+import {Pill} from '@instructure/ui-pill'
+import StatusPill from '@canvas/grading-status-pill'
 
 const wrapper = document.getElementById('fixtures')
 
@@ -38,7 +38,7 @@ QUnit.module('StatusPill', {
   }
 })
 
-test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', function() {
+test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', () => {
   const stubbedRender = sandbox.stub(ReactDOM, 'render')
   const spans = [1, 2, 3].map(() => addSpan('submission-missing-pill'))
   StatusPill.renderPills()
@@ -52,7 +52,7 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-missin
   })
 })
 
-test('renderPills mounts a <Pill /> with correct text to each .submission-late-pill', function() {
+test('renderPills mounts a <Pill /> with correct text to each .submission-late-pill', () => {
   const stubbedRender = sandbox.stub(ReactDOM, 'render')
   const spans = [1, 2, 3].map(() => addSpan('submission-late-pill'))
   StatusPill.renderPills()

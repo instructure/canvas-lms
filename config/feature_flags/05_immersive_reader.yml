@@ -1,0 +1,8 @@
+---
+immersive_reader_wiki_pages:
+  state: hidden
+  display_name: Microsoft Immersive Reader
+  description: |-
+    Makes a Microsoft Immersive Reader link option show up on wiki pages.
+  applies_to: Account
+  root_opt_in: true

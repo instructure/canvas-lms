@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -23,9 +25,9 @@ module Types
     alias set object
 
     implements GraphQL::Types::Relay::Node
+    implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", method: :id, null: false
 
     field :name, String, null: true
 
@@ -71,6 +73,13 @@ module Types
           set.groups.active.by_name :
           nil
       }
+    end
+
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:root_account).then do |root_account|
+        set.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
+      end
     end
   end
 end

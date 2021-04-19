@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from 'browser-sniffer'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 import sinon from 'sinon'
 
 let storedInstEnv = null
@@ -33,7 +33,7 @@ QUnit.module('$.fn.defaultAjaxError', {
   }
 })
 
-test('should call the function if not production', function() {
+test('should call the function if not production', () => {
   notEqual(INST.environment, 'production')
   deepEqual($.ajaxJSON.unhandledXHRs, [])
   const spy = sinon.spy()
@@ -46,7 +46,7 @@ test('should call the function if not production', function() {
   ok(spy.called)
 })
 
-test('should call the function if unhandled', function() {
+test('should call the function if unhandled', () => {
   INST.environment = 'production'
   const xhr = {
     status: 400,
@@ -59,7 +59,7 @@ test('should call the function if unhandled', function() {
   ok(spy.called)
 })
 
-test('should call the function if unauthenticated', function() {
+test('should call the function if unauthenticated', () => {
   INST.environment = 'production'
   deepEqual($.ajaxJSON.unhandledXHRs, [])
   const spy = sinon.spy()
@@ -104,7 +104,7 @@ test('returns true if status is 401 and message is unauthenticated', () => {
 let abortXhr
 
 QUnit.module('$.ajaxJSON.abortRequest', {
-  setup () {
+  setup() {
     abortXhr = {
       readyState: 0,
       abort: sinon.spy()
@@ -143,7 +143,7 @@ test('does not call success or error handler', () => {
   const spy = sinon.spy()
   $.ajaxJSON('/api', 'GET', {}, spy, spy)
   $.ajaxJSON.abortRequest(xhr)
-  xhr.readyStateChange(sinon.FakeXMLHttpRequest.DONE);
+  xhr.readyStateChange(sinon.FakeXMLHttpRequest.DONE)
   fakeXhr.restore()
   ok(spy.notCalled)
 })

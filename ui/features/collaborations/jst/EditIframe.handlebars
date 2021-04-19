@@ -1,0 +1,25 @@
+<div class="before_external_content_info_alert screenreader-only" tabindex="0">
+  <div class="ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
+    {{t 'The following content is partner provided'}}
+  </div>
+</div>
+<iframe
+  id="collaboration_external_tool_iframe"
+  class="tool_launch"
+  src="{{url}}"
+  allow="{{allowances}}"
+  data-lti-launch="true"
+>
+</iframe>
+<div class="after_external_content_info_alert screenreader-only" tabindex="0">
+  <div class="ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
+    {{t 'The preceding content is partner provided'}}
+  </div>
+</div>
+

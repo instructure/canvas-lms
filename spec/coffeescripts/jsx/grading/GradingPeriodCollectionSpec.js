@@ -20,10 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import GradingPeriodCollection from 'jsx/grading/gradingPeriodCollection'
+import GradingPeriodCollection from 'ui/features/course_grading_standards/react/gradingPeriodCollection.js'
 import fakeENV from 'helpers/fakeENV'
-import 'jquery.instructure_misc_plugins'
-import 'compiled/jquery.rails_flash_notifications'
+import '@canvas/jquery/jquery.instructure_misc_plugins'
+import '@canvas/rails-flash-notifications'
 
 QUnit.module('GradingPeriodCollection', {
   setup() {

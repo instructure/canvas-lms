@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CollectionView from 'compiled/views/CollectionView'
-import OutcomeResultCollection from 'compiled/collections/OutcomeResultCollection'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import Group from 'compiled/models/grade_summary/Group'
-import OutcomeDetailView from 'compiled/views/grade_summary/OutcomeDetailView'
+import Backbone from '@canvas/backbone'
+import CollectionView from '@canvas/backbone-collection-view'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import Group from 'ui/features/grade_summary/backbone/models/Group.coffee'
+import OutcomeDetailView from 'ui/features/grade_summary/backbone/views/OutcomeDetailView.js'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OutcomeDetailViewSpec', {
@@ -38,9 +38,7 @@ QUnit.module('OutcomeDetailViewSpec', {
       points_possible: 5
     })
     this.outcome.group = new Group({title: 'Outcome Group Title'})
-    this.url = `/api/v1/courses/${this.course_id}/outcome_results?user_ids[]=${
-      this.user_id
-    }&outcome_ids[]=${this.outcome.id}&include[]=alignments&per_page=100`
+    this.url = `/api/v1/courses/${this.course_id}/outcome_results?user_ids[]=${this.user_id}&outcome_ids[]=${this.outcome.id}&include[]=alignments&per_page=100`
     this.outcomeDetailView = new OutcomeDetailView({
       course_id: this.course_id,
       user_id: this.user_id

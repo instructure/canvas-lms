@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -20,20 +22,20 @@ module Types
   class MediaSourceType < ApplicationObjectType
     graphql_name 'MediaSource'
 
-    field :bitrate, String, null:true
+    field :bitrate, String, null: true
 
-    field :content_type, String, null:true
+    field :content_type, String, null: true
 
-    field :file_ext, String, hash_key: :fileExt, null:true
+    field :file_ext, String, hash_key: :fileExt, null: true
 
-    field :height, String, null:true
+    field :height, String, null: true
 
-    field :is_original, String, hash_key: :isOriginal, null:true
+    field :is_original, String, hash_key: :isOriginal, null: true
 
-    field :size, String, null:true
+    field :size, String, null: true
 
-    field :url, Types::UrlType, null:true
+    field :url, Types::UrlType, null: true
 
-    field :width, String, null:true
+    field :width, String, null: true
   end
 end

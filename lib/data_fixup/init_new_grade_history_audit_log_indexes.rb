@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -85,17 +87,17 @@ module DataFixup
 
     def write_batch(batch)
       return if batch.empty?
-      database.batch { batch.each { |r| r.index.insert(r.record, r.key) } }
+      database.batch { batch.each { |r| r.index.strategy_for(:cassandra).insert(r.record, r.key) } }
     end
 
     def database
-      @database ||= Canvas::Cassandra::DatabaseBuilder.from_config(:auditors)
+      @database ||= CanvasCassandra::DatabaseBuilder.from_config(:auditors)
     end
 
     ResultStruct = Struct.new(:index, :record, :key)
 
     def add_course_assignment_index(row)
-      index = Auditors::GradeChange::Stream.course_assignment_index
+      index = ::Auditors::GradeChange::Stream.course_assignment_index
       key = [row['context_id'], row['assignment_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
@@ -103,7 +105,7 @@ module DataFixup
     def add_course_assignment_grader_index(row)
       return unless row['grader_id']
 
-      index = Auditors::GradeChange::Stream.course_assignment_grader_index
+      index = ::Auditors::GradeChange::Stream.course_assignment_grader_index
       key = [row['context_id'], row['assignment_id'], row['grader_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
@@ -111,13 +113,13 @@ module DataFixup
     def add_course_assignment_grader_student_index(row)
       return unless row['grader_id']
 
-      index = Auditors::GradeChange::Stream.course_assignment_grader_student_index
+      index = ::Auditors::GradeChange::Stream.course_assignment_grader_student_index
       key = [row['context_id'], row['assignment_id'], row['grader_id'], row['student_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_assignment_student_index(row)
-      index = Auditors::GradeChange::Stream.course_assignment_student_index
+      index = ::Auditors::GradeChange::Stream.course_assignment_student_index
       key = [row['context_id'], row['assignment_id'], row['student_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
@@ -125,7 +127,7 @@ module DataFixup
     def add_course_grader_index(row)
       return unless row['grader_id']
 
-      index = Auditors::GradeChange::Stream.course_grader_index
+      index = ::Auditors::GradeChange::Stream.course_grader_index
       key = [row['context_id'], row['grader_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
@@ -133,13 +135,13 @@ module DataFixup
     def add_course_grader_student_index(row)
       return unless row['grader_id']
 
-      index = Auditors::GradeChange::Stream.course_grader_student_index
+      index = ::Auditors::GradeChange::Stream.course_grader_student_index
       key = [row['context_id'], row['grader_id'], row['student_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end
 
     def add_course_student_index(row)
-      index = Auditors::GradeChange::Stream.course_student_index
+      index = ::Auditors::GradeChange::Stream.course_student_index
       key = [row['context_id'], row['student_id']]
       ResultStruct.new(index, OpenStruct.new(row.to_hash), key)
     end

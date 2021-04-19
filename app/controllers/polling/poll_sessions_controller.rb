@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -179,7 +181,7 @@ module Polling
     def update
       @poll_session = @poll.poll_sessions.find(params[:id])
       if authorized_action(@poll, @current_user, :update)
-        if @poll_session.update_attributes(get_poll_session_params)
+        if @poll_session.update(get_poll_session_params)
           render json: serialize_jsonapi(@poll_session)
         else
           render json: @poll_session.errors, status: :bad_request

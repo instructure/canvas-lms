@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -40,12 +42,12 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", method: :id, null: false
 
-    field :context, ProgressContextUnion, null: true
-    def context
+    field :context, ProgressContextUnion, null: true, resolver_method: :progress_context
+    def progress_context
       load_association(:context).then do |context|
         # TODO: this can go away when graphql supports all types that a
         # progress context can be

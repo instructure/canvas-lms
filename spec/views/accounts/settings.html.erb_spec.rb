@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -110,6 +112,42 @@ describe "accounts/settings.html.erb" do
       expect(response).not_to have_tag("input#account_settings_global_includes")
       expect(response).not_to have_tag("input#account_settings_show_scheduler")
       expect(response).not_to have_tag("input#account_settings_enable_profiles")
+    end
+  end
+
+  describe "announcements" do
+    shared_examples "account notifications" do |text|
+      before do
+        assign(:account_users, [])
+        assign(:associated_courses_count, 0)
+        assign(:announcements, AccountNotification.none.paginate)
+
+
+        @account = account
+        assign(:account, @account)
+        assign(:root_account, @account)
+      end
+
+      it "renders the appropriate text" do
+        admin = account_admin_user
+        view_context(@account, admin)
+
+        assign(:announcements, [account_notification(account: @account)].paginate)
+        render
+        expect(response).to have_text(text)
+      end
+    end
+
+    describe "Root Account Announcements" do
+      let(:account) { Account.create!(name: "reading_rainbow") }
+
+      include_examples "account notifications", "This is a message from reading_rainbow"
+    end
+
+    describe "Site Admin Announcements" do
+      let(:account) { Account.site_admin }
+
+      include_examples "account notifications", "This is a message from Canvas Administration"
     end
   end
 
@@ -297,7 +335,8 @@ describe "accounts/settings.html.erb" do
 
       it "should show quota options" do
         render
-        expect(@controller.js_env.include?(:ACCOUNT)).to be_truthy
+        expect(@controller.js_env).to include :ACCOUNT
+        expect(@controller.js_env[:ACCOUNT]).to include 'default_storage_quota_mb'
         expect(response).to have_tag '#tab-quotas-link'
         expect(response).to have_tag '#tab-quotas'
       end
@@ -312,9 +351,41 @@ describe "accounts/settings.html.erb" do
 
       it "should not show quota options" do
         render
-        expect(@controller.js_env.include?(:ACCOUNT)).to be_falsey
+        expect(@controller.js_env).to include :ACCOUNT
+        expect(@controller.js_env[:ACCOUNT]).not_to include 'default_storage_quota_mb'
         expect(response).not_to have_tag '#tab-quotas-link'
         expect(response).not_to have_tag '#tab-quotas'
+      end
+    end
+  end
+
+  describe "reports" do
+    before do
+      @account = Account.default
+      assign(:account, @account)
+      assign(:account_users, [])
+      assign(:root_account, @account)
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    context "with :read_reports" do
+      it "should show reports tab link" do
+        admin = account_admin_user
+        view_context(@account, admin)
+        assign(:current_user, admin)
+        render
+        expect(response).to have_tag '#tab-reports-link'
+      end
+    end
+
+    context "without :read_reports" do
+      it "should not show reports tab link" do
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'read_reports' => false})
+        view_context(@account, admin)
+        assign(:current_user, admin)
+        render
+        expect(response).not_to have_tag '#tab-reports-link'
       end
     end
   end
@@ -350,6 +421,184 @@ describe "accounts/settings.html.erb" do
       assign(:current_user, admin)
       render
       expect(response).to include("Let sub-accounts use the Theme Editor")
+    end
+  end
+
+  context "smart alerts" do
+    let(:account) { Account.default }
+    let(:admin) { account_admin_user }
+
+    before(:each) do
+      assign(:context, account)
+      assign(:account, account)
+      assign(:root_account, account)
+      assign(:current_user, admin)
+      assign(:account_users, [])
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+
+      view_context(account, admin)
+    end
+
+    def expect_threshold_to_be(value)
+      expect(response).to have_tag(
+        "select#account_settings_smart_alerts_threshold" +
+        "  option[value=\"#{value}\"][selected]"
+      )
+    end
+
+    it "should show a threshold control" do
+      account.enable_feature!(:smart_alerts)
+
+      render
+
+      expect(response).to include('Smart Assignment Alerts')
+      expect(response).to include('Hours (from due date) before students are alerted')
+    end
+
+    it "does not show if the feature flag is turned off" do
+      account.disable_feature!(:smart_alerts)
+
+      render
+
+      expect(response).not_to include('Smart Assignment Alerts')
+    end
+
+    it "defaults to a 36 hour threshold" do
+      account.enable_feature!(:smart_alerts)
+
+      render
+
+      expect_threshold_to_be(36)
+    end
+
+    it "selects the current threshold" do
+      account.enable_feature!(:smart_alerts)
+      account.settings[:smart_alerts_threshold] = 24
+      account.save!
+
+      render
+
+      expect_threshold_to_be(24)
+    end
+  end
+
+  context 'privacy' do
+    let(:account) { account_model }
+    let(:account_admin) { account_admin_user(account: account) }
+    let(:dom) { Nokogiri::HTML5(response) }
+    let(:enable_fullstory) { dom.at_css('#account_settings_enable_fullstory') }
+    let(:enable_google_analytics) { dom.at_css('#account_settings_enable_google_analytics') }
+    let(:site_admin) { site_admin_user }
+    let(:sub_account) { account_model(root_account: account) }
+
+    def render_for(target_account, target_user, &block)
+      assign(:context, target_account)
+      assign(:account, target_account)
+      assign(:root_account, target_account)
+      assign(:current_user, target_user)
+      assign(:account_users, [])
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+
+      view_context(target_account, target_user)
+      render
+      yield if block_given?
+    end
+
+    it 'is not available to account admins' do
+      render_for(account, account_admin) do
+        expect(response).not_to have_tag('#tab-privacy')
+      end
+    end
+
+    it 'is not available for the site_admin account' do
+      render_for(Account.site_admin, site_admin) do
+        expect(response).not_to have_tag('#tab-privacy')
+      end
+    end
+
+    it 'is not available for sub accounts' do
+      render_for(sub_account, site_admin) do
+        expect(response).not_to have_tag('#tab-privacy')
+      end
+    end
+
+    it 'opts in to Google Analytics by default' do
+      render_for(account, site_admin) do
+        expect(enable_google_analytics).to be_checked
+      end
+    end
+
+    it 'allows opting out of Google Analytics' do
+      account.settings[:enable_google_analytics] = false
+      account.save!
+
+      render_for(account, site_admin) do
+        expect(enable_google_analytics).not_to be_checked
+      end
+    end
+
+    it 'opts in to FullStory by default' do
+      render_for(account, site_admin) do
+        expect(enable_fullstory).to be_checked
+      end
+    end
+
+    it 'allows opting out of FullStory' do
+      account.settings[:enable_fullstory] = false
+      account.save!
+
+      render_for(account, site_admin) do
+        expect(enable_fullstory).not_to be_checked
+      end
+    end
+  end
+
+  context 'course templates' do
+    let_once(:account) { Account.default }
+    let_once(:admin) { account_admin_user(account: account) }
+
+    before do
+      account.enable_feature!(:course_templates)
+      view_context(account, admin)
+      assign(:current_user, admin)
+      assign(:context, account)
+      assign(:account, account)
+      assign(:account_users, [])
+      assign(:root_account, account)
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    it "shows no template only for root account" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq [""]
+    end
+
+    it "shows no template and inherit for sub accounts" do
+      a2 = account.sub_accounts.create!
+      view_context(a2, admin)
+      assign(:context, a2)
+      assign(:account, a2)
+
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq ["", "0"]
+    end
+
+    it "disables if you don't have permission" do
+      c = account.courses.create!(template: true)
+      account.role_overrides.create!(role: admin.account_users.first.role, permission: :edit_course_template, enabled: false)
+
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq ["", c.id.to_s]
+      expect(select.css('option').map { |o| o['disabled'] }).to eq [nil, "disabled"]
     end
   end
 end

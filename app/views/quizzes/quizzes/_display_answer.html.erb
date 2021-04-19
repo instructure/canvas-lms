@@ -38,12 +38,12 @@
   selected_answer = false if question_type && question_type.display_answers == "single"
   selected_answer = true if hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && hash_get(matched_answer, :id) == answer_id
   correct_answer = answer && hash_get(answer, :weight) == 100
-  correct_answer = (hash_get(user_answer, "answer_#{answer[:id]}").to_i == hash_get(answer, :match_id).to_i) if user_answer && answer && question_type && question_type.answer_type == "matching_answer"
+  correct_answer = (hash_get(user_answer, "answer_#{answer_id}").to_f == hash_get(answer, :match_id).to_f) if user_answer && answer && question_type && question_type.answer_type == "matching_answer"
   correct_answer = false if !user_answer && question && hash_get(question, :question_type) == "matching_question"
   correct_answer = false unless show_correct_answers || selected_answer
   correct_answer_class = show_correct_answers ? (correct_answer ? "correct_answer" : "") : "unspecified_answer"
   wrong_answer = selected_answer && !correct_answer
-  no_answer = wrong_answer && (hash_get(user_answer, "answer_#{answer[:id]}")  == '')
+  no_answer = wrong_answer && (hash_get(user_answer, "answer_#{answer_id}")  == '')
   hide_right_arrow = false
   show_comment = !assessment_results || selected_answer
   has_answer_comment = hash_get(answer, :comments_html).present? || comment_get(answer, :comments).present?
@@ -131,6 +131,7 @@
     <div style="display: none;">
       <span class="numerical_answer_type"><%= hash_get(answer, :numerical_answer_type, "exact_answer") %></span>
       <span class="blank_id"><%= hash_get(answer, :blank_id, "none") %></span>
+      <span class="question_id"><%= question_id %></span>
       <span class="id"><%= answer_id %></span>
       <span class="match_id"><%= hash_get(answer, :match_id) %></span>
     </div>
@@ -141,31 +142,31 @@
       <% number_type = "precision" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) == "precision_answer" %>
       <% number_type = "equation" if answer_type == "numerical_answer" && hash_get(answer, :variables) %>
       <div class="numerical_exact_answer answer_type" <%= hidden(true) unless number_type == 'exact' %>>
-        <span class="answer_exact"><%= hash_get(answer, :exact, "0") %></span> (<%= before_label :answer_with_margin, 'with margin' %> <span class="answer_error_margin"><%= hash_get(answer, :margin, "0") %></span>)
+        <span class="answer_exact"><%= render_number(hash_get(answer, :exact, 0)) %></span> (<%= before_label :answer_with_margin, 'with margin' %> <span class="answer_error_margin"><%= render_number(hash_get(answer, :margin, 0)) %></span>)
       </div>
       <div class="numerical_precision_answer answer_type" <%= hidden(true) unless number_type == 'precision' %>>
         <span class="answer_approximate">
-          <%= "%.#{hash_get(answer, :precision, 10)}g" % hash_get(answer, :approximate, "0") %>
-        </span> (<%= before_label :answer_with_precision, 'with precision' %> <span class="answer_precision"><%= hash_get(answer, :precision, "0") %></span>)
+          <%= render_score(hash_get(answer, :approximate, 0), hash_get(answer, :precision, 10)) %>
+        </span> (<%= before_label :answer_with_precision, 'with precision' %> <span class="answer_precision"><%= render_number(hash_get(answer, :precision, 10)) %></span>)
       </div>
       <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'range' %>>
         <%= t(:range_answer, "Between %{lower_bound} and %{upper_bound}",
-              :lower_bound => raw("<span class=\"answer_range_start\">#{hash_get(answer, :start, 0)}</span>"),
-              :upper_bound => raw("<span class=\"answer_range_end\">#{hash_get(answer, :end, 0)}</span>")) %>
+              :lower_bound => raw("<span class=\"answer_range_start\">#{render_number(hash_get(answer, :start, 0))}</span>"),
+              :upper_bound => raw("<span class=\"answer_range_end\">#{render_number(hash_get(answer, :end, 0))}</span>")) %>
       </div>
     <% end %>
     <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'equation' %>>
-      <span class="answer_equation"><%= hash_get(answer, :answer) || hash_get(answer, :exact) %></span>
+      <span class="answer_equation"><%= render_number(hash_get(answer, :answer) || hash_get(answer, :exact)) %></span>
       <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0).to_f > 0 %>">
         <%= t(:margin_of_error, "margin of error") %>
         <span style="font-size: 0.8em;">
           <%= t(:plus_or_minus, "+/-") %>
         </span>
-        <span class="answer_tolerance"><%= hash_get(question, :answer_tolerance) %></span>
+        <span class="answer_tolerance"><%= render_number(hash_get(question, :answer_tolerance)) %></span>
       </span>
     </div>
     <% if show_correct_answers %>
-      <span class="answer_weight" style="display: none;"><%= hash_get(answer, :weight, 0) %></span>
+      <span class="answer_weight" style="display: none;"><%= render_number(hash_get(answer, :weight, 0)) %></span>
     <% end %>
     <% if show_comment %>
       <div class="quiz_comment <%= "empty" unless has_answer_comment %>">

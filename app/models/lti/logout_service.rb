@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -91,7 +93,7 @@ module Lti
       callbacks = get_logout_callbacks(pseudonym)
       return unless callbacks.any?
       clear_logout_callbacks(pseudonym)
-      Delayed::Job.enqueue(Lti::LogoutService::Runner.new(callbacks), max_attempts: 1)
+      Delayed::Job.enqueue(Lti::LogoutService::Runner.new(callbacks))
     end
   end
 end

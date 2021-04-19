@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { TOGGLE_NEWPAGE_FORM } from "../actions/links";
+import {TOGGLE_NEWPAGE_FORM} from '../actions/links'
 
 export default function(state = false, action) {
   switch (action.type) {
     case TOGGLE_NEWPAGE_FORM:
-      return !state;
+      return !state
     default:
-      return state;
+      return state
   }
 }

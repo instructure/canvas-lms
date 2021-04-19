@@ -21,12 +21,7 @@
   padding: direction-sides(0px 10px 0px 5px);
 }
 
-.RestrictedRadioButtons__unpublish_icon {
-  color: gray;
-  padding: direction-sides(0px 10px 0px 5px);
-}
-
-.RestrictedRadioButtons__icon-cloud-lock {
-  color: $ic-color-alert;
+.RestrictedRadioButtons__icon {
+  color: $ic-font-color-dark;
   padding: direction-sides(0px 10px 0px 5px);
 }

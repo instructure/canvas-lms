@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -30,6 +32,19 @@ module RubricsCommon
     wait_for_ajaximations
   end
 
+  def create_assignment_with_points(points)
+    assignment_name = 'first test assignment'
+    due_date = Time.now.utc + 2.days
+    @group = @course.assignment_groups.create!(name: "default")
+    @assignment = @course.assignments.create(
+      name: assignment_name,
+      due_at: due_date,
+      points_possible: points,
+      assignment_group: @group
+    )
+    @assignment
+  end
+
   def assignment_with_rubric(points, title = 'new rubric')
     @assignment = create_assignment_with_points(points)
     rubric_model(title: title, data:
@@ -60,7 +75,7 @@ module RubricsCommon
               :description => "Amazing",
             },
             "1" => {
-                :points => 3,
+                :points => points*0.30,
                 :description => "Reduced Marks",
             },
             "2" => {

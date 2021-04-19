@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -22,9 +24,13 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
+  before(:once) do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
+
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -55,19 +61,6 @@ describe "calendar2" do
 
       it "should create an event through clicking on a calendar day", priority: "1", test_id: 138638 do
         create_middle_day_event
-      end
-
-      it "should show scheduler button if it is enabled" do
-        get "/calendar2"
-        expect(find("#scheduler")).not_to be_nil
-      end
-
-      it "should not show scheduler button if it is disabled" do
-        account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
-        get "/calendar2"
-        find_all('.calendar_view_buttons .btn').each do |button|
-          expect(button.text).not_to match(/scheduler/i)
-        end
       end
 
       it "should create an assignment by clicking on a calendar day" do
@@ -223,19 +216,6 @@ describe "calendar2" do
           extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
           expect(f('.event-details-timestring .date-range').text).to eq("#{original_day_text} - #{extended_day_text}")
         end
-
-        it "allows dropping onto the minical" do
-          event = make_event(start: @initial_time)
-          load_month_view
-          quick_jump_to_date(@initial_time_str)
-
-          drag_and_drop_element(f('.calendar .fc-event'), fj("#minical .fc-day-number[data-date=#{@one_day_later_str}]"))
-          expect(fj("#minical .fc-bg .fc-day.event[data-date=#{@one_day_later_str}]")).to be
-          wait_for_ajaximations
-
-          event.reload
-          expect(event.start_at).to eq(@one_day_later)
-        end
       end
 
       it "more options link should go to calendar event edit page" do
@@ -292,7 +272,7 @@ describe "calendar2" do
         hover_and_click '.delete_event_link'
         expect(f('.ui-dialog .ui-dialog-buttonset')).to be_displayed
         wait_for_ajaximations
-        hover_and_click '.ui-dialog:visible .btn-primary'
+        hover_and_click '.ui-dialog:visible .btn-danger'
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css('.fc-event')
         # make sure it was actually deleted and not just removed from the interface
@@ -472,6 +452,26 @@ describe "calendar2" do
 
         # verify discussion has line-through
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
+      end
+
+      it "should return back to the original calendar view after editing a section child event" do
+        calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
+        child = @event.child_events.build
+        child.context = @course.course_sections.create!
+        child.start_at = Time.zone.now.utc
+        child.title = "the real event"
+        child.save!
+
+        get '/calendar2'
+        quick_jump_to_date(child.start_at.strftime '%Y-%m-%d')
+        f('.fc-event').click
+
+        hover_and_click '.edit_event_link'
+        expect_new_page_load { f('.more_options_link').click }
+        cancel_btn = f('.form-actions a')
+        expect(cancel_btn.text).to eq "Cancel"
+        expect(cancel_btn['href']).to include("view_name=month")
+        expect(cancel_btn['href']).to_not include(@course.asset_string)
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -32,9 +34,11 @@ class CreateK12Theme < ActiveRecord::Migration[4.2]
     bc.name = NAME
     bc.share = true
     bc.save!
+    SharedBrandConfig.create!(name: bc.name, brand_config_md5: bc.md5)
   end
 
   def down
+    SharedBrandConfig.where(name: NAME).delete_all
     BrandConfig.where(name: NAME).delete_all
   end
 end

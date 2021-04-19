@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -72,6 +74,46 @@ describe AppointmentGroup do
       )
       expect(group).to be_valid
       expect(group.sub_context_codes.include?(invalid_context)).to be_falsey
+    end
+  end
+
+  context 'broadcast_data' do
+    it 'should include course_id if the context is a course' do
+      course_with_student(:active_all => true)
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+    end
+
+    it 'should include all course_ids' do
+      course_with_student(:active_all => true)
+      course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course, course2]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+    end
+
+    it 'should include course_id if the context is a section' do
+      course_with_student(:active_all => true)
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course.default_section]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+    end
+
+    it 'should include mixed contexts course_ids' do
+      course_with_student(:active_all => true)
+      course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course.default_section, course2]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
     end
   end
 
@@ -164,23 +206,23 @@ describe AppointmentGroup do
     end
 
     it "should allow additional appointments" do
-      expect(@ag.update_attributes(:new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])).to be_truthy
+      expect(@ag.update(:new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])).to be_truthy
       expect(@ag.appointments.size).to eql 2
     end
 
     it "should not allow invalid appointments" do
-      expect(@ag.update_attributes(:new_appointments => [['2012-01-01 14:00:00', '2012-01-01 13:00:00']])).to be_falsey
+      expect(@ag.update(:new_appointments => [['2012-01-01 14:00:00', '2012-01-01 13:00:00']])).to be_falsey
     end
 
     it "should not allow overlapping appointments" do
-      expect(@ag.update_attributes(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])).to be_falsey
+      expect(@ag.update(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])).to be_falsey
     end
 
     it "should update start_at/end_at when adding appointments" do
       expect(@ag.start_at).to eql @ag.appointments.map(&:start_at).min
       expect(@ag.end_at).to eql @ag.appointments.map(&:end_at).max
 
-      expect(@ag.update_attributes(:new_appointments => [
+      expect(@ag.update(:new_appointments => [
         ['2012-01-01 17:00:00', '2012-01-01 18:00:00'],
         ['2012-01-01 07:00:00', '2012-01-01 08:00:00']
       ])).to be_truthy
@@ -188,6 +230,27 @@ describe AppointmentGroup do
       expect(@ag.appointments.size).to eql 3
       expect(@ag.start_at).to eql @ag.appointments.map(&:start_at).min
       expect(@ag.end_at).to eql @ag.appointments.map(&:end_at).max
+    end
+  end
+
+  context "update_appointments" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      @ag = AppointmentGroup.create!(
+          :title => "test",
+          :description => "hello",
+          :contexts => [@course],
+          :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'],
+                                ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+      )
+    end
+
+    it "should update the description for each event" do
+      new_desc = "new description 1234"
+      expect(@ag.update(:description => new_desc)).to be_truthy
+      expect(@ag.appointments.size).to be 2
+      expect(@ag.appointments.first.description).to eq new_desc
+      expect(@ag.appointments.last.description).to eq new_desc
     end
   end
 
@@ -374,8 +437,7 @@ describe AppointmentGroup do
       course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student)
 
       [@teacher, @student].each do |user|
-        channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
-        channel.confirm
+        communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
       end
 
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
@@ -389,7 +451,7 @@ describe AppointmentGroup do
 
     it "should notify all participants when adding appointments", priority: "1", test_id: 193138 do
       @ag.publish!
-      @ag.update_attributes(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
+      @ag.update(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       expect(@ag.messages_sent).to be_include("Appointment Group Updated")
       expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
@@ -453,12 +515,12 @@ describe AppointmentGroup do
     end
 
     it "should be nil if participants_per_appointment is nil" do
-      @ag.update_attributes :participants_per_appointment => nil
+      @ag.update :participants_per_appointment => nil
       expect(@ag.available_slots).to be_nil
     end
 
     it "should change if participants_per_appointment changes" do
-      @ag.update_attributes :participants_per_appointment => 1
+      @ag.update :participants_per_appointment => 1
       expect(@ag.available_slots).to eql 2
     end
 
@@ -466,12 +528,12 @@ describe AppointmentGroup do
       @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
       @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
       expect(@ag.reload.available_slots).to eql 2
-      @ag.update_attributes :participants_per_appointment => 1
+      @ag.update :participants_per_appointment => 1
       expect(@ag.reload.available_slots).to eql 1
     end
 
     it "should increase as appointments are added" do
-      @ag.update_attributes(:new_appointments => [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
+      @ag.update(:new_appointments => [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
       expect(@ag.available_slots).to eql 6
     end
 
@@ -511,6 +573,11 @@ describe AppointmentGroup do
       expect(@ag.reload.available_slots).to eql 3
       enrollment2.conclude
       expect(@ag.reload.available_slots).to eql 4
+    end
+
+    it "should respect the current_only option" do
+      @ag.update(:new_appointments => [["#{Time.zone.now - 2.hour}", "#{Time.zone.now - 1.hour}"]])
+      expect(@ag.available_slots(current_only: true)).to eql 4
     end
   end
 

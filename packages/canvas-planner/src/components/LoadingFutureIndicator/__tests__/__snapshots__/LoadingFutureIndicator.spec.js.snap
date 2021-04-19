@@ -4,17 +4,24 @@ exports[`renders all future items loaded regardless of other props 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Text
       as="span"
       color="secondary"
       letterSpacing="normal"
       size="small"
+      wrap="normal"
     >
       All items loaded
     </Text>
@@ -26,22 +33,30 @@ exports[`renders load more by default 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       margin="0"
       onClick={[Function]}
       size="medium"
+      textAlign="center"
       type="button"
       variant="link"
+      withBackground={true}
     >
       Load more
     </Button>
@@ -53,22 +68,34 @@ exports[`renders loading when indicated 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <View
+      borderColor="primary"
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <Spinner
         as="div"
         margin="0 x-small 0 0"
+        renderTitle={[Function]}
         size="small"
-        title="Loading..."
         variant="default"
       />
       <Text
@@ -76,6 +103,7 @@ exports[`renders loading when indicated 1`] = `
         color="secondary"
         letterSpacing="normal"
         size="small"
+        wrap="normal"
       >
         Loading...
       </Text>
@@ -88,11 +116,17 @@ exports[`shows an Alert when there's a query error 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <div
       style={
@@ -110,14 +144,16 @@ exports[`shows an Alert when there's a query error 1`] = `
     </div>
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       margin="0"
       onClick={[Function]}
       size="medium"
+      textAlign="center"
       type="button"
       variant="link"
+      withBackground={true}
     >
       Load more
     </Button>

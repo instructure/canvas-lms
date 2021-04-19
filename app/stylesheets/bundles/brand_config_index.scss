@@ -27,6 +27,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start; // keeps height in check on card when current card is selected
+  justify-content: center;
+
+  @include breakpoint(tablet) {
+    justify-content: flex-start;
+  }
 }
 
 .ic-ThemeCard-container__Heading {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,10 +22,13 @@ class UserListsController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :require_context
 
+  rescue_from UserListV2::ParameterError, with: :rescue_expected_error_type
+
   # POST /courses/:course_id/user_lists.json
   # POST /accounts/:account_id/user_lists.json
   def create
-    return unless authorized_action(@context, @current_user, @context.is_a?(Course) ? [:manage_students, :manage_admin_users] : :manage_account_memberships)
+    perms = @context.is_a?(Course) ? add_enrollment_permissions : :manage_account_memberships
+    return unless authorized_action(@context, @current_user, perms)
     respond_to do |format|
       format.json do
         if value_to_boolean(params[:v2])
@@ -45,6 +50,23 @@ class UserListsController < ApplicationController
             current_user: @current_user)
         end
       end
+    end
+  end
+
+  def add_enrollment_permissions
+    if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
+      [
+        :add_teacher_to_course,
+        :add_ta_to_course,
+        :add_designer_to_course,
+        :add_student_to_course,
+        :add_observer_to_course,
+      ]
+    else
+      [
+        :manage_students,
+        :manage_admin_users
+      ]
     end
   end
 end

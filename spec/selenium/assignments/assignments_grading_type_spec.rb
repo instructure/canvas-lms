@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -29,6 +31,7 @@ describe "assignments" do
   end
 
   before :each do
+    Account.default.enable_feature!(:rce_enhancements)
     create_session(@pseudonym)
   end
 

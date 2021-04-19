@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 Instructure, Inc.
 #
@@ -30,8 +32,7 @@ module Types
     graphql_name "GroupMembership"
 
     implements Interfaces::TimestampInterface
-
-    field :_id, ID, "legacy canvas id", method: :id, null: false
+    implements Interfaces::LegacyIDInterface
 
     field :state, GroupMembershipStateType, method: :workflow_state, null: false
 

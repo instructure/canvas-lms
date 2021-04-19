@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import FilePreviewInfoPanel from 'jsx/files/FilePreviewInfoPanel'
-import File from 'compiled/models/File'
+import FilePreviewInfoPanel from '@canvas/files/react/components/FilePreviewInfoPanel'
+import File from '@canvas/files/backbone/models/File.coffee'
 
 QUnit.module('File Preview Info Panel Specs', {
   setup() {
@@ -63,11 +63,7 @@ test('displays status', function() {
 })
 
 test('displays content type', function() {
-  equal(
-    this.rendered.refs.contentType.innerText,
-    'Plain text',
-    'rendered the Kind (content-type)'
-  )
+  equal(this.rendered.refs.contentType.innerText, 'Plain text', 'rendered the Kind (content-type)')
 })
 
 test('displays size', function() {
@@ -78,7 +74,7 @@ test('displays date modified', function() {
   equal(
     $(ReactDOM.findDOMNode(this.rendered))
       .find('#dateModified')
-      .find(".visible-desktop")
+      .find('.visible-desktop')
       .text(),
     'Jan 17, 1970',
     'rendered date modified'
@@ -89,7 +85,7 @@ test('displays date created', function() {
   equal(
     $(ReactDOM.findDOMNode(this.rendered))
       .find('#dateCreated')
-      .find(".visible-desktop")
+      .find('.visible-desktop')
       .text(),
     'Jan 17, 1970',
     'rendered date created'
@@ -102,11 +98,7 @@ test('displays modifed by name with link', function() {
     'http://fun.com/',
     'make sure its a link to the correct place'
   )
-  equal(
-    this.rendered.refs.modifedBy.innerText,
-    'Jim Bob',
-    'check that the name was inserted'
-  )
+  equal(this.rendered.refs.modifedBy.innerText, 'Jim Bob', 'check that the name was inserted')
 })
 
 test('displays legal copy', function() {

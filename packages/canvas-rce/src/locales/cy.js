@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/cy.json";
-import "../rce/languages/cy";
-formatMessage.addLocale({ cy: locale });
+import formatMessage from '../format-message'
+import locale from '@instructure/translations/lib/canvas-rce/cy.json'
+import '../rce/languages/cy'
+
+formatMessage.addLocale({cy: locale})

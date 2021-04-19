@@ -20,26 +20,64 @@
 
 .course_details {
   border-collapse: collapse;
-  min-width: 400px;
   margin-#{direction(left)}: 20px;
   border-spacing: 0;
+
+  @include mobile-only {
+    display: flex;
+    flex-direction: column;
+    margin-#{direction(left)}: 0;
+
+    tr {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      justify-content: start;
+
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+    }
+  }
   th {
     text-align: direction(left);
   }
   td {
     border-bottom: 1px solid #ccc;
+
+    @include mobile-only {
+      border: 0;
+    }
+  }
+
+  .content-box {
+    @include mobile-only {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
   .course {
     font-size: 1.2em;
     padding: direction-sides(6px 50px 6px 5px);
+
+    @include mobile-only {
+      padding: 0;
+    }
   }
   .percent {
     text-align: center;
     font-size: 1.2em;
     font-weight: bold;
     min-width: 73px;
+
+    @include mobile-only {
+      text-align: direction(left);
+    }
   }
   .report {
     padding: 12px;
+
+    @include mobile-only {
+      padding: 0;
+    }
   }
 }

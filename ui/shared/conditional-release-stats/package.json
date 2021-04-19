@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/conditional-release-stats",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./react/app.js"
+}

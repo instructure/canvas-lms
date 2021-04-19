@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ describe "teacher shared rubric specs" do
   let(:who_to_login) { 'teacher' }
 
   before(:each) do
-    resize_screen_to_normal
+
     course_with_teacher_logged_in
   end
 
@@ -46,7 +48,7 @@ describe "teacher shared rubric specs" do
   end
 
   it "should round to an integer when splitting" do
-    resize_screen_to_default
+
     should_round_to_an_integer_when_splitting
   end
 
@@ -88,6 +90,35 @@ describe "course rubrics" do
       # check again after reload
       refresh_page
       expect(fj('.rubric_total')).to include_text "10" #avoid selenium caching
+    end
+
+    it "should calculate ratings based on initial rating values" do
+      assignment_with_editable_rubric(10)
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+
+      f('#right-side .edit_rubric_link').click
+      replace_content(fj(".criterion_points:visible"), "50")
+      fj(".criterion_points:visible").send_keys(:return)
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["50", "15", "0"]
+
+      replace_content(fj(".criterion_points:visible"), "25")
+      fj(".criterion_points:visible").send_keys(:return)
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["25", "7.5", "0"]
+
+      replace_content(fj(".criterion_points:visible"), "10")
+      fj(".criterion_points:visible").send_keys(:return)
+      submit_form("#edit_rubric_form")
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["10", "3", "0"]
+    end
+
+    it "should not show an error when adjusting from 0 points" do
+      assignment_with_editable_rubric(0)
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+      f('#right-side .edit_rubric_link').click
+      replace_content(fj(".criterion_points:visible"), "10")
+      fj(".criterion_points:visible").send_keys(:return)
+      submit_form("#edit_rubric_form")
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["10", "5", "0"]
     end
 
     it "should not display the edit form more than once" do
@@ -148,6 +179,74 @@ describe "course rubrics" do
       expect(fj('.rubric_grading:hidden')).not_to be_nil
     end
 
+    it "should display integer and float ratings" do
+      assignment_with_editable_rubric(2)
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["2", "0.6", "0"]
+      expect(ff('.display_criterion_points').map(&:text).reject!(&:empty?)).to eq ["2"]
+      expect(f('#rubrics span .rubric_total').text).to eq "2"
+    end
+
+    context "with the account_level_mastery_scales FF enabled" do
+      before :each do
+        @course.account.enable_feature!(:account_level_mastery_scales)
+      end
+
+      it "should use the account outcome proficiency for mastery scales if one exists" do
+        proficiency = outcome_proficiency_model(@course.account)
+        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+        outcome_model(:context => @course)
+
+        get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+        wait_for_ajaximations
+        import_outcome
+        points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s}
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq points
+      end
+
+      it "defaults to the the default account proficiency if no outcome proficiecy exists" do
+        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+        outcome_model(:context => @course)
+
+        get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+        wait_for_ajaximations
+        import_outcome
+        points = OutcomeProficiency.find_or_create_default!(@course.account).outcome_proficiency_ratings.map do |rating|
+          round_if_whole(rating.points).to_s
+        end
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq points
+      end
+
+      it "rubrics are updated after mastery scales are modified" do
+        current_proficiency = OutcomeProficiency.find_or_create_default!(@course.account)
+        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+        outcome_model(:context => @course)
+
+        get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+        wait_for_ajaximations
+        import_outcome
+        current_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f}
+        # checks if they are equal after adding outcome
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq current_points
+        submit_form("#edit_rubric_form")
+        wait_for_ajaximations
+        # check if they are equal after submission
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq current_points
+
+        # Update proficiency's first rating with new point value of 30
+        ratings_hash_map = current_proficiency.ratings_hash
+        ratings_hash_map[0][:points] = 30.0
+        current_proficiency.replace_ratings(ratings_hash_map)
+        current_proficiency.save!
+
+        refresh_page
+        wait_for_ajaximations
+        updated_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f}
+        # checks if they are equal after update
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq updated_points
+      end
+    end
   end
 
   it "should display free-form comments to the student" do
@@ -203,7 +302,7 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    expect(ff('.rubric-criterion:nth-of-type(1) .rating-tier').third).to have_class('selected')
+    expect(ff('tr[data-testid="rubric-criterion"]:nth-of-type(1) .rating-tier').third).to have_class('selected')
   end
 
   it "should not highlight a criterion level if score is nil" do
@@ -227,7 +326,7 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    ff('.rubric-criterion:nth-of-type(1) .rating-tier').each do |criterion|
+    ff('tr[data-testid="rubric-criterion"]:nth-of-type(1) .rating-tier').each do |criterion|
       expect(criterion).not_to have_class('selected')
     end
   end

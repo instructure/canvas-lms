@@ -16,25 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t('titles.courses', 'Courses') %>
+<% provide :page_title, t('titles.courses', 'Courses') %>
+<% provide_blank :right_side %>
 
-<% content_for :auto_discovery do %>
-  <% if @current_user %>
-    <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")}) %>
-  <% end %>
-<% end %>
+<% load_enrollments_for_index %>
+<% @visible_groups ||= @current_user.visible_groups %>
 
-<% css_bundle :context_list, :course_list %>
-<% js_bundle :course_list %>
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = true %>
   <div class="header-bar">
-    <h2><%= t('headings.my_courses', %{All Courses}) %></h2>
+    <h1><%= t('headings.my_courses', %{All Courses}) %></h1>
   </div>
 
   <div class="ic-Action-header content--hasMarginTop">
     <div class="ic-Action-header__Secondary">
-      <% if @domain_root_account.feature_enabled?(:course_catalog) %>
+      <% if @domain_root_account.enable_course_catalog? %>
         <%= link_to t('browse_more_courses', 'Browse More Courses'), "/search/all_courses/", class:"Button" %>
       <% end %>
 
@@ -50,7 +46,7 @@
     </div>
   </div>
 
-<% if @current_enrollments.empty? %>
+<% if enrollments_for_index(:current).empty? %>
   <%= t("You are not enrolled in any courses.") %>
 <% else %>
   <table id="my_courses_table" class="ic-Table ic-Table--bordered course-list-table">
@@ -65,15 +61,15 @@
       </tr>
     </thead>
     <tbody>
-      <% @current_enrollments.each do |enrollment| %>
-        <%= render :partial => "shared/current_enrollment", :object => enrollment %>
+      <% enrollments_for_index(:current).each do |enrollment| %>
+        <%= render :partial => "shared/current_enrollment", :object => enrollment, :locals => { :is_current_term => true } %>
       <% end %>
     </tbody>
   </table>
 <% end %>
 
 <% @show_star_column = true %>
-<% unless @past_enrollments.empty? %>
+<% unless enrollments_for_index(:past).empty? %>
   <div class="content--hasMarginTop">
     <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
   </div>
@@ -89,14 +85,14 @@
       </tr>
     </thead>
     <tbody>
-      <% @past_enrollments.each do |enrollment| %>
+      <% enrollments_for_index(:past).each do |enrollment| %>
         <%= render :partial => "shared/current_enrollment", :object => enrollment %>
       <% end %>
     </tbody>
   </table>
 <% end %>
 
-<% unless @future_enrollments.empty? %>
+<% unless enrollments_for_index(:future).empty? %>
   <div class="content--hasMarginTop">
     <h2><%= t('headings.future_enrollments', 'Future Enrollments') %></h2>
   </div>
@@ -112,7 +108,7 @@
       </tr>
     </thead>
     <tbody>
-      <% @future_enrollments.each do |enrollment| %>
+      <% enrollments_for_index(:future).each do |enrollment| %>
         <%= render :partial => 'shared/current_enrollment', :object => enrollment %>
       <% end %>
     </tbody>

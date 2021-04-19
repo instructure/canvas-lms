@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,35 +30,48 @@ module Lti
     POST_GRADES = 'post_grades'
     RESOURCE_SELECTION = 'resource_selection'
     SIMILARITY_DETECTION = 'similarity_detection'
+    GLOBAL_NAVIGATION = 'global_navigation'.freeze
 
     SIMILARITY_DETECTION_LTI2 = 'Canvas.placements.similarityDetection'
 
-    DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
+    # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
+    LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     PLACEMENTS = [:account_navigation,
                   :similarity_detection,
                   :assignment_edit,
                   :assignment_menu,
+                  :assignment_index_menu,
+                  :assignment_group_menu,
                   :assignment_selection,
                   :assignment_view,
                   :collaboration,
+                  :conference_selection,
                   :course_assignments_menu,
                   :course_home_sub_navigation,
                   :course_navigation,
                   :course_settings_sub_navigation,
                   :discussion_topic_menu,
+                  :discussion_topic_index_menu,
                   :editor_button,
                   :file_menu,
+                  :file_index_menu,
                   :global_navigation,
                   :homework_submission,
                   :link_selection,
                   :migration_selection,
                   :module_menu,
+                  :module_group_menu,
+                  :module_index_menu,
                   :post_grades,
                   :quiz_menu,
+                  :quiz_index_menu,
                   :resource_selection,
+                  :submission_type_selection,
+                  :student_context_card,
                   :tool_configuration,
                   :user_navigation,
+                  :wiki_index_menu,
                   :wiki_page_menu].freeze
 
     PLACEMENT_LOOKUP = {
@@ -76,5 +91,11 @@ module Lti
 
     validates_inclusion_of :placement, :in => PLACEMENT_LOOKUP.values
 
+    def self.valid_placements(root_account)
+      PLACEMENTS.dup.tap do |p|
+        p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
+        p.delete(:submission_type_selection) unless root_account&.feature_enabled?(:submission_type_tool_placement)
+      end
+    end
   end
 end

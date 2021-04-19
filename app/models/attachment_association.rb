@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,4 +21,17 @@
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group]
+
+  before_create :set_root_account_id
+
+  def set_root_account_id
+    self.root_account_id ||=
+      if context_type == 'ConversationMessage' || context.nil?
+        # conversation messages can have multiple root account IDs, so we
+        # don't bother dealing with them here
+        attachment&.root_account_id
+      else
+        context.root_account_id
+      end
+  end
 end

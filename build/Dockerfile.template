@@ -1,27 +1,48 @@
 <%= generation_message %>
-# See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
-FROM instructure/ruby-passenger:2.4
+ARG RUBY=2.6-p6.0.4
 
+<% if development? -%>
+FROM instructure/ruby-passenger:$RUBY
+<% else -%>
+FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
+<% end -%>
+LABEL maintainer="Instructure"
+
+ARG POSTGRES_CLIENT=12
 ENV APP_HOME /usr/src/app/
-ENV RAILS_ENV "production"
+ENV RAILS_ENV production
 ENV NGINX_MAX_UPLOAD_SIZE 10g
-ENV YARN_VERSION 1.12.3-1
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ARG CANVAS_RAILS6_0=1
+ENV CANVAS_RAILS6_0=${CANVAS_RAILS6_0}
 
-# Work around github.com/zertosh/v8-compile-cache/issues/2
-# This can be removed once yarn pushes a release including the fixed version
-# of v8-compile-cache.
-ENV DISABLE_V8_COMPILE_CACHE 1
+ENV YARN_VERSION 1.19.1-1
+ENV BUNDLER_VERSION 2.2.11
+ENV GEM_HOME /home/docker/.gem/$RUBY
+ENV PATH $GEM_HOME/bin:$PATH
+ENV BUNDLE_APP_CONFIG /home/docker/.bundle
+
+WORKDIR $APP_HOME
 
 USER root
-WORKDIR /root
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+<% if development? -%>
+
+ARG USER_ID
+# This step allows docker to write files to a host-mounted volume with the correct user permissions.
+# Without it, some linux distributions are unable to write at all to the host mounted volume.
+RUN if [ -n "$USER_ID" ]; then usermod -u "${USER_ID}" docker \
+        && chown --from=9999 docker /usr/src/nginx /usr/src/app -R; fi
+
+<% end -%>
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
   && printf 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*' > /etc/dpkg/dpkg.cfg.d/01_nodoc \
-<% unless production? -%>
   && echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
   && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-<% end -%>
   && apt-get update -qq \
   && apt-get install -qqy --no-install-recommends \
        nodejs \
@@ -29,102 +50,51 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        libxmlsec1-dev \
        python-lxml \
        libicu-dev \
-<% unless production? -%>
-       postgresql-client-9.5 \
+       parallel \
+       postgresql-client-$POSTGRES_CLIENT \
        unzip \
+       pbzip2 \
        fontforge \
-<% end -%>
-  && apt-get clean \
+       autoconf \
+       automake \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
+# install pulsar stuff
+ENV PULSAR_VERSION=2.6.1
+ENV PULSAR_CLIENT_SHA512=90fdb6e3ad85c9204f2b20a9077684f667f84be32df0952f8823ccee501c9d64a4c8131cab38a295a4cb66e2b63211afcc24f32130ded47e9da8f334ec6053f5
+ENV PULSAR_CLIENT_DEV_SHA512=d0cc58c0032cb35d4325769ab35018b5ed823bc9294d75edfb56e62a96861be4194d6546107af0d5f541a778cdc26274aac9cb7b5ced110521467f89696b2209
+RUN cd "$(mktemp -d)" && \
+    curl -SLO 'http://archive.apache.org/dist/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client.deb' && \
+    curl -SLO 'http://archive.apache.org/dist/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client-dev.deb' && \
+    echo $PULSAR_CLIENT_SHA512 '*apache-pulsar-client.deb' | shasum -a 512 -c -s - && \
+    echo $PULSAR_CLIENT_DEV_SHA512 '*apache-pulsar-client-dev.deb' | shasum -a 512 -c -s - && \
+    apt install ./apache-pulsar-client*.deb
+
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.16.1 \
+  && gem install bundler --no-document -v $BUNDLER_VERSION \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
+RUN npm install -g npm@latest && npm cache clean --force
 
-<% if development? -%>
-# We will need sfnt2woff in order to build fonts
-COPY build/vendor/woff-code-latest.zip ./
-RUN unzip woff-code-latest.zip -d woff \
-  && cd woff \
-  && make \
-  && cp sfnt2woff /usr/local/bin \
-  && cd - \
-  && rm -rf woff*
+USER docker
+
+<% if jenkins? -%>
+COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
+
+RUN set -eux; \
+  \
+  # set up bundle config options \
+  bundle config --global build.nokogiri --use-system-libraries \
+  && bundle config --global build.ffi --enable-system-libffi \
+  && mkdir -p \
+    /home/docker/.bundle \
+  # TODO: --without development \
+  && bundle install --jobs $(nproc) \
+  && rm -rf $GEM_HOME/cache
 <% end -%>
-
-WORKDIR $APP_HOME
-<% if production? -%>
-
-COPY . $APP_HOME
-
-# optimizing for size here ... get all the dev dependencies so we can
-# compile assets, then throw away everything we don't need
-#
-# the privilege dropping could be slightly less verbose if we ever add
-# gosu (here or upstream)
-#
-# TODO: once we have docker 17.05+ everywhere, do this via multi-stage
-# build
-
-RUN bash -c ' \
-  # bash cuz better globbing and comments \
-  set -e; \
-  \
-  sudo -u docker -E env HOME=/home/docker PATH=$PATH bundle install --jobs 8; \
-  yarn install --pure-lockfile; \
-  COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets; \
-  \
-  # downgrade to prod dependencies \
-  sudo -u docker -E env HOME=/home/docker PATH=$PATH bundle install --without test development; \
-  sudo -u docker -E env HOME=/home/docker PATH=$PATH bundle clean --force; \
-  yarn install --prod; \
-  \
-  # now some cleanup... \
-  rm -rf \
-    /home/docker/.bundle/cache \
-    $GEM_HOME/cache \
-    $GEM_HOME/bundler/gems/*/{.git,spec,test,features} \
-    $GEM_HOME/gems/*/{spec,test,features} \
-    `yarn cache dir` \
-    /root/.node-gyp \
-    /tmp/phantomjs \
-    .yardoc \
-    client_apps/canvas_quizzes/{tmp,node_modules} \
-    config/locales/generated \
-    gems/*/node_modules \
-    gems/plugins/*/node_modules \
-    log \
-    public/dist/maps \
-    public/doc/api/*.json \
-    public/javascripts/translations \
-    tmp-*.tmp'
-
-USER docker
-<% else -%>
-
-COPY Gemfile      ${APP_HOME}
-COPY Gemfile.d    ${APP_HOME}Gemfile.d
-COPY config       ${APP_HOME}config
-COPY gems         ${APP_HOME}gems
-COPY packages     ${APP_HOME}packages
-COPY script       ${APP_HOME}script
-COPY package.json ${APP_HOME}
-COPY yarn.lock    ${APP_HOME}
-RUN find gems packages -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
-
-# Install deps as docker to avoid sadness w/ npm lifecycle hooks
-USER docker
-RUN bundle install --jobs 8 \
-  && yarn install --pure-lockfile
-USER root
-
-COPY . $APP_HOME
-RUN mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %> \
-  && find ${APP_HOME} /home/docker ! -user docker -print0 | xargs -0 chown -h docker:docker
-
-USER docker
-# TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
-RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
+<% if development? -%>
+RUN set -eux; \
+  mkdir -p \
+    <%= docker_compose_volume_paths.join(" \\\n    ") %>
 <% end -%>

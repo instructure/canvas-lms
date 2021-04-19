@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -78,6 +80,16 @@ describe Mutations::CreateSubmissionComment do
     expect(
       result.dig(:data, :createSubmissionComment, :submissionComment, :_id)
     ).to eq SubmissionComment.last.id.to_s
+  end
+
+  it 'creates a new submission comment and a Viewed Submission Commment for the user' do
+    result = run_mutation
+    expect(
+      result.dig(:data, :createSubmissionComment, :submissionComment, :_id)
+    ).to eq SubmissionComment.last.id.to_s
+    expect(ViewedSubmissionComment.count).to eq 1
+    expect(ViewedSubmissionComment.last.user).to eq @teacher
+    expect(ViewedSubmissionComment.last.submission_comment_id).to eq SubmissionComment.last.id
   end
 
   it 'requires permission to comment on the submission' do

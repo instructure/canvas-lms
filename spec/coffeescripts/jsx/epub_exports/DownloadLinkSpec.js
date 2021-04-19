@@ -20,7 +20,7 @@ import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import DownloadLink from 'jsx/epub_exports/DownloadLink'
+import DownloadLink from 'ui/features/epub_exports/react/DownloadLink.js'
 import I18n from 'i18n!epub_exports'
 
 QUnit.module('DownloadLink', {

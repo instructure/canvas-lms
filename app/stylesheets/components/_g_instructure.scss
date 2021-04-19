@@ -30,7 +30,7 @@
   position: fixed;
   top: 10px;
   #{direction(left)}: 50px;
-  z-index: 9999;
+  z-index: 99999;
   background-color: #fff;
   border: 2px solid #888;
 }
@@ -45,7 +45,7 @@
   position: fixed;
   z-index: 100000;
   #{direction(left)}: 0;
-  width: 100%;
+  width: 100vw;
 }
 
 // contains copies of all static messages so that we reserve enough height in the ui
@@ -74,10 +74,11 @@
     }
   }
 
-  li:not(.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error), .ui-effects-wrapper {
+  li:not(.ic-flash-info):not(.ic-flash-success):not(.ic-flash-warning):not(.ic-flash-error),
+  .ui-effects-wrapper {
     margin: 0 auto !important;
   }
-  li:not(.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error) {
+  li:not(.ic-flash-info):not(.ic-flash-success):not(.ic-flash-warning):not(.ic-flash-error) {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
     border-bottom-color: rgba(0, 0, 0, 0.5);
     padding: direction-sides(4px 40px 4px 8px);
@@ -132,25 +133,23 @@
   position: relative;
   min-height: 5px;
   max-width: 100%;
-  // firefox max-width images break the parent container
-  @-moz-document url-prefix() {
-    overflow-x: hidden;
-  }
-  a:not(.btn, .Button) {
+  overflow-x: auto;
+  a:not(.btn):not(.Button):not([role='button']) {
     text-decoration: underline;
   }
-
-  h3, .h3 {
-    margin-top: 1em;
-    margin-bottom: 1em;
+  a.btn, a.Button, a[role='button'] {
+    &:hover, &:focus {
+      text-decoration: none;
+    }
   }
+
   table:not([cellpadding]) {
-    margin-#{direction(left)}: 5px;
     td {
       padding: 2px;
     }
   }
 }
+
 
 .user_content iframe,
 .user_content video
@@ -159,6 +158,10 @@
   padding: 0;
   margin: 0;
   max-width: 100%;
+}
+
+.user_content iframe[data-media-id] {
+  background-color: #eee;
 }
 
 .reminder, .reminder-content {
@@ -1764,9 +1767,13 @@ form.user_content_post_form {
       vertical-align: middle;
       margin-#{direction(right)}: 10px;
     }
-    b {
+    b, div {
       line-height: 28px;
       vertical-align: middle;
+    }
+    i.icon-x {
+      padding-bottom: 3px;
+      margin: 0px;
     }
   }
   .fixed_warning {
@@ -1777,6 +1784,13 @@ form.user_content_post_form {
     padding: 15px;
     opacity: 0.9;
     color: black;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .warning_message {
+      margin-#{direction(left)}: auto;
+    }
   }
 }
 
@@ -1793,6 +1807,11 @@ form.user_content_post_form {
   text-indent: -10000px;
   white-space: nowrap;
   width: 0;
+}
+
+.nav-icon {
+  @include ic-badge-maker(18px, $ic-content-background-color, $ic-color-dark);
+  float: direction(right);
 }
 
 .nav-badge {

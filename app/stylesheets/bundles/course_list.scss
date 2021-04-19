@@ -62,6 +62,14 @@
   color: $ic-color-alert;
 }
 
+.course-list-unpublished-course {
+  color: $ic-color-alert;
+}
+
+.course-list-unpublished-course-row {
+  background: #f5f5f5;
+}
+
 .content--hasMarginTop {
   margin-top: $ic-sp*2;
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -91,9 +93,27 @@ describe "users" do
       page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => "#{"%03d" % i}") }
       get "/users/#{@student.id}"
       wait_for_ajaximations
+      scroll_page_to_bottom
       driver.execute_script("$('#pageviews').scrollTop($('#pageviews')[0].scrollHeight);")
-      wait_for_ajaximations
+      # wait for loading spinner to finish
+      wait_for(method: nil, timeout: 0.5) { f(".paginatedView-loading").displayed? }
+      wait_for_no_such_element { f(".paginatedView-loading") }
       expect(ff("#page_view_results tr").length).to eq page_views_count
+    end
+
+    it "filters by date" do
+      old_date = 2.days.ago.beginning_of_day
+      page_view(:user => @student, :course => @course, :url => 'recent', :created_at => 5.minutes.ago)
+      page_view(:user => @student, :course => @course, :url => 'older', :created_at => old_date + 1.minute)
+      get "/users/#{@student.id}"
+      wait_for_ajaximations
+      expect(ff('#page_view_results tr').first.text).to include 'recent'
+      replace_content(f('#page_view_date'), old_date.strftime("%Y-%m-%d"))
+      driver.action.send_keys(:tab).perform
+      wait_for_ajaximations
+      expect(ff('#page_view_results tr').first.text).to include 'older'
+      match = f('#page_views_csv_link')['href'].match(/start_time=([^&]+)/)
+      expect(DateTime.parse(match[1]).to_i).to eq old_date.to_i
     end
   end
 

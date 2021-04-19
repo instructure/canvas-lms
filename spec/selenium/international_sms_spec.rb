@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -31,12 +33,12 @@ describe "international sms" do
     it 'shows a disclaimer for international numbers', priority: "1", test_id: 443930 do
       # All selections except those in this array should include the text messaging rate disclaimer
       no_disclaimer = Array[
-          'Select Country',
+          'Select Country or Region',
           'United States'
       ]
 
       get '/profile/settings'
-      make_full_screen
+
       find('.add_contact_link').click
       wait_for_ajaximations
 
@@ -57,7 +59,7 @@ describe "international sms" do
 
     it 'allows a phone number to be entered', priority: "1", test_id: 602158 do
       get '/profile/settings'
-      make_full_screen
+
       find('.add_contact_link').click
       wait_for_ajaximations
 

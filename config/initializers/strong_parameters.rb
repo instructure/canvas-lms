@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -100,8 +102,4 @@ ActionController::Base.class_eval do
   def strong_anything
     ArbitraryStrongishParams::ANYTHING
   end
-end
-
-ActionController::ParameterMissing.class_eval do
-  def skip_error_report?; true; end
 end

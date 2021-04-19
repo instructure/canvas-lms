@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -122,8 +124,9 @@ module Api
       { :lookups => { 'sis_account_id' => 'sis_source_id',
                       'id' => 'id',
                       'sis_integration_id' => 'integration_id',
-                      'lti_context_id' => 'lti_context_id' }.freeze,
-        :is_not_scoped_to_account => ['id', 'lti_context_id'].freeze,
+                      'lti_context_id' => 'lti_context_id',
+                      'uuid' => 'uuid' }.freeze,
+        :is_not_scoped_to_account => ['id', 'lti_context_id', 'uuid'].freeze,
         :scope => 'root_account_id' }.freeze,
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id',
@@ -141,11 +144,19 @@ module Api
                         'id' => 'id' }.freeze,
           :is_not_scoped_to_account => ['id'].freeze,
           :scope => 'root_account_id' }.freeze,
+    'assignments' =>
+        { :lookups => { 'sis_assignment_id' => 'sis_source_id',
+                        'id' => 'id',
+                        'lti_context_id' => 'lti_context_id' }.freeze,
+          :is_not_scoped_to_account => ['id'].freeze,
+          :scope => 'root_account_id' }.freeze,
   }.freeze
 
-  MAX_ID_LENGTH = (2**63 - 1).to_s.length
+  MAX_ID = (2**63 - 1)
+  MAX_ID_LENGTH = MAX_ID.to_s.length
+  MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
-  USER_UUID_REGEX = %r{\Auuid:(\w{40,})\z}
+  UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -160,7 +171,7 @@ module Api
       sis_id = $2
     elsif id =~ ID_REGEX
       return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
-    elsif id =~ USER_UUID_REGEX
+    elsif id =~ UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil
@@ -301,6 +312,7 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {}, response_args = {})
+    collection = ordered_collection(collection)
     collection = paginate_collection!(collection, controller, pagination_args)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
@@ -310,6 +322,13 @@ module Api
     else
       collection
     end
+  end
+
+  def self.ordered_collection(collection)
+    if collection.is_a?(ActiveRecord::Relation) && collection.order_values.blank?
+      collection = collection.order(collection.primary_key.to_sym)
+    end
+    collection
   end
 
   # Returns collection as the first return value, and the meta information hash
@@ -496,7 +515,12 @@ module Api
 
   def user_can_download_attachment?(attachment, context, user)
     # checking on the context first can improve performance when checking many attachments for admins
-    (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) || attachment.grants_right?(user, nil, :download)
+    context&.grants_any_right?(
+      user,
+      :manage_files,
+      :read_as_admin,
+      *RoleOverride::GRANULAR_FILE_PERMISSIONS
+    ) || attachment&.grants_right?(user, nil, :download)
   end
 
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
@@ -559,11 +583,11 @@ module Api
   end
 
   def self.invalid_time_stamp_error(attribute, message)
-    Canvas::Errors.capture(
-      'invalid_date_time',
+    data = {
       message: "invalid #{attribute}",
       exception_message: message
-    )
+    }
+    Canvas::Errors.capture('invalid_date_time', data, :info)
   end
 
   # regex for valid iso8601 dates

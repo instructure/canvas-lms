@@ -19,9 +19,22 @@
 <%
   css_bundle :learning_outcomes, :tinymce
   js_bundle :learning_outcomes
-  content_for :page_title, t("#titles.learning_outcomes", "Learning Outcomes")
+  provide :page_title, t("#titles.learning_outcomes", "Learning Outcomes")
 %>
 
 <h1 class="screenreader-only"><%= t("#titles.learning_outcomes", "Learning Outcomes") %></h1>
-
-<div id="outcomes"></div>
+<%
+  if @domain_root_account.feature_enabled?(:improved_outcomes_management)
+    css_bundle :improved_outcomes_management
+  end
+%>
+<% if @domain_root_account.feature_enabled?(:account_level_mastery_scales) %>
+  <%
+    js_bundle :outcome_management
+    css_bundle :proficiency_table
+  %>
+    <div id="outcome_management"></div>
+    <div id="outcomes" style="display: none;"></div>
+<% else %>
+  <div id="outcomes"></div>
+<% end %>

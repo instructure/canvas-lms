@@ -19,8 +19,8 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import Collaboration from 'jsx/collaborations/Collaboration'
-import tz from 'timezone'
+import Collaboration from 'ui/features/lti_collaborations/react/Collaboration.js'
+import tz from '@canvas/timezone'
 
 QUnit.module('Collaboration')
 
@@ -124,9 +124,7 @@ test('has an edit button that links to the proper url', () => {
   const editIcon = TestUtils.findRenderedDOMComponentWithClass(component, 'icon-edit')
   ok(
     ReactDOM.findDOMNode(editIcon).href.includes(
-      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${
-        props.collaboration.id
-      }&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`
+      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${props.collaboration.id}&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`
     )
   )
 })

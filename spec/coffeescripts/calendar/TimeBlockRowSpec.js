@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import fcUtil from 'compiled/util/fcUtil'
-import TimeBlockList from 'compiled/calendar/TimeBlockList'
-import TimeBlockRow from 'compiled/calendar/TimeBlockRow'
-import tz from 'timezone'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList.js'
+import TimeBlockRow from 'ui/features/calendar/jquery/TimeBlockRow.js'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 
 const nextYear = new Date().getFullYear() + 1
@@ -57,7 +57,7 @@ QUnit.module('TimeBlockRow', {
 test('should init properly', function() {
   const me = new TimeBlockRow(this.timeBlockList, {start: this.start, end: this.end})
   // make sure the <input> `value`s are right
-  equal(me.$date.val().trim(), tz.format(unfudged_start, 'date.formats.medium_with_weekday'))
+  equal(me.$date.val().trim(), tz.format(unfudged_start, 'date.formats.default'))
   equal(me.$start_time.val().trim(), tz.format(unfudged_start, 'time.formats.tiny'))
   equal(me.$end_time.val().trim(), tz.format(unfudged_end, 'time.formats.tiny'))
 })

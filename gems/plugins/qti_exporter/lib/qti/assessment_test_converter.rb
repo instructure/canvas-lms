@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -105,7 +107,7 @@ class AssessmentTestConverter
           @quiz[:questions].unshift({:question_type => 'text_only_question', :question_text => intro, :migration_id => unique_local_id})
         end
         if html = get_node_att(meta, 'instructureField[name=assessment_rubric_html]', 'value')
-          if node = (Nokogiri::HTML::DocumentFragment.parse(html) rescue nil)
+          if node = (Nokogiri::HTML5.fragment(html) rescue nil)
             description = sanitize_html_string(node.text)
             @quiz[:description] = description if description.present?
           end
@@ -159,6 +161,13 @@ class AssessmentTestConverter
     limit
   end
 
+  def self.parse_pick_count(section)
+    select_node = section.children.find { |child| child.name == "selection" }
+    return nil unless select_node
+    val = select_node['select']&.strip
+    val =~ /^\d+$/ && val.to_i
+  end
+
   def process_section(section)
     group = nil
     questions_list = @quiz[:questions]
@@ -166,32 +175,29 @@ class AssessmentTestConverter
     if shuffle = get_node_att(section, 'ordering','shuffle')
       @quiz[:shuffle_answers] = true if shuffle =~ /true/i
     end
-    if select = section.children.find {|child| child.name == "selection"}
-      select = select['select'].to_i
-      if select > 0
-        group = {:questions=>[], :pick_count => select, :question_type => 'question_group', :title => section['title']}
-        if weight = get_node_att(section, 'weight','value')
-          group[:question_points] = convert_weight_to_points(weight)
-        end
-        if val = get_float_val(section, 'points_per_item')
-          group[:question_points] = val
-        end
-        bank_refs = section.css('sourcebank_ref')
-        if bank_refs.count > 1
-          # multiple source banks for one section - duplicate the groups (see below)
-          group[:question_bank_migration_ids] = bank_refs.map{|br| translate_bank_id(br.text)}
-        elsif bank_refs.count == 1
-          group[:question_bank_migration_id] = translate_bank_id(bank_refs.first.text)
-        end
-        if val = get_node_val(section, 'sourcebank_context')
-          group[:question_bank_context] = val
-        end
-        if val = get_bool_val(section, 'sourcebank_is_external')
-          group[:question_bank_is_external] = val
-        end
-        group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : unique_local_id
-        questions_list = group[:questions]
+    if select = AssessmentTestConverter.parse_pick_count(section)
+      group = {:questions=>[], :pick_count => select, :question_type => 'question_group', :title => section['title']}
+      if weight = get_node_att(section, 'weight','value')
+        group[:question_points] = convert_weight_to_points(weight)
       end
+      if val = get_float_val(section, 'points_per_item')
+        group[:question_points] = val
+      end
+      bank_refs = section.css('sourcebank_ref')
+      if bank_refs.count > 1
+        # multiple source banks for one section - duplicate the groups (see below)
+        group[:question_bank_migration_ids] = bank_refs.map{|br| translate_bank_id(br.text)}
+      elsif bank_refs.count == 1
+        group[:question_bank_migration_id] = translate_bank_id(bank_refs.first.text)
+      end
+      if val = get_node_val(section, 'sourcebank_context')
+        group[:question_bank_context] = val
+      end
+      if val = get_bool_val(section, 'sourcebank_is_external')
+        group[:question_bank_is_external] = val
+      end
+      group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : unique_local_id
+      questions_list = group[:questions]
     end
     if section['visible'] and section['visible'] =~ /true/i
       if title = section['title']

@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
+import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('StudentGroupStore', {
@@ -109,7 +109,7 @@ test('adding groups works', () => {
   const arrayOfGroups = [{id: 2, title: 'group 2'}]
   StudentGroupStore.setState({groups: initialGroups})
   StudentGroupStore.addGroups(arrayOfGroups)
-  deepEqual(StudentGroupStore.getGroups(), _.indexBy([g1, g2], 'id'))
+  deepEqual(StudentGroupStore.getGroups(), _.keyBy([g1, g2], 'id'))
 })
 
 // ==================

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -21,6 +23,14 @@ module UserContent
     class UriMatch < SimpleDelegator
       def preview?
         rest.start_with?('/preview')
+      end
+
+      def download?
+        rest.start_with?('/download')
+      end
+
+      def download_frd?
+        rest.include?('download_frd=1')
       end
     end
 
@@ -58,7 +68,7 @@ module UserContent
 
       def options
         { only_path: true }.tap do |h|
-          h[:download] = 1 unless match.preview?
+          h[:download] = 1 if match.download_frd?
           h[:verifier] = attachment.uuid unless in_app && !is_public
           if !match.preview? && match.rest.include?('wrap=1')
             h[:wrap] = 1
@@ -70,8 +80,10 @@ module UserContent
         if Attachment.relative_context?(attachment.context_type)
           if match.preview?
             "#{attachment.context_type.downcase}_file_preview_url"
-          else
+          elsif match.download? || match.download_frd?
             "#{attachment.context_type.downcase}_file_download_url"
+          else
+            "#{attachment.context_type.downcase}_file_url"
           end
         else
           "file_download_url"
@@ -93,9 +105,18 @@ module UserContent
 
       if user_can_access_attachment?
         ProcessedUrl.new(match: match, attachment: attachment, is_public: is_public, in_app: in_app).url
-      elsif attachment.previewable_media? && match.url.present?
-        uri = URI.parse(match.url)
-        uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
+      else
+        begin
+          uri = URI.parse(match.url)
+        rescue URI::InvalidURIError
+          uri = URI.parse(Addressable::URI.escape(match.url))
+        end
+        if attachment.previewable_media? && match.url.present?
+          uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
+        elsif attachment.locked_for?(user) && attachment.content_type =~ /^image/
+          # hidden=1 tells the browser to strip the alt attribute for locked files
+          uri.query = (uri.query.to_s.split("&") + ["hidden=1"]).join("&")
+        end
         uri.to_s
       end
     end
@@ -105,6 +126,7 @@ module UserContent
 
     def attachment
       return nil unless match.obj_id
+
       unless @_attachment
         @_attachment = preloaded_attachments[match.obj_id]
         @_attachment ||= Attachment.find_by_id(match.obj_id) if context.is_a?(User) || context.nil?
@@ -119,8 +141,12 @@ module UserContent
 
     def user_can_download_attachment?
       # checking on the context first can improve performance when checking many attachments for admins
-      (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) ||
-        attachment.grants_right?(user, nil, :download)
+      context&.grants_any_right?(
+        user,
+        :manage_files,
+        :read_as_admin,
+        *RoleOverride::GRANULAR_FILE_PERMISSIONS
+      ) || attachment&.grants_right?(user, nil, :download)
     end
 
     def user_can_view_attachment?

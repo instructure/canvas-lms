@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import PublishIconView from 'compiled/views/PublishIconView'
+import Backbone from '@canvas/backbone'
+import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
 import 'helpers/jquery.simulate'
 
@@ -28,14 +28,17 @@ QUnit.module('PublishIconView', {
         published: false,
         publishable: true
       }
+
       publish() {
         this.set('published', true)
         return $.Deferred().resolve()
       }
+
       unpublish() {
         this.set('published', false)
         return $.Deferred().resolve()
       }
+
       disabledMessage() {
         return "can't unpublish"
       }

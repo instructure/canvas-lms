@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -61,10 +63,14 @@ class SubmissionSearch
     end
 
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades)
-      search_scope
+      # TODO: may want to add a preloader for this
+      allowed_user_ids = @course.users_visible_to(@searcher)
+      search_scope.where(user_id: allowed_user_ids)
     elsif @course.grants_right?(@searcher, @session, :read_grades)
       # a user can see their own submission
       search_scope.where(user_id: @searcher.id)
+    else
+      Submission.none # return nothing
     end
 
     if @options[:scored_less_than]
@@ -73,6 +79,23 @@ class SubmissionSearch
 
     if @options[:scored_more_than]
       search_scope = search_scope.where("submissions.score > ?", @options[:scored_more_than])
+    end
+
+    if @options[:late].present?
+      search_scope = @options[:late] ? search_scope.late : search_scope.not_late
+    end
+
+    if @options[:grading_status].present?
+      case @options[:grading_status]
+      when "needs_grading"
+        search_scope = search_scope.where(Submission.needs_grading_conditions)
+      when "excused"
+        search_scope = search_scope.where(excused: true)
+      when "needs_review"
+        search_scope = search_scope.where(workflow_state: 'pending_review')
+      when "graded"
+        search_scope = search_scope.where(workflow_state: 'graded')
+      end
     end
 
     search_scope

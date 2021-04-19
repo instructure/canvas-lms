@@ -1,8 +1,0 @@
-{
-  "presets": [
-    "@instructure/ui-babel-preset"
-  ],
-  "plugins": [
-    "inline-react-svg"
-  ]
-}

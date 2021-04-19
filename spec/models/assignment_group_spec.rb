@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -49,21 +51,79 @@ describe AssignmentGroup do
     expect(score.assignment_group_id).to be ag.id
   end
 
-  context "visible assignments" do
+  context "visible_assignments" do
     before(:each) do
       @ag = @course.assignment_groups.create!(@valid_attributes)
       @s = @course.course_sections.create!(name: "test section")
       student_in_section(@s, user: @student)
-      assignments = (0...4).map { @course.assignments.create!({:title => "test_foo",
-                                  :assignment_group => @ag,
-                                  :points_possible => 10,
-                                  :only_visible_to_overrides => true})}
-      assignments.first.destroy
-      assignments.second.grade_student(@student, grade: 10, grader: @teacher)
-      assignment_to_override = assignments.last
-      create_section_override_for_assignment(assignment_to_override, course_section: @s)
+      assignments = (0...4).map do
+        @course.assignments.create!(
+          title: "test_foo",
+          assignment_group: @ag,
+          points_possible: 10,
+          only_visible_to_overrides: true
+        )
+      end
+      @destroyed_assignment = assignments.first
+      @destroyed_assignment.destroy
+      @assignment = assignments.second
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @overridden_assignment = assignments.last
+      create_section_override_for_assignment(@overridden_assignment, course_section: @s)
       @course.reload
       @ag.reload
+    end
+
+    describe "class method" do
+      it "optionally scopes results to specific assignment IDs" do
+        assignment_ids = AssignmentGroup.visible_assignments(
+          @student,
+          @course,
+          [@ag],
+          assignment_ids: [@assignment.id]
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "does not include requested assignments that would otherwise not be returned" do
+        assignment_ids = AssignmentGroup.visible_assignments(
+          @student,
+          @course,
+          [@ag],
+          assignment_ids: [@assignment.id, @destroyed_assignment.id]
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "gracefully ignores assignment_ids if passed nil" do
+        assignment_ids = AssignmentGroup.visible_assignments(
+          @student,
+          @course,
+          [@ag],
+          assignment_ids: nil
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id, @overridden_assignment.id]
+      end
+    end
+
+    describe "instance method" do
+      it "optionally scopes results to specific assignment IDs" do
+        assignment_ids = @ag.visible_assignments(@student, assignment_ids: [@assignment.id]).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "does not include requested assignments that would otherwise not be returned" do
+        assignment_ids = @ag.visible_assignments(
+          @student,
+          assignment_ids: [@assignment.id, @destroyed_assignment.id]
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "gracefully ignores assignment_ids if passed nil" do
+        assignment_ids = @ag.visible_assignments(@student, assignment_ids: nil).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id, @overridden_assignment.id]
+      end
     end
 
     context "with differentiated assignments and draft state on" do
@@ -198,7 +258,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due in a closed grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 4.weeks.ago)
+          @assignment.update(due_at: 4.weeks.ago)
         end
 
         it "is true for admins" do
@@ -212,7 +272,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due in an open grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.weeks.ago)
+          @assignment.update(due_at: 2.weeks.ago)
         end
 
         it "is true for admins" do
@@ -226,7 +286,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due after all grading periods" do
         before(:once) do
-          @assignment.update_attributes(due_at: 1.day.from_now)
+          @assignment.update(due_at: 1.day.from_now)
         end
 
         it "is true for admins" do
@@ -240,7 +300,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due before all grading periods" do
         before(:once) do
-          @assignment.update_attributes(due_at: 6.weeks.ago)
+          @assignment.update(due_at: 6.weeks.ago)
         end
 
         it "is true for admins" do
@@ -254,7 +314,7 @@ describe AssignmentGroup do
 
       context "when the assignment has no due date" do
         before(:once) do
-          @assignment.update_attributes(due_at: nil)
+          @assignment.update(due_at: nil)
         end
 
         it "is true for admins" do
@@ -268,7 +328,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due in a closed grading period for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.days.from_now)
+          @assignment.update(due_at: 2.days.from_now)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.override_due_at(4.weeks.ago)
@@ -286,7 +346,7 @@ describe AssignmentGroup do
 
       context "when the assignment is overridden with no due date for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: nil)
+          @assignment.update(due_at: nil)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.save!
@@ -303,7 +363,7 @@ describe AssignmentGroup do
 
       context "when the assignment is deleted and due in a closed grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 4.weeks.ago)
+          @assignment.update(due_at: 4.weeks.ago)
           @assignment.destroy
         end
 
@@ -318,7 +378,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due in a closed grading period" do
         before(:once) do
-          @quiz.update_attributes(due_at: 4.weeks.ago)
+          @quiz.update(due_at: 4.weeks.ago)
         end
 
         it "is true for admins" do
@@ -332,7 +392,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due in an open grading period" do
         before(:once) do
-          @quiz.update_attributes(due_at: 2.weeks.ago)
+          @quiz.update(due_at: 2.weeks.ago)
         end
 
         it "is true for admins" do
@@ -346,7 +406,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due after all grading periods" do
         before(:once) do
-          @quiz.update_attributes(due_at: 1.day.from_now)
+          @quiz.update(due_at: 1.day.from_now)
         end
 
         it "is true for admins" do
@@ -360,7 +420,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due before all grading periods" do
         before(:once) do
-          @quiz.update_attributes(due_at: 6.weeks.ago)
+          @quiz.update(due_at: 6.weeks.ago)
         end
 
         it "is true for admins" do
@@ -374,7 +434,7 @@ describe AssignmentGroup do
 
       context "when the quiz has no due date" do
         before(:once) do
-          @quiz.update_attributes(due_at: nil)
+          @quiz.update(due_at: nil)
         end
 
         it "is true for admins" do
@@ -388,7 +448,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due in a closed grading period for a student" do
         before(:once) do
-          @quiz.update_attributes(due_at: 2.days.from_now)
+          @quiz.update(due_at: 2.days.from_now)
           override = @quiz.assignment_overrides.build
           override.set = @course.default_section
           override.override_due_at(4.weeks.ago)
@@ -406,7 +466,7 @@ describe AssignmentGroup do
 
       context "when the quiz is overridden with no due date for a student" do
         before(:once) do
-          @quiz.update_attributes(due_at: nil)
+          @quiz.update(due_at: nil)
           override = @quiz.assignment_overrides.build
           override.set = @course.default_section
           override.save!
@@ -423,7 +483,7 @@ describe AssignmentGroup do
 
       context "when the quiz is deleted and due in a closed grading period" do
         before(:once) do
-          @quiz.update_attributes(due_at: 4.weeks.ago)
+          @quiz.update(due_at: 4.weeks.ago)
           @quiz.destroy
         end
 
@@ -515,6 +575,13 @@ describe AssignmentGroup do
     it "does not restore scores belonging to deleted students" do
       @student_enrollment.destroy
       expect { @group.restore }.not_to change { student_score.reload.state }
+    end
+  end
+
+  describe '#create' do
+    it 'sets the root_account_id using context' do
+      group = @course.assignment_groups.create!(@valid_attributes)
+      expect(group.root_account_id).to eq @course.root_account_id
     end
   end
 end

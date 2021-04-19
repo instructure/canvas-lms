@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -29,12 +31,10 @@ describe ExternalIntegrationKey do
   let!(:key_type) { :external_key0 }
   let!(:account) { Account.create! }
   let!(:external_integration_key) do
-    eik = ExternalIntegrationKey.new
-    eik.context = account
-    eik.key_type = key_type
-    eik.key_value = '42'
-    eik.save
-    eik
+    account.external_integration_keys.create!(
+      key_type: key_type,
+      key_value: '42',
+    )
   end
 
   context "key_types" do
@@ -114,5 +114,16 @@ describe ExternalIntegrationKey do
       expect(external_integration_key.grants_right?(user_factory, :read)).to be_falsey
       expect(external_integration_key.grants_right?(user_factory, :write)).to be_falsey
     end
+  end
+
+  it "can be validated within a new account" do
+    account = Account.new
+    eik = account.external_integration_keys.build(key_type: key_type)
+
+    expect {
+      eik.key_value = '42'
+    }.to change {
+      account.valid?
+    }.from(false).to(true)
   end
 end

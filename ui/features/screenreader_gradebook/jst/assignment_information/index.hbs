@@ -1,0 +1,45 @@
+<div id="assignment_information">
+  <div class="row-fluid">
+    <div class="span4">
+      <h2>{{#t 'assignment_info'}}Assignment Information{{/t}}</h2>
+    </div>
+    <div class="span8">
+      {{#if selectedAssignment}}
+        <h3 class="assignment_selection">
+          <a {{bind-attr href="selectedAssignment.html_url"}}>{{selectedAssignment.name}}</a>
+        </h3>
+        {{#if omitFromFinalGrade}}
+          <i class="icon-warning"><span class="screenreader-only">{{#t}}Warning{{/t}}</span></i>
+          {{#t}}This assignment does not count toward the final grade.{{/t}}
+        {{else}}
+          {{#if showAssignmentPointsWarning}}
+            <span class="text-error">
+              <a {{bind-attr href="selectedAssignment.html_url"}}>
+                <i class="icon-warning"><span class="screenreader-only">{{#t}}Warning{{/t}}</span></i>
+                {{#t}}Assignments in this group have no points possible and cannot be included in grade calculation.{{/t}}
+              </a>
+            </span>
+          {{/if}}
+        {{/if}}
+        <div>
+          <a id="assignment-speedgrader-link" {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
+        </div>
+        {{#if showDownloadSubmissionsButton}}
+          <div class="pad-box no-sides">
+            {{
+              ic-submission-download-dialog
+              submissionsDownloadUrl=selectedAssignment.submissions_download_url
+            }}
+          </div>
+        {{/if}}
+
+        {{partial "assignment_information/details"}}
+        {{partial "assignment_information/actions"}}
+      {{else}}
+        <p class="assignment_selection pad-box top-only">
+          {{#t 'empty_assignment_selection'}}Select an assignment to view additional information here.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

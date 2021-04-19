@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -38,7 +40,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
             "assignment_group_id" => "888"
           },
           "filter_rows_by" => {
-            "section_id" => "null"
+            "section_id" => "null",
+            "student_group_id" => "null"
           },
           "selected_view_options_filters" => ["assignmentGroups"],
           "show_inactive_enrollments" => "true", # values must be strings
@@ -49,6 +52,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
           "sort_rows_by_column_id" => "student",
           "sort_rows_by_setting_key" => "sortable_name",
           "sort_rows_by_direction" => "descending",
+          "view_ungraded_as_zero" => "true",
           "colors" => {
             "late" => "#000000",
             "missing" => "#000001",
@@ -60,7 +64,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       let(:gradebook_settings_massaged) do
-        gradebook_settings.merge('filter_rows_by' => { 'section_id' => nil })
+        gradebook_settings.merge('filter_rows_by' => { 'section_id' => nil, 'student_group_id' => nil })
       end
 
       let(:valid_params) do
@@ -78,14 +82,14 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       context 'given a valid PUT request' do
-        subject { json_parse.fetch('gradebook_settings').fetch(@course.id.to_s) }
+        subject { json_parse.fetch('gradebook_settings').fetch(@course.global_id.to_s) }
 
         before { put :update, params: valid_params }
 
         it { expect(response).to be_ok }
         it { is_expected.to include 'enter_grades_as' => {'2301' => 'points'} }
         it { is_expected.to include 'filter_columns_by' => {'grading_period_id' => '1401', 'assignment_group_id' => '888'} }
-        it { is_expected.to include 'filter_rows_by' => {'section_id' => nil} }
+        it { is_expected.to include 'filter_rows_by' => {'section_id' => nil, 'student_group_id' => nil} }
         it { is_expected.to include 'selected_view_options_filters' => ['assignmentGroups'] }
         it { is_expected.to include 'show_inactive_enrollments' => 'true' }
         it { is_expected.to include 'show_concluded_enrollments' => 'false' }
@@ -95,8 +99,9 @@ RSpec.describe GradebookSettingsController, type: :controller do
         it { is_expected.to include 'sort_rows_by_column_id' => 'student' }
         it { is_expected.to include 'sort_rows_by_setting_key' => 'sortable_name' }
         it { is_expected.to include 'sort_rows_by_direction' => 'descending' }
+        it { is_expected.to include 'view_ungraded_as_zero' => 'true' }
         it { is_expected.not_to include 'colors' }
-        it { is_expected.to have(12).items } # ensure we add specs for new additions
+        it { is_expected.to have(13).items } # ensure we add specs for new additions
 
         context 'colors' do
           subject { json_parse.fetch('gradebook_settings').fetch('colors') }
@@ -117,9 +122,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       it "transforms 'null' string values to nil" do
         put :update, params: valid_params
 
-        section_id = teacher.preferences.
-          fetch(:gradebook_settings).
-          fetch(@course.id).
+        section_id = teacher.get_preference(:gradebook_settings, @course.global_id).
           fetch('filter_rows_by').
           fetch('section_id')
 

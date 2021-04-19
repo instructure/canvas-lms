@@ -15,35 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react';
-import { shallow, mount } from 'enzyme';
-import ShowOnFocusButton from '../index';
+import React from 'react'
+import {shallow, mount} from 'enzyme'
+import ShowOnFocusButton from '../index'
 
-it('renders a ScreenReaderContent by default',  () => {
-  const wrapper = shallow(
-    <ShowOnFocusButton>Button</ShowOnFocusButton>
-  );
+it('renders a ScreenReaderContent by default', () => {
+  const wrapper = shallow(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  expect(wrapper).toMatchSnapshot();
-});
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders a Button when it has focus', () => {
-  const wrapper = mount(
-    <ShowOnFocusButton>Button</ShowOnFocusButton>
-  );
+  const wrapper = mount(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  wrapper.find('Button').simulate('focus');
-  expect(wrapper.find('ScreenReaderContent').exists()).toBe(false);
-});
+  wrapper.find('Button').simulate('focus')
+  expect(wrapper.find('ScreenReaderContent').exists()).toBe(false)
+})
 
 it('renders ScreeenReaderContent after blur', () => {
-  const wrapper = mount(
-    <ShowOnFocusButton>Button</ShowOnFocusButton>
-  );
+  const wrapper = mount(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  wrapper.find('Button').simulate('focus');
-  expect(wrapper.find('ScreenReaderContent').exists()).toBe(false);
+  wrapper.find('Button').simulate('focus')
+  expect(wrapper.find('ScreenReaderContent').exists()).toBe(false)
 
-  wrapper.find('Button').simulate('blur');
-  expect(wrapper.find('ScreenReaderContent').exists()).toBe(true);
-});
+  wrapper.find('Button').simulate('blur')
+  expect(wrapper.find('ScreenReaderContent').exists()).toBe(true)
+})

@@ -20,12 +20,12 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
-import * as FlashAlert from 'jsx/shared/FlashAlert'
-import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
-import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
-import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
-import FlashMessageHolder from 'jsx/assignments/GradeSummary/components/FlashMessageHolder'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
+import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions.js'
+import FlashMessageHolder from 'ui/features/assignment_grade_summary/react/components/FlashMessageHolder.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 /* eslint-disable qunit/no-identical-names */
 
@@ -146,9 +146,9 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
   })
 
-  test('does not display a flash alert when publishing grades starts', () => {
+  test('does not display a flash alert when releasing grades starts', () => {
     mountComponent()
-    store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
+    store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
     strictEqual(FlashAlert.showFlashAlert.callCount, 0)
   })
 
@@ -198,9 +198,9 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
   })
 
-  test('does not display a flash alert when publishing grades starts', () => {
+  test('does not display a flash alert when releasing grades starts', () => {
     mountComponent()
-    store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
+    store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
     strictEqual(FlashAlert.showFlashAlert.callCount, 0)
   })
 
@@ -343,10 +343,10 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
   })
 
-  QUnit.module('when publishing grades succeeds', hooks => {
+  QUnit.module('when releasing grades succeeds', hooks => {
     hooks.beforeEach(() => {
       mountComponent()
-      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.SUCCESS))
+      store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.SUCCESS))
     })
 
     test('displays a flash alert', () => {
@@ -358,17 +358,17 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
       equal(type, 'success')
     })
 
-    test('includes a message about grades being published', () => {
+    test('includes a message about grades being released', () => {
       const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Grades were successfully published to the gradebook.')
+      equal(message, 'Grades were successfully released to the gradebook.')
     })
   })
 
-  QUnit.module('when publishing grades fails for having already been published', hooks => {
+  QUnit.module('when releasing grades fails for having already been released', hooks => {
     hooks.beforeEach(() => {
       mountComponent()
       store.dispatch(
-        AssignmentActions.setPublishGradesStatus(AssignmentActions.GRADES_ALREADY_PUBLISHED)
+        AssignmentActions.setReleaseGradesStatus(AssignmentActions.GRADES_ALREADY_RELEASED)
       )
     })
 
@@ -381,17 +381,17 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
       equal(type, 'error')
     })
 
-    test('includes a message about grades already being published', () => {
+    test('includes a message about grades already being released', () => {
       const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Assignment grades have already been published.')
+      equal(message, 'Assignment grades have already been released.')
     })
   })
 
-  QUnit.module('when publishing grades fails for not having all grade selections', hooks => {
+  QUnit.module('when releasing grades fails for not having all grade selections', hooks => {
     hooks.beforeEach(() => {
       mountComponent()
       store.dispatch(
-        AssignmentActions.setPublishGradesStatus(
+        AssignmentActions.setReleaseGradesStatus(
           AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE
         )
       )
@@ -406,16 +406,16 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
       equal(type, 'error')
     })
 
-    test('includes a message about grades already being published', () => {
+    test('includes a message about grades already being released', () => {
       const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
       equal(message, 'All submissions must have a selected grade.')
     })
   })
 
-  QUnit.module('when publishing grades fails for some other reason', hooks => {
+  QUnit.module('when releasing grades fails for some other reason', hooks => {
     hooks.beforeEach(() => {
       mountComponent()
-      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.FAILURE))
+      store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.FAILURE))
     })
 
     test('displays a flash alert', () => {
@@ -427,9 +427,9 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
       equal(type, 'error')
     })
 
-    test('includes a message about grades already being published', () => {
+    test('includes a message about grades already being released', () => {
       const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'There was a problem publishing grades.')
+      equal(message, 'There was a problem releasing grades.')
     })
   })
 
@@ -481,3 +481,4 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
   })
 })
+/* eslint-enable qunit/no-identical-names */

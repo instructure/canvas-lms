@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,7 +23,6 @@ class InfoController < ApplicationController
   skip_before_action :load_user, :only => [:health_check, :browserconfig]
 
   def styleguide
-    js_bundle :styleguide
     render :layout => "layouts/styleguide"
   end
 
@@ -51,9 +52,10 @@ class InfoController < ApplicationController
 
   def health_check
     # This action should perform checks on various subsystems, and raise an exception on failure.
-    Account.connection.select_value("SELECT 1")
-    if Delayed::Job == Delayed::Backend::ActiveRecord::Job
-      Delayed::Job.connection.select_value("SELECT 1") unless Account.connection == Delayed::Job.connection
+    Account.connection.active?
+    if Delayed::Job == Delayed::Backend::ActiveRecord::Job &&
+      Account.connection != Delayed::Job.connection
+      Delayed::Job.connection.active? 
     end
     Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
 
@@ -113,5 +115,41 @@ class InfoController < ApplicationController
     end
 
     render status: 404, template: "shared/errors/404_message"
+  end
+
+  def web_app_manifest
+    # brand_variable returns a value that we expect to go through a rails
+    # asset helper, so we need to do that manually here
+    icon = helpers.image_path(brand_variable('ic-brand-apple-touch-icon'))
+    render json: {
+      name: "Canvas",
+      short_name: "Canvas",
+      icons: [
+        {
+          src: icon,
+          sizes: "144x144",
+          type: "image/png"
+        },
+        {
+          src: icon,
+          sizes: "192x192",
+          type: "image/png"
+        }
+      ],
+      prefer_related_applications: true,
+      related_applications: [
+        {
+          platform: "play",
+          url: "https://play.google.com/store/apps/details?id=com.instructure.candroid",
+          id: "com.instructure.candroid"
+        },
+        {
+          platform: "itunes",
+          url: "https://itunes.apple.com/app/canvas-by-instructure/id480883488"
+        }
+      ],
+      start_url: "/",
+      display: "minimal-ui"
+    }
   end
 end

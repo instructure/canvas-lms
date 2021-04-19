@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
+import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator.js'
 
 QUnit.module('LatePolicyApplicator#processSubmission', function() {
   let assignment
@@ -150,6 +150,12 @@ QUnit.module('LatePolicyApplicator#processSubmission', function() {
         strictEqual(submission.points_deducted, 1)
       })
 
+      test('assigned points_deducted is rounded to a precision of 2', () => {
+        latePolicy.lateSubmissionDeduction = 2.35
+        LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)
+        strictEqual(submission.points_deducted, 0.24)
+      })
+
       test('assigns a pre-deduction entered score/entered grade to the late submission when hourly late penalty enabled', function() {
         LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)
         strictEqual(submission.entered_score, 10)
@@ -194,6 +200,13 @@ QUnit.module('LatePolicyApplicator#processSubmission', function() {
       test('assigns points_deducted  to the late submission when daily late penalty enabled', function() {
         LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)
         strictEqual(submission.points_deducted, 2)
+      })
+
+      test('assigned points_deducted is rounded to a precision of 2', () => {
+        // 2.375 * 2 == 4.75; round(4.75 / 100, 2) == 0.48
+        latePolicy.lateSubmissionDeduction = 2.375
+        LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)
+        strictEqual(submission.points_deducted, 0.48)
       })
 
       test('assigns a pre-deduction score/grade to the late submission when daily late penalty enabled', function() {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -58,15 +60,31 @@ module Factories
   end
 
   def create_assignments(course_ids, count_per_course = 1, fields = {})
+    account = Account.default
     course_ids = Array(course_ids)
     course_ids *= count_per_course
     records = course_ids.each_with_index.map do |id, i|
       {
         context_id: id, context_type: 'Course', context_code: "course_#{id}",
         title: "#{id}:#{i}", grading_type: "points", submission_types: "none",
-        workflow_state: 'published'
+        workflow_state: 'published',
+        root_account_id: account.id,
       }.merge(fields)
     end
     create_records(Assignment, records)
+  end
+
+  def new_quizzes_assignment(opts = {})
+    assignment_model({:submission_types => "external_tool"}.merge(opts))
+    tool = @c.context_external_tools.create!(
+      :name => 'Quizzes.Next',
+      :consumer_key => 'test_key',
+      :shared_secret => 'test_secret',
+      :tool_id => 'Quizzes 2',
+      :url => 'http://example.com/launch'
+    )
+    @a.external_tool_tag_attributes = { :content => tool }
+    @a.save!
+    @a
   end
 end

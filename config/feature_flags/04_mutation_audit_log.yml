@@ -1,0 +1,9 @@
+---
+mutation_audit_log:
+  state: hidden
+  display_name: GraphQL Mutation Log
+  description: |-
+    Allows admins to view a log containing information about all recently run
+    GraphQL mutations
+  applies_to: RootAccount
+  root_opt_in: true

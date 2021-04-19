@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@ describe Submission::ShowPresenter do
 
   let(:submission_path) { course_assignment_submission_path(course, assignment, reviewee_submission.user_id) }
   let(:anonymous_submission_path) do
-    course_assignment_anonymous_submission_path(course, assignment, reviewee_submission.anonymous_id) 
+    course_assignment_anonymous_submission_path(course, assignment, reviewee_submission.anonymous_id)
   end
 
   describe "#anonymize_submission_owner?" do
@@ -116,6 +118,55 @@ describe Submission::ShowPresenter do
     end
   end
 
+  describe '#submission_details_tool_launch_url' do
+    subject do
+      presenter_for_reviewer.submission_details_tool_launch_url
+    end
+
+    let(:resource_link_lookup_uuid) { SecureRandom.uuid }
+    let(:parameters) do
+      {
+        assignment_id: assignment.id,
+        display: 'borderless',
+        url: reviewee_submission.external_tool_url,
+        resource_link_lookup_uuid: resource_link_lookup_uuid
+      }
+    end
+    let(:launch_params) do
+      "assignment_id=#{assignment.id}&display=borderless&resource_link_lookup_uuid=#{resource_link_lookup_uuid}"
+    end
+
+    before do
+      reviewee_submission.resource_link_lookup_uuid = resource_link_lookup_uuid
+    end
+
+    context 'when `current_host` is not given' do
+      it 'return the tool launch url using the host from the domain config file (config/domain.yml)' do
+        expect(subject).to eq "http://localhost/courses/#{course.id}/external_tools/retrieve?#{launch_params}"
+      end
+    end
+
+    context 'when `current_host` is given' do
+      let(:current_host) { 'edu.com' }
+      let(:presenter_for_reviewer) do
+        Submission::ShowPresenter.new(
+          submission: reviewee_submission,
+          current_user: reviewer,
+          assessment_request: assessment_request,
+          current_host: current_host
+        )
+      end
+
+      before do
+        allow(HostUrl).to receive(:context_host).and_return(current_host)
+      end
+
+      it 'return the tool launch url using the host from the `current_host`' do
+        expect(subject).to eq "http://edu.com/courses/#{course.id}/external_tools/retrieve?#{launch_params}"
+      end
+    end
+  end
+
   describe "#comment_attachment_download_url" do
     it "calls submission_data_url with parameters from the passed-in comment and attachment" do
       attachment = Attachment.create!(
@@ -153,6 +204,39 @@ describe Submission::ShowPresenter do
 
     it "returns false if no assessment request is present" do
       expect(presenter_for_teacher).not_to be_currently_peer_reviewing
+    end
+  end
+
+  describe '#default_url_options' do
+    subject { presenter.default_url_options }
+
+    let(:current_host) { nil }
+    let(:presenter) do
+      Submission::ShowPresenter.new(
+        submission: reviewee_submission,
+        current_user: teacher,
+        current_host: current_host,
+      )
+    end
+
+    context 'when `current_host` is not given' do
+      it 'return the `host` from the domain config file (config/domain.yml)' do
+        expect(subject[:host]).to eq 'localhost'
+        expect(subject[:protocol]).to eq 'http'
+      end
+    end
+
+    context 'when `current_host` is given' do
+      let(:current_host) { 'edu.com' }
+
+      before do
+        allow(HostUrl).to receive(:context_host).and_return(current_host)
+      end
+
+      it 'return the current host and protocol' do
+        expect(subject[:host]).to eq current_host
+        expect(subject[:protocol]).to eq 'http'
+      end
     end
   end
 end

@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import CourseSearchResultsView from 'compiled/views/accounts/admin_tools/CourseSearchResultsView'
-import CourseRestore from 'compiled/models/CourseRestore'
+import Backbone from '@canvas/backbone'
+import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView.js'
+import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
 import assertions from 'helpers/assertions'
 
 const errorMessageJSON = {
@@ -62,7 +62,8 @@ test('restored is set to false when initialized', function() {
 })
 
 test('render is called whenever the model has a change event triggered', function() {
-  sandbox.mock(this.courseSearchResultsView)
+  sandbox
+    .mock(this.courseSearchResultsView)
     .expects('render')
     .once()
   this.courseSearchResultsView.applyBindings()
@@ -71,7 +72,8 @@ test('render is called whenever the model has a change event triggered', functio
 
 test('pressing the restore button calls restore on the model and view', function() {
   this.courseRestore.set(courseJSON)
-  sandbox.mock(this.courseRestore)
+  sandbox
+    .mock(this.courseRestore)
     .expects('restore')
     .once()
     .returns($.Deferred().resolve())

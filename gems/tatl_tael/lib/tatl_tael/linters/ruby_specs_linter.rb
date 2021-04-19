@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TatlTael
   module Linters
     # TODO: inherit from SimpleLinter
@@ -36,7 +38,7 @@ module TatlTael
 
       def ruby_specs?
         changes_exist?(include: config[:globs][:ruby_spec],
-                       whitelist: config[:globs][:selenium_spec])
+                       allowlist: config[:globs][:selenium_spec])
       end
 
       def selenium_specs?

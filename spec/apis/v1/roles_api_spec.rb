@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -69,7 +71,7 @@ describe "Roles API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles",
           { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param })
 
-        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles.map(&:name)).sort
+        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:name)).sort
         expect(json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state']).to eq 'built_in'
         expect(json.find{|role| role['role'] == "NewRole"}['workflow_state']).to eq 'active'
       end
@@ -86,13 +88,13 @@ describe "Roles API", type: :request do
                         { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
                           :account_id => sub_account.id.to_param, :show_inherited => '1' })
 
-        expect(json.map{|r| r['id']}).to match_array ([role.id] + Role.visible_built_in_roles.map(&:id))
+        expect(json.map{|r| r['id']}).to match_array ([role.id] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
         expect(json.detect{|r| r['id'] == role.id}['account']['id']).to eq @account.id
 
         json2 = api_call(:get, "/api/v1/accounts/#{sub_account.id}/roles",
                         { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
                           :account_id => sub_account.id.to_param })
-        expect(json2.map{|r| r['id']}).to match_array (Role.visible_built_in_roles.map(&:id))
+        expect(json2.map{|r| r['id']}).to match_array (Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
       end
 
       it "should paginate" do
@@ -105,7 +107,7 @@ describe "Roles API", type: :request do
           { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :per_page => '5', :page => '2' })
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=2.*>; rel="last"})
         expect(json.size).to eq 7
-        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles.map(&:name)).sort
+        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:name)).sort
       end
 
       context "with state parameter" do
@@ -438,10 +440,32 @@ describe "Roles API", type: :request do
     end
 
     describe "json response" do
-      it "should return the expected json format" do
+      before :each do
+        @account.root_account.disable_feature!(:granular_permissions_manage_users)
+        @expected_permissions = [
+          "become_user", "change_course_state", "create_collaborations",
+          "create_conferences", "manage_account_memberships",
+          "manage_account_settings", "manage_admin_users", "manage_alerts",
+          "manage_assignments", "manage_calendar", "manage_content",
+          "manage_courses", "manage_files", "manage_grades", "manage_groups",
+          "manage_interaction_alerts", "manage_outcomes",
+          "manage_role_overrides", "manage_sections_add", "manage_sections_edit",
+          "manage_sections_delete", "manage_sis", "manage_students", "manage_user_logins",
+          "manage_wiki_create", "manage_wiki_delete", "manage_wiki_update",
+          "moderate_forum", "post_to_forum",
+          "read_course_content", "read_course_list", "read_forum",
+          "read_question_banks", "read_reports", "read_roster",
+          "read_sis", "send_messages", "view_all_grades", "view_group_pages",
+          "view_statistics"
+        ]
+      end
+
+      it "should return the expected json format with granular admin user permission off" do
         json = api_call_with_settings
-        expect(json.keys.sort).to eq ["account", "base_role_type", "created_at", "id", "label",
-                                      "last_updated_at", "permissions", "role", "workflow_state"]
+        expect(json.keys.sort).to eq %w[
+          account base_role_type created_at id is_account_role label last_updated_at
+          permissions role workflow_state
+        ]
         expect(json["account"]["id"]).to eq @account.id
         expect(json["id"]).to eq @role.id
         expect(json["role"]).to eq @role_name
@@ -449,21 +473,48 @@ describe "Roles API", type: :request do
 
         # make sure all the expected keys are there, but don't assert on a
         # *only* the expected keys, since plugins may have added more.
-        expect([
-          "become_user", "change_course_state", "create_collaborations",
-          "create_conferences", "manage_account_memberships",
-          "manage_account_settings", "manage_admin_users", "manage_alerts",
-          "manage_assignments", "manage_calendar", "manage_content",
-          "manage_courses", "manage_files", "manage_grades", "manage_groups",
-          "manage_interaction_alerts", "manage_outcomes",
-          "manage_role_overrides", "manage_sections", "manage_sis",
-          "manage_students", "manage_user_logins",
-          "manage_wiki", "moderate_forum", "post_to_forum",
-          "read_course_content", "read_course_list", "read_forum",
-          "read_question_banks", "read_reports", "read_roster",
-          "read_sis", "send_messages", "view_all_grades", "view_group_pages",
-          "view_statistics"
-        ] - json["permissions"].keys).to be_empty
+        expect(@expected_permissions - json["permissions"].keys).to be_empty
+
+        expect(json["permissions"][@permission]).to eq({
+          "explicit" => false,
+          "readonly" => false,
+          "enabled" => false,
+          "locked" => false
+        })
+      end
+
+      it "should return the expected json format with granular admin user permission on" do
+        @account.root_account.enable_feature!(:granular_permissions_manage_users)
+
+        # no longer have manage_admin_users or manage_students, instead we have the new ones
+        expected_perms = @expected_permissions - ["manage_admin_users", "manage_students"]
+        expected_perms += [
+          "allow_course_admin_actions",
+          "add_teacher_to_course",
+          "add_ta_to_course",
+          "add_designer_to_course",
+          "add_student_to_course",
+          "add_observer_to_course",
+          "remove_teacher_from_course",
+          "remove_ta_from_course",
+          "remove_designer_from_course",
+          "remove_student_from_course",
+          "remove_observer_from_course"
+        ]
+
+        json = api_call_with_settings
+        expect(json.keys.sort).to eq %w[
+          account base_role_type created_at id is_account_role label last_updated_at
+          permissions role workflow_state
+        ]
+        expect(json["account"]["id"]).to eq @account.id
+        expect(json["id"]).to eq @role.id
+        expect(json["role"]).to eq @role_name
+        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
+
+        # make sure all the expected keys are there, but don't assert on a
+        # *only* the expected keys, since plugins may have added more.
+        expect(expected_perms - json["permissions"].keys).to be_empty
 
         expect(json["permissions"][@permission]).to eq({
           "explicit" => false,

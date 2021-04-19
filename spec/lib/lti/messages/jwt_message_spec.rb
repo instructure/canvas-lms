@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -39,8 +41,7 @@ describe Lti::Messages::JwtMessage do
     JSON::JWT.decode(jws[:id_token], pub_key)
   end
   let(:pub_key) do
-    jwk = JSON::JWK.new(Lti::KeyStorage.retrieve_keys['jwk-present.json'])
-    jwk.to_key.public_key
+    Lti::KeyStorage.present_key.to_key.public_key
   end
   let_once(:course) do
     course_with_student
@@ -115,7 +116,7 @@ describe Lti::Messages::JwtMessage do
 
     it 'sets the "iss" to "https://canvas.instructure.com"' do
       config = "test:\n  lti_iss: 'https://canvas.instructure.com'"
-      allow(Canvas::Security).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
+      allow(CanvasSecurity).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
       expect(decoded_jwt['iss']).to eq 'https://canvas.instructure.com'
     end
 
@@ -127,17 +128,36 @@ describe Lti::Messages::JwtMessage do
       expect(first_nonce).not_to eq second_nonce
     end
 
-    it 'sets the "sub" claim' do
-      expect(decoded_jwt['sub']).to eq user.lti_id
+    context 'when user is an authorized user' do
+      it 'sets the "sub" claim' do
+        expect(decoded_jwt['sub']).to eq user.lti_id
+      end
+    end
+
+    context 'when user is an unauthorized user' do
+      let(:user) { nil }
+
+      it 'does not sets the "sub" claim' do
+        expect(decoded_jwt['sub']).to be_nil
+      end
     end
 
     it 'sets the "sub" claim to past lti_id' do
-      UserPastLtiIds.create!(user: user, context: course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+      UserPastLtiId.create!(user: user, context: course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old')
       expect(decoded_jwt['sub']).to eq 'old_lti_id'
     end
 
     it 'sets the "target_link_uri" claim' do
       expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq tool.url
+    end
+
+    context 'when the target_link_uri is specified in opts' do
+      let(:target_link_uri) { 'https://www.cool-tool.com/test?foo=bar' }
+      let(:opts) { { resource_type: 'course_navigation', target_link_uri: target_link_uri } }
+
+      it 'sets the "target_link_uri" claim' do
+        expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq target_link_uri
+      end
     end
 
     context 'when security claim group disabled' do
@@ -351,10 +371,6 @@ describe Lti::Messages::JwtMessage do
     end
     let(:lti_advantage_service_claim) { raise 'Set in example' }
 
-    before(:each) do
-      course.root_account.enable_feature!(:lti_1_3)
-      course.root_account.save!
-    end
   end
 
   shared_context 'with lti advantage group context' do
@@ -488,10 +504,25 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe 'include name claims' do
-
     before do
       course
       tool.update!(workflow_state: 'name_only')
+    end
+
+    context 'when the user is nil' do
+      let(:user) { nil }
+
+      it 'does not add the name' do
+        expect(decoded_jwt['name']).to be_blank
+      end
+
+      it 'does not add the given name' do
+        expect(decoded_jwt['given_name']).to be_blank
+      end
+
+      it 'does not add the family name' do
+        expect(decoded_jwt['family_name']).to be_blank
+      end
     end
 
     it 'adds the name' do
@@ -660,16 +691,18 @@ describe Lti::Messages::JwtMessage do
     before { tool.update!(workflow_state: 'public') }
 
     shared_examples 'sets role scope mentor' do
-      it 'adds role scope mentor' do
-        course
-        observer = user_factory
-        observer.update!(lti_context_id: SecureRandom.uuid)
-        observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
-        observer_enrollment.update_attribute(:associated_user_id, user.id)
-        allow_any_instance_of(Lti::Messages::JwtMessage).to receive(:current_observee_list).and_return([observer.lti_context_id])
+      let(:student) { user_factory }
 
+      before do
+        course.enroll_student(student)
+        enrollment = course.enroll_user(user, "ObserverEnrollment", associated_user_id: student)
+        enrollment.update!(workflow_state: 'active')
+        course.update!(workflow_state: 'available')
+      end
+
+      it 'adds role scope mentor' do
         expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor']).to match_array [
-          observer.lti_context_id
+          student.lti_id
         ]
       end
     end
@@ -692,6 +725,38 @@ describe Lti::Messages::JwtMessage do
       before { tool.update!(workflow_state: 'name_only') }
 
       it_behaves_like 'skips role scope mentor'
+    end
+  end
+
+  describe 'legacy user id claims' do
+    subject { decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id'] }
+
+    it { is_expected.to eq tool.opaque_identifier_for(user) }
+
+    context 'when the user is blank' do
+      let(:user) { nil }
+
+      it { is_expected.to be_empty }
+    end
+  end
+
+  describe 'lti1p1 claims' do
+    context 'when user does not have lti_context_id' do
+      before do
+        allow(user).to receive(:lti_context_id).and_return(nil)
+      end
+
+      it 'does not include the claim' do
+        expect(decoded_jwt).to_not include 'https://purl.imsglobal.org/spec/lti/claim/lti1p1'
+      end
+    end
+
+    context 'when user has lti_context_id' do
+      let(:message_lti1p1) { decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti1p1'] }
+
+      it 'adds user_id' do
+        expect(message_lti1p1['user_id']).to eq user.lti_context_id
+      end
     end
   end
 end

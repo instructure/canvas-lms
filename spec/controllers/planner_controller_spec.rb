@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -20,11 +22,14 @@ require_relative '../sharding_spec_helper'
 
 describe PlannerController do
   before :once do
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     @group = @course.assignment_groups.create(:name => "some group")
     @assignment = course_assignment
     @assignment2 = course_assignment
+    @assignment.unmute!
+    @assignment2.unmute!
   end
 
   def course_assignment
@@ -46,7 +51,6 @@ describe PlannerController do
   context "as student" do
     before :each do
       user_session(@student)
-      @course.root_account.enable_feature!(:student_planner)
     end
 
     describe "GET #index" do
@@ -105,6 +109,41 @@ describe PlannerController do
         expect(user_event['plannable']['title']).to eq 'user_event'
       end
 
+      it "should not show group events from inactive courses" do
+        @course1 = course_factory
+        @course2 = course_factory
+
+        @student1 = user_factory(active_all: true)
+        @student1_enrollment = course_with_student(course: @course1, user: @student1, active_all: true)
+        course_with_student(course: @course2, user: @student1, active_all: true)
+
+        @course1_group = @course1.groups.create(:name => "some group")
+        @course1_group.add_user(@student1)
+
+        @course2_group = @course2.groups.create(:name => "some other group")
+        @course2_group.add_user(@student1)
+
+        course1_event = @course1_group.calendar_events.create!(start_at: 2.days.from_now, title: 'user_event1')
+        course2_event = @course2_group.calendar_events.create!(start_at: 3.days.from_now, title: 'user_event2')
+
+        user_session(@student1)
+        get :index
+        response_json = json_parse(response.body)
+        expect(response_json.length).to eq 2
+        expect(response_json.find { |i| i['plannable_id'] == course1_event.id }).to_not be_nil
+        expect(response_json.find { |i| i['plannable_id'] == course2_event.id }).to_not be_nil
+
+        @student1_enrollment.deactivate
+        @student1 = User.find(@student1.id)
+        user_session(@student1)
+
+        get :index
+        response_json = json_parse(response.body)
+        expect(response_json.length).to eq 1
+        expect(response_json.find { |i| i['plannable_id'] == course1_event.id }).to be_nil
+        expect(response_json.find { |i| i['plannable_id'] == course2_event.id }).to_not be_nil
+      end
+
       it "shows the appropriate section-specific event for the user" do
         other_section = @course.course_sections.create!(name: 'Other Section')
         event = @course.calendar_events.build(:title => 'event', :child_event_data =>
@@ -120,6 +159,14 @@ describe PlannerController do
         my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
         expect(event_ids).not_to include event.id
         expect(event_ids).to include my_event_id
+
+        event.update(remove_child_events: true)
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing['plannable_type'] == 'calendar_event' }.map { |thing| thing['plannable_id'] }
+        expect(event_ids).to include event.id
+        expect(event_ids).not_to include my_event_id
       end
 
       it "should show appointment group reservations" do
@@ -140,7 +187,6 @@ describe PlannerController do
         response_json = json_parse(response.body)
         expect(response_json.select{|i| i['plannable_type'] == 'announcement'}.map{|i| i['plannable_id']}).to eq [a1.id]
       end
-
 
       it "should show planner overrides created on quizzes" do
         quiz = quiz_model(course: @course, due_at: 1.day.from_now)
@@ -175,7 +221,7 @@ describe PlannerController do
       it "should show peer review tasks for the user" do
         @current_user = @student
         reviewee = course_with_student(course: @course, active_all: true).user
-        assignment_model(course: @course, peer_reviews: true, only_visible_to_overrides: true)
+        assignment_model(course: @course, peer_reviews: true)
         submission_model(assignment: @assignment, user: reviewee)
         assessment_request = @assignment.assign_peer_review(@current_user, reviewee)
         get :index
@@ -190,7 +236,7 @@ describe PlannerController do
         @current_user = @student
         reviewee = user_model
         differentiated_assignment(course: @course, peer_reviews: true, due_at: nil)
-        @override.update_attributes(due_at: Time.zone.now, due_at_overridden: true)
+        @override.update(due_at: Time.zone.now, due_at_overridden: true)
         add_section('section 2').enroll_user(reviewee, 'StudentEnrollment', 'active')
         create_section_override_for_assignment(@assignment, due_at: nil, course_section: @course_section)
         submission_model(assignment: @assignment, user: reviewee)
@@ -341,6 +387,21 @@ describe PlannerController do
           expect(response_hash.length).to be 5
         end
 
+        it "should return items from all context_codes specified for group and a different course" do
+          get :index, params: {context_codes: [@group.asset_string, @course2.asset_string]}
+          response_json = json_parse(response.body)
+          response_hash = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
+          # stuff from course
+          expect(response_hash).to include(['assignment', @assignment2.id])
+          expect(response_hash).to include(['planner_note', @course2_note.id])
+          expect(response_hash).to include(['calendar_event', @course2_event.id])
+          # stuff from group of other course
+          expect(response_hash).to include(['discussion_topic', @group_topic.id])
+          expect(response_hash).to include(['wiki_page', @group_page.id])
+          expect(response_hash).to include(['calendar_event', @group_event.id])
+          expect(response_hash.length).to be 6
+        end
+
         it "returns unauthorized if the user doesn't have read permission on a context_code" do
           course_with_teacher(active_all: true)
           assignment_model(course: @course, due_at: 1.day.from_now)
@@ -473,12 +534,13 @@ describe PlannerController do
           get :index, params: {:per_page => 2}
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
 
-          next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-          get :index, params: {:per_page => 2, :page => next_page}
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          expect(link[:uri].path).to include '/api/v1/planner/items'
+          get :index, params: {:per_page => 2, :page => link['page']}
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
 
-          next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-          get :index, params: {:per_page => 2, :page => next_page}
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          get :index, params: {:per_page => 2, :page => link['page']}
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
         end
 
@@ -553,6 +615,7 @@ describe PlannerController do
           dt.change_all_read_state("unread", @student)
 
           @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
+          @assignment3.unmute!
           override = @assignment3.assignment_overrides.new(:set => @course.default_section)
           override.override_due_at(2.days.from_now)
           override.save!
@@ -654,6 +717,32 @@ describe PlannerController do
             expect(response_json.length).to eq 4
             expect(response_json.map { |i| i["plannable_id"] }).to eq([page1.id, @planner_note1.id, @page.id, @planner_note2.id])
           end
+        end
+      end
+
+      context "with user id" do
+        it "allows a student to query her own planner items" do
+          get :index, params: {user_id: 'self', per_page: 1}
+          expect(response).to be_successful
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          expect(link[:uri].path).to include "/api/v1/users/self/planner/items"
+        end
+
+        it "allows a linked observer to query a student's planner items" do
+          observer = user_with_pseudonym
+          user_session(observer)
+          UserObservationLink.create_or_restore(observer: observer, student: @student, root_account: Account.default)
+          get :index, params: {user_id: @student.to_param, per_page: 1}
+          expect(response).to be_successful
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          expect(link[:uri].path).to include "/api/v1/users/#{@student.to_param}/planner/items"
+        end
+
+        it "does not allow a user without :read_as_parent to query another user's planner items" do
+          rando = user_with_pseudonym
+          user_session(rando)
+          get :index, params: {user_id: @student.to_param, per_page: 1}
+          expect(response).to be_unauthorized
         end
       end
 
@@ -892,7 +981,7 @@ describe PlannerController do
 
         it "should return items with new submission comments" do
           @sub = @assignment2.submit_homework(@student)
-          @sub.submission_comments.create!(comment: "hello", author: @teacher)
+          @sub.add_comment(comment: "hello", author: @teacher)
           get :index, params: {filter: "new_activity"}
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 1
@@ -1036,6 +1125,23 @@ describe PlannerController do
             expect(json_parse(response.body)).to be_empty
           end
 
+          it "should exclude unpublished graded discussion topics" do
+            @topic.change_read_state('read', @student)
+            assign = assignment_model(course: @course, due_at: Time.zone.now)
+            topic = @course.discussion_topics.create!(course: @course, assignment: assign)
+            topic.publish!
+
+            get :index, params: {filter: "new_activity"}
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 1
+            expect(response_json.first["plannable_id"]).to eq topic.id
+            expect(response_json.first["plannable"]["id"]).to eq topic.id
+
+            topic.unpublish!
+            get :index, params: {filter: "new_activity"}
+            expect(json_parse(response.body)).to be_empty
+          end
+
           it 'should calculate unread count correctly' do
             get :index
             topic_json = json_parse(response.body).first
@@ -1055,6 +1161,21 @@ describe PlannerController do
             topic_json = json_parse(response.body).first
             expect(topic_json['plannable']['unread_count']).to be 1
           end
+        end
+      end
+
+      context "date ranges" do
+        let(:start_date) { Time.parse("2020-01-1T00:00:00") }
+        let(:end_date) { Time.parse("2020-01-1T23:59:59Z") }
+
+        it "only returns items between (inclusive) the specified dates" do
+          pn = planner_note_model(course: @course, todo_date: end_date)
+          calendar_event_model(start_at: end_date + 1.second)
+          get :index, params: {:start_date => start_date.iso8601, :end_date => end_date.iso8601}
+          response_json = json_parse(response.body)
+          expect(response_json.length).to eq 1
+          note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
+          expect(note["plannable"]["title"]).to eq pn.title
         end
       end
     end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import enrollmentName from 'compiled/util/enrollmentName'
+import enrollmentName from '@canvas/handlebars-helpers/enrollmentName'
 
 QUnit.module('enrollmentName')
 
@@ -25,6 +25,6 @@ test('it converts a role name to the name', () => {
   equal(enrollmentName('TeacherEnrollment'), 'Teacher')
   equal(enrollmentName('TaEnrollment'), 'TA')
   equal(enrollmentName('ObserverEnrollment'), 'Observer')
-  equal(enrollmentName('DesignerEnrollment'), 'Course Designer')
+  equal(enrollmentName('DesignerEnrollment'), 'Designer')
   equal(enrollmentName('no match'), 'no match')
 })

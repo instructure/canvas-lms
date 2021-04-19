@@ -4,17 +4,29 @@ exports[`prioritizes loading complete over currently loading 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="small"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <View
+      borderColor="primary"
       display="block"
+      focusColor="info"
+      focusPosition="offset"
       margin="small"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <TV
         aria-hidden="true"
@@ -30,6 +42,7 @@ exports[`prioritizes loading complete over currently loading 1`] = `
       as="div"
       letterSpacing="normal"
       size="large"
+      wrap="normal"
     >
       Beginning of Your To-Do History
     </Text>
@@ -37,6 +50,7 @@ exports[`prioritizes loading complete over currently loading 1`] = `
       as="div"
       letterSpacing="normal"
       size="medium"
+      wrap="normal"
     >
       You've scrolled back to your very first To-Do!
     </Text>
@@ -48,17 +62,29 @@ exports[`renders TV when all past items loaded 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="small"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <View
+      borderColor="primary"
       display="block"
+      focusColor="info"
+      focusPosition="offset"
       margin="small"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <TV
         aria-hidden="true"
@@ -74,6 +100,7 @@ exports[`renders TV when all past items loaded 1`] = `
       as="div"
       letterSpacing="normal"
       size="large"
+      wrap="normal"
     >
       Beginning of Your To-Do History
     </Text>
@@ -81,6 +108,7 @@ exports[`renders TV when all past items loaded 1`] = `
       as="div"
       letterSpacing="normal"
       size="medium"
+      wrap="normal"
     >
       You've scrolled back to your very first To-Do!
     </Text>
@@ -92,17 +120,23 @@ exports[`renders spinner while loading 1`] = `
 <div>
   <View
     as="div"
+    borderColor="primary"
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
     overflowX="visible"
     overflowY="visible"
     padding="medium small small small"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Spinner
       as="div"
       margin="0 x-small 0 0"
+      renderTitle={[Function]}
       size="small"
-      title="Loading past items"
       variant="default"
     />
     <Text
@@ -110,6 +144,7 @@ exports[`renders spinner while loading 1`] = `
       color="secondary"
       letterSpacing="normal"
       size="small"
+      wrap="normal"
     >
       Loading past items
     </Text>

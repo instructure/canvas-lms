@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -41,6 +43,14 @@ describe "Api::V1::CustomGradebookColumn" do
     it "works" do
       expect(controller.custom_gradebook_column_datum_json(@datum, @teacher, nil))
       .to eq @datum.attributes.slice(*%w(user_id content))
+    end
+  end
+
+  context "validations" do
+    GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES.each do |reserved_column|
+      it "won't allow creation if titled for gradebook reserved column #{reserved_column}" do
+        expect { @course.custom_gradebook_columns.create!(title: reserved_column) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
   end
 end

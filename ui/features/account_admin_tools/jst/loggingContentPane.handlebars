@@ -1,0 +1,46 @@
+<label class="control-label" for="loggingType">
+  <h2>{{#t}}Select a log type to search.{{/t}}</h2>
+</label>
+
+<div class="controls">
+  <select id="loggingType">
+    <option value="default">{{#t "select_default"}}Select a Log type{{/t}}</option>
+    {{#if authentication}}
+    <option value='#loggingAuthentication'>
+      {{#t "authentication"}}Login / Logout Activity{{/t}}
+    </option>
+    {{/if}}
+    {{#if grade_change}}
+    <option value='#loggingGradeChange'>
+      {{#t "grade_change"}}Grade Change Activity{{/t}}
+    </option>
+    {{/if}}
+    {{#if course}}
+    <option value='#loggingCourse'>
+      {{#t "course"}}Course Activity{{/t}}
+    </option>
+    {{/if}}
+    {{#if mutation}}
+    <option value='#loggingMutation'>
+      {{#t "mutations"}}GraphQL Mutation Activity{{/t}}
+    </option>
+    {{/if}}
+  </select>
+</div>
+<hr aria-hidden="true"/>
+
+{{#if authentication}}
+<div id="loggingAuthentication" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if grade_change}}
+<div id="loggingGradeChange" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if course}}
+<div id="loggingCourse" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if mutation}}
+<div id="loggingMutation" class="loggingTypeContent"></div>
+{{/if}}

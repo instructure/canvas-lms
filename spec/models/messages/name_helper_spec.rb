@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -21,10 +23,13 @@ require_dependency "messages/name_helper"
 module Messages
 
   describe NameHelper do
-    let(:author){ double("Author", short_name: "Author Name") }
+    let(:course) { double(:course, account_membership_allows: false) }
+    let(:author) { double("Author", short_name: "Author Name") }
     let(:user){ double("User", short_name: "User Name") }
     let(:asset){ double("Asset", user: user, author: author) }
     let(:message_recipient) { double(:user) }
+    let(:assignment) { double(:assignment, anonymize_students?: false, context: course) }
+    let(:submission) { double(:submission, assignment: assignment, user: user) }
 
     def asset_for(notification_name, a = asset)
       NameHelper.new(
@@ -40,11 +45,12 @@ module Messages
       end
 
       it 'uses the author name for messages with authors' do
-        expect(asset_for("Submission Comment").reply_to_name).to  eq "Author Name via Canvas Notifications"
+        comment = double(:submission_comment, author: author, recipient: user, submission: submission, can_read_author?: true)
+        expect(asset_for("Submission Comment", comment).reply_to_name).to eq "Author Name via Canvas Notifications"
       end
 
       it 'uses the user name for messages belonging to users' do
-        expect(asset_for("New Discussion Entry").reply_to_name).to  eq "User Name via Canvas Notifications"
+        expect(asset_for("New Discussion Entry").reply_to_name).to eq "User Name via Canvas Notifications"
       end
     end
 
@@ -62,21 +68,7 @@ module Messages
       end
 
       it 'uses the user name for messages belonging to users' do
-        expect(asset_for("Assignment Resubmitted").from_name).to eq "User Name"
-      end
-
-      it 'returns Anonymous User when the user is not allowed to read the author' do
-        assignment = double(:assignment, anonymize_students?: false)
-        submission = double(:submission, assignment: assignment)
-        asset2 = double(:asset, author: author, recipient: user, submission: submission, can_read_author?: false)
-        expect(asset_for("Submission Comment", asset2).from_name).to eq "Anonymous User"
-      end
-
-      it "returns Anonymous User when the assignment is anonymous and muted" do
-        assignment = double(:assignment, anonymize_students?: true)
-        submission = double(:submission, assignment: assignment)
-        asset2 = double(:asset, author: author, recipient: user, submission: submission)
-        expect(asset_for("Submission Comment For Teacher", asset2).from_name).to eq "Anonymous User"
+        expect(asset_for("Assignment Resubmitted", submission).from_name).to eq "User Name"
       end
 
       it "returns the author's name when the message recipient is the author" do
@@ -89,6 +81,24 @@ module Messages
           notification_name: "Submission Comment"
         ).from_name
         expect(from_name).to eq "Author Name"
+      end
+    end
+
+    describe "anonymized notifications" do
+      let(:anon_assignment) { double(:assignment, anonymize_students?: true, context: course) }
+      let(:anon_submission) { double(:submission, assignment: anon_assignment, user: user) }
+      let(:anon_comment) { double(:submission_comment, author: author, recipient: user, submission: anon_submission, can_read_author?: false) }
+
+      it "returns Anonymous User for comments when assignment is anonymous" do
+        expect(asset_for("Submission Comment For Teacher", anon_comment).from_name).to eq "Anonymous User"
+      end
+
+      it "returns Anonymous User for resubmissions when assignment is anonymous" do
+        expect(asset_for("Assignment Resubmitted", anon_submission).from_name).to eq "Anonymous User"
+      end
+
+      it "returns Anonymous User for submissions when assignment is anonymous" do
+        expect(asset_for("Assignment Submitted", anon_submission).from_name).to eq "Anonymous User"
       end
     end
   end

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t('titles.copy_course', 'Copy Course') %>
+<% provide :page_title, t('titles.copy_course', 'Copy Course') %>
 <% add_crumb t('#crumbs.copy_course', 'Copy Course') %>
 
 <h1><%= t'headings.copy_course', 'Copy %{course}', :course => @context.name %></h1>
@@ -107,6 +107,11 @@
   </div>
 
   <div class="control-group">
+    <% if @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration) %>
+      <div class="controls">
+        <div id="new_quizzes_migrate"></div>
+      </div>
+    <% end %>
     <div id="date_shift"></div>
   </div>
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,6 +23,7 @@ class WebConference < ActiveRecord::Base
   include TextHelper
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course, :group, :account]
+  has_one :calendar_event, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: 'invitee' }) }, through: :web_conference_participants, source: :user
@@ -29,6 +32,8 @@ class WebConference < ActiveRecord::Base
 
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
+  validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
+
 
   MAX_DURATION = 99999999
   validates_numericality_of :duration, :less_than_or_equal_to => MAX_DURATION, :allow_nil => true
@@ -36,13 +41,16 @@ class WebConference < ActiveRecord::Base
   before_validation :infer_conference_details
 
   before_create :assign_uuid
+  before_create :set_root_account_id
   after_save :touch_context
 
   has_a_broadcast_policy
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
-  scope :with_config, -> { where(conference_type: WebConference.conference_types.map{|ct| ct['conference_type']}) }
+  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map{|ct| ct['conference_type']}) }
+
+  scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 
   serialize :settings
   def settings
@@ -63,7 +71,11 @@ class WebConference < ActiveRecord::Base
   end
 
   def user_settings=(new_settings)
-    @user_settings = new_settings.symbolize_keys
+    new_settings = new_settings.symbolize_keys
+    if new_settings != user_settings
+      settings_will_change!
+      @user_settings = new_settings
+    end
   end
 
   def user_settings
@@ -72,6 +84,34 @@ class WebConference < ActiveRecord::Base
         hash[key] = settings[key]
         hash
       }
+  end
+
+  def lti?
+    false
+  end
+
+  def lti_settings=(new_settings)
+    settings[:lti_settings] = new_settings
+  end
+
+  def lti_settings
+    settings&.[](:lti_settings)
+  end
+
+  def lti_tool_valid
+    tool_id = settings.dig(:lti_settings, :tool_id)
+    if tool_id.blank?
+      errors.add(:settings, 'settings[lti_settings][tool_id] must exist for LtiConference')
+      return
+    end
+    tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
+    if tool.blank?
+      errors.add(:settings, 'settings[lti_settings][tool_id] must be a ContextExternalTool instance visible in context')
+      return
+    end
+    unless tool.has_placement?(:conference_selection)
+      errors.add(:settings, 'settings[lti_settings][tool_id] must be a ContextExternalTool instance with conference_selection placement')
+    end
   end
 
   def external_urls_name(key)
@@ -158,6 +198,10 @@ class WebConference < ActiveRecord::Base
   end
   protected :assign_uuid
 
+  def course_broadcast_data
+    context.broadcast_data if context.respond_to?(:broadcast_data)
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
     p.to do
@@ -166,12 +210,14 @@ class WebConference < ActiveRecord::Base
       end
     end
     p.whenever { context_is_available? && @new_participants && !@new_participants.empty? }
+    p.data { course_broadcast_data }
 
     p.dispatch :web_conference_recording_ready
     p.to { user }
     p.whenever do
       recording_ready? && saved_change_to_recording_ready?
     end
+    p.data { course_broadcast_data }
   end
 
   on_create_send_to_streams do
@@ -201,6 +247,14 @@ class WebConference < ActiveRecord::Base
       self.save
     end
     p.save
+  end
+
+  def invite_users_from_context(user_ids = context.user_ids)
+    members = context.is_a?(Course) ? context.participating_users(user_ids) : context.participating_users_in_context(user_ids)
+    new_invitees = members.to_a - invitees
+    new_invitees.uniq.each do |u|
+      add_invitee(u)
+    end
   end
 
   def recording_ready!
@@ -236,7 +290,11 @@ class WebConference < ActiveRecord::Base
   end
 
   def conference_type=(val)
-    conf_type = WebConference.conference_types.detect{|t| t[:conference_type] == val }
+    conf_type = if val == 'LtiConference'
+                  { conference_type: 'LtiConference', class_name: 'LtiConference' }
+                else
+                  WebConference.conference_types(context).detect{|t| t[:conference_type] == val }
+                end
     if conf_type
       write_attribute(:conference_type, conf_type[:conference_type] )
       write_attribute(:type, conf_type[:class_name] )
@@ -250,7 +308,6 @@ class WebConference < ActiveRecord::Base
     infer_conference_settings
     self.conference_type ||= config && config[:conference_type]
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
-    self.user_ids ||= (self.user_id || "").to_s
     self.added_user_ids ||= ""
     self.title ||= self.context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
     self.start_at ||= self.started_at
@@ -420,7 +477,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def config
-    @config ||= WebConference.config(self.class.to_s)
+    @config ||= WebConference.config(context: context, class_name: self.class.to_s)
   end
 
   def valid_config?
@@ -431,7 +488,15 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { where(:conference_type => WebConference.plugins.map{|p| p.id.classify}) }
+  def conference_status
+    :active
+  end
+
+  def self.active_conference_type_names
+    WebConference.plugins.map{|p| p.id.classify}
+  end
+
+  scope :active, -> { where(:conference_type => WebConference.active_conference_type_names) }
 
   def as_json(options={})
     url = options.delete(:url)
@@ -443,11 +508,37 @@ class WebConference < ActiveRecord::Base
     result
   end
 
+  def user_ids
+    self.web_conference_participants.pluck(:user_id)
+  end
+
+  def self.conference_types(context)
+    plugin_types + lti_types(context)
+  end
+
+  def self.lti_types(context)
+    return [] unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
+
+    lti_tools(context).map do |tool|
+      {
+        name: tool.name,
+        class_name: 'LtiConference',
+        conference_type: 'LtiConference',
+        user_setting_fields: {},
+        lti_settings: tool.conference_selection.merge(tool_id: tool.id)
+      }.with_indifferent_access
+    end
+  end
+
+  def self.lti_tools(context)
+    ContextExternalTool.all_tools_for(context, placements: :conference_selection) || []
+  end
+
   def self.plugins
     Canvas::Plugin.all_for_tag(:web_conferencing)
   end
 
-  def self.conference_types
+  def self.plugin_types
     plugins.map{ |plugin|
       next unless plugin.enabled? &&
           (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
@@ -456,18 +547,28 @@ class WebConference < ActiveRecord::Base
         :conference_type => plugin.id.classify,
         :class_name => (plugin.base || "#{plugin.id.classify}Conference"),
         :user_setting_fields => klass.user_setting_fields,
+        :name => plugin.name,
         :plugin => plugin
       ).with_indifferent_access
     }.compact
   end
 
-  def self.config(class_name=nil)
+  def self.config(context: nil, class_name: nil)
     if class_name
-      conference_types.detect{ |c| c[:class_name] == class_name }
+      conference_types(context).detect{ |c| c[:class_name] == class_name }
     else
-      conference_types.first
+      conference_types(context).first
     end
   end
 
   def self.serialization_excludes; [:uuid]; end
+
+  def set_root_account_id
+    case self.context
+    when Course, Group
+      self.root_account_id = self.context.root_account_id
+    when Account
+      self.root_account_id = self.context.resolved_root_account_id
+    end
+  end
 end

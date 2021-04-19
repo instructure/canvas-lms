@@ -18,9 +18,9 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
+import DeveloperKeyFormFields from 'ui/features/developer_keys_v2/react/NewKeyForm.js'
 import fakeENV from 'helpers/fakeENV'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 
 QUnit.module('NewKeyForm')
 
@@ -44,29 +44,25 @@ const developerKey = {
   test_cluster_only: true
 }
 
-function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey, customizing) {
+function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={devKey}
-      dispatch={ () => {} }
-      listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing, isLtiKey} }
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey={isLtiKey}
     />
   )
-  return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
-    find((elem) => elem.name == `developer_key[${name}]`);
+  return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).find(
+    elem => elem.name === `developer_key[${name}]`
+  )
 }
 
 test('populates the key name', () => {
   const input = formFieldOfTypeAndName(developerKey, 'input', 'name')
   equal(input.value, developerKey.name)
-})
-
-test('defaults name to "Unnamed Tool"', () => {
-  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name')
-  equal(input.value, 'Unnamed Tool')
 })
 
 test('populates the key owner email', () => {
@@ -105,7 +101,7 @@ test('does not populates the key test_cluster_only without ENV set', () => {
 })
 
 test('populates the key test_cluster_only', () => {
-  fakeENV.setup({ enableTestClusterChecks: true })
+  fakeENV.setup({enableTestClusterChecks: true})
   const input = formFieldOfTypeAndName(developerKey, 'input', 'test_cluster_only')
   equal(input.checked, developerKey.test_cluster_only)
   fakeENV.teardown()
@@ -124,26 +120,21 @@ test('does not include icon URL if lti key', () => {
 })
 
 test('populates the redirect uris if lti key', () => {
-  ok(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris', true))
+  ok(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris'))
 })
 
 test('populates the key name when lti key', () => {
-  const input = formFieldOfTypeAndName(developerKey, 'input', 'name', true)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'name')
   equal(input.value, developerKey.name)
 })
 
-test('defaults name to "Unnamed Tool" when lti key', () => {
-  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name', true)
-  equal(input.value, 'Unnamed Tool')
-})
-
 test('populates the key owner email when lti key', () => {
-  const input = formFieldOfTypeAndName(developerKey, 'input', 'email', true)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'email')
   equal(input.value, developerKey.email)
 })
 
 test('populates the key notes when lti key', () => {
-  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes', true)
+  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes')
   equal(textarea.value, developerKey.notes)
 })
 
@@ -153,12 +144,12 @@ test('renders the tool configuration form if isLtiKey is true', () => {
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={developerKey}
-      dispatch={ () => {} }
-      listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing: false, isLtiKey: true} }
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey
     />
   )
-  ok(wrapper.find('ToolConfiguration').exists())
+  ok(wrapper.find('ToolConfigurationForm').exists())
 })
 
 test('renders the developer key scopes form if isLtiKey is false', () => {
@@ -167,11 +158,55 @@ test('renders the developer key scopes form if isLtiKey is false', () => {
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={developerKey}
-      dispatch={ () => {} }
-      listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing: false, isLtiKey: false} }
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey={false}
     />
   )
-  ok(wrapper.find('DeveloperKeyScopes').exists())
+  ok(wrapper.find('Scopes').exists())
+  wrapper.unmount()
+})
+
+test('render a not require `Redirect URIs:` field if isRedirectUriRequired is false', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey
+      isRedirectUriRequired={false}
+    />
+  )
+
+  const match = wrapper.html().match(new RegExp(/<span.*>Redirect URIs:<\/span>/))
+
+  ok(match)
+
+  wrapper.unmount()
+})
+
+test('render a require `* Redirect URIs:` field if isRedirectUriRequired is true', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      isLtiKey
+      isRedirectUriRequired
+    />
+  )
+
+  const match1 = wrapper.html().match(new RegExp(/<span class=.*>Redirect URIs:<\/span>/))
+
+  notOk(match1)
+
+  const match2 = wrapper.html().match(new RegExp(/<span class=.*>* Redirect URIs:<\/span>/))
+
+  ok(match2)
+
   wrapper.unmount()
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -49,8 +51,38 @@ class UserObserveesController < ApplicationController
     observed_users = observer.linked_students.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
 
-    UserPastLtiIds.manual_preload_past_lti_ids(users, @domain_root_account) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
     data = users_json(observed_users, @current_user, session, includes, @domain_root_account)
+    add_linked_root_account_ids_to_user_json(data)
+    render json: data
+  end
+
+  # @API List observers
+  # A paginated list of the users that the given user is observing.
+  #
+  # *Note:* all users are allowed to list their own observees. Administrators can list
+  # other users' observees.
+  #
+  # The returned observees will include an attribute "observation_link_root_account_ids", a list
+  # of ids for the root accounts the observer and observee are linked on. The observer will only be able to
+  # observe in courses associated with these root accounts.
+  #
+  # @argument include[] [String, "avatar_url"]
+  #   - "avatar_url": Optionally include avatar_url.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/observees \
+  #          -X GET \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [User]
+  def observers
+    includes = params[:include] || []
+    users = student.linked_observers.order_by_sortable_name
+    users = Api.paginate(users, self, api_v1_user_observers_url)
+
+    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    data = users_json(users, @current_user, session, includes, @domain_root_account)
     add_linked_root_account_ids_to_user_json(data)
     render json: data
   end
@@ -100,7 +132,7 @@ class UserObserveesController < ApplicationController
       @student = verified_token.user
       common_root_accounts = common_root_accounts_for(observer, student)
     elsif params[:pairing_code]
-      code = ObserverPairingCode.active.where(code: params[:pairing_code]).first
+      code = find_observer_pairing_code(params[:pairing_code])
       if code.nil?
         render json: {errors: [{'message' => 'Invalid pairing code.'}]}, status: 422
         return
@@ -148,6 +180,10 @@ class UserObserveesController < ApplicationController
     render_student_json
   end
 
+  def find_observer_pairing_code(pairing_code)
+    ObserverPairingCode.active.where(code: pairing_code).first
+  end
+
   # @API Show an observee
   #
   # Gets information about an observed user.
@@ -164,6 +200,27 @@ class UserObserveesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless has_observation_link?
 
     render_student_json
+  end
+
+  # @API Show an observer
+  #
+  # Gets information about an observed user.
+  #
+  # *Note:* all users are allowed to view their own observers.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/observers/<observer_id> \
+  #          -X GET \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def show_observer
+    scope = student.as_student_observation_links.where(observer: observer)
+    raise ActiveRecord::RecordNotFound unless scope.exists?
+
+    json = user_json(observer, @current_user, session)
+    add_linked_root_account_ids_to_user_json([json])
+    render json: json
   end
 
   # @API Add an observee
@@ -216,11 +273,21 @@ class UserObserveesController < ApplicationController
   private
 
   def observer
-    @observer ||= params[:user_id].nil? ? @current_user : api_find(User.active, params[:user_id])
+    param = params[:observer_id] || params[:user_id]
+    @observer ||= param.nil? ? @current_user : api_find(User.active, param)
   end
 
   def student
-    @student ||= api_find(User.active, params[:observee_id])
+    param = params[:observee_id] || params[:user_id]
+    @student ||= api_find(User.active, param)
+  end
+
+  def user
+    if ['observers', 'show_observer'].include?(params[:action])
+      student
+    else
+      observer
+    end
   end
 
   def create_observation_links(root_accounts)
@@ -241,12 +308,12 @@ class UserObserveesController < ApplicationController
   end
 
   def self_or_admin_permission_check
-    return true if observer == @current_user
+    return true if user == @current_user
     admin_permission_check
   end
 
   def admin_permission_check
-    @accounts_with_observer_permissions = common_root_accounts_with_permissions(observer)
+    @accounts_with_observer_permissions = common_root_accounts_with_permissions(user)
     root_accounts_valid?(@accounts_with_observer_permissions)
   end
 
@@ -309,13 +376,20 @@ class UserObserveesController < ApplicationController
   def add_linked_root_account_ids_to_user_json(user_rows)
     user_rows = Array(user_rows)
     ra_id_map = {}
-    scope = observer.as_observer_observation_links.where(:student => user_rows.map{|r| r['id']})
-    if observer != @current_user
-      scope = scope.where(:root_account_id => @accounts_with_observer_permissions || common_root_accounts_with_permissions(observer))
+    if ['observers', 'show_observer'].include?(params[:action])
+      scope = student.as_student_observation_links.where(:observer => user_rows.map{|r| r['id']})
+      column = :observer_id
+    else
+      scope = observer.as_observer_observation_links.where(:student => user_rows.map{|r| r['id']})
+      column = :user_id
     end
-    scope.pluck(:user_id, :root_account_id).each do |student_id, ra_id|
-      ra_id_map[student_id] ||= []
-      ra_id_map[student_id] << ra_id
+
+    if user != @current_user
+      scope = scope.where(:root_account_id => @accounts_with_observer_permissions || common_root_accounts_with_permissions(user))
+    end
+    scope.pluck(column, :root_account_id).each do |user_id, ra_id|
+      ra_id_map[user_id] ||= []
+      ra_id_map[user_id] << ra_id
     end
     ra_id_map
 

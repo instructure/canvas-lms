@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -29,7 +31,6 @@ describe Api::V1::PlannerItem do
 
   before :once do
     course_factory active_all: true
-    @course.root_account.enable_feature!(:student_planner)
 
     teacher_in_course active_all: true
     @reviewer = student_in_course(course: @course, active_all: true).user
@@ -118,20 +119,50 @@ describe Api::V1::PlannerItem do
     context 'peer reviews' do
       it 'should include submissions needing peer review' do
         submission = @assignment.submit_homework(@student, body: "the stuff")
-        assessor_submission = @assignment.find_or_create_submission(@reviewer)
-        @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: assessor_submission, assessor: @reviewer)
-        json = api.planner_item_json(@peer_review, @student, session)
+        @peer_review = @assignment.assign_peer_review(@reviewer, @student)
+        json = api.planner_item_json(@peer_review, @reviewer, session)
         expect(json[:plannable_type]).to eq "assessment_request"
         expect(json[:plannable][:title]).to eq @assignment.title
-        expect(json[:plannable][:todo_date]).to eq @assignment.due_at
+        expect(json[:plannable][:todo_date]).to eq submission.cached_due_date
+      end
+
+      it "includes the submission url" do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        assessor_submission = @assignment.find_or_create_submission(@reviewer)
+        @peer_review = AssessmentRequest.create!(
+          assessor: @reviewer,
+          assessor_asset: assessor_submission,
+          asset: submission,
+          user: @student
+        )
+        json = api.planner_item_json(@peer_review, @reviewer, session)
+        expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(json[:html_url]).to eq expected_url
+      end
+
+      it "includes the anonymized submission url when anonymous peer reviews" do
+        @assignment.update!(anonymous_peer_reviews: true)
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        assessor_submission = @assignment.find_or_create_submission(@reviewer)
+        @peer_review = AssessmentRequest.create!(
+          assessor: @reviewer,
+          assessor_asset: assessor_submission,
+          asset: submission,
+          user: @student
+        )
+        json = api.planner_item_json(@peer_review, @reviewer, session)
+        expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
+        expect(json[:html_url]).to eq expected_url
       end
     end
 
     describe '#submission_statuses_for' do
       it 'should return the submission statuses for the learning object' do
         json = api.planner_item_json(@assignment, @student, session)
-        expect(json.has_key?(:submissions)).to be true
-        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback].all? { |k| json[:submissions].has_key?(k) }).to be true
+        expect(json.key?(:submissions)).to be true
+        expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback, :redo_request].all? do |k|
+          json[:submissions].key?(k)
+        end).to be true
       end
 
       it 'should indicate that an assignment is submitted' do
@@ -339,11 +370,12 @@ describe Api::V1::PlannerItem do
     it 'should return true for assignments with new grades' do
       group_discussion_assignment
       graded_submission(@quiz, @student)
-      graded_submission_model(assignment: @assignment, user: @student).update_attributes(score: 5)
-      graded_submission_model(assignment: @topic.assignment, user: @student).update_attributes(score: 5)
-      expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be true
-      expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be true
-      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+      graded_submission_model(assignment: @assignment, user: @student).update(score: 5)
+      graded_submission_model(assignment: @topic.assignment, user: @student).update(score: 5)
+      Assignment.active.update_all(muted: false)
+      expect(api.planner_item_json(@quiz.reload, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@assignment.reload, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@topic.reload, @student, session)[:new_activity]).to be true
     end
 
     it 'should return true for assignments with new feedback' do
@@ -351,9 +383,10 @@ describe Api::V1::PlannerItem do
       submission_model(assignment: @quiz.assignment, user: @student).add_comment(author: @teacher, comment: 'hi')
       submission_model(assignment: @assignment, user: @student).add_comment(author: @teacher, comment: 'hi')
       submission_model(assignment: @topic.assignment, user: @student).add_comment(author: @teacher, comment: 'hi')
-      expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be true
-      expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be true
-      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+      Assignment.active.update_all(muted: false)
+      expect(api.planner_item_json(@quiz.reload, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@assignment.reload, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@topic.reload, @student, session)[:new_activity]).to be true
     end
 
     it 'should return true for unread discussions' do
@@ -405,7 +438,7 @@ describe Api::V1::PlannerItem do
     it "links to a graded discussion topic's submission if appropriate" do
       group_discussion_assignment
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq 'named_context_url'
-      graded_submission_model(assignment: @topic.assignment, user: @student).update_attributes(score: 5)
+      graded_submission_model(assignment: @topic.assignment, user: @student).update(score: 5)
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq 'course_assignment_submission_url'
     end
   end

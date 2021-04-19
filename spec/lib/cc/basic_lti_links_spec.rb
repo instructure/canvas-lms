@@ -1,5 +1,5 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -35,7 +35,7 @@ describe CC::BasicLTILinks do
 
     let(:lti_doc) { Builder::XmlMarkup.new(target: xml, indent: 2) }
     #this is the target for Builder::XmlMarkup. this is how you access the generated XML
-    let(:xml) { '' }
+    let(:xml) { +'' }
 
     it "sets the encoding to 'UTF-8'" do
       subject.create_blti_link(tool, lti_doc)
@@ -178,6 +178,36 @@ describe CC::BasicLTILinks do
         expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="my_list"]')).to be_nil
       end
 
+      it 'does not add a client id' do
+        subject.create_blti_link(tool, lti_doc)
+        xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+        expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="my_list"]')).to be_nil
+      end
+
+      context 'when the tool does not have a developer key' do
+        let(:xml_doc) { Nokogiri::XML(xml) { |c| c.nonet.strict } }
+
+        before { subject.create_blti_link(tool, lti_doc) }
+
+        it 'does not add the client_id property element' do
+          expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="client_id"]')).to be_nil
+        end
+      end
+
+      context 'when the tool has a developer key' do
+        let(:developer_key) { DeveloperKey.create! }
+        let(:xml_doc) { Nokogiri::XML(xml) { |c| c.nonet.strict } }
+
+        before do
+          tool.developer_key_id = developer_key.global_id
+          subject.create_blti_link(tool, lti_doc)
+        end
+
+        it 'adds the client_id property element' do
+          expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="client_id"]').text.to_i).to eq developer_key.global_id
+        end
+      end
+
       context "course_copy" do
         before do
           allow(subject).to receive(:for_course_copy).and_return true
@@ -261,6 +291,35 @@ describe CC::BasicLTILinks do
 
       end
 
+      context "content migrations" do
+        it "adds content migrations settings" do
+          tool.settings[:content_migration] = {
+            export_start_url: "https://example.com/export",
+            import_start_url: "https://example.com/import"
+          }
+          subject.create_blti_link(tool, lti_doc)
+          xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+          cm_xpath = '//blti:extensions/lticm:options[@name="content_migration"]'
+          export_xpath = "#{cm_xpath}/lticm:property[@name=\"export_start_url\"]"
+          import_xpath = "#{cm_xpath}/lticm:property[@name=\"import_start_url\"]"
+          expect(xml_doc.at_xpath(export_xpath).text).to eq tool.settings[:content_migration][:export_start_url]
+          expect(xml_doc.at_xpath(import_xpath).text).to eq tool.settings[:content_migration][:import_start_url]
+        end
+
+        it "adds format settings" do
+          tool.settings[:content_migration] = {
+            export_format: "json",
+            import_format: "default"
+          }
+          subject.create_blti_link(tool, lti_doc)
+          xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+          cm_xpath = '//blti:extensions/lticm:options[@name="content_migration"]'
+          export_xpath = "#{cm_xpath}/lticm:property[@name=\"export_format\"]"
+          import_xpath = "#{cm_xpath}/lticm:property[@name=\"import_format\"]"
+          expect(xml_doc.at_xpath(export_xpath).text).to eq tool.settings[:content_migration][:export_format]
+          expect(xml_doc.at_xpath(import_xpath).text).to eq tool.settings[:content_migration][:import_format]
+        end
+      end
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -40,6 +42,7 @@ describe "add content box" do
   end
 
   it "should preview rich text content" do
+    skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello preview"
     fj('button:contains("Preview")').click
@@ -47,6 +50,7 @@ describe "add content box" do
   end
 
   it "should add rich text content" do
+    skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello student"
     submit_form(".form_content")

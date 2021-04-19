@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 
 class TestCollection extends Backbone.Collection {}
 TestCollection.prototype.defaults = {
@@ -94,7 +94,7 @@ test('uses conventional default url', () => {
   )
 })
 
-test('triggers setParam event', function() {
+test('triggers setParam event', () => {
   const collection = new Backbone.Collection()
   const spy = sinon.spy()
   collection.on('setParam', spy)
@@ -114,7 +114,7 @@ test('setParams', () => {
   deepEqual(collection.options.params, {foo: 'bar', baz: 'qux'})
 })
 
-test('triggers setParams event', function() {
+test('triggers setParams event', () => {
   const collection = new Backbone.Collection()
   const spy = sinon.spy()
   collection.on('setParams', spy)

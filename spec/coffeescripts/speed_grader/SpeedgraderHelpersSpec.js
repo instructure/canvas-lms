@@ -24,7 +24,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
   setupAnonymizableAuthorId
-} from 'speed_grader_helpers'
+} from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
 import $ from 'jquery'
 
 QUnit.module('SpeedGrader', hooks => {
@@ -563,5 +563,43 @@ QUnit.module('SpeedGraderHelpers.plagiarismResubmitUrl', () => {
     )
 
     $('#assignment_submission_resubmit_to_turnitin_url').remove()
+  })
+})
+
+QUnit.module('SpeedGraderHelpers.plagiarismErrorMessage', () => {
+  test('returns the error_message if present', () => {
+    const errorMessage = 'Error message :('
+    equal(SpeedgraderHelpers.plagiarismErrorMessage({error_message: errorMessage}), errorMessage)
+  })
+
+  test('returns the default error message if "error_message" is missing', () => {
+    equal(
+      SpeedgraderHelpers.plagiarismErrorMessage({}),
+      'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+    )
+  })
+})
+
+QUnit.module('SpeedGraderHelpers.resourceLinkLookupUuidParam', () => {
+  test('returns an empty string when submission resource_link_lookup_uuid does not exists', () => {
+    const submission = {}
+
+    equal(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), '')
+
+    submission.resource_link_lookup_uuid = null
+
+    equal(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), '')
+
+    submission.resource_link_lookup_uuid = ''
+
+    equal(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), '')
+  })
+
+  test('returns a query string parameter when submission resource_link_lookup_uuid exists', () => {
+    const id = '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    const submission = {resource_link_lookup_uuid: id}
+    const param = `&resource_link_lookup_uuid=${id}`
+
+    strictEqual(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission), param)
   })
 })

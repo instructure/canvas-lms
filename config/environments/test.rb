@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -24,8 +26,8 @@ environment_configuration(defined?(config) && config) do |config|
   # and recreated between test runs.  Don't rely on the data there!
   config.cache_classes = true
 
-  # Show full error reports and disable caching
-  config.consider_all_requests_local = true
+  # Show formatted error reports and disable caching
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true
@@ -51,10 +53,6 @@ environment_configuration(defined?(config) && config) do |config|
   config.active_support.deprecation = [:stderr, :log]
 
   config.eager_load = false
-
-  config.after_initialize do
-    require_relative 'bullet'
-  end
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }

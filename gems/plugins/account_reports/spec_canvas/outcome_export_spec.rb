@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -46,7 +48,7 @@ describe "Outcome Reports" do
       report.find { |row| match_outcome(object).matches?(row) }
     end
 
-    def have_n_ratings(n)
+    def n_ratings?(n)
       satisfy("have #{n} ratings") do |row|
         row.length - RATING_INDEX == 2 * n
       end
@@ -66,7 +68,23 @@ describe "Outcome Reports" do
 
     it 'includes the correct headers' do
       report_options[:header] = true
-        expect(report[0].headers).to eq AccountReports::OutcomeExport::OUTCOME_EXPORT_HEADERS
+      expect(report[0].headers).to eq AccountReports::OutcomeExport::OUTCOME_EXPORT_HEADERS
+    end
+
+    it 'respects csv i18n settings' do
+      preparsed_report_options = {
+        parse_header: true,
+        account: account,
+        order: 'skip',
+        header: true
+      }
+      admin = account_admin_user(account: account)
+      expected_headers = ['vendor_guid', 'object_type', 'title']
+      admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+
+      preparsed_report = run_report('outcome_export_csv', preparsed_report_options)
+      actual_headers = parse_report(preparsed_report, preparsed_report_options.merge('col_sep': ';'))[0].headers
+      expect(actual_headers[0..2]).to eq(expected_headers)
     end
 
     context 'with outcome groups' do
@@ -106,25 +124,17 @@ describe "Outcome Reports" do
 
       context 'with vendor guids' do
         before(:once) do
-          @root_group_1.update! vendor_guid: 'lion', vendor_guid_2: 'tiger'
-          @root_group_2.update! vendor_guid: 'bear'
-          @child_group_1_1.update! vendor_guid_2: 'monkey'
+          @root_group_1.update! vendor_guid: 'lion'
         end
 
         let(:guids) { report.map { |row| row['vendor_guid'] } }
 
-        it 'defaults to vendor_guid field when AcademicBenchmark.use_new_guid_columns? not set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return false
-          expect(guids).to include('lion', 'bear', 'monkey')
-        end
-
-        it 'defaults to vendor_guid_2 field when AcademicBenchmark.use_new_guid_columns? set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
-          expect(guids).to include('tiger', 'bear', 'monkey')
+        it 'defaults to vendor_guid' do
+          expect(guids).to include('lion')
         end
 
         it 'uses canvas id for vendor_guid if and only if vendor_guid is not present' do
-          expect(guids).to include("canvas_outcome_group:#{@child_group_2_1.id}")
+          expect(guids).to include("canvas_outcome_group:#{@child_group_1_1.id}")
         end
       end
 
@@ -211,6 +221,18 @@ describe "Outcome Reports" do
         expect(other['calculation_int']).to eq '5'
       end
 
+      it 'ignores fields when account level mastery scales are enabled' do
+        @account.set_feature_flag!(:account_level_mastery_scales, 'on')
+        expect(report.length).to eq 4
+        report.each do |r|
+          expect(r).to_not have_key('mastery_points')
+          expect(r).to_not have_key('calculation_method')
+          expect(r).to_not have_key('calculation_int')
+          expect(r).to_not have_key('ratings')
+        end
+      end
+
+
       it 'does not include deleted outcomes' do
         @root_outcome_2.destroy!
         expect(report.length).to eq 3
@@ -219,28 +241,16 @@ describe "Outcome Reports" do
 
       context 'with vendor guids' do
         before(:once) do
-          @root_outcome_1.update! vendor_guid: 'lion', vendor_guid_2: 'tiger'
-          @root_outcome_2.update! vendor_guid: 'bear'
-          @root_outcome_3.update! vendor_guid: 'llama'
+          @root_outcome_1.update! vendor_guid: 'lion'
         end
 
-        it 'defaults to vendor_guid field when AcademicBenchmark.use_new_guid_columns? not set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return false
+        it 'defaults to vendor_guid' do
           expect(find_object(@root_outcome_1)['vendor_guid']).to eq 'lion'
-          expect(find_object(@root_outcome_2)['vendor_guid']).to eq 'bear'
-          expect(find_object(@root_outcome_3)['vendor_guid']).to eq 'llama'
-        end
-
-        it 'defaults to vendor_guid_2 field when AcademicBenchmark.use_new_guid_columns? set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
-          expect(find_object(@root_outcome_1)['vendor_guid']).to eq 'tiger'
-          expect(find_object(@root_outcome_2)['vendor_guid']).to eq 'bear'
-          expect(find_object(@root_outcome_3)['vendor_guid']).to eq 'llama'
         end
 
         it 'uses canvas id for vendor_guid if vendor_guid is not present' do
-          guid = "canvas_outcome:#{@root_outcome_4.id}"
-          expect(find_object(@root_outcome_4)['vendor_guid']).to eq guid
+          guid = "canvas_outcome:#{@root_outcome_2.id}"
+          expect(find_object(@root_outcome_2)['vendor_guid']).to eq guid
         end
       end
 
@@ -279,7 +289,7 @@ describe "Outcome Reports" do
         let(:first_outcome) { find_object(@root_outcome_1) }
 
         it 'includes all ratings' do
-          expect(first_outcome).to have_n_ratings(2)
+          expect(first_outcome).to n_ratings?(2)
           expect(first_outcome[RATING_INDEX]).to eq '3.0'
           expect(first_outcome[RATING_INDEX + 1]).to eq 'Rockin'
           expect(first_outcome[RATING_INDEX + 2]).to eq '0.0'
@@ -298,7 +308,7 @@ describe "Outcome Reports" do
             ]
           }
           @root_outcome_1.save!
-          expect(first_outcome).to have_n_ratings(6)
+          expect(first_outcome).to n_ratings?(6)
           expect(first_outcome[RATING_INDEX]).to eq '10.0'
           expect(first_outcome[RATING_INDEX + 1]).to eq 'a fly'
           expect(first_outcome[RATING_INDEX + 10]).to eq '0.0'

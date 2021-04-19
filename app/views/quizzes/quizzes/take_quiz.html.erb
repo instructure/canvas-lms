@@ -16,17 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% @body_classes << 'assessing' if @body_classes %>
-<% content_for :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
+<% add_body_class 'assessing' %>
+<% provide :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
 
-<% content_for :meta_tags do %>
-  <% if params[:persist_headless] %>
-    <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=yes,width=device-width">
-    <% js_env :MOBILE_UI => true %>
-  <% end %>
-<% end %>
-
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <%= render "take_quiz_right_side" %>
 <% end %>
 <% css_bundle :quizzes, :tinymce %>
@@ -85,8 +78,10 @@
       <span class="started_at"><%= @submission.started_at.iso8601 %></span>
       <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
       <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
+      <span class="end_at_without_time_limit"><%= @submission.end_at_without_time_limit && @submission.end_at_without_time_limit.iso8601 %></span>
       <span class="due_at"><%= @quiz.due_at && @quiz.due_at.iso8601 %></span>
       <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
+      <span class="timer_autosubmit_disabled"><%= @quiz.timer_autosubmit_disabled? %></span>
       <span class="time_left"><%= @submission.time_left %></span>
     </div>
 

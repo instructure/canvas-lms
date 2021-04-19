@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import ModeratedGradingFormFieldGroup from 'jsx/assignments/ModeratedGradingFormFieldGroup'
+import ModeratedGradingFormFieldGroup from 'ui/features/assignment_edit/react/ModeratedGradingFormFieldGroup.js'
 
 QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
   let props
@@ -34,7 +34,7 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
       isGroupAssignment: false,
       isPeerReviewAssignment: false,
       locale: 'en',
-      maxGraderCount: 10,
+      availableGradersCount: 10,
       moderatedGradingEnabled: true,
       onGraderCommentsVisibleToGradersChange() {},
       onModeratedGradingChange() {}

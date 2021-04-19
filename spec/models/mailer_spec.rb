@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -50,6 +52,14 @@ describe Mailer do
       expect(mail.header['Reply-To']).to be_nil
       expect(mail.header['From'].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
     end
+
+    it 'truncates the message body if it exceeds the maximum text length' do
+      message = message_model()
+      message.body = 'a' * 300.kilobytes
+      message.html_body = 'a' * 300.kilobytes
+      mail = Mailer.create_message(message)
+      expect(mail.message.html_part.body.raw_source).to eq 'message preview unavailable'
+    end
   end
 
   describe 'deliver_now' do
@@ -58,6 +68,16 @@ describe Mailer do
       mail = Mailer.create_message(message)
       expect(mail).to receive(:deliver_now)
       expect(Services::NotificationService).not_to receive(:process)
+      Mailer.deliver(mail)
+    end
+
+    it 'sends stat to stat service' do
+      message = message_model(to: "someemail@example.com")
+      mail = Mailer.create_message(message)
+      expect(mail).to receive(:deliver_now)
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver",
+                                                             { short_stat: "message.deliver",
+                                                               tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' } })
       Mailer.deliver(mail)
     end
 

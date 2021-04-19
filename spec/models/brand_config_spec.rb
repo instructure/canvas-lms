@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2015 - present Instructure, Inc.
@@ -227,11 +229,12 @@ describe BrandConfig do
   end
 
   it "expects md5 to be correct" do
-    current_calculated_md5 = BrandableCSS.migration_version
-    expect(current_calculated_md5 == (92630630174579589147 || 75072935522965904110132)).to be true
+    what_it_should_be_if_you_have_not_ran_gulp_rev = 85663486644871658581990
+    what_it_should_be_if_you_have = 839184435922331766
+    expect(BrandableCSS.migration_version).to eq(what_it_should_be_if_you_have_not_ran_gulp_rev).or eq(what_it_should_be_if_you_have)
     # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
     # you will need to update the migration that runs brand_configs and update these md5s that are
     # with and without running `rake canvas:compile_assets`
-    # Also update the other use of 92630630174579589147 in lib/brandable_css.rb
+    # Also update the other use of 85663486644871658581990 in lib/brandable_css.rb
   end
 end

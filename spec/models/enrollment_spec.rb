@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -181,7 +183,8 @@ describe Enrollment do
     end
 
     it "should return the sis enrollment type otherwise" do
-      e = TaEnrollment.new
+      c = Account.default.courses.create!
+      e = TaEnrollment.create(course: c)
       expect(e.sis_role).to eq 'ta'
     end
   end
@@ -253,7 +256,6 @@ describe Enrollment do
     before(:once) do
       @course.assignments.create!
       @enrollment.save!
-      @enrollment.scores.create!
       @enrollment.destroy
     end
 
@@ -265,12 +267,10 @@ describe Enrollment do
 
     it 'does not restore scores associated with other enrollments' do
       new_enrollment = StudentEnrollment.create!(user: User.create!, course: @course)
-      new_score = new_enrollment.scores.new
-      new_score.workflow_state = :deleted
-      new_score.save!
+      score = new_enrollment.scores.first
+      score.update!(workflow_state: :deleted)
       @enrollment.restore
-      new_score.reload
-      expect(new_score.workflow_state).not_to eq('active')
+      expect(score.workflow_state).to eq("deleted")
     end
 
     it 'restores associated scores that are deleted if restored by workflow state' do
@@ -281,18 +281,42 @@ describe Enrollment do
 
     it 'does not restore scores associated with other enrollments if restored by workflow_state' do
       new_enrollment = StudentEnrollment.create!(user: User.create!, course: @course)
-      new_score = new_enrollment.scores.new
-      new_score.workflow_state = :deleted
-      new_score.save!
+      score = new_enrollment.scores.first
+      score.update!(workflow_state: :deleted)
       @enrollment.update!(workflow_state: :active)
-      new_score.reload
-      expect(new_score.workflow_state).not_to eq('active')
+      expect(score.workflow_state).to eq "deleted"
     end
 
     it 'restores associated scores that are deleted if restored to inactive by workflow state' do
       @enrollment.update!(workflow_state: :inactive)
       score_workflow = Score.find_by(enrollment_id: @enrollment, course_score: true).workflow_state
       expect(score_workflow).to eq('active')
+    end
+  end
+
+  describe "enrolling into a previously enrolled course" do
+    let(:assignment) { @course.assignments.create!(points_possible: 10) }
+    let(:section) { @course.course_sections.create! }
+    let(:student) { User.create! }
+    let(:teacher) do
+      user = User.create!
+      @course.enroll_teacher(user).accept(true)
+      user
+    end
+
+    before :each do
+      original_enrollment = @course.enroll_student(student)
+      original_enrollment.accept(true)
+      assignment.grade_student(student, grade: "10", grader: teacher)
+      original_enrollment.destroy!
+    end
+
+    it "when there are no active enrollments, grades are recalculated" do
+      # Create a new assignment while the student has no enrollment, to prove
+      # that scores are being recalculated on enrollment, rather than copied.
+      @course.assignments.create!(points_possible: 10)
+      new_enrollment = @course.enroll_student(student, allow_multiple_enrollments: true, section: section)
+      expect(new_enrollment.scores.find_by!(course_score: true).final_score).to be 50.0
     end
   end
 
@@ -761,6 +785,76 @@ describe Enrollment do
         end
       end
 
+      describe '#computed_current_points' do
+        it 'uses the value from the associated score object, if one exists' do
+          @enrollment.scores.create!(current_points: 80.3)
+          expect(@enrollment.computed_current_points).to eq 80.3
+        end
+
+        it 'uses the value from the associated score object, even if it is nil' do
+          @enrollment.scores.create!(current_points: nil)
+          expect(@enrollment.computed_current_points).to be_nil
+        end
+
+        it 'ignores grading period scores when passed no arguments' do
+          @enrollment.scores.create!(current_points: 80.3, grading_period: period)
+          expect(@enrollment.computed_current_points).to be_nil
+        end
+
+        it 'ignores soft-deleted scores' do
+          score = @enrollment.scores.create!(current_points: 80.3)
+          score.destroy
+          expect(@enrollment.computed_current_points).to be_nil
+        end
+
+        it 'computes current points for a given grading period id' do
+          @enrollment.scores.create!(current_points: 80.3)
+          @enrollment.scores.create!(current_points: 70.6, grading_period: period)
+          current_points = @enrollment.computed_current_points(grading_period_id: period.id)
+          expect(current_points).to eq 70.6
+        end
+
+        it 'returns nil if a grading period score is requested and does not exist' do
+          current_points = @enrollment.computed_current_points(grading_period_id: period.id)
+          expect(current_points).to be_nil
+        end
+      end
+
+      describe '#unposted_current_points' do
+        it 'uses the value from the associated score object, if one exists' do
+          @enrollment.scores.create!(unposted_current_points: 80.3)
+          expect(@enrollment.unposted_current_points).to eq 80.3
+        end
+
+        it 'uses the value from the associated score object, even if it is nil' do
+          @enrollment.scores.create!(unposted_current_points: nil)
+          expect(@enrollment.unposted_current_points).to be_nil
+        end
+
+        it 'ignores grading period scores when passed no arguments' do
+          @enrollment.scores.create!(unposted_current_points: 80.3, grading_period: period)
+          expect(@enrollment.unposted_current_points).to be_nil
+        end
+
+        it 'ignores soft-deleted scores' do
+          score = @enrollment.scores.create!(unposted_current_points: 80.3)
+          score.destroy
+          expect(@enrollment.unposted_current_points).to be_nil
+        end
+
+        it 'computes current points for a given grading period id' do
+          @enrollment.scores.create!(unposted_current_points: 80.3)
+          @enrollment.scores.create!(unposted_current_points: 70.6, grading_period: period)
+          current_points = @enrollment.unposted_current_points(grading_period_id: period.id)
+          expect(current_points).to eq 70.6
+        end
+
+        it 'returns nil if a grading period score is requested and does not exist' do
+          current_score = @enrollment.unposted_current_points(grading_period_id: period.id)
+          expect(current_score).to be_nil
+        end
+      end
+
       describe '#find_score' do
         before(:each) do
           @course.update!(grading_standard_enabled: true)
@@ -836,19 +930,10 @@ describe Enrollment do
             @enrollment.update!(type: 'StudentViewEnrollment')
             expect(new_fake_student_enrollment.computed_current_score).to eq(@enrollment.computed_current_score)
           end
-
-          it 'does not copy scores if the new enrollment type does not match existing enrollment types' do
-            expect(new_fake_student_enrollment.computed_current_score).to be_nil
-          end
-
-          it 'does not copy scores if the existing enrollment is soft-deleted' do
-            @enrollment.destroy
-            expect(new_student_enrollment.computed_current_score).to be_nil
-          end
         end
 
         # if a user is being restored to active, the DueDateCacher
-        # run will kick off a grade calculation, which sill update
+        # run will kick off a grade calculation, which will update
         # the score objects. To test we're not copying scores, we'll
         # restore to completed for these tests.
         context 'on restoration' do
@@ -863,19 +948,6 @@ describe Enrollment do
             new_fake_student_enrollment.destroy
             new_fake_student_enrollment.update!(workflow_state: :completed)
             expect(new_fake_student_enrollment.computed_current_score).to eq(@enrollment.computed_current_score)
-          end
-
-          it 'does not copy scores if the restored enrollment type does not match existing enrollment types' do
-            new_fake_student_enrollment.destroy
-            new_fake_student_enrollment.update!(workflow_state: :completed)
-            expect(new_fake_student_enrollment.computed_current_score).to be_nil
-          end
-
-          it 'does not copy scores if the existing enrollment is soft-deleted' do
-            @enrollment.destroy
-            new_student_enrollment.destroy
-            new_student_enrollment.update!(workflow_state: :completed)
-            expect(new_student_enrollment.computed_current_score).to be_nil
           end
         end
       end
@@ -995,15 +1067,6 @@ describe Enrollment do
         it 'copies scores over from the user\'s existing fake student enrollments to new fake student enrollments' do
           @enrollment.update!(type: 'StudentViewEnrollment')
           expect(new_fake_student_enrollment.computed_final_score).to eq(@enrollment.computed_final_score)
-        end
-
-        it 'does not copy scores if the new enrollment type does not match existing enrollment types' do
-          expect(new_fake_student_enrollment.computed_final_score).to be_nil
-        end
-
-        it 'does not copy scores if the existing enrollment is soft-deleted' do
-          @enrollment.destroy
-          expect(new_student_enrollment.computed_final_score).to be_nil
         end
       end
     end
@@ -1341,7 +1404,7 @@ describe Enrollment do
 
   context "permissions" do
     it "should grant read rights to account members with the ability to read_roster" do
-      role = Role.get_built_in_role("AccountMembership")
+      role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
       user = account_admin_user(:role => role)
       RoleOverride.create!(:context => Account.default, :permission => :read_roster,
                            :role => role, :enabled => true)
@@ -1375,11 +1438,10 @@ describe Enrollment do
     end
 
     it "sends later for a single student" do
-      expect(Enrollment).to receive(:send_later_if_production_enqueue_args).with(
-        :recompute_final_score,
-        hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"),
-        @user.id, @course.id, {}
-      )
+      expect(Enrollment).to receive(:delay_if_production).
+        with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:")).
+        and_return(Enrollment)
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id, {})
 
       Enrollment.recompute_final_score_in_singleton(@user.id, @course.id)
     end
@@ -1394,8 +1456,8 @@ describe Enrollment do
       expect(@user.student_enrollments.reload.count).to eq 2
       course_with_student(:user => @user)
       @c2 = @course
-      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c1.id, {})
-      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c2.id, {})
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c1.id)
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c2.id)
       Enrollment.recompute_final_scores(@user.id)
     end
   end
@@ -1554,7 +1616,7 @@ describe Enrollment do
         @term = @course.enrollment_term
         expect(@term).not_to be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
+        @override = @term.enrollment_dates_overrides.create!(enrollment_type: @enrollment.type, enrollment_term: @term, context: @term.root_account)
         @override.start_at = 2.days.ago
         @override.end_at = 2.days.from_now
         @override.save!
@@ -1638,7 +1700,7 @@ describe Enrollment do
         end
 
         it "recomputes scores for the student" do
-          expect(Enrollment).to receive(:recompute_final_score).with(@enrollment.user_id, @enrollment.course_id, {})
+          expect(Enrollment).to receive(:recompute_final_score).with(@enrollment.user_id, @enrollment.course_id)
           @enrollment.workflow_state = 'invited'
           @enrollment.save!
           @enrollment.accept
@@ -1769,7 +1831,7 @@ describe Enrollment do
       describe 'enrollment_dates_override dates' do
         before do
           @term = @course.enrollment_term
-          @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
+          @override = @term.enrollment_dates_overrides.create!(enrollment_type: @enrollment.type, enrollment_term: @term, context: @term.root_account)
         end
 
         it "should return active" do
@@ -2452,7 +2514,7 @@ describe Enrollment do
     it "should return candidate enrollments" do
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @course.enroll_user(@user)
       expect(Enrollment.invited.for_email('jt@instructure.com').count).to eq 1
     end
@@ -2461,27 +2523,27 @@ describe Enrollment do
       # mismatched e-mail
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'bob@instructure.com')
+      communication_channel(@user, {username: 'bob@instructure.com'})
       @course.enroll_user(@user)
       # registered user
       user_factory
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @user.register!
       @course.enroll_user(@user)
       # active e-mail
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
+      communication_channel(@user, {username: 'jt@instructure.com', active_cc: true})
       @course.enroll_user(@user)
       # accepted enrollment
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @course.enroll_user(@user).accept
       # rejected enrollment
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      @user.communication_channels.create!(:path => 'jt@instructure.com')
+      communication_channel(@user, {username: 'jt@instructure.com'})
       @course.enroll_user(@user).reject
 
       expect(Enrollment.invited.for_email('jt@instructure.com')).to eq []
@@ -2494,7 +2556,7 @@ describe Enrollment do
         course_factory(active_all: true)
         user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
-        @user.communication_channels.create!(:path => 'jt@instructure.com')
+        communication_channel(@user, {username: 'jt@instructure.com'})
         @enrollment = @course.enroll_user(@user)
         expect(Enrollment.cached_temporary_invitations('jt@instructure.com').length).to eq 1
         @enrollment.accept
@@ -2507,11 +2569,11 @@ describe Enrollment do
         course_with_student(:active_course => 1)
         User.where(:id => @user).update_all(:updated_at => 1.year.ago)
         @user.reload
-        expect(@user.cached_current_enrollments).to eq [@enrollment]
+        expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.reject!
         # have to get the new updated_at
         @user.reload
-        expect(@user.cached_current_enrollments).to eq []
+        expect(@user.cached_currentish_enrollments).to eq []
       end
     end
 
@@ -2520,11 +2582,11 @@ describe Enrollment do
         course_with_student(:active_course => 1)
         User.where(:id => @user).update_all(:updated_at => 1.year.ago)
         @user.reload
-        expect(@user.cached_current_enrollments).to eq [@enrollment]
+        expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.destroy
         # have to get the new updated_at
         @user.reload
-        expect(@user.cached_current_enrollments).to eq []
+        expect(@user.cached_currentish_enrollments).to eq []
       end
     end
 
@@ -2551,14 +2613,14 @@ describe Enrollment do
           course_factory(active_all: true)
           user_factory
           @user.update_attribute(:workflow_state, 'creation_pending')
-          @user.communication_channels.create!(:path => 'jt@instructure.com')
+          communication_channel(@user, {username: 'jt@instructure.com'})
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
             course_factory(active_all: true, :account => account)
             user_factory
             @user.update_attribute(:workflow_state, 'creation_pending')
-            @user.communication_channels.create!(:path => 'jt@instructure.com')
+            communication_channel(@user, {username: 'jt@instructure.com'})
             @enrollment2 = @course.enroll_user(@user)
           end
         end
@@ -2758,28 +2820,28 @@ describe Enrollment do
   end
 
   describe 'conclude' do
-    it "should remove the enrollment from User#cached_current_enrollments" do
+    it "should remove the enrollment from User#cached_currentish_enrollments" do
       enable_cache do
         course_with_student(:active_all => 1)
         User.where(:id => @user).update_all(:updated_at => 1.day.ago)
         @user.reload
-        expect(@user.cached_current_enrollments).to eq [ @enrollment ]
+        expect(@user.cached_currentish_enrollments).to eq [ @enrollment ]
         @enrollment.conclude
         @user.reload
-        expect(@user.cached_current_enrollments).to eq []
+        expect(@user.cached_currentish_enrollments).to eq []
       end
     end
   end
 
   describe 'unconclude' do
-    it 'should add the enrollment to User#cached_current_enrollments' do
+    it 'should add the enrollment to User#cached_currentish_enrollments' do
       enable_cache do
         course_with_student active_course: true, enrollment_state: 'completed'
         User.where(:id => @student).update_all(:updated_at => 1.day.ago)
         @student.reload
-        expect(@student.cached_current_enrollments).to eq []
+        expect(@student.cached_currentish_enrollments).to eq []
         @enrollment.unconclude
-        expect(@student.cached_current_enrollments).to eq [@enrollment]
+        expect(@student.cached_currentish_enrollments).to eq [@enrollment]
       end
     end
   end
@@ -2859,30 +2921,30 @@ describe Enrollment do
 
   describe '#can_be_deleted_by' do
 
-    describe 'on a student enrollment' do
-      let(:course) { Course.new(id: 99) }
-      let(:enrollment) { StudentEnrollment.new(course_id: course.id) }
+    describe 'on a student enrollment without granular_permissions_manage_users' do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
+      before :each do
+        course_with_student
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
+      end
+
       it 'is true for a user who has been granted :manage_students' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
       it 'is false for a user without :manage_students' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users but without :manage_students' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users in other context' do
@@ -2893,40 +2955,142 @@ describe Enrollment do
       end
 
       it 'is false if a user is trying to remove their own enrollment' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        allow(context).to receive_messages(:account => context)
-        enrollment.user_id = user.id
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        allow(@course).to receive_messages(:account => @course)
+        @enrollment.user_id = user.id
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
 
-    describe 'on an observer enrollment' do
-      let(:course) { Course.new(id: 99) }
-      let(:enrollment) { ObserverEnrollment.new(course_id: course.id) }
+
+    describe 'on a student enrollment with granular_permissions_manage_users' do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      it 'is true with :manage_students' do
-        context = course
+      before :each do
+        course_with_student
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is true for a user who has been granted :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it 'is false for a user without :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it 'is false for someone with :allow_course_admin_actions in other context' do
+        context = CourseSection.new(id: 10)
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        allow(context).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+      end
+
+      it 'is false if a user is trying to remove their own enrollment' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
+        allow(@course).to receive_messages(:account => @course)
+        @enrollment.user_id = user.id
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+    end
+
+    describe 'on an observer enrollment without granular_permissions_manage_users' do
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
+
+      before :each do
+        course_with_observer
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is true with :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
       it 'is true with :manage_admin_users' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
       it 'is false otherwise' do
-        context = course
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+    end
+
+    describe "on an observer enrollment with granular_permission_manage_users" do
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
+
+      before :each do
+        course_with_observer
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is true with :manage_students' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it "is true without :manage_students but with the :remove_observer_from_account granular" do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_observer_from_course).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it 'is false with :allow_course_admin_actions but not the granular' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it 'is false otherwise' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+    end
+
+    describe "on a teacher enrollment with granular_permission_manage_users" do
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
+
+      before :each do
+        course_with_teacher
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      end
+
+      it 'is false with :manage_students' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it "is true without :allow_course_admin_actions but with the :remove_teacher_from_account granular" do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_teacher_from_course).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
+      end
+
+      it 'is false with only :allow_course_admin_actions' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
+      end
+
+      it 'is false otherwise' do
+        allow(@course).to receive(:grants_right?).and_return(false)
+        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
   end
@@ -2942,7 +3106,7 @@ describe Enrollment do
 
     it "triggers a batch when enrollment is created" do
       added_user = user_factory
-      expect(DueDateCacher).to receive(:recompute_users_for_course).with(added_user.id, @course, nil, { update_grades: false })
+      expect(DueDateCacher).to receive(:recompute_users_for_course).with(added_user.id, @course, nil, { update_grades: true })
       @course.enroll_student(added_user)
     end
 
@@ -2974,6 +3138,44 @@ describe Enrollment do
       expect(DueDateCacher).to receive(:recompute_users_for_course).once
       expect(DueDateCacher).to receive(:recompute).never
       @enrollment.destroy
+    end
+
+    context 'with mastery paths' do
+      before do
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+        assignment_override_model(
+          assignment: @assignments.first,
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS
+        )
+        @override = assignment_override_model(assignment: @assignments.first)
+        @student_override = @override.assignment_override_students.create(user: @student)
+      end
+
+      it 'restores assignment override from mastery paths' do
+        @enrollment.destroy
+        expect(@override.reload.workflow_state).to eq 'deleted'
+        expect(@student_override.reload.workflow_state).to eq 'deleted'
+        @enrollment.enrollment_state.update(state:'invited')
+        @enrollment.update(workflow_state:'invited')
+        @enrollment.reload.accept!
+        expect(@override.reload.workflow_state).to eq 'active'
+        expect(@student_override.reload.workflow_state).to eq 'active'
+      end
+
+      it 'restores student assignment override from mastery paths' do
+        other_student = User.create!
+        @course.enroll_student(other_student, enrollment_state: :active)
+        @override.assignment_override_students.create!(user: other_student)
+        @enrollment.destroy
+        expect(@override.reload.workflow_state).to eq 'active'
+        expect(@student_override.reload.workflow_state).to eq 'deleted'
+        @enrollment.enrollment_state.update(state:'invited')
+        @enrollment.update(workflow_state:'invited')
+        @enrollment.reload.accept!
+        expect(@override.reload.workflow_state).to eq 'active'
+        expect(@student_override.reload.workflow_state).to eq 'active'
+      end
     end
   end
 
@@ -3030,22 +3232,6 @@ describe Enrollment do
           expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(false)
         end
       end
-    end
-  end
-
-  describe ".not_yet_started" do
-    before :once do
-      course_with_student(active_all: true)
-    end
-
-    it 'includes users for whom the enrollment has not yet started' do
-      allow_any_instance_of(Enrollment).to receive(:effective_start_at).and_return(1.month.from_now)
-      expect(Enrollment.not_yet_started(@course)).to include(@enrollment)
-    end
-
-    it 'excludes users for whom the enrollment has started' do
-      allow(@enrollment).to receive(:effective_start_at).and_return(1.month.ago)
-      expect(Enrollment.not_yet_started(@course)).not_to include(@enrollment)
     end
   end
 

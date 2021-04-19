@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'jsx/context_modules/stores/FolderStore'
+import store from '@canvas/select-content-dialog/stores/FolderStore'
 
 QUnit.module('FolderStore')
 

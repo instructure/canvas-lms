@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -72,7 +74,7 @@ describe StreamItemsHelper do
       @group_assignment_discussion = group_assignment_discussion({ :course => @course })
       @group_assignment_discussion.update_attribute(:user, @teacher)
       assignment = @group_assignment_discussion.assignment
-      assignment.update_attributes({
+      assignment.update({
         :due_at => 30.days.from_now,
         :lock_at => 30.days.from_now,
         :unlock_at => 20.days.from_now
@@ -199,13 +201,35 @@ describe StreamItemsHelper do
       student = @student
       create_enrollments(@course, [@other_user])
       assessor_submission = submission_model(assignment: @assignment, user: @other_user)
-      assessment_request = AssessmentRequest.create!(assessor: @other_user, asset: @submission,
-                                                     user: student, assessor_asset: assessor_submission)
+      assessment_request = AssessmentRequest.create!(
+        assessor: @other_user,
+        asset: @submission,
+        user: student,
+        assessor_asset: assessor_submission
+      )
       assessment_request.workflow_state = 'assigned'
       assessment_request.save
       items = @other_user.recent_stream_items
       @categorized = helper.categorize_stream_items(items, @other_user)
       expect(@categorized["AssessmentRequest"].first.summary).to include('Anonymous User')
+    end
+
+    it 'should anonymize path for anonymous AssessmentRequests' do
+      @assignment.update_attribute(:anonymous_peer_reviews, true)
+      student = @student
+      create_enrollments(@course, [@other_user])
+      assessor_submission = submission_model(assignment: @assignment, user: @other_user)
+      assessment_request = AssessmentRequest.create!(
+        assessor: @other_user,
+        asset: @submission,
+        user: student,
+        assessor_asset: assessor_submission
+      )
+      assessment_request.workflow_state = 'assigned'
+      assessment_request.save
+      items = @other_user.recent_stream_items
+      @categorized = helper.categorize_stream_items(items, @other_user)
+      expect(@categorized["AssessmentRequest"].first.path).to include('anonymous_submission')
     end
   end
 end

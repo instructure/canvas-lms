@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -414,7 +416,7 @@ describe "LTI integration tests" do
     end
 
     it "should include assignment outcome service params for student" do
-      allow(Canvas::Security).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
+      allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
 
@@ -479,8 +481,7 @@ describe "LTI integration tests" do
         "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
       end
 
-      course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-      expect(course).to eq @course
+      assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
       expect(assignment).to eq @assignment
       expect(user).to eq @user
     end

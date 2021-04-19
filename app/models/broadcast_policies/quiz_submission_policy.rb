@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -52,7 +54,7 @@ module BroadcastPolicies
     def quiz_is_accepting_messages_for_student?
       quiz_submission &&
       quiz.assignment &&
-      !quiz.muted? &&
+      quiz_posted?(quiz_submission) &&
       quiz.context.available? &&
       !quiz.deleted?
     end
@@ -76,6 +78,10 @@ module BroadcastPolicies
     def user_is_actively_enrolled?
       return false if quiz_submission.user.nil?
       quiz_submission.user.not_removed_enrollments.where(course_id: quiz.context_id).any?
+    end
+
+    def quiz_posted?(quiz_submission)
+      quiz_submission.posted?
     end
   end
 end

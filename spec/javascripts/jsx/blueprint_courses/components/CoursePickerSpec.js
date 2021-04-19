@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import CoursePicker from 'jsx/blueprint_courses/components/CoursePicker'
+import CoursePicker from 'ui/features/blueprint_course_master/react/components/CoursePicker.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('CoursePicker component')
@@ -30,7 +30,7 @@ const defaultProps = () => ({
   terms: getSampleData().terms,
   isLoadingCourses: false,
   loadCourses: () => {},
-  onSelectedChanged: () => {},
+  onSelectedChanged: () => {}
 })
 
 test('renders the CoursePicker component', () => {
@@ -56,7 +56,7 @@ test('calls loadCourses when filters are updated', () => {
   picker.onFilterChange({
     term: '',
     subAccount: '',
-    search: 'one',
+    search: 'one'
   })
 
   ok(props.loadCourses.calledOnce)

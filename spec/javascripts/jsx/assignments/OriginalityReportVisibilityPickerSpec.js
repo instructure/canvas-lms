@@ -18,16 +18,13 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import OriginalityReportVisibilityPicker from 'jsx/assignments/OriginalityReportVisibilityPicker'
+import OriginalityReportVisibilityPicker from 'ui/features/assignment_edit/react/OriginalityReportVisibilityPicker.js'
 
 QUnit.module('OriginalityReportVisibilityPicker')
 
 test('it renders', () => {
   const wrapper = shallow(
-    <OriginalityReportVisibilityPicker
-      isEnabled
-      selectedOption="immediate"
-    />
+    <OriginalityReportVisibilityPicker isEnabled selectedOption="immediate" />
   )
   ok(wrapper.exists())
 })
@@ -36,10 +33,7 @@ const options = ['immediate', 'after_grading', 'after_due_date', 'never']
 options.forEach(option => {
   test(`it renders "${option}" option`, () => {
     const wrapper = shallow(
-      <OriginalityReportVisibilityPicker
-        isEnabled
-        selectedOption="immediate"
-      />
+      <OriginalityReportVisibilityPicker isEnabled selectedOption="immediate" />
     )
     ok(wrapper.find(`option[value='${option}']`).exists())
   })
@@ -47,10 +41,7 @@ options.forEach(option => {
 
 test('it selects the "selectedOption"', () => {
   const wrapper = shallow(
-    <OriginalityReportVisibilityPicker
-      isEnabled
-      selectedOption="after_due_date"
-    />
+    <OriginalityReportVisibilityPicker isEnabled selectedOption="after_due_date" />
   )
   ok(wrapper.find('#report_visibility_picker_select').prop('value'), 'after_due_date')
 })

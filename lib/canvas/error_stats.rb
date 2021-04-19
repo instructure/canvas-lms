@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -19,13 +21,32 @@ module Canvas
   # Simple class for shipping errors to statsd based on the format
   # propogated from callbacks on Canvas::Errors
   class ErrorStats
-    def self.capture(exception, _data)
+    def self.capture(exception, data, level=:error)
       category = exception
+      cause_category = nil
       unless exception.is_a?(String) || exception.is_a?(Symbol)
         category = exception.class.name
+        if exception.respond_to?(:cause) && exception.cause.present?
+          cause_category = exception.cause.class.name
+        end
       end
-      InstStatsd::Statsd.increment("errors.all")
-      InstStatsd::Statsd.increment("errors.#{category}")
+      # careful!  adding tags is useful for finding things,
+      # but every unique combination of tags gets treated
+      # as a custom metric for billing purposes.  Only
+      # add high value and low-ish cardinality tags.
+      all_tags = data.fetch(:tags, {})
+      stat_tags = all_tags.fetch(:for_stats, {})
+      # convenience for propogating the "type" parameter
+      # passed in Canvas::Errors.capture_exception,
+      # which is usually a subsystem label
+      stat_tags[:type] = all_tags[:type]
+      stat_tags[:category] = category.to_s
+      InstStatsd::Statsd.increment("errors.#{level}", tags: stat_tags)
+      if cause_category.present?
+        # if there's an inner exception, let's stat that one too.
+        cause_tags = stat_tags.merge({category: cause_category.to_s})
+        InstStatsd::Statsd.increment("errors.#{level}", tags: cause_tags)
+      end
     end
   end
 end

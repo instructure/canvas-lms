@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DueDateTokenWrapper from 'jsx/due_dates/DueDateTokenWrapper'
+import DueDateTokenWrapper from '@canvas/due-dates/react/DueDateTokenWrapper'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateTokenWrapper', {

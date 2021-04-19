@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe DeveloperKey do
   let(:account) { Account.create! }
@@ -38,6 +41,353 @@ describe DeveloperKey do
       email:        'test@test.com',
       redirect_uri: 'http://test.com',
     )
+  end
+
+  describe '#find_cached' do
+    it "raises error when not found, and caches that" do
+      enable_cache do
+        expect(DeveloperKey).to receive(:find_by).once.and_call_original
+        expect { DeveloperKey.find_cached(0) }.to raise_error(ActiveRecord::RecordNotFound)
+        # only calls the original once
+        expect { DeveloperKey.find_cached(0) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+
+  describe 'site_admin' do
+    subject { DeveloperKey.site_admin }
+
+    let!(:site_admin_key) { DeveloperKey.create! }
+    let!(:root_account_key) { DeveloperKey.create!(account: Account.default) }
+
+    it { is_expected.to match_array [site_admin_key] }
+  end
+
+  describe 'default values for is_lti_key' do
+    let(:public_jwk) do
+      key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
+      key_hash['kty'] = key_hash['kty'].to_s
+      key_hash
+    end
+    let(:public_jwk_url) { "https://hello.world.com" }
+
+    it 'throws error if public jwk and public jwk are absent' do
+      expect { DeveloperKey.create!(is_lti_key: true) }.to raise_error ActiveRecord::RecordInvalid
+    end
+
+    it 'validates when public jwk is present' do
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk: public_jwk) }.to_not raise_error
+    end
+
+    it 'validates when public jwk url is present' do
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url: public_jwk_url) }.to_not raise_error
+    end
+  end
+
+  describe 'external tool management' do
+    specs_require_sharding
+    include_context 'lti_1_3_spec_helper'
+
+    let(:shard_1_account) { @shard1.activate { account_model } }
+    let(:developer_key) { @shard1.activate { DeveloperKey.create!(root_account: shard_1_account) } }
+    let(:shard_1_tool) do
+      tool = nil
+      @shard1.activate do
+        tool = ContextExternalTool.create!(
+          name: 'shard 1 tool',
+          workflow_state: 'public',
+          developer_key: developer_key,
+          context: shard_1_account,
+          url: 'https://www.test.com',
+          consumer_key: 'key',
+          shared_secret: 'secret'
+        )
+        DeveloperKeyAccountBinding.create!(
+          developer_key: tool.developer_key,
+          account: shard_1_account,
+          workflow_state: 'on'
+        )
+      end
+      tool
+    end
+    let(:shard_2_account) { @shard2.activate { account_model } }
+    let(:shard_2_tool) do
+      tool = nil
+      @shard2.activate do
+        tool = ContextExternalTool.create!(
+          name: 'shard 2 tool',
+          workflow_state: 'public',
+          developer_key: developer_key,
+          context: shard_2_account,
+          url: 'https://www.test.com',
+          consumer_key: 'key',
+          shared_secret: 'secret'
+        )
+        DeveloperKeyAccountBinding.create!(
+          developer_key: tool.developer_key,
+          account: shard_2_account,
+          workflow_state: 'off'
+        )
+      end
+      tool
+    end
+
+    describe '#restore_external_tools!' do
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        shard_1_tool.update!(root_account: shard_1_account)
+        shard_2_tool.update!(root_account: shard_2_account)
+        subject
+      end
+
+      context 'when account is site admin' do
+        subject do
+          @shard1.activate do
+            developer_key.restore_external_tools!(account)
+            run_jobs
+          end
+        end
+
+        let(:account) { Account.site_admin }
+
+        it 'restores tools in non-disabled states' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'public'
+        end
+
+        it 'restores tools in disabled states' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+    end
+
+    describe '#disable_external_tools!' do
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        shard_1_tool
+        shard_2_tool
+        subject
+      end
+
+      context 'when account is site admin' do
+        subject do
+          @shard1.activate do
+            developer_key.disable_external_tools!(account)
+            run_jobs
+          end
+        end
+
+        let(:account) { Account.site_admin }
+
+        it 'disables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+        end
+
+        it 'disables tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+
+      context 'account is not site admin' do
+        subject do
+          @shard1.activate do
+            developer_key.disable_external_tools!(account)
+            run_jobs
+          end
+        end
+
+        let(:account) { shard_1_tool.root_account }
+
+        it 'disables associated tools on the active shard' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+        end
+
+        it 'does not disable tools on inactive shards' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'public'
+        end
+      end
+    end
+
+    describe '#enable_external_tools!' do
+      subject do
+        @shard1.activate do
+          developer_key.enable_external_tools!(account)
+          run_jobs
+        end
+      end
+
+      before do
+        developer_key
+        @shard1.activate { tool_configuration.update!(privacy_level: 'anonymous') }
+        shard_1_tool.update!(workflow_state: 'disabled')
+        shard_2_tool.update!(workflow_state: 'disabled')
+        subject
+      end
+
+      context 'account is site admin' do
+        let(:account) { Account.site_admin }
+
+        it 'enables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
+        end
+
+        it 'enables tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'anonymous'
+        end
+      end
+
+      context 'is_site_admin is false' do
+        let(:account) { shard_1_tool.root_account }
+
+        it 'enables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
+        end
+
+        it 'does not enable tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+    end
+
+    describe '#update_external_tools!' do
+      subject do
+        @shard1.activate do
+          tool_configuration.settings['title'] = new_title
+          tool_configuration.save!
+          developer_key.update_external_tools!
+          run_jobs
+        end
+      end
+
+      let(:new_title) { 'New Title!' }
+
+      before do
+        developer_key
+        @shard1.activate { tool_configuration.update!(privacy_level: 'anonymous') }
+        shard_1_tool.update!(workflow_state: 'disabled')
+        shard_2_tool.update!(workflow_state: 'disabled')
+      end
+
+      context 'when site admin key' do
+        before do
+          developer_key.update!(account: nil)
+          subject
+          run_jobs
+        end
+
+        it 'updates tools on all shard 1' do
+          expect(shard_1_tool.reload.name).to eq new_title
+        end
+
+        it 'updates tools on shard 2' do
+          expect(shard_2_tool.reload.name).to eq new_title
+        end
+      end
+
+      context 'when non-site admin key' do
+        before do
+          developer_key.update!(account: shard_1_account)
+          subject
+          run_jobs
+        end
+
+        it 'updates tools on shard 1' do
+          expect(shard_1_tool.reload.name).to eq new_title
+        end
+
+        it 'does not update tools on shard 2' do
+          expect(shard_2_tool.reload.name).to eq 'shard 2 tool'
+        end
+      end
+    end
+  end
+
+  describe 'usable_in_context?' do
+    let(:account) { account_model }
+    let(:developer_key) { DeveloperKey.create!(account: account) }
+
+    shared_examples_for 'a boolean indicating the key is usable in context' do
+      subject { developer_key.usable_in_context?(context) }
+
+      let(:context) { raise 'set in examples' }
+
+      context 'when the key is usable and the binding is on' do
+        before do
+          developer_key.account_binding_for(account).update!(workflow_state: 'on')
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when the key is not usable' do
+        before { developer_key.update!(workflow_state: 'deleted') }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'when the binding is not on' do
+        it { is_expected.to eq false }
+      end
+    end
+
+    context 'when the context is an account' do
+      it_behaves_like 'a boolean indicating the key is usable in context' do
+        let(:context) { account }
+      end
+    end
+
+    context 'when the context is a course' do
+      it_behaves_like 'a boolean indicating the key is usable in context' do
+        let(:context) { course_model(account: account) }
+      end
+    end
+  end
+
+  describe "site_admin_lti scope" do
+    specs_require_sharding
+    include_context 'lti_1_3_spec_helper'
+
+    context "when root account and site admin keys exist" do
+      subject do
+        DeveloperKey.site_admin_lti(
+          [
+            root_account_key,
+            site_admin_key,
+            lti_site_admin_key
+          ].map(&:global_id)
+        )
+      end
+
+      let(:root_account_key) do
+        @shard1.activate do
+          a = account_model
+          DeveloperKey.create!(
+            account: a,
+            tool_configuration: tool_configuration.dup
+          )
+        end
+      end
+
+      let(:site_admin_key) do
+        Account.site_admin.shard.activate do
+          DeveloperKey.create!
+        end
+      end
+
+      let(:lti_site_admin_key) do
+        Account.site_admin.shard.activate do
+          k = DeveloperKey.create!
+          Lti::ToolConfiguration.create!(
+            developer_key: k,
+            settings: settings.merge(public_jwk: tool_config_public_jwk)
+          )
+          k
+        end
+      end
+
+      it { is_expected.to match_array [lti_site_admin_key] }
+    end
   end
 
   describe "sets a default value" do
@@ -196,9 +546,68 @@ describe DeveloperKey do
     end
 
     context 'when site admin' do
+      let(:key) { DeveloperKey.create!(account: nil) }
+
       it 'it creates a binding on save' do
-        key = DeveloperKey.create!(account: nil)
         expect(key.developer_key_account_bindings.find_by(account: Account.site_admin)).to be_present
+      end
+
+      describe 'destroy_external_tools!' do
+        include_context 'lti_1_3_spec_helper'
+        specs_require_sharding
+
+        subject do
+          @shard1.activate { ContextExternalTool.active }.merge(
+            @shard2.activate { ContextExternalTool.active }
+          )
+        end
+
+        context 'when developer key is an LTI key' do
+          let(:shard_1_account) { @shard1.activate { account_model } }
+          let(:shard_2_account) { @shard2.activate { account_model } }
+          let(:configuration) { Account.site_admin.shard.activate { tool_configuration } }
+          let(:shard_1_tool) do
+            t = @shard1.activate { configuration.new_external_tool(shard_1_account) }
+            t.save!
+            t
+          end
+          let(:shard_2_tool) do
+            t = @shard2.activate { configuration.new_external_tool(shard_2_account) }
+            t.save!
+            t
+          end
+
+          before do
+            shard_1_tool
+            shard_2_tool
+            developer_key.update!(account: nil)
+          end
+
+          it 'destroys associated tools across all shards' do
+            developer_key.destroy
+            run_jobs
+            expect(subject).to be_empty
+          end
+
+          context 'when tools are installed at the course level' do
+            let(:shard_1_course) { shard_1_account.shard.activate { course_model(account: shard_1_account) } }
+            let(:shard_1_course_tool) do
+              t = @shard1.activate { configuration.new_external_tool(shard_1_course) }
+              t.save!
+              t
+            end
+
+            before do
+              shard_1_course_tool
+            end
+
+            it 'destroys associated tools across all shards' do
+              developer_key.destroy
+              run_jobs
+              expect(subject).to be_empty
+            end
+          end
+        end
       end
     end
 
@@ -206,6 +615,90 @@ describe DeveloperKey do
       it 'it creates a binding on save' do
         key = DeveloperKey.create!(account: account)
         expect(key.developer_key_account_bindings.find_by(account: account)).to be_present
+      end
+
+      describe 'destroy_external_tools!' do
+        include_context 'lti_1_3_spec_helper'
+        specs_require_sharding
+
+        subject { ContextExternalTool.active }
+
+        let(:account) { account_model }
+        let(:tool) do
+          t = tool_configuration.new_external_tool(account)
+          t.save!
+          t
+        end
+
+        before do
+          tool
+        end
+
+        context 'when developer key is an LTI key' do
+          it 'destroys associated tools on the current shard' do
+            developer_key.destroy
+            run_jobs
+            expect(subject).to be_empty
+          end
+
+          context 'when tools are installed at the course level' do
+            let(:course) { course_model(account: account) }
+            let(:course_tool) do
+              t = tool_configuration.new_external_tool(course)
+              t.save!
+              t
+            end
+
+            before { course_tool }
+
+            it 'destroys associated tools on the current shard' do
+              developer_key.destroy
+              run_jobs
+              expect(subject).to be_empty
+            end
+          end
+        end
+      end
+    end
+
+    describe 'after_save' do
+      describe 'set_root_account' do
+        context 'when account is not root account' do
+          let(:account) {
+            a = account_model
+            a.root_account = Account.create!
+            a.save!
+            a
+          }
+
+          it 'sets root account equal to account\'s root account' do
+            expect(developer_key_not_saved.root_account).to be_nil
+            developer_key_not_saved.account = account
+            developer_key_not_saved.save!
+            expect(developer_key_not_saved.root_account).to eq account.root_account
+          end
+        end
+
+        context 'when accout is site admin' do
+          subject { developer_key_not_saved.root_account }
+
+          let(:account) { nil }
+
+          before { developer_key_not_saved.update!(account: account) }
+
+          it { is_expected.to eq Account.site_admin }
+        end
+
+        context 'when account is root account' do
+          let(:account) { account_model }
+
+          it 'set root account equal to account' do
+            expect(developer_key_not_saved.root_account).to be_nil
+            developer_key_not_saved.account = account
+            developer_key_not_saved.save!
+            expect(developer_key_not_saved.root_account).to eq account
+          end
+        end
       end
     end
   end
@@ -327,6 +820,19 @@ describe DeveloperKey do
         end
       end
       let(:sa_account_binding) { sa_developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
+
+      context 'when the developer key and account are on different, non site-admin shards' do
+        it "doesn't return a binding for an account with the same local ID on a different shard" do
+          expect(root_account.shard.id).to_not eq(@shard2.id)
+          @shard2.activate do
+            account = Account.find_by(id: root_account.local_id)
+            account ||= Account.create!(id: root_account.local_id)
+            shard2_developer_key = DeveloperKey.create!(name: 'Shard 2 Key', account_id: account.id)
+            expect(shard2_developer_key.account_binding_for(account)).to_not be_nil
+            expect(shard2_developer_key.account_binding_for(root_account)).to be_nil
+          end
+        end
+      end
 
       context 'when developer key binding is on the site admin shard' do
         it 'finds the site admin binding if it is set to "on"' do
@@ -454,11 +960,11 @@ describe DeveloperKey do
       before { subject.generate_rsa_keypair! }
 
       it 'populates the "public_jwk" column with a public key' do
-        expect(subject.public_jwk['kty']).to eq Lti::RSAKeyPair::KTY
+        expect(subject.public_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY
       end
 
       it 'populates the "private_jwk" attribute with a private key' do
-        expect(subject.private_jwk['kty']).to eq Lti::RSAKeyPair::KTY.to_sym
+        expect(subject.private_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY.to_sym
       end
     end
   end
@@ -497,6 +1003,13 @@ describe DeveloperKey do
       expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
       expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
       expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+    end
+
+    it "requires scheme to match on lenient matches" do
+      developer_key_not_saved.redirect_uri = "http://example.com/a/b"
+
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq true
+      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to eq false
     end
   end
 
@@ -568,5 +1081,41 @@ describe DeveloperKey do
   it "doesn't allow the default key to be deleted" do
     expect { DeveloperKey.default.destroy }.to raise_error "Please never delete the default developer key"
     expect { DeveloperKey.default.deactivate }.to raise_error "Please never delete the default developer key"
+  end
+
+  describe "issue_token" do
+    subject { DeveloperKey.create! }
+    let(:claims) { { "key" => "value" } }
+    let(:asymmetric_keypair) { Canvas::Security::RSAKeyPair.new.to_jwk }
+    let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }
+
+    before {
+      # set up assymetric key
+      allow(Canvas::Oauth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
+    }
+
+
+    it "defaults to internal symmetric encryption with no audience set" do
+      expect(subject.client_credentials_audience).to be_nil
+      token = subject.issue_token(claims)
+      decoded = Canvas::Security.decode_jwt(token)
+      expect(decoded).to eq claims
+    end
+
+    it "uses to symmetric encryption with audience set to internal" do
+      subject.client_credentials_audience = "internal"
+      subject.save!
+      token = subject.issue_token(claims)
+      decoded = Canvas::Security.decode_jwt(token)
+      expect(decoded).to eq claims
+    end
+
+    it "uses to asymmetric encryption with audience set to external" do
+      subject.client_credentials_audience = "external"
+      subject.save!
+      token = subject.issue_token(claims)
+      decoded = JSON::JWT.decode(token, asymmetric_public_key)
+      expect(decoded).to eq claims
+    end
   end
 end

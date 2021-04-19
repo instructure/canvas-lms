@@ -16,27 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import sinon from "sinon";
-import scroll from "../../src/common/scroll";
-import scrollIntoView from "scroll-into-view";
+import assert from 'assert'
+import sinon from 'sinon'
+import scroll from '../../src/common/scroll'
+import scrollIntoView from 'scroll-into-view'
 
-describe("scroll", () => {
+describe('scroll', () => {
   beforeEach(() => {
-    sinon.stub(scrollIntoView, "scrollIntoView");
-  });
+    sinon.stub(scrollIntoView, 'scrollIntoView')
+  })
 
   afterEach(() => {
-    scrollIntoView.scrollIntoView.restore();
-  });
+    scrollIntoView.scrollIntoView.restore()
+  })
 
-  describe("element in view method", () => {
-    it("calls scrollIntoView()", done => {
-      scroll.scrollIntoViewWDelay(null, {});
+  describe('element in view method', () => {
+    it('calls scrollIntoView()', done => {
+      scroll.scrollIntoViewWDelay(null, {})
       setTimeout(() => {
-        assert.ok(scrollIntoView.scrollIntoView.calledWith(null, {}));
-        done();
-      }, scroll.INTERIM_DELAY * 1.1);
-    });
-  });
-});
+        assert.ok(scrollIntoView.scrollIntoView.calledWith(null, {}))
+        done()
+      }, scroll.INTERIM_DELAY * 1.1)
+    })
+  })
+})

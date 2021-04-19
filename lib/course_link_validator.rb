@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ class CourseLinkValidator
 
     progress ||= Progress.new(:tag => TAG, :context => course)
     progress.reset!
-    progress.process_job(self, :process)
+    progress.process_job(self, :process, {})
     progress
   end
 
@@ -183,7 +185,7 @@ class CourseLinkValidator
   # pretty much copied from ImportedHtmlConverter
   def find_invalid_links(html)
     links = []
-    doc = Nokogiri::HTML(html || "")
+    doc = Nokogiri::HTML5(html || "")
     attrs = ['href', 'src', 'data', 'value']
 
     doc.search("*").each do |node|
@@ -255,6 +257,7 @@ class CourseLinkValidator
     object ||= Context.find_asset_by_url(url)
     unless object
       return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
+      return :missing_item if url =~ /\/media_objects_iframe\//
       return nil
     end
     if object.deleted?
@@ -274,8 +277,20 @@ class CourseLinkValidator
     :missing_item
   end
 
+  # whitelisted hosts will never be flagged as unavailable
+  def whitelisted?(url)
+    @whitelist ||= Setting.get('link_validator_whitelisted_hosts', '').split(',')
+    return false if @whitelist.empty?
+    host = URI.parse(url).host
+    @whitelist.include?(host)
+  rescue URI::InvalidURIError
+    false
+  end
+
   # ping the url and make sure we get a 200
   def reachable_url?(url)
+    return true if whitelisted?(url)
+
     @unavailable_photo_redirect_pattern ||= Regexp.new(Setting.get('unavailable_photo_redirect_pattern', 'yimg\.com/.+/photo_unavailable.png$'))
     redirect_proc = lambda do |response|
       # flickr does a redirect to this file when a photo is deleted/not found;
@@ -295,7 +310,7 @@ class CourseLinkValidator
       case response.code
       when /^2/ # 2xx code
         true
-      when "401", "403", "503"
+      when "401", "403", "429", "503"
         # we accept unauthorized and forbidden codes here because sometimes servers refuse to serve our requests
         # and someone can link to a site that requires authentication anyway - doesn't necessarily make it invalid
         true

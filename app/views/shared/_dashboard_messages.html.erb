@@ -17,9 +17,12 @@
 %>
 
 <%# These all take care of their own conditions for showing/hiding %>
-<%# TODO: aria roles for these. maybe use list/listitem or region 
+<%# TODO: aria roles for these. maybe use list/listitem or region
     http://www.w3.org/TR/wai-aria/roles#document_structure_roles %>
-<%= render :partial => 'shared/account_notification', :collection => @announcements %>
+<% js_bundle :past_global_alert %>
+<div id='announcementWrapper'>
+  <%= render :partial => 'shared/account_notification', :collection => @announcements %>
+</div>
 <%= render :partial => 'users/current_conference', :collection => @current_conferences %>
 <%= render :partial => 'users/scheduled_conference', :collection => @scheduled_conferences %>
 <%= render :partial => 'users/welcome' %>

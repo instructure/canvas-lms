@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -19,17 +21,19 @@ require_dependency 'importers'
 
 module Importers
   class LearningOutcomeGroupImporter < Importer
-    extend OutcomeImporter
-
     self.item_class = LearningOutcomeGroup
 
-    def self.import_from_migration(hash, migration, item=nil)
+    def self.import_from_migration(hash, migration, item=nil, skip_import=false)
       hash = hash.with_indifferent_access
+      if skip_import
+        Importers::LearningOutcomeGroupImporter.process_children(hash, hash[:parent_group], migration, skip_import)
+        return
+      end
       if hash[:is_global_standard]
         if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
           hash[:parent_group] ||= LearningOutcomeGroup.global_root_outcome_group
-          item ||= LearningOutcomeGroup.global.where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
-          item ||= LearningOutcomeGroup.global.where(vendor_clause(hash[:vendor_guid])).first if hash[:vendor_guid]
+          item ||= LearningOutcomeGroup.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
+          item ||= LearningOutcomeGroup.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
           item ||= LearningOutcomeGroup.new
         else
           migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
@@ -38,8 +42,18 @@ module Importers
       else
         context = migration.context
         root_outcome_group = context.root_outcome_group
+        parent_group = hash[:parent_group] || root_outcome_group
+
         item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s).
-          where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
+          where(migration_id: hash[:migration_id]).first if hash[:migration_id]
+        item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
+          context: context, learning_outcome_group: parent_group) if hash[:vendor_guid].present?
+        # Don't migrate if we already have a folder with the same name inside the parent_group
+        item ||= LearningOutcomeGroup.active.where(
+          context: context,
+          learning_outcome_group: parent_group,
+          title: hash[:title]
+        ).first
         item ||= context.learning_outcome_groups.temp_record
         item.context = context
         item.mark_as_importing!(migration)
@@ -80,19 +94,30 @@ module Importers
       item.skip_parent_group_touch = true
       migration.add_imported_item(item)
 
+      Importers::LearningOutcomeGroupImporter.process_children(hash, item, migration)
+
+      item
+    end
+
+    def self.process_children(hash, item, migration, skip_import=false)
       if hash[:outcomes]
         hash[:outcomes].each do |child|
           if child[:type] == 'learning_outcome_group'
             child[:parent_group] = item
-            Importers::LearningOutcomeGroupImporter.import_from_migration(child, migration)
+            Importers::LearningOutcomeGroupImporter.import_from_migration(
+              child,
+              migration,
+              nil,
+              skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
+            )
           else
             child[:learning_outcome_group] = item
-            Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+            if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
+              Importers::LearningOutcomeImporter.import_from_migration(child, migration)
+            end
           end
         end
       end
-
-      item
     end
   end
 end

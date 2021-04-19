@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -70,7 +72,7 @@ module Lti
     # Creates a webook subscription for the specified event type and
     # context.
     #
-    # @argument submission[ContextId] [Required, String]
+    # @argument subscription[ContextId] [Required, String]
     #   The id of the context for the subscription.
     #
     # @argument subscription[ContextType] [Required, String]

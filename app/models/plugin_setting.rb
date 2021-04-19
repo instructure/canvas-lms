@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -46,7 +48,7 @@ class PluginSetting < ActiveRecord::Base
   def validate_posted_settings
     if @posted_settings
       plugin = Canvas::Plugin.find(name.to_s)
-      @posted_settings.transform_values{|v| v.strip! if v.is_a?(String)}
+      @posted_settings.transform_values! {|v| v.is_a?(String) ? v.strip : v }
       result = plugin.validate_settings(self, @posted_settings)
       throw :abort if result == false
     end
@@ -63,6 +65,7 @@ class PluginSetting < ActiveRecord::Base
     return unless settings && self.plugin
     @valid_settings = true
     if self.plugin.encrypted_settings
+      was_dirty = self.changed?
       self.plugin.encrypted_settings.each do |key|
         if settings["#{key}_enc".to_sym]
           begin
@@ -73,6 +76,8 @@ class PluginSetting < ActiveRecord::Base
           settings[key] = DUMMY_STRING
         end
       end
+      # We shouldn't consider a plugin setting to be dirty if all that changed were the decrypted/placeholder attributes
+      self.clear_changes_information unless was_dirty
     end
   end
 

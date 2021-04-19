@@ -27,81 +27,73 @@
  * any '<td><iframe>' conditions in the table. if there are, the code inserts
  * a div to make it '<td><div><iframe>'
  * ultimately, we need to get this fixed in tinymce, but this hack will resolve
- * the customer issue now in the short term. 
+ * the customer issue now in the short term.
  */
 export default class IframesTableFix {
   getHackedTables(editor) {
-    return editor.hackedTables || [];
+    return editor.hackedTables || []
   }
 
   setHackedTables(editor, hackedTables) {
-    editor.hackedTables = hackedTables;
+    editor.hackedTables = hackedTables
   }
 
   cleanHackedTables(editor) {
-    const hackedTables = this.getHackedTables(editor);
-    const tables = editor.dom.select("table");
-    this.setHackedTables(
-      editor,
-      hackedTables.filter(t => tables.indexOf(t) > -1)
-    );
+    const hackedTables = this.getHackedTables(editor)
+    const tables = editor.dom.select('table')
+    this.setHackedTables(editor, hackedTables.filter(t => tables.indexOf(t) > -1))
   }
 
   isTableHacked(editor, table) {
-    this.cleanHackedTables(editor);
-    return this.getHackedTables(editor).indexOf(table) > -1;
+    this.cleanHackedTables(editor)
+    return this.getHackedTables(editor).indexOf(table) > -1
   }
 
   addHackedTable(editor, table) {
-    this.getHackedTables(editor).push(table);
+    this.getHackedTables(editor).push(table)
   }
 
   fixIframes(editor) {
-    const tds =
-      editor && editor.dom && editor.dom.select ? editor.dom.select("td") : [];
-    const brokenTds = [];
+    const tds = editor && editor.dom && editor.dom.select ? editor.dom.select('td') : []
+    const brokenTds = []
     tds.forEach(td => {
       const spanChildren = [].slice
         .call(td.children)
-        .filter(
-          n =>
-            n.tagName === "SPAN" &&
-            n.getAttribute("data-mce-object") === "iframe"
-        );
+        .filter(n => n.tagName === 'SPAN' && n.getAttribute('data-mce-object') === 'iframe')
       if (spanChildren.length > 0) {
         if (brokenTds.indexOf(td) === -1) {
-          td.innerHTML = `<div>${td.innerHTML}</div>`;
-          brokenTds.push(td);
+          td.innerHTML = `<div>${td.innerHTML}</div>`
+          brokenTds.push(td)
         }
       }
-    });
+    })
   }
 
   addMutationObserverToTables(editor, MutationObserver) {
     const tables =
       editor && editor.dom && editor.dom.select
-        ? editor.dom.select("table").filter(t => !this.isTableHacked(editor, t))
-        : [];
+        ? editor.dom.select('table').filter(t => !this.isTableHacked(editor, t))
+        : []
     if (tables.length > 0) {
       const mo = new MutationObserver(() => {
-        this.fixIframes(editor);
-      });
+        this.fixIframes(editor)
+      })
       for (let i = tables.length - 1; i >= 0; i--) {
-        const table = tables[i];
-        mo.observe(table, { childList: true, subtree: true });
-        this.addHackedTable(editor, table);
+        const table = tables[i]
+        mo.observe(table, {childList: true, subtree: true})
+        this.addHackedTable(editor, table)
       }
     }
-    this.fixIframes(editor);
+    this.fixIframes(editor)
   }
 
   hookAddVisual(editor, MutationObserver) {
-    const addVisual = editor.addVisual.bind(editor);
+    const addVisual = editor.addVisual.bind(editor)
     const newAddVisual = elm => {
-      this.addMutationObserverToTables(editor, MutationObserver);
-      addVisual(elm);
-    };
-    editor.addVisual = newAddVisual.bind(editor);
-    this.addMutationObserverToTables(editor, MutationObserver);
+      this.addMutationObserverToTables(editor, MutationObserver)
+      addVisual(elm)
+    }
+    editor.addVisual = newAddVisual.bind(editor)
+    this.addMutationObserverToTables(editor, MutationObserver)
   }
 }

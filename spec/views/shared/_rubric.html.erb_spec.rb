@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -19,11 +21,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/shared/_rubric" do
+describe "shared/_rubric" do
   let(:context) { course_model }
   let(:rubric) { rubric_model(context: context) }
   let(:rubric_association) { rubric_association_model(context: context, rubric: rubric) }
-  let(:html) { Nokogiri::HTML.fragment(response) }
+  let(:html) { Nokogiri::HTML5.fragment(response) }
 
   it "should render" do
     view_context(context)

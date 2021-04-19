@@ -21,8 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
-import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
-import Folder from 'compiled/models/Folder'
+import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
+import Folder from '@canvas/files/backbone/models/Folder'
 
 QUnit.module('RestrictedDialogForm Multiple Selected Items', {
   setup() {
@@ -95,7 +95,6 @@ test(
   1,
   function() {
     const refs = this.restrictedDialogForm
-    Simulate.change(refs.restrictedSelection.permissionsInput)
     this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
     const startDate = new Date(2016, 5, 1)
     const endDate = new Date(2016, 5, 4)
@@ -122,7 +121,6 @@ test(
 
 test('accepts blank unlock_at date', function() {
   const refs = this.restrictedDialogForm
-  Simulate.change(refs.restrictedSelection.permissionsInput)
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const endDate = new Date(2016, 5, 4)
   $(refs.restrictedSelection.unlock_at).data('unfudged-date', null)
@@ -147,7 +145,6 @@ test('accepts blank unlock_at date', function() {
 
 test('accepts blank lock_at date', function() {
   const refs = this.restrictedDialogForm
-  Simulate.change(refs.restrictedSelection.permissionsInput)
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const startDate = new Date(2016, 5, 4)
   $(refs.restrictedSelection.unlock_at).data('unfudged-date', startDate)
@@ -172,7 +169,6 @@ test('accepts blank lock_at date', function() {
 
 test('rejects unlock_at date after lock_at date', function() {
   const refs = this.restrictedDialogForm
-  Simulate.change(refs.restrictedSelection.permissionsInput)
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const startDate = new Date(2016, 5, 4)
   const endDate = new Date(2016, 5, 1)

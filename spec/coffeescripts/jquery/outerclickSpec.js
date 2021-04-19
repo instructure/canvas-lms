@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery/outerclick'
+import 'ui/features/manage_groups/jquery/outerclick.js'
 
 QUnit.module('outerclick')
 
-test('should work', function() {
+test('should work', () => {
   const handler = sinon.spy()
   const $doc = $(document)
   const $foo = $('<b>hello <i>world</i></b>').appendTo($doc)

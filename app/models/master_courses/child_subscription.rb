@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -16,8 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class MasterCourses::ChildSubscription < ActiveRecord::Base
+  # links an associated course to the blueprint (via the master_template)
+  # keeps track of the last sync status so future syncs know whether they perform faster selective syncs
+  # also links the associated course to child_content_tags to keep track of changes
+
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :child_course, :class_name => "Course"
+  belongs_to :root_account, :class_name => 'Account'
+
+  before_create :set_root_account_id
 
   has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
 
@@ -62,12 +71,16 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
     # mess up the migration ids so restrictions no longer get applied
     if workflow_state_changed?
       if deleted? && workflow_state_was == 'active'
-        self.unlink_syllabus!
-        self.add_deactivation_prefix!
+        self.class.connection.after_transaction_commit do
+          self.unlink_syllabus!
+          self.add_deactivation_prefix!
+        end
       elsif active? && workflow_state_was == 'deleted'
         self.use_selective_copy = false # require a full import next time
-        self.link_syllabus!
-        self.remove_deactivation_prefix!
+        self.class.connection.after_transaction_commit do
+          self.link_syllabus!
+          self.remove_deactivation_prefix!
+        end
       end
     end
   end
@@ -88,7 +101,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   def add_deactivation_prefix!
-    where_clause = ["migration_id LIKE ?", "#{MasterCourses::MasterTemplate.migration_id_prefix(self.shard.id, self.master_template_id)}%"]
+    where_clause = ["migration_id IS NOT NULL AND migration_id LIKE ?", "#{MasterCourses::MasterTemplate.migration_id_prefix(self.shard.id, self.master_template_id)}%"]
     update_query = ["migration_id = concat(?, migration_id)", self.deactivation_prefix]
     update_content_in_child_course(where_clause, update_query)
   end
@@ -102,7 +115,9 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   def update_content_in_child_course(where_clause, update_query)
     if self.child_content_tags.where(where_clause).update_all(update_query) > 0 # don't run all the rest of it if there's no reason to
       self.content_scopes_for_deactivation.each do |scope|
-        scope.where(where_clause).update_all(update_query)
+        scope.where(where_clause).find_ids_in_batches do |ids|
+          scope.where(where_clause).where(scope.klass.primary_key => ids).update_all(update_query)
+        end
       end
     end
   end
@@ -122,5 +137,9 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
 
   def last_migration_id
     child_course.content_migrations.where(child_subscription_id: self).order('id desc').limit(1).pluck(:id).first
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.child_course.root_account_id
   end
 end

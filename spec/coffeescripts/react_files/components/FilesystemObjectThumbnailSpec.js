@@ -19,10 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import File from 'compiled/models/File'
-import Folder from 'compiled/models/Folder'
-import FilesystemObject from 'compiled/models/FilesystemObject'
-import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
+import File from '@canvas/files/backbone/models/File.coffee'
+import Folder from '@canvas/files/backbone/models/Folder'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObjectThumbnail from '@canvas/files/react/components/FilesystemObjectThumbnail'
 
 QUnit.module('Filesystem Object Thumbnail: file', {
   setup() {
@@ -49,13 +49,16 @@ QUnit.module('Filesystem Object Thumbnail: file', {
 test('displays the thumbnail image', function() {
   equal(
     $(ReactDOM.findDOMNode(this.thumbnail)).attr('style'),
-    "background-image: url(\"sweet_thumbnail_url\");",
+    'background-image: url("sweet_thumbnail_url");',
     'set background image to correct url'
   )
 })
 
 test('adds class name from props to the span', function() {
-  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'), 'finds the custom className')
+  ok(
+    $(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'),
+    'finds the custom className'
+  )
 })
 
 QUnit.module('Filesystem Object Thumbnail: folder', {
@@ -78,11 +81,17 @@ QUnit.module('Filesystem Object Thumbnail: folder', {
 })
 
 test("adds mimeClass-Folder if it's a folder", function() {
-  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('mimeClass-folder'), 'adds mimeClass for folder')
+  ok(
+    $(ReactDOM.findDOMNode(this.thumbnail)).hasClass('mimeClass-folder'),
+    'adds mimeClass for folder'
+  )
 })
 
 test('adds on className to i tag if set in props', function() {
-  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'), 'finds the custom className')
+  ok(
+    $(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'),
+    'finds the custom className'
+  )
 })
 
 QUnit.module('Filesystem Object Thumbnail: other')

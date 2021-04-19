@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -18,7 +20,6 @@
 require_relative "../spec_helper"
 
 describe EnrollmentState do
-
   describe "#enrollments_needing_calculation" do
     it "should find enrollments that need calculation" do
       course_factory
@@ -111,7 +112,7 @@ describe EnrollmentState do
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(term_enroll)
 
-      override = term.enrollment_dates_overrides.new(:enrollment_type => "StudentEnrollment", :enrollment_term => term)
+      override = term.enrollment_dates_overrides.new(enrollment_type: "StudentEnrollment", enrollment_term: term, context: term.root_account)
       start_at = 2.days.from_now
       override.start_at = start_at
       override.save!

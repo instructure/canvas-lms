@@ -1,0 +1,31 @@
+{
+  "name": "wiki_page_created",
+  "definition": "The event is emitted anytime a new wiki page is created by an end user or API request.",
+  "trigger": "Triggered when a new wiki page is created.",
+  "schema": {
+    "body": "The body of the new page. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "title": "The title of the new page. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "wiki_page_id": "The Canvas id of the new wiki page."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "wiki_page_created",
+          "event_time": "2019-11-01T19:11:05.861Z",
+          "job_id": "1020020528469291",
+          "job_tag": "Canvas::Migration::Worker::CCWorker#perform",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "body": "<p>page 1</p>",
+          "title": "Page 1 Created",
+          "wiki_page_id": "21070000000000009"
+        }
+      }
+    }
+  ]
+}

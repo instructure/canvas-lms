@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import {func, shape} from 'prop-types';
+import React from 'react'
+import {func, shape} from 'prop-types'
 
-function getDisplayName (WrappedComponent) {
-  return `Animatable(${WrappedComponent.displayName})`;
+function getDisplayName(WrappedComponent) {
+  return `Animatable(${WrappedComponent.displayName})`
 }
 
 // Components passed to registerAnimatable that the manager uses must provide this interface:
@@ -28,34 +28,37 @@ function getDisplayName (WrappedComponent) {
 // - getScrollable() must return a DOM element
 export function animatable(WrappedComponent) {
   return class Animatable extends React.Component {
-    static displayName = getDisplayName(WrappedComponent);
+    static displayName = getDisplayName(WrappedComponent)
 
     static contextTypes = {
       dynamicUiManager: shape({
         registerAnimatable: func,
-        deregisterAnimatable: func,
-      }),
+        deregisterAnimatable: func
+      })
     }
 
     registerAnimatable = (type, component, index, componentIds) => {
       // This should be required, but I don't want tests to have to muck with wrapping their stuff
       // in a DynamicUiProvider
-      if (!this.context.dynamicUiManager) return;
-      this.context.dynamicUiManager.registerAnimatable(type, component, index, componentIds);
+      if (!this.context.dynamicUiManager) return
+      this.context.dynamicUiManager.registerAnimatable(type, component, index, componentIds)
     }
 
     deregisterAnimatable = (type, component, componentIds) => {
       // This should be required, but I don't want tests to have to muck with wrapping their stuff
       // in a DynamicUiProvider
-      if (!this.context.dynamicUiManager) return;
-      this.context.dynamicUiManager.deregisterAnimatable(type, component, componentIds);
+      if (!this.context.dynamicUiManager) return
+      this.context.dynamicUiManager.deregisterAnimatable(type, component, componentIds)
     }
 
-    render () {
-      return <WrappedComponent {...this.props}
-        registerAnimatable={this.registerAnimatable}
-        deregisterAnimatable={this.deregisterAnimatable}
-      />;
+    render() {
+      return (
+        <WrappedComponent
+          {...this.props}
+          registerAnimatable={this.registerAnimatable}
+          deregisterAnimatable={this.deregisterAnimatable}
+        />
+      )
     }
-  };
+  }
 }

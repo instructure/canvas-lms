@@ -1,0 +1,107 @@
+<%
+# Copyright (C) 2019 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% add_crumb t(:eportfolio_moderation_crumb, "Eportfolio Moderation") %>
+<% set_active_tab "eportfolio_moderation" %>
+<% css_bundle :eportfolio_moderation %>
+<% provide :page_title do %>
+  <%= t(:page_title, "Eportfolio Moderation") %>
+<% end %>
+
+<div>
+  <h1><%= t(:title, "Eportfolio Moderation") %></h1>
+
+  <p>
+    <%= t("Deleting a user will destroy all of their ePortfolios. Alternatively, ePortfolios can be individually marked as 'spam' or 'safe' to modify their visibility.") %>
+  </p>
+  <p>
+    <%= t("Explanation of statuses:") %>
+    <ul>
+      <li><%= t("'Needs review: flagged as possible spam': Instructure's systems have identified this ePortfolio as possible spam, and it needs administrator review. It is only visible to the original author and administrators.") %></li>
+      <li><%= t("'Marked as spam': An administrator has reviewed this ePortfolio and marked it as spam. It is only visible to the original author and administrators.") %></li>
+      <li><%= t("'Marked as safe': An administrator has reviewed this ePortfolio and marked it as safe. It is visible to its original intended audience.") %></li>
+    </ul>
+  </p>
+
+  <%= will_paginate(@eportfolios) %>
+
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("Author") %></th>
+        <th><%= t("Eportfolio") %></th>
+        <th><%= t("Currently Visible To") %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @eportfolios.group_by(&:user_id).values.each do |eportfolios_for_user| %>
+        <% eportfolios_for_user.each_with_index do |eportfolio, index| %>
+
+          <tr>
+            <% if index == 0 %>
+              <% user = eportfolios_for_user.first.user %>
+
+              <td rowspan="<%= eportfolios_for_user.count %>">
+                <%= link_to(user.short_name.truncate(30), user_path(user)) %>
+              </td>
+            <% end %>
+
+            <%
+              display_status = case eportfolio.spam_status
+              when "flagged_as_possible_spam"
+                t("Needs review: flagged as possible spam")
+              when "marked_as_spam"
+                t("Marked as spam")
+              when "marked_as_safe"
+                t("Marked as safe")
+              else
+                t("Not reviewed")
+              end
+
+              eportfolio_name = eportfolio.name.presence || t("Untitled")
+              path = if eportfolio.public?
+                eportfolio_path(eportfolio)
+              else
+                eportfolio_path(eportfolio, verifier: eportfolio.uuid)
+              end
+
+              current_visibility = if eportfolio.flagged_as_possible_spam?
+                t("Administrators and author only (flagged as possible spam)")
+              elsif eportfolio.spam?(include_possible_spam: false)
+                t("Administrators and author only (marked as spam)")
+              elsif eportfolio.public?
+                t("Everyone (public)")
+              else
+                t("Anyone with a direct link (private)")
+              end
+            %>
+
+            <td>
+              <%= link_to(eportfolio_name.truncate(30), path) %>
+              <br />
+              <span class="<%= eportfolio.spam_status || "" %>"><%= display_status %></span>
+            </td>
+
+            <td><%= current_visibility %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import formatMessage from 'format-message';
-const canvasPlannerNamespace = formatMessage.namespace();
-export default canvasPlannerNamespace;
+import formatMessage from 'format-message'
+
+const canvasPlannerNamespace = formatMessage.namespace()
+export default canvasPlannerNamespace

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,6 +29,10 @@ class MessagesController < ApplicationController
 
   def index
     @messages = @context.messages.order('created_at DESC').paginate(:page => params[:page], :per_page => 20)
+  end
+
+  def show
+    @messages = [@context.messages.find(params[:id])]
   end
 
   def create

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -45,7 +47,7 @@ describe CollaborationsController, type: :request do
     get "/courses/#{@course.id}/collaborations/"
     expect(response).to be_successful
 
-    html = Nokogiri::HTML(response.body)
+    html = Nokogiri::HTML5(response.body)
     links = html.css("div.collaboration_#{Collaboration.last.id} a.collaborator_link")
     expect(links.count).to eq 1
     link = links.first

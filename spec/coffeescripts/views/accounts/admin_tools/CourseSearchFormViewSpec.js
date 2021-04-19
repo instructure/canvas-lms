@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CourseRestore from 'compiled/models/CourseRestore'
-import CourseSearchFormView from 'compiled/views/accounts/admin_tools/CourseSearchFormView'
+import Backbone from '@canvas/backbone'
+import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
+import CourseSearchFormView from 'ui/features/account_admin_tools/backbone/views/CourseSearchFormView.js'
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
 
@@ -40,7 +40,8 @@ test('should be accessible', function(assert) {
 })
 
 test('#search, when form is submited, search is called', function() {
-  sandbox.mock(this.courseRestore)
+  sandbox
+    .mock(this.courseRestore)
     .expects('search')
     .once()
     .returns($.Deferred().resolve())
@@ -49,7 +50,8 @@ test('#search, when form is submited, search is called', function() {
 })
 
 test('#search shows an error when given a blank query', function() {
-  sandbox.mock(this.courseSearchFormView.$courseSearchField)
+  sandbox
+    .mock(this.courseSearchFormView.$courseSearchField)
     .expects('errorBox')
     .once()
   return this.courseSearchFormView.$el.submit()

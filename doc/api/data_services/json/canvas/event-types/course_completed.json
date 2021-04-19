@@ -1,0 +1,76 @@
+{
+  "name": "course_completed",
+  "definition": "The event is emitted anytime a course module's completion requirements are met.",
+  "trigger": "Triggered when all the module requirements of a course have been met. Also gets triggered when a module has a set completion time or when the completion time gets updated.",
+  "schema": {
+    "course": {
+      "account_id": "The local Canvas id of the course's account.",
+      "id": "The local Canvas id of the course.",
+      "name": "The name of the course.",
+      "sis_source_id": "The SIS identifier for the course, if defined."
+    },
+    "progress": {
+      "completed_at": "Timestamp when the course module progress item was completed. ",
+      "next_requirement_url": "Next module item on the module requirements list. Typically is null if student meets all requirements but also could have a value if there are more optional requirements left on the list.",
+      "requirement_completed_count": "Count of those requirements that are done. E.g. 7 total, 5 completed.",
+      "requirement_count": "Count of all the requirements in the course as a number"
+    },
+    "user": {
+      "email": "The students email",
+      "id": "The Canvas id of the student completing the course.",
+      "name": "The name of the student."
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_role": "StudentEnrollment",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "developer_key_id": "170000000056",
+          "event_name": "course_completed",
+          "event_time": "2019-11-01T19:11:26.615Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "GET",
+          "producer": "canvas",
+          "referrer": null,
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/New_York",
+          "url": "https://oxana.instructure.com/api/v1/courses/565/modules?include%5B%5D=items&per_page=99",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000123",
+          "user_login": "inewton@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "course": {
+            "account_id": "79",
+            "id": "565",
+            "name": "Computer Science I",
+            "sis_source_id": "2017.100.101.101-1"
+          },
+          "progress": {
+            "completed_at": "2019-11-05T13:38:00.218Z",
+            "next_requirement_url": "http://oxana.instructure.com/courses/565/modules/items/12345",
+            "requirement_completed_count": 6,
+            "requirement_count": 6
+          },
+          "user": {
+            "email": "inewton@example.com",
+            "id": "123",
+            "name": "Isaac Newton"
+          }
+        }
+      }
+    }
+  ]
+}

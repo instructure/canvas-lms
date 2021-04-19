@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - 2014 Instructure, Inc.
 #
@@ -76,7 +78,8 @@ describe "Groups API", type: :request do
       "#{group_category.context_type.underscore}_id" => group_category.context_id,
       "protected" => group_category.protected?,
       "allows_multiple_memberships" => group_category.allows_multiple_memberships?,
-      "is_member" => group_category.is_member?(user)
+      "is_member" => group_category.is_member?(user),
+      "created_at" => group_category.created_at.iso8601
     }
     json['sis_group_category_id'] = group_category.sis_source_id if group_category.context.grants_any_right?(user, :read_sis, :manage_sis)
     json['sis_import_id'] = group_category.sis_batch_id if group_category.context.grants_right?(user, :manage_sis)
@@ -406,6 +409,17 @@ describe "Groups API", type: :request do
                                                  group_category_id: 'sis_group_category_id:gcsis1',
                                                  sis_group_id: 'gsis1'))
     expect(json['sis_group_id']).to eq 'gsis1'
+  end
+
+  it "should validate sis id uniqueness on group creation" do
+    @account = Account.default
+    account_admin_user(account: @account)
+    project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
+    project_groups.groups.create!(:sis_source_id => "gsis1", :context => @account)
+    json = api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
+      @category_path_options.merge(action: :create,
+        group_category_id: 'sis_group_category_id:gcsis1',
+        sis_group_id: 'gsis1'), {}, {}, {expected_status: 400})
   end
 
   it "should not allow a non-admin to create a group in a account" do
@@ -901,10 +915,10 @@ describe "Groups API", type: :request do
       expect(response.code).to eq '401'
     end
 
-    it "returns an error when search_term is fewer than 3 characters" do
-      json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+    it "returns an error when search_term is fewer than 2 characters" do
+      json = api_call(:get, api_url, api_route, {:search_term => 'a'}, {}, :expected_status => 400)
       error = json["errors"].first
-      verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+      verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
     end
 
     it "returns a list of users" do
@@ -930,6 +944,33 @@ describe "Groups API", type: :request do
 
       json = api_call(:get, api_url + "?include[]=avatar_url", api_route.merge(include: ["avatar_url"]))
       expect(json.first['avatar_url']).to eq user.avatar_image_url
+    end
+
+    it "honors the exclude_inactive query parameter" do
+      course_with_teacher(:active_all => true)
+      @group = @course.groups.create!(:name => 'Inactive user group')
+
+      inactive_user = user_factory
+      enrollment = @course.enroll_student(inactive_user)
+      enrollment.deactivate
+      @group.add_user(inactive_user, 'accepted')
+
+      @course.enroll_student(user_factory).accept!
+      @group.add_user(@user, 'accepted')
+
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/users?exclude_inactive=true",
+                      api_route.merge({exclude_inactive: true, group_id: @group.id}))
+
+      expect(json.count).to eq 1
+      expect(json.first['id']).to eq @user.id
+
+      enrollment.reactivate
+
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/users?exclude_inactive=true",
+                      api_route.merge({exclude_inactive: true, group_id: @group.id}))
+
+      expect(json.count).to eq 2
+      expect(json.first['id']).to eq inactive_user.id
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ module Canvas::Oauth
     let(:provider) { Provider.new('123') }
 
     def stub_dev_key(key)
-      allow(DeveloperKey).to receive(:where).and_return(double(first: key))
+      allow(DeveloperKey).to receive(:find_cached).and_return(key)
     end
 
     describe 'initialization' do
@@ -42,7 +44,6 @@ module Canvas::Oauth
     end
 
     describe '#has_valid_key?' do
-
       it 'is true when there is a key and the key is active' do
         stub_dev_key(double(active?: true))
         expect(provider.has_valid_key?).to be_truthy
@@ -161,7 +162,6 @@ module Canvas::Oauth
     end
 
     describe '#session_hash' do
-
       before { stub_dev_key(double(:id => 123)) }
 
       it 'uses the key id for a client id' do
@@ -179,20 +179,36 @@ module Canvas::Oauth
       end
     end
 
-    describe '#valid_scopes?' do
+    context 'scopes' do
       let(:developer_key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
       let(:scopes) { [TokenScopes::USER_INFO_SCOPE[:scope]] }
       let(:provider) { Provider.new(developer_key.id, 'some_uri', scopes)}
 
-      it 'returns true if scopes requested are included on key' do
-        expect(provider.valid_scopes?).to eq(true)
+      describe '#valid_scopes?' do
+        it 'returns true if scopes requested are included on key' do
+          expect(provider.valid_scopes?).to eq(true)
+        end
+
+        context 'with invalid scopes' do
+          let(:scopes) { [TokenScopes::USER_INFO_SCOPE[:scope], 'otherscope'] }
+
+          it 'returns false' do
+            expect(provider.valid_scopes?).to eq(false)
+          end
+        end
       end
 
-      context 'with invalid scopes' do
-        let(:scopes) { [TokenScopes::USER_INFO_SCOPE[:scope], 'otherscope'] }
+      describe '#missing_scopes' do
+        it 'returns empty array if no scopes are missing' do
+          expect(provider.missing_scopes).to eq([])
+        end
 
-        it 'returns false' do
-          expect(provider.valid_scopes?).to eq(false)
+        context 'with missing scopes' do
+          let(:scopes) { ['second', 'third'] }
+
+          it 'lists missing scopes in array' do
+            expect(provider.missing_scopes).to eq(['second', 'third'])
+          end
         end
       end
     end

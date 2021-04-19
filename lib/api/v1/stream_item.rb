@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -169,7 +171,7 @@ module Api::V1::StreamItem
   def api_render_stream_summary(contexts = nil)
     items = []
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @current_user.shard.activate do
         base_scope = @current_user.visible_stream_item_instances(:contexts => contexts).joins(:stream_item)
 
@@ -198,23 +200,6 @@ module Api::V1::StreamItem
           end
           total_counts[new_key] ||= 0
           total_counts[new_key] += count
-        end
-
-        # TODO: can remove after DataFixup::PopulateStreamItemNotificationCategory is run
-        if total_counts.delete(['Message', nil]) # i.e. there are Message stream items without notification_category
-          unread_counts.delete(['Message', nil])
-          base_scope.where(:stream_items => {:asset_type => "Message", :notification_category => nil}).
-            eager_load(:stream_item).each do |i|
-
-            category = i.stream_item.get_notification_category
-            key = ['Message', category]
-            total_counts[key] ||= 0
-            total_counts[key] += 1
-            unless i.read?
-              unread_counts[key] ||= 0
-              unread_counts[key] += 1
-            end
-          end
         end
 
         cross_shard_totals, cross_shard_unreads = cross_shard_stream_item_counts(contexts)
@@ -269,23 +254,6 @@ module Api::V1::StreamItem
             unread_counts[['Announcement', nil]] = ann_unread
             unread_counts[['DiscussionTopic', nil]] -= ann_unread
           end
-        end
-      end
-
-      # TODO: can remove after DataFixup::PopulateStreamItemNotificationCategory is run
-      if total_counts.delete(['Message', nil]) # i.e. there are Message stream items without notification_category
-        unread_counts.delete(['Message', nil])
-        StreamItem.where(:id => stream_item_ids).where(:asset_type => "Message", :notification_category => nil).find_each do |i|
-          category = i.get_notification_category
-          key = ['Message', category]
-          total_counts[key] ||= 0
-          total_counts[key] += 1
-        end
-        StreamItem.where(:id => unread_stream_item_ids).where(:asset_type => "Message", :notification_category => nil).find_each do |i|
-          category = i.get_notification_category
-          key = ['Message', category]
-          unread_counts[key] ||= 0
-          unread_counts[key] += 1
         end
       end
     end

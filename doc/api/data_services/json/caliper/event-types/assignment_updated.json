@@ -1,0 +1,108 @@
+{
+  "name": "assignment_updated",
+  "definition": "The event is emitted anytime an assignment is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered when an assignment has been modified.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "lock_at": "The lock date (assignment is locked after this date)",
+      "workflow_state": "1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished)\n2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited)"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-16T02:09:00.554Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:0a2a8c4d-0ebc-4200-ab6f-095b3b16852d",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000001",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana@example.com",
+                  "user_sis_id": "456-T45",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000001"
+                }
+              }
+            },
+            "action": "Modified",
+            "object": {
+              "id": "urn:instructure:canvas:assignment:21070000002030605",
+              "type": "AssignableDigitalResource",
+              "name": "A New Assignment For Today",
+              "description": "<h3>Assignment Description<h3/> This is your tasks, students:...",
+              "dateModified": "2019-11-05T13:38:00.218Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "lock_at": "2019-11-05T13:38:00.218Z",
+                  "workflow_state": "published",
+                  "entity_id": "21070000002030605"
+                }
+              },
+              "dateToShow": "2019-11-05T13:38:00.218Z",
+              "dateToSubmit": "2019-11-05T13:38:00.218Z",
+              "maxScore": 100
+            },
+            "eventTime": "2019-11-01T19:11:14.005Z",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000001279362",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000001279362"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000001279362:Instructor:21070000000000001",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000001",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000001279362",
+                "type": "CourseOffering"
+              },
+              "roles": [
+                "Instructor"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/courses/1279362/assignments/2030605",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2015 - present Instructure, Inc.
@@ -75,6 +77,10 @@ describe "Exportable" do
 
     def create_zip(exporter, progress_key)
       ZipPackageTest.new(exporter, @course, @user, progress_key)
+    end
+
+    def content_export
+      @export ||= @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
     end
   end
 

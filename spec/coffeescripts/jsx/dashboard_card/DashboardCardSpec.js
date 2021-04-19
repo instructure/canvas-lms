@@ -20,8 +20,13 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import DashboardCard from 'jsx/dashboard_card/DashboardCard'
-import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
+import moxios from 'moxios'
+import sinon from 'sinon'
+import {moxiosWait} from 'jest-moxios-utils'
+import {waitFor} from '@testing-library/react'
+
+import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
+import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
 import assertions from 'helpers/assertions'
 
 QUnit.module('DashboardCard', {
@@ -47,12 +52,15 @@ QUnit.module('DashboardCard', {
       id: '1',
       backgroundColor: '#EF4437',
       image: null,
+      isFavorited: true,
       connectDragSource: c => c,
       connectDropTarget: c => c
     }
+    moxios.install()
     return sandbox.stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
   },
   teardown() {
+    moxios.uninstall()
     localStorage.clear()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.component).parentNode)
     if (this.wrapper) {
@@ -61,7 +69,13 @@ QUnit.module('DashboardCard', {
   }
 })
 
-test('render', function() {
+function errorRendered() {
+  if (document.querySelector['.FlashAlert']) {
+    return true
+  }
+}
+
+test('render', function () {
   const DashCard = <DashboardCard {...this.props} />
   this.component = TestUtils.renderIntoDocument(DashCard)
   const $html = $(ReactDOM.findDOMNode(this.component))
@@ -72,7 +86,8 @@ test('render', function() {
   ok(renderSpy.called, 'should re-render on state update')
 })
 
-test('it should be accessible', function(assert) {
+// eslint-disable-next-line qunit/resolve-async
+test('it should be accessible', function (assert) {
   const DashCard = <DashboardCard {...this.props} />
   this.wrapper = $('<div>').appendTo('body')[0]
   this.component = ReactDOM.render(DashCard, this.wrapper)
@@ -81,7 +96,7 @@ test('it should be accessible', function(assert) {
   assertions.isAccessible($html, done)
 })
 
-test('unreadCount', function() {
+test('unreadCount', function () {
   const DashCard = <DashboardCard {...this.props} />
   this.component = TestUtils.renderIntoDocument(DashCard)
   ok(!this.component.unreadCount('icon-discussion', []), 'should not blow up without a stream')
@@ -92,17 +107,18 @@ test('unreadCount', function() {
   )
 })
 
-test('does not have image attribute when a url is not provided', function() {
+test('does not have image attribute when a url is not provided', function () {
   const DashCard = <DashboardCard {...this.props} />
   this.component = TestUtils.renderIntoDocument(DashCard)
-  ok(
+  strictEqual(
     TestUtils.scryRenderedDOMComponentsWithClass(this.component, 'ic-DashboardCard__header_image')
-      .length === 0,
+      .length,
+    0,
     'image attribute should not be present'
   )
 })
 
-test('has image attribute when url is provided', function() {
+test('has image attribute when url is provided', function () {
   this.props.image = 'http://coolUrl'
   const DashCard = <DashboardCard {...this.props} />
   this.component = TestUtils.renderIntoDocument(DashCard)
@@ -111,4 +127,56 @@ test('has image attribute when url is provided', function() {
     'ic-DashboardCard__header_image'
   )
   ok($html, 'image showing')
+})
+
+test('#removeCourseFromFavorites succeeds', function () {
+  const handleRerenderSpy = sinon.spy()
+  this.props.onConfirmUnfavorite = handleRerenderSpy
+
+  function waitForResponse() {
+    if (handleRerenderSpy.calledOnce) {
+      return true
+    }
+  }
+
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  this.component.removeCourseFromFavorites()
+
+  return moxiosWait(function () {
+    const request = moxios.requests.mostRecent()
+    request.respondWith({
+      status: 200,
+      response: []
+    })
+  }).then(async function () {
+    await waitFor(() => waitForResponse())
+    ok(handleRerenderSpy.calledOnce)
+  })
+})
+
+test('#removeCourseFromFavorites fails', function () {
+  const handleRerenderSpy = sinon.spy()
+  this.props.onConfirmUnfavorite = handleRerenderSpy
+
+  function waitForAlert() {
+    if (errorRendered) {
+      return true
+    }
+  }
+
+  const DashCard = <DashboardCard {...this.props} />
+  this.component = TestUtils.renderIntoDocument(DashCard)
+  this.component.removeCourseFromFavorites()
+
+  return moxiosWait(function () {
+    const request = moxios.requests.mostRecent()
+    request.respondWith({
+      status: 403,
+      response: []
+    })
+  }).then(async function () {
+    await waitFor(() => waitForAlert())
+    ok(errorRendered)
+  })
 })

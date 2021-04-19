@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - 2013 Instructure, Inc.
 #
@@ -76,7 +78,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       term = Account.default.enrollment_terms.create!(:name => "termname")
       child_course1 = course_factory(:course_name => "immachildcourse1", :active_all => true)
       @teacher.update_attribute(:short_name, "displayname")
-      child_course1.update_attributes(:sis_source_id => "sisid", :course_code => "shortname", :enrollment_term => term)
+      child_course1.update(:sis_source_id => "sisid", :course_code => "shortname", :enrollment_term => term)
       child_course2 = course_factory(:course_name => "immachildcourse2")
       [child_course1, child_course2].each{|c| @template.add_child_course!(c)}
 
@@ -160,6 +162,22 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @template.reload
       expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
     end
+
+    it "should be able to add and remove courses by sis_source_id" do
+      existing_child = course_factory(:sis_source_id => "bleep")
+      existing_sub = @template.add_child_course!(existing_child)
+
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = subaccount1.sub_accounts.create!
+      c1 = course_factory(:account => subaccount1, :sis_source_id => "beep")
+      c2 = course_factory(:account => subaccount2, :sis_source_id => "beep2")
+
+      api_call(:put, @url, @params, {:course_ids_to_add => ["sis_course_id:#{c1.sis_source_id}", "sis_course_id:#{c2.sis_source_id}"],
+        :course_ids_to_remove => "sis_course_id:#{existing_child.sis_source_id}"})
+
+      @template.reload
+      expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
+    end
   end
 
   describe "#queue_migration" do
@@ -214,6 +232,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
           @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
         expect(json['workflow_state']).to eq 'queued'
+        expect(json['user']['display_name']).to eq @user.short_name
         expect(json['comment']).to eq 'Hark!'
       end
 
@@ -223,6 +242,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         migration2 = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations", @base_params.merge(:action => 'migrations_index'))
+        expect(json[0]['user']['display_name']).to eq @user.short_name
         pairs = json.map{|hash| [hash['id'], hash['workflow_state']]}
         expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
       end
@@ -247,6 +267,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                                 @base_params.merge(:subscription_id => @sub.to_param, :course_id => @child_course.to_param, :action => 'imports_show', :id => @minion_migration.to_param))
         expect(json['workflow_state']).to eq 'completed'
         expect(json['subscription_id']).to eq @sub.id
+        expect(json['user']['display_name']).to eq @user.short_name
         expect(json['comment']).to eq 'Hark!'
       end
 
@@ -256,6 +277,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         expect(json.size).to eq 1
         expect(json[0]['id']).to eq @minion_migration.id
         expect(json[0]['subscription_id']).to eq @sub.id
+        expect(json[0]['user']['display_name']).to eq @user.short_name
       end
 
       it "filters by subscription and enumerates old subscriptions" do
@@ -356,7 +378,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       assmt_restricts = {:content => true, :points => true}
       page_restricts = {:content => true}
-      @template.update_attributes(:use_default_restrictions_by_type => true,
+      @template.update(:use_default_restrictions_by_type => true,
         :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'WikiPage' => page_restricts})
 
       api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
@@ -373,7 +395,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       assmt_restricts = {:content => true, :points => true}
       quiz_restricts = {:content => true}
-      @template.update_attributes(:use_default_restrictions_by_type => true,
+      @template.update(:use_default_restrictions_by_type => true,
         :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'Quizzes::Quiz' => quiz_restricts})
 
       api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => quiz_assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
@@ -395,27 +417,31 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @minions = (1..2).map do |n|
           @template.add_child_course!(course_factory(:name => "Minion #{n}", :active_all => true)).child_course
         end
-
         # set up some stuff
         @file = attachment_model(:context => @master, :display_name => 'Some File')
         @assignment = @master.assignments.create! :title => 'Blah', :points_possible => 10
+      end
+
+      Timecop.travel(55.minutes.ago) do
         @full_migration = run_master_migration
       end
 
-      # prepare some exceptions
-      @minions.first.attachments.first.update_attribute :display_name, 'Some Renamed Nonsense'
-      @minions.first.syllabus_body = 'go away'; @minions.first.save!
-      @minions.last.assignments.first.update_attribute :points_possible, 11
+      Timecop.travel(5.minutes.ago) do
+        # prepare some exceptions
+        @minions.first.attachments.first.update_attribute :display_name, 'Some Renamed Nonsense'
+        @minions.first.syllabus_body = 'go away'; @minions.first.save!
+        @minions.last.assignments.first.update_attribute :points_possible, 11
 
-      # now push some incremental changes
-      @page = @master.wiki_pages.create! :title => 'Unicorn'
-      page_tag = @template.content_tag_for(@page)
-      page_tag.restrictions = @template.default_restrictions
-      page_tag.save!
-      @quiz = @master.quizzes.create! :title => 'TestQuiz'
-      @file.update_attribute :display_name, 'I Can Rename Files Too'
-      @assignment.destroy
-      @master.syllabus_body = 'syllablah frd'; @master.save!
+        # now push some incremental changes
+        @page = @master.wiki_pages.create! :title => 'Unicorn'
+        page_tag = @template.content_tag_for(@page)
+        page_tag.restrictions = @template.default_restrictions
+        page_tag.save!
+        @quiz = @master.quizzes.create! :title => 'TestQuiz'
+        @file.update_attribute :display_name, 'I Can Rename Files Too'
+        @assignment.destroy
+        @master.syllabus_body = 'syllablah frd'; @master.save!
+      end
       run_master_migration(:copy_settings => true)
     end
 
@@ -423,7 +449,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
                  :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
                  :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
-      expect(json).to match_array([
+      expected_result = [
          {"asset_id"=>@page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
           "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
          {"asset_id"=>@quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
@@ -439,7 +465,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
            "exceptions"=>[{"course_id"=>@minions.first.id,"conflicting_changes"=>["content"]}]},
          {"asset_id"=>@master.id,"asset_type"=>"settings","asset_name"=>"Course Settings","change_type"=>"updated",
            "html_url"=>"http://www.example.com/courses/#{@master.id}/settings","locked"=>false,"exceptions"=>[]}
-      ])
+      ]
+      expect(json).to match_array(expected_result)
     end
 
     it "returns change information from the minion side" do
@@ -455,7 +482,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                  "/api/v1/courses/#{minion.id}/blueprint_subscriptions/default/migrations/#{minion_migration.id}/details",
                  :controller => 'master_courses/master_templates', :format => 'json', :subscription_id => 'default',
                  :id => minion_migration.to_param, :course_id => minion.to_param, :action => 'import_details')
-      expect(json).to match_array([
+      expected_result = [
          {"asset_id"=>minion_page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
           "html_url"=>"http://www.example.com/courses/#{minion.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
          {"asset_id"=>minion_quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
@@ -470,7 +497,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
           "exceptions"=>[{"course_id"=>minion.id,"conflicting_changes"=>["content"]}]},
          {"asset_id"=>minion.id,"asset_type"=>"settings","asset_name"=>"Course Settings","change_type"=>"updated",
           "html_url"=>"http://www.example.com/courses/#{minion.id}/settings","locked"=>false,"exceptions"=>[]}
-      ])
+      ]
+      expect(json).to match_array(expected_result)
     end
 
     it "returns empty for a non-selective migration" do

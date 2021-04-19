@@ -17,42 +17,46 @@
  */
 
 import $ from 'jquery'
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageContentView from 'compiled/views/wiki/WikiPageContentView'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView.js'
+import {subscribe} from 'jquery-tinypubsub'
 
 QUnit.module('WikiPageContentView')
 
-test('setModel causes a re-render', function() {
+test('setModel causes a re-render', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
-  sandbox.mock(contentView)
+  sandbox
+    .mock(contentView)
     .expects('render')
     .atLeast(1)
   contentView.setModel(wikiPage)
 })
 
-test('setModel binds to the model change:title trigger', function() {
+test('setModel binds to the model change:title trigger', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   contentView.setModel(wikiPage)
-  sandbox.mock(contentView)
+  sandbox
+    .mock(contentView)
     .expects('render')
     .atLeast(1)
   wikiPage.set('title', 'A New Title')
 })
 
-test('setModel binds to the model change:title trigger', function() {
+test('setModel binds to the model change:title trigger', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   contentView.setModel(wikiPage)
-  sandbox.mock(contentView)
+  sandbox
+    .mock(contentView)
     .expects('render')
     .atLeast(1)
   wikiPage.set('body', 'A New Body')
 })
 
-test('render publishes a "userContent/change" (to enhance user content)', function() {
+test('render publishes a "userContent/change" (to enhance user content)', () => {
   const contentView = new WikiPageContentView()
-  $.subscribe('userContent/change', sandbox.mock().atLeast(1))
+  subscribe('userContent/change', sandbox.mock().atLeast(1))
   contentView.render()
 })

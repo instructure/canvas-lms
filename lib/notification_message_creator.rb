@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -16,10 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# This file creates notification messages. I hope that was already known.
+# Users have multiple communication_channels and notification preferences at
+# different levels. This file accounts for these details.
+#
+# There are three main types of messages that are created here:
+# immediate_message, delayed_messages, and dashboard_messages.
+#
 class NotificationMessageCreator
   include LocaleSelection
 
-  attr_accessor :notification, :asset, :to_users, :to_channels, :message_data
+  attr_accessor :notification, :asset, :to_user_channels, :message_data
+  attr_reader :courses, :account
 
   # Options can include:
   #  :to_list - A list of Users, User IDs, and CommunicationChannels to send to
@@ -27,17 +37,20 @@ class NotificationMessageCreator
   def initialize(notification, asset, options={})
     @notification = notification
     @asset = asset
-    @to_users = []
-    @to_channels = []
-    if options[:to_list]
-      @to_users = users_from_to_list(options[:to_list])
-      @to_channels = communication_channels_from_to_list(options[:to_list])
-    end
+    @to_user_channels = user_channels(options[:to_list])
+    @user_counts = recent_messages_for_users(@to_user_channels.keys)
     @message_data = options.delete(:data)
+    course_ids = @message_data&.dig(:course_ids)
+    course_ids ||= [@message_data&.dig(:course_id)]
+    root_account_id = @message_data&.dig(:root_account_id)
+    if course_ids.any? && root_account_id
+      @account = Account.new(id: root_account_id)
+      @courses = course_ids.map { |id| Course.new(id: id, root_account_id: @account&.id) }
+    end
   end
 
   # Public: create (and dispatch, and queue delayed) a message
-  # for this notication, associated with the given asset, sent to the given recipients
+  # for this notification, associated with the given asset, sent to the given recipients
   #
   # asset - what the message applies to. An assignment, a discussion, etc.
   # to_list - a list of who to send the message to. the list can contain Users, User ids, or CommunicationChannels
@@ -45,89 +58,95 @@ class NotificationMessageCreator
   #
   # Returns a list of the messages dispatched immediately
   def create_message
-    @user_counts = {}
-
-    to_user_channels = Hash.new([])
-    @to_users.each do |user|
-      to_user_channels[user] += [user.email_channel]
-    end
-    @to_channels.each do |channel|
-      to_user_channels[channel.user] += [channel]
-    end
-    to_user_channels.each_value{ |channels| channels.uniq! }
-
     dashboard_messages = []
     immediate_messages = []
     delayed_messages = []
 
-    # Looping on users and channels might be a bad thing. If you had a User and their CommunicationChannel in
-    # the to_list (which currently never happens, I think), duplicate messages could be sent.
-    to_user_channels.each do |user, channels|
-      next unless asset_filtered_by_user(user)
-      user_locale = infer_locale(
-        :user => user,
-        :context => user_asset_context(asset_filtered_by_user(user)),
-        :ignore_browser_locale => true
-      )
+    @to_user_channels.each do |user, channels|
+      # asset_applied_to is used for the asset (ie assignment, announcement)
+      # to filter users out that do not apply to the notification like when a due
+      # date is different for a specific user when using variable due dates.
+      next unless (asset = asset_applied_to(user))
+      user_locale = infer_locale(user: user, context: user_asset_context(asset), ignore_browser_locale: true)
       I18n.with_locale(user_locale) do
-        channels.each do |default_channel|
-          if @notification.registration?
-            registration_channels = if default_channel then
-                                      [default_channel]
-                                    else
-                                      immediate_channels_for(user)
-                                    end
-            immediate_messages += build_immediate_messages_for(user, registration_channels)
+        # the channels in this method are all the users active channels or the
+        # channels that were provided in the to_list.
+        #
+        # If the notification has an immediate_policy, it will create an
+        # immediate_message or a delayed_message via build_fallback_for.
+        # otherwise it will create a delayed_message. Any message can create a
+        # dashboard message in addition to itself.
+        channels.each do |channel|
+          channel.set_root_account_ids(persist_changes: true, log: true)
+          next unless notifications_enabled_for_courses?(user)
+
+          if immediate_policy?(user, channel)
+            immediate_messages << build_immediate_message_for(user, channel)
+            delayed_messages << build_fallback_for(user, channel)
           else
-            if @notification.summarizable?
-              delayed_messages += build_summaries_for(user, default_channel)
-            end
+            delayed_messages << build_delayed_message_for(user, channel)
           end
         end
 
-        unless @notification.registration?
-          if @notification.summarizable? && no_daily_messages_in(delayed_messages) && too_many_messages_for?(user)
-            fallback = build_fallback_for(user)
-            delayed_messages << fallback if fallback
-          end
-
-          unless user.pre_registered?
-            immediate_messages += build_immediate_messages_for(user)
-            dashboard_messages << build_dashboard_message_for(user) if @notification.dashboard? && @notification.show_in_feed?
-          end
-        end
+        dashboard_messages << build_dashboard_message_for(user)
       end
     end
-
-    delayed_messages.each{ |message| message.save! }
-    dispatch_dashboard_messages(dashboard_messages)
-    dispatch_immediate_messages(immediate_messages)
-
-    @user_counts.each{|user_id, cnt| recent_messages_for_user(user_id, cnt) }
-
-    return immediate_messages + dashboard_messages
+    [delayed_messages, dashboard_messages, immediate_messages].each(&:compact!)
+    delayed_messages.each(&:save!)
+    dispatch_immediate_messages(immediate_messages) + dispatch_dashboard_messages(dashboard_messages)
   end
 
   private
 
-  def no_daily_messages_in(delayed_messages)
-    !delayed_messages.any?{ |message| message.frequency == 'daily' }
+  # Notifications are enabled for a user in a course by default, but can be
+  # disabled for notifications. The broadcast_policy needs to pass both the
+  # course_id and the root_account_id to the set_broadcast_policy block for us
+  # to be able to look up if it should be disabled. root_account_id is used
+  # right now to look up the feature flag, but it can also be used to set
+  # root_account_id on the message, or look up policy overrides in the future.
+  # A user can disable notifications for a course with a notification policy
+  # override.
+  def notifications_enabled_for_courses?(user)
+    # if the message is not summarizable?, it is in a context that notifications
+    # cannot be disabled, so return true before checking.
+    return true unless @notification.summarizable?
+
+    return NotificationPolicyOverride.enabled_for_all_contexts(user, courses) if courses&.any?
+
+    true
   end
 
-  def build_fallback_for(user)
-    fallback_channel = immediate_channels_for(user).find{ |cc| cc.path_type == 'email'}
-    return unless fallback_channel
+  # fallback message is a summary message for email only that we create when we
+  # have sent too many immediate messages to a user in a day.
+  # returns delayed_message or nil
+  def build_fallback_for(user, channel)
+    # delayed_messages are only sent to email channels.
+    # some types of notifications are only for immediate.
+    return unless @notification.summarizable? && channel.path_type == 'email'
+    # we only send fallback when we did not send an immediate message, ie.
+    # when the channel is bouncing or there have been too_many_messages
+    return unless channel.bouncing? || too_many_messages_for?(user)
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
-      fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
-      fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
+      fallback_policy = channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
+      fallback_policy ||= channel.notification_policies.create!(frequency: 'daily')
     end
 
+    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: 'message.fall_back_used')
     build_summary_for(user, fallback_policy)
   end
 
-  def build_summaries_for(user, channel=user.email_channel)
-    delayed_policies_for(user, channel).map{ |policy| build_summary_for(user, policy) }
+  # returns delayed_message or nil
+  def build_delayed_message_for(user, channel)
+    # delayed_messages are only sent to email channels.
+    # some types of notifications are only for immediate.
+    return unless @notification.summarizable? && channel.path_type == 'email'
+    policy = effective_policy_for(user, channel)
+    # if the policy is not daily or weekly, it is either immediate which was
+    # picked up before in build_immediate_message_for, or it's never.
+    return unless %w(daily weekly).include?(policy&.frequency)
+
+    build_summary_for(user, policy) if policy
   end
 
   def build_summary_for(user, policy)
@@ -136,9 +155,14 @@ class NotificationMessageCreator
       message.parse!('summary')
       delayed_message = policy.delayed_messages.build(:notification => @notification,
                                     :frequency => policy.frequency,
-                                    :communication_channel_id => policy.communication_channel_id,
+                                    # policy.communication_channel should
+                                    # already be loaded in memory as the
+                                    # inverse association of loading the
+                                    # policy from the channel. passing the
+                                    # object through here lets the delayed
+                                    # message use it without having to re-query.
+                                    :communication_channel => policy.communication_channel,
                                     :root_account_id => message.context_root_account.try(:id),
-                                    :linked_name => 'work on this link!!!',
                                     :name_of_topic => message.subject,
                                     :link => message.url,
                                     :summary => message.body)
@@ -148,36 +172,37 @@ class NotificationMessageCreator
     end
   end
 
-  def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))
-    return [] unless asset_filtered_by_user(user)
-    messages = []
+  def build_immediate_message_for(user, channel)
+    # if we have already created a fallback message, we don't want to make an
+    # immediate message.
+    return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
     message_options = message_options_for(user)
-    channels.reject!{ |channel| ['email', 'sms'].include?(channel.path_type) } if @notification.summarizable? && too_many_messages_for?(user)
-    channels.reject!(&:bouncing?)
-    channels.each do |channel|
-      messages << user.messages.build(message_options.merge(:communication_channel => channel,
-                                                            :to => channel.path))
-      increment_user_counts(user) if ['email', 'sms'].include?(channel.path_type)
-    end
-    messages.each(&:parse!)
-    messages
+    message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
+    message&.parse!
+    message.workflow_state = 'bounced' if channel.bouncing?
+    message
   end
 
   def dispatch_immediate_messages(messages)
     Message.transaction do
       # Cancel any that haven't been sent out for the same purpose
-      cancel_pending_duplicate_messages
+      cancel_pending_duplicate_messages if Rails.env.production?
       messages.each do |message|
         message.stage_without_dispatch!
         message.save!
       end
     end
+    # we filter out bounced messages now that they have been saved.
+    messages = messages.select(&:staged?)
     MessageDispatcher.batch_dispatch(messages)
-
     messages
   end
 
+  # returns a message or nil
   def build_dashboard_message_for(user)
+    # Dashboard messages are only built if the user has finished registration,
+    # if a user has never logged in, let's not spam the dashboard for no reason.
+    return unless @notification.dashboard? && @notification.show_in_feed? && !user.pre_registered?
     message = user.messages.build(message_options_for(user).merge(:to => 'dashboard'))
     message.parse!
     message
@@ -191,30 +216,71 @@ class NotificationMessageCreator
     messages
   end
 
-  def unretired_policies_for(user)
-    user.communication_channels.select { |cc| !cc.retired? }.map(&:notification_policies).flatten
-  end
-
-  def delayed_policies_for(user, channel=user.email_channel)
-    # This condition is weird. Why would not throttling stop sending notifications?
-    # Why could an inactive email channel stop us here? We handle that later! And could still send
-    # notifications without it!
-    return [] if channel && !channel.active? && !too_many_messages_for?(user)
-
-    # If any channel has a policy, even policy-less channels don't get the notification based on the
-    # notification default frequency. Is that right?
-    policies = unretired_policies_for(user).select { |np| np.notification_id == @notification.id }
-    if !policies.empty?
-      policies = policies.select { |np| ['daily', 'weekly'].include?(np.frequency) && np.communication_channel.path_type == 'email' }
-    elsif channel &&
-          channel.active? &&
-          channel.path_type == 'email'
-      frequency = @notification.default_frequency(user)
-      if ['daily', 'weekly'].include?(frequency)
-        policies << channel.notification_policies.create!(:notification => @notification, :frequency => frequency)
+  def effective_policy_for(user, channel)
+    # a user can override the notification preference for a course or a
+    # root_account, the course_id needs to be provided in the notification from
+    # broadcast_policy in message_data, the lowest level override is the one
+    # that should be respected.
+    policy = override_policy_for(channel, 'Course')
+    policy ||= override_policy_for(channel, 'Account')
+    if !policy && should_use_default_policy?(user, channel)
+      begin
+        policy = channel.notification_policies.create!(notification_id: @notification.id, frequency: @notification.default_frequency(user))
+      rescue ActiveRecord::RecordNotUnique => e
+        # there is a race condition here that can happen if multiple jobs are trying to create the same
+        # flavor of policy for the same user at the same time.  If we fail to save this one,
+        # we should just allow the process to continue because it will find the right policy in the
+        # next step of this method.
+        Canvas::Errors.capture_exception(:notifications, e, :info)
       end
     end
-    policies
+    policy ||= channel.notification_policies.find { |np| np.notification_id == @notification.id }
+    policy
+  end
+
+  def should_use_default_policy?(user, channel)
+    # only use new policies for default channel when there are no other policies for the notification and user.
+    # If another policy exists then it means the notification preferences page has been visited and null values
+    # show as never policies in the UI.
+    default_email?(user, channel) && (user.notification_policies.find { |np| np.notification_id == @notification.id }).nil?
+  end
+
+  def default_email?(user, channel)
+    user.email_channel == channel
+  end
+
+  def override_policy_for(channel, context_type)
+    # NotificationPolicyOverrides are already loaded and this find block is on
+    # an array and can only have one for a given context and channel.
+    ops = channel.notification_policy_overrides.select { |np| np.notification_id == @notification.id && np.context_type == context_type }
+    case context_type
+    when 'Course'
+      ops.find { |np| courses.map(&:id).include?(np.context_id) } if courses&.any?
+    when 'Account'
+      ops.find { |np| np.context_id == account.id } if account
+    end
+  end
+
+  def user_channels(to_list)
+    to_user_channels = Hash.new([])
+    # if this method is given users we preload communication channels and they
+    # are already loaded so we are using the select :active? to not do another
+    # query to load them again.
+    users_from_to_list(to_list).each do |user|
+      to_user_channels[user] += user.communication_channels.select{ |cc| add_channel?(user, cc) }
+    end
+    # if the method gets communication channels, the user is loaded, and this
+    # allows all the methods in this file to behave the same as if it were users.
+    communication_channels_from_to_list(to_list).each do |channel|
+      to_user_channels[channel.user] += [channel]
+    end
+    to_user_channels.each_value(&:uniq!)
+    to_user_channels
+  end
+
+  # only send emails to active channels or registration notifications to default users' channel
+  def add_channel?(user, channel)
+    channel.active? || (@notification.registration? && default_email?(user, channel))
   end
 
   def users_from_to_list(to_list)
@@ -233,7 +299,7 @@ class NotificationMessageCreator
     to_list.select{ |to| to.is_a? CommunicationChannel }.uniq
   end
 
-  def asset_filtered_by_user(user)
+  def asset_applied_to(user)
     if asset.respond_to?(:filter_asset_by_recipient)
       asset.filter_asset_by_recipient(@notification, user)
     else
@@ -242,7 +308,7 @@ class NotificationMessageCreator
   end
 
   def message_options_for(user)
-    user_asset = asset_filtered_by_user(user)
+    user_asset = asset_applied_to(user)
 
     message_options = {
       :subject => @notification.subject,
@@ -251,15 +317,11 @@ class NotificationMessageCreator
       :user => user,
       :context => user_asset,
     }
+
     # can't just merge these because nil values need to be overwritten in a later merge
     message_options[:delay_for] = @notification.delay_for if @notification.delay_for
     message_options[:data] = @message_data if @message_data
     message_options
-  end
-
-  def increment_user_counts(user_id, count=1)
-    @user_counts[user_id] ||= 0
-    @user_counts[user_id] += count
   end
 
   def user_asset_context(user_asset)
@@ -270,59 +332,69 @@ class NotificationMessageCreator
     end
   end
 
-  # Finds channels for a user that should get this notification immediately
-  #
-  # If the user doesn't have a policy for this notification on a non-push
-  # channel and the default frequency is immediate, the user should get the
-  # notification by email.
-  # Unregistered users don't get notifications. (registration notifications
-  # are a special case handled elsewhere)
-  def immediate_channels_for(user)
-    return [] unless user.registered?
+  def immediate_policy?(user, channel)
+    # we want to ignore unconfirmed channels unless the notification is
+    # registration because that is how the user can confirm the channel
+    return true if @notification.registration?
+    # pre_registered users should only get registration emails.
+    return false if user.pre_registered?
+    return false if channel.unconfirmed?
+    return true if @notification.migration?
 
-    active_channel_scope = user.communication_channels.select { |cc| cc.active? && cc.notification_policies.find { |np| np.notification_id == @notification.id } }
-    immediate_channel_scope = active_channel_scope.select { |cc| cc.notification_policies.find { |np| np.frequency == 'immediately' } }
-
-    user_has_a_policy = active_channel_scope.find { |cc| cc.path_type != 'push' }
-    if !user_has_a_policy && @notification.default_frequency(user) == 'immediately'
-      return [user.email_channel, *immediate_channel_scope.select { |cc| cc.path_type == 'push' }].compact
-    end
-    immediate_channel_scope
+    policy = effective_policy_for(user, channel)
+    policy&.frequency == 'immediately'
   end
 
   def cancel_pending_duplicate_messages
-    # doesn't include dashboard messages. should it?
-    Message.where(:notification_id => @notification).
-      for(@asset).
-      by_name(@notification.name).
-      for_user(@to_users + @to_channels).
-      cancellable.
-      where("created_at BETWEEN ? AND ?", Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago, Time.now.utc).
-      update_all(:workflow_state => 'cancelled')
+    first_start_time = start_time = Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago
+    final_end_time = Time.now.utc
+    first_partition = Message.infer_partition_table_name('created_at' => first_start_time)
+
+    loop do
+      end_time = start_time + 7.days
+      end_time = final_end_time if end_time > final_end_time
+      scope = Message.
+        in_partition('created_at' => start_time).
+        where(:notification_id => @notification).
+        for(@asset).
+        by_name(@notification.name).
+        for_user(@to_user_channels.keys).
+        cancellable
+      start_partition = Message.infer_partition_table_name('created_at' => start_time)
+      end_partition = Message.infer_partition_table_name('created_at' => end_time)
+      if first_partition == start_partition &&
+        start_partition == end_partition
+        Message.infer_partition_table_name('created_at' => end_time)
+        scope = scope.where(created_at: start_time..end_time)
+        break_this_loop = true
+      elsif start_time == first_start_time
+        scope = scope.where("created_at>=?", start_time)
+      elsif start_partition == end_partition
+        scope = scope.where("created_at<=?", end_time)
+        break_this_loop = true
+      # else <no conditions; we're addressing the entire partition>
+      end
+      scope.update_all(:workflow_state => 'cancelled')
+
+      break if break_this_loop
+      start_time = end_time
+    end
   end
 
   def too_many_messages_for?(user)
-    all_messages = recent_messages_for_user(user.id) || 0
-    @user_counts[user.id] = all_messages
-    all_messages >= user.max_messages_per_day
+    if @user_counts[user.id] >= user.max_messages_per_day
+      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: 'message.too_many_messages_for_was_true')
+      true
+    end
   end
 
   # Cache the count for number of messages sent to a user/user-with-category,
   # it can also be manually re-set to reflect new rows added... this cache
   # data can get out of sync if messages are cancelled for being repeats...
   # not sure if we care about that...
-  def recent_messages_for_user(id, messages=nil)
-    if !id
-      nil
-    elsif messages
-      Rails.cache.write(['recent_messages_for', id].cache_key, messages, :expires_in => 1.hour)
-    else
-      user_id = id
-      messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        Shackles.activate(:slave) do
-          Message.where("dispatch_at>? AND created_at>? AND user_id=? AND to_email=?", 24.hours.ago, 24.hours.ago, user_id, true).count
-        end
-      end
+  def recent_messages_for_users(users)
+    GuardRail.activate(:secondary) do
+      Hash.new(0).merge(Message.more_recent_than(24.hours.ago).where(user_id: users, to_email: true).group(:user_id).count)
     end
   end
 end

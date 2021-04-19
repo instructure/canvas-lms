@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -96,18 +98,18 @@ describe SIS::CSV::EnrollmentImporter do
   end
 
   it "should enroll users" do
-    #create course, users, and sections
+    # create course, users, and sections
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
     importer = process_csv_data(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user@example.com,active",
-      "user_2,user2,User,Dos,user2@example.com,active",
+      "user_id,login_id,first_name,last_name,email,status,notify",
+      "user_1,user1,User,Uno,user@example.com,active,true",
+      "user_2,user2,User,Dos,user2@example.com,active,true",
       "user_3,user4,User,Tres,user3@example.com,active",
-      "user_5,user5,User,Quatro,user5@example.com,active",
-      "user_6,user6,User,Cinco,user6@example.com,active",
+      "user_5,user5,User,Quatro,user5@example.com,active,false",
+      "user_6,user6,User,Cinco,user6@example.com,active,false",
       "user_7,user7,User,Siete,user7@example.com,active",
       ",,,,,"
     )
@@ -364,6 +366,30 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@enrollment.reload).to be_active
   end
 
+  it 'should not update an enrollment that is deleted and pseudonym is deleted' do
+    # course
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    # deleted user
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted"
+    )
+    # deleted enrollment
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,deleted,"
+    )
+    # skipped enrollment update
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,"
+    )
+    expect(importer.batch.roll_back_data.count).to eq 0
+  end
+
   it "should count re-deletions" do
     # because people get confused otherwise
     course_model(:account => @account, :sis_source_id => 'C001')
@@ -378,6 +404,29 @@ describe SIS::CSV::EnrollmentImporter do
       "C001,U001,student,deleted"
     )
     expect(importer.batch.data[:counts][:enrollments]).to eq 1
+  end
+
+  it "should always update sis_batch_id" do
+    # because people get confused otherwise
+    course = course_model(account: @account, sis_source_id: 'C001')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,active"
+    )
+    enrollment = Enrollment.where(course_id: course.id, user_id: user.id).take
+    expect(enrollment.sis_batch_id).to eq importer.batch.id
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,deleted"
+    )
+    expect(enrollment.reload.sis_batch_id).to eq importer.batch.id
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,deleted"
+    )
+    expect(enrollment.reload.sis_batch_id).to eq importer.batch.id
   end
 
   it "should allow one user multiple enrollment types in the same section" do
@@ -574,6 +623,16 @@ describe SIS::CSV::EnrollmentImporter do
     )
   end
 
+  describe "#persist_errors" do
+    it "gracefully handles string errors" do
+      batch = Account.default.sis_batches.create!
+      csv = double(root_account: Account.default, batch: batch, :[] => nil)
+      importer = SIS::CSV::EnrollmentImporter.new(csv)
+      importer.persist_errors(csv, ['a string error message'], batch)
+      expect(batch.sis_batch_errors.count).to eq(1)
+    end
+  end
+
   it 'should only queue up one recache_grade_distribution job per course' do
     Course.create!(account: @account, sis_source_id: 'C001', workflow_state: 'available')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
@@ -736,7 +795,7 @@ describe SIS::CSV::EnrollmentImporter do
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
+    expect(work).to receive(:root_account_from_id).once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
 
     # the enrollments
@@ -765,7 +824,7 @@ describe SIS::CSV::EnrollmentImporter do
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
+    expect(work).to receive(:root_account_from_id).once.and_return(account2)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
     process_csv_data(
@@ -794,7 +853,7 @@ describe SIS::CSV::EnrollmentImporter do
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(nil)
+    expect(work).to receive(:root_account_from_id).once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
     importer = process_csv_data_cleanly(

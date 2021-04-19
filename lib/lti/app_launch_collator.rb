@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -17,6 +19,12 @@
 #
 module Lti
   class AppLaunchCollator
+    CONTENT_MESSAGE_TYPES = %w(
+      ContentItemSelection
+      ContentItemSelectionRequest
+      LtiDeepLinkingRequest
+    ).freeze
+
     def self.external_tools_for(context, placements, options={})
       tools_options = {}
       if options[:current_user]
@@ -69,6 +77,17 @@ module Lti
 
     private
 
+    def self.selection_property_value(property, tool, placement, message_type)
+      placement = placement.to_sym
+
+      # Only return selection property if the message type offers content selection
+      return unless CONTENT_MESSAGE_TYPES.include?(message_type) || placement == :resource_selection
+
+      # For backward compatibility, check the "resource_selection" placement before the requested placement
+      tool.extension_setting(:resource_selection, property) || tool.extension_setting(placement, property)
+    end
+    private_class_method :selection_property_value
+
     def self.lti1_launch_definition(tool, placements)
       definition = {
         definition_type: tool.class.name,
@@ -85,9 +104,15 @@ module Lti
             url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
             title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
-          if p.to_sym == :resource_selection || definition[:placements][p.to_sym][:message_type] == 'ContentItemSelection'
-            definition[:placements][p.to_sym][:selection_width] = tool.extension_setting(:resource_selection, :selection_width)
-            definition[:placements][p.to_sym][:selection_height] = tool.extension_setting(:resource_selection, :selection_height)
+
+          message_type = definition.dig(:placements, p.to_sym, :message_type)
+
+          if (width = selection_property_value(:selection_width, tool, p, message_type))
+            definition[:placements][p.to_sym][:selection_width] = width
+          end
+
+          if (height = selection_property_value(:selection_height, tool, p, message_type))
+            definition[:placements][p.to_sym][:selection_height] = height
           end
 
           %i[launch_width launch_height].each do |property|
@@ -113,11 +138,12 @@ module Lti
 
     def self.lti2_placements(message_handler, placements)
       resource_placements = message_handler.placements.pluck(:placement)
-      if resource_placements.present?
-        valid_placements = resource_placements & placements.map(&:to_s)
-      else
-        valid_placements = ResourcePlacement::DEFAULT_PLACEMENTS
-      end
+      valid_placements =
+        if resource_placements.present?
+          resource_placements & placements.map(&:to_s)
+        else
+          ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS
+        end
       valid_placements.each_with_object({}) { |p, hsh| hsh[p.to_sym] = lti2_placement(message_handler) }
     end
 

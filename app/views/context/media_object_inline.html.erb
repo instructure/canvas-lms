@@ -17,7 +17,7 @@
 %>
 
 <% title = @media_object.try(:title) || t('titles.media_playback', "Media Playback")
-   content_for :page_title, title
+   provide :page_title, title
    add_crumb t('#crumbs.media', "Media")
    add_crumb title
 %>
@@ -25,4 +25,4 @@
   <div id="media_comment">
   </div>
 </div>
-<% js_bundle 'legacy/context_media_object_inline' %>
+<% js_bundle 'context_media_object_inline' %>

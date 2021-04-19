@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@
 #       "id": "Feature",
 #       "description": "",
 #       "properties": {
-#         "name": {
+#         "feature": {
 #           "description": "The symbolic name of the feature, used in FeatureFlags",
 #           "example": "fancy_wickets",
 #           "type": "string"
@@ -116,13 +118,14 @@
 #           "type": "string"
 #         },
 #         "state": {
-#           "description": "The policy for the feature at this context.  can be 'off', 'allowed', or 'on'.",
+#           "description": "The policy for the feature at this context.  can be 'off', 'allowed', 'allowed_on', or 'on'.",
 #           "example": "allowed",
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "off",
 #               "allowed",
+#               "allowed_on",
 #               "on"
 #             ]
 #           }
@@ -147,7 +150,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns [Feature]
   def index
@@ -155,9 +158,20 @@ class FeatureFlagsController < ApplicationController
       route = polymorphic_url([:api_v1, @context, :features])
       features = Feature.applicable_features(@context)
       features = Api.paginate(features, self, route)
+
+      skip_cache = @context.grants_right?(@current_user, session, :manage_feature_flags)
+      @context.feature_flags.load if skip_cache
+
       flags = features.map { |fd|
-        @context.lookup_feature_flag(fd.feature, Account.site_admin.grants_right?(@current_user, session, :read))
+        @context.lookup_feature_flag(fd.feature,
+          override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
+          skip_cache: skip_cache,
+          # Hide flags that are forced ON at a higher level
+          # Undocumented flag for frontend use only
+          hide_inherited_enabled: params[:hide_inherited_enabled]
+        )
       }.compact
+
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
     end
   end
@@ -170,7 +184,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features/enabled' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @example_response
   #
@@ -181,6 +195,25 @@ class FeatureFlagsController < ApplicationController
                    select { |ff| ff.enabled? }.map(&:feature)
       render json: features
     end
+  end
+
+  # @API List environment features
+  #
+  # Return a hash of global feature settings that pertain to the
+  # Canvas user interface. This is the same information supplied to the
+  # web interface as +ENV.FEATURES+.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/features/environment' \
+  #     -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #
+  #   { "telepathic_navigation": true, "fancy_wickets": true, "automatic_essay_grading": false }
+  #
+  def environment
+    render json: cached_js_env_account_features
   end
 
   # @API Get feature flag
@@ -194,7 +227,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features/flags/fancy_wickets' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns FeatureFlag
   def show
@@ -202,7 +235,10 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "missing feature parameter" }, status: :bad_request unless params[:feature].present?
       feature = params[:feature]
       raise ActiveRecord::RecordNotFound unless Feature.definitions.has_key?(feature.to_s)
-      flag = @context.lookup_feature_flag(feature, Account.site_admin.grants_right?(@current_user, session, :read))
+      flag = @context.lookup_feature_flag(feature,
+        override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
+        skip_cache: @context.grants_right?(@current_user, session, :manage_feature_flags)
+      )
       raise ActiveRecord::RecordNotFound unless flag
       render json: feature_flag_json(flag, @context, @current_user, session)
     end
@@ -234,16 +270,15 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "invalid feature" }, status: :bad_request unless feature_def && feature_def.applies_to_object(@context)
 
       # check whether the feature is locked
-      @context.feature_flag_cache.delete(@context.feature_flag_cache_key(params[:feature]))
-      current_flag = @context.lookup_feature_flag(params[:feature])
+      current_flag = @context.lookup_feature_flag(params[:feature], skip_cache: true)
       if current_flag
         return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag.locked?(@context)
         prior_state = current_flag.state
       end
 
-      # if this is a hidden feature, require site admin privileges to create (but not update) a root account flag
+      # require site admin privileges to unhide a hidden feature
       if !current_flag && feature_def.hidden?
-        return render json: { message: "invalid feature" }, status: :bad_request unless ((@context.is_a?(Account) && @context.root_account?) || @context.is_a?(User)) && Account.site_admin.grants_right?(@current_user, session, :read)
+        return render json: { message: "invalid feature" }, status: :bad_request unless Account.site_admin.grants_right?(@current_user, session, :read)
         prior_state = 'hidden'
       end
 
@@ -280,15 +315,19 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl -X DELETE 'http://<canvas>/api/v1/courses/1/features/flags/fancy_wickets' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns FeatureFlag
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
-      flag = @context.feature_flags.where(feature: params[:feature]).first!
+      flag = @context.feature_flags.find_by!(feature: params[:feature])
+      prior_state = flag.state
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context)
-      flag.destroy
+      if flag.destroy
+        feature_def = Feature.definitions[params[:feature]]
+        feature_def.after_state_change_proc&.call(@current_user, @context, prior_state, feature_def.state)
+      end
       render json: feature_flag_json(flag, @context, @current_user, session)
     end
   end

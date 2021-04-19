@@ -16,54 +16,54 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/makeInvisibleReducer'
+import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions.js'
+import reducer from 'ui/features/developer_keys_v2/react/reducers/makeInvisibleReducer.js'
 
-QUnit.module('makeInvisibleReducer');
+QUnit.module('makeInvisibleReducer')
 
 const defaults = reducer(undefined, {})
 
 test('there are defaults', () => {
-  equal(defaults.makeInvisibleDeveloperKeyPending, false);
-  equal(defaults.makeInvisibleDeveloperKeySuccessful, false);
-  equal(defaults.makeInvisibleDeveloperKeyError, null);
-});
+  equal(defaults.makeInvisibleDeveloperKeyPending, false)
+  equal(defaults.makeInvisibleDeveloperKeySuccessful, false)
+  equal(defaults.makeInvisibleDeveloperKeyError, null)
+})
 
 test('responds to makeInvisibleDeveloperKeyStart', () => {
   const state = {
     makeInvisibleDeveloperKeyPending: false,
     makeInvisibleDeveloperKeySuccessful: true,
     makeInvisibleDeveloperKeyError: {}
-  };
+  }
 
-  const action = actions.makeInvisibleDeveloperKeyStart();
-  const newState = reducer(state, action);
-  equal(newState.makeInvisibleDeveloperKeyPending, true);
-  equal(newState.makeInvisibleDeveloperKeySuccessful, false);
-  equal(newState.makeInvisibleDeveloperKeyError, null);
-});
+  const action = actions.makeInvisibleDeveloperKeyStart()
+  const newState = reducer(state, action)
+  equal(newState.makeInvisibleDeveloperKeyPending, true)
+  equal(newState.makeInvisibleDeveloperKeySuccessful, false)
+  equal(newState.makeInvisibleDeveloperKeyError, null)
+})
 
 test('responds to makeInvisibleDeveloperKeySuccessful', () => {
   const state = {
     makeInvisibleDeveloperKeyPending: true,
-    makeInvisibleDeveloperKeySuccessful: false,
-  };
-  const payload = {};
-  const action = actions.makeInvisibleDeveloperKeySuccessful(payload);
-  const newState = reducer(state, action);
-  equal(newState.makeInvisibleDeveloperKeyPending, false);
-  equal(newState.makeInvisibleDeveloperKeySuccessful, true);
-});
+    makeInvisibleDeveloperKeySuccessful: false
+  }
+  const payload = {}
+  const action = actions.makeInvisibleDeveloperKeySuccessful(payload)
+  const newState = reducer(state, action)
+  equal(newState.makeInvisibleDeveloperKeyPending, false)
+  equal(newState.makeInvisibleDeveloperKeySuccessful, true)
+})
 
 test('responds to makeInvisibleDeveloperKeyFailed', () => {
   const state = {
     makeInvisibleDeveloperKeyPending: true,
     makeInvisibleDeveloperKeyError: null
-  };
-  const error = {};
+  }
+  const error = {}
 
-  const action = actions.makeInvisibleDeveloperKeyFailed(error);
-  const newState = reducer(state, action);
-  equal(newState.makeInvisibleDeveloperKeyPending, false);
-  equal(newState.makeInvisibleDeveloperKeyError, error);
-});
+  const action = actions.makeInvisibleDeveloperKeyFailed(error)
+  const newState = reducer(state, action)
+  equal(newState.makeInvisibleDeveloperKeyPending, false)
+  equal(newState.makeInvisibleDeveloperKeyError, error)
+})

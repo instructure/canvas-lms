@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -33,11 +35,11 @@ module NewCourseAddCourseModal
   end
 
   def subaccount_select
-    fj('label:contains("Subaccount") select', add_course_modal)
+    fj('label:contains("Subaccount") input', add_course_modal)
   end
 
   def enrollment_term_select
-    fj('label:contains("Enrollment Term") select', add_course_modal)
+    fj('label:contains("Enrollment Term") input', add_course_modal)
   end
 
   #---------------------- Actions ----------------------
@@ -56,10 +58,10 @@ module NewCourseAddCourseModal
   end
 
   def select_subaccount(subaccount)
-    click_option(subaccount_select, subaccount.to_param, :value)
+    click_INSTUI_Select_option(subaccount_select, subaccount.name)
   end
 
   def select_enrollment_term(term_text)
-    click_option(enrollment_term_select, term_text)
+    click_INSTUI_Select_option(enrollment_term_select, term_text)
   end
 end

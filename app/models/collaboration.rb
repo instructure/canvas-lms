@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,6 +21,8 @@
 class Collaboration < ActiveRecord::Base
   include Workflow
   include SendToStream
+
+  DEEP_LINKING_EXTENSION = 'https://canvas.instructure.com/lti/collaboration'
 
   attr_readonly   :collaboration_type
 
@@ -127,7 +131,9 @@ class Collaboration < ActiveRecord::Base
   # Returns a collaboration instance or raises an exception if type unknown.
   def self.typed_collaboration_instance(name)
     class_config = Collaboration.collaboration_types.find { |c| c['name'] == name }
-    klass        = collaboration_class(class_config['type'].titleize.gsub(/\s/, ''))
+    raise InvalidCollaborationType unless class_config
+
+    klass = collaboration_class(class_config['type'].titleize.gsub(/\s/, ''))
 
     if klass
       collaboration = klass.new
@@ -382,4 +388,6 @@ class Collaboration < ActiveRecord::Base
   protected def authorized_service_user_id_for(user)
     user.gmail
   end
+
+  class InvalidCollaborationType < StandardError; end
 end

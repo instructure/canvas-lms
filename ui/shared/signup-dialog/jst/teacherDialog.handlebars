@@ -1,0 +1,39 @@
+<div class="registration-dialog">
+  <form class="form-horizontal bootstrap-form" method="post" action="/users">
+    <div class="control-group">
+      <label class="control-label" for="teacher_name">{{#t "labels.name"}}Name{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="teacher_name" name="user[name]">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="teacher_email">{{#t "labels.email"}}Email{{/t}}</label>
+      <div class="controls">
+        <input type="text" id="teacher_email" name="pseudonym[unique_id]">
+      </div>
+    </div>
+    {{#if terms_required}}
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox">
+          <input type="checkbox" name="user[terms_of_use]" value="1">
+          {{{terms_html}}}
+        </label>
+      </div>
+    </div>
+    {{/if}}
+    {{#if recaptcha}}
+    <div class="control-group">
+      <div class="controls">
+        <div class="g-recaptcha"></div>
+      </div>
+    </div>
+    {{/if}}
+    <div class="control-group">
+      <div class="controls">
+        <input type="hidden" name="user[initial_enrollment_type]" value="teacher">
+        <button class="btn btn-primary" type="submit">{{#t "buttons.start_teaching"}}Start Teaching{{/t}}</button>
+      </div>
+    </div>
+  </form>
+</div>

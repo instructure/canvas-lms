@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -161,7 +163,7 @@ describe Api::V1::GradebookHistory do
       let(:harness) {  GradebookHistoryHarness.new }
       let(:submission) do
         s = assignment.submit_homework(student)
-        s.update_attributes(graded_at: now, score: 90, grade: '90', grader: grader)
+        s.update(graded_at: now, score: 90, grade: '90', grader: grader)
         s
       end
       let(:course) do
@@ -176,6 +178,13 @@ describe Api::V1::GradebookHistory do
       harness.versions_json(course, versions, api_context)
       expect(versions.first.model.association(:originality_reports).loaded?).to eq true
     end
+
+    it "handles versions without an associated 'versionable' object" do
+      version = Version.create!(versionable: submission, model: submission)
+      version.update_column(:versionable_id, nil)
+      submission.reload
+      expect { harness.versions_json(course, [version], api_context) }.not_to raise_error
+    end
   end
 
   describe '#submissions_for' do
@@ -188,7 +197,7 @@ describe Api::V1::GradebookHistory do
       @course.enroll_teacher(@grader2)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @submission = @assignment.submit_homework(student1)
-      @submission.update_attributes(graded_at: now, grader_id: @grader1.id)
+      @submission.update(graded_at: now, grader_id: @grader1.id)
       @submission.score = 90
       @submission.grade = '90'
       @submission.grader = @grader2

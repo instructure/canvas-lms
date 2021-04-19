@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -53,10 +55,10 @@ module Api
         %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
 
         # Get file
-        %r{^/courses/(#{ID})/files/(#{ID})/} => ['File', :api_v1_course_attachment_url, :course_id, :id],
-        %r{^/groups/(#{ID})/files/(#{ID})/} => ['File', :api_v1_group_attachment_url, :group_id, :id],
-        %r{^/users/(#{ID})/files/(#{ID})/} => ['File', :api_v1_user_attachment_url, :user_id, :id],
-        %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+        %r{^/courses/(#{ID})/files/(#{ID})} => ['File', :api_v1_course_attachment_url, :course_id, :id],
+        %r{^/groups/(#{ID})/files/(#{ID})} => ['File', :api_v1_group_attachment_url, :group_id, :id],
+        %r{^/users/(#{ID})/files/(#{ID})} => ['File', :api_v1_user_attachment_url, :user_id, :id],
+        %r{^/files/(#{ID})} => ['File', :api_v1_attachment_url, :id],
 
         # List quizzes
         %r{^/courses/(#{ID})/quizzes$} => ['[Quiz]', :api_v1_course_quizzes_url, :course_id],
@@ -89,10 +91,27 @@ module Api
       end
 
       def media_context
+        # not all objects are clean to find media urls for.
+        # If the current context is one of those classes,
+        # then we should look up what the actual context is that
+        # would have a reasonable media url on it (usually a course).
+        # If you are trying to do "media_redirect_url" on a context
+        # where you're finding a media url helper doesn't exist, you probably
+        # need to add a case here.
         case context
-        when Group
+        when Announcement
           context.context
         when CourseSection
+          context.course
+        when DiscussionTopic
+          context.course
+        when DiscussionEntry
+          context.discussion_topic.course
+        when Message
+          context.media_context
+        when Group
+          context.context
+        when WikiPage
           context.course
         else
           context

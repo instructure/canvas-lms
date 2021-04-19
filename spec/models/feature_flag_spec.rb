@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -43,6 +45,7 @@ describe FeatureFlag do
     it "should validate the feature exists" do
       flag = t_root_account.feature_flags.build(feature: 'xyzzy')
       expect(flag).not_to be_valid
+      expect(flag.errors.to_h).to eq({feature: "does not exist"})
     end
 
     it "should allow 'allowed' state only in accounts" do
@@ -59,6 +62,7 @@ describe FeatureFlag do
 
       flag = t_sub_account.feature_flags.build(feature: 'root_account_feature')
       expect(flag).not_to be_valid
+      expect(flag.errors.to_h).to eq({feature: "does not apply to context"})
     end
   end
 

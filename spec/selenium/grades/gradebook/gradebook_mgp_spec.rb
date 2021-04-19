@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -18,9 +20,10 @@
 
 require_relative '../../common'
 require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook_cells_page'
 require_relative '../setup/gradebook_setup'
 
-describe "gradebook with grading periods" do
+describe "Gradebook with grading periods" do
   include_context "in-process server selenium tests"
   include GradebookSetup
 
@@ -32,6 +35,7 @@ describe "gradebook with grading periods" do
       create_grading_periods(term_name, now)
       add_teacher_and_student
       associate_course_to_term(term_name)
+      show_grading_periods_filter(@teacher)
     end
 
     context 'as a teacher' do
@@ -40,17 +44,17 @@ describe "gradebook with grading periods" do
       end
 
       it 'assignment in ended grading period should be gradable', test_id: 2947119, priority: "1" do
-        @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
-        Gradebook.visit_gradebook(@course)
-        Gradebook.select_grading_period(0)
-        Gradebook.enter_grade("10", 0, 0)
+        assign = @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
+        Gradebook.visit(@course)
 
-        expect(Gradebook.cell_graded?("10", 0, 0)).to be true
+        Gradebook.select_grading_period("All Grading Periods")
+        Gradebook::Cells.edit_grade(@student, assign, "10")
+        expect { Gradebook::Cells.get_grade(@student, assign) }.to become "10"
 
-        Gradebook.select_grading_period(@gp_ended.id)
-        Gradebook.enter_grade("8", 0, 0)
 
-        expect(Gradebook.cell_graded?("8", 0, 0)).to be true
+        Gradebook.select_grading_period(@gp_ended.title)
+        Gradebook::Cells.edit_grade(@student, assign, "8")
+        expect { Gradebook::Cells.get_grade(@student, assign) }.to become "8"
       end
     end
 
@@ -58,16 +62,16 @@ describe "gradebook with grading periods" do
       before(:each) do
         account_admin_user(account: Account.site_admin)
         user_session(@admin)
+        show_grading_periods_filter(@admin)
       end
 
       it 'assignment in closed grading period should be gradable', test_id: 2947126, priority: "1" do
-
         assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
-        Gradebook.visit_gradebook(@course)
-        Gradebook.select_grading_period(@gp_closed.id)
-        Gradebook.enter_grade("10", 0, 0)
+        Gradebook.visit(@course)
 
-        expect(Gradebook.cell_graded?("10", 0, 0)).to be true
+        Gradebook.select_grading_period(@gp_closed.title)
+        Gradebook::Cells.edit_grade(@student, assignment, "10")
+        expect { Gradebook::Cells.get_grade(@student, assignment) }.to become "10"
         expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first.grade).to eq "10"
       end
     end
@@ -75,15 +79,14 @@ describe "gradebook with grading periods" do
     it 'assignment in closed gp should not be gradable', test_id: 2947118, priority: "1" do
       user_session(@teacher)
 
-      @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
-      Gradebook.visit_gradebook(@course)
-      Gradebook.select_grading_period(0)
+      assign = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
+      Gradebook.visit(@course)
 
-      expect(Gradebook.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
+      Gradebook.select_grading_period("All Grading Periods")
+      expect(Gradebook::Cells.grading_cell(@student, assign)).to contain_css(Gradebook::Cells.ungradable_selector)
 
-      Gradebook.select_grading_period(@gp_closed.id)
-
-      expect(Gradebook.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
+      Gradebook.select_grading_period(@gp_closed.title)
+      expect(Gradebook::Cells.grading_cell(@student, assign)).to contain_css(Gradebook::Cells.ungradable_selector)
     end
   end
 end

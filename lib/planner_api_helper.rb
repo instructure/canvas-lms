@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -47,10 +49,6 @@ module PlannerApiHelper
     else
       default
     end
-  end
-
-  def require_planner_enabled
-    render json: { message: "Feature disabled" }, status: :forbidden unless @domain_root_account.feature_enabled?(:student_planner)
   end
 
   def sync_module_requirement_done(item, user, complete)

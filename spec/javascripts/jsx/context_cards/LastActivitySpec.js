@@ -20,8 +20,8 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import LastActivity from 'jsx/context_cards/LastActivity'
-import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import LastActivity from '@canvas/context-cards/react/LastActivity'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
 QUnit.module('StudentContextTray/LastActivity', hooks => {
   let subject

@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import AssignToGroupMenu from 'compiled/views/groups/manage/AssignToGroupMenu'
-import GroupCollection from 'compiled/collections/GroupCollection'
-import Group from 'compiled/models/Group'
-import GroupUser from 'compiled/models/GroupUser'
-import GroupCategory from 'compiled/models/GroupCategory'
+import AssignToGroupMenu from 'ui/features/manage_groups/backbone/views/AssignToGroupMenu.js'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
+import Group from '@canvas/groups/backbone/models/Group.coffee'
+import GroupUser from '@canvas/groups/backbone/models/GroupUser.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import assertions from 'helpers/assertions'
 
 let view = null

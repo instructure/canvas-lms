@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Section from 'compiled/models/Section'
-import I18n from 'i18n!overrides'
+import Section from '@canvas/sections/backbone/models/Section.coffee'
+import I18n from 'i18n!modelsSection'
 
 QUnit.module('Section')
 

@@ -19,8 +19,8 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import chicago from 'timezone/America/Chicago'
-import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
-import tz from 'timezone'
+import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
+import tz from '@canvas/timezone'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
@@ -141,13 +141,23 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
   test('forwards properties to label', () => {
     props.labelClasses = 'special-label'
     mountComponent()
-    ok(wrapper.find('label').prop('className').match(/special-label/));
+    ok(
+      wrapper
+        .find('label')
+        .prop('className')
+        .match(/special-label/)
+    )
   })
 
   test('forwards properties to input', () => {
     props.name = 'special-name'
     mountComponent()
-    ok(wrapper.find('input').prop('name').match(/special-name/));
+    ok(
+      wrapper
+        .find('input')
+        .prop('name')
+        .match(/special-name/)
+    )
   })
 
   test('label and input reference each other', () => {

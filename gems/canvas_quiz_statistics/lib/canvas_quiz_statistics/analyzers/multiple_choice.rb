@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -66,6 +68,7 @@ module CanvasQuizStatistics::Analyzers
       answers = parse_answers do |answer, answer_stats|
         stats = {
           responses: 0,
+          user_ids: [],
           user_names: []
         }
 

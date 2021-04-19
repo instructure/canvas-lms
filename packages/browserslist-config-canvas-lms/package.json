@@ -1,0 +1,15 @@
+{
+  "name": "@instructure/browserslist-config-canvas-lms",
+  "version": "2.0.0",
+  "description": "The official list of browsers supported by Canvas LMS & the Canvas product ecosystem. To use this, just add `\"browserslist\": [\"extends @instructure/browserslist-config-canvas-lms\"]` to your package.json",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/instructure/canvas-lms.git"
+  },
+  "scripts": {
+    "test": "node --eval \"assert(require('.').includes('last 2 safari versions'))\""
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/instructure/canvas-lms/blob/master/packages/browserslist-config-canvas-lms"
+}

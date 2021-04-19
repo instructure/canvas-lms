@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 Instructure, Inc.
 #
@@ -20,7 +22,10 @@ module Lti
   class PrivacyLevelExpander
     EMAIL_ONLY = %w(Person.email.primary).freeze
     INLCUDE_NAME = %w(Person.name.given Person.name.full Person.name.family).freeze
-    PUBLIC = (%w(Person.sourcedId CourseOffering.sourcedId) + EMAIL_ONLY + INLCUDE_NAME).freeze
+    PUBLIC = %w(Person.sourcedId CourseOffering.sourcedId).
+      concat(EMAIL_ONLY).
+      concat(INLCUDE_NAME).
+      freeze
     ANONYMOUS = %w(com.instructure.contextLabel).freeze
 
     SUPPORTED_PARAMETERS_HASH = {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -38,17 +40,19 @@ module ErrorContext
       EscapeCode::HtmlFormatter.new("").generate_stylesheet
     end
 
+    # make a nice little html file for jenkins
     def write_error_page
-      # make a nice little html file for jenkins
+      return if summary.discard?
+
       File.open(File.join(errors_path, "index.html"), "w") do |file|
         file.write error_page_content
       end
     end
 
     def error_page_content
-      return if summary.discard?
-
-      output_buffer = nil
+      # these seemingly unused local and instance vars are necessary preambles
+      # to the `error_template.src` that gets eval'd below
+      @output_buffer = ActionView::OutputBuffer.new
       example = summary.example
       formatted_exception = ::RSpec::Core::Formatters::ExceptionPresenter.new(example.exception, example).fully_formatted(nil)
       eval(error_template.src, binding, error_template_path)
@@ -60,13 +64,14 @@ module ErrorContext
       base_path = "../" + ("../" * summary.spec_path.count("/"))
       errors = ErrorSummary.recent_spec_runs.reverse.map do |run|
         location = ERB::Util.html_escape(run[:location])
-        if run[:pending]
+        contents = if run[:pending]
           "bin/rspec #{location} (pending)"
         elsif run[:exception]
           "bin/rspec <a href=\"#{base_path + location}/index.html\">#{location}</a> (failed)"
         else
           "bin/rspec #{location}"
         end
+        "#{run[:recorded_at]}: #{contents}"
       end.join("<br>")
 
       "(newest)<br>#{errors}<br>(oldest)".html_safe

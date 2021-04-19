@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -73,7 +75,7 @@ module RCSSidebarPage
   end
 
   def files_tab
-    fj('[role="presentation"]:contains("Files")')
+    fj('[role=tablist] [role=presentation]:not([aria-disabled]):contains("Files")')
   end
 
   def upload_new_file
@@ -88,8 +90,28 @@ module RCSSidebarPage
     fj('button:contains("Upload a new image")')
   end
 
-  def image_link(title)
-    fj("aside [role='button']:contains('#{title}')")
+  def sidebar
+    f('#right-side')
+  end
+
+  def sidebar_tabs
+    f('#editor_tabs')
+  end
+
+  def sidebar_files
+    ff('#right-side li')
+  end
+
+  def sidebar_images
+    ff("#right-side [role='button']")
+  end
+
+  def sidebar_image_tag
+    f('#right-side a img')
+  end
+
+  def close_button
+    f('[data-testid="CloseButton_ContentTray"] > button')
   end
 
   # ---------------------- Actions ----------------------
@@ -136,13 +158,15 @@ module RCSSidebarPage
 
   def click_files_tab
     files_tab.click
+    wait_for_ajaximations
   end
 
   def click_images_tab
     images_tab.click
   end
 
-  def click_image_link(title)
-    image_link(title).click
+  def click_close_button
+    close_button.click
+    wait_for_ajaximations
   end
 end

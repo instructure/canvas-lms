@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -34,13 +36,17 @@ describe 'enrollment_notification' do
 
     context "creation_pending student" do
       before :once do
-        @student.communication_channels.create!(path: 'jacob@instructure.com')
+        communication_channel(@student, {username: 'jacob@isntructure.com'})
       end
 
       let(:asset) { @enrollment }
 
       it "should render" do
         generate_message(:enrollment_notification, :email, asset)
+        expect(@message.html_body).to include 'Click here to view the course page'
+        expect(@message.html_body).to include 'Update your notification settings</a>'
+        # email footer
+        expect(@message.body).to include 'To change or turn off email notifications,'
       end
     end
   end

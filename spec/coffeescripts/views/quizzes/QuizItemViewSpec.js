@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Quiz from 'compiled/models/Quiz'
-import QuizItemView from 'compiled/views/quizzes/QuizItemView'
-import PublishIconView from 'compiled/views/PublishIconView'
+import Backbone from '@canvas/backbone'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import QuizItemView from 'ui/features/quizzes_index/backbone/views/QuizItemView.js'
+import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
+import ReactDOM from 'react-dom'
 
 const fixtures = $('#fixtures')
 
@@ -55,7 +56,8 @@ const createView = function(quiz, options = {}) {
 
   ENV.FLAGS = {
     post_to_sis_enabled: options.post_to_sis,
-    migrate_quiz_enabled: options.migrate_quiz_enabled
+    migrate_quiz_enabled: options.migrate_quiz_enabled,
+    DIRECT_SHARE_ENABLED: options.DIRECT_SHARE_ENABLED || false
   }
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
@@ -70,10 +72,10 @@ QUnit.module('QuizItemView', {
       CONDITIONAL_RELEASE_ENV: {
         active_rules: [
           {
-            trigger_assignment: '1',
+            trigger_assignment_id: '1',
             scoring_ranges: [
               {
-                assignment_sets: [{assignments: [{assignment_id: '2'}]}]
+                assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]
               }
             ]
           }
@@ -87,35 +89,56 @@ QUnit.module('QuizItemView', {
   }
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', assert => {
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz)
   const done = assert.async()
   return assertions.isAccessible(view, done, {a11yReport: true})
 })
 
-test('renders admin if can_update', function() {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
+test('renders admin if canManage', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo'})
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin').length, 1)
 })
 
-test('doesnt render admin if can_update is false', function() {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: false})
-  const view = createView(quiz)
+test('doesnt render admin if canManage is false', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo'})
+  const view = createView(quiz, {canManage: false})
   equal(view.$('.ig-admin').length, 0)
 })
 
-test('renders Migrate Button if post to migrateQuizEnabled is true', function() {
+test('renders Migrate Button if post to migrateQuizEnabled is true', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: true})
   equal(view.$('.migrate').length, 1)
 })
 
-test('does not render Migrate Button if migrateQuizEnabled is false', function() {
+test('does not render Migrate Button if migrateQuizEnabled is false', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
   equal(view.$('.migrate').length, 0)
+})
+
+test('shows solid quiz icon for new.quizzes', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+  const view = createView(quiz, {canManage: true})
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
+})
+
+test('shows a teacher a line quiz icon for old quizzes', () => {
+  Object.assign(window.ENV, {current_user_roles: ['teacher', 'student']})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
+  equal(view.$('i.icon-quiz').length, 1)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 0)
+})
+
+test('shows a student a solid quiz icon for old quizzes', () => {
+  Object.assign(window.ENV, {current_user_roles: ['student']})
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {canManage: false, migrate_quiz_enabled: false})
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 
 test('#migrateQuiz is called', function() {
@@ -126,70 +149,70 @@ test('#migrateQuiz is called', function() {
   ok(this.ajaxStub.called)
 })
 
-test('initializes sis toggle if post to sis enabled', function() {
+test('initializes sis toggle if post to sis enabled', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, published: true})
   quiz.set('post_to_sis', true)
   const view = createView(quiz, {canManage: true, post_to_sis: true})
   ok(view.sisButtonView)
 })
 
-test('initializes sis toggle if post to sis disabled', function() {
+test('initializes sis toggle if post to sis disabled', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, published: true})
   quiz.set('post_to_sis', false)
   const view = createView(quiz, {canManage: true, post_to_sis: true})
   ok(view.sisButtonView)
 })
 
-test('does not initialize sis toggle if post_to_sis feature option disabled', function() {
+test('does not initialize sis toggle if post_to_sis feature option disabled', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, published: true})
   quiz.set('post_to_sis', true)
   const view = createView(quiz, {canManage: true, post_to_sis: false})
   ok(!view.sisButtonView)
 })
 
-test('does not initialize sis toggle if post to sis is null', function() {
+test('does not initialize sis toggle if post to sis is null', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   quiz.set('post_to_sis', null)
   const view = createView(quiz, {canManage: true})
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if sis enabled but can't manage", function() {
+test("does not initialize sis toggle if sis enabled but can't manage", () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: false})
   quiz.set('post_to_sis', false)
   const view = createView(quiz, {canManage: false})
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if sis enabled, can't manage and is unpublished", function() {
+test("does not initialize sis toggle if sis enabled, can't manage and is unpublished", () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: false, published: false})
   quiz.set('post_to_sis', true)
   const view = createView(quiz, {canManage: false})
   ok(!view.sisButtonView)
 })
 
-test("does not initialize sis toggle if sis disabled, can't manage and is unpublished", function() {
+test("does not initialize sis toggle if sis disabled, can't manage and is unpublished", () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: false, published: false})
   quiz.set('post_to_sis', false)
   const view = createView(quiz, {canManage: false})
   ok(!view.sisButtonView)
 })
 
-test('does not initialize sis toggle if sis enabled, can manage and is unpublished', function() {
+test('does not initialize sis toggle if sis enabled, can manage and is unpublished', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: false, published: false})
   quiz.set('post_to_sis', true)
   const view = createView(quiz, {canManage: true})
   ok(!view.sisButtonView)
 })
 
-test('does not initialize sis toggle if sis disabled, can manage and is unpublished', function() {
+test('does not initialize sis toggle if sis disabled, can manage and is unpublished', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: false, published: false})
   quiz.set('post_to_sis', false)
   const view = createView(quiz, {canManage: true})
   ok(!view.sisButtonView)
 })
 
-test('udpates publish status when model changes', function() {
+test('udpates publish status when model changes', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', published: false})
   const view = createView(quiz)
 
@@ -199,7 +222,7 @@ test('udpates publish status when model changes', function() {
   ok(view.$el.find('.ig-row').hasClass('ig-published'))
 })
 
-test('cannot delete quiz without delete permissions', function() {
+test('cannot delete quiz without delete permissions', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, permissions: {delete: false}})
   const view = createView(quiz)
 
@@ -211,9 +234,9 @@ test('cannot delete quiz without delete permissions', function() {
   notOk(quiz.destroy.called)
 })
 
-test('prompts confirm for delete', function() {
+test('prompts confirm for delete', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   quiz.destroy = () => true
 
   sandbox.stub(window, 'confirm').returns(true)
@@ -222,9 +245,9 @@ test('prompts confirm for delete', function() {
   ok(window.confirm.called)
 })
 
-test('confirm delete destroys model', function() {
+test('confirm delete destroys model', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
 
   let destroyed = false
   quiz.destroy = () => (destroyed = true)
@@ -234,7 +257,7 @@ test('confirm delete destroys model', function() {
   ok(destroyed)
 })
 
-test('doesnt redirect if clicking on ig-admin area', function() {
+test('doesnt redirect if clicking on ig-admin area', () => {
   const view = createView()
 
   let redirected = false
@@ -244,7 +267,7 @@ test('doesnt redirect if clicking on ig-admin area', function() {
   ok(!redirected)
 })
 
-test('follows through when clicking on row', function() {
+test('follows through when clicking on row', () => {
   const view = createView()
 
   let redirected = false
@@ -254,7 +277,7 @@ test('follows through when clicking on row', function() {
   ok(redirected)
 })
 
-test('renders lockAt/unlockAt for multiple due dates', function() {
+test('renders lockAt/unlockAt for multiple due dates', () => {
   const quiz = createQuiz({
     id: 1,
     title: 'mdd',
@@ -265,7 +288,7 @@ test('renders lockAt/unlockAt for multiple due dates', function() {
   equal(json.showAvailability, true)
 })
 
-test('renders lockAt/unlockAt when locked', function() {
+test('renders lockAt/unlockAt when locked', () => {
   const future = new Date()
   future.setDate(future.getDate() + 10)
   const quiz = createQuiz({id: 1, title: 'mdd', unlock_at: future.toISOString()})
@@ -274,7 +297,7 @@ test('renders lockAt/unlockAt when locked', function() {
   equal(json.showAvailability, true)
 })
 
-test('renders lockAt/unlockAt when locking in future', function() {
+test('renders lockAt/unlockAt when locking in future', () => {
   const past = new Date()
   past.setDate(past.getDate() - 10)
   const future = new Date()
@@ -290,7 +313,7 @@ test('renders lockAt/unlockAt when locking in future', function() {
   equal(json.showAvailability, true)
 })
 
-test('does not render lockAt/unlockAt when not locking in future', function() {
+test('does not render lockAt/unlockAt when not locking in future', () => {
   const past = new Date()
   past.setDate(past.getDate() - 10)
   const quiz = createQuiz({id: 1, title: 'unlocked for good', unlock_at: past.toISOString()})
@@ -299,14 +322,14 @@ test('does not render lockAt/unlockAt when not locking in future', function() {
   equal(json.showAvailability, false)
 })
 
-test('does not render mastery paths menu option for quiz if cyoe off', function() {
+test('does not render mastery paths menu option for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
-test('renders mastery paths menu option for assignment quiz if cyoe on', function() {
+test('renders mastery paths menu option for assignment quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({
     id: 1,
@@ -315,32 +338,32 @@ test('renders mastery paths menu option for assignment quiz if cyoe on', functio
     quiz_type: 'assignment',
     assignment_id: '2'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 1)
 })
 
-test('does not render mastery paths menu option for survey quiz if cyoe on', function() {
+test('does not render mastery paths menu option for survey quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'survey'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
-test('does not render mastery paths menu option for graded survey quiz if cyoe on', function() {
+test('does not render mastery paths menu option for graded survey quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'graded_survey'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
-test('does not render mastery paths menu option for practice quiz if cyoe on', function() {
+test('does not render mastery paths menu option for practice quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
-test('does not render mastery paths link for quiz if cyoe off', function() {
+test('does not render mastery paths link for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
   const quiz = new Quiz({
     id: 1,
@@ -349,11 +372,11 @@ test('does not render mastery paths link for quiz if cyoe off', function() {
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
 })
 
-test('does not render mastery paths link for quiz if quiz does not have a rule', function() {
+test('does not render mastery paths link for quiz if quiz does not have a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({
     id: 1,
@@ -362,11 +385,11 @@ test('does not render mastery paths link for quiz if quiz does not have a rule',
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
 })
 
-test('renders mastery paths link for quiz if quiz has a rule', function() {
+test('renders mastery paths link for quiz if quiz has a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({
     id: 1,
@@ -375,11 +398,11 @@ test('renders mastery paths link for quiz if quiz has a rule', function() {
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1)
 })
 
-test('does not render mastery paths icon for quiz if cyoe off', function() {
+test('does not render mastery paths icon for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
   const quiz = new Quiz({
     id: 1,
@@ -388,11 +411,11 @@ test('does not render mastery paths icon for quiz if cyoe off', function() {
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 0)
 })
 
-test('does not render mastery paths icon for quiz if quiz is not released by a rule', function() {
+test('does not render mastery paths icon for quiz if quiz is not released by a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({
     id: 1,
@@ -401,11 +424,11 @@ test('does not render mastery paths icon for quiz if quiz is not released by a r
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 0)
 })
 
-test('renders mastery paths link for quiz if quiz has is released by a rule', function() {
+test('renders mastery paths link for quiz if quiz has is released by a rule', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({
     id: 1,
@@ -414,6 +437,253 @@ test('renders mastery paths link for quiz if quiz has is released by a rule', fu
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 1)
+})
+
+test('can duplicate when a quiz can be duplicated', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['admin']})
+  const view = createView(quiz, {canManage: true})
+  const json = view.toJSON()
+  ok(json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 1)
+})
+
+test('duplicate option is not available when a quiz can not be duplicated (old quizzes)', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['admin']})
+  const view = createView(quiz, {})
+  const json = view.toJSON()
+  ok(!json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 0)
+})
+
+test('clicks on Retry button to trigger another duplicating request', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const dfd = $.Deferred()
+  const view = createView(quiz)
+  sandbox.stub(quiz, 'duplicate_failed').returns(dfd)
+  view.$(`.duplicate-failed-retry`).simulate('click')
+  ok(quiz.duplicate_failed.called)
+})
+
+test('clicks on Retry button to trigger another migrating request', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_migrate'
+  })
+  const dfd = $.Deferred()
+  const view = createView(quiz)
+  sandbox.stub(quiz, 'retry_migration').returns(dfd)
+  view.$(`.migrate-failed-retry`).simulate('click')
+  ok(quiz.retry_migration.called)
+})
+
+test('can duplicate when a user has permissons to manage assignments', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['teacher']})
+  const view = createView(quiz, {canManage: true})
+  const json = view.toJSON()
+  ok(json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 1)
+})
+
+test('cannot duplicate when user is not admin', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['user']})
+  const view = createView(quiz, {})
+  const json = view.toJSON()
+  ok(!json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 0)
+})
+
+test('displays duplicating message when assignment is duplicating', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'duplicating'
+  })
+  const view = createView(quiz)
+  ok(view.$el.text().includes('Making a copy of "Foo"'))
+})
+
+test('displays failed to duplicate message when assignment failed to duplicate', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const view = createView(quiz)
+  ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
+})
+
+QUnit.module('direct share', hooks => {
+  hooks.beforeEach(() => {
+    $('<div id="direct-share-mount-point">').appendTo('#fixtures')
+    fakeENV.setup({COURSE_ID: 123})
+    sinon.stub(ReactDOM, 'render')
+  })
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore()
+    fakeENV.teardown()
+    $('#direct-share-mount-point').remove()
+  })
+
+  test('does not render direct share menu items when not DIRECT_SHARE_ENABLED', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz)
+    equal(view.$('.quiz-copy-to').length, 0)
+    equal(view.$('.quiz-send-to').length, 0)
+  })
+
+  test('renders direct share menu items when DIRECT_SHARE_ENABLED', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    equal(view.$('.quiz-copy-to').length, 1)
+    equal(view.$('.quiz-send-to').length, 1)
+  })
+
+  test('opens and closes the Copy To tray', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-copy-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentSelection, {quizzes: [1]})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+
+  test('uses the correct content_type for new quizzes on Copy To', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-copy-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentSelection, {assignments: [1]})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+
+  test('opens and closes the Send To tray', () => {
+    const quiz = createQuiz({id: '1', title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-send-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentShare, {content_type: 'quiz', content_id: '1'})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+
+  test('uses the correct content_type for new quizzes on Send To', () => {
+    const quiz = createQuiz({id: '1', title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-send-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentShare, {content_type: 'assignment', content_id: '1'})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+})
+
+QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
+  hooks.beforeEach(() => {
+    fakeENV.setup({current_user_roles: []})
+  })
+
+  hooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns false if the assignment is not RLDB enabled', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    const quiz = createQuiz({
+      id: 1,
+      quiz_type: 'quizzes.next',
+      require_lockdown_browser: false
+    })
+    const view = createView(quiz)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, false)
+  })
+
+  test('returns false if the assignment is not a N.Q assignment', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    const quiz = createQuiz({
+      id: 1,
+      quiz_type: 'practice',
+      require_lockdown_browser: true
+    })
+    const view = createView(quiz)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, false)
+  })
+
+  test('returns false if the user is not a student', () => {
+    fakeENV.setup({current_user_roles: ['teacher']})
+    const quiz = createQuiz({
+      id: 1,
+      quiz_type: 'quizzes.next',
+      require_lockdown_browser: true
+    })
+    const view = createView(quiz)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, false)
+  })
+
+  test('returns true if the assignment is a RLDB enabled N.Q', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    const quiz = createQuiz({
+      id: 1,
+      quiz_type: 'quizzes.next',
+      require_lockdown_browser: true
+    })
+    const view = createView(quiz)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, true)
+  })
 })

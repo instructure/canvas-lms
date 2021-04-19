@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
+import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 
 const DATE_IN_FIRST_PERIOD = new Date('July 15, 2015')
 const DATE_IN_LAST_PERIOD = new Date('Sep 15, 2015')
@@ -47,7 +47,7 @@ function generateGradingPeriods() {
 
 QUnit.module('GradingPeriodsHelper#new')
 
-test('throws an error if any dates on the grading periods are Strings', function() {
+test('throws an error if any dates on the grading periods are Strings', () => {
   const gradingPeriods = generateGradingPeriods()
   gradingPeriods[0].startDate = '2015-07-01T06:00:00Z'
   throws(() => {
@@ -55,7 +55,7 @@ test('throws an error if any dates on the grading periods are Strings', function
   })
 })
 
-test('throws an error if any dates on the grading periods are null', function() {
+test('throws an error if any dates on the grading periods are null', () => {
   const gradingPeriods = generateGradingPeriods()
   gradingPeriods[0].startDate = null
   throws(() => {
@@ -63,7 +63,7 @@ test('throws an error if any dates on the grading periods are null', function() 
   })
 })
 
-test('throws an error if grading periods are not passed in', function() {
+test('throws an error if grading periods are not passed in', () => {
   throws(() => {
     new GradingPeriodsHelper()
   })
@@ -71,15 +71,15 @@ test('throws an error if grading periods are not passed in', function() {
 
 QUnit.module('GradingPeriodsHelper.isAllGradingPeriods')
 
-test('returns true if the ID is the string "0"', function() {
+test('returns true if the ID is the string "0"', () => {
   equal(GradingPeriodsHelper.isAllGradingPeriods('0'), true)
 })
 
-test('returns false if the ID is a string other than "0"', function() {
+test('returns false if the ID is a string other than "0"', () => {
   equal(GradingPeriodsHelper.isAllGradingPeriods('42'), false)
 })
 
-test('throws the error if the ID is not a string', function() {
+test('throws the error if the ID is not a string', () => {
   throws(() => {
     GradingPeriodsHelper.isAllGradingPeriods(0)
   })

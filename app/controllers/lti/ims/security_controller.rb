@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -44,14 +46,12 @@ module Lti::Ims
   class SecurityController < ApplicationController
     skip_before_action :load_user
 
-    MAX_CACHE_AGE = 10.days.to_i
-
     # @API Show all available JWKs used by Canvas for signing.
     #
     # @returns JWKs
     def jwks
       keys = Lti::KeyStorage.public_keyset
-      response.set_header('Cache-Control', "max-age=#{Setting.get('public_jwk_cache_age_in_seconds', MAX_CACHE_AGE)}")
+      response.set_header('Cache-Control', "max-age=#{Lti::KeyStorage.max_cache_age}")
       render json: { keys: keys }
     end
   end

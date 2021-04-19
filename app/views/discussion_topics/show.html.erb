@@ -17,43 +17,28 @@
 %>
 
 <%
-  content_for :page_title, join_title( t(:topic, "Topic"), @topic.title)
+  provide :page_title, join_title( t(:topic, "Topic"), @topic.title)
   @discussion_presenter = DiscussionTopicPresenter.new(@topic, @current_user)
+  @no_reply = @topic.homeroom_announcement?(@context)
 %>
 
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")}) %>
-    <% if @topic.podcast_enabled %>
-      <%= auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")}) %>
-    <% end %>
-  <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")}) %>
-    <% if @topic.podcast_enabled %>
-      <%= auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")}) %>
-    <% end %>
-  <% end %>
-<% end %>
-
-<% if @headers || !@locked %>
-  <% content_for :right_side do %>
+<% if (@headers || !@locked) && ((show_crs_graphs = can_do(@context, @current_user, :view_all_grades) && ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session)) || !@context.try(:feature_enabled?, :rce_enhancements)) %>
+  <% provide :right_side do %>
     <div id="sidebar_content" class="rs-margin-bottom">
-      <% if can_do(@context, @current_user, :view_all_grades) &&
-            ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session) %>
+      <% if show_crs_graphs %>
         <div id="crs-graphs"></div>
       <% end %>
     </div>
     <%= render :partial => "shared/wiki_sidebar" %>
   <% end %>
+<% else %>
+  <% provide_blank :right_side %>
 <% end %>
+
 <% if !@headers %>
   <div style="width: 600px; margin: 10px auto;">
   <h2><%= @topic.title %></h2>
 <% end %>
-<%
-  js_bundle :discussion
-  css_bundle :tinymce, :discussions, :learning_outcomes
-%>
 
 <% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
   <div id="discussion-managebar" class="toolbarView">
@@ -79,11 +64,8 @@
     <div class="headerBar">
       <div class="form-inline" style="overflow: visible;">
         <div id="keyboard-shortcut-modal-info" tabindex="0">
-          <span aria-hidden="true" class="accessibility-warning">
-            <%= t 'Press the comma key or shift + ? to see a list of keyboard shortcuts' %>
-          </span>
-          <span class="screenreader-only">
-            <%= t 'Press the comma key or shift + question mark to see a list of keyboard shortcuts' %>
+          <span class="accessibility-warning">
+            <%= t 'Press ALT + F8 to see a list of keyboard shortcuts' %>
           </span>
         </div>
         <div class="pull-right">
@@ -119,9 +101,9 @@
               </a>
               <ul class="al-options">
                 <% unless @initial_post_required %>
-                  <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
+                  <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="true"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
                   <% if false # keep this command out of the interface for now %>
-                    <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
+                    <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="true"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
                   <% end %>
                 <% end %>
 
@@ -134,7 +116,7 @@
                                                :speed_grader_context_gradebook_url,
                                                :assignment_id => @topic.assignment.id) %>"
                          target="_blank">
-                    <i class="icon-speed-grader" aria-hidden="hidden"></i>
+                    <i class="icon-speed-grader" aria-hidden="true"></i>
                     <%= t :speed_grader, "SpeedGrader™" %>
                   </a></li>
                 <% end %>
@@ -144,7 +126,7 @@
                      href="<%= context_url(@topic.assignment.context,
                                            :context_assignment_peer_reviews_url,
                                            @topic.assignment.id) %>">
-                    <i class="icon-peer-review" aria-hidden="hidden"></i>
+                    <i class="icon-peer-review" aria-hidden="true"></i>
                     <%= t 'links.peer_reviews', "Peer Reviews" %>
                   </a></li>
                 <% end %>
@@ -157,7 +139,7 @@
                       data-no-rubric-exists="<%= !@discussion_presenter.has_attached_rubric? %>"
                       data-focus-returns-to=".announcement_cog"
                     >
-                      <i class="icon-rubric" aria-hidden="hidden"></i>
+                      <i class="icon-rubric" aria-hidden="true"></i>
                       <%= @discussion_presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
                     </a>
                   </li>
@@ -171,6 +153,11 @@
                   <% elsif can_do(@context, @current_user, :moderate_forum) && @topic.can_lock? %>
                     <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
                   <% end %>
+                <% end %>
+
+                <% if @discussion_presenter.can_direct_share? %>
+                  <li><a href="#", class="direct-share-send-to-menu-item"><i class="icon-user" aria-hidden="true"></i> <%= t("Send To...") %></a></li>
+                  <li><a href="#", class="direct-share-copy-to-menu-item"><i class="icon-duplicate" aria-hidden="true"></i> <%= t("Copy To...") %></a></li>
                 <% end %>
 
                 <% if can_do(@context, @current_user, :manage_content) %>
@@ -192,7 +179,7 @@
 
   <div id="discussion_container">
     <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
-      <div class="entry-content">
+      <div class="entry-content <%= 'no-reply' if @no_reply %>">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
           <%= render :partial => 'peer_reviews' %>
@@ -220,7 +207,7 @@
                 <span class="discussion-subtitle">
                   <%= t(:from_context, "From *%{context_name}*", {
                           :context_name => @topic.root_topic.context.short_name,
-                          :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
+                          :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\\1</a>" }) %>
                 </span>
               <% end %>
             </div>
@@ -244,13 +231,15 @@
             </div>
           <% end %>
           <% if @locked %>
-            <div class="discussion-fyi">
-              <% if @topic.is_a? Announcement %>
-                <%= t 'announcement_closed', 'This announcement is closed for comments' %>
-              <% elsif @locked.is_a?(Hash) %>
-                <%= lock_explanation(@locked, 'topic', @context) %>
-              <% end %>
-            </div>
+            <% unless @no_reply %>
+              <div class="discussion-fyi">
+                <% if @topic.is_a? Announcement %>
+                  <%= t 'announcement_closed', 'This announcement is closed for comments' %>
+                <% elsif @locked.is_a?(Hash) %>
+                  <%= lock_explanation(@locked, 'topic', @context) %>
+                <% end %>
+              </div>
+            <% end %>
           <% end %>
 
           <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
@@ -284,66 +273,76 @@
           <% end %>
         </div>
       </div>
+      <% unless  @no_reply %>
+        <div id="discussion-toolbar" class="toolbarView">
+          <div class="headerBar" data-sticky>
+            <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
+            <div class="form-inline headerBar__layout">
+              <div class="headerBar__controls">
+            <% else %>
+            <div class="row-fluid form-inline" style="overflow: visible;">
+              <div class="span9">
+            <% end %>
+                <label class="screenreader-only" for="discussion-search">
+                  <%= t("Search entries or author") %>
+                </label>
+                <input
+                  id               = "discussion-search"
+                  type             = "search"
+                  placeholder      = "<%= t("Search entries or author") %>"
+                  size             = 50
+                >
 
-      <div id="discussion-toolbar" class="toolbarView">
-        <div class="headerBar" data-sticky>
-          <div class="row-fluid form-inline" style="overflow: visible;">
-            <div class="span9">
-              <label class="screenreader-only" for="discussion-search">
-                <%= t("Search entries or author") %>
-              </label>
-              <input
-                id               = "discussion-search"
-                type             = "search"
-                placeholder      = "<%= t("Search entries or author") %>"
-                size             = 50
-              >
+                <span class="screenreader-only" id="onlyUnreadAccessibleLabel"><%= t("Filter replies by unread") %></span>
+                <input
+                  type    = "checkbox"
+                  id      = "onlyUnread"
+                  aria-labelledby="onlyUnreadAccessibleLabel"/>
+                <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
 
-              <span class="screenreader-only" id="onlyUnreadAccessibleLabel"><%= t("Filter replies by unread") %></span>
-              <input
-                type    = "checkbox"
-                id      = "onlyUnread"
-                aria-labelledby="onlyUnreadAccessibleLabel"/>
-              <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
+                <% if can_do(@context, @current_user, :moderate_forum) %>
+                  <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
+                  <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
+                  <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+                <% end %>
 
-              <% if can_do(@context, @current_user, :moderate_forum) %>
-                <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
-                <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
-                <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+                &nbsp; &nbsp;
+                <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
+                  <i class="icon-expand" aria-hidden="true"> </i>
+                  <span class="screenreader-only">Collapse replies</span>
+                </button>
+                <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
+                  <i class="icon-collapse" aria-hidden="true"></i>
+                  <span class="screenreader-only">Expand replies</span>
+                </button>
+              </div>
+              <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
+              <div class="discussion_subscribe headerBar__subscribe">
+              <% else %>
+              <div class="span3 right-align discussion_subscribe">
               <% end %>
-
-              &nbsp; &nbsp;
-              <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
-                <i class="icon-expand" aria-hidden="true"> </i>
-                <span class="screenreader-only">Collapse replies</span>
-              </button>
-              <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
-                <i class="icon-collapse" aria-hidden="true"></i>
-                <span class="screenreader-only">Expand replies</span>
-              </button>
-            </div>
-
-            <div class="span3 right-align">
-              <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
-                 title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
-                 role="button"
-                 aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
-                <i class='icon-discussion-check' aria-hidden="hidden"></i>
-                <%= t(:topic_subscribe, 'Subscribe') %>
-              </a>
-              <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
-                 title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
-                 role="button"
-                 aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
-                <i class='icon-discussion-check' aria-hidden="hidden"></i>
-                <%= t(:topic_unsubscribe, 'Subscribed') %>
-              </a>
+                <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
+                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
+                  role="button"
+                  aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
+                  <i class='icon-discussion-check' aria-hidden="true"></i>
+                  <%= t(:topic_subscribe, 'Subscribe') %>
+                </a>
+                <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
+                  title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
+                  role="button"
+                  aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
+                  <i class='icon-discussion-check' aria-hidden="true"></i>
+                  <%= t(:topic_unsubscribe, 'Subscribed') %>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      <% end %>
     </article>
 
+    <% unless @no_reply %>
     <div id="discussion_subentries" class="discussion_subentries">
       <% if @initial_post_required %>
         <span><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></span>
@@ -351,12 +350,15 @@
         <span><%= t :loading_replies, "Loading replies..." %></span>
       <% end %>
     </div>
+    <% end %>
 
     <div id="filterResults" class="discussion_subentries hidden"></div>
 
   </div>
 
-  <div id="assignment_external_tools"></div>
+  <%= prefetch_assignment_external_tools %>
+
+  <div id="direct-share-mount-point"></div>
 
   <% if @headers != false %>
     <div id="module_sequence_footer"></div>

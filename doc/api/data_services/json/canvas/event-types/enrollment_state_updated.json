@@ -1,0 +1,39 @@
+{
+  "name": "enrollment_state_updated",
+  "definition": "The event is emitted anytime an enrollment record workflow state changes.",
+  "trigger": "Triggered when a course enrollment workflow_state changes.",
+  "schema": {
+    "access_is_current": "If this enrollment_state access is upto date.",
+    "enrollment_id": "The Canvas id of the new enrollment.",
+    "restricted_access": "True if this enrollment_state is restricted.",
+    "state": "The state of the enrollment.",
+    "state_is_current": "If this enrollment_state is uptodate",
+    "state_started_at": "The time when this enrollment state starts.",
+    "state_valid_until": "The time at which this enrollment is no longer valid."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "enrollment_state_updated",
+          "event_time": "2019-11-01T19:11:00.802Z",
+          "job_id": "1020020528469291",
+          "job_tag": "EnrollmentState.process_account_states_in_ranges",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "access_is_current": true,
+          "enrollment_id": "21070000000001533",
+          "restricted_access": false,
+          "state": "pending_invited",
+          "state_is_current": true,
+          "state_started_at": "2018-11-05 05:38:00 -0800",
+          "state_valid_until": "2019-11-05T13:38:00.218Z"
+        }
+      }
+    }
+  ]
+}

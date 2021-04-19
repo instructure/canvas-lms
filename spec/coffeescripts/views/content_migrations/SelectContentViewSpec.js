@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import SelectContentView from 'compiled/views/content_migrations/SelectContentView'
-import ProgressingMigration from 'compiled/models/ProgressingContentMigration'
+import SelectContentView from 'ui/features/content_migrations/backbone/views/SelectContentView.coffee'
+import ProgressingMigration from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
@@ -27,9 +27,11 @@ class SelectContentHelper {
   static initClass() {
     this.url = '/api/v1/courses/42/content_migrations/5/selective_data'
   }
+
   static $caret() {
     return this.$fixtures.find('.checkbox-caret').first()
   }
+
   static toplevelCheckboxResponse() {
     return [
       200,
@@ -55,6 +57,7 @@ class SelectContentHelper {
       ])
     ]
   }
+
   static sublevelCheckboxResponse() {
     return [
       200,

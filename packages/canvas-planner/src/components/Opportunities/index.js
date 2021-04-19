@@ -15,28 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
-import themeable from '@instructure/ui-themeable/lib';
-import {animatable} from '../../dynamic-ui';
-import {specialFallbackFocusId} from '../../dynamic-ui/util';
-import scopeTab from '@instructure/ui-a11y/lib/utils/scopeTab';
-import keycode from 'keycode';
+import React, {Component} from 'react'
+import {themeable} from '@instructure/ui-themeable'
+import {scopeTab, AccessibleContent} from '@instructure/ui-a11y'
+import keycode from 'keycode'
 
-import Opportunity from '../Opportunity';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList';
-import AccessibleContent from   '@instructure/ui-a11y/lib/components/AccessibleContent';
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import { findDOMNode } from 'react-dom';
-import { array, string, func, number, oneOfType} from 'prop-types';
-import formatMessage from '../../format-message';
+import {Tabs} from '@instructure/ui-tabs'
+import {CloseButton} from '@instructure/ui-buttons'
+import {array, string, func, number, oneOfType} from 'prop-types'
+import Opportunity from '../Opportunity'
+import {specialFallbackFocusId} from '../../dynamic-ui/util'
+import {animatable} from '../../dynamic-ui'
+import formatMessage from '../../format-message'
 
-import IconXLine from '@instructure/ui-icons/lib/Line/IconX';
+import styles from './styles.css'
+import theme from './theme'
 
-import styles from './styles.css';
-import theme from './theme.js';
-
-export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity');
+export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity')
 
 export class Opportunities extends Component {
   static propTypes = {
@@ -48,60 +43,67 @@ export class Opportunities extends Component {
     togglePopover: func.isRequired,
     maxHeight: oneOfType([number, string]),
     registerAnimatable: func,
-    deregisterAnimatable: func,
+    deregisterAnimatable: func
   }
 
   static defaultProps = {
     maxHeight: 'none',
     registerAnimatable: () => {},
-    deregisterAnimatable: () => {},
+    deregisterAnimatable: () => {}
   }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
 
     this.state = {
-      innerMaxHeight: "auto"
+      innerMaxHeight: 'auto',
+      selectedIndex: 0
     }
-    this.closeButtonRef = null;
-    this.tabPanelContentDiv = null;
+    this.closeButtonRef = null
+    this.tabPanelContentDiv = null
   }
 
-  componentDidMount () {
-    this.props.registerAnimatable('opportunity', this, -1, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
-    this.setMaxHeight(this.props);
-    this.closeButtonRef.focus();
+  handleTabChange = (event, {index, id}) => {
+    this.setState({
+      selectedIndex: index
+    })
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.setMaxHeight(nextProps);
+  componentDidMount() {
+    this.props.registerAnimatable('opportunity', this, -1, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID])
+    this.setMaxHeight(this.props)
+    this.closeButtonRef.focus()
   }
 
-  componentWillUnmount () {
-    this.props.deregisterAnimatable('opportunity', this, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    this.setMaxHeight(nextProps)
   }
 
-  getFocusable () {
-    return this.closeButtonRef;
+  componentWillUnmount() {
+    this.props.deregisterAnimatable('opportunity', this, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID])
   }
 
-  handleKeyDown = (event) => {
-    if ((event.keyCode === keycode.codes.tab)) {
-      scopeTab(this._content, event);
+  getFocusable() {
+    return this.closeButtonRef
+  }
+
+  handleKeyDown = event => {
+    if (event.keyCode === keycode.codes.tab) {
+      scopeTab(this._content, event)
     }
 
-   if (event.keyCode === keycode.codes.escape) {
-      event.preventDefault();
-      this.props.togglePopover();
+    if (event.keyCode === keycode.codes.escape) {
+      event.preventDefault()
+      this.props.togglePopover()
     }
   }
 
   courseAttr = (id, attr) => {
-    const course = this.props.courses.find(c => c.id === id) || {};
-    return course[attr];
+    const course = this.props.courses.find(c => c.id === id) || {}
+    return course[attr]
   }
 
-  // the only place on the TabList heirarchy where we can set a maxHeight is on 
+  // the only place on the TabList heirarchy where we can set a maxHeight is on
   // TabPanel, which puts the style on it's child content-holding div.
   // To keep the scrolling area w/in the TabPanel's content so that
   // the TabList doesn't outgrow its parent and the user winds up scrolling the tabs
@@ -110,27 +112,27 @@ export class Opportunities extends Component {
   // Unfortunately TabPanel's tabRef returns a ref to the Tab, and TabPanel's ref returns
   // a ref to the TabPanel component. Even if we get it's div, it doesn't have it's padding
   // at the time when the component mounts and our calculation is off.
-  setMaxHeight (props) {
-    let mxht = 'auto';
+  setMaxHeight(props) {
+    let mxht = 'auto'
     if (this.tabPanelContentDiv) {
-      const style = window.getComputedStyle(this.tabPanelContentDiv);
-      const padding = parseInt(style['padding-top']) + parseInt(style['padding-bottom']);
-      const border =  parseInt(style['border-top-width']) + parseInt(style['border-bottom-width']);
-      mxht = `${props.maxHeight - this.tabPanelContentDiv.offsetTop - padding - border}px`;
+      const style = window.getComputedStyle(this.tabPanelContentDiv)
+      const padding = parseInt(style['padding-top']) + parseInt(style['padding-bottom'])
+      const border = parseInt(style['border-top-width']) + parseInt(style['border-bottom-width'])
+      mxht = `${props.maxHeight - this.tabPanelContentDiv.offsetTop - padding - border}px`
     }
-    this.setState({innerMaxHeight: mxht});
+    this.setState({innerMaxHeight: mxht})
   }
 
-  // the parent of the <ol> holding the opportunities is the div TabPanel will assign 
+  // the parent of the <ol> holding the opportunities is the div TabPanel will assign
   // TabPanel's maxHeight prop to.
-   getTabPanelContentDivRefFromList = (ol) => {
-    this.tabPanelContentDiv = ol && ol.parentElement;
+  getTabPanelContentDivRefFromList = ol => {
+    this.tabPanelContentDiv = ol && ol.parentElement
   }
 
-  renderOpportunities (opportunities, dismissed) {
+  renderOpportunities(opportunities, dismissed) {
     return (
       <ol className={styles.list} ref={this.getTabPanelContentDivRefFromList}>
-        {opportunities.map((opportunity, oppIndex) =>
+        {opportunities.map((opportunity, oppIndex) => (
           <li key={opportunity.id} className={styles.item}>
             <Opportunity
               id={opportunity.id}
@@ -145,64 +147,84 @@ export class Opportunities extends Component {
               animatableIndex={oppIndex}
             />
           </li>
-        )}
+        ))}
       </ol>
-    );
+    )
   }
 
-  renderNewOpportunities () {
-    return this.props.newOpportunities.length ?
-      this.renderOpportunities(this.props.newOpportunities, false) :
+  renderNewOpportunities() {
+    return this.props.newOpportunities.length ? (
+      this.renderOpportunities(this.props.newOpportunities, false)
+    ) : (
       <div>{formatMessage('Nothing new needs attention.')}</div>
+    )
   }
 
-  renderDismissedOpportunities () {
-    return this.props.dismissedOpportunities.length ?
-      this.renderOpportunities(this.props.dismissedOpportunities, true) :
+  renderDismissedOpportunities() {
+    return this.props.dismissedOpportunities.length ? (
+      this.renderOpportunities(this.props.dismissedOpportunities, true)
+    ) : (
       <div>{formatMessage('Nothing here needs attention.')}</div>
+    )
   }
 
-  renderTitle (which) {
-    const srtitle = (which === "new") ? formatMessage("New Opportunities") : formatMessage("Dismissed Opportunities");
-    const title = (which === "new") ? formatMessage("New") : formatMessage("Dismissed");
-    return <AccessibleContent alt={srtitle}>{title}</AccessibleContent>;
+  renderTitle(which) {
+    const srtitle =
+      which === 'new'
+        ? formatMessage('New Opportunities')
+        : formatMessage('Dismissed Opportunities')
+    const title = which === 'new' ? formatMessage('New') : formatMessage('Dismissed')
+    return <AccessibleContent alt={srtitle}>{title}</AccessibleContent>
   }
 
-  renderCloseButton () {
+  renderCloseButton() {
     return (
       <CloseButton
         placement="end"
         offset="x-small"
         variant="icon"
         onClick={this.props.togglePopover}
-        buttonRef={(el) => {this.closeButtonRef = el}}
+        buttonRef={el => {
+          this.closeButtonRef = el
+        }}
       >
         {formatMessage('Close Opportunity Center popup')}
       </CloseButton>
     )
   }
 
-  render () {
+  render() {
+    const {selectedIndex} = this.state
     return (
       <div
         id="opportunities_parent"
         className={styles.root}
         onKeyDown={this.handleKeyDown}
-        ref={(c) => {this._content=c;}}
+        ref={c => {
+          this._content = c
+        }}
         style={{maxHeight: this.props.maxHeight}}
       >
         {this.renderCloseButton()}
-        <TabList variant="minimal" focus={false}>
-          <TabPanel title={this.renderTitle("new")} maxHeight={this.state.innerMaxHeight}>
+        <Tabs onRequestTabChange={this.handleTabChange}>
+          <Tabs.Panel
+            renderTitle={this.renderTitle('new')}
+            maxHeight={this.state.innerMaxHeight}
+            selected={selectedIndex === 0}
+          >
             {this.renderNewOpportunities()}
-          </TabPanel>
-          <TabPanel title={this.renderTitle("dismissed")} maxHeight={this.state.innerMaxHeight}>
-              {this.renderDismissedOpportunities()}
-          </TabPanel>
-        </TabList>
+          </Tabs.Panel>
+          <Tabs.Panel
+            renderTitle={this.renderTitle('dismissed')}
+            maxHeight={this.state.innerMaxHeight}
+            selected={selectedIndex === 1}
+          >
+            {this.renderDismissedOpportunities()}
+          </Tabs.Panel>
+        </Tabs>
       </div>
-    );
+    )
   }
 }
 
-export default animatable(themeable(theme, styles)(Opportunities));
+export default animatable(themeable(theme, styles)(Opportunities))

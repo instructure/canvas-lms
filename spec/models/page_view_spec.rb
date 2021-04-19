@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -62,6 +64,10 @@ describe PageView do
       PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }) }.store
       expect(PageView.connection).to receive(:transaction).never
       expect(PageView.find("abcdef")).to be_present
+    end
+
+    it "logs on error without blowing up" do
+      expect{ PageView::EventStream.on_error[0].call("write", {user: @user}, StandardError.new) }.to_not raise_error
     end
 
     describe "sharding" do

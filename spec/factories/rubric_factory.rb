@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -84,5 +86,6 @@ module Factories
         }
     ]
     @rubric.save!
+    @rubric
   end
 end

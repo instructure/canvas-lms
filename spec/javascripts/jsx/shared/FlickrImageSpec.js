@@ -19,7 +19,7 @@
 import React from 'react'
 
 import TestUtils from 'react-dom/test-utils'
-import FlickrImage from 'jsx/shared/FlickrImage'
+import FlickrImage from 'ui/features/course_settings/react/components/FlickrImage.js'
 
 QUnit.module('FlickrImage View')
 

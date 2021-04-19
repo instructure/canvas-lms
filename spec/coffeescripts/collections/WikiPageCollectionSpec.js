@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageCollection from 'compiled/collections/WikiPageCollection'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection.js'
 
 QUnit.module('WikiPageCollection')
 const checkFrontPage = function(collection) {

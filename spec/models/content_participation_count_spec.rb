@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -22,6 +24,8 @@ describe ContentParticipationCount do
   before :once do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
+
+    @course.default_post_policy.update!(post_manually: false)
 
     @assignment = @course.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
@@ -59,6 +63,11 @@ describe ContentParticipationCount do
       ContentParticipationCount.where(:id => cpc).update_all(:updated_at => time)
       ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       expect(cpc.reload.updated_at.to_i).to eq time.to_i
+    end
+
+    it "should correctly set root_account_id from course" do
+      cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
+      expect(cpc.root_account_id).to eq(@course.root_account_id)
     end
   end
 
@@ -171,6 +180,7 @@ describe ContentParticipationCount do
     end
 
     it "ignores hidden comments" do
+      @assignment.ensure_post_policy(post_manually: true)
       @submission = @assignment.update_submission(
         @student,
         {

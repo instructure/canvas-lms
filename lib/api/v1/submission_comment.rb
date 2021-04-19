@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -20,6 +22,7 @@ module Api::V1::SubmissionComment
   include GradebookSettingsHelpers
 
   ANONYMOUS_MODERATED_JSON_ATTRIBUTES = %i[
+    attempt
     author_id
     author_name
     cached_attachments
@@ -48,7 +51,7 @@ module Api::V1::SubmissionComment
     sc_hash['attachments'] = submission_comment.attachments.map do |a|
       attachment_json(a, user)
     end unless submission_comment.attachments.blank?
-    if submission_comment.grants_right?(@current_user, :read_author)
+    if @current_user && submission_comment.grants_right?(@current_user, :read_author)
       sc_hash['author'] = user_display_json(submission_comment.author, submission_comment.context)
     else
       if sc_hash.delete('avatar_path')
@@ -141,7 +144,7 @@ module Api::V1::SubmissionComment
   def students(course:, assignment:, current_user:)
     @students ||= begin
       includes = gradebook_includes(user: current_user, course: course)
-      assignment.representatives(current_user, includes: includes)
+      assignment.representatives(user: current_user, includes: includes)
     end
   end
 

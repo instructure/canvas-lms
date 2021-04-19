@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -54,7 +56,7 @@ RSpec.shared_context 'lti_advantage_shared_examples' do
     assignment_model(
       course: course,
       submission_types: 'external_tool',
-      external_tool_tag_attributes: { content: tool }
+      external_tool_tag_attributes: { content: tool, url: tool.url }
     )
   end
   let_once(:user) { user_model(email: 'banana@test.com') }

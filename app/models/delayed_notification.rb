@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -39,7 +41,12 @@ class DelayedNotification < ActiveRecord::Base
     state :errored
   end
 
-  def self.process(asset, notification, recipient_keys, data)
+  
+  def self.process(asset, notification, recipient_keys, data = {}, **kwargs)
+    # RUBY 2.7 this can go away (**{} will work at the caller)
+    raise ArgumentError, "Only send one hash" if !data&.empty? && !kwargs.empty?
+    data = kwargs if data&.empty? && !kwargs.empty?
+
     DelayedNotification.new(
       asset: asset,
       notification: notification,
@@ -78,8 +85,8 @@ class DelayedNotification < ActiveRecord::Base
 
     lookups.each do |klass, ids|
       includes = []
-      includes = [ :notification_policies, { user: :pseudonyms } ] if klass == CommunicationChannel
-      includes = [ :pseudonyms, { communication_channel: :notification_policies } ] if klass == User
+      includes = [ :notification_policies, :notification_policy_overrides, { user: :pseudonyms } ] if klass == CommunicationChannel
+      includes = [ :pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] } ] if klass == User
 
       ids.each_slice(100) do |slice|
         yield klass.where(:id => slice).preload(includes).to_a

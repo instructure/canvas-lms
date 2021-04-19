@@ -2,13 +2,13 @@
   <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
 <% if send_student_names(asset, user) %>
-  <%= t "Canvas Alert - Graded: %{assignment}, %{context} for %{name}", :assignment => asset.assignment.title, :context => asset.assignment.context.name, name: user.asset.name %>
+  <%= t "Canvas Alert - Graded: %{assignment}, %{context} for %{name}", :assignment => asset.assignment.title, :context => asset.assignment.context.name, name: asset.user.name %>
 <% else %>
   <%= t :tweet, "Canvas Alert - Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
 <% end %>
 
 <%= datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set") %>
 
-<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>
+<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context) %>
   <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
 <% end %><%= t(:score_pending_review, "(pending review)") if asset.pending_review? %>

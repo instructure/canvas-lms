@@ -1,0 +1,57 @@
+{
+  "name": "grade_override",
+  "definition": "The event is emitted anytime a student course grade is overriden. Typically grade override feature is used to edit student course grade",
+  "trigger": "Triggered when the final grade override has been changed. Only triggered when the override changes the existing score.",
+  "schema": {
+    "score_id": "Canvas Id of Score record",
+    "enrollment_id": "Canvas Id of Employment record",
+    "user_id": "Canvas Id of User attached to this enrollment",
+    "course_id": "Canvas Id of Course attached to this enrollment",
+    "grading_period_id": "Canvas Id of Grading Period",
+    "override_score": "New value of score after override",
+    "old_override_score": "Previous value of score before override",
+    "updated_at": "Date/Time the override occurred"
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000001",
+          "context_id": "21070000000000123",
+          "context_role": "TeacherEnrollment",
+          "context_sis_source_id": "194837",
+          "context_type": "Course",
+          "event_name": "grade_change",
+          "event_time": "2019-11-15T07:46:18.697Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/123/gradebook/speed_grader?assignment_id=8188213&student_id=3541",
+          "request_id": "392c325f-cba1-423f-ad2c-d213cabce732",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "V3kdo4kgu3F4Kf4fK109DSFkdso432950GKSOJNj:canvas-lms",
+          "root_account_uuid": "V3kdo4kgu3F4Kf4fK109DSFkdso432950GKSOJNj",
+          "session_id": "4e032912e321a243163232941f435324",
+          "time_zone": "America/Los_Angeles",
+          "url": "https://oxana.instructure.com/courses/46/gradebook/update_submission",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000003541",
+          "user_login": "oxana",
+          "user_sis_id": "0119359"
+        },
+        "body": {
+          "score_id": "43",
+          "enrollment_id": "44",
+          "user_id": "45",
+          "course_id": "46",
+          "grading_period_id": "47",
+          "override_score": 90,
+          "old_override_score": 85,
+          "updated_at": "2019-11-15T07:46:18.697Z"
+        }
+      }
+    }
+  ]
+}

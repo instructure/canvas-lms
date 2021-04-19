@@ -9,7 +9,6 @@
 # * pretty much any dotfile not already covered (e.g. .rvmrc)
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
-
 .bundle/
 .byebug_history
 .env
@@ -17,25 +16,31 @@
 /.ruby-version
 /app/views/info/styleguide.html.erb
 /config/*.yml
+!/config/credentials.test.yml
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS5_2
+/config/RAILS6_0
 /coverage/
 /coverage-js/
 /db/schema.rb
 /db/*.sqlite*
 /db/*sql
+docker-compose.override.yml
 /exports/
 Gemfile.lock
-Gemfile.lock.52
-/log/
+Gemfile.lock.next
+/log/*
+!/log/.keep
+!/log/parallel-runtime-rspec.log
 mkmf.log
 /node_modules
 npm-debug.log
 /public/dist/
 /public/doc/api/
 /public/javascripts/translations/
-/tmp/
+/storybook-static/
+/tmp/*
+!/tmp/.keep
 /vendor/bundle
 yarn-error.log
 
@@ -48,29 +53,33 @@ yarn-error.log
 /spec/coffeescripts/plugins/
 /spec/plugins/
 
-# generated client app stuff
-/public/javascripts/client_apps/
-
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
 /gems/*/node_modules
+/gems/plugins/*
+!/gems/plugins/academic_benchmark/
+!/gems/plugins/account_reports/
+!/gems/plugins/moodle_importer/
+!/gems/plugins/qti_exporter/
+!/gems/plugins/respondus_soap_endpoint/
+!/gems/plugins/simply_versioned/
 
 # user docker compose overrides
 docker-compose.local.*
 
 # sub-packages
 /packages/*/node_modules
-/packages/canvas-planner/lib
-/packages/canvas-planner/es
-/packages/canvas-planner/coverage/
+/packages/*/es
+/packages/*/lib
+/packages/*/coverage/
 /packages/canvas-planner/.babel-cache
 
 # pact artifacts
 /reports/
 /pacts/
 
-# generated scope names
+# generated scopes
 /lib/api_scope_mapper.rb
 
 # generated scopes markdown
@@ -80,3 +89,9 @@ docker-compose.local.*
 .nyc_output
 coverage-jest
 coverage-karma
+
+# generated graphql schema
+schema.graphql
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key

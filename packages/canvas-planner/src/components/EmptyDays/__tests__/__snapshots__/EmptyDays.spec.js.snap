@@ -7,7 +7,6 @@ exports[`renders the component 1`] = `
   <Heading
     border="bottom"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -15,6 +14,7 @@ exports[`renders the component 1`] = `
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 23 to April 26
     </Text>
@@ -39,6 +39,7 @@ exports[`renders the component 1`] = `
           as="span"
           letterSpacing="normal"
           size="large"
+          wrap="normal"
         >
           Nothing Planned Yet
         </Text>
@@ -55,7 +56,6 @@ exports[`renders the today className when surrounds Today 1`] = `
   <Heading
     border="bottom"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -63,6 +63,7 @@ exports[`renders the today className when surrounds Today 1`] = `
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 22 to April 26
     </Text>
@@ -87,6 +88,7 @@ exports[`renders the today className when surrounds Today 1`] = `
           as="span"
           letterSpacing="normal"
           size="large"
+          wrap="normal"
         >
           Nothing Planned Yet
         </Text>

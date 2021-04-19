@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -54,7 +56,7 @@ module CanvasPandaPub
     end
 
     def start!
-        @thread = Thread.new { self.run_thread }
+      @thread = Thread.new { self.run_thread }
     end
 
     def run_thread
@@ -109,8 +111,8 @@ module CanvasPandaPub
           rescue Exception => e
             @logger.error("Exception making PandaPub call to channel #{tag}: #{e}")
           end
+          CanvasPandaPub.on_work_unit_end&.call
         end
-
         break if stop
       end
     end

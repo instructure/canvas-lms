@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2014 - present Instructure, Inc.
@@ -76,7 +78,7 @@ describe ContentMigration do
       @cm.save!
       run_course_copy
 
-      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
       expect(new_topic.message).to eq topic.message
       expect(@copy_to.syllabus_body).to match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
@@ -124,10 +126,10 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
+      new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(new_att).not_to be_nil
 
-      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
       expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
@@ -140,10 +142,10 @@ describe ContentMigration do
 
       run_course_copy
 
-      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
+      new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(new_att).not_to be_nil
 
-      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
 
       expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
@@ -158,7 +160,7 @@ describe ContentMigration do
       run_course_copy
 
       @copy_to.enroll_student(student)
-      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
+      new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(new_att).to be_present
 
       expect(new_att.grants_right?(student, :download)).to be_falsey
@@ -229,11 +231,11 @@ describe ContentMigration do
       ['A', 'B'].map { |name| @copy_to.context_modules.create!(:name => name) }
       ['C', 'D'].map { |name| @copy_from.context_modules.create!(:name => name) }
       run_course_copy
-      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+      expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(['A', 'B', 'C', 'D'])
 
       @copy_to.context_modules.where(name: ['C', 'D']).map(&:destroy)
       run_course_copy
-      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+      expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(['A', 'B', 'C', 'D'])
     end
 
     it "should be able to copy links to files in folders with html entities and unicode in path" do
@@ -448,6 +450,7 @@ describe ContentMigration do
       @copy_from.public_syllabus = true
       @copy_from.public_syllabus_to_auth = true
       @copy_from.lock_all_announcements = true
+      @copy_from.usage_rights_required = true
       @copy_from.allow_student_discussion_editing = false
       @copy_from.restrict_student_future_view = true
       @copy_from.restrict_student_past_view = true
@@ -455,7 +458,16 @@ describe ContentMigration do
       @copy_from.organize_epub_by_content_type = true
       @copy_from.enable_offline_web_export = true
       @copy_from.is_public_to_auth_users = true
+      @copy_from.syllabus_course_summary = false
+      @copy_from.homeroom_course = true
+      @copy_from.course_color = '#123456'
       @copy_from.save!
+
+      @copy_from.lti_resource_links.create!(
+        context_external_tool: external_tool_model(context: @copy_from),
+        custom: nil,
+        lookup_uuid: '1b302c1e-c0a2-42dc-88b6-c029699a7c7a'
+      )
 
       run_course_copy
 
@@ -471,6 +483,9 @@ describe ContentMigration do
       expect(@copy_to.grading_standard).to eq gs_2
       expect(@copy_to.name).to eq "tocourse"
       expect(@copy_to.course_code).to eq "tocourse"
+      expect(@copy_to.syllabus_course_summary).to eq false
+      expect(@copy_to.homeroom_course).to eq true
+      expect(@copy_to.course_color).to eq "#123456"
       # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
@@ -478,6 +493,9 @@ describe ContentMigration do
         expect(@copy_to.send(att)).to eq(@copy_from.send(att)), "@copy_to.#{att}: expected #{@copy_from.send(att)}, got #{@copy_to.send(att)}"
       end
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
+
+      expect(@copy_to.lti_resource_links.size).to eq 1
+      expect(@copy_to.lti_resource_links.first.lookup_uuid).to eq '1b302c1e-c0a2-42dc-88b6-c029699a7c7a'
     end
 
     it "should copy the overridable course visibility setting" do
@@ -559,15 +577,17 @@ describe ContentMigration do
       tag_to = mod1_to.content_tags.first
       expect(mod1_to.completion_requirements).to eq [{:id => tag_to.id, :type => 'must_view'}]
       expect(mod1_to.require_sequential_progress).to be_truthy
-      expect(mod1_to.requirement_count).to be_truthy
+      expect(mod1_to.requirement_count).to eq 1
       mod2_to = @copy_to.context_modules.where(:migration_id => mig_id(mod2)).first
 
       expect(mod2_to.prerequisites.count).to eq 1
       expect(mod2_to.prerequisites.first[:id]).to eq mod1_to.id
 
       mod1.update_attribute(:require_sequential_progress, false)
+      mod1.update_attribute(:requirement_count, nil)
       run_course_copy
       expect(mod1_to.reload.require_sequential_progress).to be_falsey
+      expect(mod1_to.requirement_count).to eq nil
     end
 
     it "should sync module items (even when removed) on re-copy" do
@@ -626,7 +646,7 @@ describe ContentMigration do
 
     it "should copy weird longdesc things" do
       page = @copy_from.wiki_pages.create!(:title => "page")
-      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/>"
+      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/\">"
       @copy_from.save!
 
       run_course_copy
@@ -671,7 +691,7 @@ describe ContentMigration do
       run_course_copy
 
       expect(@copy_to.calendar_events.count).to eq 2
-      cal_2 = @copy_to.calendar_events.where(migration_id: CC::CCHelper.create_key(cal)).first
+      cal_2 = @copy_to.calendar_events.where(migration_id: mig_id(cal)).first
       expect(cal_2.title).to eq cal.title
       expect(cal_2.start_at.to_i).to eq cal.start_at.to_i
       expect(cal_2.end_at.to_i).to eq cal.end_at.to_i
@@ -679,7 +699,7 @@ describe ContentMigration do
       expect(cal_2.all_day_date).to eq cal.all_day_date
       cal_2.description = body_with_link % @copy_to.id
 
-      cal2_2 = @copy_to.calendar_events.where(migration_id: CC::CCHelper.create_key(cal2)).first
+      cal2_2 = @copy_to.calendar_events.where(migration_id: mig_id(cal2)).first
       expect(cal2_2.title).to eq cal2.title
       expect(cal2_2.start_at.to_i).to eq cal2.start_at.to_i
       expect(cal2_2.end_at.to_i).to eq cal2.end_at.to_i
@@ -697,10 +717,10 @@ describe ContentMigration do
         run_course_copy
       }.to raise_error(ArgumentError)
 
-      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
+      new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(new_att).not_to be_nil
 
-      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
       expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end

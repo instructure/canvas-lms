@@ -10,6 +10,13 @@
   line-height: var(--lineHeight);
   &.small {
     align-items: flex-start;
+    &.missingItem {
+      padding-inline-start: 0;
+    }
+  }
+  &.missingItem {
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 0;
   }
 }
 
@@ -109,10 +116,17 @@
       text-transform: none;
     }
   }
+  .missingItem & {
+    flex-basis: 16rem;
+    &.with_end_time {
+      flex-basis: 20rem;
+    }
+  }
 }
 
 .due,
 .score {
+  color: var(--secondaryColor);
   box-sizing: border-box;
   text-transform: uppercase;
   letter-spacing: 0.0625rem;
@@ -154,7 +168,7 @@
 .small {
   padding-left: 0;
   padding-right: 0;
-  
+
   .completed {
     margin-inline-start: 6px;
   }
@@ -188,6 +202,11 @@
     display: none;
   }
   .location {
+    color: var(--secondaryColor);
     margin-inline-start: 1rem;
   }
+}
+
+:global(.k5) .type {
+  display: none;
 }

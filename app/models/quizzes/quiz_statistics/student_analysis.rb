@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -234,7 +236,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             row << submission.user.name
             row << submission.user_id
             if includes_sis_ids?
-              pseudonym = SisPseudonym.for(submission.user, quiz.context.account, type: :trusted)
+              pseudonym = SisPseudonym.for(submission.user, quiz.context, type: :trusted)
               row << pseudonym.try(:sis_user_id)
             end
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
@@ -271,7 +273,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             next
           end
           strip_html_answers(question)
-          answer_item = question && question[:answers].detect { |a| a[:id] == answer[:answer_id] }
+          answer_item = question && question[:answers]&.detect { |a| a[:id] == answer[:answer_id] }
           answer_item ||= answer
           if question[:question_type] == 'fill_in_multiple_blanks_question'
             blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
@@ -323,7 +325,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   private
 
   def submissions_for_statistics(param_options = {})
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope = quiz.quiz_submissions.for_students(quiz)
       logged_out = quiz.quiz_submissions.logged_out
 

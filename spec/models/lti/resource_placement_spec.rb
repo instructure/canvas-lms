@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -37,5 +39,24 @@ module Lti
 
     end
 
+    describe 'valid_placements' do
+      it 'does not include conference_selection when FF disabled' do
+        expect(described_class.valid_placements(Account.default)).not_to include(:conference_selection)
+      end
+
+      it 'includes conference_selection when FF enabled' do
+        Account.site_admin.enable_feature! :conference_selection_lti_placement
+        expect(described_class.valid_placements(Account.default)).to include(:conference_selection)
+      end
+
+      it 'does not include submission_type_selection when FF disabled' do
+        expect(described_class.valid_placements(Account.default)).not_to include(:submission_type_selection)
+      end
+
+      it 'includes submission_type_selection when FF enabled' do
+        Account.default.enable_feature!(:submission_type_tool_placement)
+        expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
+      end
+    end
   end
 end

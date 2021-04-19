@@ -17,12 +17,12 @@
 %>
 
 <%
-  @active_tab = 'settings'
+  set_active_tab 'settings'
   css_bundle :statistics
   add_crumb t('#crumbs.stats', "Statistics")
  %>
 
-<% content_for :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
+<% provide :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
 <div style="padding: 0 20px;" id="stats">
 <h1><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h1>
 

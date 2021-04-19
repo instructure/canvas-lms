@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Assignment from 'compiled/models/Assignment'
-import AssignmentGroupListItemView from 'compiled/views/assignments/AssignmentGroupListItemView'
-import AssignmentListItemView from 'compiled/views/assignments/AssignmentListItemView'
-import AssignmentGroupListView from 'compiled/views/assignments/AssignmentGroupListView'
+import Backbone from '@canvas/backbone'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import AssignmentGroupListItemView from 'ui/features/assignment_index/backbone/views/AssignmentGroupListItemView.coffee'
+import AssignmentListItemView from 'ui/features/assignment_index/backbone/views/AssignmentListItemView.coffee'
+import AssignmentGroupListView from 'ui/features/assignment_index/backbone/views/AssignmentGroupListView.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import simulate from 'helpers/jquery.simulate'
-import elementToggler from 'compiled/behaviors/elementToggler'
+import elementToggler from '../../../../ui/boot/initializers/activateElementToggler.js'
 
 const assignment1 = function() {
   const date1 = {
@@ -290,7 +290,7 @@ test('toJSON includes group weight', function() {
 
 test('shouldBeExpanded returns cache state', function() {
   const view = createView(this.model)
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }
@@ -306,7 +306,7 @@ test('shouldBeExpanded returns cache state', function() {
 
 test('toggleCache correctly toggles cache state', function() {
   const view = createView(this.model)
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }
@@ -320,7 +320,7 @@ test('toggleCache correctly toggles cache state', function() {
 
 test('currentlyExpanded returns expanded state', function() {
   const view = createView(this.model)
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }
@@ -330,7 +330,7 @@ test('currentlyExpanded returns expanded state', function() {
 test('toggleCollapse toggles expansion', function() {
   const view = createView(this.model)
   const $toggle_el = view.$el.find('.element_toggler')
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -62,7 +64,7 @@ module PlannerHelper
 
   def self.complete_planner_override(planner_override)
     return unless planner_override.is_a? PlannerOverride
-    planner_override.update_attributes(marked_complete: true)
+    planner_override.update(marked_complete: true)
     clear_planner_cache(planner_override&.user)
   end
 

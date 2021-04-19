@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
+<% provide :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
 <%- css_bundle(:assignments_peer_review) %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='btn button-sidebar-wide'>
     <i class="icon-arrow-left"></i>
     <%= t 'links.back_to_assignment', "Back to Assignment" %>
@@ -44,10 +44,10 @@
     <% end %>
   <% end %>
 <% end %>
-<% js_bundle 'legacy/assignments_peer_reviews' %>
+<% js_bundle 'assignments_peer_reviews' %>
 
 <h1><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h1>
-  <% if @assignment.rubric_association %>
+  <% if @assignment.active_rubric_association? %>
     <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
       at least once on the page and filled out the rubric form for the assignment." %>
   <% else %>
@@ -60,7 +60,7 @@
     <% submission = @submissions.to_a.find{|s| s.user_id == student.id} %>
     <li style="font-size: 1.2em; margin-bottom: 10px;" class="student_reviews">
       <a <%= submission && submission.has_submission? ? "class='icon-warning person' title='#{h(t(:submitted, "submitted"))}'" : "class='person_gray' title='#{h(t(:not_yet_submitted, "not yet submitted"))}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, student.id) %>">
-        <span class="assessor_name"><%= student.last_name_first %></span>
+        <span class="assessor_name"><%= student.last_name_first %> <% if student.pronouns %><i>(<%= student.pronouns %>)</i><% end %></span>
         <span class="user_id student_review_id" style="display: none;"><%= student.id %></span>
       </a>
       <ul class="unstyled_list peer_reviews" style="padding-<%= direction('left') %>: 21px; font-size: 0.8em; width: 50%;">
@@ -74,7 +74,7 @@
         <% end %>
       </ul>
       <div style="margin-<%= direction('left') %>: 25px; font-size: 0.7em;" class="assign_box">
-        <a href="#" class="assign_peer_review_link"><%= t 'links.assign_peer_review', "Give %{student} another submission to assess", :student => student.name %>
+        <a href="#" class="assign_peer_review_link"><%= t 'links.assign_peer_review', "Give %{student} another submission to assess", :student => student.name %> 
           <i class="icon-add" role="presentation"></i>
         </a>
         <div class="form_content">

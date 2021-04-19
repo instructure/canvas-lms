@@ -18,24 +18,25 @@
 
 import $ from 'jquery'
 import {isArray, isObject, uniq} from 'lodash'
-import tz from 'timezone'
-import fcUtil from 'compiled/util/fcUtil'
+import tz from '@canvas/timezone'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import denver from 'timezone/America/Denver'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
-import AgendaView from 'compiled/views/calendar/AgendaView'
-import Calendar from 'compiled/calendar/Calendar'
-import EventDataSource from 'compiled/calendar/EventDataSource'
+import AgendaView from 'ui/features/calendar/backbone/views/AgendaView.coffee'
+import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import eventResponse from 'helpers/ajax_mocks/api/v1/calendarEvents'
+import plannerItemsResponse from 'helpers/ajax_mocks/api/planner/items'
 import assignmentResponse from 'helpers/ajax_mocks/api/v1/calendarAssignments'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 
 const loadEventPage = (server, includeNext = false) =>
-  sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
-var sendCustomEvents = function(server, events, assignments, includeNext = false) {
-  const requestIndex = server.requests.length - 2
-  server.requests[requestIndex].respond(
+  sendCustomEvents(server, eventResponse, assignmentResponse, plannerItemsResponse, includeNext)
+const sendCustomEvents = function(server, events, assignments, plannerItems, includeNext = false) {
+  const requestIndex = server.requests.length - 3
+  server.requests[requestIndex].respond(200, {'Content-Type': 'application/json'}, plannerItems)
+  server.requests[requestIndex + 1].respond(
     200,
     {
       'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ var sendCustomEvents = function(server, events, assignments, includeNext = false
     },
     events
   )
-  return server.requests[requestIndex + 1].respond(
+  return server.requests[requestIndex + 2].respond(
     200,
     {'Content-Type': 'application/json'},
     assignments
@@ -59,9 +60,11 @@ QUnit.module('AgendaView', {
       {asset_string: 'group_3'}
     ]
     this.contextCodes = ['user_1', 'course_2', 'group_3']
-    this.startDate = fcUtil.now()
-    this.startDate.minute(1)
-    this.startDate.year(2001)
+    // with LS-1701 we're only looking a month into the future,
+    // not 1000 years, so let's just
+    // backup 15 days from the first canned event
+    this.startDate = fcUtil.wrap(new Date(JSON.parse(eventResponse)[0].start_at))
+    fcUtil.addMinuteDelta(this.startDate, -60 * 24 * 15)
     this.dataSource = new EventDataSource(this.contexts)
     this.server = sinon.fakeServer.create()
     this.snapshot = tz.snapshot()
@@ -125,10 +128,6 @@ test('toJSON should properly serialize results', function() {
   ok(isObject(serialized.meta), 'meta is an object')
   ok(uniq(serialized.days).length === serialized.days.length, 'does not duplicate dates')
   ok(serialized.days[0].date === 'Mon, Oct 7', 'finds the correct first day')
-  ok(
-    serialized.meta.hasOwnProperty('better_scheduler'),
-    'contains a property indicating better_scheduler is active or not'
-  )
   serialized.days.forEach(d => ok(d.events.length, 'every day has events'))
 })
 
@@ -155,7 +154,13 @@ test('should only include days on page breaks once', function() {
     date.setFullYear(date.getFullYear() + 1)
     addEvents(events, date)
   }
-  sendCustomEvents(this.server, JSON.stringify(events), JSON.stringify([]), true)
+  sendCustomEvents(
+    this.server,
+    JSON.stringify(events),
+    JSON.stringify([]),
+    JSON.stringify([]),
+    true
+  )
   ok(
     this.container.find('.agenda-event__item-container').length,
     40,
@@ -168,7 +173,13 @@ test('should only include days on page breaks once', function() {
     addEvents(events, date)
     date.setFullYear(date.getFullYear() + 1)
   }
-  sendCustomEvents(this.server, JSON.stringify(events), JSON.stringify([]), false)
+  sendCustomEvents(
+    this.server,
+    JSON.stringify(events),
+    JSON.stringify([]),
+    JSON.stringify([]),
+    false
+  )
   equal(
     this.container.find('.agenda-event__item-container').length,
     70,

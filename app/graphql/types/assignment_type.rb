@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -23,8 +25,9 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
+    implements Interfaces::LegacyIDInterface
 
-    alias :assignment :object
+    alias assignment object
 
     class AssignmentStateType < Types::BaseEnum
       graphql_name "AssignmentState"
@@ -37,29 +40,6 @@ module Types
     GRADING_TYPES = Hash[
       Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
     ]
-
-    SUBMISSION_TYPES = %w[
-      attendance
-      discussion_topic
-      external_tool
-      media_recording
-      none
-      not_graded
-      on_paper
-      online_quiz
-      online_text_entry
-      online_upload
-      online_url
-      wiki_page
-    ].to_set
-
-    class AssignmentSubmissionType < Types::BaseEnum
-      graphql_name "SubmissionType"
-      description "Types of submissions an assignment accepts"
-      SUBMISSION_TYPES.each { |submission_type|
-        value(submission_type)
-      }
-    end
 
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"
@@ -119,7 +99,6 @@ module Types
     end
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
 
     field :name, String, null: true
 
@@ -128,35 +107,31 @@ module Types
       null: true
     field :points_possible, Float, "the assignment is out of this many points",
       null: true
-    field :due_at, DateTimeType,
-      "when this assignment is due",
-      null: true
-    def due_at
-      overridden_field(:due_at)
-    end
 
-    field :lock_at, DateTimeType,
-      "the lock date (assignment is locked after this date).",
-      null: true
-    def lock_at
-      overridden_field(:lock_at)
-    end
+    def self.overridden_field(field_name, description)
+      field field_name, DateTimeType, description, null: true do
+        argument :apply_overrides, Boolean, <<~DOC, required: false, default_value: true
+          When true, return the overridden dates.
 
-    field :unlock_at, DateTimeType,
-      "the unlock date (assignment is unlocked after this date)",
-      null: true
-    def unlock_at
-      overridden_field(:unlock_at)
-    end
+          Not all roles have permission to view un-overridden dates (in which
+          case the overridden dates will be returned)
+        DOC
+      end
 
-    ##
-    # use this method to get overridden dates
-    # (all_day_date/all_day  should use this if/when we add them to gql)
-    def overridden_field(field)
-      load_association(:assignment_overrides).then do
-        OverrideAssignmentLoader.for(current_user).load(assignment).then &field
+      define_method(field_name) do |apply_overrides:|
+        load_association(:context).then do |course|
+          if !apply_overrides && course.grants_right?(current_user, :manage_assignments)
+            assignment.send(field_name)
+          else
+            OverrideAssignmentLoader.for(current_user).load(assignment).then &field_name
+          end
+        end
       end
     end
+
+    overridden_field :due_at, "when this assignment is due"
+    overridden_field :lock_at, "the lock date (assignment is locked after this date)"
+    overridden_field :unlock_at, "the unlock date (assignment is unlocked after this date)"
 
     class OverrideAssignmentLoader < GraphQL::Batch::Loader
       def initialize(current_user)
@@ -214,6 +189,14 @@ module Types
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
 
     field :rubric, RubricType, null: true
+    def rubric
+      load_association(:rubric)
+    end
+
+    field :rubric_association, RubricAssociationType, null: true
+    def rubric_association
+      assignment.active_rubric_association? ? load_association(:rubric_association) : nil
+    end
 
     def lock_info
       load_locked_for { |lock_info| lock_info || {} }
@@ -245,8 +228,6 @@ module Types
       "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
       null: true
 
-    field :muted, Boolean, method: :muted?, null: false
-
     field :state, AssignmentStateType, method: :workflow_state, null: false
 
     field :quiz, Types::QuizType, null: true
@@ -268,17 +249,6 @@ module Types
       )
     end
 
-    class AttachmentPreloader < GraphQL::Batch::Loader
-      def initialize(context)
-        @context = context
-      end
-
-      def perform(htmls)
-        as = Api.api_bulk_load_user_content_attachments(htmls, @context)
-        htmls.each { |html| fulfill(html, as) }
-      end
-    end
-
     field :description, String, null: true
     def description
       return nil if assignment.description.blank?
@@ -286,8 +256,7 @@ module Types
       load_locked_for do |lock_info|
         # some (but not all) locked assignments allow viewing the description
         next nil if lock_info && !assignment.include_description?(current_user, lock_info)
-        AttachmentPreloader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
-
+        Loaders::ApiContentAttachmentLoader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
             GraphQLHelpers::UserContent.process(assignment.description,
                                                 request: context[:request],
                                                 context: assignment.context,
@@ -317,7 +286,7 @@ module Types
       GRADING_TYPES[assignment.grading_type]
     end
 
-    field :submission_types, [AssignmentSubmissionType],
+    field :submission_types, [Types::AssignmentSubmissionType],
       null: true
     def submission_types
       # there's some weird data in the db so we'll just ignore anything that
@@ -340,8 +309,7 @@ module Types
        `AssignmentOverride` applies.",
       null: false
 
-    field :assignment_overrides, AssignmentOverrideType.connection_type,
-      null: true
+    field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
     def assignment_overrides
         # this is the assignment overrides index method of loading
         # overrides... there's also the totally different method found in
@@ -361,11 +329,35 @@ module Types
       argument :order_by, [SubmissionSearchOrderInputType], required: false
     end
     def submissions_connection(filter: nil, order_by: nil)
+      return nil if current_user.nil?
+
       filter = filter.to_h
       order_by ||= []
       filter[:states] ||= DEFAULT_SUBMISSION_STATES
       filter[:order_by] = order_by.map(&:to_h)
       SubmissionSearch.new(assignment, current_user, session, filter).search
+    end
+
+    field :group_submissions_connection, SubmissionType.connection_type, null: true do
+      description "returns submissions grouped to one submission object per group"
+      argument :filter, SubmissionSearchFilterInputType, required: false
+      argument :order_by, [SubmissionSearchOrderInputType], required: false
+    end
+    def group_submissions_connection(filter: nil, order_by: nil)
+      return nil if current_user.nil? || assignment.group_category_id.nil?
+
+      filter = filter.to_h
+      order_by ||= []
+      filter[:states] ||= DEFAULT_SUBMISSION_STATES
+      filter[:order_by] = order_by.map(&:to_h)
+      scope = SubmissionSearch.new(assignment, current_user, session, filter).search
+      Promise.all([
+        Loaders::AssociationLoader.for(Assignment, :submissions).load(assignment),
+        Loaders::AssociationLoader.for(Assignment, :context).load(assignment)
+      ]).then do
+        students = assignment.representatives(user: current_user)
+        scope.where(user_id: students)
+      end
     end
 
     field :post_policy, PostPolicyType, null: true
@@ -374,6 +366,13 @@ module Types
         if course.grants_right?(current_user, :manage_grades)
           load_association(:post_policy)
         end
+      end
+    end
+
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:context).then do |course|
+        assignment.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
   end

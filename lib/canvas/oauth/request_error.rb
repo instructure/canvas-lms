@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -50,11 +52,6 @@ module Canvas::Oauth
         error_description: "incorrect client"
       }.freeze,
 
-      invalid_scope: {
-        error: :invalid_scope,
-        error_description: 'A requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner.'
-      }.freeze,
-
       authorization_code_not_supplied: {
         error: :invalid_request,
         error_description: "You must provide the code parameter when using the authorization_code grant type"
@@ -93,7 +90,20 @@ module Canvas::Oauth
       error_map[:http_status] || 400
     end
 
+    def redirect_uri(url)
+      append_error(url)
+    end
+
     private
+
+    def append_error(redirect)
+      uri = URI.parse(redirect)
+      error_query = URI.decode_www_form(String(uri.query)) << ["error", to_render_data.with_indifferent_access.dig('json', 'error')]
+      uri.query = URI.encode_www_form(error_query)
+      error_description_query = URI.decode_www_form(String(uri.query)) << ["error_description", to_render_data.with_indifferent_access.dig('json', 'error_description')]
+      uri.query = URI.encode_www_form(error_description_query)
+      uri.to_s
+    end
 
     def error_map
       ERROR_MAP[@message]

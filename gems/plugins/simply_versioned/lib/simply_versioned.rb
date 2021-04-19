@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -138,7 +140,7 @@ module SimplyVersioned
 
       options[:except] = options[:except].map( &:to_s )
 
-      self.update_attributes( YAML::load( version.yaml ).except( *options[:except] ) )
+      self.update( YAML::load( version.yaml ).except( *options[:except] ) )
     end
 
     # Invoke the supplied block passing the receiver as the sole block argument with

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -18,30 +20,14 @@
 require File.expand_path('../../../spec_helper', File.dirname(__FILE__))
 require_dependency "canvas/oauth/client_credentials_provider"
 
-RSA_KEY_PAIR = Lti::RSAKeyPair.new
-
 module Canvas::Oauth
   describe ClientCredentialsProvider do
-    let(:provider) { described_class.new jws, 'example.com' }
-    let(:alg) { :RS256 }
-    let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(protocol: 'https://') }
-    let(:iat) { 1.minute.ago.to_i }
-    let(:exp) { 10.minutes.from_now.to_i }
-    let(:signing_key) { JSON::JWK.new(RSA_KEY_PAIR.to_jwk) }
-    let(:jwt) do
-      {
-        iss: 'someiss',
-        sub: dev_key.id,
-        aud: aud,
-        iat: iat,
-        exp: exp,
-        jti: SecureRandom.uuid
-      }
-    end
-    let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
-    let_once(:dev_key) { DeveloperKey.create! public_jwk: RSA_KEY_PAIR.public_jwk }
+    let(:dev_key) { DeveloperKey.create! }
+    let(:provider) { described_class.new dev_key.id, 'example.com' }
 
-    before { Rails.application.routes.default_url_options[:host] = 'example.com' }
+    before {
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+    }
 
     describe 'generate_token' do
       subject { provider.generate_token }
@@ -62,6 +48,130 @@ module Canvas::Oauth
           Timecop.freeze(future_iat_time - 5.seconds) do
             expect(subject).to be_a Hash
           end
+        end
+      end
+
+      describe "with account scoped dev_key" do
+        before do
+          @account = Account.create!
+          dev_key.update!(account_id: @account)
+        end
+
+        it "includes a custom canvas account_id claim in the token" do
+          token = subject[:access_token]
+          claims = Canvas::Security.decode_jwt(token)
+          expect(claims).to have_key "canvas.instructure.com"
+          expect(claims["canvas.instructure.com"]["account_uuid"]).to eq @account.uuid
+        end
+      end
+    end
+  end
+
+  describe AsymmetricClientCredentialsProvider do
+    let(:provider) { described_class.new jws, 'example.com' }
+    let(:alg) { :RS256 }
+    let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
+    let(:iat) { 1.minute.ago.to_i }
+    let(:exp) { 10.minutes.from_now.to_i }
+    let(:rsa_key_pair) { Canvas::Security::RSAKeyPair.new }
+    let(:signing_key) { JSON::JWK.new(rsa_key_pair.to_jwk) }
+    let(:jwt) do
+      {
+        iss: 'someiss',
+        sub: dev_key.id,
+        aud: aud,
+        iat: iat,
+        exp: exp,
+        jti: SecureRandom.uuid
+      }
+    end
+    let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
+    let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
+
+    before {
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+    }
+
+    describe 'using public jwk url' do
+      subject { provider.valid? }
+
+      let(:url) { "https://get.public.jwk" }
+      let(:public_jwk_url_response) do
+        {
+          keys: [
+            rsa_key_pair.public_jwk
+          ]
+        }
+      end
+      let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
+
+      context 'when there is no public jwk' do
+        before do
+          dev_key.update!(public_jwk: nil, public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq true
+        end
+      end
+
+      context 'when there is a public jwk' do
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq true
+        end
+      end
+
+      context 'when an empty object is returned' do
+        let(:public_jwk_url_response) { {} }
+
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq false
+        end
+      end
+
+      context 'when the url is not valid giving a 404' do
+        let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
+
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        let(:public_jwk_url_response) do
+          {
+            success?: false, code: '404'
+          }
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq false
+        end
+      end
+
+      def expected_url_called(url, type, response)
+        expect(HTTParty).to receive(type).with(url).and_return(response)
+      end
+    end
+
+    describe 'generate_token' do
+      subject { provider.generate_token }
+
+      it { is_expected.to be_a Hash }
+
+      it 'has the correct expected keys' do
+        %i(access_token token_type expires_in scope).each do |key|
+          expect(subject).to have_key key
         end
       end
     end
@@ -88,12 +198,6 @@ module Canvas::Oauth
         let(:aud) { 'doesnotexist' }
 
         it { is_expected.not_to be_empty }
-
-        context 'when aud is not https' do
-          let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(protocol: 'http://') }
-
-          it { is_expected.not_to be_empty }
-        end
       end
 
       context 'with bad exp' do
@@ -115,7 +219,7 @@ module Canvas::Oauth
       end
 
       context 'with bad signing key' do
-        let(:signing_key) { JSON::JWK.new(Lti::RSAKeyPair.new.to_jwk) }
+        let(:signing_key) { JSON::JWK.new(Canvas::Security::RSAKeyPair.new.to_jwk) }
 
         it { is_expected.not_to be_empty }
       end
@@ -186,6 +290,53 @@ module Canvas::Oauth
             expect(subject).to be false
           end
         end
+      end
+    end
+  end
+
+  describe SymmetricClientCredentialsProvider do
+    let(:dev_key) { DeveloperKey.create! client_credentials_audience: "external" }
+    let(:provider) { described_class.new dev_key.id, 'example.com' }
+
+    before {
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+    }
+
+    context 'with valid client_id' do
+      describe '#error_message' do
+        subject { provider.error_message }
+        it { is_expected.to be_empty }
+      end
+
+      describe '#valid?' do
+        subject { provider.valid? }
+        it { is_expected.to be true }
+      end
+
+      describe 'generate_token' do
+        subject { provider.generate_token }
+
+        it { is_expected.to be_a Hash }
+
+        it 'has the correct expected keys' do
+          %i(access_token token_type expires_in scope).each do |key|
+            expect(subject).to have_key key
+          end
+        end
+      end
+    end
+
+    context 'with invalid client_id' do
+      let(:provider) { described_class.new 'invalid', 'example.com' }
+
+      describe '#error_message' do
+        subject { provider.error_message }
+        it { is_expected.to eq("Unknown client_id") }
+      end
+
+      describe '#valid?' do
+        subject { provider.valid? }
+        it { is_expected.to be false }
       end
     end
   end

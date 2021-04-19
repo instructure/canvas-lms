@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -15,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'English'
 
 class ContentExport < ActiveRecord::Base
   include Workflow
@@ -23,6 +26,8 @@ class ContentExport < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_one :sent_content_share
+  has_many :received_content_shares
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
@@ -33,6 +38,8 @@ class ContentExport < ActiveRecord::Base
 
   has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
 
+  before_create :set_global_identifiers
+
   # export types
   COMMON_CARTRIDGE = 'common_cartridge'.freeze
   COURSE_COPY = 'course_copy'.freeze
@@ -41,6 +48,7 @@ class ContentExport < ActiveRecord::Base
   USER_DATA = 'user_data'.freeze
   ZIP = 'zip'.freeze
   QUIZZES2 = 'quizzes2'.freeze
+  CC_EXPORT_TYPES = [COMMON_CARTRIDGE, COURSE_COPY, MASTER_COURSE_COPY, QTI, QUIZZES2].freeze
 
   workflow do
     state :created
@@ -73,39 +81,100 @@ class ContentExport < ActiveRecord::Base
     }
   end
 
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return self.context.account if self.context.is_a?(User)
+
+    self.context.try(:root_account) || user&.account
+  end
+
   set_policy do
-    # file managers (typically course admins) can read all course exports (not zip or user-data exports)
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) && [ZIP, USER_DATA].exclude?(self.export_type) }
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files) &&
+      [ZIP, USER_DATA].exclude?(self.export_type)
+    end
     can :manage_files and can :read
+
+    ##################### End legacy permission block ##########################
+
+    # file managers (typically course admins) can read all course exports (not zip or user-data exports)
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_any_right?(user, session, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS) &&
+      [ZIP, USER_DATA].exclude?(self.export_type)
+    end
+    can :read and can :manage_files
 
     # admins can create exports of any type
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :create
 
-    # all users can read exports they created (in contexts they retain read permission)
-    given { |user, session| self.user == user && self.context.grants_right?(user, session, :read) }
+    # admins can read any export they created
+    given { |user, session| self.user == user && self.context.grants_right?(user, session, :read_as_admin) }
+    can :read
+
+    # all users can read zip/user data exports they created (in contexts they retain read permission)
+    # NOTE: other exports may be created on their behalf that they do *not* have direct access to;
+    # e.g. a common cartridge export created under the hood when a student creates a web zip export
+    given { |user, session| self.user == user && [ZIP, USER_DATA].include?(self.export_type) && self.context.grants_right?(user, session, :read) }
     can :read
 
     # non-admins can create zip or user-data exports, but not other types
     given { |user, session| [ZIP, USER_DATA].include?(self.export_type) && self.context.grants_right?(user, session, :read) }
     can :create
+
+    # users can read exports that are shared with them
+    given { |user| user && user.content_shares.where(content_export: self).exists? }
+    can :read
+  end
+
+  def set_global_identifiers
+    self.global_identifiers = can_use_global_identifiers? if CC_EXPORT_TYPES.include?(self.export_type)
+  end
+
+  def can_use_global_identifiers?
+    # use global identifiers if no other cc export from this course has used local identifiers
+    # i.e. all exports from now on should try to use global identifiers
+    # unless there's a risk of not matching up with a previous export
+    !self.context.content_exports.where(:export_type => CC_EXPORT_TYPES, :global_identifiers => false).exists?
+  end
+
+  def quizzes_next?
+    return false unless context.feature_enabled?(:quizzes_next)
+
+    export_type == QUIZZES2 || self.settings[:quizzes2].present?
+  end
+
+  def new_quizzes_page_enabled?
+    quizzes_next? && root_account.feature_enabled?(:newquizzes_on_quiz_page)
   end
 
   def export(opts={})
-    opts = opts.with_indifferent_access
-    case export_type
-    when ZIP
-      export_zip(opts)
-    when USER_DATA
-      export_user_data(opts)
-    when QUIZZES2
-      return unless context.feature_enabled?(:quizzes_next)
-      export_quizzes2
-    else
-      export_course(opts)
+    self.shard.activate do
+      opts = opts.with_indifferent_access
+      case export_type
+      when ZIP
+        export_zip(opts)
+      when USER_DATA
+        export_user_data(opts)
+      when QUIZZES2
+        return unless context.feature_enabled?(:quizzes_next)
+        new_quizzes_page_enabled? ? quizzes2_export_complete : export_quizzes2
+      else
+        export_course(opts)
+      end
     end
   end
-  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :on_permanent_failure => :fail_with_error!
 
   def reset_and_start_job_progress
     self.job_progress.try :reset!
@@ -124,7 +193,13 @@ class ContentExport < ActiveRecord::Base
 
   def mark_failed
     self.workflow_state = 'failed'
-    self.job_progress.try :fail!
+    self.job_progress.fail! if self.job_progress&.queued? || self.job_progress&.running?
+  end
+
+  def fail_with_error!(exception_or_info = nil, error_message: I18n.t('Unexpected error while performing export'))
+    add_error(error_message, exception_or_info) if exception_or_info
+    mark_failed
+    save!
   end
 
   def export_course(opts={})
@@ -145,7 +220,7 @@ class ContentExport < ActiveRecord::Base
         mark_failed
       end
     rescue
-      add_error("Error running course export.", $!)
+      add_error("Error running course export.", $ERROR_INFO)
       mark_failed
     ensure
       self.save
@@ -164,7 +239,7 @@ class ContentExport < ActiveRecord::Base
         mark_exported
       end
     rescue
-      add_error("Error running user_data export.", $!)
+      add_error("Error running user_data export.", $ERROR_INFO)
       mark_failed
     ensure
       self.save
@@ -181,7 +256,66 @@ class ContentExport < ActiveRecord::Base
         mark_exported
       end
     rescue
-      add_error("Error running zip export.", $!)
+      add_error("Error running zip export.", $ERROR_INFO)
+      mark_failed
+    ensure
+      self.save
+    end
+  end
+
+  def quizzes2_build_assignment(opts = {})
+    mark_exporting
+    reset_and_start_job_progress
+
+    @quiz_exporter = Exporters::Quizzes2Exporter.new(self)
+    if @quiz_exporter.export(opts)
+      self.update(
+        selected_content: {
+          quizzes: {
+            create_key(@quiz_exporter.quiz) => true
+          }
+        }
+      )
+      self.settings[:quizzes2] = @quiz_exporter.build_assignment_payload
+      self.save!
+      return true
+    else
+      add_error("Error running export to Quizzes 2.", $ERROR_INFO)
+      mark_failed
+    end
+
+    false
+  end
+
+  def quizzes2_export_complete
+    return unless quizzes_next?
+
+    assignment_id = self.settings.dig(:quizzes2, :assignment, :assignment_id)
+    assignment = Assignment.find_by(id: assignment_id)
+    if assignment.blank?
+      mark_failed
+      return
+    end
+
+    begin
+      self.update(export_type: QTI)
+      @cc_exporter = CC::CCExporter.new(self)
+
+      if @cc_exporter.export
+        self.update(
+          export_type: QUIZZES2
+        )
+        self.settings[:quizzes2][:qti_export] = {}
+        self.settings[:quizzes2][:qti_export][:url] = self.attachment.public_download_url
+        self.progress = 100
+        mark_exported
+      else
+        assignment.fail_to_migrate
+        mark_failed
+      end
+    rescue
+      add_error("Error running export to Quizzes 2.", $ERROR_INFO)
+      assignment.fail_to_migrate
       mark_failed
     ensure
       self.save
@@ -220,7 +354,7 @@ class ContentExport < ActiveRecord::Base
         mark_failed
       end
     rescue
-      add_error("Error running export to Quizzes 2.", $!)
+      add_error("Error running export to Quizzes 2.", $ERROR_INFO)
       mark_failed
     ensure
       self.save
@@ -238,6 +372,7 @@ class ContentExport < ActiveRecord::Base
     p.completion = 0
     p.user = self.user
     p.save!
+    quizzes2_build_assignment(opts) if new_quizzes_page_enabled?
     export(opts)
   end
 
@@ -293,15 +428,17 @@ class ContentExport < ActiveRecord::Base
     if zip_export?
       obj.asset_string
     else
-      CC::CCHelper.create_key(obj)
+      create_key(obj)
     end
   end
 
   def create_key(obj, prepend="")
-    if for_master_migration? && !is_external_object?(obj)
-      master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
-    else
-      CC::CCHelper.create_key(obj, prepend)
+    self.shard.activate do
+      if for_master_migration? && !is_external_object?(obj)
+        master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
+      else
+        CC::CCHelper.create_key(obj, prepend, global: self.global_identifiers?)
+      end
     end
   end
 
@@ -441,6 +578,7 @@ class ContentExport < ActiveRecord::Base
 
   def expired?
     return false unless ContentExport.expire?
+    return false if ContentShare.where(content_export: self).exists?
     created_at < ContentExport.expire_days.days.ago
   end
 

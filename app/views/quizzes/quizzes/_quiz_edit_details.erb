@@ -42,10 +42,12 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
           <input type="hidden" name="description" value="<%=@quiz.description%>"/>
         <% else %>
           <%= before_label(:quiz_instructions, "Quiz Instructions") %>
-          <div class="pull-right" style="font-size: 0.8em; cursor: pointer;">
-            <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
-            <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
-          </div>
+          <% unless @context.feature_enabled?(:rce_enhancements) %>
+            <div class="pull-right" style="font-size: 0.8em; cursor: pointer;">
+              <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
+              <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
+            </div>
+          <% end %>
           <textarea id="quiz_description" style="display: none;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
         <% end %>
       </div>
@@ -78,7 +80,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
         <div class="control-group" id="quiz_points_possible" style="<%= hidden unless @quiz.graded_survey? %>">
           <%= label :quiz, :points_possible, :quiz_score, :en => "Score", :class => 'control-label' %>
             <div class="controls">
-              <%= text_field :quiz, :points_possible, :style => "width: 50px;" %> pts
+              <%= text_field :quiz, :points_possible, :style => "width: 50px;", :value => points_possible_display %> pts
               <div style="font-size: 0.8em;">
                 <%= t("students will automatically receive full credit once they take the survey") %>
               </div>
@@ -112,6 +114,13 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
                 <%= t("Minutes") %>
               </label>
             </div>
+
+            <% if @context.root_account.feature_enabled?(:timer_without_autosubmission) %>
+              <label class="checkbox" for="quiz_disable_timer_autosubmission" style="margin-left:12px;<%= hidden if @quiz.time_limit.blank? %>">
+                <%= check_box :quiz, :disable_timer_autosubmission %>
+                <%= t("Disable Automatic Submission") %>
+              </label>
+            <% end %>
 
             <div class="quiz_survey_setting" style="<%= hidden unless @quiz.survey? %>">
               <label class="checkbox" for="quiz_anonymous_submissions">
@@ -299,5 +308,5 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
       </div>
     </div>
   <% end %>
-  <div id="assignment_external_tools"></div>
+  <%= prefetch_assignment_external_tools %>
 </div>

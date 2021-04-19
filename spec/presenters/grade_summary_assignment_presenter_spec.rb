@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -15,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GradeSummaryAssignmentPresenter do
@@ -62,7 +65,7 @@ describe GradeSummaryAssignmentPresenter do
 
     it 'returns when submission was automatically created by group assignment submission' do
       submission_two = @submission.dup
-      submission_two.update_attributes!(user: User.create!(name: 'second student'))
+      submission_two.update!(user: User.create!(name: 'second student'))
       AttachmentAssociation.create!(context: @submission, attachment_id: @attachment)
       AttachmentAssociation.create!(context: submission_two, attachment_id: @attachment)
       OriginalityReport.create(originality_score: 0.8,
@@ -132,12 +135,34 @@ describe GradeSummaryAssignmentPresenter do
       it "returns nil when a summary's assignment_stats is empty" do
         expect(presenter.grade_distribution).to be_nil
       end
+
+    end
+
+    context "when summary stats exist" do
+      it "rounds values to 2 decimal places" do
+        @assignment.create_score_statistic!(
+          count: 3,
+          minimum: 1.3333333,
+          maximum: 2.6666666,
+          mean: 2
+        )
+        presenter = GradeSummaryPresenter.new(@course, @student, @student.id)
+        assignment_presenter = GradeSummaryAssignmentPresenter.new(presenter, @student, @assignment, @submission)
+
+        maximum, minimum, mean = assignment_presenter.grade_distribution
+
+        aggregate_failures do
+          expect(minimum).to eq 1.33
+          expect(maximum).to eq 2.67
+          expect(mean).to eq 2
+        end
+      end
     end
   end
 
   describe "#original_points" do
-    it "returns an empty string when assignment is muted" do
-      @assignment.muted = true
+    it "returns an empty string when grades are hidden" do
+      allow(@submission).to receive(:hide_grade_from_student?).and_return(true)
       expect(presenter.original_points).to eq ''
     end
 
@@ -234,6 +259,67 @@ describe GradeSummaryAssignmentPresenter do
     it "returns the value of the submission method" do
       expect(@submission).to receive(:late?).and_return('foo')
       expect(presenter.late?).to eq('foo')
+    end
+  end
+
+  describe "#hide_grade_from_student?" do
+    it "returns true if the submission object is nil" do
+      submissionless_presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
+      expect(submissionless_presenter).to be_hide_grade_from_student
+    end
+
+    context "when assignment posts manually" do
+      before(:each) do
+        @assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "returns false when the student's submission is posted" do
+        @submission.update!(posted_at: Time.zone.now)
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns true when the student's submission is not posted" do
+        @submission.update!(posted_at: nil)
+        expect(presenter).to be_hide_grade_from_student
+      end
+    end
+
+    context "when assignment posts automatically" do
+      before(:each) do
+        @assignment.ensure_post_policy(post_manually: false)
+      end
+
+      it "returns false when the student's submission is posted" do
+        @submission.update!(posted_at: Time.zone.now)
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns false when the student's submission is not posted and no grade has been issued" do
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns false when the student has submitted something but no grade is posted" do
+        @assignment.update!(submission_types: "online_text_entry")
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
+        expect(presenter).not_to be_hide_grade_from_student
+      end
+
+      it "returns true when the student's submission is graded and not posted" do
+        @assignment.grade_student(@student, grader: @teacher, score: 5)
+        @submission.reload
+        @submission.update!(posted_at: nil)
+        expect(presenter).to be_hide_grade_from_student
+      end
+
+      it "returns true when the student has resubmitted to a previously graded and subsequently hidden submission" do
+        @assignment.update!(submission_types: "online_text_entry")
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
+        @assignment.grade_student(@student, score: 0, grader: @teacher)
+        @assignment.hide_submissions
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "I will not lose")
+        @submission.reload
+        expect(presenter).to be_hide_grade_from_student
+      end
     end
   end
 end

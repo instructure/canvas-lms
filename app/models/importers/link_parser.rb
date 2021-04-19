@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -86,7 +88,7 @@ module Importers
           # replace the entire node with a placeholder
           result[:old_value] = node.to_xml
           result[:placeholder] = placeholder(result[:old_value])
-          placeholder_node = Nokogiri::HTML::DocumentFragment.parse(result[:placeholder])
+          placeholder_node = Nokogiri::HTML5.fragment(result[:placeholder])
 
           node.replace(placeholder_node)
         else
@@ -115,7 +117,8 @@ module Importers
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^\?]*)(\?.*)?}
         unresolved(:module_item, :migration_id => $1, :query => $2)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/\?#]+)(.*)}
-        unresolved(:file_ref, :migration_id => $1, :rest => $2)
+        unresolved(:file_ref, :migration_id => $1, :rest => $2,
+                   :in_media_iframe => attr == 'src' && node.name == 'iframe' && node['data-media-id'])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^\?]*)(\?.*)?}
         unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
 
@@ -124,12 +127,14 @@ module Importers
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
         rel_path = URI.unescape($1)
-        if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
+        if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/ ||
+           attr == 'src' && node.name == 'iframe' && node['data-media-id']
           unresolved(:media_object, :rel_path => rel_path)
         else
           unresolved(:file, :rel_path => rel_path)
         end
-      elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
+      elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/ ||
+            attr == 'src' && node.name == 'iframe' && node['data-media-id']
         # Course copy media reference, leave it alone
         resolved
       elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))
@@ -169,7 +174,7 @@ module Importers
       file.binmode
       file.write(image_data)
       file.close
-      attachment = FileInContext.attach(context, file.path, filename, @folder, filename, false, md5)
+      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5: md5)
       resolved("#{context_path}/files/#{attachment.id}/preview")
     rescue
       unresolved(:file, rel_path: "#{folder_name}/#{filename}")

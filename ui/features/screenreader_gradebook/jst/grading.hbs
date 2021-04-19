@@ -1,0 +1,68 @@
+<div id="grading">
+  <div class="row-fluid">
+    <div class="span4">
+      <h2>{{#t 'grading'}}Grading{{/t}}</h2>
+    </div>
+    <div class= "span8 pad-box top-only">
+      {{#if selectedSubmission}}
+        {{#if selectedSubmissionHidden}}
+          {{#t 'submission_hidden'}}This assignment is not available to this student and will not be included in their grade.{{/t}}
+        {{else}}
+          <div class="pad-box bottom-only">
+            <label for="student_and_assignment_grade">
+              {{#with selectedAssignment}}
+                <strong>{{#t}}Grade for: {{name}}{{/t}}</strong>
+              {{/with}}
+              {{#if selectedSubmission.late}}
+                <span class="late-pill">
+                  <ul class="pill pill-align error" />
+                    <li class="error"><strong>{{#t}}late{{/t}}</strong></li>
+                  </ul>
+                </span>
+              {{/if}}
+              {{#if selectedSubmission.missing}}
+                <span class="missing-pill">
+                  <ul class="pill pill-align error" />
+                    <li class="error"><strong>{{#t}}missing{{/t}}</strong></li>
+                  </ul>
+                </span>
+              {{/if}}
+            </label>
+          </div>
+          {{
+            grading-cell
+            assignment=selectedAssignment
+            input-id="student_and_assignment_grade"
+            submission=selectedSubmission
+            on-submit-grade="gradeUpdated"
+            class="pad-box bottom-only"
+          }}
+          {{#if selectedSubmission.drop}}
+            <p class="dropped muted">
+              {{#t 'is_dropped'}}This grade is currently dropped for this student.{{/t}}
+            </p>
+          {{/if}}
+          {{#unless selectedSubmission.grade_matches_current_submission}}
+            <p class="resubmitted muted">
+              {{#t 'was_resubmitted'}}This assignment has been resubmitted since it was graded last.{{/t}}
+            </p>
+          {{/unless}}
+          </div>
+          {{#unless anonymizeStudents}}
+            <button
+              id="submission_details"
+              class="btn"
+              {{action 'openDialog' 'submission' target=view}}
+            >
+              {{#t 'submission_details'}}Submission Details{{/t}}
+            </button>
+          {{/unless}}
+        {{/if}}
+      {{else}}
+        <p class="submission_selection">
+          {{#t "empty_submission_selection"}}Select a student and an assignment to view and edit grades.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

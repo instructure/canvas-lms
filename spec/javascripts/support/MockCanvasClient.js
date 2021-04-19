@@ -24,8 +24,8 @@
  * see apollo_without_react_spec.js for examples of this module.
  */
 
-import {createClient} from 'jsx/canvas-apollo'
-import {MockLink} from 'react-apollo/test-links'
+import {createClient} from '@canvas/apollo'
+import {MockLink} from '@apollo/react-testing'
 
 /*
  * React components should use Apollo's MockProvider instead of MockCanvasClient.

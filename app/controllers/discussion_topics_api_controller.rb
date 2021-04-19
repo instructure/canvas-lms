@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -55,6 +57,7 @@ class DiscussionTopicsApiController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   def show
     include_params = Array(params[:include])
+    log_asset_access(@topic, 'topics', 'topics')
     render(json: discussion_topics_api_json([@topic], @context,
                                             @current_user, session,
                                             include_all_dates: include_params.include?('all_dates'),
@@ -121,6 +124,7 @@ class DiscussionTopicsApiController < ApplicationController
   #   }
   def view
     return unless authorized_action(@topic, @current_user, :read_replies)
+    log_asset_access(@topic, 'topics', 'topics')
 
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
@@ -238,13 +242,26 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
+  # @API Duplicate discussion topic
+  #
+  # Duplicate a discussion topic according to context (Course/Group)
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/discussion_topics/123/duplicate
+  #
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/group/456/discussion_topics/456/duplicate
+  #
+  # @returns DiscussionTopic
   def duplicate
-    return unless authorized_action(@topic, @current_user, :create)
     # Require topic hook forbids duplicating of child, nonexistent, and deleted topics
     # The only extra check we need is to prevent duplicating announcements.
     if @topic.is_announcement
       return render json: { error: t('announcements cannot be duplicated') }, status: :bad_request
     end
+
+    return unless authorized_action(@topic, @current_user, :duplicate)
 
     new_topic = @topic.duplicate({ :user => @current_user })
     if @topic.pinned
@@ -688,6 +705,11 @@ class DiscussionTopicsApiController < ApplicationController
     if @entry.save
       @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
+
+      assignment_id = @topic.assignment_id
+      submission_id = assignment_id && @topic.assignment.submission_for_student_id(@entry.user_id)&.id
+      Canvas::LiveEvents.discussion_entry_submitted(@entry, assignment_id, submission_id)
+
       if has_attachment
         @attachment = create_attachment
         @attachment.handle_duplicates(:rename)

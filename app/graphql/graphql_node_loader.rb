@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -21,17 +23,28 @@ module GraphQLNodeLoader
     check_read_permission = make_permission_check(ctx, :read)
 
     case type
+    when "Account"
+      Loaders::IDLoader.for(Account).load(id).then(check_read_permission)
+    when "AccountBySis"
+      Loaders::SISIDLoader.for(Account).load(id).then(check_read_permission)
     when "Course"
       Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
+    when "CourseBySis"
+      Loaders::SISIDLoader.for(Course).load(id).then(check_read_permission)
     when "Assignment"
       Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+    when "AssignmentBySis"
+      Loaders::SISIDLoader.for(Assignment).load(id).then(check_read_permission)
     when "Section"
       Loaders::IDLoader.for(CourseSection).load(id).then(check_read_permission)
+    when "SectionBySis"
+      Loaders::SISIDLoader.for(CourseSection).load(id).then(check_read_permission)
     when "User"
       Loaders::IDLoader.for(User).load(id).then(->(user) do
         return nil unless user && ctx[:current_user]
 
         return user if user.grants_right?(ctx[:current_user], :read_full_profile)
+        return user if user == ctx[:current_user]
 
         has_permission = Rails.cache.fetch(["node_user_perm", ctx[:current_user], user].cache_key) do
           has_perm = Shard.with_each_shard(user.associated_shards & ctx[:current_user].associated_shards) do
@@ -63,11 +76,19 @@ module GraphQLNodeLoader
       end
     when "Group"
       Loaders::IDLoader.for(Group).load(id).then(check_read_permission)
+    when "GroupBySis"
+      Loaders::SISIDLoader.for(Group).load(id).then(check_read_permission)
     when "GroupSet"
       Loaders::IDLoader.for(GroupCategory).load(id).then do |category|
-        Loaders::AssociationLoader.for(GroupCategory, :context)
-          .load(category)
-          .then { check_read_permission.(category) }
+        Loaders::AssociationLoader.for(GroupCategory, :context).
+          load(category).
+          then { check_read_permission.call(category) }
+      end
+    when "GroupSetBySis"
+      Loaders::SISIDLoader.for(GroupCategory).load(id).then do |category|
+        Loaders::AssociationLoader.for(GroupCategory, :context).
+          load(category).
+          then { check_read_permission.call(category) }
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
@@ -113,8 +134,12 @@ module GraphQLNodeLoader
       end
     when "AssignmentGroup"
       Loaders::IDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
+    when "AssignmentGroupBySis"
+      Loaders::SISIDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"
       Loaders::IDLoader.for(DiscussionTopic).load(id).then(check_read_permission)
+    when "DiscussionEntry"
+      Loaders::IDLoader.for(DiscussionEntry).load(id).then(check_read_permission)
     when "Quiz"
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
     when "Submission"
@@ -126,8 +151,63 @@ module GraphQLNodeLoader
           progress
         end
       end
+    when 'Rubric'
+      Loaders::IDLoader.for(Rubric).load(id).then(check_read_permission)
+    when "Term"
+      Loaders::IDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
+        Loaders::AssociationLoader.for(EnrollmentTerm, :root_account).load(enrollment_term).then do
+          next nil unless enrollment_term.root_account.grants_right?(ctx[:current_user], :read)
+          enrollment_term
+        end
+      end
+    when "TermBySis"
+      Loaders::SISIDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
+        Loaders::AssociationLoader.for(EnrollmentTerm, :root_account).load(enrollment_term).then do
+          next nil unless enrollment_term.root_account.grants_right?(ctx[:current_user], :read)
+          enrollment_term
+        end
+      end
+    when "OutcomeCalculationMethod"
+      Loaders::IDLoader.for(OutcomeCalculationMethod).load(id).then do |record|
+        next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
+        record
+      end
+    when "OutcomeProficiency"
+      Loaders::IDLoader.for(OutcomeProficiency).load(id).then do |record|
+        next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
+
+        record
+      end
+    when "LearningOutcomeGroup"
+      Loaders::IDLoader.for(LearningOutcomeGroup).load(id).then do |record|
+        if record.context
+          next unless record.context.grants_right?(ctx[:current_user], :read_outcomes)
+        else
+          next unless Account.site_admin.grants_right?(ctx[:current_user], :read_global_outcomes)
+        end
+
+        record
+      end
+    when "Conversation"
+      Loaders::IDLoader.for(Conversation).load(id).then do |conversation|
+        Loaders::AssociationLoader.for(User, :all_conversations).load(ctx[:current_user]).then do |all_conversations|
+          next nil unless all_conversations.where(conversation_id: conversation.id).first
+
+          conversation
+        end
+      end
+    when "LearningOutcome"
+      Loaders::IDLoader.for(LearningOutcome).load(id).then do |record|
+        if record.context
+          next unless record.context.grants_right?(ctx[:current_user], :read_outcomes)
+        else
+          next unless Account.site_admin.grants_right?(ctx[:current_user], :read_global_outcomes)
+        end
+
+        record
+      end
     else
-      raise UnsupportedTypeError.new("don't know how to load #{type}")
+      raise UnsupportedTypeError, "don't know how to load #{type}"
     end
   end
 

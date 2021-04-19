@@ -19,16 +19,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Modal from 'react-modal'
-import DeleteExternalToolButton from 'jsx/external_apps/components/DeleteExternalToolButton'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import Modal from '@canvas/react-modal'
+import DeleteExternalToolButton from 'ui/features/external_apps/react/components/DeleteExternalToolButton.js'
+import store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
 import {mount} from 'enzyme'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 const createElement = data => (
-  <DeleteExternalToolButton tool={data.tool} canAddEdit={data.canAddEdit} returnFocus={data.returnFocus} />
+  <DeleteExternalToolButton
+    tool={data.tool}
+    canAddEdit={data.canAddEdit}
+    returnFocus={data.returnFocus}
+  />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
@@ -85,7 +89,9 @@ test('open and close modal', function() {
 
 test('deletes a tool', function() {
   sinon.spy(store, 'delete')
-  const wrapper = mount(<DeleteExternalToolButton tool={this.tools[0]} canAddEdit returnFocus={() => {}}/>)
+  const wrapper = mount(
+    <DeleteExternalToolButton tool={this.tools[0]} canAddEdit returnFocus={() => {}} />
+  )
   wrapper.instance().deleteTool({preventDefault: () => {}})
   ok(store.delete.called)
   store.delete.restore()

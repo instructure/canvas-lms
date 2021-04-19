@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -23,7 +25,6 @@ describe "student planner" do
   include PlannerPageObject
 
   before :once do
-    Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true, course_name: "Planner Course")
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
@@ -99,8 +100,14 @@ describe "student planner" do
     end
 
     it "shows missing tag for an assignment with missing submissions.", priority: "1", test_id: 3263153 do
-      @assignment.due_at = Time.zone.now - 2.days
+      @assignment.due_at = Time.zone.now - 2.weeks
       @assignment.save!
+      @course.assignments.create({
+        name: 'Assignment 2',
+        due_at: Time.zone.now + 1.day,
+        submission_types: 'online_text_entry'
+      })
+
       go_to_list_view
       force_click(load_prior_button_selector)
       expect(planner_app_div).to be_displayed

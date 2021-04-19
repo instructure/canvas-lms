@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -14,12 +16,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 require_relative '../../helpers/gradebook_common'
+require_relative '../setup/gradebook_setup'
+require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook_cells_page'
 
-describe "gradebook - concluded courses and enrollments" do
+describe "Gradebook - concluded courses and enrollments" do
   include_context "in-process server selenium tests"
   include GradebookCommon
+  include GradebookSetup
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -27,67 +34,32 @@ describe "gradebook - concluded courses and enrollments" do
   let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }
 
   context "active course" do
-    let(:gradebook_settings_for_course) do
-      -> (teacher, course) do
-        teacher.reload
-          .preferences.fetch(:gradebook_settings, {})[course.id]
-      end
-    end
-
-    it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
-      get course_gradebook_path(@course)
-      f('#gradebook_settings').click
-      expect do
-        wait_for_new_page_load(f('label[for="show_inactive_enrollments"]').click)
-      end
-        .to change { gradebook_settings_for_course.call(@teacher, @course)}
-        .from(nil)
-        .to({
-          "show_inactive_enrollments" => "true",
-          "show_concluded_enrollments" => "false",
-          "enter_grades_as" => nil
-        })
-    end
-
-    it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
-      get course_gradebook_path(@course)
-      f('#gradebook_settings').click
-      expect do
-        wait_for_new_page_load{ f('label[for="show_concluded_enrollments"]').click }
-      end
-        .to change { gradebook_settings_for_course.call(@teacher, @course) }
-        .from(nil)
-        .to({
-          "show_inactive_enrollments" => "false",
-          "show_concluded_enrollments" => "true",
-          "enter_grades_as" => nil
-        })
-    end
-
     it "does not show concluded enrollments by default", priority: "1", test_id: 210020 do
       conclude_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
-      get "/courses/#{@course.id}/gradebook"
+
+      Gradebook.visit(@course)
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
-    it "shows/hides concluded enrollments when checked/unchecked in settings cog", priority: "1", test_id: 164223 do
+    it "shows concluded enrollments when checked in column header", priority: "1", test_id: 3253331 do
       conclude_student_1
-      get "/courses/#{@course.id}/gradebook"
+      Gradebook.visit(@course)
 
-      # show concluded
-      expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_concluded_enrollments"]').click
-      end
+      Gradebook.click_student_header_menu_show_option('Concluded enrollments')
+
       expect(ff('.student-name')).to have_size @course.all_students.count
+    end
 
-      # hide concluded
-      expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_concluded_enrollments"]').click
-      end
+    it "hides concluded enrollments when unchecked in column header", priority: "1", test_id: 3253332 do
+      conclude_student_1
+      display_concluded_enrollments
+      Gradebook.visit(@course)
+
+      Gradebook.click_student_header_menu_show_option('Concluded enrollments')
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
@@ -95,27 +67,28 @@ describe "gradebook - concluded courses and enrollments" do
       deactivate_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
-      get "/courses/#{@course.id}/gradebook"
+
+      Gradebook.visit(@course)
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
-    it "shows/hides inactive enrollments when checked/unchecked in settings cog", priority: "1", test_id: 1102066 do
+    it "shows inactive enrollments when checked in column header", priority: "1", test_id: 3253329 do
       deactivate_student_1
-      get "/courses/#{@course.id}/gradebook"
+      Gradebook.visit(@course)
 
-      # show deactivated
-      expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_inactive_enrollments"]').click
-      end
+      Gradebook.click_student_header_menu_show_option('Inactive enrollments')
+
       expect(ff('.student-name')).to have_size @course.all_students.count
+    end
 
+    it "hides inactive enrollments when unchecked in column header", priority: "1", test_id: 3253330 do
+      deactivate_student_1
+      display_inactive_enrollments
+      Gradebook.visit(@course)
 
-      # hide deactivated
-      expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_inactive_enrollments"]').click
-      end
+      Gradebook.click_student_header_menu_show_option('Inactive enrollments')
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
   end
@@ -123,11 +96,11 @@ describe "gradebook - concluded courses and enrollments" do
   context "concluded course" do
     it "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
-      get "/courses/#{@course.id}/gradebook"
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2')
-      expect(cell).to include_text '10'
-      cell.click
-      expect(cell).not_to contain_css('.grade') # no input box for entry
+      Gradebook.visit(@course)
+
+      expect(Gradebook::Cells.get_grade(@student_1, @first_assignment)).to eq '10'
+      cell = Gradebook::Cells.grading_cell(@student_1, @first_assignment)
+      expect(cell).to contain_css(Gradebook::Cells.ungradable_selector)
     end
   end
 end

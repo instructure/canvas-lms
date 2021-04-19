@@ -1,6 +1,7 @@
 development:
   session_store: encrypted_cookie_store
   expire_after: 86400 # 1 day in seconds
+  # secure: true
 
 production:
   session_store: encrypted_cookie_store

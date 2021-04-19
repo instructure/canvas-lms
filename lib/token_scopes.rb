@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,19 +24,63 @@ class TokenScopes
     verb: "GET",
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
   }.freeze
+  # Allows interaction with Canvas Data service
+  CD2_SCOPE = {
+    resource: :peer_services,
+    verb: "GET",
+    scope: "cd2".freeze
+  }.freeze
   LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem".freeze
   LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly".freeze
   LTI_AGS_RESULT_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly".freeze
   LTI_AGS_SCORE_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/score".freeze
+  LTI_AGS_SHOW_PROGRESS_SCOPE = "https://canvas.instructure.com/lti-ags/progress/scope/show".freeze
   LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".freeze
+  LTI_UPDATE_PUBLIC_JWK_SCOPE = "https://canvas.instructure.com/lti/public_jwk/scope/update".freeze
+  LTI_ACCOUNT_LOOKUP_SCOPE = "https://canvas.instructure.com/lti/account_lookup/scope/show".freeze
+  LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/create".freeze
+  LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/show".freeze
+  LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/update".freeze
+  LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list".freeze
+  LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/destroy".freeze
+  LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list_event_types".freeze
+  LTI_SHOW_FEATURE_FLAG_SCOPE = "https://canvas.instructure.com/lti/feature_flags/scope/show".freeze
+  LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/create".freeze
+  LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/destroy".freeze
+  LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/list".freeze
+  LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show".freeze
+  LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update".freeze
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
     LTI_AGS_RESULT_READ_ONLY_SCOPE => I18n.t("Can view submission data for assignments associated with the tool."),
     LTI_AGS_SCORE_SCOPE => I18n.t("Can create and update submission results for assignments associated with the tool."),
-    LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in.")
+    LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in."),
+    LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),
+    LTI_ACCOUNT_LOOKUP_SCOPE => I18n.t("Can lookup Account information"),
+    LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can create subscription to data service data."),
+    LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can show subscription to data service data."),
+    LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can update subscription to data service data."),
+    LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data."),
+    LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
+    LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
+    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t('Can view feature flags'),
+    LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t('Can view Progress records associated with the context the tool is installed in'),
   }.freeze
-  LTI_AGS_SCOPES = [ LTI_AGS_LINE_ITEM_SCOPE, LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE, LTI_AGS_RESULT_READ_ONLY_SCOPE, LTI_AGS_SCORE_SCOPE ].freeze
+  LTI_AGS_SCOPES = [ 
+    LTI_AGS_LINE_ITEM_SCOPE,
+    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+    LTI_AGS_RESULT_READ_ONLY_SCOPE,
+    LTI_AGS_SCORE_SCOPE,
+    LTI_AGS_SHOW_PROGRESS_SCOPE
+  ].freeze
+  LTI_HIDDEN_SCOPES = {
+    LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can create external tools."),
+    LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can destroy external tools."),
+    LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can list external tools."),
+    LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can show external tools."),
+    LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can update external tools."),
+  }.freeze
 
   def self.named_scopes
     return @_named_scopes if @_named_scopes
@@ -50,11 +96,11 @@ class TokenScopes
   end
 
   def self.all_scopes
-    @_all_scopes ||= [USER_INFO_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.keys].freeze
+    @_all_scopes ||= [USER_INFO_SCOPE[:scope], CD2_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].freeze
   end
 
   def self.detailed_scopes
-    @_detailed_scopes ||= [USER_INFO_SCOPE, *api_routes].freeze
+    @_detailed_scopes ||= [USER_INFO_SCOPE, CD2_SCOPE, *api_routes].freeze
   end
   private_class_method :detailed_scopes
 
@@ -73,4 +119,10 @@ class TokenScopes
   end
   private_class_method :api_routes
 
+  def self.reset!
+    @_api_routes = nil
+    @_all_scopes = nil
+    @_detailed_scopes = nil
+    @_named_scopes = nil
+  end
 end

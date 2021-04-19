@@ -1,4 +1,4 @@
-FROM instructure/node:10
+FROM instructure/node:14
 
 USER docker
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -39,7 +41,6 @@ module Lti
       collection.map do |o|
         case o
         when ContextExternalTool
-          next if o.use_1_3?
           hash = external_tool_definition(o)
           if opts[:master_course_status]
             hash.merge!(o.master_course_api_restriction_data(opts[:master_course_status]))
@@ -47,31 +48,14 @@ module Lti
           hash
         when ToolProxy
           tool_proxy_definition(o)
-        when Hash
-          lti13_tool_definition(o)
         end
       end.compact
     end
 
     private
 
-    def lti13_tool_definition(tool_configuration)
-      config = tool_configuration[:config]
-      {
-        app_type: "LTI 1.3 Tool",
-        app_id: config.developer_key.id,
-        name: config[:settings]['title'],
-        description: config[:settings]['description'],
-        installed_for_context: tool_configuration[:installed_for_context],
-        installed_at_context_level: tool_configuration[:installed_at_context_level],
-        installed_tool_id: tool_configuration[:installed_tool_id],
-        context_id: config.developer_key.account_id,
-        lti_version: '1.3'
-      }
-    end
-
     def external_tool_definition(external_tool)
-      {
+      result = {
         app_type: 'ContextExternalTool',
         app_id: external_tool.id,
         name: external_tool.name,
@@ -83,8 +67,12 @@ module Lti
         context_id: external_tool.context.id,
         reregistration_url: nil,
         has_update: nil,
-        lti_version: '1.1'
+        lti_version: external_tool.use_1_3? ? '1.3' : '1.1',
+        deployment_id: external_tool.deployment_id,
+        editor_button_settings: external_tool.settings[:editor_button]
       }
+      result[:is_rce_favorite] = external_tool.is_rce_favorite_in_context?(@context) if external_tool.can_be_rce_favorite?
+      result
     end
 
     def tool_proxy_definition(tool_proxy)

@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import _ from 'underscore'
-import DashboardCardAction from 'jsx/dashboard_card/DashboardCardAction'
+import DashboardCardAction from '@canvas/dashboard-card/react/DashboardCardAction'
 
 QUnit.module('DashboardCardAction', {
   setup() {
@@ -50,7 +50,11 @@ test('should render fallback icon for unrecognized iconClass', function() {
   this.component = TestUtils.renderIntoDocument(<DashboardCardAction {...this.props} />)
   const $html = $(ReactDOM.findDOMNode(this.component))
   equal($html.prop('tagName'), 'A', 'parent tag should be link')
-  equal($html.find('i').attr('class'), this.props.iconClass, 'i tag should have given prop as class')
+  equal(
+    $html.find('i').attr('class'),
+    this.props.iconClass,
+    'i tag should have given prop as class'
+  )
   equal($html.find('span.screenreader-only').length, 0, 'should not have screenreader span')
 })
 

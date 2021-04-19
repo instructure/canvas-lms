@@ -18,16 +18,12 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import LoadingIndicator from 'jsx/files/LoadingIndicator'
+import LoadingIndicator from 'ui/features/files/react/components/LoadingIndicator.js'
 
 QUnit.module('LoadingIndicator')
 
 test('display none if no props supplied', () => {
-  equal(
-    shallow(<LoadingIndicator />).prop('style').display,
-    'none',
-    'loading indicator not shown'
-  )
+  equal(shallow(<LoadingIndicator />).prop('style').display, 'none', 'loading indicator not shown')
 })
 
 test('if props supplied for loading', () => {

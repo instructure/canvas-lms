@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -74,7 +76,14 @@ class PseudonymsController < ApplicationController
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
     @ccs = []
     if email.present?
-      @ccs = CommunicationChannel.email.by_path(email).active.to_a
+      shards = Set.new
+      shards << Shard.current
+      associated_shards = CommunicationChannel.associated_shards(email)
+      @domain_root_account.trusted_account_ids.each do |account_id|
+        shard = Shard.shard_for(account_id)
+        shards << shard if associated_shards.include?(shard)
+      end
+      @ccs = CommunicationChannel.email.by_path(email).shard(shards.to_a).active.to_a
       if @domain_root_account
         @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user
@@ -83,13 +92,22 @@ class PseudonymsController < ApplicationController
         end
       end
     end
+
     @ccs = @ccs.flatten.compact.uniq.select do |cc|
       if !cc.user
         false
       else
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
-        @domain_root_account.pseudonyms.active.where(user_id: cc.user_id).exists?
+        found = false
+        Shard.partition_by_shard([@domain_root_account.id] + @domain_root_account.trusted_account_ids) do |account_ids|
+          next unless cc.user.associated_shards.include?(Shard.current)
+          if Pseudonym.active.where(user_id: cc.user_id, account_id: account_ids).exists?
+            found = true
+            break
+          end
+        end
+        found
       end
     end
     respond_to do |format|
@@ -273,11 +291,37 @@ class PseudonymsController < ApplicationController
   #   Integration ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account. The Integration ID is a secondary
   #   identifier useful for more complex SIS integrations.
-
+  #
+  # @argument login[authentication_provider_id] [String]
+  #   The authentication provider this login is associated with. Logins
+  #   associated with a specific provider can only be used with that provider.
+  #   Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+  #   them, or unassociated logins. New providers will only search for logins
+  #   explicitly associated with them. This can be the integer ID of the
+  #   provider, or the type of the provider (in which case, it will find the
+  #   first matching provider).
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/:account_id/logins/:login_id \
+  #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
+  #     -X PUT
+  #
+  # @example_response
+  #   {
+  #     "id": 1,
+  #     "user_id": 2,
+  #     "account_id": 3,
+  #     "unique_id": "bieber@example.com",
+  #     "created_at": "2020-01-29T19:33:35Z",
+  #     "sis_user_id": null,
+  #     "integration_id": null,
+  #     "authentication_provider_id": null
+  #   }
   def update
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
       return unless @user = @pseudonym.user
+      params[:login] ||= {}
       params[:login][:password_confirmation] = params[:login][:password] if params[:login][:password]
       params[:pseudonym]  = params[:login]
     else
@@ -287,6 +331,7 @@ class PseudonymsController < ApplicationController
     end
 
     return unless authorized_action(@pseudonym, @current_user, [:update, :change_password])
+    return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
     if @pseudonym.save_without_session_maintenance
@@ -356,7 +401,13 @@ class PseudonymsController < ApplicationController
 
   def update_pseudonym_from_params
     # you have to at least attempt something recognized...
-    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id, :authentication_provider, :integration_id).blank?
+    if params[:pseudonym].slice(
+      :unique_id,
+      :password,
+      :sis_user_id,
+      :authentication_provider_id,
+      :integration_id
+    ).blank?
       render json: nil, status: :bad_request
       return false
     end

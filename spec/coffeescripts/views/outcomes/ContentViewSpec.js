@@ -17,11 +17,12 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import ContentView from 'compiled/views/outcomes/ContentView'
+import Backbone from '@canvas/backbone'
+import ContentView from '@canvas/outcome-content-view'
 import fakeENV from 'helpers/fakeENV'
-import instructionsTemplate from 'jst/outcomes/mainInstructions'
+import instructionsTemplate from 'ui/features/learning_outcomes/jst/mainInstructions.handlebars'
 import assertions from 'helpers/assertions'
+import {publish} from 'jquery-tinypubsub'
 
 QUnit.module('CollectionView', {
   setup() {
@@ -49,7 +50,7 @@ test('should be accessible', function(assert) {
 
 test('collectionView replaces text with warning and link on renderNoOutcomeWarning event', function() {
   ok(this.contentView.$el.text().match(/original_text/))
-  $.publish('renderNoOutcomeWarning')
+  publish('renderNoOutcomeWarning')
   ok(this.contentView.$el.text().match(/You have no outcomes/))
   ok(!this.contentView.$el.text().match(/original_text/))
   ok(

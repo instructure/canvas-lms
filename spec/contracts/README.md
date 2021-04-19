@@ -35,7 +35,6 @@ files:
 cd path/to/quiz_lti # clone the repo first if necessary
 dinghy up # if not already running
 bin/dev-setup
-bin/contracts-generate
 ```
 
 All specs should pass and Quiz LTI should generate the Pact files. The script
@@ -71,24 +70,17 @@ LMS Live Events". Click on the document icon to view the contract, if you like.
 
 ### Verify the Contracts
 
-Because we're only verifying the Quiz LTI contracts, you'll first want to open
-`canvas-lms/spec/contracts/service_consumers/pact_config.rb` and comment out all
-constants in the `Consumers` module with the exception of `QUIZ_LTI` and `ALL`.
-For example:
+Because we're only verifying the Quiz LTI contracts, you'll first want to run only
 
-```ruby
-module Consumers
-  # GENERIC_CONSUMER = 'Generic Consumer'.freeze
-  QUIZ_LTI = 'Quiz LTI'.freeze
-  ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
-end
+```sh
+bin/contracts-verify-live-events quiz_lti
 ```
 
 This avoids attempting to verify contracts for consumers whose Pact files we
 didn't generate (otherwise you'd get errors). Now you're ready to verify the
 Quiz LTI contracts.
 
-To verify the contracts, start Canvas on your computer---either in docker or
+To verify the all contracts, start Canvas on your computer---either in docker or
 natively---and then run:
 
 ```sh
@@ -110,3 +102,8 @@ You're also welcome to stop by the #test_advisory_board Slack channel!
 [Pact]: https://docs.pact.io/
 [https://inst-pact-broker.inseng.net]: https://inst-pact-broker.inseng.net
 [Test Advisory Board github repo]: https://github.com/instructure/test_advisory_board
+
+## Troubleshooting
+
+When adding contracts from a new repo (either as a producer or consumer), ensure that
+your versions of the pact-messages and pact gems are the same as they are in this repo

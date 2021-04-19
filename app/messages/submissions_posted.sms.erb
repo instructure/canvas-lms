@@ -1,0 +1,24 @@
+<% body_text = "" %>
+
+<%
+  if @data.graded_only
+    if @data.section_names.present?
+      body_text = t("Grade changes and comments have been released for everyone graded in sections: %{section_names}.", section_names: @data.section_names.to_sentence)
+    else
+      body_text = t("Grade changes and comments have been released for everyone graded.")
+    end
+  else
+    if @data.section_names.present?
+      body_text = t("Grade changes and comments have been released for everyone in sections: %{section_names}.", section_names: @data.section_names.to_sentence)
+    else
+      body_text = t("Grade changes and comments have been released for everyone.")
+    end
+  end
+%>
+
+<%= t <<-BODY, body_text: body_text, url: polymorphic_url([asset.context, asset])
+%{body_text}
+
+More info at %{url}
+BODY
+%>

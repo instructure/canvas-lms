@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import {createStore} from 'jsx/add_people/store'
-import {actions, actionTypes} from 'jsx/add_people/actions'
+import axios from '@canvas/axios'
+import {createStore} from '@canvas/add-people/react/store'
+import {actions, actionTypes} from '@canvas/add-people/react/actions'
 import INITIAL_STATE from './initialState'
 
 let sandbox = null
@@ -28,7 +28,7 @@ const restoreAxios = () => {
 }
 const mockAxios = adapter => {
   restoreAxios()
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   sandbox.stub(axios, 'post').callsFake(adapter)
 }
 const mockAxiosSuccess = (data = {}) => {

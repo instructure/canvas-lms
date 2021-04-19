@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -22,19 +24,12 @@ describe "add_people" do
   include_context "in-process server selenium tests"
   let(:enrollee_count){0}
 
-  before(:each) do
-    # in the people table, the kyle menu can be off the screen
-    # and uninteractable if the window is too small
-    make_full_screen
-  end
-
   context "as a teacher" do
     before(:each) do
       course_with_teacher_logged_in
-      4.times.with_index { |i| add_section("Section #{i}") }
+      4.times { |i| add_section("Section #{i}") }
       user_with_pseudonym(:name => "Foo Foo", :active_user => true, :username => "foo", :account => @account)
       user_with_pseudonym(:name => "Foo Bar", :active_user => true, :username => "bar", :account => @account)
-
     end
 
     # this is one giant test because it has to walk through the panels of a
@@ -116,13 +111,24 @@ describe "add_people" do
         expect(msg).to be_displayed
     end
 
-    it "should include only manageable roles" do
-      @course.account.role_overrides.create! :role => Role.get_built_in_role('TeacherEnrollment'),
+    it "should include only manageable roles (non-granular)" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_users)
+      @course.account.role_overrides.create! :role => teacher_role,
                                              :permission => :manage_students,
                                              :enabled => false
       get "/courses/#{@course.id}/users"
       f('#addUsers').click
-      expect(ff('#peoplesearch_select_role option').map(&:text)).not_to include 'Student'
+      expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
+    end
+
+    it "should include only manageable roles (granular)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      @course.account.role_overrides.create! :role => teacher_role,
+                                             :permission => :add_student_to_course,
+                                             :enabled => false
+      get "/courses/#{@course.id}/users"
+      f('#addUsers').click
+      expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
     end
 
     # CNVS-34781
@@ -150,6 +156,28 @@ describe "add_people" do
       f('label[for="limit_privileges_to_course_section"]').click
       expect(f('#limit_privileges_to_course_section')).to be_selected
 
+    end
+
+    # tests that INSTUI fixed a bug in Select that would close the Modal
+    # when the user uses 'esc' to close the options dropdown
+    it "should not close the modal on 'escape'ing from role Select options" do
+      get "/courses/#{@course.id}/users"
+
+      # open the add people modal dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
+
+      # expand the roles
+      roleselect = f('#peoplesearch_select_role')
+      roleselect.click
+      option_list_id = roleselect.attribute('aria-controls')
+      expect(f('body')).to contain_css("##{option_list_id}")
+
+      optionList = f("##{option_list_id}")
+      roleselect.send_keys(:escape)
+      expect(f('body')).not_to contain_css("##{option_list_id}")
+
+      expect(f(".addpeople")).to be_displayed # still
     end
 
   end

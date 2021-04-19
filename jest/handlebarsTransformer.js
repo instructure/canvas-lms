@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {transform} = require('babel-core')
+const {transformSync} = require('@babel/core')
 const {compile} = require('../frontend_build/i18nLinerHandlebars')
 
 exports.process = (source, path) => {
   const amd = compile(source, path)
-  const cjs = transform(amd, {plugins: ['transform-amd-to-commonjs']}).code
+  const cjs = transformSync(amd).code
   return cjs
 }

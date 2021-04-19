@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -54,6 +56,13 @@ describe Notification do
 
   it "should always have some subject" do
     expect(Notification.create!(:name => 'Testing').subject).not_to be_nil
+  end
+
+  describe "#related_user_setting" do
+    it "doesnt exist for nil user" do
+      notification = notification_model({subject: "<%= t :subject, 'This is 6!' %>", name: "Test Name", category: 'Grading'})
+      expect(notification.related_user_setting(nil, Account.default)).to be_nil
+    end
   end
 end
 

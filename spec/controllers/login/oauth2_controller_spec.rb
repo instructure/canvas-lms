@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -23,13 +25,6 @@ describe Login::Oauth2Controller do
   before do
     aac
     allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
-
-    # replace on just this instance. this allows the tests to look directly at
-    # response.location independent of any implementation plugins may add for
-    # this method.
-    def @controller.delegated_auth_redirect_uri(uri)
-      uri
-    end
   end
 
   describe "#new" do
@@ -38,13 +33,6 @@ describe Login::Oauth2Controller do
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://www.facebook.com/dialog/oauth\?})
       expect(session[:oauth2_nonce]).to_not be_blank
-    end
-
-    it "wraps redirect in delegated_auth_redirect_uri" do
-      # needs the `returns` or it returns nil and causes a 500
-      expect(@controller).to receive(:delegated_auth_redirect_uri).once.and_return('/')
-      get :new, params: {auth_type: 'facebook'}
-      expect(response).to be_redirect
     end
   end
 
@@ -144,6 +132,18 @@ describe Login::Oauth2Controller do
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       p = Account.default.pseudonyms.active.by_unique_id('user').first!
       expect(p.authentication_provider).to eq aac
+    end
+
+    it "redirects to login any time an expired token is noticed" do
+      session[:oauth2_nonce] = 'bob'
+      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::Security::TokenExpired)
+      user_with_pseudonym(username: 'user', active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+      get :create, params: {state: jwt}
+      expect(response).to redirect_to(login_url)
     end
   end
 end

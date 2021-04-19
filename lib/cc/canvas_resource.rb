@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -175,6 +177,10 @@ JOKE
           end
         end
         c.root_account_uuid(@course.root_account.uuid) if @course.root_account
+
+        if @course.default_post_policy.present?
+          c.default_post_policy { |policy| policy.post_manually(@course.default_post_policy.post_manually?) }
+        end
       end
       course_file.close if course_file
       rel_path

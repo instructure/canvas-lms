@@ -1,0 +1,253 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React from 'react'
+import I18n from 'i18n!dashboard'
+import axios from '@canvas/axios'
+import classnames from 'classnames'
+import {bool, func, string, object, oneOf} from 'prop-types'
+import {
+  initializePlanner,
+  loadPlannerDashboard,
+  renderToDoSidebar,
+  responsiviser
+} from '@instructure/canvas-planner'
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import apiUserContent from '@canvas/util/jquery/apiUserContent'
+import DashboardOptionsMenu from './DashboardOptionsMenu'
+import loadCardDashboard from '@canvas/dashboard-card'
+import $ from 'jquery'
+import {asText, getPrefetchedXHR} from '@instructure/js-utils'
+import '@canvas/jquery/jquery.disableWhileLoading'
+
+const [show, hide] = ['block', 'none'].map(displayVal => id => {
+  const el = document.getElementById(id)
+  if (el) el.style.display = displayVal
+})
+/**
+ * This component renders the header and the to do sidebar for the user
+ * dashboard and loads the current dashboard.
+ */
+class DashboardHeader extends React.Component {
+  static propTypes = {
+    dashboard_view: string,
+    planner_enabled: bool.isRequired,
+    screenReaderFlashMessage: func,
+    env: object,
+    showTodoList: func,
+    responsiveSize: oneOf(['small', 'medium', 'large'])
+  }
+
+  static defaultProps = {
+    dashboard_view: 'cards',
+    screenReaderFlashMessage: () => {},
+    env: {},
+    showTodoList,
+    responsiveSize: 'large'
+  }
+
+  constructor(...args) {
+    super(...args)
+    if (ENV.STUDENT_PLANNER_ENABLED) {
+      initializePlanner({
+        changeDashboardView: this.changeDashboard,
+        getActiveApp: this.getActiveApp,
+        flashError: message => showFlashAlert({message, type: 'error'}),
+        flashMessage: message => showFlashAlert({message, type: 'info'}),
+        srFlashMessage: this.props.screenReaderFlashMessage,
+        convertApiUserContent: apiUserContent.convert,
+        dateTimeFormatters: {
+          dateString: $.dateString,
+          timeString: $.timeString,
+          datetimeString: $.datetimeString
+        },
+        externalFallbackFocusable: this.menuButtonFocusable,
+        env: this.props.env
+      })
+    }
+  }
+
+  state = {
+    currentDashboard: ['cards', 'activity', this.props.planner_enabled && 'planner']
+      .filter(Boolean)
+      .includes(this.props.dashboard_view)
+      ? this.props.dashboard_view
+      : 'cards',
+    loadedViews: []
+  }
+
+  componentDidMount() {
+    this.showDashboard(this.state.currentDashboard)
+  }
+
+  getActiveApp = () => this.state.currentDashboard
+
+  resetClasses(newDashboard) {
+    if (newDashboard === 'planner') {
+      document.body.classList.add('dashboard-is-planner')
+    } else {
+      document.body.classList.remove('dashboard-is-planner')
+    }
+  }
+
+  loadPlannerComponent() {
+    loadPlannerDashboard()
+  }
+
+  loadCardDashboard() {
+    // I put this in so I can spy on the imported function in a spec :'(
+    loadCardDashboard()
+  }
+
+  loadStreamItemDashboard() {
+    // populates the stream items via ajax when the toggle is switched
+    const $dashboardActivity = $('#dashboard-activity')
+    if ($dashboardActivity.text().trim()) return // don't do anything if it is already populated
+
+    const promiseToGetCode = import('../backbone/views/DashboardView')
+    const promiseToGetHtml = axios.get('/dashboard/stream_items')
+    $dashboardActivity.show().disableWhileLoading(
+      Promise.all([promiseToGetCode, promiseToGetHtml])
+        .then(([{default: DashboardView}, axiosResponse]) => {
+          // xsslint safeString.property data
+          $dashboardActivity.html(axiosResponse.data)
+          new DashboardView()
+        })
+        .catch(showFlashError(I18n.t('Failed to load recent activity')))
+    )
+  }
+
+  loadDashboard(newView) {
+    if (this.state.loadedViews.includes(newView)) return
+
+    if (newView === 'planner' && this.props.planner_enabled) {
+      this.loadPlannerComponent()
+    } else if (newView === 'cards') {
+      this.loadCardDashboard()
+    } else if (newView === 'activity') {
+      this.loadStreamItemDashboard()
+    }
+
+    // also load the sidebar if we need to (no sidebar is shown in planner dashboard)
+    if (newView !== 'planner' && !this.sidebarHasLoaded) {
+      this.props.showTodoList()
+      this.sidebarHasLoaded = true
+    }
+
+    this.setState((state, _props) => {
+      return {loadedViews: state.loadedViews.concat(newView)}
+    })
+  }
+
+  saveDashboardView(newView) {
+    axios
+      .put('/dashboard/view', {
+        dashboard_view: newView
+      })
+      .catch(() => {
+        showFlashError(I18n.t('Failed to save dashboard selection'))()
+      })
+  }
+
+  changeDashboard = newView => {
+    this.saveDashboardView(newView)
+    this.switchDashboard(newView)
+  }
+
+  switchDashboard = newView => {
+    this.showDashboard(newView)
+    this.setState({currentDashboard: newView})
+  }
+
+  showDashboard = newView => {
+    this.resetClasses(newView)
+    const elements = {
+      planner: ['dashboard-planner', 'dashboard-planner-header', 'dashboard-planner-header-aux'],
+      activity: ['dashboard-activity', 'right-side-wrapper'],
+      cards: ['DashboardCard_Container', 'right-side-wrapper']
+    }
+    this.loadDashboard(newView)
+
+    // hide the elements not part of this view
+    Object.keys(elements)
+      .filter(k => k !== newView)
+      .forEach(k => elements[k].forEach(hide))
+
+    // show the ones that are
+    elements[newView].forEach(show)
+  }
+
+  render() {
+    return (
+      <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
+        <h1 className="ic-Dashboard-header__title">
+          <span className="hidden-phone">{I18n.t('Dashboard')}</span>
+        </h1>
+        <div className="ic-Dashboard-header__actions">
+          {this.props.planner_enabled && (
+            <div
+              id="dashboard-planner-header"
+              className="CanvasPlanner__HeaderContainer"
+              style={{display: this.state.currentDashboard === 'planner' ? 'block' : 'none'}}
+            />
+          )}
+          <div id="DashboardOptionsMenu_Container">
+            <DashboardOptionsMenu
+              view={this.state.currentDashboard}
+              planner_enabled={this.props.planner_enabled}
+              onDashboardChange={this.changeDashboard}
+              menuButtonRef={ref => {
+                this.menuButtonFocusable = ref
+              }}
+            />
+          </div>
+          {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
+        </div>
+      </div>
+    )
+  }
+}
+
+export {DashboardHeader}
+export default responsiviser()(DashboardHeader)
+
+// extract this out to a property so tests can override it and not have to mock
+// out the timers in every single test.
+function showTodoList() {
+  if (ENV.DASHBOARD_SIDEBAR_URL) {
+    const rightSide = $('#right-side')
+    const promiseToGetNewCourseForm = import('../jquery/util/newCourseForm')
+    const promiseToGetHtml =
+      asText(getPrefetchedXHR(ENV.DASHBOARD_SIDEBAR_URL)) || $.get(ENV.DASHBOARD_SIDEBAR_URL)
+
+    rightSide.disableWhileLoading(
+      Promise.all([promiseToGetNewCourseForm, promiseToGetHtml]).then(
+        ([{default: newCourseForm}, html]) => {
+          // inject the erb html we got from the server
+          rightSide.html(html)
+          newCourseForm()
+
+          // the injected html has a .Sidebar__TodoListContainer element in it,
+          // render the canvas-planner ToDo list into it
+          const container = document.querySelector('.Sidebar__TodoListContainer')
+          if (container) renderToDoSidebar(container)
+        }
+      )
+    )
+  }
+}

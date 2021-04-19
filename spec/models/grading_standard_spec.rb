@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -46,9 +48,9 @@ describe GradingStandard do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:context_type) }
-    it { is_expected.to validate_presence_of(:context_id) }
+    it { is_expected.to belong_to(:context).required }
     it { is_expected.to validate_presence_of(:data) }
+    it { is_expected.to serialize(:data) }
 
     describe 'grading standard data' do
       let(:standard) { GradingStandard.new(context: @course) }
@@ -75,6 +77,22 @@ describe GradingStandard do
         expect(standard).to be_valid
       end
     end
+  end
+
+  it "strips trailing whitespaces from scheme names" do
+    bad_data = GradingStandard.default_grading_standard
+    bad_data[0][0] = "   A "
+    standard = @course.grading_standards.create!(data: bad_data)
+    expect(standard.data[0][0]).to eq "A"
+  end
+
+  it "does not strip trailing whitespaces from scheme name if saving only unrelated changes" do
+    standard = @course.grading_standards.create!(data: GradingStandard.default_grading_standard)
+    bad_data = standard.data
+    bad_data[0][0] = "   A "
+    standard.update_column(:data, bad_data)
+    standard.update!(title: "updated")
+    expect(standard.data[0][0]).to eq "   A "
   end
 
   it "should upgrade the standard scheme from v1 to v2" do
@@ -213,6 +231,13 @@ describe GradingStandard do
       score = @gs.grade_to_score('Z')
       expect(score).to eql(nil)
     end
+
+    it "should not return more than 3 decimal digits" do
+      score = @gs.grade_to_score('A-')
+      decimal_part = score.to_s.split('.')[1]
+      expect(decimal_part.length).to be <= 3
+    end
+
   end
 
   context "place in scheme" do
@@ -314,7 +339,7 @@ describe GradingStandard do
         @root_account = Account.default
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @root_account)
-        @enrollment.update_attributes(workflow_state: "active")
+        @enrollment.update(workflow_state: "active")
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)
         @course_standard = grading_standard_for(@course)
@@ -378,7 +403,7 @@ describe GradingStandard do
         @root_account = Account.default
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @sub_account)
-        @enrollment.update_attributes(workflow_state: "active")
+        @enrollment.update(workflow_state: "active")
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)
         @course_standard = grading_standard_for(@course)
@@ -434,6 +459,34 @@ describe GradingStandard do
         it "should be able to manage course level grading standards" do
           expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
         end
+      end
+    end
+  end
+
+  describe "root account ID" do
+    let_once(:root_account) { Account.create! }
+    let_once(:subaccount) { Account.create(root_account: root_account) }
+    let_once(:course) { Course.create!(account: subaccount) }
+
+    let_once(:data) { [["A", 94], ["F", 0]] }
+
+    context "when this grading standard is associated with a course" do
+      it "is set to the course's root account ID" do
+        grading_standard = course.grading_standards.create!(workflow_state: "active", data: data)
+        expect(grading_standard.root_account_id).to eq root_account.id
+      end
+    end
+
+    context "when this grading standard is associated with an account" do
+      it "is set to the account's ID if the account is a root account" do
+        grading_standard = subaccount.grading_standards.create!(workflow_state: "active", data: data)
+        expect(grading_standard.root_account_id).to eq root_account.id
+
+      end
+
+      it "is set to the account's root account ID if the account is not a root account" do
+        grading_standard = root_account.grading_standards.create!(workflow_state: "active", data: data)
+        expect(grading_standard.root_account_id).to eq root_account.id
       end
     end
   end

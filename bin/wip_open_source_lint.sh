@@ -77,18 +77,6 @@ function run_brakeman {
   bundle exec ruby script/brakeman
 }
 
-function graphQL_schema_check {
-  bundle exec rails graphql:schema
-  # if the generated file is different from the checked in file, fail
-  if ! git diff --exit-code schema.graphql; then
-    echo "Error: GraphQL Schema changes are not checked in"
-    echo "run 'bundle exec rails graphql:schema' to generate graphql.schema file"
-    return 1
-  else
-    echo "GraphQL schema changes passed"
-  fi
-}
-
 function build_tasklist {
   echo "Building tasklist..."
 

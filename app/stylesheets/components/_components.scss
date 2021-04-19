@@ -47,6 +47,10 @@
     border-top: 0 !important; // oldskool important
   }
 
+  & > nav.theme-preview {
+    padding: 3px;
+  }
+
   & > ul,
   // oldskool overrides
   & > nav > ul {
@@ -59,9 +63,8 @@
       & > a {
         display: block;
         text-decoration: none;
-        color: $ic-font-color-dark;
         border-radius: $baseBorderRadius;
-        padding: ($ic-sp - 4) $ic-sp;
+        padding: ($ic-sp - 4) 0 ($ic-sp - 4) ($ic-sp / 2);
         overflow-wrap: break-word;
         word-wrap: break-word;
         hyphens: auto;
@@ -71,8 +74,16 @@
           text-decoration: underline;
         }
 
-        &:hover, &:focus {
-          background: lighten($ic-color-neutral, 5%);
+        &:hover {
+          text-decoration: underline;
+          @if $use_high_contrast {
+            text-decoration: none;
+          }
+        }
+        &:focus {
+          @include ic-focus-variant($offset: 0.0625rem);
+          outline-width: 2px;
+          outline-style: solid;
         }
 
         & > span {
@@ -92,20 +103,19 @@
   }
 
   a.active {
-    background-color: var(--ic-brand-primary);
+    border-#{direction(left)}: 2px solid $ic-color-dark;
+    border-radius: 0px;
     font-weight: bold;
-    color: $ic-color-light;
+    color: $ic-color-dark;
+    padding-#{direction(left)}: ($ic-sp / 2 - 2);
 
-    // offset focus ring so it doesn't blend in with background
-    &:focus { @include ic-focus-variant($offset: 0.0625rem); }
-
-    &:hover, &:focus { background-color: var(--ic-brand-primary); }
     .nav-badge {
       background: $ic-color-light;
       color: var(--ic-brand-primary);
     }
   }
 }
+
 .image-block {
   display: flex;
   min-width: 1px;

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -152,6 +154,7 @@ class ContextModulesApiController < ApplicationController
   # @returns [Module]
   def index
     if authorized_action(@context, @current_user, :read)
+      log_api_asset_access([ "modules", @context ], "modules", "other")
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@student || @current_user)
 
@@ -424,7 +427,7 @@ class ContextModulesApiController < ApplicationController
       end
       relock_warning = @module.relock_warning?
 
-      if @module.update_attributes(module_parameters) && set_position
+      if @module.update(module_parameters) && set_position
         json = module_json(@module, @current_user, session, nil)
         json['relock_warning'] = true if relock_warning || @module.relock_warning?
         json['publish_warning'] = publish_warning.present?

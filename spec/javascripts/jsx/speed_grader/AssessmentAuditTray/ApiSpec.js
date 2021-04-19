@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Api from 'jsx/speed_grader/AssessmentAuditTray/Api'
-import FakeServer, {pathFromRequest} from 'jsx/__tests__/FakeServer'
+import Api from 'ui/features/speed_grader/react/AssessmentAuditTray/Api.js'
+import FakeServer, {pathFromRequest} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('AssessmentAuditTray Api', suiteHooks => {
   let api
@@ -64,7 +64,7 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
       quizzes = [{id: '1101', name: 'Accessibility', role: 'grader'}]
     })
 
-    async function loadAssessmentAuditTrail() {
+    function loadAssessmentAuditTrail() {
       return api.loadAssessmentAuditTrail('1201', '2301', '2501')
     }
 
@@ -92,16 +92,17 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
       let tool
       let quiz
 
-      contextHooks.beforeEach(async () => {
+      contextHooks.beforeEach(() => {
         server
           .for(url)
           .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
 
-        const returnData = await loadAssessmentAuditTrail()
-        event = returnData.auditEvents[0]
-        user = returnData.users[0]
-        tool = returnData.externalTools[0]
-        quiz = returnData.quizzes[0]
+        return loadAssessmentAuditTrail().then(returnData => {
+          event = returnData.auditEvents[0]
+          user = returnData.users[0]
+          tool = returnData.externalTools[0]
+          quiz = returnData.quizzes[0]
+        })
       })
 
       QUnit.module('returned event data', () => {

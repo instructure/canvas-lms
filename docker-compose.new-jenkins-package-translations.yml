@@ -1,0 +1,22 @@
+# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
+version: "2.1"
+services:
+  translations:
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - TRANSIFEX_USERNAME
+      - TRANSIFEX_PASSWORD
+      - SSH_USERNAME
+    build:
+      dockerfile: ./Dockerfile.package-translations
+      context: .
+      args:
+        NPM_PRIVATE_SCOPE: "inst"
+        NPM_PRIVATE_REGISTRY: "//instructure.jfrog.io/instructure/api/npm/internal-npm/"
+        NPM_PRIVATE_USERNAME: $NPM_PRIVATE_USERNAME
+        NPM_PRIVATE_PASSWORD: $NPM_PRIVATE_PASSWORD
+        NPM_PRIVATE_EMAIL: $NPM_PRIVATE_EMAIL
+    volumes:
+      - ".git:/usr/src/app/.git"
+      - "$SSH_KEY_FILE:/usr/src/sshkeyfile"

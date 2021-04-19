@@ -20,7 +20,7 @@
   add_crumb @quiz.title, context_url(@context, :context_quiz_url, @quiz)
   add_crumb t(:page_title, 'Moderate Quiz')
 %>
-<% content_for :page_title do %><%= t(:moderate_page_title, "%{title}: Moderate", :title => @quiz.title) %><% end %>
+<% provide :page_title do %><%= t(:moderate_page_title, "%{title}: Moderate", :title => @quiz.title) %><% end %>
 <div class="alert" id="outstanding_quiz_submissions_found" style="display: none">
   <%= t(:outstanding_quiz_submissions_found, "There are outstanding quiz submissions.") %>
   <a href="#" role="button" class="icon-not-graded outstanding_link" id="check_outstanding">
@@ -107,7 +107,7 @@
           <% end %>
         </td>
         <td class="score_holder">
-          <span class="score"><%= submission && submission.kept_score %></span>
+          <span class="score"><%= submission && render_score(submission.kept_score) %></span>
         </td>
         <td class="unlocked_col">
           <span class="unlocked" title="<%= manually_unlocked_title %>" style="<%= hidden unless submission && submission.manually_unlocked %>"><i class="icon-unlock standalone-icon" alt="<%= manually_unlocked_title %>"><span class="screenreader-only"><%= manually_unlocked_title %></span></i></span>
@@ -193,6 +193,11 @@
         <span class="input">
           <input id="extension_extra_time" type="text" name="extra_time" title="<%= t('titles.extra_quiz_minutes', "additional minutes on each attempt") %>"/>
           <span class="units"><%= t('minutes', 'minutes') %></span>
+        </span>
+      </div>
+      <div class="field cutoff_warning">
+        <span class="cutoff_warning">
+          <p class="note"><%= t('Quiz attempts whose availability dates have passed will still auto-submit even if the extended time has not expired.')%></p>
         </span>
       </div>
     <% end %>

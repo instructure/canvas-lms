@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -30,6 +32,7 @@ describe EportfoliosController do
 
   before :once do
     user_factory(active_all: true)
+    @user.account_users.create!(account: Account.default, role: student_role)
   end
 
   describe "GET 'user_index'" do
@@ -97,6 +100,17 @@ describe EportfoliosController do
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio].name).to eql("some portfolio")
     end
+
+    it "should prevent creation for unverified users if account requires it" do
+      Account.default.tap{|a| a.settings[:require_confirmed_email] = true; a.save!}
+
+      user_session(@user)
+      post 'create', params: {:eportfolio => {:name => "some portfolio"}}
+
+      expect(response).to be_redirect
+      expect(response.location).to eq root_url
+      expect(flash[:warning]).to include("Complete registration")
+    end
   end
 
   describe "GET 'show'" do
@@ -135,6 +149,14 @@ describe EportfoliosController do
         get 'show', params: {:id => @portfolio.id}
         expect(response).to be_successful
         expect(assigns[:page]).not_to be_nil
+      end
+
+      describe "js_env" do
+        it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+          @portfolio.eportfolio_categories.create!(name: "Home")
+          get 'show', params: {id: @portfolio.id, view: "preview"}
+          expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
+        end
       end
     end
 
@@ -194,6 +216,61 @@ describe EportfoliosController do
         end
       end
     end
+
+    context "spam eportfolios" do
+      before(:once) do
+        @portfolio.update!(public: true)
+      end
+
+      context "when the user is the author of the eportfolio" do
+        it "renders the eportfolio when it is spam" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@user)
+          get :show, params: { id: @portfolio.id }
+
+          expect(response.status).to eq(200)
+        end
+      end
+
+      context "when the user is a non-admin, non-author of the eportfolio" do
+        before(:once) do
+          @other_user = user_model
+          @other_user.account_users.create!(account: Account.default, role: student_role)
+        end
+
+        it "is unauthorized when the eportfolio is spam" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@other_user)
+          get :show, params: { id: @portfolio.id }
+
+          assert_unauthorized
+        end
+      end
+
+      context "when the user is an admin" do
+        before(:once) do
+          @admin = account_admin_user
+        end
+
+        it "renders the eportfolio when the eportfolio is spam and the admin has :moderate_user_content permissions" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { id: @portfolio.id }
+
+          expect(response.status).to eq(200)
+        end
+
+        it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { id: @portfolio.id }
+
+          assert_unauthorized
+        end
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -209,6 +286,70 @@ describe EportfoliosController do
       expect(response).to be_redirect
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio].name).to eql("new title")
+    end
+
+    context "spam eportfolios" do
+      context "when the user is the author" do
+        it "can not make updates to the eportfolio if it has been flagged as possible spam" do
+          @portfolio.update!(spam_status: "flagged_as_possible_spam")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
+          expect(response.status).to eq(401)
+        end
+
+        it "can not make updates to the eportfolio if it has been marked as spam" do
+          @portfolio.update!(spam_status: "marked_as_spam")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
+          expect(response.status).to eq(401)
+        end
+
+        it "can make updates to the eportfolio if it has been marked as safe" do
+          @portfolio.update!(spam_status: "marked_as_safe")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "new title" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].name).to eq("new title")
+        end
+
+        it "cannot update the spam_status attribute" do
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "new title", spam_status: "marked_as_safe" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].spam_status).to eq(nil)
+        end
+      end
+
+      context "when the user is an admin" do
+        before(:once) do
+          @admin = account_admin_user
+        end
+
+        it "can change the spam_status attribute if granted the moderate_user_content permission" do
+          @portfolio.update!(spam_status: "marked_as_spam")
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          put :update, params: { id: @portfolio.id, eportfolio: { spam_status: "marked_as_safe" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].spam_status).to eq("marked_as_safe")
+        end
+
+        it "cannot change any attrs besides spam_status if granted the moderate_user_content permission" do
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: 'changed name' } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].name).to eq(nil)
+        end
+
+        it "cannot change the spam_status attribute if not granted the moderate_user_content permission" do
+          @portfolio.update!(spam_status: "marked_as_spam")
+          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
+          user_session(@admin)
+          put :update, params: { id: @portfolio.id, eportfolio: { spam_status: "marked_as_safe" } }
+          assert_unauthorized
+        end
+      end
     end
   end
 
@@ -247,6 +388,32 @@ describe EportfoliosController do
       expect(c2.position).to eql(2)
       expect(c3.position).to eql(3)
       post 'reorder_categories', params: {:eportfolio_id => @portfolio.id, :order => "#{c2.id},#{c3.id},#{c1.id}"}
+      expect(response).to be_successful
+      c1.reload
+      c2.reload
+      c3.reload
+      expect(c1.position).to eql(3)
+      expect(c2.position).to eql(1)
+      expect(c3.position).to eql(2)
+    end
+  end
+
+  describe "POST 'reorder_categories' cross shard" do
+    specs_require_sharding
+    let!(:user) { user_model }
+
+    it "should reorder categories" do
+      user.associate_with_shard(@shard1)
+      @shard1.activate { @portfolio = Eportfolio.create!(user_id: user) }
+      user_session(user)
+      c1 = eportfolio_category
+      c2 = eportfolio_category
+      c3 = eportfolio_category
+      expect(c1.position).to eql(1)
+      expect(c2.position).to eql(2)
+      expect(c3.position).to eql(3)
+      [c2, c3, c1].map(&:id).join(',')
+      post 'reorder_categories', params: { eportfolio_id: @portfolio.id, order: "#{c2.id},#{c3.id},#{c1.id}" }
       expect(response).to be_successful
       c1.reload
       c2.reload

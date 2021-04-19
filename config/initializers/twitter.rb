@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ class CanvasTwitterConfig
         secret_key: settings[:consumer_secret_dec]
       }.with_indifferent_access
     else
-      ConfigFile.load('twitter')
+      ConfigFile.load('twitter').dup
     end
 
   end

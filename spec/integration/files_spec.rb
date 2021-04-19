@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -90,7 +92,7 @@ describe FilesController do
 
       get location
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
@@ -99,7 +101,7 @@ describe FilesController do
       allow(HostUrl).to receive(:file_host).and_return('test.host')
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
     end
@@ -139,8 +141,8 @@ describe FilesController do
         get return_location
         # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
         expect(response).to be_successful
-        expect(response.content_type).to eq 'text/html'
-        doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+        expect(response.media_type).to eq 'text/html'
+        doc = Nokogiri::HTML5.fragment(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
 
@@ -151,8 +153,8 @@ describe FilesController do
         location = response['Location']
         expect(URI.parse(location).path).to eq "/users/#{@me.id}/files/#{@att.id}"
         get location
-        expect(response.content_type).to eq 'text/html'
-        doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+        expect(response.media_type).to eq 'text/html'
+        doc = Nokogiri::HTML5.fragment(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
 
@@ -191,6 +193,32 @@ describe FilesController do
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
 
+  it "falls back to try to get another verifier if we get an expired one for some reason" do
+    course_with_teacher_logged_in(:active_all => true, :user => @user)
+    host!("test.host")
+    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
+
+    # create an old sf_verifier
+    old_time = 1.hour.ago
+    Timecop.freeze(old_time) do
+      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: {:inline => '1'}
+      expect(response).to be_redirect
+      @files_domain_location = response['Location']
+      uri = URI.parse(@files_domain_location)
+      @qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+    end
+
+    allow_any_instance_of(ApplicationController).to receive(:files_domain?).and_return(true)
+    expect{ Users::AccessVerifier.validate(@qs) }.to raise_exception(Canvas::Security::TokenExpired)
+    get @files_domain_location # try to use the expired verifier anyway because durr
+
+    expect(response).to be_redirect
+    # go back to original url but with an extra param
+    expected_url = "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?inline=1&fallback_ts=#{old_time.to_i}"
+    expect(response['Location']).to eq expected_url
+  end
+
   it "logs user access with safefiles" do
     course_with_teacher_logged_in(:active_all => true, :user => @user)
     host!("test.host")
@@ -227,7 +255,7 @@ describe FilesController do
 
     get location
     expect(response).to be_successful
-    expect(response.content_type).to eq 'image/png'
+    expect(response.media_type).to eq 'image/png'
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
@@ -249,7 +277,7 @@ describe FilesController do
 
     get location
     expect(response).to be_successful
-    expect(response.content_type).to eq 'image/png'
+    expect(response.media_type).to eq 'image/png'
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
@@ -271,8 +299,8 @@ describe FilesController do
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
     expect(response).to be_successful
-    expect(response.content_type).to eq 'text/html'
-    doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+    expect(response.media_type).to eq 'text/html'
+    doc = Nokogiri::HTML5.fragment(response.body)
     location = doc.at_css('iframe#file_content')['src']
 
     # now reset the user session (simulating accessing via a separate domain), grab the document,
@@ -309,7 +337,7 @@ describe FilesController do
 
       get location
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
@@ -328,7 +356,7 @@ describe FilesController do
       allow(HostUrl).to receive(:file_host).and_return('test.host')
       get url
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
     end
@@ -362,7 +390,7 @@ describe FilesController do
 
     get location
     expect(response).to be_successful
-    expect(response.content_type).to eq 'image/png'
+    expect(response.media_type).to eq 'image/png'
     expect(controller.instance_variable_get(:@current_user)).to be_nil
     expect(controller.instance_variable_get(:@context)).to be_nil
   end
@@ -424,5 +452,18 @@ describe FilesController do
 
     get response['Location']
     expect(response).to be_successful
+  end
+
+  it "shouldn't expose arbitary context names" do
+    allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
+
+    some_course = Course.create!
+    some_file = attachment_model(:context => some_course, :content_type => 'text/html',
+      :uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
+    secret_user = User.create!(:name => "secret user name gasp")
+
+    # course and file don't match
+    get "http://files-test.host/users/#{secret_user.id}/files/#{some_file.id}?verifier=#{some_file.uuid}"
+    expect(response.body).to_not include(secret_user.name)
   end
 end

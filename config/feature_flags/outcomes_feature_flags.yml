@@ -1,0 +1,51 @@
+---
+outcome_alignment_non_scoring_content:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcome alignment to non-scoring content
+  description: |-
+    Allows aligning outcomes to non-scoring content
+  environments:
+    production:
+      state: disabled
+selectable_outcomes_in_course_copy:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Selectable outcomes during course content migration"
+  description: "Allows learning outcomes to be selectable when migrating course content"
+limit_section_visibility_in_lmgb:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Restricted view for teachers in LMGB
+  description: Hides certain students and sections in the LMGB if the teacher only
+    has access to a particular section
+outcome_alignments_course_migration:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcomes Service Alignment Migration
+  description: Includes Outcomes Service alignments when exporting and importing
+    course content
+account_level_mastery_scales:
+  state: hidden
+  display_name: Account and Course Level Outcome Mastery Scales
+  description: Allows setting Account & Course Level mastery scales and calculation methods,
+    replacing per-outcome criterion ratings & calculation methods
+  after_state_change_proc: mastery_scales_after_change_hook
+  applies_to: RootAccount
+usage_rights_discussion_topics:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Usage Rights on Discussion Topics
+  description: On courses with usage rights enabled, enforces usage rights
+    selection on discussion topic file attachments
+improved_outcomes_management:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Improved Outcomes Management
+  description: Helps administrators and teachers make more meaningful decisions as they import,
+    organize, and edit outcomes in their account and courses.
+assignment_comment_library:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Comment Library
+  description: Adds comment bank for assignment comments within speedgrader

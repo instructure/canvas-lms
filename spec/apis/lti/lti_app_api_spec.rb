@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 Instructure, Inc.
 #
@@ -127,6 +129,12 @@ module Lti
         expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).not_to be_nil
       end
 
+      it 'cannot get the definition of public stuff at the account level' do
+        json = api_call(:get, "/api/v1/accounts/self/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', account_id: 'self', placements: %w(global_navigation)})
+        expect(response.status).to eq 401
+      end
+
       it 'public can not get definition for tool with members visibility' do
         @course = create_course(active_all: true, account: account)
         resource_tool = new_valid_external_tool(account, true)
@@ -185,7 +193,7 @@ module Lti
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions?per_page=3",
                         {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json',
-                         placements: Lti::ResourcePlacement::DEFAULT_PLACEMENTS, course_id: @course.id.to_s, per_page: '3'})
+                         placements: Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS, course_id: @course.id.to_s, per_page: '3'})
 
         json_next = follow_pagination_link('next', {
           controller: 'lti/lti_apps',
@@ -217,16 +225,31 @@ module Lti
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
       end
 
-      context 'lti 1.1 and 2.0 tools' do
+      context 'lti 1.1 and 2.0, and 1.3 tools' do
+        let(:dev_key) { DeveloperKey.create! account: account }
+        let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
+        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
+        let(:advantage_tool) do
+          t = new_valid_external_tool(account)
+          t.use_1_3 = true
+          t.developer_key = dev_key
+          t.save!
+          t
+        end
+
         before do
           @tp = create_tool_proxy
           @tp.bindings.create(context: account)
           @external_tool = new_valid_external_tool(account)
+          enable_binding
+          tool_config
+          advantage_tool
         end
 
         it 'returns a list of app definitions for a context' do
           expect(subject.select {|j| j['app_type'] == @tp.class.name && j['app_id'] == @tp.id.to_s}).not_to be_nil
           expect(subject.select {|j| j['app_type'] == @external_tool.class.name && j['app_id'] == @external_tool.id.to_s}).not_to be_nil
+          expect(subject.select {|j| j['app_type'] == @advantage_tool.class.name && j['app_id'] == @advantage_tool.id.to_s}).not_to be_nil
         end
 
         context 'with pagination limit request' do
@@ -250,88 +273,32 @@ module Lti
           end
         end
       end
+    end
 
-      context 'lti 1.3 tools' do
-        let(:params) { super().merge v1p3: true }
-        let(:dev_key) { DeveloperKey.create! account: account }
-        let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
-        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
+    describe '#index on root account' do
+      let(:tool) { new_valid_external_tool(account, true) }
+      let(:params) do
+        {
+          controller: 'lti/lti_apps',
+          action: 'index',
+          format: 'json',
+          account_id: account.id
+        }
+      end
+      subject { api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps", params) }
 
-        before { 2.times { |_| new_valid_external_tool(account) } }
+      it "includes is_rce_favorite when applicable" do
+        account_admin_user(account: account)
+        tool.editor_button = {url: "http://example.com", icon_url: "http://example.com"}
+        tool.is_rce_favorite = true
+        tool.save!
+        expect(subject[0]["is_rce_favorite"]).to be true
+      end
 
-        context 'with no 1.3 tools' do
-          it 'makes successful request' do
-            subject
-            expect(response).to have_http_status :ok
-          end
-
-          it { is_expected.to be_empty }
-        end
-
-        context 'with 1.3 tools' do
-          before do
-            enable_binding
-            tool_config
-          end
-
-          it 'makes successful request' do
-            subject
-            expect(response).to have_http_status :ok
-          end
-
-          it { is_expected.to_not be_empty }
-          it { is_expected.to have(1).items }
-
-          it 'is not installed_for_context' do
-            expect(subject.first['installed_for_context']).to be false
-          end
-
-          it 'is not installed_at_context_level' do
-            expect(subject.first['installed_at_context_level']).to eq false
-          end
-
-          context 'when a tool is installed in a course' do
-            let(:tool) { ContextExternalTool.first }
-            let(:course) { course_model(account: tool.account) }
-
-            before do
-              tool.context = course
-              tool.use_1_3 = true
-              tool.developer_key = dev_key
-              tool.save!
-            end
-
-            it 'is installed_at_context_level' do
-              expect(subject.first['installed_at_context_level']).to eq true
-            end
-
-            it 'is installed_for_context' do
-              expect(subject.first['installed_for_context']).to eq true
-            end
-
-            it 'has installed_tool_id' do
-              expect(subject.first['installed_tool_id']).not_to be_blank
-            end
-          end
-
-          context 'with a deleted tool in context chain' do
-            before do
-              tool = ContextExternalTool.first
-              tool.use_1_3 = true
-              tool.developer_key = dev_key
-              tool.save!
-              tool.destroy!
-            end
-
-            it { is_expected.to_not be_empty }
-            it { is_expected.to have(1).items }
-
-
-            it 'is not installed_for_context' do
-              expect(subject.first['installed_for_context']).to eq false
-            end
-          end
-        end
+      it "does not include is_rce_favorite when not applicable" do
+        account_admin_user(account: account)
+        tool
+        expect(subject[0].has_key?("is_rce_favorite")).to be false
       end
     end
   end

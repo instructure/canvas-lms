@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -25,7 +27,6 @@ describe "student planner" do
   include PlannerPageObject
 
   before :once do
-    Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true, user_name: 'PlannerTeacher', course_name: 'Planner Course')
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
@@ -45,7 +46,7 @@ describe "student planner" do
     switch_to_dashcard_view
 
     expect(dashboard_card_container).to contain_css("[aria-label='#{@course.name}']")
-    expect(dashboard_card_header_content).to contain_css("h2[title='#{@course.name}']")
+    expect(dashboard_card_header_content).to contain_css("h3[title='#{@course.name}']")
   end
 
   it "shows and navigates to announcements page from student planner", priority: "1", test_id: 3259302 do
@@ -85,7 +86,7 @@ describe "student planner" do
 
   context "responsive layout" do
     it "changes layout on browser resize" do
-      resize_screen_to_normal
+
       go_to_list_view
 
       expect(f('.large.ic-Dashboard-header__layout')).to be_present
@@ -99,7 +100,7 @@ describe "student planner" do
       driver.manage.window.resize_to(500, dimension.height)
       expect(f('.small.ic-Dashboard-header__layout')).to be_present
       expect(f('.small.PlannerApp')).to be_present
-      resize_screen_to_normal
+
     end
   end
 
@@ -175,8 +176,9 @@ describe "student planner" do
       go_to_list_view
 
       validate_object_displayed(@course.name,'Peer Review')
-      expect(list_view_planner_items.second).to contain_css(peer_review_icon_selector)
-      expect(list_view_planner_items.second).to contain_jqcss(peer_review_reminder_selector)
+      expect(list_view_planner_item("Planner Course Peer Review")).to contain_css(peer_review_icon_selector)
+      expect(list_view_planner_item("Planner Course Peer Review")).to contain_jqcss(peer_review_reminder_selector)
+      expect(list_view_planner_item("Planner Course Assignment")).not_to contain_css(peer_review_icon_selector)
     end
 
     it "navigates to peer review submission when clicked" do
@@ -201,7 +203,7 @@ describe "student planner" do
       user_session(@student1)
     end
 
-    it "opens the sidebar to creata a new To-Do item.", priority: "1", test_id: 3263157 do
+    it "opens the sidebar to create a new To-Do item.", priority: "1", test_id: 3263157 do
       go_to_list_view
       todo_modal_button.click
       expect(todo_save_button).to be_displayed
@@ -445,6 +447,7 @@ describe "student planner" do
     end
 
     it "closes the opportunities dropdown.", priority: "1", test_id: 3281711 do
+      skip("Flaky: skip for now LS-2135 to fix")
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown
@@ -489,22 +492,26 @@ describe "student planner" do
     end
 
     it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
-      wait_for_spinner
       expect(items_displayed.count).to eq 1
       expect(scroll_height).to eq 0
 
       new_activity_button.click
       wait_for_spinner
-      expect(items_displayed.count).to eq 4
-      expect{scroll_height}.to become_between 600, 620  # 609
+      expect(items_displayed.count).to eq 5
 
+      next_item_y = item_top_position(1)
       new_activity_button.click
-      wait_for_animations
-      expect{scroll_height}.to become_between 450, 470  # 457
+      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
+
+      next_item_y = item_top_position(0)
+      new_activity_button.click
+      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
       wait_for_spinner
 
@@ -544,10 +551,26 @@ describe "student planner" do
         f('#student_planner_checkbox').click
         wait_for_ajaximations
         f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
-        fj('button:contains("Save")').click
+        expect_new_page_load{fj('button:contains("Save")').click}
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value('input[name="student_todo_at"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
+    end
+
+    it "allows account admins with content management rights to add todo dates" do
+      @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
+      admin = account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+      user_session(admin)
+
+      expect(@course.grants_right?(admin, :manage)).to eq false # sanity check
+      expect(@course.grants_right?(admin, :manage_content)).to eq true
+
+      get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+      f('#student_planner_checkbox').click
+      wait_for_ajaximations
+      f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+      expect_new_page_load{fj('button:contains("Save")').click}
+      expect(@wiki.reload.todo_date).to be_present
     end
 
     it "shows correct default time in an ungraded discussion" do

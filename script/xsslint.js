@@ -22,7 +22,7 @@ const globby = require('gglobby')
 const fs = require('fs')
 const CoffeeScript = require('coffee-script')
 const glob = require('glob')
-const babylon = require('babylon')
+const babylon = require('@babel/parser')
 
 XSSLint.configure({
   'xssable.receiver.whitelist': ['formData'],
@@ -99,16 +99,16 @@ let warningCount = 0
 
 const allPaths = [
   {
-    paths: ['app/coffeescripts'].concat(glob.sync('gems/plugins/*/app/coffeescripts')),
+    paths: ['ui'].concat(glob.sync('gems/plugins/*/app/coffeescripts')),
     glob: '*.coffee',
     transform: source => CoffeeScript.compile(source, {})
   },
   {
-    paths: ['app/jsx', 'app/coffeescripts'].concat(glob.sync('gems/plugins/*/app/jsx')),
+    paths: ['ui'].concat(glob.sync('gems/plugins/*/app/jsx')),
     glob: '*.js'
   },
   {
-    paths: ['public/javascripts'].concat(glob.sync('gems/plugins/*/public/javascripts')),
+    paths: glob.sync('gems/plugins/*/public/javascripts'),
     defaultIgnores: ['/compiled', '/jst', '/vendor'],
     glob: '*.js'
   }
@@ -137,7 +137,13 @@ allPaths.forEach(({paths, glob, defaultIgnores = ['**/__tests__/**/*.js'], trans
       let source = fs.readFileSync(file).toString()
       if (transform) source = transform(source)
       source = babylon.parse(source, {
-        plugins: ['jsx', 'classProperties', 'objectRestSpread', 'dynamicImport'],
+        plugins: [
+          'jsx',
+          'classProperties',
+          'objectRestSpread',
+          'dynamicImport',
+          'optionalChaining'
+        ],
         sourceType: 'module'
       })
       const warnings = XSSLint.run({source})

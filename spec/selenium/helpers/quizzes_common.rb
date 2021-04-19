@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -393,13 +395,6 @@ module QuizzesCommon
       f('#quiz_access_code').send_keys(access_code)
       wait_for_new_page_load { fj('.btn', '#main').click }
     end or raise "unable to start quiz"
-
-    wait_for_quiz_to_begin
-  end
-
-  # uses sleep() because the display is updated on a timer, not an ajax callback
-  def wait_for_quiz_to_begin
-    sleep 1
   end
 
   def submit_quiz
@@ -414,7 +409,6 @@ module QuizzesCommon
     open_quiz_show_page
 
     expect_new_page_load { f('#preview_quiz_button').click }
-    wait_for_quiz_to_begin
 
     complete_and_submit_quiz(submit)
   end
@@ -458,7 +452,7 @@ module QuizzesCommon
   end
 
   def set_answer_comment(answer_num, text)
-    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .comment_focus').click()")
+    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comments').click()")
     wait_for_ajaximations
     type_in_tiny(".question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comments textarea", text)
   end

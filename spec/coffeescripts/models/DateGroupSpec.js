@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import DateGroup from 'compiled/models/DateGroup'
+import Backbone from '@canvas/backbone'
+import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 
 QUnit.module('DateGroup', {
   setup() {}

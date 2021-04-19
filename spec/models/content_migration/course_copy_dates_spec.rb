@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -373,6 +375,19 @@ describe ContentMigration do
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
         end
+
+        context "implicit start date" do
+          let(:old_date) { DateTime.new(2021, 3, 3) }
+          let(:old_start_date) { nil }
+          let(:old_end_date) { nil }
+          let(:new_start_date) { nil }
+          let(:new_end_date) { '2021-01-01T00:00:00Z' }
+
+          it "doesn't implicitly set course dates based on assignment dates" do
+            expect { copy_assignment }.not_to raise_error
+            expect(@copy_to.start_at).to be_nil
+          end
+        end
       end
     end
 
@@ -532,6 +547,33 @@ describe ContentMigration do
       new_event = @copy_to.calendar_events.where(migration_id: mig_id(all_day_event)).first
       expect(new_event.all_day?).to be_truthy
       expect(new_event.all_day_date).to be_nil
+    end
+
+    it "should trigger cached_due_date changes" do
+      assmt = @copy_from.assignments.create!(title: "an event", :due_at => 1.day.from_now)
+
+      run_course_copy
+
+      assmt_to = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+      student_in_course(:active_all => true, :course => @copy_to)
+      sub_to = assmt_to.reload.submissions.first
+      expect(sub_to.cached_due_date.to_i).to eq assmt.due_at.to_i
+
+      opts = {
+        everything: true,
+        shift_dates: true,
+        old_start_date: 1.week.ago.to_date,
+        old_end_date: 1.week.from_now.to_date,
+        new_start_date: 2.weeks.from_now.to_date,
+        new_end_date: 4.weeks.from_now.to_date
+      }
+      @cm.copy_options = opts
+      @cm.save!
+
+      run_course_copy
+
+      expect(assmt_to.reload.due_at.to_i).to_not eq assmt.due_at.to_i # shifted the date on the assignment
+      expect(sub_to.reload.cached_due_date.to_i).to_not eq assmt.due_at.to_i # shifted the cached date too
     end
   end
 end

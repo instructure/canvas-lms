@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -36,7 +38,7 @@ describe WillPaginateHelper do
 
       it 'when page is current page' do
         link = @renderer.send(:page_number, 2)
-        expect(link).to match('title="Page 2"')
+        expect(link).to match('aria-label="Page 2"')
         expect(link).to match('class="current"')
         expect(link).to_not match('href')
         expect(link).to_not match('rel')
@@ -44,7 +46,7 @@ describe WillPaginateHelper do
 
       it 'when page is not current page' do
         link = @renderer.send(:page_number, 3)
-        expect(link).to match('title="Page 3"')
+        expect(link).to match('aria-label="Page 3"')
         expect(link).to match('href="url://3')
       end
     end
@@ -61,7 +63,7 @@ describe WillPaginateHelper do
           :previous_or_next_page,
           2, 'Previous', 'previous_page'
         )
-        expect(link).to match('title="Previous Page"')
+        expect(link).to match('aria-label="Previous Page"')
         expect(link).to match('class="previous_page"')
         expect(link).to match('rel="prev"')
         expect(link).to match('href="url://2')
@@ -72,7 +74,7 @@ describe WillPaginateHelper do
           :previous_or_next_page,
           4, 'Next', 'next_page'
         )
-        expect(link).to match('title="Next Page"')
+        expect(link).to match('aria-label="Next Page"')
         expect(link).to match('class="next_page"')
         expect(link).to match('rel="next"')
         expect(link).to match('href="url://4')
@@ -83,7 +85,7 @@ describe WillPaginateHelper do
           :previous_or_next_page,
           nil, 'Previous', 'previous_page'
         )
-        expect(link).to match('title="Previous Page"')
+        expect(link).to match('aria-label="Previous Page"')
         expect(link).to match('class="previous_page disabled"')
         expect(link).to_not match('rel')
         expect(link).to_not match('href')
@@ -94,7 +96,7 @@ describe WillPaginateHelper do
           :previous_or_next_page,
           nil, 'Next', 'next_page'
         )
-        expect(link).to match('title="Next Page"')
+        expect(link).to match('aria-label="Next Page"')
         expect(link).to match('class="next_page disabled"')
         expect(link).to_not match('rel')
         expect(link).to_not match('href')

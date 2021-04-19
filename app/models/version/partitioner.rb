@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -23,18 +25,16 @@ class Version::Partitioner
   end
 
   def self.process
-    Shackles.activate(:deploy) do
-      Version.transaction do
-        log '*' * 80
-        log '-' * 80
+    GuardRail.activate(:deploy) do
+      log '*' * 80
+      log '-' * 80
 
-        partman = CanvasPartman::PartitionManager.create(Version)
+      partman = CanvasPartman::PartitionManager.create(Version)
 
-        partman.ensure_partitions(precreate_tables)
+      partman.ensure_partitions(precreate_tables)
 
-        log 'Done. Bye!'
-        log '*' * 80
-      end
+      log 'Done. Bye!'
+      log '*' * 80
       ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
     end
   end

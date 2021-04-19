@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Calendar from 'compiled/calendar/Calendar'
+import Calendar from 'ui/features/calendar/jquery/index.js'
+import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
 import I18n from 'i18n!calendar'
-import fcUtil from 'compiled/util/fcUtil'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import moment from 'moment'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
+import {subscribe} from 'jquery-tinypubsub'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Calendar', {
   setup() {
@@ -31,6 +34,7 @@ QUnit.module('Calendar', {
     tz.changeZone(denver, 'America/Denver')
     fixtures.setup()
     sinon.stub($, 'getJSON')
+    fakeENV.setup()
   },
   teardown() {
     tz.restore(this.snapshot)
@@ -40,6 +44,7 @@ QUnit.module('Calendar', {
     }
     fixtures.teardown()
     $.getJSON.restore()
+    fakeENV.teardown()
   }
 })
 const makeMockDataSource = () => ({
@@ -71,14 +76,14 @@ test('creates a fullcalendar instance', () => {
   ok($('.fc')[0])
 })
 
-test('returns correct format for 24 hour times', function() {
+test('returns correct format for 24 hour times', () => {
   const cal = makeCal()
   const stub = sinon.stub(I18n, 'lookup').returns('%k:%M')
-  strictEqual(cal.eventTimeFormat(), "HH:mm")
+  strictEqual(cal.eventTimeFormat(), 'HH:mm')
   stub.restore()
 })
 
-test('return correct format for non 24 hour times', function() {
+test('return correct format for non 24 hour times', () => {
   const cal = makeCal()
   const stub = sinon.stub(I18n, 'lookup').returns('whatever')
   strictEqual(cal.eventTimeFormat(), null)
@@ -103,7 +108,7 @@ test('animates loading', () => {
 
 test('publishes event when date is changed', () => {
   const eventSpy = sinon.spy()
-  $.subscribe('Calendar/currentDate', eventSpy)
+  subscribe('Calendar/currentDate', eventSpy)
   const cal = makeCal()
   cal.navigateDate(Date.now())
   ok(eventSpy.called)
@@ -179,4 +184,32 @@ test('gets appointment groups when show scheduler activated', () => {
   })
   ok(mockDataSource.getAppointmentGroups.called)
   ok(mockDataSource.getEvents.called)
+})
+
+test('displays group name in tooltip', () => {
+  fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: true}})
+  const cal = makeCal()
+  const $eventDiv = $(
+    '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>'
+  ).appendTo('#fixtures')
+  const now = moment()
+  const data = {
+    start_at: now,
+    end_at: now,
+    child_events: [
+      {
+        group: {
+          name: 'Foobar'
+        }
+      }
+    ],
+    appointment_group_url: '/foo/bar'
+  }
+  const event = new CalendarEvent(data, {calendar_event_url: '/foo/bar'})
+  cal.eventRender(event, $eventDiv, 'month')
+  ok(
+    $($eventDiv)
+      .attr('title')
+      .includes('Reserved By:  Foobar')
+  )
 })

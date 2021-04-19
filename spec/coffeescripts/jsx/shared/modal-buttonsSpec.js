@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import ModalButtons from '@canvas/modal/react/buttons'
 
 QUnit.module('ModalButtons')
 
@@ -39,6 +39,9 @@ test('renders children', () => {
     </ModalButtons>
   )
   const component = TestUtils.renderIntoDocument(mB)
-  ok($(ReactDOM.findDOMNode(component)).find('.cool_div').length === 1, 'renders the child component')
+  ok(
+    $(ReactDOM.findDOMNode(component)).find('.cool_div').length === 1,
+    'renders the child component'
+  )
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

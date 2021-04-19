@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'jsx/account_course_user_search/reducers/rootReducer'
+import reducer from 'ui/features/account_course_user_search/react/reducers/rootReducer.js'
 
 QUnit.module('Account Course User Search Reducer')
 
@@ -106,7 +106,7 @@ test('ADD_TO_USERS action reducer invalid email', () => {
   equal(user.email, null, 'creates an email property if needed')
 })
 
-test('GOT_USERS action reducer', function() {
+test('GOT_USERS action reducer', () => {
   const initialState = {
     userList: {
       users: [],
@@ -147,7 +147,8 @@ test('GOT_USERS action reducer', function() {
         }
       ],
       xhr: {
-        getResponseHeader: sandbox.mock()
+        getResponseHeader: sandbox
+          .mock()
           .withArgs('Link')
           .returns(LinkHeader)
       }

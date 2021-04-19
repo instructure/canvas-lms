@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AuditTrail from 'jsx/speed_grader/AssessmentAuditTray/components/AuditTrail'
-import {buildEvent} from 'jsx/speed_grader/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
-import buildAuditTrail from 'jsx/speed_grader/AssessmentAuditTray/buildAuditTrail'
+import AuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/index.js'
+import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers.js'
+import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail.js'
 
 QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
   let $container

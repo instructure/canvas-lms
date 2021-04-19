@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -34,8 +36,31 @@ module Lti::Ims::Concerns
     end
 
     def messaging_value(type)
-      value = deep_linking_jwt["#{CLAIM_PREFIX}#{type}"]
-      value.presence
+      deep_linking_jwt["#{CLAIM_PREFIX}#{type}"].presence&.to_s
+    end
+
+    def content_items
+      @content_items ||= deep_linking_jwt["#{CLAIM_PREFIX}content_items"]
+    end
+
+    def client_id
+      deep_linking_jwt.developer_key
+    end
+
+    def tool
+      @tool ||= ContextExternalTool.find_active_external_tool_by_client_id(client_id, @context)
+    end
+
+    def lti_resource_links
+      content_items.filter { |item| item[:type] == 'ltiResourceLink' }
+    end
+
+    def create_lti_resource_links
+      lti_resource_links.each do |content_item|
+        resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom])
+
+        content_item[:lookup_uuid] = resource_link&.lookup_uuid
+      end
     end
 
     class DeepLinkingJwt
@@ -52,11 +77,19 @@ module Lti::Ims::Concerns
         verified_jwt[key]
       end
 
+      def developer_key
+        @developer_key ||= DeveloperKey.find_cached(client_id)
+      end
+
       private
 
       def verified_jwt
         @verified_jwt ||= begin
-          jwt_hash = JSON::JWT.decode(@raw_jwt_str, public_key)
+          if developer_key&.public_jwk_url.present?
+            jwt_hash = get_jwk_from_url
+          else
+            jwt_hash = JSON::JWT.decode(@raw_jwt_str, public_key)
+          end
           standard_claim_errors(jwt_hash)
           developer_key_errors
           return if @errors.present?
@@ -74,6 +107,14 @@ module Lti::Ims::Concerns
         end
       end
 
+      def get_jwk_from_url
+        pub_jwk_from_url = HTTParty.get(developer_key&.public_jwk_url)
+        JSON::JWT.decode(@raw_jwt_str, JSON::JWK::Set.new(pub_jwk_from_url.parsed_response))
+      rescue JSON::JWT::Exception => e
+        errors.add(:jwt, e.message)
+        raise JSON::JWS::VerificationFailed
+      end
+
       def standard_claim_errors(jwt_hash)
         hash = jwt_hash.dup
 
@@ -86,7 +127,8 @@ module Lti::Ims::Concerns
         validator = Canvas::Security::JwtValidator.new(
           jwt: hash,
           expected_aud: Canvas::Security.config['lti_iss'],
-          require_iss: true
+          require_iss: true,
+          skip_jti_check: true
         )
         validator.validate
         validator.errors.to_h.each do |k, v|
@@ -100,17 +142,13 @@ module Lti::Ims::Concerns
         errors.add(:developer_key, 'Developer key inactive') unless developer_key.workflow_state == 'active'
       end
 
-      def developer_key
-        @developer_key ||= DeveloperKey.find_cached(client_id)
-      end
-
       def client_id
         @client_id ||= JSON::JWT.decode(@raw_jwt_str, :skip_verification)['iss']
       end
 
       def public_key
         @public_key ||= begin
-          public_jwk = developer_key&.public_jwk
+            public_jwk = developer_key&.public_jwk
           JSON::JWK.new(public_jwk) if public_jwk.present?
         end
       end

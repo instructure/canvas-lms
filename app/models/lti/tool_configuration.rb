@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,8 +24,9 @@ module Lti
 
     belongs_to :developer_key
 
-    before_validation :store_configuration_from_url, only: :create
     before_save :normalize_configuration
+
+    after_update :update_external_tools!, if: :update_external_tools?
 
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
@@ -37,8 +40,8 @@ module Lti
     alias_attribute :configuration, :settings
     alias_attribute :configuration_url, :settings_url
 
-    def new_external_tool(context)
-      tool = ContextExternalTool.new(context: context)
+    def new_external_tool(context, existing_tool: nil)
+      tool = existing_tool || ContextExternalTool.new(context: context)
       Importers::ContextExternalToolImporter.import_from_migration(
         importable_configuration,
         context,
@@ -47,41 +50,81 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.workflow_state = privacy_level || DEFAULT_PRIVACY_LEVEL
+      tool.workflow_state = canvas_extensions['privacy_level'] || DEFAULT_PRIVACY_LEVEL
       tool.use_1_3 = true
       tool
     end
 
-    def self.create_tool_and_key!(account, tool_configuration_params)
+    def self.create_tool_config_and_key!(account, tool_configuration_params)
+      settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
+                  retrieve_and_extract_configuration(tool_configuration_params[:settings_url])
+                 elsif tool_configuration_params[:settings].present?
+                   tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
+                 end
+
+      # try to recover the target_link_url from the tool configuration and use
+      # it into developer_key.redirect_uris
+      redirect_uris = settings[:target_link_uri]
+
+      raise_error(:configuration, "Configuration must be present") if settings.blank?
       self.transaction do
-        dk = DeveloperKey.create!(account: account)
-        if tool_configuration_params[:settings].present?
-          self.create!(
-            developer_key: dk,
-            configuration: tool_configuration_params[:settings]&.merge(
-              'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-            ),
-            disabled_placements: tool_configuration_params[:disabled_placements]
-          )
-        else
-          t = self.create!(
-            developer_key: dk,
-            configuration_url: tool_configuration_params[:settings_url],
-            disabled_placements: tool_configuration_params[:disabled_placements]
-          )
-          t.update! configuration: t.configuration.merge(
+        dk = DeveloperKey.create!(
+          account: (account.site_admin? ? nil : account),
+          is_lti_key: true,
+          public_jwk_url: settings[:public_jwk_url],
+          public_jwk: settings[:public_jwk],
+          redirect_uris: redirect_uris || [],
+          scopes: settings[:scopes] || []
+        )
+        self.create!(
+          developer_key: dk,
+          configuration: settings.deep_merge(
             'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-            )
-          t
-        end
+          ),
+          configuration_url: tool_configuration_params[:settings_url],
+          disabled_placements: tool_configuration_params[:disabled_placements]
+        )
       end
     end
 
     private
 
+    def self.retrieve_and_extract_configuration(url)
+      response = CanvasHttp.get(url)
+
+      raise_error(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
+      raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
+
+      JSON.parse(response.body).with_indifferent_access
+    rescue Timeout::Error
+      raise_error(:configuration_url, 'Could not retrieve settings, the server response timed out.')
+    end
+    private_class_method :retrieve_and_extract_configuration
+
+    def self.raise_error(type, message)
+      tool_config_obj = self.new
+      tool_config_obj.errors.add(type, message)
+      raise ActiveRecord::RecordInvalid, tool_config_obj
+    end
+    private_class_method :raise_error
+
+    def update_external_tools?
+      saved_change_to_settings?
+    end
+
+    def update_external_tools!
+      developer_key.update_external_tools!
+    end
+
     def valid_configuration?
-      errors.add(:configuration, '"public_jwk" must be present') if configuration['public_jwk'].blank?
-      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration)
+      if configuration['public_jwk'].blank? && configuration['public_jwk_url'].blank?
+        errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
+      end
+      if configuration['public_jwk'].present?
+        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration['public_jwk'])
+        errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
+      end
+      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration.compact)
       errors.add(:configuration, schema_errors) if schema_errors.present?
       return if errors[:configuration].present?
 
@@ -107,32 +150,16 @@ module Lti
 
     def canvas_extensions
       return {} if configuration.blank?
-      extension = configuration['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || { 'settings' => {} }
+      extension = configuration['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL }&.deep_dup || { 'settings' => {} }
       # remove any placements at the root level
       extension['settings'].delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
       # ensure we only have enabled placements being added
       extension['settings'].fetch('placements', []).delete_if { |placement| disabled_placements&.include?(placement['placement']) }
-      # readd valid placements to root settings hash
+      # read valid placements to root settings hash
       extension['settings'].fetch('placements', []).each do |p|
         extension['settings'][p['placement']] = p
       end
       extension
-    end
-
-    def store_configuration_from_url
-      return if configuration_url.blank? || configuration.present?
-
-      response = CC::Importer::BLTIConverter.new.fetch(configuration_url)
-
-      errors.add(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
-      return if errors[:configuration_url].present?
-
-      errors.add(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
-      return if errors[:configuration_url].present?
-
-      self.settings = JSON.parse(response.body)
-    rescue Timeout::Error
-      errors.add(:configuration_url, 'Could not retrieve settings, the server response timed out.')
     end
 
     def normalize_configuration

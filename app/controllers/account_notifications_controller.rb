@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -80,7 +82,11 @@ class AccountNotificationsController < ApplicationController
 
   # @API Index of active global notification for the user
   # Returns a list of all global notifications in the account for the current user
-  # Any notifications that have been closed by the user will not be returned
+  # Any notifications that have been closed by the user will not be returned, unless
+  # a include_past parameter is passed in as true.
+  #
+  # @argument include_past [Boolean]
+  #   Include past and dismissed global announcements.
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
@@ -88,12 +94,40 @@ class AccountNotificationsController < ApplicationController
   #
   # @returns [AccountNotification]
   def user_index
-    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    include_past = value_to_boolean(params[:include_past])
+    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: include_past)
     render :json => account_notifications_json(notifications, @current_user, session)
   end
 
   def user_index_deprecated
     user_index
+  end
+
+  def render_past_global_announcements
+    add_crumb(@current_user.short_name, profile_path)
+    add_crumb(t("Global Announcements"))
+    js_env(global_notifications: html_to_string)
+    @show_left_side = true
+    @context = @current_user.profile
+    set_active_tab('past_global_announcements')
+    js_bundle :past_global_announcements
+    render html: '', layout: true
+  end
+
+  def html_to_string
+    # This generates an array of html strings for the global announcements page
+    # to allow for paination on the front end.
+    html_strings = { current: [], past: [] }
+    @for_display = true
+    coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, :include_past => true)
+    [:current, :past].each do |time|
+      coll.select(&time).in_groups_of(5, false) { |a| html_strings[time] << html_string_from_announcements(a) }
+    end
+    html_strings
+  end
+
+  def html_string_from_announcements(announcements)
+    render_to_string(partial: 'shared/account_notification', collection: announcements)
   end
 
   # @API Show a global notification
@@ -258,8 +292,13 @@ class AccountNotificationsController < ApplicationController
   def update
     account_notification = @account.announcements.find(params[:id])
     if account_notification
-      account_notification.attributes = params.require(:account_notification).
-        permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific)
+      notification_params = params.require(:account_notification).
+        permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
+      account_notification.attributes = notification_params
+
+      if value_to_boolean(notification_params[:send_message])
+        account_notification.messages_sent_at = nil # reset if we're explicitly re-sending messages
+      end
 
       existing_roles = account_notification.account_notification_roles.map(&:role)
       requested_roles = roles_to_add(params[:account_notification_roles])
@@ -326,6 +365,6 @@ class AccountNotificationsController < ApplicationController
 
   def account_notification_params
     params.require(:account_notification).
-      permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific)
+      permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
   end
 end

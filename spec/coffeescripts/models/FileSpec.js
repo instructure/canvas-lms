@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import File from 'compiled/models/File'
-import {Model} from 'Backbone'
-import * as uploader from 'jsx/shared/upload_file'
+import File from '@canvas/files/backbone/models/File.coffee'
+import {Model} from '@canvas/backbone'
+import * as uploader from '@canvas/upload-file'
 
 let model = null
 
@@ -31,7 +31,7 @@ QUnit.module('File', {
   }
 })
 
-test('uploads the file, and sets attributes from response', function(assert) {
+test('uploads the file, and sets attributes from response', assert => {
   const done = assert.async()
   const data = {
     id: 123,

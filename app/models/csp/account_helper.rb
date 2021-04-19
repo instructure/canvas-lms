@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -99,7 +101,7 @@ module Csp::AccountHelper
   end
 
   def add_domain!(domain)
-    domain.downcase!
+    domain = domain.downcase
     Csp::Domain.unique_constraint_retry do |retry_count|
       if retry_count > 0 && (record = self.csp_domains.where(:domain => domain).take)
         record.undestroy if record.deleted?
@@ -116,9 +118,10 @@ module Csp::AccountHelper
   end
 
   def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
-    # first, get the whitelist from the enabled csp account
+    # first, get the allowed domain list from the enabled csp account
     # then get the list of domains extracted from external tools
     domains = ::Csp::Domain.get_cached_domains_for_account(self.csp_account_id)
+    domains += Setting.get('csp.global_whitelist', '').split(',').map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
     domains.uniq.sort
@@ -132,11 +135,16 @@ module Csp::AccountHelper
   end
 
   def csp_tools_grouped_by_domain
-    csp_tool_scope.to_a.group_by{|tool| (tool.domain || (Addressable::URI.parse(tool.url).normalize.host rescue nil))&.downcase }.except(nil)
+    csp_tool_scope.each_with_object({}) do |tool, hash|
+      Csp::Domain.domains_for_tool(tool).each do |domain|
+        hash[domain] ||= []
+        hash[domain] << tool
+      end
+    end
   end
 
   def get_account_tool_domains
-    Csp::Domain.domains_for_tools(csp_tool_scope)
+    csp_tools_grouped_by_domain.keys.uniq
   end
 
   def csp_tool_scope
@@ -144,7 +152,8 @@ module Csp::AccountHelper
   end
 
   def clear_tool_domain_cache
-    Account.send_later_if_production(:invalidate_inherited_caches, self, [ACCOUNT_TOOL_CACHE_KEY_PREFIX])
+    Rails.cache.delete([ACCOUNT_TOOL_CACHE_KEY_PREFIX, self.global_id].cache_key)
+    Account.delay_if_production.invalidate_inherited_caches(self, [ACCOUNT_TOOL_CACHE_KEY_PREFIX])
   end
 
   def csp_files_domains(request)
@@ -158,7 +167,9 @@ module Csp::AccountHelper
         "*.#{files_host}"
       end
     end
-    [files_host]
+    canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config['base_url']).host
+    inst_fs_host = InstFS.enabled?.presence && URI.parse(InstFS.app_host).host
+    [files_host, canvadocs_host, inst_fs_host].compact
   end
 
   def csp_logging_config

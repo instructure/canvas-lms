@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -34,5 +36,8 @@ module Types
 
     argument :scored_less_than, Float, "Limit results to submissions that scored below the specified value", required: false
     argument :scored_more_than, Float, "Limit results to submissions that scored above the specified value", required: false
+    argument :late, Boolean, "Limit results to submissions that are late", required: false
+
+    argument :grading_status, SubmissionGradingStatusType, "Limit results by grading status", required: false
   end
 end

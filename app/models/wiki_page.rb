@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -48,6 +50,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
 
   belongs_to :context, polymorphic: [:course, :group]
+  belongs_to :root_account, :class_name => 'Account'
 
   acts_as_url :title, :sync_url => true
 
@@ -58,6 +61,7 @@ class WikiPage < ActiveRecord::Base
   before_save :set_revised_at
   before_validation :ensure_wiki_and_context
   before_validation :ensure_unique_title
+  before_create :set_root_account_id
 
   after_save  :touch_context
   after_save  :update_assignment,
@@ -79,12 +83,13 @@ class WikiPage < ActiveRecord::Base
   end
 
   scope :visible_to_user, -> (user_id) do
-    joins(sanitize_sql(["LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?", user_id])).
-      where("wiki_pages.assignment_id IS NULL OR asv IS NOT NULL")
+    where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
   end
 
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
+
+  self.ignored_columns = %i[view_count]
 
   def ensure_wiki_and_context
     self.wiki_id ||= (self.context.wiki_id || self.context.wiki.id)
@@ -110,15 +115,14 @@ class WikiPage < ActiveRecord::Base
       baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
-    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).first
-      return if existing == self
+    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
       begin
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while self.context.wiki_pages.not_deleted.where(title: new_title).exists?
+      end while self.context.wiki_pages.not_deleted.where(title: new_title).where.not(:id => self.id).exists?
 
       self.title = new_title
     end
@@ -232,7 +236,7 @@ class WikiPage < ActiveRecord::Base
 
   def low_level_locked_for?(user, opts={})
     return false unless self.could_be_locked
-    Rails.cache.fetch([locked_cache_key(user), opts[:deep_check_if_needed]].cache_key, :expires_in => 1.minute) do
+    RequestCache.cache(locked_request_cache_key(user), opts[:deep_check_if_needed]) do
       locked = false
       if item = locked_by_module_item?(user, opts)
         locked = {object: self, :module => item.context_module}
@@ -275,19 +279,13 @@ class WikiPage < ActiveRecord::Base
     given {|user| user && self.can_edit_page?(user)}
     can :update_content and can :read_revisions
 
-    given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :create_page)}
+    given {|user, session| user && self.wiki.grants_right?(user, session, :create_page)}
     can :create
 
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
     can :update and can :read_revisions
 
-    given {|user, session| user && self.can_edit_page?(user) && self.published? && self.wiki.grants_right?(user, session, :update_page_content)}
-    can :update_content and can :read_revisions
-
-    given {|user, session| user && self.can_edit_page?(user) && self.published? && self.wiki.grants_right?(user, session, :delete_page)}
-    can :delete
-
-    given {|user, session| user && self.can_edit_page?(user) && self.unpublished? && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
+    given {|user, session| user && can_read_page?(user) && self.wiki.grants_right?(user, session, :delete_page)}
     can :delete
   end
 
@@ -299,8 +297,8 @@ class WikiPage < ActiveRecord::Base
   def can_edit_page?(user, session=nil)
     return false unless can_read_page?(user, session)
 
-    # wiki managers are always allowed to edit
-    return true if wiki.grants_right?(user, session, :manage)
+    # wiki managers are always allowed to edit.
+    return true if wiki.grants_right?(user, session, :update)
 
     roles = effective_roles
     # teachers implies all course admins (teachers, TAs, etc)
@@ -321,7 +319,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def available_for?(user, session=nil)
-    return true if wiki.grants_right?(user, session, :manage)
+    return true if wiki.grants_right?(user, session, :update)
 
     return false unless published? || (unpublished? && wiki.grants_right?(user, session, :view_unpublished_items))
     return false if locked_for?(user, :deep_check_if_needed => true)
@@ -339,6 +337,10 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :updated_wiki_page
     p.to { participants }
@@ -346,6 +348,7 @@ class WikiPage < ActiveRecord::Base
       BroadcastPolicies::WikiPagePolicy.new(wiki_page).
         should_dispatch_updated_wiki_page?
     end
+    p.data { course_broadcast_data }
   end
 
   def participants
@@ -393,18 +396,6 @@ class WikiPage < ActiveRecord::Base
     res
   end
 
-  def increment_view_count(user, context = nil)
-    Shackles.activate(:master) do
-      unless self.new_record?
-        self.with_versioning(false) do |p|
-          context ||= p.context
-          WikiPage.where(id: p).update_all("view_count=COALESCE(view_count, 0) + 1")
-          p.context_module_action(user, context, :read)
-        end
-      end
-    end
-  end
-
   def can_unpublish?
     return @can_unpublish unless @can_unpublish.nil?
     @can_unpublish = !is_front_page?
@@ -415,6 +406,35 @@ class WikiPage < ActiveRecord::Base
     return unless wiki_pages.any?
     front_page_url = context.wiki.get_front_page_url
     wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
+  end
+
+  def self.reinterpret_version_yaml(yaml_string)
+    # TODO: This should be temporary.  For a long time
+    # course exports/imports would corrupt the yaml in the first version
+    # of an imported wiki page by trying to replace placeholders right
+    # in the yaml.  This doctors the yaml back, and can be removed
+    # when the "content_imports" exception type for psych syntax errors
+    # isn't happening anymore.
+    pattern_1 = /(\<a[^<>]*?id=.*?"media_comment.*?\/\>)/im
+    pattern_2 = /(\<a[^<>]*?id=.*?"media_comment.*?\<\/a\>)/
+    replacements = []
+    [pattern_1, pattern_2].each do |regex_pattern|
+      yaml_string.scan(regex_pattern).each do |matched_groups|
+        matched_groups.each do |group|
+          # this should be an UNESCAPED version of a media comment.
+          # let's try to escape it.
+          replacements << [group, group.inspect[1..-2]]
+        end
+      end
+    end
+    new_string = yaml_string.dup
+    replacements.each do |operation|
+      new_string = new_string.sub(operation[0], operation[1])
+    end
+    # if this works without throwing another error, we've
+    # cleaned up the yaml successfully
+    YAML::load( new_string )
+    new_string
   end
 
   # opts contains a set of related entities that should be duplicated.
@@ -438,7 +458,6 @@ class WikiPage < ActiveRecord::Base
       :user_id => self.user_id,
       :protected_editing => self.protected_editing,
       :editing_roles => self.editing_roles,
-      :view_count => 0,
       :todo_date => self.todo_date
     })
     if self.assignment && opts_with_default[:duplicate_assignment]
@@ -479,5 +498,9 @@ class WikiPage < ActiveRecord::Base
           revised_at: self.revised_at
         })
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.context&.root_account_id unless self.root_account_id
   end
 end

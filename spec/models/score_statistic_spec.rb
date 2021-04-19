@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@ require 'spec_helper'
 
 RSpec.describe ScoreStatistic, type: :model do
   describe 'relationships' do
-    it { is_expected.to belong_to(:assignment) }
+    it { is_expected.to belong_to(:assignment).required }
   end
 
   describe 'validations' do

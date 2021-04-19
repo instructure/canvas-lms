@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ module ActiveRecord
 
       it 'escapes special characters in the query' do
         %w(% _).each do |char|
-          expect(Base.wildcard_pattern('some' << char << 'string')).to include('some\\' << char << 'string')
+          expect(Base.wildcard_pattern('some' + char + 'string')).to include('some\\' + char + 'string')
         end
       end
 
@@ -75,8 +77,10 @@ module ActiveRecord
 
         it "cleans up the cursor" do
           # two cursors with the same name; if it didn't get cleaned up, it would error
-          User.all.find_each {}
-          User.all.find_each {}
+          expect do
+            User.all.find_each {}
+            User.all.find_each {}
+          end.to_not raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -117,10 +121,12 @@ module ActiveRecord
         end
 
         it "should use a temp table when you select without an id" do
-          User.create!
-          User.select(:name).find_in_batches do |batch|
-            User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
-          end
+          expect do
+            User.create!
+            User.select(:name).find_in_batches do |batch|
+              User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
+            end
+          end.to_not raise_error
         end
 
         it "should not use a temp table for a plain query" do
@@ -149,8 +155,10 @@ module ActiveRecord
 
         it "cleans up the temp table" do
           # two temp tables with the same name; if it didn't get cleaned up, it would error
-          User.all.find_in_batches_with_temp_table {}
-          User.all.find_in_batches_with_temp_table {}
+          expect do
+            User.all.find_in_batches_with_temp_table {}
+            User.all.find_in_batches_with_temp_table {}
+          end.to_not raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -163,6 +171,14 @@ module ActiveRecord
           end.to raise_error(ArgumentError)
 
           User.all.find_in_batches_with_temp_table {}
+        end
+
+        it "does not die with index error when table size is exactly batch size" do
+          user_count = 10
+          User.delete_all
+          user_count.times{ user_model }
+          expect(User.count).to eq(user_count)
+          User.all.find_in_batches_with_temp_table(batch_size: user_count) {}
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do
@@ -179,6 +195,73 @@ module ActiveRecord
           end.to raise_error(ActiveRecord::InvalidForeignKey)
         end
 
+      end
+
+      describe "with id plucking" do
+        it "should iterate through all selected rows" do
+          users = Set.new
+          3.times { users << user_model }
+          found = Set.new
+          User.find_in_batches(strategy: :pluck_ids, batch_size: 1) do |u_batch|
+            u_batch.each{|u| found << u }
+          end
+          expect(found).to eq users
+        end
+
+        it "keeps the specified order" do
+          [ "user_F", "user_D", "user_A", "user_C", "user_B", "user_E"].map{ |name| user_model(name: name) }
+          names = []
+          User.order(:name).find_in_batches(strategy: :pluck_ids, batch_size: 3) do |u_batch|
+            names += u_batch.map(&:name)
+          end
+          expect(names).to eq(["user_A", "user_B", "user_C", "user_D", "user_E", "user_F"])
+        end
+      end
+    end
+
+    describe ".bulk_insert" do
+      it "throws exception if it violates a foreign key" do
+        attrs = {
+          'request_id' => 'abcde-12345',
+          'uuid' => 'edcba-54321',
+          'account_id' => Account.default.id,
+          'user_id' => -1,
+          'pseudonym_id' => -1,
+          'event_type' => 'login',
+          'created_at' => DateTime.now.utc
+        }
+        expect do
+          Auditors::ActiveRecord::AuthenticationRecord.bulk_insert([attrs])
+        end.to raise_error(ActiveRecord::InvalidForeignKey)
+      end
+
+      it "writes to the correct partition" do
+        user = user_with_pseudonym(active_user: true)
+        pseud = @pseudonym
+        attrs_1 = {
+          'request_id' => 'abcde-12345',
+          'uuid' => 'edcba-54321',
+          'account_id' => Account.default.id,
+          'user_id' => user.id,
+          'pseudonym_id' => pseud.id,
+          'event_type' => 'login',
+          'created_at' => DateTime.now.utc
+        }
+        attrs_2 = attrs_1.merge({
+          'created_at' => 40.days.ago
+        })
+        ar_type = Auditors::ActiveRecord::AuthenticationRecord
+        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
+        conn = ar_type.connection
+        root_partition_count = conn.execute("select count(*) from only #{ar_type.quoted_table_name};")[0]["count"]
+        expect(root_partition_count).to eq(0)
+        expect(ar_type.count).to eq(2)
+        now_partition_name = conn.quote_table_name(ar_type.infer_partition_table_name(attrs_1))
+        now_partition_count = conn.execute("select count(*) from #{now_partition_name};")[0]["count"]
+        expect(now_partition_count).to eq(1)
+        prev_partition_name = conn.quote_table_name(ar_type.infer_partition_table_name(attrs_2))
+        prev_partition_count = conn.execute("select count(*) from #{prev_partition_name};")[0]["count"]
+        expect(prev_partition_count).to eq(1)
       end
     end
 
@@ -323,6 +406,100 @@ module ActiveRecord
         User.connection.alter_constraint(:user_services, old_name, new_name: 'test')
         expect(User.connection.find_foreign_key(:user_services, :users)).to eq 'test'
       end
+
+      it "allows if_not_exists on add_index" do
+        expect { User.connection.add_index(:enrollments, :user_id, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "allows if_not_exists on add_column" do
+        expect { User.connection.add_column(:enrollments, :user_id, :bigint, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "allows if_not_exists on add_foreign_key" do
+        expect { User.connection.add_foreign_key(:enrollments, :users, if_not_exists: true) }.not_to raise_exception
+      end
+
+      it "add_foreign_key automatically validates an invalid constraint with delay_validation" do
+        expect do
+          User.connection.remove_foreign_key(:enrollments, column: :user_id)
+          User.connection.add_foreign_key(:enrollments, :users, validate: false)
+          # so that delay_validation doesn't get ignored
+          allow(User.connection).to receive(:open_transactions).and_return(0)
+          User.connection.add_foreign_key(:enrollments, :users, delay_validation: true)
+        end.not_to raise_exception
+      end
+
+      it "remove_foreign_key allows if_exists" do
+        expect { User.connection.remove_foreign_key(:discussion_topics, :conversations, if_exists: true) }.not_to raise_exception
+      end
+
+      it "remove_foreign_key allows column and if_exists" do
+        expect { User.connection.remove_foreign_key(:enrollments, column: :associated_user_id, if_exists: true) }.not_to raise_exception
+      end
+
+      it "foreign_key_for prefers a 'bare' FK first" do
+        expect(User.connection.foreign_key_for(:enrollments, to_table: :users).column).to eq 'user_id'
+      end
+
+      it "remove_index allows if_exists" do
+        expect { User.connection.remove_index(:users, column: :non_existent, if_exists: true) }.not_to raise_exception
+      end
+
+      it "remove_index by name allows if_exists" do
+        expect { User.connection.remove_index(:users, name: :lti_id, if_exists: true) }.not_to raise_exception
+      end
+
     end
+  end
+
+  describe 'with_statement_timeout' do
+    it 'stops long-running queries' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout(1_000) do
+          ActiveRecord::Base.connection.execute("SELECT pg_sleep(3)")
+        end
+      }.to raise_error(ActiveRecord::QueryTimeout)
+    end
+
+    it 'only accepts an integer timeout' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout("1_000") do
+          ActiveRecord::Base.connection.execute("SELECT pg_sleep(3)")
+        end
+      }.to raise_error(ArgumentError)
+    end
+
+    it 're-raises other errors' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout(1_000) do
+          ActiveRecord::Base.connection.execute("bad sql")
+        end
+      }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
+end
+
+describe ActiveRecord::Migration::CommandRecorder do
+  it "reverses if_exists/if_not_exists" do
+    recorder = ActiveRecord::Migration::CommandRecorder.new
+    r = recorder
+    recorder.revert do
+      r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
+      r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
+      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true
+
+      r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
+      r.remove_foreign_key :enrollments, :users, if_exists: true
+      r.remove_index :accounts, :id, if_exists: true
+    end
+    expect(recorder.commands).to eq([
+      [:add_index, [:accounts, :id, { if_not_exists: true }]],
+      [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
+      [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
+
+      [:remove_index, [:accounts, { column: :course_template_id, algorithm: :concurrently, if_exists: true }]],
+      [:remove_foreign_key, [:accounts, :courses, { column: :course_template_id, if_exists: true }], nil],
+      [:remove_column, [:accounts, :course_template_id, :integer, { limit: 8, if_exists: true }], nil],
+    ])
   end
 end

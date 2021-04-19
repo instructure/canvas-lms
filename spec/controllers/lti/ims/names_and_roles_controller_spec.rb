@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/names_and_roles_controller.rb"
 require_dependency "lti/ims/providers/course_memberships_provider.rb"
 require_dependency "lti/ims/providers/group_memberships_provider.rb"
@@ -314,6 +317,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
 
     it_behaves_like 'advantage services'
+    it_behaves_like 'lti services'
 
     # Bunch of single-enrollment tests b/c they're just so much easier to
     # debug as compared to multi-enrollment tests
@@ -467,7 +471,7 @@ describe Lti::Ims::NamesAndRolesController do
       let(:total_items) { enrollments.length }
       let(:rsp_page) { 1 }
       let(:rsp_page_size) { [total_items, effective_page_size].min }
-      let(:effective_page_size) { 10 } # system default
+      let(:effective_page_size) { Lti::Ims::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system default
       let(:pass_thru_params) { { pass: 'thru' } }
       let(:params_overrides) { super().merge(pass_thru_params) }
 
@@ -870,6 +874,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:unknown_context_id) { group_record && Group.maximum(:id) + 1 }
 
     it_behaves_like 'advantage services'
+    it_behaves_like 'lti services'
 
     context 'when a group has a single membership' do
       let(:group_record) { group_with_user(active_all: true, context: course).group }
@@ -936,7 +941,7 @@ describe Lti::Ims::NamesAndRolesController do
       let(:total_items) { enrollments.length }
       let(:rsp_page) { 1 }
       let(:rsp_page_size) { [total_items, effective_page_size].min }
-      let(:effective_page_size) { 10 } # system default
+      let(:effective_page_size) { Lti::Ims::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system default
       let(:pass_thru_params) { { pass: 'thru' } }
       let(:params_overrides) { super().merge(pass_thru_params) }
 

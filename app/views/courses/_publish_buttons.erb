@@ -1,0 +1,42 @@
+<%
+  # Copyright (C) 2021 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<div id='course_status_actions' class="ui-buttonset">
+  <%= form_for @context, html: {id: "course_status_form"} do |f| %>
+    <% if redirect_to_settings %>
+      <%= hidden_field_tag :continue_to, course_settings_url(@context) %>
+    <% end %>
+    <% if @context.created? || @context.claimed? %>
+      <button type="button" class='ui-button btn-unpublish disabled' disabled>
+        <i class="icon-unpublish"></i><%= t('#buttons.unpublished', %{Unpublished}) %>
+      </button>
+      <button type='submit' class="ui-button btn-publish">
+        <i class="icon-publish icon-Solid"></i><%= t('#buttons.publish', %{Publish}) %>
+      </button>
+      <input type='hidden' name='course[event]' value='offer' />
+    <% else %>
+      <button type='submit' class="ui-button">
+        <i class="icon-unpublish"></i>&nbsp;<%= t('#buttons.unpublish', %{Unpublish}) %>
+      </button>
+      <button type="button" class="ui-button disabled btn-published" disabled>
+        <i class="icon-publish icon-Solid"></i><%= t('#buttons.published', %{Published}) %>
+      </button>
+      <input type='hidden' name='course[event]' value='claim' />
+    <% end %>
+  <% end %>
+</div>

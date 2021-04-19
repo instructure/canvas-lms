@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -19,19 +21,21 @@ require_dependency 'importers'
 
 module Importers
   class LearningOutcomeImporter < Importer
-    extend OutcomeImporter
-
     self.item_class = LearningOutcome
 
     def self.process_migration(data, migration)
+      selectable_outcomes = migration.context.respond_to?(:root_account) &&
+                            migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
       migration.outcome_to_id_map = {}
       outcomes.each do |outcome|
-        next unless migration.import_object?('learning_outcomes', outcome['migration_id'])
+        import_item = migration.import_object?('learning_outcomes', outcome['migration_id'])
+        import_item ||= migration.import_object?('learning_outcome_groups', outcome['migration_id']) if selectable_outcomes
+        next unless import_item || selectable_outcomes
         begin
           if outcome[:type] == 'learning_outcome_group'
-            Importers::LearningOutcomeGroupImporter.import_from_migration(outcome, migration)
-          else
+            Importers::LearningOutcomeGroupImporter.import_from_migration(outcome, migration, nil, selectable_outcomes && !import_item)
+          elsif !selectable_outcomes || import_item
             Importers::LearningOutcomeImporter.import_from_migration(outcome, migration)
           end
         rescue
@@ -52,12 +56,13 @@ module Importers
           else
             outcome = context.available_outcome(hash[:external_identifier])
           end
+        end
 
-          if outcome
-            # Help prevent linking to the wrong outcome if copying into a different install of canvas
-            # (using older migration packages that lack the root account uuid)
-            outcome = nil if outcome.short_description != hash[:title]
-          end
+        outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if hash[:vendor_guid].present?
+        if outcome
+          # Help prevent linking to the wrong outcome if copying into a different install of canvas
+          # (using older migration packages that lack the root account uuid)
+          outcome = nil if outcome.short_description != hash[:title]
         end
 
         if !outcome
@@ -79,8 +84,8 @@ module Importers
             # import from vendor with global outcomes
             context = nil
             hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
-            item ||= LearningOutcome.global.where(migration_clause(hash[:migration_id])).first if hash[:migration_id] && !migration.cross_institution?
-            item ||= LearningOutcome.global.where(vendor_clause(hash[:vendor_guid])).first if hash[:vendor_guid]
+            item ||= LearningOutcome.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id] && !migration.cross_institution?
+            item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else
             migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
@@ -88,7 +93,7 @@ module Importers
           end
         else
           item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s).
-            where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
+            where(migration_id: hash[:migration_id]).first if hash[:migration_id]
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
           item.mark_as_importing!(migration)
@@ -121,14 +126,21 @@ module Importers
         migration.add_imported_item(item)
       else
         item = outcome
+        if context.respond_to?(:root_account) && context.root_account.feature_enabled?(:outcome_alignments_course_migration)
+          migration.add_imported_item(item, key: CC::CCHelper.create_key(item, global: true))
+        end
       end
 
       # don't add a deleted outcome to an outcome group, or align it with an assignment
       # (blueprint migration will not undelete outcomes deleted downstream)
       return item if item.deleted?
 
-      log = hash[:learning_outcome_group] || context.root_outcome_group
-      log.add_outcome(item)
+      # don't implicitly add an outcome to the root outcome group if it's already in an outcome group
+      if hash[:learning_outcome_group].present? || context.learning_outcome_links.not_deleted.where(content: item).none?
+        log = hash[:learning_outcome_group] || context.root_outcome_group
+        outcome_link = log.add_outcome(item, migration_id: hash[:migration_id])
+        migration.add_imported_item(outcome_link)
+      end
 
       if hash[:alignments] && !previously_imported
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}

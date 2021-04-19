@@ -1,0 +1,27 @@
+{
+  "assignment_groups": [
+    {
+      "migration_id": "g57308533ff82c2c4a8fd60f540f59ec9",
+      "title": "Assignments"
+    }
+  ],
+  "assignments": [
+    {
+      "migration_id": "gf455e2add230724ba190bb20c1491aa9",
+      "title": "assignment1",
+      "assignment_group_migration_id": "g57308533ff82c2c4a8fd60f540f59ec9"
+    }
+  ],
+  "discussion_topics": [
+    {
+      "title": "discussion1",
+      "migration_id": "g8bacee869e70bf19cd6784db3efade7e",
+      "type": "topic",
+      "assignment": {
+        "migration_id": "g696f150ec4e25e87ac8347b3ef6f4e43",
+        "assignment_group_migration_id": "g57308533ff82c2c4a8fd60f540f59ec9",
+        "title": "discussion1"
+      }
+    }
+  ]
+}

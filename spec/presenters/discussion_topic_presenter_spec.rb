@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DiscussionTopicPresenter do
   let (:topic)      { DiscussionTopic.new(:title => 'Test Topic', :assignment => assignment) }
@@ -63,18 +66,13 @@ describe DiscussionTopicPresenter do
 
   describe "#has_attached_rubric?" do
     it "returns true if assignment has a rubric association with a rubric" do
-      expect(assignment).to receive(:rubric_association).
-        and_return double(:try => double(:rubric => double))
+      expect(assignment).to receive(:rubric).
+        and_return double
       expect(presenter.has_attached_rubric?).to eq true
     end
 
     it "returns false if assignment has nil rubric association" do
-      expect(assignment).to receive(:rubric_association).and_return nil
-      expect(presenter.has_attached_rubric?).to eq false
-    end
-
-    it "returns false if assignment has a rubric association but no rubric" do
-      expect(assignment).to receive(:rubric_association).and_return double(:rubric => nil)
+      expect(assignment).to receive(:rubric).and_return nil
       expect(presenter.has_attached_rubric?).to eq false
     end
   end
@@ -86,13 +84,13 @@ describe DiscussionTopicPresenter do
         ).should_show_rubric?(user)).to eq false
     end
 
-    it "returns true if has_attached_rubric? is false" do
-      expect(assignment).to receive(:rubric_association).and_return double(:rubric => double)
+    it "returns true if has_attached_rubric? is true" do
+      expect(assignment).to receive(:rubric).and_return double
       expect(presenter.should_show_rubric?(user)).to eq true
     end
 
     context "no rubric association or rubric for the topic's assignment" do
-      before { allow(assignment).to receive(:rubric_association).and_return nil }
+      before { allow(assignment).to receive(:rubric).and_return nil }
 
       it "returns true when the assignment grants the user update privs" do
         expect(assignment).to receive(:grants_right?).with(user, :update).and_return true
@@ -187,6 +185,41 @@ describe DiscussionTopicPresenter do
 
       it "returns true when assignment published" do
         expect(presenter.allows_speed_grader?).to eq true
+      end
+    end
+  end
+
+  describe "#peer_reviews_for" do
+    let(:user2) { user_model }
+    let(:user3) { user_model }
+
+    before do
+      topic.context = course
+      assignment.context = course
+      assignment.peer_reviews = true
+      assignment.save!
+      [user, user2, user3].map do |u|
+        course.enroll_student(u, {enrollment_state: 'active'})
+      end
+      assignment.assign_peer_review(user, user2)
+    end
+
+    it "returns the assigned peer reviews" do
+      expect(
+        presenter.peer_reviews_for(user).map(&:user_id)
+      ).to match_array [user2.id]
+    end
+
+    context "for cross-shard enrollments" do
+      specs_require_sharding
+
+      let(:user) { @shard2.activate { user_model } }
+      let(:user2) { @shard2.activate { user_model } }
+
+      it "returns the assigned peer reviews" do
+        expect(
+          presenter.peer_reviews_for(user).map(&:user_id)
+        ).to match_array [user2.id]
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,7 +30,44 @@ describe "course settings" do
   it "should show unused tabs to teachers" do
     get "/courses/#{@course.id}/settings"
     wait_for_ajaximations
-    expect(ff("#section-tabs .section.section-tab-hidden").count).to be > 0
+    expect(ff("#section-tabs .section.section-hidden").count).to be > 0
+  end
+
+  context "considering homeroom courses" do
+    before(:each) do
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'on')
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      @course.homeroom_course = true
+      @course.save!
+    end
+
+    after(:each) do
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'off')
+    end
+
+    it 'hides most tabs if set' do
+      @account.root_account.enable_feature!(:canvas_for_elementary)
+
+      get "/courses/#{@course.id}/settings"
+      expect(ff('#course_details_tabs > ul li').length).to eq 2
+      expect(f('#course_details_tab')).to be_displayed
+      expect(f('#sections_tab')).to be_displayed
+    end
+
+  end
+
+  describe('Integrations tab') do
+    let(:course) { @course }
+
+    context 'with the MSFT sync flag on' do
+      before { course.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+
+      it 'displays the course settings tab' do
+        get "/courses/#{course.id}/settings"
+        expect(f('#integrations_tab')).to be_displayed
+      end
+    end
   end
 
   describe "course details" do
@@ -123,6 +162,17 @@ describe "course settings" do
       expect(message).not_to include_text('self_enrollment_code')
     end
 
+    it "should not show the self enrollment code and url for blueprint templates even if enabled" do
+      a = Account.default
+      a.courses << @course
+      a.settings[:self_enrollment] = 'manually_created'
+      a.save!
+      @course.update(:self_enrollment => true)
+      MasterCourses::MasterTemplate.set_as_master_course(@course)
+      get "/courses/#{@course.id}/settings"
+      expect(f('.self_enrollment_message')).to_not be_displayed
+    end
+
     it "should enable announcement limit if show announcements enabled" do
       get "/courses/#{@course.id}/settings"
 
@@ -139,42 +189,6 @@ describe "course settings" do
 
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
-    end
-  end
-
-  describe 'csp settings' do
-    before(:once) do
-      @csp_account = Account.create!(name: 'csp account')
-      @csp_account.enable_feature!(:javascript_csp)
-      @csp_account.enable_csp!
-      @csp_course = @csp_account.courses.create!(name: 'csp course')
-      @csp_user = User.create!(name: 'csp user')
-      @csp_user.accept_terms
-      @csp_user.register!
-      @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: 'csp@example.com')
-      @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
-    end
-
-    before(:each) {create_session(@csp_pseudonym)}
-
-    it "should not allow teachers to click CSP check" do
-      get "/courses/#{@csp_course.id}/settings"
-      f('.course_form_more_options_link').click
-      expect(f("#csp_options input[type='checkbox']")).not_to be_enabled
-    end
-
-    it "should save CSP check by admin" do
-      @csp_account.account_users.create!(user: @csp_user)
-      get "/courses/#{@csp_course.id}/settings"
-
-      f('.course_form_more_options_link').click
-      expect(f("#csp_options input[type='checkbox']")).to be_enabled
-
-      force_click("#csp_options input[type='checkbox']")
-      wait_for_new_page_load { submit_form('#course_form') }
-
-      f('.course_form_more_options_link').click
-      expect(is_checked(f("#csp_options input[type='checkbox']"))).to be_truthy
     end
   end
 
@@ -234,7 +248,9 @@ describe "course settings" do
       wait_for_ajaximations
       f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
       wait_for_ajaximations
-      f('.student_view_button').click
+      enter_student_view
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/settings#tab-navigation"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_link("Home")
     end
@@ -299,13 +315,6 @@ describe "course settings" do
   end
 
   context "right sidebar" do
-    it "should allow entering student view from the right sidebar" do
-      @fake_student = @course.student_view_student
-      get "/courses/#{@course.id}/settings"
-      f(".student_view_button").click
-      expect(displayed_username).to include(@fake_student.name)
-    end
-
     it "should allow leaving student view" do
       enter_student_view
       stop_link = f("#masquerade_bar .leave_student_view")
@@ -343,6 +352,16 @@ describe "course settings" do
       expect(fj('.summary tr:nth(1)').text).to match /weirdo \(inactive\):\s*1/
       expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
       expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
+    end
+
+    it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
+      @account.root_account.enable_feature!(:canvas_for_elementary)
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      course_with_teacher_logged_in(:active_all => true)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#course_status_form")).to be_present
+      expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -43,6 +45,15 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
 
   def verify_authorized_action!(obj, perm)
     raise GraphQL::ExecutionError, 'not found' unless obj.grants_right?(current_user, session, perm)
+  end
+
+  # TODO: replace this with model validation where applicable
+  def validation_error(message, attribute: 'message')
+    {
+      errors: {
+        attribute.to_sym => message
+      }
+    }
   end
 
   private

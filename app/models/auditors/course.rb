@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -21,7 +23,8 @@ class Auditors::Course
     attributes :course_id,
                :user_id,
                :event_source,
-               :sis_batch_id
+               :sis_batch_id,
+               :account_id
 
     def self.generate(course, user, event_type, event_data = {}, opts = {})
       event_source = opts[:source] || :manual
@@ -63,7 +66,7 @@ class Auditors::Course
     end
 
     def user
-      @user ||= User.find(user_id)
+      @user ||= User.find(user_id) if user_id
     end
 
     def user=(user)
@@ -90,6 +93,7 @@ class Auditors::Course
       @course = course
 
       attributes['course_id'] = Shard.global_id_for(@course)
+      attributes['account_id'] = Shard.global_id_for(@course.account_id)
     end
 
     def event_data
@@ -101,18 +105,33 @@ class Auditors::Course
 
       attributes['data'] = @event_data.to_json
     end
+
+    def account
+      course.account
+    end
   end
 
-  Stream = Auditors.stream do
-    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
+  Stream = Audits.stream do
+    course_ar_type = Auditors::ActiveRecord::CourseRecord
+    backend_strategy -> { Audits.backend_strategy }
+    active_record_type course_ar_type
+    database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record
-    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
+    read_consistency_level -> { CanvasCassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :course do
       table :courses_by_course
       entry_proc lambda{ |record| record.course }
       key_proc lambda{ |course| course.global_id }
+      ar_scope_proc lambda { |course| course_ar_type.where(course_id: course.id) }
+    end
+
+    add_index :account do
+      table :courses_by_account
+      entry_proc lambda{ |record| record.account }
+      key_proc lambda{ |account| account.global_id }
+      ar_scope_proc lambda { |account| course_ar_type.where(account_id: account.id) }
     end
   end
 
@@ -186,15 +205,24 @@ class Auditors::Course
         data[k] = change.map{|v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, :max_length => 1000) : v}
       end
     end
+    event_record = nil
     course.shard.activate do
-      record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
-      Auditors::Course::Stream.insert(record)
+      event_record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
+      Auditors::Course::Stream.insert(event_record, {backend_strategy: :cassandra}) if Audits.write_to_cassandra?
+      Auditors::Course::Stream.insert(event_record, {backend_strategy: :active_record}) if Audits.write_to_postgres?
     end
+    event_record
   end
 
   def self.for_course(course, options={})
     course.shard.activate do
-      Auditors::Course::Stream.for_course(course, options)
+      Auditors::Course::Stream.for_course(course, Audits.read_stream_options(options))
+    end
+  end
+
+  def self.for_account(account, options={})
+    account.shard.activate do
+      Auditors::Course::Stream.for_account(account, Audits.read_stream_options(options))
     end
   end
 end

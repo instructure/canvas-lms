@@ -1,0 +1,41 @@
+<div class="popover-title">
+  {{#t "add_to_group"}}Add to Group{{/t}}
+</div>
+
+<div class='popover-content'>
+  {{#if noGroups}}
+    <p tabindex="-1">
+      {{#t "no_groups_created"}}
+        Groups need to be created before users can be added.
+      {{/t}}
+    </p>
+  {{/if}}
+  {{#if allFull}}
+    <p class='separated' tabindex="-1">
+      {{#t "all_groups_full"}}
+        All groups are full. <br />
+      {{/t}}
+      {{#t "all_groups_full_suggestion"}}
+        Either change group limits or add more groups.
+      {{/t}}
+    </p>
+  {{/if}}
+
+  <ul class="unstyled assign-to-groups">
+    <li class="focus-bound" tabindex="0"></li>
+    {{#each groups}}
+      {{#unless isFull}}
+        <li>
+          <a role="button"
+             href="#"
+             class="set-group ellipsis"
+             data-group-id="{{id}}"
+             title="{{#t "assign_user_to_group"}}Assign user to this group{{/t}}"
+             aria-label="{{#t "assign_user_to_group_name"}}Assign user to group {{name}}{{/t}}"
+            >{{name}}</a>
+        </li>
+      {{/unless}}
+    {{/each}}
+    <li class="focus-bound" tabindex="0"></li>
+  </ul>
+</div>

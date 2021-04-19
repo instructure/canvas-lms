@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -40,12 +42,13 @@ module CC::Exporter::Epub
       "WikiPage" => :pages
     }.freeze
 
-    def initialize(cartridge, sort_by_content=false, export_type=:epub)
+    def initialize(cartridge, sort_by_content=false, export_type=:epub, global_identifiers: false)
       @cartridge = cartridge
       @export_type = export_type
       @sort_by_content = sort_by_content || cartridge_json[:modules].empty?
+      @global_identifiers = global_identifiers
     end
-    attr_reader :cartridge, :sort_by_content
+    attr_reader :cartridge, :sort_by_content, :global_identifiers
     delegate :unsupported_files, to: :cartridge_converter, allow_nil: true
 
     def cartridge_json
@@ -63,7 +66,7 @@ module CC::Exporter::Epub
         resources = sort_by_content ? LINKED_RESOURCE_KEY.except("Attachment").values : module_ids
         remove_hidden_content_from_syllabus!
         resources.each do |resource_type|
-          hash.reverse_merge!(resource_type => create_content_template(resource_type))
+          hash.merge!(resource_type => create_content_template(resource_type))
         end
       end
     end

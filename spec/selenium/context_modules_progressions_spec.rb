@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -173,6 +175,18 @@ describe "context modules" do
       get "/courses/#{@course.id}"
       expect(f("#content")).not_to contain_css('.module_progressions_link')
     end
+
+    it "should show progressions link if user has grading permission but not content management" do
+      RoleOverride.create!(:context => Account.default, :permission => 'manage_content', :role => teacher_role, :enabled => false)
+      get "/courses/#{@course.id}/modules"
+      expect(f("#content")).to contain_css('.module_progressions_link')
+    end
+
+    it "should not show progressions link in modules page if user lacks grading permission" do
+      RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :role => teacher_role, :enabled => false)
+      get "/courses/#{@course.id}/modules"
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
+    end
   end
 
   context "View Progress button" do
@@ -277,7 +291,6 @@ describe "context modules" do
     end
 
     it "should show student progress once discussion-contribute requirement is met", priority: "1", test_id: 126693 do
-      make_full_screen
       @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       tag = @module1.add_item({id: @discussion_1.id, type: 'assignment'})
       add_requirement({tag.id => {type: 'must_contribute'}})
@@ -288,7 +301,7 @@ describe "context modules" do
       type_in_tiny 'textarea', 'something to submit'
       f('button[type="submit"]').click
       validate_access_to_module
-      resize_screen_to_normal
+
     end
 
     it "should show student progress once wiki page-view requirement is met", priority: "1", test_id: 126700 do

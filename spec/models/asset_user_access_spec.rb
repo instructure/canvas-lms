@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,58 +21,134 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssetUserAccess do
-  before :once do
-    @course = Account.default.courses.create!(:name => 'My Course')
-    @assignment = @course.assignments.create!(:title => 'My Assignment')
-    @user = User.create!
+  describe "with course context" do
+    before :once do
+      @course = Account.default.courses.create!(:name => 'My Course')
+      @assignment = @course.assignments.create!(:title => 'My Assignment')
+      @user = User.create!
 
-    @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => @assignment.asset_string)
-    @asset.display_name = @assignment.asset_string
-    @asset.save!
+      @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => @assignment.asset_string)
+      @asset.display_name = @assignment.asset_string
+      @asset.save!
+    end
+
+    it "should update existing records that have bad display names" do
+      expect(@asset.display_name).to eq "My Assignment"
+    end
+
+    it "loads root account id from context" do
+      expect(@asset.root_account_id).to eq(@course.root_account_id)
+    end
+
+    it "should update existing records that have changed display names" do
+      @assignment.title = 'My changed Assignment'
+      @assignment.save!
+      AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+      expect(@asset.reload.display_name).to eq 'My changed Assignment'
+    end
+
+    it "should work for assessment questions" do
+      question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
+      asset = AssetUserAccess.log @user, question, { level: 'view', code: @assignment.asset_string }
+      expect(asset.context).to eq @course
+    end
+
+    describe "configured for log compaction" do
+      it "writes to the log instead for view counts" do
+        allow(AssetUserAccess).to receive(:view_counting_method).and_return("log")
+        expect(AssetUserAccessLog.for_today(@asset).count).to eq(0)
+        # updating view level which hasn't been set before,
+        # so this one should write to the table
+        cur_view_count = @asset.view_score
+        AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+        expect(@asset.reload.view_score).to_not eq(cur_view_count)
+        expect(AssetUserAccessLog.for_today(@asset).count).to eq(0)
+        # this time it's just a bump of the views, should get
+        # sent to the log
+        cur_view_count = @asset.view_score
+        AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+        expect(@asset.reload.view_score).to eq(cur_view_count)
+        expect(AssetUserAccessLog.for_today(@asset).count).to eq(1)
+      end
+
+      describe "#eligible_for_log_path?" do
+        it "is eligible only for view bumps" do
+          AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+          @asset.reload
+          @asset.display_name = "foo_bar"
+          expect(@asset.eligible_for_log_path?).to be_falsey
+          @asset.restore_attributes
+          @asset.view_score = @asset.view_score + 1
+          expect(@asset.eligible_for_log_path?).to be_truthy
+        end
+      end
+    end
+
+    describe "for_user" do
+      it "should work with a User object" do
+        expect(AssetUserAccess.for_user(@user)).to eq [@asset]
+      end
+
+      it "should work with a list of User objects" do
+        expect(AssetUserAccess.for_user([@user])).to eq [@asset]
+      end
+
+      it "should work with a User id" do
+        expect(AssetUserAccess.for_user(@user.id)).to eq [@asset]
+      end
+
+      it "should work with a list of User ids" do
+        expect(AssetUserAccess.for_user([@user.id])).to eq [@asset]
+      end
+
+      it "should with with an empty list" do
+        expect(AssetUserAccess.for_user([])).to eq []
+      end
+
+      it "should not find unrelated accesses" do
+        expect(AssetUserAccess.for_user(User.create!)).to eq []
+        expect(AssetUserAccess.for_user(@user.id + 1)).to eq []
+      end
+    end
+
+    describe '#icon' do
+      it 'works for quizzes' do
+        quiz = @course.quizzes.create!(:title => 'My Quiz')
+
+        asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => quiz.asset_string)
+        asset.log(@course, { category: 'quizzes' })
+        asset.save!
+
+        expect(asset.icon).to eq 'icon-quiz'
+      end
+
+      it "falls back with an unexpected asset_category" do
+        asset = AssetUserAccess.create asset_category: 'blah'
+        expect(asset.icon).to eq 'icon-question'
+        expect(asset.readable_category).to eq ''
+      end
+    end
   end
 
-  it "should update existing records that have bad display names" do
-    expect(@asset.display_name).to eq "My Assignment"
-  end
+  describe "with user context" do
+    before :once do
+      @course = Account.default.courses.create!(:name => 'My Course')
+      @assignment = @course.assignments.create!(:title => 'My Assignment')
+      @user = User.create!
 
-  it "should update existing records that have changed display names" do
-    @assignment.title = 'My changed Assignment'
-    @assignment.save!
-    AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
-    expect(@asset.reload.display_name).to eq 'My changed Assignment'
-  end
-
-  it "should work for assessment questions" do
-    question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
-    asset = AssetUserAccess.log @user, question, { level: 'view', code: @assignment.asset_string }
-    expect(asset.context).to eq @course
-  end
-
-  describe "for_user" do
-    it "should work with a User object" do
-      expect(AssetUserAccess.for_user(@user)).to eq [@asset]
+      @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @user, :asset_code => @assignment.asset_string)
+      @asset.display_name = @assignment.asset_string
+      @asset.save!
     end
 
-    it "should work with a list of User objects" do
-      expect(AssetUserAccess.for_user([@user])).to eq [@asset]
+    it "sets root account id to 0" do
+      expect(@asset.root_account_id).to eq(0)
     end
 
-    it "should work with a User id" do
-      expect(AssetUserAccess.for_user(@user.id)).to eq [@asset]
+    it "can load by user context" do
+      expect(AssetUserAccess.for_context(@user)).to eq [@asset]
     end
 
-    it "should work with a list of User ids" do
-      expect(AssetUserAccess.for_user([@user.id])).to eq [@asset]
-    end
-
-    it "should with with an empty list" do
-      expect(AssetUserAccess.for_user([])).to eq []
-    end
-
-    it "should not find unrelated accesses" do
-      expect(AssetUserAccess.for_user(User.create!)).to eq []
-      expect(AssetUserAccess.for_user(@user.id + 1)).to eq []
-    end
   end
 
   describe '#log_action' do
@@ -273,6 +351,37 @@ describe AssetUserAccess do
       end
     end
 
+    describe 'setting root account id' do
+      before :once do
+        @course = Account.default.courses.create!(:name => 'My Course')
+        @user = User.create!
+      end
+
+      it "loads root account id from context" do
+        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        AssetUserAccess.log @user, @course, { level: 'view', code: assignment.asset_string }
+        expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "loads root account id from asset_for_root_account_id when context is a User" do
+        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        AssetUserAccess.log @user, @user, { level: 'view', code: assignment.asset_string, asset_for_root_account_id: assignment }
+        expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "loads root account id from asset_for_root_account_id when context is a User and asset has a resolved_root_account_id but not a root_account_id" do
+        # Not sure if this really ever happens but handle it on the safe side
+        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @course.root_account }
+        expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "sets root account id to 0 when context is a User and asset is a User" do
+        AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @user }
+        expect(AssetUserAccess.last.root_account_id).to eq(0)
+      end
+    end
+
   end
 
   describe '#corrected_view_score' do
@@ -300,15 +409,17 @@ describe AssetUserAccess do
     end
   end
 
-  describe '#icon' do
-    it 'works for quizzes' do
-      quiz = @course.quizzes.create!(:title => 'My Quiz')
+  describe "consuming plugin setting" do
+    it "defaults to normal updates" do
+      expect(AssetUserAccess.view_counting_method).to eq("update")
+    end
 
-      asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => quiz.asset_string)
-      asset.log(@course, { category: 'quizzes' })
-      asset.save!
-
-      expect(asset.icon).to eq 'icon-quiz'
+    it "reads plugin setting for override" do
+      ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs")
+      ps.inheritance_scope = "shard"
+      ps.settings = { max_log_ids: [0,0,0,0,0,0,0], write_path: 'log' }
+      ps.save!
+      expect(AssetUserAccess.view_counting_method).to eq("log")
     end
   end
 end

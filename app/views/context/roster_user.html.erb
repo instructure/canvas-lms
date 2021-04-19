@@ -16,17 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%
-  js_env ga_page_title: "Roster User"
-%>
-<%
-  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
-  add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
-  @active_tab="people"
-%>
-<% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
-
-<% content_for :right_side do %>
+<% provide :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
+<% provide :right_side do %>
   <h2><%= t 'links.more_about_this_user', "More About This User" %></h2>
   <div class="page-action-list rs-margin-bottom" id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
@@ -45,12 +36,12 @@
       <a href="<%= user_user_notes_path(@user) %>"> <%= t 'links.faculty_journal', "Faculty Journal" %></a>
     <% end %>
     <% if @context.is_a?(Course)%>
-      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
+      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_course_teacher_activity_url(@user, @context) %>">
           <i class="icon-chat" aria-hidden="true"></i>
           <%= t 'links.teacher_activity', 'Student Interactions Report' %>
         </a>
-      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <%= link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
           <i class="icon-chat" aria-hidden="true"></i>
           <%= t('Interactions Report') %>
@@ -90,15 +81,16 @@
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
   <h2><%= t 'headings.user_services', "Registered Web Services" %></h2>
   <div>
-    <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
+    <% services = @membership.user.user_services.to_a.select{|s| feature_and_service_enabled?(s.service)} %>
+    <% if can_do(@membership, @current_user, :read_services) && !services.empty? %>
       <p>
-      <% @membership.user.user_services.each do |service| %>
+      <% services.each do |service| %>
         <% service_name = service.service.titleize rescue 'Unknown' %>
         <a href="<%= service.service_user_link %>" title="<%= service_name %>" class="no-hover"><%= image_tag "#{service.service}_icon.png", :alt => service_name %></a>
       <% end %>
       </p>
     <% else %>
-      <% if !@membership.user.user_services.empty?  %>
+      <% if !services.empty?  %>
         <p>
           <%= t 'services_not_visible', "%{user}'s registered services are not visible to you at this time.", :user => @user.short_name %>
         </p>
@@ -108,7 +100,7 @@
         </p>
       <% end %>
     <% end %>
-    <% if @current_user && @current_user == @user && @current_user.user_services.empty? %>
+    <% if @current_user && @current_user == @user && @current_user.user_services.select{|s| feature_and_service_enabled?(s.service)}.empty? %>
       <p>
         <%= t 'help.services', %{You haven't linked your user profile to any external services. You can link your Canvas account to services like Twitter. This will make it easier for fellow course and group members to link up with you outside of class.} %>
       </p>
@@ -126,12 +118,11 @@
   </div>
 <% end %>
 
-<% js_bundle :user_name %>
-<% css_bundle :roster_user, :pairing_code %>
+<h1><%= @user.name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h1>
 
-<h1><%= @user.name %></h1>
+<% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
-<% can_manage_admins = can_do(@context, @current_user, :manage_admin_users) %>
+<% can_manage_admins = can_do(@context, @current_user, manage_perm) %>
 
 <% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
 <%= render :partial => 'users/name' %>
@@ -184,7 +175,7 @@
               <% end %>
             </tr>
           <% end %>
-          <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+          <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
             <tr>
               <td>
                 <%= before_label('user_privileges', %{Privileges}) %>
@@ -206,7 +197,7 @@
             </tr>
           <% end %>
         </table>
-        <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+        <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
           <div id="student_last_attended__component"></div>
         <% end %>
       </fieldset>
@@ -236,4 +227,3 @@
 <% end %>
 <% end %>
 
-<% js_bundle 'legacy/context_roster_user' %>

@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, "Calendar"
+  provide :page_title, "Calendar"
   js_env :CALENDAR => {
     :CONTEXTS => @contexts_json,
     :MANAGE_CONTEXTS => @manage_contexts,
@@ -26,30 +26,23 @@
     :VIEW_START => @view_start,
     :CAL2_ONLY => true,
     :SHOW_SCHEDULER => @domain_root_account.show_scheduler?,
-    :BETTER_SCHEDULER => @domain_root_account.feature_enabled?(:better_scheduler) && @domain_root_account.show_scheduler?,
     :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size,
     :VISIBLE_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10,
+    :CONFERENCES_ENABLED => Account.site_admin.feature_enabled?(:calendar_conferences)
   }
   js_env({
-    :STUDENT_PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?,
-    :PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner)
+    :STUDENT_PLANNER_ENABLED => @current_user.has_student_enrollment?,
   })
 
-  js_bundle :calendar2
+  js_bundle :calendar
   css_bundle :calendar2, :agenda_view
   crumbs.clear
-  @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
+  add_body_class "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>
 <h1 class="screenreader-only"><%= t(:page_title_header, "Calendar") %></h1>
 
-<% content_for :auto_discovery do %>
-  <%= auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")}) %>
-<% end %>
-
-<% content_for :right_side do %>
-  <a href="#" class="screenreader-only skip-to-calendar"><%= t(:skip_to_calendar, "Skip to calendar") %></a>
-
-  <div class="rs-section">
+<% provide :right_side do %>
+  <div class="rs-section hidden-phone">
     <div id="minical"></div>
   </div>
   <div id="select-course-component" class="rs-section"></div>
@@ -79,7 +72,7 @@
   </p>
   <p id="calendar-feed-box-lower">
     <input value="<%= @feed_url%>.ics"><br>
-    <a href="<%= @feed_url%>.ics"><%= t "links.feed", 'click here to view the feed' %></a>
+    <a href="<%= @feed_url%>.ics"><%= t "Click to view Calendar Feed" %></a>
   </p>
 </div>
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -108,7 +110,15 @@ module Lti
          Canvas.membership.roles
          com.instructure.Course.groupIds
          com.Instructure.membership.roles
-         com.instructure.Assignment.anonymous_grading)
+         com.instructure.Assignment.anonymous_grading
+         com.instructure.Course.accept_canvas_resource_types
+         com.instructure.Course.canvas_resource_type
+         com.instructure.Course.allow_canvas_resource_selection
+         com.instructure.Course.available_canvas_resources
+         com.instructure.Person.pronouns
+         com.instructure.User.observees
+         com.instructure.User.sectionNames
+         com.instructure.Observee.sisIds)
     }
 
     describe '#supported_capabilities' do

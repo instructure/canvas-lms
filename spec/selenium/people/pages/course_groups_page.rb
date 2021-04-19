@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ class CourseGroups
     # elements
     def visit_course_groups(course_id)
       get "/courses/#{course_id}/groups"
-      make_full_screen
+
     end
 
     def groupset_actions_button(groupset_id)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -21,7 +23,9 @@ class Types::DateTimeType < Types::BaseScalar
   description "an ISO8601 formatted time string"
 
   def self.coerce_input(time_str, _)
-    time_str
+    Time.zone.iso8601(time_str)
+  rescue ArgumentError
+    raise GraphQL::CoercionError, "#{time_str.inspect} is not a iso8601 formatted date"
   end
 
   def self.coerce_result(time, _)

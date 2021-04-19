@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -90,7 +92,6 @@ class PlannerNotesController < ApplicationController
   include Api::V1::PlannerNote
 
   before_action :require_user
-  before_action :require_planner_enabled
 
   # @API List planner notes
   #
@@ -210,7 +211,7 @@ class PlannerNotesController < ApplicationController
         update_params[:course] = nil
       end
     end
-    if note.update_attributes(update_params)
+    if note.update(update_params)
       Rails.cache.delete(planner_meta_cache_key)
       render json: planner_note_json(note, @current_user, session), status: :ok
     else

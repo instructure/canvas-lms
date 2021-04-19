@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -63,7 +65,7 @@
 #         "all_day": {
 #           "description": "the overridden all day flag (present if due_at is overridden)",
 #           "example": true,
-#           "type": "integer"
+#           "type": "boolean"
 #         },
 #         "all_day_date": {
 #           "description": "the overridden all day date (present if due_at is overridden)",
@@ -429,7 +431,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def require_assignment
-    @assignment = @course.active_assignments.find(params[:assignment_id])
+    @assignment = api_find(@course.active_assignments, params[:assignment_id])
   end
 
   def require_assignment_edit

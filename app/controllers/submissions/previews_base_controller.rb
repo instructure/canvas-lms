@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -38,7 +40,7 @@ module Submissions
       @body_classes << 'is-inside-submission-frame'
 
       if @assignment.moderated_grading?
-        @moderated_grading_whitelist = @submission.moderated_grading_whitelist
+        @moderated_grading_allow_list = @submission.moderated_grading_allow_list
       end
 
       @anonymous_instructor_annotations = @context.grants_right?(@current_user, :manage_grades) &&
@@ -50,7 +52,7 @@ module Submissions
 
       @headers = false
       if authorized_action(@submission, @current_user, :read)
-        if redirect?
+        if redirect? && @assignment&.quiz&.id
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?

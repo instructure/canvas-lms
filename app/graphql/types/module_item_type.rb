@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ class ModuleProgressionVisibleLoader < GraphQL::Batch::Loader
   end
 
   def perform(contexts)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       contexts.each do |context|
         # Use sequential_ids to insure the modules are in the correct oreder
         sequential_ids = context.sequential_module_item_ids
@@ -40,14 +42,14 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     alias content_tag object
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
 
-    field :module, Types::ModuleType, null: true
-    def module
+    field :module, Types::ModuleType, null: true, resolver_method: :module_resolver
+    def module_resolver
       load_association(:context_module)
     end
 
@@ -60,8 +62,8 @@ module Types
         )
     end
 
-   field :next, Types::ModuleItemType, null: true
-   def next
+   field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
+   def next_resolver
      Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
        ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
          index = visible_tag_ids.index(content_tag.id)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,14 +19,39 @@
 #
 class PostPolicy < ActiveRecord::Base
   belongs_to :course, optional: false, inverse_of: :post_policies
-  belongs_to :assignment, optional: true, inverse_of: :post_policy
+  belongs_to :assignment, optional: true, touch: true, inverse_of: :post_policy
 
   validates :post_manually, inclusion: [true, false]
 
   before_validation :set_course_from_assignment
+  before_save :set_root_account_id
+
+  after_update :update_owning_course, if: -> { assignment.blank? }
+
+  # These methods allow callers to check whether Post Policies is enabled
+  # without needing to reference the specific setting every time. Note that, in
+  # addition to the setting, a course must also have New Gradebook enabled to
+  # have post policies be active.
+  def self.feature_enabled?
+    true
+  end
 
   private
   def set_course_from_assignment
     self.course_id = assignment.context_id if assignment.present? && course.blank?
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= course.root_account_id
+  end
+
+  def update_owning_course
+    # When a course post policy changes, mark the course as updated so
+    # we know the course has changed (so that, e.g., blueprint courses
+    # know there are unsynced changes).
+    #
+    # The "touch: true" parameter on the assignment association handles this
+    # for assignment post policies.
+    course.touch
   end
 end

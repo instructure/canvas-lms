@@ -67,13 +67,11 @@
 }
 
 @mixin button-focus-light {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px var(--ic-link-color); }
-  @else { box-shadow: inset 0 0 0 1px var(--ic-link-color); }
+  box-shadow: inset 0 0 0 2px var(--ic-link-color);
 }
 
 @mixin button-focus-dark {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
-  @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
+  box-shadow: inset 0 0 0 2px $ic-color-light;
 }
 
 
@@ -159,4 +157,14 @@
       box-shadow: none;
     }
   }
+}
+
+@mixin button-link {
+  border: none;
+  background: none;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 3px;
+  outline: none;
+  &:focus { @include button-focus-light; }
 }

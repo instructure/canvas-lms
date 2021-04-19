@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -40,7 +42,7 @@ class ExternalFeedEntry < ActiveRecord::Base
   protected :infer_defaults
 
   def update_feed_attributes(opts)
-    self.update_attributes(opts)
+    self.update(opts)
     @feed_entry_updated = self.changed?
   end
 

@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -44,6 +44,13 @@ describe I18nTimeZone do
       I18n.backend.stub({es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" }}}) do
         tz = I18nTimeZone['International Date Line West']
         expect(tz.to_s).to include "Línea de fecha internacional del oeste"
+      end
+    end
+
+    it "should have an entry in en locale for every time zone" do
+      I18n.locale = :en
+      I18nTimeZone.all.each do |zone|
+        expect(zone.to_s).to_not include("translation missing")
       end
     end
   end

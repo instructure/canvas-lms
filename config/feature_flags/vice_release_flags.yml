@@ -1,0 +1,60 @@
+---
+confetti_for_assignments:
+  state: hidden
+  display_name: Confetti for On-Time Submissions
+  description: |-
+    Displays confetti for users that turn in an assignment prior
+    to the set due date.
+  applies_to: RootAccount
+
+confetti_for_valid_links:
+  state: hidden
+  display_name: Confetti for valid links
+  description: |-
+    Displays confetti for teachers that run the link validator on
+    a course and no issues are found.
+  applies_to: RootAccount
+
+react_announcement_discussion_edit:
+  state: hidden
+  display_name: Update announcement/discussion edit page to use react/instui
+  description: |-
+    This refactor will make this page more maintainable and easily
+    allow us to make the page more accessible
+  applies_to: RootAccount
+
+react_discussions_post:
+  state: hidden
+  display_name: Update Discussions to use React & InstUI
+  description: |-
+    This refactor will make our Discussions Posts more maintainable and
+    allow for easier changes in the future
+  applies_to: RootAccount
+
+react_inbox:
+  state: hidden
+  display_name: Update Inbox page to use react/instui
+  description: |-
+    This refactor will make this page more maintainable
+  applies_to: RootAccount
+
+smart_alerts:
+  state: hidden
+  display_name: Smart alerts
+  description: |-
+    Notify students in time of assignments that require their attention.
+  applies_to: RootAccount
+
+trophy_case:
+  state: hidden
+  display_name: Trophy case
+  description: |-
+    Display historical view of achievements of users
+  applies_to: SiteAdmin
+
+show_push_notification_account_setting:
+  state: hidden
+  display_name: Allow push notification opt-out
+  description: |-
+    Enable an account setting which toggles push notifications for that account
+  applies_to: SiteAdmin

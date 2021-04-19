@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -203,10 +205,12 @@ class FoldersController < ApplicationController
   #
   # @returns [Folder]
   def resolve_path
-    if authorized_action(@context, @current_user, [:read, :manage_files])
+    # as long as one granted permission holds true, in most cases :read, user is authorized
+    if authorized_action(@context, @current_user, [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
       folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
+
       render json: folders_json(folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files, :context => @context)
     end
   end
@@ -331,9 +335,10 @@ class FoldersController < ApplicationController
         if parent_folder_id = folder_params.delete(:parent_folder_id)
           parent_folder = @context.folders.active.find(parent_folder_id)
           return unless authorized_action(parent_folder, @current_user, :manage_contents)
+
           folder_params[:parent_folder] = parent_folder
         end
-        if @folder.update_attributes(folder_params)
+        if @folder.update(folder_params)
           if !@folder.parent_folder_id || !@context.folders.where(id: @folder).first
             @folder.parent_folder = Folder.root_folders(@context).first
             @folder.save
@@ -599,11 +604,13 @@ class FoldersController < ApplicationController
   #
   # @returns Folder
   def copy_folder
-    unless params[:source_folder_id].present?
+    if params[:source_folder_id].blank?
       return render :json => {:message => "source_folder_id must be provided"}, :status => :bad_request
     end
+
     @dest_folder = Folder.find(params[:dest_folder_id])
     return unless authorized_action(@dest_folder, @current_user, :manage_contents)
+
     @context = @dest_folder.context
     @source_folder = Folder.find(params[:source_folder_id])
     unless @source_folder.shard == @dest_folder.shard
@@ -612,7 +619,10 @@ class FoldersController < ApplicationController
     if @source_folder.context == @context && (@dest_folder.full_name + '/').start_with?(@source_folder.full_name + '/')
       return render :json => {:message => "source folder may not contain destination folder"}, :status => :bad_request
     end
-    if authorized_action(@source_folder.context, @current_user, :manage_files)
+
+    if authorized_action(@source_folder.context,
+                         @current_user,
+                         [:manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       @folder = @context.folders.build(parent_folder: @dest_folder)
       if authorized_action(@folder, @current_user, :create)
         @folder = @source_folder.clone_for(@context, @folder, everything: true, force_copy: true)
@@ -622,6 +632,38 @@ class FoldersController < ApplicationController
           render :json => @folder.errors
         end
       end
+    end
+  end
+
+  # @API Get uploaded media folder for user
+  # @subtopic Folders
+  # Returns the details for a designated upload folder that the user has rights to
+  # upload to, and creates it if it doesn't exist.
+  #
+  # If the current user does not have the permissions to manage files
+  # in the course or group, the folder will belong to the current user directly.
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/media' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns Folder
+  def media_folder
+    require_context
+    if authorized_action(@context, @current_user, :read)
+      folder_context =
+        if @context.grants_any_right?(
+          @current_user,
+          session,
+          :manage_files,
+          *RoleOverride::GRANULAR_FILE_PERMISSIONS
+        )
+          @context
+        else
+          @current_user
+        end
+      @folder = Folder.media_folder(folder_context)
+      render json: folder_json(@folder, @current_user, session)
     end
   end
 end

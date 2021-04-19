@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,11 +28,16 @@ describe LearningOutcomeGroup do
   end
 
   def long_text(max = 65535)
-    text = ''
+    text = +''
     (0...max+1).each do |num|
       text.concat(num.to_s)
     end
     text
+  end
+
+  describe 'associations' do
+    it { is_expected.to belong_to(:source_outcome_group).class_name('LearningOutcomeGroup').inverse_of(:destination_outcome_groups) }
+    it { is_expected.to have_many(:destination_outcome_groups).class_name('LearningOutcomeGroup').inverse_of(:source_outcome_group).dependent(:nullify) }
   end
 
   context 'object creation' do
@@ -245,6 +252,14 @@ describe LearningOutcomeGroup do
 
       expect(root).not_to eq(course_root)
     end
+
+    it 'sends live events even when they have been otherwise disabled' do
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_group_created)
+      ActiveRecord::Base.observers.disable LiveEventsObserver do
+        new_course = course_factory
+        LearningOutcomeGroup.find_or_create_root(new_course, true)
+      end
+    end
   end
 
   describe '#destroy' do
@@ -274,38 +289,20 @@ describe LearningOutcomeGroup do
     end
   end
 
-  context 'enable new guid columns' do
-    before :once do
-      course_factory
-      @group = @course.learning_outcome_groups.create!(:title => 'groupage')
+  context 'root account resolution' do
+    it 'sets root_account_id using Account context' do
+      group = LearningOutcomeGroup.create!(title: 'group', context: Account.default)
+      expect(group.root_account).to eq Account.default
     end
 
-    it "should read vendor_guid_2" do
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@group.vendor_guid).to be_nil
-      @group.vendor_guid = "GUID-XXXX"
-      @group.save!
-      expect(@group.vendor_guid).to eql "GUID-XXXX"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
-      expect(@group.vendor_guid).to eql "GUID-XXXX"
-      @group.write_attribute('vendor_guid_2', "GUID-YYYY")
-      expect(@group.vendor_guid).to eql "GUID-YYYY"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@group.vendor_guid).to eql "GUID-XXXX"
+    it 'sets root_account_id using Course context' do
+      group = @course.learning_outcome_groups.create!(title: 'group')
+      expect(group.root_account).to eq @course.root_account
     end
 
-    it "should read migration_id_2" do
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@group.migration_id).to be_nil
-      @group.migration_id = "GUID-XXXX"
-      @group.save!
-      expect(@group.migration_id).to eql "GUID-XXXX"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
-      expect(@group.migration_id).to eql "GUID-XXXX"
-      @group.write_attribute('migration_id_2', "GUID-YYYY")
-      expect(@group.migration_id).to eql "GUID-YYYY"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@group.migration_id).to eql "GUID-XXXX"
+    it 'sets root_acount_id 0 when global (context is nil)' do
+      group = LearningOutcomeGroup.create!(title: 'group', context_id: nil)
+      expect(group.root_account_id).to eq 0
     end
   end
 end

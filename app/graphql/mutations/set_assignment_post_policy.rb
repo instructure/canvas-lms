@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -34,9 +36,21 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
 
     verify_authorized_action!(course, :manage_grades)
 
+    if input[:post_manually] == false
+      raise GraphQL::ExecutionError, I18n.t("Anonymous assignments must be manually posted") if assignment.anonymous_grading?
+
+      if assignment.moderated_grading? && !assignment.grades_published?
+        raise GraphQL::ExecutionError, I18n.t("Moderated assignments must be manually posted until grades are released")
+      end
+    end
+
     policy = PostPolicy.find_or_create_by(course: course, assignment: assignment)
     policy.update!(post_manually: input[:post_manually])
 
     {post_policy: policy}
+  end
+
+  def self.post_policy_log_entry(post_policy, _context)
+    post_policy.assignment
   end
 end

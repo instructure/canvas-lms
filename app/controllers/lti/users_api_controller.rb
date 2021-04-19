@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -39,7 +41,7 @@ module Lti
       }.freeze,
       {
         id: GROUP_INDEX_SERVICE,
-        endpoint: 'api/lti/group/{group_id}/users',
+        endpoint: 'api/lti/groups/{group_id}/users',
         format: ['application/json'].freeze,
         action: ['GET'].freeze
       }.freeze
@@ -58,7 +60,7 @@ module Lti
     #
     # @returns User
     def show
-      render json: user_json(user, user, nil, USER_INCLUDES, tool_proxy.context)
+      render json: user_json(user, user, nil, [], tool_proxy.context, tool_includes: USER_INCLUDES)
     end
 
     # @API Get all users in a group (lti)
@@ -70,8 +72,8 @@ module Lti
     def group_index
       users = Api.paginate(group.participating_users, self, lti_user_group_index_url)
       user_json_preloads(users)
-      UserPastLtiIds.manual_preload_past_lti_ids(users, group.context)
-      render json: users.map { |user| user_json(user, user, nil, USER_INCLUDES, group.context) }
+      UserPastLtiId.manual_preload_past_lti_ids(users, group.context)
+      render json: users.map { |user| user_json(user, user, nil, [], group.context, tool_includes: USER_INCLUDES) }
     end
 
     private
@@ -94,11 +96,16 @@ module Lti
     end
 
     def user_in_context
-      user_assignments = user.enrollments.active.preload(:course).map(&:course).map do |c|
-        Assignments::ScopedToUser.new(c, user).scope
-      end.flatten
-      tool_assignments = AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)
-      render_unauthorized_action if (tool_assignments & user_assignments).blank?
+      tool_proxy_assignments = AssignmentConfigurationToolLookup.by_tool_proxy_scope(tool_proxy).select(:assignment_id)
+      user_visible_to_proxy = user.enrollments
+        .joins(course: :assignments)
+        .where(assignments: {id: tool_proxy_assignments})
+        .where.not(
+          courses: {workflow_state: 'deleted'},
+          assignments: {workflow_state: 'deleted'}
+        )
+        .exists?
+      render_unauthorized_action unless user_visible_to_proxy
     end
   end
 end

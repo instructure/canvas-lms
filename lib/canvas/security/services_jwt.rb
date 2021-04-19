@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -33,7 +35,9 @@ class Canvas::Security::ServicesJwt
   def wrapper_token
     return {} unless is_wrapped
     raw_wrapper_token = Canvas::Security.base64_decode(token_string)
-    Canvas::Security.decode_jwt(raw_wrapper_token, [signing_secret])
+    keys = [signing_secret]
+    keys << previous_signing_secret if previous_signing_secret
+    Canvas::Security.decode_jwt(raw_wrapper_token, keys)
   end
 
   def original_token(ignore_expiration: false)
@@ -45,6 +49,18 @@ class Canvas::Security::ServicesJwt
     Canvas::Security.decrypt_services_jwt(
       original_crypted_token,
       signing_secret,
+      encryption_secret,
+      ignore_expiration: ignore_expiration
+    )
+  rescue Canvas::Security::InvalidToken
+    # if we failed during the wrapper token decoding then
+    # there is no way to decrypt this because we already
+    # tried the relevent keys, so we need not try anything else
+    # if original_crypted_token is nil.
+    raise unless original_crypted_token && previous_signing_secret
+    Canvas::Security.decrypt_services_jwt(
+      original_crypted_token,
+      previous_signing_secret,
       encryption_secret,
       ignore_expiration: ignore_expiration
     )
@@ -137,11 +153,15 @@ class Canvas::Security::ServicesJwt
   end
 
   def self.encryption_secret
-    Canvas::DynamicSettings.find("canvas")["encryption-secret"]
+    Canvas::Security.services_encryption_secret
   end
 
   def self.signing_secret
-    Canvas::DynamicSettings.find("canvas")["signing-secret"]
+    Canvas::Security.services_signing_secret
+  end
+
+  def self.previous_signing_secret
+    Canvas::Security.services_previous_signing_secret
   end
 
   private
@@ -152,6 +172,10 @@ class Canvas::Security::ServicesJwt
 
   def signing_secret
     self.class.signing_secret
+  end
+
+  def previous_signing_secret
+    self.class.previous_signing_secret
   end
 
   class << self

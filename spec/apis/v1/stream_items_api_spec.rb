@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2012 Instructure, Inc.
 #
@@ -90,9 +92,6 @@ describe UsersController, type: :request do
         assignment_model(:course => @course)
         @assignment.update_attribute(:due_at, 1.week.from_now)
         @assignment.update_attribute(:due_at, 2.weeks.from_now)
-        # manually set the pre-datafixup state for one of them
-        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item_id)).
-          limit(1).update_all(:notification_category => nil)
       end
       json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
         { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
@@ -115,7 +114,7 @@ describe UsersController, type: :request do
         @course2.enroll_student(@student).accept!
         @dt1 = discussion_topic_model(:context => @course1)
         @dt2 = discussion_topic_model(:context => @course2)
-        @course2.update_attributes(:start_at => 2.weeks.ago, :conclude_at => 1.week.ago, :restrict_enrollments_to_course_dates => true)
+        @course2.update(:start_at => 2.weeks.ago, :conclude_at => 1.week.ago, :restrict_enrollments_to_course_dates => true)
       end
       json = api_call(:get, "/api/v1/users/self/activity_stream",
         { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -153,24 +152,6 @@ describe UsersController, type: :request do
       expect(json.count).to eq 1
       expect(json.first["submission_comments"].count).to eq 2
     end
-  end
-
-  it "should still return notification_category in the the activity stream summary if not set (yet)" do
-    # TODO: can remove this spec as well as the code in lib/api/v1/stream_item once the datafixup has been run
-    @context = @course
-    Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
-    allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
-    assignment_model(:course => @course)
-    @assignment.update_attribute(:due_at, 1.week.from_now)
-    @assignment.update_attribute(:due_at, 2.weeks.from_now)
-    # manually set the pre-datafixup state for one of them
-    StreamItem.where(:id => @user.visible_stream_item_instances.first.stream_item).update_all(:notification_category => nil)
-    json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
-      { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
-
-    expect(json).to eq [
-          {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
-        ]
   end
 
   it "should format DiscussionTopic" do
@@ -368,7 +349,7 @@ describe UsersController, type: :request do
   it "should format graded Submission with comments" do
     #set @domain_root_account
     @domain_root_account = Account.default
-    @domain_root_account.update_attributes(:default_time_zone => 'America/Denver')
+    @domain_root_account.update(:default_time_zone => 'America/Denver')
 
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
@@ -402,6 +383,7 @@ describe UsersController, type: :request do
       'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => @sub.graded_at.as_json,
+      'posted_at' => @sub.posted_at.as_json,
       'score' => 12.0,
       'entered_score' => 12.0,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
@@ -430,6 +412,7 @@ describe UsersController, type: :request do
           'author' => {
             'id' => @teacher.id,
             'display_name' => 'teacher',
+            'pronouns' => nil,
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
             'avatar_image_url' => User.avatar_fallback_url(nil, request)
           },
@@ -445,6 +428,7 @@ describe UsersController, type: :request do
           'author' => {
             'id' => @user.id,
             'display_name' => 'User',
+            'pronouns' => nil,
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
             'avatar_image_url' => User.avatar_fallback_url(nil, request)
           },
@@ -464,6 +448,7 @@ describe UsersController, type: :request do
         'created_at' => @course.created_at.as_json,
         'start_at' => @course.start_at.as_json,
         'grading_standard_id'=>nil,
+        'grade_passback_setting'=>nil,
         'id' => @course.id,
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
@@ -481,7 +466,9 @@ describe UsersController, type: :request do
         'time_zone' => 'America/Denver',
         'uuid' => @course.uuid,
         'blueprint' => false,
-        'license' => nil
+        'license' => nil,
+        'homeroom_course' => false,
+        'course_color' => nil
       },
 
       'user' => {
@@ -494,11 +481,11 @@ describe UsersController, type: :request do
   end
 
   it "should format ungraded Submission with comments" do
-    #set @domain_root_account
     @domain_root_account = Account.default
-    @domain_root_account.update_attributes(:default_time_zone => 'America/Denver')
+    @domain_root_account.update(:default_time_zone => 'America/Denver')
 
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
+    @assignment.unmute!
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
     @sub = @assignment.grade_student(@user, grade: nil, grader: @teacher).first
@@ -530,6 +517,7 @@ describe UsersController, type: :request do
       'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => nil,
+      'posted_at' => @sub.posted_at.as_json,
       'score' => nil,
       'entered_score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
@@ -559,7 +547,8 @@ describe UsersController, type: :request do
             'id' => @teacher.id,
             'display_name' => 'teacher',
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-            'avatar_image_url' => User.avatar_fallback_url(nil, request)
+            'avatar_image_url' => User.avatar_fallback_url(nil, request),
+            'pronouns' => nil
           },
           'author_name' => 'teacher',
           'author_id' => @teacher.id,
@@ -574,6 +563,7 @@ describe UsersController, type: :request do
             'id' => @user.id,
             'display_name' => 'User',
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+            'pronouns' => nil,
             'avatar_image_url' => User.avatar_fallback_url(nil, request)
           },
           'author_name' => 'User',
@@ -592,6 +582,7 @@ describe UsersController, type: :request do
         'start_at' => @course.start_at.as_json,
         'created_at' => @course.created_at.as_json,
         'grading_standard_id'=>nil,
+        'grade_passback_setting'=>nil,
         'id' => @course.id,
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
@@ -609,13 +600,14 @@ describe UsersController, type: :request do
         'time_zone' => 'America/Denver',
         'uuid' => @course.uuid,
         'blueprint' => false,
-        'license' => nil
+        'license' => nil,
+        'homeroom_course' => false,
+        'course_color' => nil
       },
 
       'user' => {
         "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User", "created_at"=>@user.created_at.iso8601
       },
-
       'context_type' => 'Course',
       'course_id' => @course.id,
     }]

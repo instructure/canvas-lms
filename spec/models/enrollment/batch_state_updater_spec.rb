@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -76,7 +78,7 @@ describe "Enrollment::BatchStateUpdater" do
       enable_cache do
         user = User.create!
         user.update_attribute(:workflow_state, 'creation_pending')
-        user.communication_channels.create!(path: 'panda@instructure.com')
+        communication_channel(user, {username: 'panda@instructure.com'})
         enrollment = @course.enroll_user(user)
         expect(Enrollment.cached_temporary_invitations('panda@instructure.com').length).to eq 1
         Enrollment::BatchStateUpdater.mark_enrollments_as_deleted([enrollment])
@@ -146,6 +148,7 @@ describe "Enrollment::BatchStateUpdater" do
       recache_course_grade_distribution
       recalculate_enrollment_state
       reset_notifications_cache
+      resolve_cross_account_role
       restore_submissions_and_scores
       set_sis_stickiness
       set_update_cached_due_dates

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ shared_context "Blueprint Sync History Context" do
   end
 
   def open_item_history
-    f('.bcs__history-item:nth-of-type(1) .pill').click
+    f('.bcs__history-item:nth-of-type(1) #exceptionPill').click
   end
 
   def exceptions_frame

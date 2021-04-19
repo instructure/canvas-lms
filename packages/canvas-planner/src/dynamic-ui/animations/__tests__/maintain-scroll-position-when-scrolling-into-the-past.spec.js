@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MaintainScrollPositionWhenScrollingIntoThePast} from '../index';
-import {createAnimation} from './test-utils';
+import {MaintainScrollPositionWhenScrollingIntoThePast} from '../index'
+import {createAnimation} from './test-utils'
 
 it('records and forwards the memo for the fixed element', () => {
-  const {animation, app, animator} = createAnimation(MaintainScrollPositionWhenScrollingIntoThePast);
+  const {animation, app, animator} = createAnimation(MaintainScrollPositionWhenScrollingIntoThePast)
   app.fixedElementForItemScrolling
     .mockReturnValueOnce('scroll-past-fixed-element-first')
-    .mockReturnValueOnce('scroll-past-fixed-element-second');
-  animator.elementPositionMemo.mockReturnValueOnce('position-memo');
-  animation.invokeUiWillUpdate();
-  animation.invokeUiDidUpdate();
-  expect(animator.elementPositionMemo).toHaveBeenCalledWith('scroll-past-fixed-element-first');
-  expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith('scroll-past-fixed-element-second', 'position-memo');
-});
+    .mockReturnValueOnce('scroll-past-fixed-element-second')
+  animator.elementPositionMemo.mockReturnValueOnce('position-memo')
+  animation.invokeUiWillUpdate()
+  animation.invokeUiDidUpdate()
+  expect(animator.elementPositionMemo).toHaveBeenCalledWith('scroll-past-fixed-element-first')
+  expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
+    'scroll-past-fixed-element-second',
+    'position-memo'
+  )
+})

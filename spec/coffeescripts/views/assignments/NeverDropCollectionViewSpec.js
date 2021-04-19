@@ -17,27 +17,16 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import NeverDropCollection from 'compiled/collections/NeverDropCollection'
-import NeverDropCollectionView from 'compiled/views/assignments/NeverDropCollectionView'
+import Backbone from '@canvas/backbone'
+import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection.coffee'
+import NeverDropCollectionView from 'ui/features/assignment_index/backbone/views/NeverDropCollectionView.coffee'
 import {useNormalDebounce, useOldDebounce} from 'helpers/util'
 
 class AssignmentStub extends Backbone.Model {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
-    this.toView = this.toView.bind(this)
-    super(...args)
-  }
-
   name() {
     return this.get('name')
   }
+
   toView() {
     return {
       name: this.get('name'),
@@ -199,7 +188,7 @@ test('when there are no availableValues, the add assignment link is not rendered
   equal($('#fixtures').find('.add_never_drop').length, 0)
 })
 
-test("when there are no takenValues, the add assignment says 'add an assignment'", function() {
+test("when there are no takenValues, the add assignment says 'add an assignment'", () => {
   const text = $('#fixtures')
     .find('.add_never_drop')
     .text()

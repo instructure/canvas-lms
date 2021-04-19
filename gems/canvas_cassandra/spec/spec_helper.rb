@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -30,8 +32,12 @@ rescue LoadError => e
   puts "Error: #{e}"
 end
 
+require "rails"
+Rails.env = 'test'
+
 require "canvas_cassandra"
 require "yaml"
+require "byebug"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,6 +27,9 @@ class AssignmentGroup < ActiveRecord::Base
   workflow { state :available }
   include Canvas::SoftDeletable
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:group_weight, :rules]
+
   attr_readonly :context_id, :context_type
 
   attr_accessor :saved_by
@@ -50,6 +55,7 @@ class AssignmentGroup < ActiveRecord::Base
   validates :default_assignment_name, length: { maximum: maximum_string_length }, allow_nil: true
   validates :name, length: { maximum: maximum_string_length }, allow_nil: true
 
+  before_create :set_root_account_id
   before_save :set_context_code
   before_save :generate_default_values
   after_save :course_grading_change
@@ -57,6 +63,7 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :update_student_grades
 
   before_destroy :destroy_scores
+  after_destroy :clear_context_has_assignment_group_cache
 
   def generate_default_values
     if self.name.blank?
@@ -67,6 +74,7 @@ class AssignmentGroup < ActiveRecord::Base
     end
     self.default_assignment_name = self.name
     self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
+    self.position = self.position_was if self.will_save_change_to_position? && self.position.nil? # don't allow setting to nil
   end
   protected :generate_default_values
 
@@ -155,12 +163,21 @@ class AssignmentGroup < ActiveRecord::Base
   scope :include_active_assignments, -> { preload(:active_assignments) }
   scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
-  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
+  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).ordered }
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
 
   def course_grading_change
     self.context.grade_weight_changed! if saved_change_to_group_weight? && self.context && self.context.group_weighting_scheme == 'percent'
     true
+  end
+
+  # this is just in case we happen to delete the last assignment_group in a course
+  def clear_context_has_assignment_group_cache
+    Rails.cache.delete(['has_assignment_group', global_context_id].cache_key) if context_id
+  end
+
+  def course_broadcast_data
+    context&.broadcast_data
   end
 
   set_broadcast_policy do |p|
@@ -170,6 +187,7 @@ class AssignmentGroup < ActiveRecord::Base
       false &&
       record.changed_in_state(:available, :fields => :group_weight)
     }
+    p.data { course_broadcast_data }
   end
 
   def students
@@ -208,19 +226,30 @@ class AssignmentGroup < ActiveRecord::Base
     effective_due_dates.any_in_closed_grading_period?
   end
 
-  def visible_assignments(user, includes=[])
-    self.class.visible_assignments(user, self.context, [self], includes)
+  def visible_assignments(user, includes: [], assignment_ids: [])
+    self.class.visible_assignments(
+      user,
+      self.context,
+      [self],
+      includes: includes,
+      assignment_ids: assignment_ids
+    )
   end
 
-  def self.visible_assignments(user, context, assignment_groups, includes = [])
-    if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments)
-      scope = context.active_assignments.where(:assignment_group_id => assignment_groups)
+  def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
+    scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments)
+      context.active_assignments.where(:assignment_group_id => assignment_groups)
     elsif user.nil?
-      scope = context.active_assignments.published.where(:assignment_group_id => assignment_groups)
+      context.active_assignments.published.where(:assignment_group_id => assignment_groups)
     else
-      scope = user.assignments_visible_in_course(context).
-              where(:assignment_group_id => assignment_groups).published
+      user.assignments_visible_in_course(context).
+        where(:assignment_group_id => assignment_groups).published
     end
+
+    if assignment_ids&.any?
+      scope = scope.where(id: assignment_ids)
+    end
+
     includes.any? ? scope.preload(includes) : scope
   end
 
@@ -266,5 +295,9 @@ class AssignmentGroup < ActiveRecord::Base
 
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(context, published_assignments)
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= context.root_account_id
   end
 end

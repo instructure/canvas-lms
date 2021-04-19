@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -54,7 +56,6 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     if body.respond_to?(:call)
       StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
     end
-    body.sub!(%r{^while\(1\);}, '')
     # Check that the body doesn't have any duplicate keys. this can happen if
     # you add both a string and a symbol to the hash before calling to_json on
     # it.
@@ -140,7 +141,7 @@ def api_json_response(objects, opts = nil)
 end
 
 def check_document(html, course, attachment, include_verifiers)
-  doc = Nokogiri::HTML::DocumentFragment.parse(html)
+  doc = Nokogiri::HTML5.fragment(html)
   img1 = doc.at_css('img#1')
   expect(img1).to be_present
   params = include_verifiers ? "?verifier=#{attachment.uuid}" : ""
@@ -148,6 +149,9 @@ def check_document(html, course, attachment, include_verifiers)
   img2 = doc.at_css('img#2')
   expect(img2).to be_present
   expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
+  img3 = doc.at_css('img#3')
+  expect(img3).to be_present
+  expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
   video = doc.at_css('video')
   expect(video).to be_present
   expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
@@ -166,6 +170,7 @@ def should_translate_user_content(course, include_verifiers=true)
       Hello, students.<br>
       This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
       This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
+      This might explain something:  <img id="3" src="/courses/#{course.id}/files/#{attachment.id}" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
       And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>

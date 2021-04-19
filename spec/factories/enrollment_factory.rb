@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -56,19 +58,19 @@ module Factories
       users
 
     if options[:account_associations]
-      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0}})
+      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0, root_account_id: course.root_account_id}})
     end
 
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    role_id = options[:role].try(:id) || Role.get_built_in_role(type).id
+    role_id = options[:role].try(:id) || Role.get_built_in_role(type, root_account_id: course.root_account_id).id
     result = create_records(Enrollment, user_ids.map { |id|
       {
         course_id: course.id,
         user_id: id,
         type: type,
         course_section_id: section_id,
-        root_account_id: course.root_account.id,
+        root_account_id: course.root_account_id,
         workflow_state: enrollment_state,
         role_id: role_id,
         sis_batch_id: sis_batch_id,
@@ -76,7 +78,7 @@ module Factories
         limit_privileges_to_course_section: limit_privileges_to_course_section
       }
     }, options[:return_type])
-    create_enrollment_states(result, {state: enrollment_state})
+    create_enrollment_states(result, {state: enrollment_state, root_account_id: course.root_account_id})
     result
   end
 end

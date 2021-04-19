@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Subject from 'compiled/quizzes/log_auditing/event_trackers/session_started'
-import K from 'compiled/quizzes/log_auditing/constants'
+import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/session_started'
+import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
 
 QUnit.module('Quizzes::LogAuditing::EventTrackers::SessionStarted')
@@ -28,7 +28,7 @@ test('#constructor: it sets up the proper context', () => {
   equal(tracker.priority, K.EVT_PRIORITY_LOW)
 })
 
-QUnit.skip('capturing: it works', function() {
+QUnit.skip('capturing: it works', () => {
   const tracker = new Subject()
   const capture = sinon.stub()
   tracker.install(capture)

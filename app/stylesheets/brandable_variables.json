@@ -84,6 +84,12 @@
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
     "default": "/images/canvas_logomark_only@2x.png"
+  },
+  {
+    "variable_name": "ic-brand-mobile-global-nav-logo",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
+    "default": "/images/mobile-global-nav-logo.svg"
   }
 ]},
 {

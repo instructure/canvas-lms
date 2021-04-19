@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditRubricPage from 'compiled/views/rubrics/EditRubricPage'
+import EditRubricPage from '@canvas/rubrics/backbone/views/EditRubricPage'
 import assertions from 'helpers/assertions'
 
-QUnit.module('RubricEdit');
+QUnit.module('RubricEdit')
 
-test('should be accessible', (assert) => {
+test('should be accessible', assert => {
   const view = new EditRubricPage()
   const done = assert.async()
-  assertions.isAccessible(view, done, {'a11yReport': true})
-});
+  assertions.isAccessible(view, done, {a11yReport: true})
+})
 
 test('does not immediately create the dialog', () => {
   const clickSpy = sinon.spy(EditRubricPage.prototype, 'attachInitialEvent')
   const dialogSpy = sinon.spy(EditRubricPage.prototype, 'createDialog')
 
-  new EditRubricPage();
+  new EditRubricPage()
 
   ok(clickSpy.called, 'sets up the initial click event')
   ok(dialogSpy.notCalled, 'does not immediately create the dialog')
   clickSpy.restore()
   dialogSpy.restore()
-});
+})

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -35,7 +37,7 @@ class CrocodocSessionsController < ApplicationController
       url = crocodoc.session_url(:user => @current_user,
                                  :annotations => annotations,
                                  :enable_annotations => blob["enable_annotations"],
-                                 :moderated_grading_whitelist => blob["moderated_grading_whitelist"])
+                                 :moderated_grading_allow_list => blob["moderated_grading_allow_list"])
 
       # For the purposes of reporting student viewership, we only
       # care if the original attachment owner is looking

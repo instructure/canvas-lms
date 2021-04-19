@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -120,7 +122,8 @@ module Api::V1::Assignment
       override_dates: true,
       needs_grading_count_by_section: false,
       exclude_response_fields: [],
-      include_planner_override: false
+      include_planner_override: false,
+      include_can_edit: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -183,6 +186,7 @@ module Api::V1::Assignment
     hash['original_course_id'] = assignment.duplicate_of&.course&.id
     hash['original_assignment_id'] = assignment.duplicate_of&.id
     hash['original_assignment_name'] = assignment.duplicate_of&.name
+    hash['original_quiz_id'] = assignment.migrate_from_id
     hash['workflow_state'] = assignment.workflow_state
 
     if assignment.quiz_lti?
@@ -215,11 +219,15 @@ module Api::V1::Assignment
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
-      hash['external_tool_tag_attributes'] = {
+      tool_attributes = {
         'url' => external_tool_tag.url,
         'new_tab' => external_tool_tag.new_tab,
-        'resource_link_id' => assignment.lti_resource_link_id
+        'resource_link_id' => assignment.lti_resource_link_id,
+        'external_data' => external_tool_tag.external_data
       }
+      tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
+      tool_attributes.merge!('custom' => assignment.primary_resource_link&.custom)
+      hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
                                            :assignment_id => assignment.id)
@@ -244,6 +252,7 @@ module Api::V1::Assignment
     end
 
     if assignment.context.grants_any_right?(user, :read_sis, :manage_sis)
+      hash['sis_assignment_id'] = assignment.sis_source_id
       hash['integration_id'] = assignment.integration_id
       hash['integration_data'] = assignment.integration_data
     end
@@ -258,7 +267,7 @@ module Api::V1::Assignment
     end
 
     unless opts[:exclude_response_fields].include?('rubric')
-      if assignment.rubric_association
+      if assignment.active_rubric_association?
         hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
         if assignment.rubric_association.rubric
           hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
@@ -312,6 +321,16 @@ module Api::V1::Assignment
       end
     end
 
+    if opts[:include_can_edit]
+      can_edit_assignment = assignment.user_can_update?(user, session)
+      hash['can_edit'] = can_edit_assignment
+      hash['all_dates']&.each do |date_hash|
+        in_closed_grading_period = date_in_closed_grading_period?(date_hash['due_at'])
+        date_hash['in_closed_grading_period'] = in_closed_grading_period
+        date_hash['can_edit'] = can_edit_assignment && (!in_closed_grading_period || !constrained_by_grading_periods?)
+      end
+    end
+
     if opts[:include_module_ids]
       modulable = case assignment.submission_types
                   when 'online_quiz' then assignment.quiz
@@ -337,11 +356,27 @@ module Api::V1::Assignment
     end
 
     if submission = opts[:submission]
+      should_show_statistics = opts[:include_score_statistics] && assignment.can_view_score_statistics?(user)
+
       if submission.is_a?(Array)
         ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
         hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params) }
+        should_show_statistics = should_show_statistics && submission.any? do |s|
+          s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
+          s.eligible_for_showing_score_statistics?
+        end
       else
         hash['submission'] = submission_json(submission, assignment, user, session, assignment.context, params)
+        submission.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
+        should_show_statistics = should_show_statistics && submission.eligible_for_showing_score_statistics?
+      end
+
+      if should_show_statistics && (stats = assignment&.score_statistic)
+        hash["score_statistics"] = {
+          'min' => stats.minimum.to_f.round(1),
+          'max': stats.maximum.to_f.round(1),
+          'mean': stats.mean.to_f.round(1)
+        }
       end
     end
 
@@ -364,8 +399,18 @@ module Api::V1::Assignment
       hash['planner_override'] = planner_override_json(override, user, session)
     end
 
+    hash['post_manually'] = assignment.post_manually?
     hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
     hash['anonymize_students'] = assignment.anonymize_students?
+
+    hash['require_lockdown_browser'] = assignment.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false
+
+    if opts[:include_can_submit] && !assignment.quiz? && !submission.is_a?(Array)
+      hash['can_submit'] = assignment.expects_submission? &&
+          assignment.rights_status(user, :submit)[:submit] &&
+          (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
+    end
+
     hash
   end
 
@@ -425,6 +470,7 @@ module Api::V1::Assignment
     grading_standard_id
     freeze_on_copy
     notify_of_update
+    sis_assignment_id
     integration_id
     omit_from_final_grade
     anonymous_instructor_annotations
@@ -454,12 +500,13 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+
     return false unless prepared_create[:valid]
 
     response = :created
 
     Assignment.suspend_due_date_caching do
-      assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
+      assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
       response = if prepared_create[:overrides].present?
         create_api_assignment_with_overrides(prepared_create, user)
@@ -473,9 +520,6 @@ module Api::V1::Assignment
     DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades, executing_user: user)
     response
   rescue ActiveRecord::RecordInvalid
-    false
-  rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
-    assignment.errors.add('plagiarism_tool_subscription', e)
     false
   end
 
@@ -504,6 +548,8 @@ module Api::V1::Assignment
     end
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
+      assignment.clear_cache_key(:availability)
+      assignment.quiz.clear_cache_key(:availability) if assignment.quiz?
       DueDateCacher.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 
@@ -528,6 +574,7 @@ module Api::V1::Assignment
     "media_recording",
     "not_graded",
     "wiki_page",
+    "student_annotation",
     ""
   ].freeze
 
@@ -538,7 +585,7 @@ module Api::V1::Assignment
     if assignment_params['submission_types'].present? &&
       !assignment_params['submission_types'].all? do |s|
         return false if s == 'wiki_page' && !self.context.try(:feature_enabled?, :conditional_release)
-        API_ALLOWED_SUBMISSION_TYPES.include?(s)
+        API_ALLOWED_SUBMISSION_TYPES.include?(s) || (s == 'default_external_tool' && assignment.unpublished?)
       end
         assignment.errors.add('assignment[submission_types]',
           I18n.t('assignments_api.invalid_submission_types',
@@ -606,19 +653,18 @@ module Api::V1::Assignment
     false
   end
 
-  def assignment_mute_status_valid?(assignment, assignment_params)
-    return true unless assignment_params.include?("muted") && assignment.moderated_grading?
-
-    # A moderated assignment may not be unmuted until grades have been published
-    assignment.grades_published? || value_to_boolean(assignment_params["muted"])
-  end
-
   def update_from_params(assignment, assignment_params, user, context = assignment.context)
     update_params = assignment_params.permit(allowed_assignment_input_fields)
 
     if update_params.key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
       update_params.delete('peer_reviews_assign_at')
+    end
+
+    if update_params.key?("anonymous_peer_reviews")
+      if Canvas::Plugin.value_to_boolean(update_params["anonymous_peer_reviews"]) != assignment.anonymous_peer_reviews
+        ::AssessmentRequest.where(asset: assignment.submissions).update_all(updated_at: Time.now.utc)
+      end
     end
 
     if update_params["submission_types"].is_a? Array
@@ -628,6 +674,8 @@ module Api::V1::Assignment
       end
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
+
+    update_params["submission_types"] ||= "not_graded" if update_params["grading_type"] == "not_graded"
 
     if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
@@ -649,19 +697,11 @@ module Api::V1::Assignment
       end
     end
 
-    if assignment_params.key? "muted"
-      muted = value_to_boolean(assignment_params.delete("muted"))
-      if muted
-        assignment.mute!
-      else
-        assignment.unmute!
-      end
-    end
-
     if assignment.context.grants_right?(user, :manage_sis)
       data = update_params['integration_data']
       update_params['integration_data'] = JSON.parse(data) if data.is_a?(String)
     else
+      update_params.delete('sis_assignment_id')
       update_params.delete('integration_id')
       update_params.delete('integration_data')
     end
@@ -735,12 +775,39 @@ module Api::V1::Assignment
       end
     end
 
+    if assignment_params.key?('migrated_successfully')
+      if value_to_boolean(assignment_params[:migrated_successfully])
+        assignment.finish_migrating
+      else
+        assignment.fail_to_migrate
+      end
+    end
+
     if assignment_params.key?('cc_imported_successfully')
       if value_to_boolean(assignment_params[:cc_imported_successfully])
         assignment.finish_importing
       else
         assignment.fail_to_import
       end
+    end
+
+    if update_params[:submission_types]&.include?('student_annotation')
+      if assignment_params.key?(:annotatable_attachment_id)
+        attachment = Attachment.find(assignment_params.delete(:annotatable_attachment_id))
+        assignment.annotatable_attachment = attachment.copy_to_student_annotation_documents_folder(assignment.course)
+      end
+    else
+      assignment.annotatable_attachment_id = nil
+    end
+
+    if update_lockdown_browser?(assignment_params)
+      update_lockdown_browser_settings(assignment, assignment_params)
+    end
+
+    if update_params['allowed_attempts'].to_i == -1 && assignment.allowed_attempts.nil?
+      # if allowed_attempts is nil, the api json will replace it with -1 for some reason
+      # so if it's included in the json to update, we should just ignore it
+      update_params.delete('allowed_attempts')
     end
 
     apply_report_visibility_options!(assignment_params, assignment)
@@ -833,6 +900,12 @@ module Api::V1::Assignment
   def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
+    if assignment_params[:points_possible].blank?
+      if assignment.new_record? || assignment_params.has_key?(:points_possible) # only change if they're deliberately updating to blank
+        assignment_params[:points_possible] = 0
+      end
+    end
+
     unless assignment.new_record?
       assignment.restore_attributes
       old_assignment = assignment.clone
@@ -847,11 +920,14 @@ module Api::V1::Assignment
     apply_external_tool_settings(assignment, assignment_params)
     overrides = pull_overrides_from_params(assignment_params)
     invalid = { valid: false }
-    return invalid unless update_parameters_valid?(assignment, assignment_params, overrides)
+    return invalid unless update_parameters_valid?(assignment, assignment_params, user, overrides)
 
     updated_assignment = update_from_params(assignment, assignment_params, user, context)
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
+
+    custom_params = assignment_params.dig(:external_tool_tag_attributes, :custom_params)
+    assignment.lti_resource_link_custom_params = custom_params if custom_params.present?
 
     {
       assignment: assignment,
@@ -905,12 +981,19 @@ module Api::V1::Assignment
     overrides
   end
 
-  def update_parameters_valid?(assignment, assignment_params, overrides)
+  def update_parameters_valid?(assignment, assignment_params, user, overrides)
     return false unless !overrides || overrides.is_a?(Array)
     return false unless assignment_group_id_valid?(assignment, assignment_params)
     return false unless assignment_dates_valid?(assignment, assignment_params)
     return false unless submission_types_valid?(assignment, assignment_params)
-    return false unless assignment_mute_status_valid?(assignment, assignment_params)
+
+    if assignment_params[:submission_types]&.include?("student_annotation")
+      return false unless assignment_params.key?(:annotatable_attachment_id)
+
+      attachment = Attachment.find_by(id: assignment_params[:annotatable_attachment_id])
+      return false unless attachment&.grants_right?(user, :read)
+    end
+
     true
   end
 
@@ -920,7 +1003,7 @@ module Api::V1::Assignment
       assignment.tool_settings_tool = tool
     elsif assignment.persisted? && clear_tool_settings_tools?(assignment, assignment_params)
       # Destroy subscriptions and tool associations
-      assignment.send_later_if_production(:clear_tool_settings_tools)
+      assignment.delay_if_production.clear_tool_settings_tools
     end
   end
 
@@ -940,7 +1023,10 @@ module Api::V1::Assignment
   def clear_tool_settings_tools?(assignment, assignment_params)
     assignment.assignment_configuration_tool_lookups.present? &&
       assignment_params['submission_types']&.present? &&
-      (!assignment_params['submission_types'].include?(assignment.submission_types) || assignment_params['submission_types'].blank?)
+      (
+        !assignment.submission_types.split(',').any? { |t| assignment_params['submission_types'].include?(t) } ||
+        assignment_params['submission_types'].blank?
+      )
   end
 
   def plagiarism_capable?(assignment_params)
@@ -967,5 +1053,43 @@ module Api::V1::Assignment
       'external_tool_tag_attributes' => strong_anything,
       'submission_types' => strong_anything
     ]
+  end
+
+  def update_lockdown_browser?(assignment_params)
+    %i[
+      require_lockdown_browser
+      require_lockdown_browser_for_results
+      require_lockdown_browser_monitor
+      lockdown_browser_monitor_data
+      access_code
+    ].any? {|key| assignment_params.key?(key) }
+  end
+
+  def update_lockdown_browser_settings(assignment, assignment_params)
+    settings = assignment.settings || {}
+    ldb_settings = settings['lockdown_browser'] || {}
+
+    if assignment_params.key?('require_lockdown_browser')
+      ldb_settings[:require_lockdown_browser] = value_to_boolean(assignment_params[:require_lockdown_browser])
+    end
+
+    if assignment_params.key?('require_lockdown_browser_for_results')
+      ldb_settings[:require_lockdown_browser_for_results] = value_to_boolean(assignment_params[:require_lockdown_browser_for_results])
+    end
+
+    if assignment_params.key?('require_lockdown_browser_monitor')
+      ldb_settings[:require_lockdown_browser_monitor] = value_to_boolean(assignment_params[:require_lockdown_browser_monitor])
+    end
+
+    if assignment_params.key?('lockdown_browser_monitor_data')
+      ldb_settings[:lockdown_browser_monitor_data] = assignment_params[:lockdown_browser_monitor_data]
+    end
+
+    if assignment_params.key?('access_code')
+      ldb_settings[:access_code] = assignment_params[:access_code]
+    end
+
+    settings[:lockdown_browser] = ldb_settings
+    assignment.settings = settings
   end
 end

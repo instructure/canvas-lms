@@ -17,7 +17,7 @@
  */
 
 import MockCanvasClient from '../../../support/MockCanvasClient'
-import * as Api from 'jsx/grading/HideAssignmentGradesTray/Api'
+import * as Api from '@canvas/hide-assignment-grades-tray/react/Api'
 
 QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
   const ASSIGNMENT_ID = '23'

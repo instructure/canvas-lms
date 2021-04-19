@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -45,13 +47,35 @@ describe MediaTracksController do
       content = "one track mind"
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content}
       expect(response).to be_successful
+      expect(json_parse(response.body)["media_id"]).to eq @mo.media_id
       track = @mo.media_tracks.last
       expect(track.content).to eq content
+
     end
 
     it "should disallow TTML" do
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => example_ttml_susceptible_to_xss}
       expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "should validate :kind" do
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'unkind', :locale => 'en', :content => '1'}
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "should validate :locale" do
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => '<img src="lolcats.gif">', :content => '1'}
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "respects the exclude[] option" do
+      expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
+      content = "one track mind"
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content, :exclude => ["tracks"]}
+      expect(response).to be_successful
+      rbody = json_parse(response.body)
+      expect(rbody["media_id"]).to eq @mo.media_id
+      expect(rbody["media_tracks"]).to be_nil
     end
   end
 
@@ -60,7 +84,7 @@ describe MediaTracksController do
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "subs")
       get 'show', params: {:media_object_id => @mo.media_id, :id => track.id}
       expect(response).to be_successful
-      expect(response.body).to eq track.content
+      expect(response.body).to eq track.webvtt_content
     end
 
     it "should not show tracks that are in TTML format because it is vulnerable to xss" do
@@ -77,6 +101,48 @@ describe MediaTracksController do
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "subs")
       delete 'destroy', params: {:media_object_id => @mo.media_id, :media_track_id => track.id}
       expect(MediaTrack.where(:id => track.id).first).to be_nil
+    end
+  end
+
+  describe "#index" do
+    it "should list tracks" do
+      tracks = {}
+      tracks["en"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "en subs", user_id: @teacher.id)
+      tracks["af"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'af', content: "af subs", user_id: @teacher.id)
+      get 'index', params: {:media_object_id => @mo.media_id, :include => ["content"]}
+      expect(response).to be_successful
+      parsed = JSON.parse(response.body)
+      expect(parsed.length).to be(2)
+      parsed.each do |t|
+        expect(t["content"]).to eql tracks[t["locale"]]["content"]
+        expect(t["id"]).to eql tracks[t["locale"]]["id"]
+        expect(t["locale"]).to eql tracks[t["locale"]]["locale"]
+        expect(t["kind"]).to eql tracks[t["locale"]]["kind"]
+        expect(t["media_object_id"]).to eql tracks[t["locale"]]["media_object_id"]
+        expect(t["user_id"]).to eql tracks[t["locale"]]["user_id"]
+      end
+    end
+  end
+
+  describe "#update" do
+    it "should update tracks" do
+      tracks = {}
+      tracks["en"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "en subs", user_id: @teacher.id)
+      tracks["af"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'af', content: "af subs", user_id: @teacher.id)
+      tracks["br"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'br', content: "br subs", user_id: @teacher.id)
+      put 'update',
+        params: {
+          :media_object_id => @mo.media_id,
+          :include => ["content"]
+        },
+        body: JSON.generate([{locale: 'en', content: 'new en'}, {locale: 'es', content: 'es subs'}, {locale: 'br'}]),
+        format: :json
+        expect(response).to be_successful
+      parsed = JSON.parse(response.body)
+      expect(parsed.length).to be(3)
+      expect(parsed.any? { |t| t['locale'] == 'en' && t['content'] == 'new en'}).to be
+      expect(parsed.any? { |t| t['locale'] == 'es' && t['content'] == 'es subs'}).to be
+      expect(parsed.any? { |t| t['locale'] == 'br' && t['content'] == 'br subs'}).to be
     end
   end
 end

@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import kalturaAnalytics from 'compiled/util/kalturaAnalytics'
-import mejs from 'vendor/mediaelement-and-player'
+import kalturaAnalytics from '@canvas/media-comments/jquery/kalturaAnalytics'
+import mejs from '@canvas/mediaelement'
 import 'jquery.cookie'
 
 QUnit.module('kaltura analytics helper', {
@@ -39,7 +39,8 @@ QUnit.module('kaltura analytics helper', {
 })
 
 test('adds event listeners', function() {
-  sandbox.mock(this.player)
+  sandbox
+    .mock(this.player)
     .expects('addEventListener')
     .atLeast(6)
   return kalturaAnalytics('1', this.player, this.pluginSettings)

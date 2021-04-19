@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -22,8 +24,8 @@ module Types
 
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, "legacy canvas id", null: false, method: :id
     field :title, String, null: true
     field :url, String, null: true
 

@@ -42,7 +42,7 @@ export default function stubRouterContext(Component, props, stubs) {
     static childContextTypes = {
       router: PropTypes.func,
       routeDepth: PropTypes.number
-    };
+    }
 
     getChildContext() {
       return {
@@ -54,5 +54,5 @@ export default function stubRouterContext(Component, props, stubs) {
     render() {
       return <Component {...props} />
     }
-  };
+  }
 }

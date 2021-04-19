@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ describe 'quizzes observers' do
   context "when 'show correct answers after last attempt setting' is on" do
     before(:each) do
       quiz_with_submission
-      @quiz.update_attributes(:show_correct_answers => true,
+      @quiz.update(:show_correct_answers => true,
         :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
       @quiz.save!
     end

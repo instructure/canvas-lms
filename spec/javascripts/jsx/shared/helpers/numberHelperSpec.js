@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import numberHelper from 'jsx/shared/helpers/numberHelper'
-import I18n from 'i18nObj'
+import numberHelper from '@canvas/i18n/numberHelper'
+import I18n from '@canvas/i18n'
 import I18nStubber from 'helpers/I18nStubber'
 
 let input, output, delimiter, separator
@@ -91,6 +91,11 @@ test('returns NaN for null and undefined values', () => {
 test('returns input if already a number', () => {
   const input = 4.7
   equal(numberHelper.parse(input), input)
+})
+
+test('supports e notation', () => {
+  numberHelper._parseNumber.restore()
+  equal(numberHelper.parse('3e2'), 300)
 })
 
 test('parses toString value of objects', () => {

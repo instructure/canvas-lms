@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -42,13 +44,16 @@ module Importers
         data.delete(:assessment_question_id) if hash['assessment_question_id'].nil? && migration.for_master_course_import? # don't undo an existing association
         Quizzes::QuizQuestion.where(id: id).update_all(data)
       else
-        args = [quiz && quiz.id, quiz_group && quiz_group.id, hash['assessment_question_id'],
-            hash.to_yaml, Time.now.utc, Time.now.utc, mig_id, position]
-        query = self.item_class.send(:sanitize_sql, [<<-SQL, *args])
-          INSERT INTO #{Quizzes::QuizQuestion.quoted_table_name} (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)
-          VALUES (?,?,?,?,?,?,?,?)
+        root_account_id = quiz&.root_account_id || context&.root_account_id
+        args = [
+          quiz&.id, quiz_group&.id, hash['assessment_question_id'],
+          hash.to_yaml, Time.now.utc, Time.now.utc, mig_id, position, root_account_id
+        ]
+        query = self.item_class.send(:sanitize_sql, [<<~SQL, *args])
+          INSERT INTO #{Quizzes::QuizQuestion.quoted_table_name} (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position, root_account_id)
+          VALUES (?,?,?,?,?,?,?,?,?)
         SQL
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           qq_ids[mig_id] = self.item_class.connection.insert(query, "#{self.item_class.name} Create",
             self.item_class.primary_key, nil, self.item_class.sequence_name)
         end

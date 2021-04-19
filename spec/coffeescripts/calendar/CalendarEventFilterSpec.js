@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CommonEvent from 'compiled/calendar/CommonEvent'
-import commonEventFactory from 'compiled/calendar/commonEventFactory'
-import CalendarEventFilter from 'compiled/calendar/CalendarEventFilter'
+import CommonEvent from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+import CalendarEventFilter from 'ui/features/calendar/CalendarEventFilter.js'
 import fakeENV from 'helpers/fakeENV'
 
 const test_events = (
@@ -204,7 +204,7 @@ test('CalendarEventFilter: hides past appointments', () => {
 })
 
 test('CalendarEventFilter: With Viewing Group: do not include events that are actual appointment events', () => {
-  fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: false}})
+  fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: false}})
   const events = test_events(true, 0, 1, false)
   events[1].calendarEvent.reserve_url = null
   const filteredEvents = CalendarEventFilter({id: '2'}, events, {})
@@ -214,7 +214,7 @@ test('CalendarEventFilter: With Viewing Group: do not include events that are ac
 })
 
 test('CalendarEventFilter: With Viewing Group: include appointment groups for different viewing groups that are filled', () => {
-  fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: false}})
+  fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: false}})
   const events = test_events(true, 0, 1, true)
   events[1].calendarEvent.reserve_url = null
   const filteredEvents = CalendarEventFilter({id: '25'}, events, {})
@@ -222,8 +222,8 @@ test('CalendarEventFilter: With Viewing Group: include appointment groups for di
   fakeENV.teardown()
 })
 
-test('CalendarEventFilter: With Viewing Group: always follow the normal calendar view flow, if BETTER_SCHEDULER is enabled', () => {
-  fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: true}})
+test('CalendarEventFilter: With Viewing Group: always follow the normal calendar view flow, if SHOW_SCHEDULER is enabled', () => {
+  fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: true}})
   const events = test_events(false, 0, 1, true)
   const filteredEvents = CalendarEventFilter(true, events, {})
   equal(filteredEvents.length, 1)

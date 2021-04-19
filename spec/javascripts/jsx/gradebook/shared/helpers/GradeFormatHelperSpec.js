@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import I18n from 'i18n!sharedGradeFormatHelper'
+import numberHelper from '@canvas/i18n/numberHelper'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup() {
@@ -28,7 +28,7 @@ QUnit.module('GradeFormatHelper#formatGrade', {
   }
 })
 
-test('uses I18n#n to format numerical integer grades', function() {
+test('uses I18n#n to format numerical integer grades', () => {
   sandbox
     .stub(I18n, 'n')
     .withArgs(1000)
@@ -37,7 +37,7 @@ test('uses I18n#n to format numerical integer grades', function() {
   equal(I18n.n.callCount, 1)
 })
 
-test('uses formatPointsOutOf to format points grade type', function() {
+test('uses formatPointsOutOf to format points grade type', () => {
   equal(
     GradeFormatHelper.formatGrade('4', {
       gradingType: 'points',
@@ -48,7 +48,7 @@ test('uses formatPointsOutOf to format points grade type', function() {
   )
 })
 
-test('uses I18n#n to format numerical decimal grades', function() {
+test('uses I18n#n to format numerical decimal grades', () => {
   sandbox
     .stub(I18n, 'n')
     .withArgs(123.45)
@@ -57,85 +57,85 @@ test('uses I18n#n to format numerical decimal grades', function() {
   equal(I18n.n.callCount, 1)
 })
 
-test('uses I18n#t to format pass_fail based grades: complete', function() {
+test('uses I18n#t to format pass_fail based grades: complete', () => {
   I18n.t.withArgs('complete').returns('* complete')
   equal(GradeFormatHelper.formatGrade('complete'), '* complete')
 })
 
-test('uses I18n#t to format pass_fail based grades: pass', function() {
+test('uses I18n#t to format pass_fail based grades: pass', () => {
   I18n.t.withArgs('complete').returns('* complete')
   equal(GradeFormatHelper.formatGrade('pass'), '* complete')
 })
 
-test('uses I18n#t to format pass_fail based grades: incomplete', function() {
+test('uses I18n#t to format pass_fail based grades: incomplete', () => {
   I18n.t.withArgs('incomplete').returns('* incomplete')
   equal(GradeFormatHelper.formatGrade('incomplete'), '* incomplete')
 })
 
-test('uses I18n#t to format pass_fail based grades: fail', function() {
+test('uses I18n#t to format pass_fail based grades: fail', () => {
   I18n.t.withArgs('incomplete').returns('* incomplete')
   equal(GradeFormatHelper.formatGrade('fail'), '* incomplete')
 })
 
-test('returns "Excused" when the grade is "EX"', function() {
+test('returns "Excused" when the grade is "EX"', () => {
   // this is for backwards compatibility for users who depend on this behavior
   equal(GradeFormatHelper.formatGrade('EX'), 'Excused')
 })
 
-test('parses a stringified integer percentage grade when it is a valid number', function() {
+test('parses a stringified integer percentage grade when it is a valid number', () => {
   sandbox.spy(numberHelper, 'parse')
   GradeFormatHelper.formatGrade('32%')
   equal(numberHelper.parse.callCount, 1)
   strictEqual(numberHelper.parse.getCall(0).args[0], '32')
 })
 
-test('returns the given grade when it is not a valid number', function() {
+test('returns the given grade when it is not a valid number', () => {
   equal(GradeFormatHelper.formatGrade('!32%'), '!32%')
 })
 
-test('returns the given grade when it is a letter grade', function() {
+test('returns the given grade when it is a letter grade', () => {
   equal(GradeFormatHelper.formatGrade('A'), 'A')
 })
 
-test('returns the given grade when it is a mix of letters and numbers', function() {
+test('returns the given grade when it is a mix of letters and numbers', () => {
   equal(GradeFormatHelper.formatGrade('A3'), 'A3')
 })
 
-test('returns the given grade when it is numbers followed by letters', function() {
+test('returns the given grade when it is numbers followed by letters', () => {
   equal(GradeFormatHelper.formatGrade('1E', {delocalize: false}), '1E')
 })
 
-test('does not format letter grades', function() {
+test('does not format letter grades', () => {
   sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade('A')
   equal(I18n.n.callCount, 0, 'I18n.n was not called')
 })
 
-test('returns the defaultValue option when grade is undefined', function() {
+test('returns the defaultValue option when grade is undefined', () => {
   equal(GradeFormatHelper.formatGrade(undefined, {defaultValue: 'no grade'}), 'no grade')
 })
 
-test('returns the defaultValue option when grade is null', function() {
+test('returns the defaultValue option when grade is null', () => {
   equal(GradeFormatHelper.formatGrade(null, {defaultValue: 'no grade'}), 'no grade')
 })
 
-test('returns the defaultValue option when grade is an empty string', function() {
+test('returns the defaultValue option when grade is an empty string', () => {
   equal(GradeFormatHelper.formatGrade('', {defaultValue: 'no grade'}), 'no grade')
 })
 
-test('returns the grade when given undefined and no defaultValue option', function() {
+test('returns the grade when given undefined and no defaultValue option', () => {
   strictEqual(GradeFormatHelper.formatGrade(undefined), undefined)
 })
 
-test('returns the grade when given null and no defaultValue option', function() {
+test('returns the grade when given null and no defaultValue option', () => {
   strictEqual(GradeFormatHelper.formatGrade(null), null)
 })
 
-test('returns the grade when given an empty string and no defaultValue option', function() {
+test('returns the grade when given an empty string and no defaultValue option', () => {
   strictEqual(GradeFormatHelper.formatGrade(''), '')
 })
 
-test('formats numerical integer grades as percent when given a gradingType of "percent"', function() {
+test('formats numerical integer grades as percent when given a gradingType of "percent"', () => {
   sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade(10, {gradingType: 'percent'})
   const [value, options] = I18n.n.getCall(0).args
@@ -143,7 +143,7 @@ test('formats numerical integer grades as percent when given a gradingType of "p
   strictEqual(options.percentage, true)
 })
 
-test('formats numerical decimal grades as percent when given a gradingType of "percent"', function() {
+test('formats numerical decimal grades as percent when given a gradingType of "percent"', () => {
   sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade(10.1, {gradingType: 'percent'})
   const [value, options] = I18n.n.getCall(0).args
@@ -151,7 +151,7 @@ test('formats numerical decimal grades as percent when given a gradingType of "p
   strictEqual(options.percentage, true)
 })
 
-test('formats string percentage grades as points when given a gradingType of "points"', function() {
+test('formats string percentage grades as points when given a gradingType of "points"', () => {
   sandbox.spy(I18n, 'n')
   GradeFormatHelper.formatGrade('10%', {gradingType: 'points'})
   const [value, options] = I18n.n.getCall(0).args
@@ -159,16 +159,24 @@ test('formats string percentage grades as points when given a gradingType of "po
   strictEqual(options.percentage, false)
 })
 
-test('rounds grades to two decimal places', function() {
+test('rounds grades to two decimal places', () => {
   equal(GradeFormatHelper.formatGrade(10.321), '10.32')
   equal(GradeFormatHelper.formatGrade(10.325), '10.33')
 })
 
-test('optionally rounds to a given precision', function() {
+test('rounds very small scores to two decimal places', () => {
+  strictEqual(GradeFormatHelper.formatGrade('.00000001', {gradingType: 'points'}), '0')
+})
+
+test('scientific notation grades show as rounded numeric grades', () => {
+  equal(GradeFormatHelper.formatGrade('1e-8', {gradingType: 'points'}), '0')
+})
+
+test('optionally rounds to a given precision', () => {
   equal(GradeFormatHelper.formatGrade(10.321, {precision: 3}), '10.321')
 })
 
-test('optionally parses grades as non-localized', function() {
+test('optionally parses grades as non-localized', () => {
   sandbox
     .stub(numberHelper, 'parse')
     .withArgs('32.459')
@@ -181,7 +189,7 @@ test('optionally parses grades as non-localized', function() {
 
 QUnit.module('GradeFormatHelper#delocalizeGrade')
 
-test('returns input value when input is not a string', function() {
+test('returns input value when input is not a string', () => {
   strictEqual(GradeFormatHelper.delocalizeGrade(1), 1)
   ok(isNaN(GradeFormatHelper.delocalizeGrade(NaN)))
   strictEqual(GradeFormatHelper.delocalizeGrade(null), null)
@@ -189,22 +197,22 @@ test('returns input value when input is not a string', function() {
   strictEqual(GradeFormatHelper.delocalizeGrade(true), true)
 })
 
-test('returns input value when input is not a percent or point value', function() {
+test('returns input value when input is not a percent or point value', () => {
   strictEqual(GradeFormatHelper.delocalizeGrade('A+'), 'A+')
   strictEqual(GradeFormatHelper.delocalizeGrade('F'), 'F')
   strictEqual(GradeFormatHelper.delocalizeGrade('Pass'), 'Pass')
 })
 
-test('returns non-localized point value when given a point value', function() {
-  const sandbox = sinon.sandbox.create()
+test('returns non-localized point value when given a point value', () => {
+  const sandbox = sinon.createSandbox()
   sandbox.stub(numberHelper, 'parse').returns(123.45)
   equal(GradeFormatHelper.delocalizeGrade('123,45'), '123.45')
   ok(numberHelper.parse.calledWith('123,45'))
   sandbox.restore()
 })
 
-test('returns non-localized percent value when given a percent value', function() {
-  const sandbox = sinon.sandbox.create()
+test('returns non-localized percent value when given a percent value', () => {
+  const sandbox = sinon.createSandbox()
   sandbox.stub(numberHelper, 'parse').returns(12.34)
   equal(GradeFormatHelper.delocalizeGrade('12,34%'), '12.34%')
   ok(numberHelper.parse.calledWith('12,34'))
@@ -213,89 +221,89 @@ test('returns non-localized percent value when given a percent value', function(
 
 QUnit.module('GradeFormatHelper#parseGrade')
 
-test('parses stringified integer grades', function() {
+test('parses stringified integer grades', () => {
   strictEqual(GradeFormatHelper.parseGrade('123'), 123)
 })
 
-test('parses stringified decimal grades', function() {
+test('parses stringified decimal grades', () => {
   strictEqual(GradeFormatHelper.parseGrade('123.456'), 123.456)
 })
 
-test('parses stringified integer percentages', function() {
+test('parses stringified integer percentages', () => {
   strictEqual(GradeFormatHelper.parseGrade('123%'), 123)
 })
 
-test('parses stringified decimal percentages', function() {
+test('parses stringified decimal percentages', () => {
   strictEqual(GradeFormatHelper.parseGrade('123.456%'), 123.456)
 })
 
-test('uses numberHelper.parse to parse a stringified integer grade', function() {
+test('uses numberHelper.parse to parse a stringified integer grade', () => {
   sandbox.spy(numberHelper, 'parse')
   GradeFormatHelper.parseGrade('123')
   equal(numberHelper.parse.callCount, 1)
 })
 
-test('uses numberHelper.parse to parse a stringified decimal grade', function() {
+test('uses numberHelper.parse to parse a stringified decimal grade', () => {
   sandbox.spy(numberHelper, 'parse')
   GradeFormatHelper.parseGrade('123.456')
   equal(numberHelper.parse.callCount, 1)
 })
 
-test('uses numberHelper.parse to parse a stringified integer percentage', function() {
+test('uses numberHelper.parse to parse a stringified integer percentage', () => {
   sandbox.spy(numberHelper, 'parse')
   GradeFormatHelper.parseGrade('123%')
   equal(numberHelper.parse.callCount, 1)
 })
 
-test('uses numberHelper.parse to parse a stringified decimal percentage', function() {
+test('uses numberHelper.parse to parse a stringified decimal percentage', () => {
   sandbox.spy(numberHelper, 'parse')
   GradeFormatHelper.parseGrade('123.456%')
   equal(numberHelper.parse.callCount, 1)
 })
 
-test('returns numerical grades without parsing', function() {
+test('returns numerical grades without parsing', () => {
   equal(GradeFormatHelper.parseGrade(123.45), 123.45)
 })
 
-test('returns letter grades without parsing', function() {
+test('returns letter grades without parsing', () => {
   equal(GradeFormatHelper.parseGrade('A'), 'A')
 })
 
-test('returns other string values without parsing', function() {
+test('returns other string values without parsing', () => {
   equal(GradeFormatHelper.parseGrade('!123'), '!123')
 })
 
-test('returns undefined when given undefined', function() {
+test('returns undefined when given undefined', () => {
   strictEqual(GradeFormatHelper.parseGrade(undefined), undefined)
 })
 
-test('returns null when given null', function() {
+test('returns null when given null', () => {
   strictEqual(GradeFormatHelper.parseGrade(null), null)
 })
 
-test('returns an empty string when given an empty string', function() {
+test('returns an empty string when given an empty string', () => {
   strictEqual(GradeFormatHelper.parseGrade(''), '')
 })
 
-test('optionally parses grades without delocalizing', function() {
+test('optionally parses grades without delocalizing', () => {
   sandbox.spy(numberHelper, 'parse')
   GradeFormatHelper.parseGrade('123', {delocalize: false})
   equal(numberHelper.parse.callCount, 0)
 })
 
-test('parses stringified integer grades without delocalizing', function() {
+test('parses stringified integer grades without delocalizing', () => {
   strictEqual(GradeFormatHelper.parseGrade('123', {delocalize: false}), 123)
 })
 
-test('parses stringified decimal grades without delocalizing', function() {
+test('parses stringified decimal grades without delocalizing', () => {
   strictEqual(GradeFormatHelper.parseGrade('123.456', {delocalize: false}), 123.456)
 })
 
-test('parses stringified integer percentages without delocalizing', function() {
+test('parses stringified integer percentages without delocalizing', () => {
   strictEqual(GradeFormatHelper.parseGrade('123%', {delocalize: false}), 123)
 })
 
-test('parses stringified decimal percentages without delocalizing', function() {
+test('parses stringified decimal percentages without delocalizing', () => {
   strictEqual(GradeFormatHelper.parseGrade('123.456%', {delocalize: false}), 123.456)
 })
 

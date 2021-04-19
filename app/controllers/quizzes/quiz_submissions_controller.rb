@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
-    if params[:zip] && authorized_action(@quiz, @current_user, :grade)
+    if params[:zip] && authorized_action(@quiz, @current_user, :review_grades)
       generate_submission_zip(@quiz, @context)
     else
       redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)
@@ -112,6 +114,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
             @submission.backup_submission_data(params)
             render :json => {:backup => true,
                              :end_at => @submission.end_at,
+                             :end_at_without_time_limit => @submission.end_at_without_time_limit,
                              :time_left => @submission.time_left}
             return
           end
@@ -119,8 +122,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       end
 
       render :json => {:backup => false,
-                       :end_at => @submission && @submission.end_at,
-                       :time_left => @submission && @submission.time_left}
+                       :end_at => @submission&.end_at,
+                       :end_at_without_time_limit => @submission&.end_at_without_time_limit,
+                       :time_left => @submission&.time_left}
     end
   end
 
@@ -162,6 +166,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def update
     @submission = @quiz.quiz_submissions.find(params[:id])
     if authorized_action(@submission, @current_user, :update_scores)
+      unless @quiz.visible_to_user?(@submission.user)
+        return reject! t('Quiz not assigned to student'), 403
+      end
       @submission.update_scores(params.to_unsafe_h.merge(:grader_id => @current_user.id))
       if params[:headless]
         redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1, :hide_student_name => params[:hide_student_name])

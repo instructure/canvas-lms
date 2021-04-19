@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,6 @@
 class ContentImportsController < ApplicationController
   before_action :require_context
   before_action { |c| c.active_tab = "home" }
-  prepend_around_action :load_pseudonym_from_policy, :only => :migrate_content_upload
 
   include Api::V1::Course
   include ContentImportsHelper
@@ -41,9 +42,12 @@ class ContentImportsController < ApplicationController
 
   # current files UI uses this page for .zip uploads
   def files
-    authorized_action(@context, @current_user, [:manage_content, :manage_files])
-    js_env(return_or_context_url: return_or_context_url,
-           return_to: params[:return_to])
+    authorized_action(
+      @context,
+      @current_user,
+      [:manage_content, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+    )
+    js_env(return_or_context_url: return_or_context_url, return_to: params[:return_to])
   end
 
   # @API Get course copy status
@@ -133,7 +137,7 @@ class ContentImportsController < ApplicationController
                                     :source_course => @source_course,
                                     :copy_options => copy_params,
                                     :migration_type => 'course_copy_importer',
-                                    :initiated_source => api_request? ? :api : :manual)
+                                    :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual)
       cm.queue_migration
       cm.workflow_state = 'created'
       render :json => copy_status_json(cm, @context, @current_user, session)

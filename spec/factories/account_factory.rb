@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ module Factories
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
       ActiveSupport::HashWithIndifferentAccess.new({
-        "app-host":"http://localhost:3000",
+        "app-host":ENV['RCE_HOST'] || "http://localhost:3001",
       })
     )
     allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
@@ -34,6 +36,13 @@ module Factories
         "encryption-secret" => "astringthatisactually32byteslong"
       }
     )
+  end
+
+  def stub_common_cartridge_url
+    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(Canvas::DynamicSettings).to receive(:find).with("common_cartridge_viewer", default_ttl: 5.minutes).and_return(
+			ActiveSupport::HashWithIndifferentAccess.new({"app-host":"http://common-cartridge-viewer.netlify.com/"})
+		)
   end
 
   def account_rcs_model(opts={})
@@ -91,6 +100,5 @@ module Factories
         end
       end
     end
-    RoleOverride.clear_cached_contexts
   end
 end

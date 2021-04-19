@@ -19,10 +19,10 @@
 import $ from 'jquery'
 import {useOldDebounce, useNormalDebounce} from 'helpers/util'
 import fakeENV from 'helpers/fakeENV'
-import MessageFormDialog from 'compiled/views/conversations/MessageFormDialog'
-import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollection'
-import CourseCollection from 'compiled/collections/CourseCollection'
-import GroupCollection from 'compiled/collections/GroupCollection'
+import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog.js'
+import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection.js'
+import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection.js'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
 
 const recipients = [
   {
@@ -83,4 +83,27 @@ test('recipient ids are not parsed as numbers', function() {
   deepEqual(dialog.recipientView.tokens, ['9010000000000003'])
   const parent = dialog.$el.parent()[0]
   document.body.removeChild(parent)
+})
+
+test('fires a SR event on file attachment', function() {
+  dialog = new MessageFormDialog({
+    courses: {
+      favorites: new FavoriteCourseCollection(),
+      all: new CourseCollection(),
+      groups: new GroupCollection()
+    }
+  })
+
+  const spy = sandbox.spy($, 'screenReaderFlashMessageExclusive')
+  const e = {
+    currentTarget: {
+      value: dialog.$el.find('.file_input'),
+      files: [new File(['foo'], 'foo.txt', {type: 'text/plain'})]
+    }
+  }
+  dialog.show(null, {})
+  dialog.handleAttachment(e)
+  this.clock.tick(1000)
+
+  ok(spy.calledOnce)
 })

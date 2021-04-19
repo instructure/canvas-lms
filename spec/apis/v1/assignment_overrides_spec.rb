@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -204,7 +206,6 @@ describe AssignmentOverridesController, type: :request do
 
       @group = @course.groups.create!(:name => 'my group', :group_category => @assignment.group_category)
       @group.add_user(@teacher, 'accepted')
-      expect(@course.groups_visible_to(@teacher)).to include @group
 
       @override.reload
       @override.set = @group
@@ -793,7 +794,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "recomputes grades when changing overrides" do
-        @assignment.update_attributes! only_visible_to_overrides: true, points_possible: 10
+        @assignment.update! only_visible_to_overrides: true, points_possible: 10
         other_assignment = @course.assignments.create! points_possible: 10, context: @course
 
         student1 = @student
@@ -1310,6 +1311,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "should succeed if formatted correctly" do
+        skip 'DEMO-119 (1/27/2021)'
         section = @course.course_sections.create!
         student = student_in_section(section)
         date = Time.zone.now.tomorrow

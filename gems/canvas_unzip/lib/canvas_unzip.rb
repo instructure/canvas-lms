@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -143,6 +145,12 @@ class CanvasUnzip
     end
   end
 
+  def self.compute_uncompressed_size(archive_filename)
+    total_size = 0
+    each_entry(archive_filename){|entry, index| total_size += entry.size }
+    total_size
+  end
+
   class Entry
     attr_reader :entry, :type
 
@@ -207,7 +215,7 @@ class CanvasUnzip
         if type == :zip
           entry.get_input_stream do |is|
             entry.set_extra_attributes_on_path(dest_path)
-            buf = ''
+            buf = +''
             while buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf)
               os << buf
               digest.update(buf)
@@ -227,8 +235,8 @@ class CanvasUnzip
 
     # forces name to UTF-8, converting from fallback_encoding if it isn't UTF-8 to begin with
     def normalize_name(name, fallback_encoding)
-      utf8_name = name.force_encoding('utf-8')
-      utf8_name = name.force_encoding(fallback_encoding).encode('utf-8') unless utf8_name.valid_encoding?
+      utf8_name = name.dup.force_encoding('utf-8')
+      utf8_name = name.dup.force_encoding(fallback_encoding).encode('utf-8') unless utf8_name.valid_encoding?
       utf8_name
     end
   end

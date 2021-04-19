@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -20,9 +22,10 @@ module Api::V1::GroupCategory
   include Api::V1::Json
   include Api::V1::Context
   include Api::V1::Progress
+  include Api::V1::Group
 
   API_GROUP_CATEGORY_JSON_OPTS = {
-    :only => %w(id name role self_signup group_limit auto_leader)
+    :only => %w(id name role self_signup group_limit auto_leader created_at)
   }
 
   def group_category_json(group_category, user, session, options = {})
@@ -66,7 +69,14 @@ module Api::V1::GroupCategory
       if includes.include?('unassigned_users_count')
         hash['unassigned_users_count'] = group_category.unassigned_users.count(:all)
       end
+      if includes.include?('groups')
+        hash['groups'] = group_category.groups.active.map { |group| group_json(group, user, session) }
+      end
     end
     hash
+  end
+
+  def group_categories_json(group_categories, user, session, options = {})
+    group_categories.map { |group_category| group_category_json(group_category, user, session, options) }
   end
 end

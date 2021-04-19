@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -20,18 +22,20 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::HideAssignmentGrades do
+  include GraphQLSpecHelper
+
   let(:assignment) { course.assignments.create! }
   let(:course) { Course.create!(workflow_state: "available") }
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-  def mutation_str(assignment_id: nil)
+  def mutation_str(assignment_id: nil, **options)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
 
     <<~GQL
       mutation {
         hideAssignmentGrades(input: {
-          #{input_string}
+          #{gql_arguments(input_string, **options)}
         }) {
           assignment {
             _id
@@ -52,18 +56,8 @@ describe Mutations::HideAssignmentGrades do
     CanvasSchema.execute(mutation_str, context: context)
   end
 
-  before(:each) do
-    course.enable_feature!(:post_policies)
-  end
-
   context "when user has grade permission" do
     let(:context) { { current_user: teacher } }
-
-    it "requires that the PostPolicy feature be enabled" do
-      course.disable_feature!(:post_policies)
-      result = execute_query(mutation_str(assignment_id: assignment.id), context)
-      expect(result.dig("errors", 0, "message")).to eql "Post Policies feature not enabled"
-    end
 
     it "requires that assignmentId be passed in the query" do
       result = execute_query(mutation_str, context)
@@ -92,6 +86,8 @@ describe Mutations::HideAssignmentGrades do
     end
 
     describe "hiding the grades" do
+      let(:hide_submissions_job) { Delayed::Job.where(tag: "Assignment#hide_submissions").order(:id).last }
+
       before(:each) do
         @student_submission = assignment.submissions.find_by(user: student)
         @student_submission.update!(posted_at: Time.zone.now)
@@ -99,7 +95,6 @@ describe Mutations::HideAssignmentGrades do
 
       it "hides the assignment grades" do
         execute_query(mutation_str(assignment_id: assignment.id), context)
-        hide_submissions_job = Delayed::Job.where(tag: "Assignment#hide_submissions").order(:id).last
         hide_submissions_job.invoke_job
         expect(@student_submission.reload).not_to be_posted
       end
@@ -111,16 +106,142 @@ describe Mutations::HideAssignmentGrades do
 
       it "returns the progress" do
         result = execute_query(mutation_str(assignment_id: assignment.id), context)
-        progress = Progress.where(tag: "hide_assignment_grades").order(:id).last
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
         expect(result.dig("data", "hideAssignmentGrades", "progress", "_id").to_i).to be progress.id
       end
 
-      it "stores the ids of submissions hidden on the Progress object" do
-        execute_query(mutation_str(assignment_id: assignment.id), context)
-        hide_submissions_job = Delayed::Job.where(tag:"Assignment#hide_submissions").order(:id).last
+      it "stores the assignment id of submissions hidden on the Progress object" do
+        result = execute_query(mutation_str(assignment_id: assignment.id), context)
         hide_submissions_job.invoke_job
-        progress = Progress.where(tag: "hide_assignment_grades").order(:id).last
-        expect(progress.results[:submission_ids]).to match_array [@student_submission.id]
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+        expect(progress.results[:assignment_id]).to eq assignment.id
+      end
+
+      it "stores the posted_at of submissions hidden on the Progress object" do
+        result = execute_query(mutation_str(assignment_id: assignment.id), context)
+        hide_submissions_job.invoke_job
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+        expect(progress.results[:posted_at]).to eq @student_submission.reload.posted_at
+      end
+
+      it "stores the user ids of submissions hidden on the Progress object" do
+        result = execute_query(mutation_str(assignment_id: assignment.id), context)
+        hide_submissions_job.invoke_job
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+        expect(progress.results[:user_ids]).to match_array [student.id]
+      end
+
+      describe "section_ids" do
+        let(:section2) { course.course_sections.create! }
+
+        before(:each) do
+          @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
+          @student2_submission = assignment.submissions.find_by(user: @section2_student)
+          @student2_submission.update!(posted_at: Time.zone.now)
+        end
+
+        it "hides submissions for listed sections" do
+          execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
+          hide_submissions_job.invoke_job
+          expect(@student2_submission.reload).not_to be_posted
+        end
+
+        it "does not hide submissions for unlisted sections" do
+          execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
+          hide_submissions_job.invoke_job
+          expect(@student_submission.reload).to be_posted
+        end
+
+        it "hides all the submissions if not present" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          hide_submissions_job.invoke_job
+          expect(assignment.submissions).not_to include(be_posted)
+        end
+      end
+
+      describe "only_student_ids" do
+        let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+
+        before(:each) do
+          @student2_submission = assignment.submissions.find_by(user: student2)
+          @student2_submission.update!(posted_at: Time.zone.now)
+        end
+
+        it "hides submissions for listed users" do
+          execute_query(mutation_str(assignment_id: assignment.id, only_student_ids: [student2.id]), context)
+          hide_submissions_job.invoke_job
+          expect(@student2_submission.reload).not_to be_posted
+        end
+
+        it "does not hide submissions for unlisted users" do
+          execute_query(mutation_str(assignment_id: assignment.id, only_student_ids: [student2.id]), context)
+          hide_submissions_job.invoke_job
+          expect(@student_submission.reload).to be_posted
+        end
+
+        it "hides all the submissions if not present" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          hide_submissions_job.invoke_job
+          expect(assignment.submissions).not_to include(be_posted)
+        end
+      end
+
+      describe "skip_student_ids" do
+        let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+
+        before(:each) do
+          @student2_submission = assignment.submissions.find_by(user: student2)
+          @student2_submission.update!(posted_at: Time.zone.now)
+        end
+
+        it "hides submissions for non-listed users" do
+          execute_query(mutation_str(assignment_id: assignment.id, skip_student_ids: [student2.id]), context)
+          hide_submissions_job.invoke_job
+          expect(@student_submission.reload).not_to be_posted
+        end
+
+        it "does not hide submissions for listed users" do
+          execute_query(mutation_str(assignment_id: assignment.id, skip_student_ids: [student2.id]), context)
+          hide_submissions_job.invoke_job
+          expect(@student2_submission.reload).to be_posted
+        end
+
+        it "hides all the submissions if empty" do
+          execute_query(mutation_str(assignment_id: assignment.id, skip_student_ids: []), context)
+          hide_submissions_job.invoke_job
+          expect(assignment.submissions).not_to include(be_posted)
+        end
+
+        it "hides all the submissions if not present" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          hide_submissions_job.invoke_job
+          expect(assignment.submissions).not_to include(be_posted)
+        end
+      end
+
+      context "when the hider has limited visibility" do
+        let(:secret_student) { User.create! }
+        let(:secret_section) { course.course_sections.create! }
+
+        before(:each) do
+          Enrollment.limit_privileges_to_course_section!(course, teacher, true)
+          course.enroll_student(secret_student, enrollment_state: "active", section: secret_section)
+
+          assignment.submission_for_student(secret_student).update!(posted_at: Time.zone.now)
+        end
+
+        it "only hides grades for students that the user can see" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          hide_submissions_job.invoke_job
+          expect(assignment.submission_for_student(secret_student).posted_at).not_to be nil
+        end
+
+        it "stores only the user ids of affected students on the Progress object" do
+          result = execute_query(mutation_str(assignment_id: assignment.id), context)
+          hide_submissions_job.invoke_job
+          progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+          expect(progress.results[:user_ids]).to match_array [student.id]
+        end
       end
     end
   end

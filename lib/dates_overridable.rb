@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -24,18 +26,14 @@ module DatesOverridable
   class NotOverriddenError < RuntimeError; end
 
   def self.included(base)
-    base.has_many :assignment_overrides, :dependent => :destroy
-    base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride'
+    base.has_many :assignment_overrides, :dependent => :destroy, inverse_of: base.table_name.singularize
+    base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride', inverse_of: base.table_name.singularize
     base.has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :dependent => :destroy
     base.has_many :all_assignment_override_students, class_name: 'AssignmentOverrideStudent', :dependent => :destroy
 
     base.validates_associated :active_assignment_overrides
 
     base.extend(ClassMethods)
-  end
-
-  def reload_overrides_cache?
-    self.updated_at && self.updated_at > 2.seconds.ago
   end
 
   def without_overrides
@@ -218,7 +216,7 @@ module DatesOverridable
       [ due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First ]
     end
 
-    dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base) }
+    dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id) }
   end
 
   def due_date_hash
@@ -232,6 +230,8 @@ module DatesOverridable
     if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
       hash[:override] = override
       hash[:title] = override.title
+      hash[:set_type] = override.set_type
+      hash[:set_id] = override.set_id
     end
 
     hash
@@ -241,11 +241,14 @@ module DatesOverridable
     without_overrides.due_date_hash.merge(:base => true)
   end
 
-  def context_module_tag_info(user, context, user_is_admin: false)
+  def context_module_tag_info(user, context, user_is_admin: false, has_submission: )
+    return {} unless user
     self.association(:context).target ||= context
-    tag_info = Rails.cache.fetch([self, user, "context_module_tag_info"].cache_key) do
-      hash = {:points_possible => self.points_possible}
-
+    tag_info = Rails.cache.fetch_with_batched_keys(
+      ["context_module_tag_info3", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,
+      batch_object: self, batched_keys: :availability
+    ) do
+      hash = {}
       if user_is_admin && self.has_too_many_overrides
         hash[:has_many_overrides] = true
       elsif self.multiple_due_dates_apply_to?(user)
@@ -257,19 +260,11 @@ module DatesOverridable
       end
       hash
     end
+    tag_info[:points_possible] = self.points_possible
 
     if user && tag_info[:due_date]
       if tag_info[:due_date] < Time.now
         if self.is_a?(Quizzes::Quiz) || (self.is_a?(Assignment) && expects_submission?)
-          has_submission =
-            Rails.cache.fetch([self, user, "user_has_submission"]) do
-              case self
-              when Assignment
-                submission_for_student(user).has_submission?
-              when Quizzes::Quiz
-                self.quiz_submissions.completed.where(:user_id => user).exists?
-              end
-            end
           tag_info[:past_due] = true unless has_submission
         end
       end
@@ -282,6 +277,7 @@ module DatesOverridable
   module ClassMethods
     def due_date_compare_value(date)
       # due dates are considered equal if they're the same up to the minute
+      return nil if date.nil?
       date.to_i / 60
     end
 

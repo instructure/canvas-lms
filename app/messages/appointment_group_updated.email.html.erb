@@ -37,7 +37,7 @@
     <% if asset.available_slots -%>
       <tr>
           <td style="padding-right: 10px;" valign="top"><%= t :slots_remaining, 'Available time slots' %>:</td>
-          <td valign="top"><%= asset.available_slots %></td>
+          <td valign="top"><%= asset.available_slots(current_only: true) %></td>
       </tr>
     <% end %>
 </table>

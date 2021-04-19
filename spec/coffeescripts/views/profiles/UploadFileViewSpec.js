@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadFileView from 'compiled/views/profiles/UploadFileView'
-import BlobFactory from 'compiled/util/BlobFactory'
+import UploadFileView from '@canvas/avatar-dialog-view/backbone/views/UploadFileView'
+import BlobFactory from '@canvas/avatar-dialog-view/BlobFactory'
 
 QUnit.module('UploadFileView', {
   setup() {
@@ -31,6 +31,10 @@ QUnit.module('UploadFileView', {
       onImageLoaded: this.resolveImageLoaded
     })
     this.view.$el.appendTo('#fixtures')
+
+    // This spec currently depends on a real XHR request to the file system.
+    // Restoring the network will allow this spec to function correctly.
+    sandbox.server.restore()
     this.file = (function() {
       const dfd = $.Deferred()
       const xhr = new XMLHttpRequest()

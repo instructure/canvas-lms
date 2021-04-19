@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import File from 'compiled/models/File'
-import DragFeedback from 'jsx/files/DragFeedback'
+import File from '@canvas/files/backbone/models/File.coffee'
+import DragFeedback from 'ui/features/files/react/components/DragFeedback.js'
 
 QUnit.module('DragFeedback')
 
@@ -30,13 +30,7 @@ test('DF: shows a badge with number of items being dragged', () => {
   file.url = () => 'some_url'
   file2.url = () => 'some_url'
 
-  const dragFeedback = mount(
-    <DragFeedback pageX={1} pageY={1} itemsToDrag={[file, file2]} />
-  )
+  const dragFeedback = mount(<DragFeedback pageX={1} pageY={1} itemsToDrag={[file, file2]} />)
 
-  equal(
-    dragFeedback.find('.badge').instance().innerHTML,
-    '2',
-    'has two items'
-  )
+  equal(dragFeedback.find('.badge').instance().innerHTML, '2', 'has two items')
 })

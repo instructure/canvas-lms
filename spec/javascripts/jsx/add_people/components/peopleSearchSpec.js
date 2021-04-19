@@ -18,13 +18,13 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import PeopleSearch from 'jsx/add_people/components/people_search'
+import PeopleSearch from '@canvas/add-people/react/components/people_search'
 
 QUnit.module('PeopleSearch')
 
 const searchProps = {
-  roles: [{id: '1', name: 'Student'}, {id: '2', name: 'TA'}],
-  sections: [{id: '1', name: 'section 2'}, {id: '2', name: 'section 10'}],
+  roles: [{id: '1', label: 'Student'}, {id: '2', label: 'TA'}],
+  sections: [{id: '1', name: 'Section 2'}, {id: '2', name: 'Section 10'}],
   section: '1',
   role: '2',
   limitPrivilege: true,
@@ -51,16 +51,15 @@ test('sets the correct values', () => {
   equal(loginRadio.checked, true, 'login id radio button is checked')
   const nameInput = peopleSearch.querySelector('textarea')
   equal(nameInput.value, searchProps.nameList, 'names are in the textarea')
-  const selects = peopleSearch.querySelectorAll('.peoplesearch__selections select')
-  equal(selects[0].value, '2', 'role 2 is selected')
-  equal(selects[1].value, '1', 'section 1 is selected')
-  const sections = Array.prototype.map.call(selects[1].options, o => o.innerHTML)
-  deepEqual(sections, ['section 2', 'section 10'], 'sections are sorted by name')
+  const roleSelect = peopleSearch.querySelector('#peoplesearch_select_role')
+  equal(roleSelect.value, 'TA', 'correct role is selected')
+  const sectionSelect = peopleSearch.querySelector('#peoplesearch_select_section')
+  equal(sectionSelect.value, 'Section 2', 'correct section is selected')
   const limitPrivilegeCheckbox = peopleSearch.querySelector('#limit_privileges_to_course_section')
   equal(limitPrivilegeCheckbox.checked, true, 'limit privileges checkbox is checked')
 })
 test('removes search by SIS ID', () => {
-  const newProps = Object.assign({}, searchProps, {canReadSIS: false})
+  const newProps = {...searchProps, canReadSIS: false}
   const component = TestUtils.renderIntoDocument(<PeopleSearch {...newProps} />)
   const peopleSearch = TestUtils.findRenderedDOMComponentWithClass(
     component,
@@ -71,7 +70,7 @@ test('removes search by SIS ID', () => {
 })
 test('shows hint with bad email address', () => {
   const badEmail = 'foobar@'
-  const newProps = Object.assign({}, searchProps, {searchType: 'cc_path', nameList: badEmail})
+  const newProps = {...searchProps, searchType: 'cc_path', nameList: badEmail}
   const component = TestUtils.renderIntoDocument(<PeopleSearch {...newProps} />)
   const peopleSearch = TestUtils.findRenderedDOMComponentWithClass(
     component,

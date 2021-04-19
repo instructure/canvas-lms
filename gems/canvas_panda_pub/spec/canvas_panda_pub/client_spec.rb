@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require 'spec_helper'
-require 'jwt'
+require 'json/jwt'
 
 describe CanvasPandaPub::Client do
   include WebMock::API
@@ -49,8 +51,8 @@ describe CanvasPandaPub::Client do
 
   describe "push" do
     it "should fire an HTTP request to post a message" do
-      stub = stub_request(:post, "http://key:secret@pandapub.example.com/channel/qwerty/foo").
-        with(:body => '{"a":1}')
+      stub = stub_request(:post, "http://pandapub.example.com/channel/qwerty/foo").
+        with(basic_auth: ['key', 'secret'], body: '{"a":1}')
 
       @client.post_update "/foo", { a: 1 }
 
@@ -64,7 +66,7 @@ describe CanvasPandaPub::Client do
     it "should generate a token" do
       expires = Time.now + 60
       token = @client.generate_token "/foo", true, true, expires
-      payload, _ = JWT.decode(token, "secret")
+      payload, _ = JSON::JWT.decode(token, "secret")
       expect(payload['keyId']).to eq("key")
       expect(payload['channel']).to eq("/qwerty/foo")
       expect(payload['pub']).to be true

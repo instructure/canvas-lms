@@ -1,5 +1,5 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -83,30 +83,46 @@ describe QuizzesHelper do
     end
   end
 
+  context 'render_number' do
+    it 'should render numbers' do
+      expect(render_number(1)).to eq '1'
+      expect(render_number(100)).to eq '100'
+      expect(render_number(1.123)).to eq '1.123'
+      expect(render_number(1000.45)).to eq '1,000.45'
+      expect(render_number(1000.45966)).to eq '1,000.45966'
+      expect(render_number('100')).to eq '100'
+      expect(render_number('1.43')).to eq '1.43'
+    end
+
+    it 'should remove trailing zeros' do
+      expect(render_number(1.20000000)).to eq '1.2'
+      expect(render_number(0.10340000)).to eq '0.1034'
+    end
+
+    it 'should remove trailing zeros and decimal point' do
+      expect(render_number(0.00000000)).to eq '0'
+      expect(render_number(1.00000000)).to eq '1'
+      expect(render_number(100.0)).to eq '100'
+    end
+
+    it 'should render percentages' do
+      expect(render_number('1234.456%')).to eq '1,234.456%'
+    end
+  end
+
   context 'render_score' do
     it 'should render nil scores' do
       expect(render_score(nil)).to eq '_'
     end
 
-    it 'should render non-nil scores' do
-      expect(render_score(1)).to eq '1'
-      expect(render_score(100)).to eq '100'
-      expect(render_score(1.123)).to eq '1.12'
-      expect(render_score(1000.45166)).to eq '1,000.45'
+    it 'should render with default precision' do
       expect(render_score(1000.45966)).to eq '1,000.46'
-      expect(render_score('100')).to eq '100'
-      expect(render_score('1.43')).to eq '1.43'
+      expect(render_score('12.3456')).to eq '12.35'
     end
 
-    it 'should remove trailing zeros' do
-      expect(render_score(1.20000000)).to eq '1.2'
-      expect(render_score(0.10340000, 5)).to eq '0.1034'
-    end
-
-    it 'should remove trailing zeros and decimal point' do
-      expect(render_score(0.00000000)).to eq '0'
-      expect(render_score(1.00000000)).to eq '1'
-      expect(render_score(100.0)).to eq '100'
+    it 'should support higher precision' do
+      expect(render_score(1234.4567, 3)).to eq '1,234.457'
+      expect(render_score(0.12345000, 4)).to eq '0.1235'
     end
   end
 
@@ -260,7 +276,7 @@ describe QuizzesHelper do
         answer_list: ['val'],
         editable: true
       })
-      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected>val</option></select>' # rubocop:disable Metrics/LineLength
+      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected="selected">val</option></select>' # rubocop:disable Metrics/LineLength
       expect(html).to be_html_safe
     end
 
@@ -530,7 +546,17 @@ describe QuizzesHelper do
         foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
       }, 'foo')
       expect(comment).to match(/MathML/)
-      expect(comment).to match(/&amp;coprod/)
+      expect(comment).to match(/∐/)
+    end
+
+    it 'does not add MathML if new math handling feature is active' do
+      def controller.use_new_math_equation_handling?
+        true
+      end
+      comment = comment_get({
+        foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
+      }, 'foo')
+      expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
     end
   end
 end

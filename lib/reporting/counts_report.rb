@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,7 +29,7 @@ class CountsReport
   def self.process_shard
     reporter = new
 
-    Account.root_accounts.active.each do |account|
+    Account.root_accounts.active.non_shadow.each do |account|
       next if account.external_status == 'test'
 
       reporter.process_account(account)
@@ -42,7 +44,7 @@ class CountsReport
   end
 
   def process_account(account)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       data = {}.with_indifferent_access
       data[:generated_at] = @timestamp
       data[:id] = account.id
@@ -77,7 +79,7 @@ class CountsReport
         data[:media_files_size] *= 1000
       end
 
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         detailed = account.report_snapshots.detailed.build
         detailed.created_at = @yesterday
         detailed.data = data

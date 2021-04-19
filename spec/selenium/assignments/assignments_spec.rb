@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -33,11 +35,43 @@ describe "assignments" do
 
   context "as a teacher" do
 
-    before(:each) do
-      course_with_teacher_logged_in
+    before(:once) do
+      @teacher = user_with_pseudonym
+      course_with_teacher({:user => @teacher, :active_course => true, :active_enrollment => true})
       @course.start_at = nil
       @course.save!
       @course.require_assignment_group
+    end
+
+    before :each do
+      create_session(@pseudonym)
+    end
+
+    describe 'keyboard shortcuts' do
+      context 'when the user has keyboard shortcuts enabled' do
+        before do
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut "SHIFT-?"' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).to be_displayed
+        end
+      end
+
+      context 'when the user has keyboard shortcuts disabled' do
+        before do
+          @teacher.enable_feature!(:disable_keyboard_shortcuts)
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut dialog is not accesible when user disables keyboard shortcuts' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).not_to be_displayed
+        end
+      end
     end
 
     context "save and publish button" do
@@ -94,34 +128,6 @@ describe "assignments" do
       end
     end
 
-    it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
-      @assignment = @course.assignments.create(name: 'Test Assignment')
-      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
-      file.context = @course
-      file.save!
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      insert_file_from_rce
-    end
-
-    it "should switch text editor context from RCE to HTML", priority: "1", test_id: 699624 do
-      get "/courses/#{@course.id}/assignments/new"
-      wait_for_ajaximations
-      text_editor=f('.mce-tinymce')
-      expect(text_editor).to be_displayed
-      html_editor_link=fln('HTML Editor')
-      expect(html_editor_link).to be_displayed
-      type_in_tiny 'textarea[name=description]', 'Testing HTML- RCE Toggle'
-      html_editor_link.click
-      wait_for_ajaximations
-      rce_link=fln('Rich Content Editor')
-      rce_editor=f('#assignment_description')
-      expect(html_editor_link).not_to be_displayed
-      expect(rce_link).to be_displayed
-      expect(text_editor).not_to be_displayed
-      expect(rce_editor).to be_displayed
-      expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
-    end
-
     it "should edit an assignment", priority: "1", test_id: 56012 do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
@@ -176,18 +182,19 @@ describe "assignments" do
         due_at = format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
-        #create assignment
+        # create assignment
         wait_for_new_page_load { f(".new_assignment").click }
         f('#assignment_name').send_keys(assignment_name)
-        f('#assignment_points_possible').send_keys('10')
+        replace_content(f('#assignment_points_possible'), "10")
+        click_option('#assignment_submission_type', 'Online')
         ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
           f(element).click
         end
         replace_content(f('.DueDateInput'), due_at)
 
-
         submit_assignment_form
-        #confirm all our settings were saved and are now displayed
+        wait_for_ajaximations
+        # confirm all our settings were saved and are now displayed
         expect(f('h1.title')).to include_text(assignment_name)
         expect(f('#assignment_show .points_possible')).to include_text('10')
         expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')
@@ -198,6 +205,8 @@ describe "assignments" do
 
     it "only allows an assignment editor to edit points and title if assignment " +
            "if assignment has multiple due dates", priority: "2", test_id: 622376 do
+      skip "DEMO-25 (8/21/20)"
+
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
@@ -213,7 +222,9 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      hover_and_click(".edit_assignment")
+      fj("#assignment_#{@assignment.id} a.al-trigger").click
+      wait_for_ajaximations
+      f("#assignment_#{@assignment.id} .edit_assignment").click
       expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
       # be_disabled
       expect(f('.multiple_due_dates input')).to be_disabled
@@ -243,298 +254,6 @@ describe "assignments" do
       assignment = @course.assignments.where(title: assignment_name).last
       expect(assignment).not_to be_nil
       expect(assignment).to be_post_to_sis
-    end
-
-    context 'sync to sis' do
-      let(:name_length_limit) { 10 }
-      let(:invalid_name) { "Name Assignment Too Long"}
-      let(:valid_name) { "Name" }
-      let(:points) { "10" }
-      let(:differentiate) { false }
-      let(:due_date_valid) { "Jan 1, 2020 at 11:59pm" }
-      let(:short_date) { "Jan 1, 2020" }
-      let(:error) { "" }
-      let(:settings_enable) { {} }
-      let(:name_length_invalid) { false }
-
-      before(:each) do
-        account_model
-        turn_on_sis
-        new_assignment
-      end
-
-      def differentiate_assignment
-        @course.course_sections.create!(:name => 'Section A')
-        @course.course_sections.create!(:name => 'Section B')
-      end
-
-      def new_assignment
-        course_with_teacher_logged_in(:active_all => true, :account => @account)
-        differentiate_assignment if differentiate
-        get "/courses/#{@course.id}/assignments/new"
-        title_text = name_length_invalid ? invalid_name : valid_name
-        set_value(f("#assignment_name"), title_text)
-        set_value(f("#assignment_points_possible"), points)
-        f("#assignment_text_entry").click
-      end
-
-      def turn_on_sis
-        turn_on_sis_settings(@account)
-        turn_on_limitations
-      end
-
-      def turn_on_limitations
-        @account.settings.merge!(settings_enable)
-        @account.save!
-      end
-
-      def submit_blocked_with_errors
-        f('#edit_assignment_form .btn-primary[type=submit]').click
-        expect(errors).to include(error)
-      end
-
-      def errors
-        ff('.error_box').map(&:text)
-      end
-
-      def due_date_input_fields
-        ff('.DueDateInput')
-      end
-
-      def check_due_date_table(section, due_date="-")
-        row_elements = f('.assignment_dates').find_elements(:tag_name, 'tr')
-        section_row = row_elements.detect{ |i| i.text.include?(section)}
-        expect(section_row).not_to be_nil
-        expect(section_row.text.split("\n").first).to eq due_date
-      end
-
-      def click_assign_to_dropdown_option(date_container_el, section_name_given)
-        input_el = f('[aria-label^="Add students"]', date_container_el)
-        list_id = input_el.attribute('aria-owns')
-        input_el.click
-        f('[id="' + list_id + '"] [value="' + section_name_given + '"]', date_container_el).click
-      end
-
-      def assign_to_section(date_container, section_name)
-        scroll_to(f('[aria-label^="Add students"]', date_container))
-        click_assign_to_dropdown_option(date_container, section_name)
-      end
-
-      context 'assignment name length' do
-        let(:error) { "Name is too long, must be under 11 characters" }
-
-        let(:name_length_invalid) { true }
-        let(:settings_enable) { length_settings }
-
-        def length_settings
-          {
-            :sis_assignment_name_length       => { :value=> true },
-            :sis_assignment_name_length_input => { :value => name_length_limit.to_s }
-          }
-        end
-
-        it 'validates name length while sis is on' do
-          submit_blocked_with_errors
-          set_value(f("#assignment_name"), valid_name)
-          submit_assignment_form
-          expect(f('h1.title')).to include_text(valid_name)
-        end
-
-        it 'does not validate when sis is off' do
-          f("#assignment_post_to_sis").click
-          submit_assignment_form
-          expect(f('h1.title')).to include_text(invalid_name)
-        end
-      end
-
-      context 'due date required' do
-        let(:error) { "Please add a due date" }
-        let(:settings_enable) { {:sis_require_assignment_due_date => {:value=> true} } }
-
-        it 'validates due date while sis is on' do
-          submit_blocked_with_errors
-          set_value(due_date_input_fields.first, due_date_valid)
-          submit_assignment_form
-          check_due_date_table('Everyone', short_date)
-        end
-
-        it 'does not validate when sis is off' do
-          f("#assignment_post_to_sis").click
-          submit_assignment_form
-          check_due_date_table('Everyone')
-        end
-
-        describe 'differentiated assignment' do
-          let(:differentiate) { true }
-          let(:section_to_set) { "Section B" }
-
-          before(:each) do
-            assign_section_due_date
-          end
-
-          def assign_section_due_date
-            f('#add_due_date').click
-            due_date_fields = ff('.Container__DueDateRow-item')
-            assign_to_section(due_date_fields.last, section_to_set)
-          end
-
-          it 'checks each due date when on' do
-            submit_blocked_with_errors
-            due_date_input_fields.each{ |h| set_value(h, due_date_valid) }
-            f('#edit_assignment_form .btn-primary[type=submit]').click
-            check_due_date_table(section_to_set, short_date)
-          end
-
-          it 'does not check when sis is off' do
-            f("#assignment_post_to_sis").click
-            submit_assignment_form
-            check_due_date_table(section_to_set)
-            check_due_date_table('Everyone else')
-          end
-        end
-      end
-
-      context 'when on index page' do
-        let(:assignment_name) { "Test Assignment"}
-        let(:settings_enable) { { :sis_require_assignment_due_date => { value: true } } }
-        let(:expected_date) { format_date_for_view(Time.zone.now - 1.month) }
-        let(:assignment_id) { @assignment.id }
-        let(:assignment_entry) { f("\#assignment_#{assignment_id}") }
-        let(:post_to_sis_button) { f('.post-to-sis-status', assignment_entry) }
-        let(:due_date_error) { f('#flash_message_holder') }
-        let(:sis_state_text) { f('.icon-post-to-sis', post_to_sis_button).attribute(:alt) }
-        let(:due_date_display) { true }
-        let(:sis_state) { due_date_display ? "disabled" : "enabled" }
-        let(:set_date) { due_date_display ? nil : 1.day.ago}
-        let(:params) { { name: assignment_name} }
-        let(:type) { @course.assignments }
-
-        before(:each) do
-          account_model
-          turn_on_sis
-        end
-
-        def create_hash(due_date = nil)
-          { post_to_sis: false, points_possible: 10 }.merge(due_date_params(due_date))
-        end
-
-        def create_assignment(due_date = nil)
-          @assignment = type.create(create_hash(due_date).merge(params))
-          @assignment.publish! unless @assignment.published?
-        end
-
-        def due_date_params(due_date = nil)
-          due_date ? { due_at: due_date } : { due_at: nil, only_visible_to_overrides: true }
-        end
-
-        def override_create(section_name, due_date = Timecop.freeze(1.day.ago))
-          section = @course.course_sections.create! name: section_name
-
-          @assignment.assignment_overrides.create! do |override|
-            override.set = section
-            override.due_at = due_date
-            override.due_at_overridden = true
-          end
-        end
-
-        def click_sync_to_sis
-          post_to_sis_button.click
-          wait_for_ajaximations
-        end
-
-        def validate
-          get "/courses/#{@course.id}/assignments"
-          click_sync_to_sis
-          expect(due_date_error.displayed?).to be due_date_display
-          expect(sis_state_text).to include(sis_state)
-        end
-
-        describe "when there are due dates" do
-          it 'where there are no overrides' do
-            create_assignment(set_date)
-            validate
-          end
-
-          it 'when there are overrides and no base' do
-            create_assignment
-            override_create("A", set_date)
-            validate
-          end
-
-          it 'when there is a base and overrides' do
-            create_assignment(expected_date)
-            override_create("A", set_date)
-            validate
-          end
-        end
-
-        describe "when there are not due dates" do
-          let(:due_date_display) { false }
-
-          it 'where there are no overrides' do
-            create_assignment(set_date)
-            validate
-          end
-
-          it 'when there are overrides and no base' do
-            create_assignment
-            override_create("A", set_date)
-            validate
-          end
-
-          it 'when there is a base and overrides' do
-            create_assignment(expected_date)
-            override_create("A", set_date)
-            validate
-          end
-        end
-
-        describe 'when due dates for quizzes' do
-          let(:assignment_id) { @assignment.assignment.id }
-          let(:type) { @course.quizzes }
-          let(:assignment_group) { @course.assignment_groups.create!(name: "default") }
-          let(:params) { { title: assignment_name, assignment_group: assignment_group } }
-
-          it 'when there are no overrides' do
-            create_assignment(set_date)
-            validate
-          end
-
-          it 'when there are overrides and no base' do
-            create_assignment
-            override_create("A", set_date)
-            validate
-          end
-          it 'when there is a base and overrides' do
-            create_assignment(expected_date)
-            override_create("A", set_date)
-            validate
-          end
-        end
-
-        describe 'when no due dates for quizzes' do
-          let(:assignment_id) { @assignment.assignment.id }
-          let(:type) { @course.quizzes }
-          let(:assignment_group) { @course.assignment_groups.create!(name: "default") }
-          let(:params) { { title: assignment_name, assignment_group: assignment_group } }
-
-          it 'when there are no overrides' do
-            create_assignment(set_date)
-            validate
-          end
-
-          it 'when there are overrides and no base' do
-            create_assignment
-            override_create("A", set_date)
-            validate
-          end
-          it 'when there is a base and overrides' do
-            create_assignment(expected_date)
-            override_create("A", set_date)
-            validate
-          end
-        end
-      end
     end
 
     it "should create an assignment with more options", priority: "2", test_id: 622614 do
@@ -617,14 +336,8 @@ describe "assignments" do
       close_visible_dialog
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
-      keep_trying_until do
-        expect(driver.execute_script(
-          "return $('.errorBox').filter('[id!=error_box_template]')"
-        )).to be_present
-      end
-      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      expect(visBoxes.first.text).to eq "Please create a group set"
+      error_box = f('.errorBox[role=alert]')
+      expect(f('.error_text', error_box).text).to eq "Please create a group set"
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
@@ -641,7 +354,7 @@ describe "assignments" do
     end
 
     context "group assignments" do
-      before(:each) do
+      before(:once) do
         ag = @course.assignment_groups.first
         @assignment1, @assignment2 = [1,2].map do |i|
           gc = GroupCategory.create(:name => "gc#{i}", :context => @course)
@@ -662,7 +375,6 @@ describe "assignments" do
 
       it "should not allow group set to be changed if there are submissions", priority: "1", test_id: 626907 do
         get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
-        wait_for_ajaximations
         # be_disabled
         expect(f("#assignment_group_category_id")).to be_disabled
       end
@@ -674,7 +386,6 @@ describe "assignments" do
 
         # ensure neither deleted group shows up on an assignment with no submissions
         get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
-        wait_for_ajaximations
 
         expect(f("#assignment_group_category_id")).not_to include_text @assignment1.group_category.name
         expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
@@ -682,7 +393,6 @@ describe "assignments" do
         # ensure an assignment attached to a deleted group shows the group it's attached to,
         # but no other deleted groups, and that the dropdown is disabled
         get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
-        wait_for_ajaximations
 
         expect(get_value("#assignment_group_category_id")).to eq @assignment1.group_category.id.to_s
         expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
@@ -692,13 +402,11 @@ describe "assignments" do
       it "should revert to a blank selection if original group is deleted with no submissions", priority: "2", test_id: 627150 do
         @assignment2.group_category.destroy
         get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
-        wait_for_ajaximations
         expect(f("#assignment_group_category_id option[selected][value='blank']")).to be_displayed
       end
 
       it "should show and hide the intra-group peer review toggle depending on group setting" do
         get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
-        wait_for_ajaximations
 
         expect(f("#intra_group_peer_reviews")).to be_displayed
         f("#has_group_category").click
@@ -723,7 +431,7 @@ describe "assignments" do
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
-        fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
+        fj("div#assignment_#{@frozen_assign.id} button.al-trigger").click
         wait_for_ajaximations
         expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end
@@ -772,11 +480,38 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
+      # wait for jQuery UI sortable to be initialized
+      expect(f(".collectionViewItems.ui-sortable")).to be_displayed
       drag_with_js("#assignment_#{as[0].id}", 0, 50)
       wait_for_ajaximations
 
       as.each { |a| a.reload }
       expect(as.collect(&:position)).to eq [2, 1, 3, 4]
+    end
+
+    context "with Responsive fix" do
+      before :each do
+        Account.default.enable_feature!('responsive_misc')
+      end
+
+      it "should reorder assignments with drag and drop", priority: "2", test_id: 647848 do
+        ag = @course.assignment_groups.first
+        as = []
+        4.times do |i|
+          as << @course.assignments.create!(:name => "assignment_#{i}", :assignment_group => ag)
+        end
+        expect(as.collect(&:position)).to eq [1, 2, 3, 4]
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        # wait for jQuery UI sortable to be initialized
+        expect(f(".collectionViewItems.ui-sortable")).to be_displayed
+        drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
+        wait_for_ajaximations
+
+        as.each { |a| a.reload }
+        expect(as.collect(&:position)).to eq [2, 1, 3, 4]
+      end
     end
 
     context "with modules" do
@@ -815,7 +550,7 @@ describe "assignments" do
       end
 
       it "shows submission scores for students on index page", priority: "2", test_id: 647850 do
-        @assignment.update_attributes(points_possible: 15)
+        @assignment.update(points_possible: 15)
         @assignment.publish
         course_with_student_logged_in(active_all: true, course: @course)
         @assignment.grade_student(@student, grade: 14, grader: @teacher)
@@ -828,14 +563,11 @@ describe "assignments" do
       it "should allow publishing from the show page", priority: "1", test_id: 647851 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        expect(f("#assignment-speedgrader-link")).to have_class("hidden")
-
         f("#assignment_publish_button").click
         wait_for_ajaximations
 
         expect(@assignment.reload).to be_published
         expect(f("#assignment_publish_button")).to include_text("Published")
-        expect(f("#assignment-speedgrader-link")).not_to have_class("hidden")
       end
 
       it "should have a link to speedgrader from the show page", priority: "1", test_id: 3001903 do
@@ -956,7 +688,7 @@ describe "assignments" do
       @course.start_at = nil
       @course.save!
       @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
-      @assignment.update_attributes(
+      @assignment.update(
         moderated_grading: true,
         grader_count: 1,
         final_grader: @teacher
@@ -973,7 +705,7 @@ describe "assignments" do
     it "should not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      expect(f('#content h1').text).to eql "Page Not Found"
+      expect(f('#content h1').text).to eql "Whoops... Looks like nothing is here!"
     end
   end
 

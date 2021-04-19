@@ -19,13 +19,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {mount} from 'enzyme'
-import FilePreview from 'jsx/files/FilePreview'
-import Folder from 'compiled/models/Folder'
-import File from 'compiled/models/File'
-import FilesCollection from 'compiled/collections/FilesCollection'
+import FilePreview from '@canvas/files/react/components/FilePreview'
+import Folder from '@canvas/files/backbone/models/Folder'
+import File from '@canvas/files/backbone/models/File.coffee'
+import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 
 let filesCollection = {}
-let folderCollection = {}
+const folderCollection = {}
 let file1 = {}
 let file2 = {}
 let file3 = {}
@@ -80,19 +80,19 @@ QUnit.module('File Preview Rendering', {
     currentFolder.files = filesCollection
   },
   teardown() {
-    let filesCollection = {}
-    let folderCollection = {}
-    let file1 = {}
-    let file2 = {}
-    let file3 = {}
-    let currentFolder = {}
+    const filesCollection = {}
+    const folderCollection = {}
+    const file1 = {}
+    const file2 = {}
+    const file3 = {}
+    const currentFolder = {}
   }
 })
 
 test('clicking the info button should render out the info panel', () => {
   const component = mount(
     <FilePreview
-      isOpen={true}
+      isOpen
       query={{
         preview: '1'
       }}
@@ -116,7 +116,7 @@ test('clicking the info button should render out the info panel', () => {
 test('opening the preview for one file should show navigation buttons for the previous and next files in the current folder', () => {
   const component = mount(
     <FilePreview
-      isOpen={true}
+      isOpen
       query={{
         preview: '2'
       }}
@@ -142,7 +142,7 @@ test('opening the preview for one file should show navigation buttons for the pr
 test('download button should be rendered on the file preview', () => {
   const component = mount(
     <FilePreview
-      isOpen={true}
+      isOpen
       query={{
         preview: '3'
       }}
@@ -161,7 +161,7 @@ test('clicking the close button calls closePreview with the correct url', () => 
 
   const component = mount(
     <FilePreview
-      isOpen={true}
+      isOpen
       query={{
         preview: '3',
         search_term: 'web',

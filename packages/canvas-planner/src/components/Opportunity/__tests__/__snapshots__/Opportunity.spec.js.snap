@@ -15,15 +15,28 @@ exports[`renders the base component correctly 1`] = `
     <div
       className="Opportunity-styles__title"
     >
-      <Link
+      <Button
         as="button"
+        buttonRef={[Function]}
+        cursor="pointer"
+        display="inline-block"
+        elementRef={[Function]}
         href="http://www.non_default_url.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="medium"
+        textAlign="center"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
+        withBackground={true}
       >
         this is a description about the opportunity
-      </Link>
+      </Button>
     </div>
   </div>
   <div
@@ -33,6 +46,7 @@ exports[`renders the base component correctly 1`] = `
       className="Opportunity-styles__status"
     >
       <Pill
+        color="primary"
         text="Missing"
         variant="danger"
       />
@@ -73,16 +87,18 @@ exports[`renders the base component correctly 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      textAlign="center"
       title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
+      withBackground={true}
     >
       <ScreenReaderContent
         as="span"
@@ -109,15 +125,28 @@ exports[`renders the base component correctly with 0 points 1`] = `
     <div
       className="Opportunity-styles__title"
     >
-      <Link
+      <Button
         as="button"
+        buttonRef={[Function]}
+        cursor="pointer"
+        display="inline-block"
+        elementRef={[Function]}
         href="http://www.non_default_url.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="medium"
+        textAlign="center"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
+        withBackground={true}
       >
         this is a description about the opportunity
-      </Link>
+      </Button>
     </div>
   </div>
   <div
@@ -127,6 +156,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
       className="Opportunity-styles__status"
     >
       <Pill
+        color="primary"
         text="Missing"
         variant="danger"
       />
@@ -167,16 +197,18 @@ exports[`renders the base component correctly with 0 points 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      textAlign="center"
       title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
+      withBackground={true}
     >
       <ScreenReaderContent
         as="span"
@@ -203,15 +235,28 @@ exports[`renders the base component correctly without points 1`] = `
     <div
       className="Opportunity-styles__title"
     >
-      <Link
+      <Button
         as="button"
+        buttonRef={[Function]}
+        cursor="pointer"
+        display="inline-block"
+        elementRef={[Function]}
         href="http://www.non_default_url.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="medium"
+        textAlign="center"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
+        withBackground={true}
       >
         this is a description about the opportunity
-      </Link>
+      </Button>
     </div>
   </div>
   <div
@@ -221,6 +266,7 @@ exports[`renders the base component correctly without points 1`] = `
       className="Opportunity-styles__status"
     >
       <Pill
+        color="primary"
         text="Missing"
         variant="danger"
       />
@@ -247,16 +293,18 @@ exports[`renders the base component correctly without points 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      textAlign="center"
       title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
+      withBackground={true}
     >
       <ScreenReaderContent
         as="span"

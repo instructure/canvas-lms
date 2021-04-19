@@ -112,38 +112,22 @@ If you need to change a button's size, you can do so by adding the appropriate c
   <tbody>
     <tr>
       <td>default</td>
-      <td><button class="Button" type="button">.Button</button></td>
+      <td><button class="Button" type="button">Default</button></td>
     </tr>
     <tr>
       <td>.Button.Button--large</td>
-      <td><button class="Button Button--large" type="button">.Button-large</button></td>
+      <td><button class="Button Button--large" type="button">Large</button></td>
     </tr>
     <tr>
       <td>.Button.Button--small</td>
-      <td><button class="Button Button--small" type="button">.Button-small</button></td>
+      <td><button class="Button Button--small" type="button">Small</button></td>
     </tr>
     <tr>
       <td>.Button.Button--mini</td>
-      <td><button class="Button Button--mini" type="button">.Button-mini</button></td>
+      <td><button class="Button Button--mini" type="button">Mini</button></td>
     </tr>
   </tbody>
 </table>
-
-```html
-<button class="Button Button--large" type="button">This is a massive button!</button>
-```
-
-
-## Artificial button
-
-To create something that acts like a button when you can't use a button element,
-
-listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="button"`
-
-```html
-<div class="btn" tabindex="0" role="button">Activate me</div>
-```
-
 */
 
 .btn,       // <-- deprecated- do not use
@@ -247,11 +231,11 @@ input[type="button"] {
     @include canvas-button(#0770A3, $ic-color-light);
   } @else {
     @include canvas-button(
-      var(--ic-brand-button--primary-bgd),
-      var(--ic-brand-button--primary-text),
-      false,
-      var(--ic-brand-button--primary-bgd-darkened-5),
-      var(--ic-brand-button--primary-bgd-darkened-15)
+        var(--ic-brand-button--primary-bgd),
+        var(--ic-brand-button--primary-text),
+        false,
+        var(--ic-brand-button--primary-bgd-darkened-5),
+        var(--ic-brand-button--primary-bgd-darkened-15)
     );
   }
 }
@@ -277,11 +261,11 @@ input[type="button"] {
     @include canvas-button($ic-color-dark, $ic-color-light);
   } @else {
     @include canvas-button(
-      var(--ic-brand-button--secondary-bgd),
-      var(--ic-brand-button--secondary-text),
-      false,
-      var(--ic-brand-button--secondary-bgd-darkened-5),
-      var(--ic-brand-button--secondary-bgd-darkened-15)
+        var(--ic-brand-button--secondary-bgd),
+        var(--ic-brand-button--secondary-text),
+        false,
+        var(--ic-brand-button--secondary-bgd-darkened-5),
+        var(--ic-brand-button--secondary-bgd-darkened-15)
     );
   }
 }
@@ -366,11 +350,15 @@ input[type="button"] {
   background: transparent;
   border: none;
   padding: 2px 4px;
-  border-radius: 0;
+  border-radius: 3px;
   color: $ic-icon-link-color;
+  outline: none;
   &:hover, &:focus {
     background: transparent;
     color: $ic-icon-link-color-hover;
+  }
+  &:focus {
+    @include button-focus-light;
   }
   &.active, &.Button--active, &:active {
     background: transparent;

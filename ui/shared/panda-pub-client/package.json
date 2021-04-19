@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/panda-pub-client",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./index.js"
+}

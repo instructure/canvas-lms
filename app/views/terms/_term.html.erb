@@ -24,9 +24,9 @@
       <span class="name"><%= term.name rescue nbsp %></span>
     </div>
     <div class="show_term" style="font-size: 0.8em;">
-      <% if term && (term.sis_source_id && can_do(@root_account, @current_user, :read_sis) || can_do(@root_account, @current_user, :manage_sis)) %>
+      <% if (term&.sis_source_id && can_do(@root_account, @current_user, :read_sis) || can_do(@root_account, @current_user, :manage_sis)) %>
         <div style="font-size: 0.8em;">
-          <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term.sis_source_id %></span>
+          <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term&.sis_source_id %></span>
         </div>
       <% end %>
       <% if term.try(:grading_period_group).try(:active?) %>
@@ -38,20 +38,20 @@
           </span>
         </div>
       <% end %>
-      <%= term && t(:course_count, "Course", :count => @course_counts_by_term[term.id] || 0) %><br/>
+      <%= t(:course_count, "Course", :count => @course_counts_by_term[term&.id] || 0) %><br/>
     </div>
     <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
         <div class="control-group edit_term">
           <label class="control-label" for="enrollment_term_name"><%= t :name, 'Term Name:' %></label>
           <div class="controls">
-            <%= f.text_field :name, :class => "input-xlarge", :disabled => (term && term == default_term) %>
+            <%= f.text_field :name, :class => "input-large", :disabled => (term && term == default_term) %>
           </div>
         </div>
       <% if can_do(@root_account, @current_user, :manage_sis) %>
         <div class="control-group edit_term">
           <label class="control-label" for="enrollment_term_sis_source_id"><%= t :sis_source_id, 'SIS ID:' %></label>
           <div class="controls">
-            <%= f.text_field :sis_source_id, :class => "input-xlarge" %>
+            <%= f.text_field :sis_source_id, :class => "input-large" %>
           </div>
         </div>
       <% end %>

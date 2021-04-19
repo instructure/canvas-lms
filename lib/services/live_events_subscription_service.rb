@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -23,34 +25,31 @@ module Services
       end
 
       def tool_proxy_subscription(tool_proxy, subscription_id)
-        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
-        request(:get, "/api/subscriptions/#{subscription_id}", options)
+        show(tool_proxy_jwt_body(tool_proxy), subscription_id)
       end
 
       def tool_proxy_subscriptions(tool_proxy, optional_headers = {})
-        options = { headers: headers(tool_proxy_jwt_body(tool_proxy), optional_headers) }
-        request(:get, '/api/subscriptions', options)
+        index(tool_proxy_jwt_body(tool_proxy), optional_headers)
       end
 
       def create_tool_proxy_subscription(tool_proxy, subscription)
-        options = {
-          headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
-          body: subscription.to_json
-        }
-        request(:post, '/api/subscriptions', options)
+        Rails.logger.info do
+          "in: LiveEventsSubscriptionService::create_tool_proxy_subscription, "\
+          "tool_proxy_id: #{tool_proxy.id}, subscription: #{subscription}"
+        end
+        create(tool_proxy_jwt_body(tool_proxy), subscription)
       end
 
-      def update_tool_proxy_subscription(tool_proxy, subscription_id, subscription)
-        options = {
-          headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
-          body: subscription.to_json
-        }
-        request(:put, "/api/subscriptions/#{subscription_id}", options)
+      def update_tool_proxy_subscription(tool_proxy, _subscription_id, subscription)
+        update(tool_proxy_jwt_body(tool_proxy), subscription)
       end
 
       def destroy_tool_proxy_subscription(tool_proxy, subscription_id)
-        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
-        request(:delete, "/api/subscriptions/#{subscription_id}", options)
+        Rails.logger.info do
+          "in: LiveEventsSubscriptionService::destroy_tool_proxy_subscription, "\
+          "tool_proxy_id: #{tool_proxy.id}, subscription_id: #{subscription_id}"
+        end
+        destroy(tool_proxy_jwt_body(tool_proxy), subscription_id)
       end
 
       def destroy_all_tool_proxy_subscriptions(tool_proxy)
@@ -58,7 +57,44 @@ module Services
         request(:delete, "/api/subscriptions", options)
       end
 
+      def create(jwt_body, subscription)
+        options = {
+          headers: headers(jwt_body, { 'Content-Type' => 'application/json' }),
+          body: subscription.to_json
+        }
+        request(:post, '/api/subscriptions', options)
+      end
+
+      def show(jwt_body, subscription_id)
+        options = { headers: headers(jwt_body) }
+        request(:get, "/api/subscriptions/#{subscription_id}", options)
+      end
+
+      def update(jwt_body, subscription)
+        options = {
+          headers: headers(jwt_body, { 'Content-Type' => 'application/json' }),
+          body: subscription.to_json
+        }
+        request(:put, "/api/subscriptions/#{subscription['Id']}", options)
+      end
+
+      def destroy(jwt_body, subscription_id)
+        options = { headers: headers(jwt_body) }
+        request(:delete, "/api/subscriptions/#{subscription_id}", options)
+      end
+
+      def index(jwt_body, opts = {}, query: {})
+        options = { headers: headers(jwt_body, opts), query: query }
+        request(:get, '/api/root_account_subscriptions', options)
+      end
+
+      def event_types_index(jwt_body, message_type, opts = {})
+        options = { headers: headers(jwt_body, opts) }
+        request(:get, "/api/event_types?message_type=#{message_type}", options)
+      end
+
       private
+
       def request(method, endpoint, options = {})
         Canvas.timeout_protection("live-events-subscription-service-session", raise_on_timeout: true) do
           HTTParty.send(method, "#{settings['app-host']}#{endpoint}", options.merge(timeout: 10))
@@ -74,7 +110,7 @@ module Services
       def settings
         Canvas::DynamicSettings.find("live-events-subscription-service", default_ttl: 5.minutes)
       rescue Imperium::TimeoutError => e
-        Canvas::Errors.capture_exception(:live_events_subscription, e)
+        Canvas::Errors.capture_exception(:live_events_subscription, e, :warn)
         nil
       end
 

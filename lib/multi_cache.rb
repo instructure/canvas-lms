@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,101 +18,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class MultiCache < ActiveSupport::Cache::Store
-  def self.cache
-    @multi_cache ||= begin
-      ha_cache_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: ApplicationController.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
-      if (ha_cache_config[:cache_store])
-        store = ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)
-        store.options.delete(:namespace)
-        store
-      elsif defined?(ActiveSupport::Cache::RedisStore) && Rails.cache.is_a?(ActiveSupport::Cache::RedisStore) &&
-          defined?(Redis::DistributedStore) && (store = Rails.cache.instance_variable_get(:@data)).is_a?(Redis::DistributedStore)
-        store.instance_variable_get(:@multi_cache) || store.instance_variable_set(:@multi_cache, MultiCache.new(store.ring.nodes))
-      else
-        Rails.cache
-      end
-    end
-  end
+class MultiCache
+  class << self
+    delegate :fetch, :delete, :validate_consul_event, to: :cache
 
-  def self.reset
-    @multi_cache = nil
+    def cache
+      unless defined?(@multi_cache)
+        ha_cache_config = YAML.safe_load(Canvas::DynamicSettings.find(tree: :private, cluster: Canvas.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
+        @multi_cache = if ha_cache_config[:cache_store]
+          ha_cache_config[:url] = ha_cache_config[:servers] if ha_cache_config[:servers]
+          ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)
+        else
+          config = Canvas.cache_store_config_for(Rails.env).dup || {}
+          # MultiCache has to have an expiration
+          config[:expires_in] ||= 300
+          Canvas.lookup_cache_store(config, Rails.env)
+        end
+        @multi_cache.options.delete(:namespace) # remove the namespace that switchman added; MultiCache is global
+      end
+      @multi_cache
+    end
+
+    def reset
+      remove_instance_variable(:@multi_cache) if instance_variable_defined?(:@multi_cache)
+    end
   end
 
   Canvas::Reloader.on_reload { reset }
-
-  def initialize(ring)
-    @ring = ring
-    super()
-  end
-
-  def fetch(key, options = nil, &block)
-    options ||= {}
-    # an option to allow populating all nodes in the ring with the
-    # same data
-    if options[:node] == :all
-      calculated_value = nil
-      did_calculate = false
-      result = nil
-      @ring.each do |node|
-        options[:node] = node
-        if block
-          result = super(key, options) do
-            calculated_value = yield unless did_calculate
-            did_calculate = true
-            calculated_value
-          end
-        else
-          result ||= []
-          result << super(key, options)
-        end
-      end
-      result
-    else
-      # this makes the node "sticky" for read/write
-      options[:node] = @ring[rand(@ring.length)]
-      super(key, options, &block)
-    end
-  end
-
-  # for compatibility
-  def self.copies(key)
-    nil
-  end
-
-  def self.fetch(key, options = nil, &block)
-    cache.fetch(key, options, &block)
-  end
-
-  def self.delete(key, options = nil)
-    cache.delete(key, options)
-  end
-
-  private
-  def write_entry(key, entry, options)
-    method = options && options[:unless_exist] ? :setnx : :set
-    options[:node].send method, key, entry, options
-  rescue Errno::ECONNREFUSED, Redis::CannotConnectError
-    false
-  end
-
-  def read_entry(key, options)
-    entry = options[:node].get key, options
-    if entry
-      entry.is_a?(ActiveSupport::Cache::Entry) ? entry : ActiveSupport::Cache::Entry.new(entry)
-    end
-  rescue Errno::ECONNREFUSED, Redis::CannotConnectError
-    nil
-  end
-
-  def delete_entry(key, options)
-    nodes = options[:node] ? [options[:node]] : @ring
-    nodes.inject(false) do |result, node|
-      begin
-        node.del(key) || result
-      rescue Errno::ECONNREFUSED, Redis::CannotConnectError
-        result
-      end
-    end
-  end
 end

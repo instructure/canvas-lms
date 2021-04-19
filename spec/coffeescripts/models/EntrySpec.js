@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Entry from 'compiled/models/Entry'
+import Entry from 'ui/features/discussion_topic/backbone/models/Entry.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Entry', {
@@ -73,4 +73,16 @@ test('speedgraderUrl replaces :student_id in SPEEDGRADER_URL_TEMPLATE with the u
   })
 
   strictEqual(studentEntry.speedgraderUrl(), 'speed_grader?assignment_id=1&student_id=100')
+})
+
+test('recognizes current user as its original author', function() {
+  const nonAuthorEntry = new Entry({
+    id: 2,
+    message: 'a reply',
+    parent_id: 1,
+    user_id: 100
+  })
+
+  ok(!nonAuthorEntry.isAuthorsEntry())
+  ok(this.entry.isAuthorsEntry())
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -144,8 +146,7 @@ module AdheresToPolicy
     #   grants_right?(user, session, :update)
     #   # => true
     #
-    # Returns true if any of the provided rights are granted to the user.  False
-    # if none of the provided rights are granted.
+    # Returns true if the provided right is granted. Otherwise, returns false.
     def grants_right?(user, *args)
       session, sought_rights = parse_args(args)
       raise ArgumentError if sought_rights.length > 1

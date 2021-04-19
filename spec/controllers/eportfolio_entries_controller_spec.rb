@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -32,6 +34,7 @@ describe EportfolioEntriesController do
 
   before :once do
     eportfolio_with_user(:active_all => true)
+    @user.account_users.create!(account: Account.default, role: student_role)
     eportfolio_category
   end
 
@@ -70,6 +73,75 @@ describe EportfolioEntriesController do
       expect(assigns[:page]).to eql(@entry)
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
+    end
+
+    describe "js_env" do
+      it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+        user_session(@user)
+        @category.name = "some category"
+        @category.save!
+        @entry.name = "some entry"
+        @entry.save!
+        get 'show', params: {eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug}
+        expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
+      end
+    end
+
+    context "spam eportfolios" do
+      before(:once) do
+        @portfolio.update!(public: true)
+        @category = eportfolio_category
+        eportfolio_entry(@category)
+      end
+
+      context "when the user is the author of the eportfolio" do
+        it "renders the entry when the eportfolio is spam" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@user)
+          get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
+
+          expect(response.status).to eq(200)
+        end
+      end
+
+      context "when the user is a non-admin, non-author of the eportfolio" do
+        before(:once) do
+          @other_user = user_model
+          @other_user.account_users.create!(account: Account.default, role: student_role)
+        end
+
+        it "is unauthorized when the eportfolio is spam" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@other_user)
+          get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
+
+          assert_unauthorized
+        end
+      end
+
+      context "when the user is an admin" do
+        before(:once) do
+          @admin = account_admin_user
+        end
+
+        it "renders the entry when the eportfolio is spam and the admin has :moderate_user_content permissions" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
+
+          expect(response.status).to eq(200)
+        end
+
+        it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
+
+          assert_unauthorized
+        end
+      end
     end
   end
 
@@ -128,13 +200,10 @@ describe EportfolioEntriesController do
       assert_unauthorized
     end
 
-    it "should redirect to page" do
+    it "will 404 for bad IDs" do
       user_session(@user)
-      begin
-        get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
-      rescue => e
-        expect(e.to_s).to eql("Not Found")
-      end
+      get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
+      expect(response.status).to eq(404)
     end
 
     describe "with sharding" do
@@ -154,10 +223,13 @@ describe EportfolioEntriesController do
   describe "GET 'submission'" do
     before(:once) do
       eportfolio_entry(@category)
+      @student = @user
       course = Course.create!
-      course.enroll_student(@user, enrollment_state: @active)
+      course.enroll_student(@student).accept(true)
+      teacher = teacher_in_course(course: course, active_all: true).user
       @assignment = course.assignments.create!
-      @submission = @assignment.submissions.find_by(user: @user)
+      @submission = @assignment.submissions.find_by(user: @student)
+      @assignment.grade_student(@student, grader: teacher, score: 5)
     end
 
     it 'requires authorization' do
@@ -166,7 +238,7 @@ describe EportfolioEntriesController do
     end
 
     it 'passes anonymize_students: false to the template if the assignment is not anonymous' do
-      user_session(@user)
+      user_session(@student)
       expect(controller).to receive(:render).with({
         template: 'submissions/show_preview',
         locals: { anonymize_students: false }
@@ -175,10 +247,10 @@ describe EportfolioEntriesController do
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
 
-    it 'passes anonymize_students: false to the template if the assignment is anonymous and unmuted' do
-      user_session(@user)
+    it 'passes anonymize_students: false to the template if the assignment is anonymous and grades are posted' do
+      user_session(@student)
       @assignment.update!(anonymous_grading: true)
-      @assignment.unmute!
+      @assignment.post_submissions
       expect(controller).to receive(:render).with({
         template: 'submissions/show_preview',
         locals: { anonymize_students: false }
@@ -187,9 +259,10 @@ describe EportfolioEntriesController do
       get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
 
-    it 'passes anonymize_students: true to the template if the assignment is anonymous and muted' do
-      user_session(@user)
-      @assignment.update!(anonymous_grading: true, muted: true)
+    it 'passes anonymize_students: true to the template if the assignment is anonymous and grades are unposted' do
+      user_session(@student)
+      @assignment.update!(anonymous_grading: true)
+      @assignment.hide_submissions
       expect(controller).to receive(:render).with({
         template: 'submissions/show_preview',
         locals: { anonymize_students: true }

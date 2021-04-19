@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %>
+<% provide :page_title do %>
   <%= t('titles.unauthorized_action', %{Unauthorized}) %>
 <% end %>
 <% @show_left_side = false %>
 <% @show_embedded_chat = false %>
-<% (@body_classes ||= []) << 'full-width' %>
+<% add_body_class 'full-width' %>
 <div id="unauthorized_message" class="ic-Error-page">
     <% if @needs_cookies %>
       <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/500_pageerror.svg">

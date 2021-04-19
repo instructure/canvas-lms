@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -24,7 +26,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
         event_name: 'content_migration_completed',
-        event_subscriber: PactConfig::Consumers::QUIZ_LTI
+        event_subscriber: PactConfig::LiveEventConsumers::QUIZ_LTI
       )
     end
 
@@ -41,12 +43,10 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
           :tool_id => 'Quizzes 2'
         }
         account = Account.default
-        account.enable_feature!(:lor_for_account)
         account.context_external_tools.create!(params)
         account.settings[:provision] = {'lti' => 'lti url'}
         account.lti_context_id = '1'
         account.enable_feature!(:quizzes_next)
-        account.enable_feature!(:import_to_quizzes_next)
         account.save!
 
         course_model(uuid: '100006')

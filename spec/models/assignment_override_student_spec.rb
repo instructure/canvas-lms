@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -246,6 +248,13 @@ describe AssignmentOverrideStudent do
       it "has the quiz's ID" do
         expect(override_student.quiz_id).to eq quiz_id
       end
+    end
+  end
+
+  describe 'create' do
+    it 'sets the root_account_id using assignment' do
+      adhoc_override_with_student
+      expect(@override_student.root_account_id).to eq @assignment.root_account_id
     end
   end
 end

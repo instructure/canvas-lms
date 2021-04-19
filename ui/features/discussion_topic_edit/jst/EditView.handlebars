@@ -1,0 +1,404 @@
+{{#if title}}
+  <h1 class="screenreader-only" style="display: inline">{{title}}</h1>
+{{else}}
+  <h1 class="screenreader-only" style="display: inline">
+  {{#if isAnnouncement}}
+    {{#t}}New Announcement{{/t}}
+  {{else}}
+    {{#t}}New Discussion{{/t}}
+  {{/if}}
+  </h1>
+{{/if}}
+
+<div id="discussion-edit-view" class="ui-tabs-minimal">
+{{#unless isAnnouncement}}
+  <div id="discussion-edit-header" class="discussion-edit-header row-fluid">
+    {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED }}
+      <ul id="discussion-edit-header-tabs">
+       <li><a href="#discussion-details-tab" id="details_link">{{#t}}Details{{/t}}</a></li>
+       <li><a href="#mastery-paths-editor" id="conditional_release_link">{{#t}}Mastery Paths{{/t}}</a></li>
+       <span id="discussion-edit-header-spacer"></span>
+       {{>  ui/features/discussion_topic_edit/jst/_publishedButton.handlebars }}
+      </ul>
+    {{else}}
+      <div class="span4 offset8 text-right">
+        {{>  ui/features/discussion_topic_edit/jst/_publishedButton.handlebars }}
+      </div>
+    </div>
+    {{/if}}
+{{/unless}}
+
+<div id="discussion-details-tab">
+  <fieldset style="min-width: 0;">
+    <div class="control-group">
+      {{#if lockedItems.content}}
+        <h1 id="discussion-title" class="title">{{title}}</h1>
+        <input type="hidden" name="title" value="{{title}}"/>
+      {{else}}
+        <label class="hidden-inline-text" for="discussion-title">
+          {{#t "topic_title"}}Topic Title{{/t}}
+        </label>
+        <input type="text"
+               id="discussion-title"
+               name="title"
+               placeholder="{{#t "topic_title"}}Topic Title{{/t}}"
+               value="{{title}}"
+               maxlength="254"
+               class="input-block-level">
+      {{/if}}
+    </div>
+    <div class="control-group">
+      {{#if lockedItems.content}}
+        <div id="discussion-description" class="discussion-description">
+          {{convertApiUserContent message}}
+        </div>
+      {{else}}
+        {{#unless use_rce_enhancements}}
+          <div style="float: right;">
+            <a href="#" class="rte_switch_views_link">
+              {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+            </a>
+            <a href="#" class="rte_switch_views_link" style="display:none;">
+              {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+            </a>
+          </div>
+        {{/unless}}
+        <div style="clear:both;"></div>
+        <textarea name="message"
+                  class="input-block-level"
+                  style="width: 100%; min-height: 200px;">
+          {{convertApiUserContent message forEditing=1}}
+        </textarea>
+      {{/if}}
+    </div>
+
+  </fieldset>
+  <fieldset>
+    <div id="sections_autocomplete_root" style="margin-right: 80px"></div>
+    {{#if canAttach}}
+    <div class="control-group" style="margin-left: -75px">
+      {{#if lockedItems.content}}
+        <label class="control-label">{{#t "attachment"}}Attachment{{/t}}</label>
+      {{else}}
+        <label class="control-label"
+          aria-label="{{#t}}Add Attachment{{/t}}"
+          for="discussion_attachment_uploaded_data">
+          {{#t "attachment"}}Attachment{{/t}}
+        </label>
+      {{/if}}
+      <div class="controls">
+        {{#each attachments}}
+          <div class="attachmentRow">
+            <a aria-label="attachment" href="{{url}}" class="{{mimeClass content-type}}">
+              {{display_name}}
+            </a>
+            {{#unless ../lockedItems.content}}
+              <button type="button"
+                      class="close btn btn-link removeAttachment"
+                      style="float:none"
+                      aria-label="{{#t}}Remove Attachment{{/t}}">×</button>
+            {{/unless}}
+          </div>
+        {{/each}}
+        {{#unless lockedItems.content}}
+          <input type="file"
+                 name="attachment"
+                 {{#if attachments}}style="display:none"{{/if}}
+                 id="discussion_attachment_uploaded_data" >
+        {{/unless}}
+      </div>
+    </div>
+    {{#if ENV.FEATURES.usage_rights_discussion_topics }}
+      {{#if ENV.USAGE_RIGHTS_REQUIRED }}
+        {{#if ENV.PERMISSIONS.manage_files }}
+        <div class="control-group" style="margin-left: -75px">
+          <label class="control-label"
+            for="usage_rights_control">
+            {{#t}}Set usage rights{{/t}}
+          </label>
+          <div class="controls">
+            <div id="usage_rights_control" />
+            <div id="usage_rights_modal" />
+          </div>
+        </div>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+    {{/if}}
+  </fieldset>
+
+  <fieldset style="display:flex; flex-direction:column">
+
+    {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
+    <legend class="control-label" style="text-align:start; margin-bottom: 0">{{#t "options"}}Options{{/t}}</legend>
+    <div class="control-group">
+      <div class="controls" style="text-align:start; margin-left:0">
+        {{#if isTopic}}
+          <div><label class="checkbox short-label" for="threaded">
+            {{checkbox "threaded"}}
+            {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
+          </label></div>
+        {{/if}}
+        {{#if contextIsCourse}}
+          {{#if isAnnouncement}}
+            <div><label class="checkbox short-label" for="delay_posting">
+              {{checkbox "delay_posting"
+                checked=delayed_post_at
+                class="element_toggler"
+                aria-controls="discussion_topic_delay_post_container"}}
+              {{#t "delay_posting"}}Delay posting{{/t}}
+            </label></div>
+            <label class="screenreader-only" id="discussion_topic_delay_post_accessible_label">
+              {{#t}}Delay posting this topic until{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <div><label id="discussion_topic_delay_post_container"
+                   style="{{hiddenUnless delayed_post_at}}"
+                   class="checkbox short-label">
+              {{#t "post_at"}}Post At{{/t}}
+              <input type="text"
+                     class="datetime_field input-medium"
+                     name="delayed_post_at"
+                     {{! TODO: what would be the best way to get this formatted right? }}
+                     value="{{datetimeFormatted delayed_post_at}}"
+                     aria-labelledby="discussion_topic_delay_post_accessible_label"
+                     data-tooltip='{"position":"top","force_position":"true"}'
+                     title="{{accessibleDateFormat}}" />
+            </label></div>
+            {{#unless announcementsLocked}}
+              {{#unless homeroomCourse}}
+                <div><label class="checkbox short-label" for="allow_user_comments">
+                  {{#if title}}
+                  {{checkbox "allow_user_comments" checked=unlocked}}
+                  {{else}}
+                  {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
+                  {{/if}}
+                  {{#t}}Allow users to comment{{/t}}
+                </label></div>
+                <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
+                  {{checkbox "require_initial_post"}}
+                  {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
+                </label></div>
+              {{/unless}}
+            {{/unless}}
+          {{else}}
+          <div><label class="checkbox short-label" for="require_initial_post">
+            {{checkbox "require_initial_post"}}
+            {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
+          </label></div>
+          {{/if}}
+        {{/if}}
+        {{#if canModerate}}
+          {{#unless homeroomCourse}}
+            <div><label class="checkbox short-label" for="podcast_enabled">
+              {{checkbox "podcast_enabled"
+                checked=podcast_url
+                class="element_toggler"
+                aria-controls="podcast_has_student_posts_container"}}
+              {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
+            </label></div>
+
+            {{#if contextIsCourse}}
+              <div><label id="podcast_has_student_posts_container"
+                    style="{{hiddenUnless podcast_url}}"
+                    class="checkbox short-label" for="podcast_has_student_posts">
+                {{checkbox "podcast_has_student_posts"}}
+                {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
+              </label></div>
+            {{/if}}
+          {{/unless}}
+        {{/if}}
+        {{#if showAssignment}}
+          <div><label class="checkbox short-label" for="use_for_grading">
+            {{checkbox "assignment.set_assignment"
+              id="use_for_grading"
+              class="element_toggler"
+              aria-controls="assignment_options"
+              checked=set_assignment}}
+            {{#t "use_for_grading"}}Graded{{/t}}
+          </label></div>
+        {{/if}}
+
+        {{#unless homeroomCourse}}
+          <div><label class="checkbox short-label" for="allow_rating">
+            {{checkbox "allow_rating"
+              id="allow_rating"
+              class="element_toggler"
+              checked=allow_rating
+              aria-controls="rating_settings_container"}}
+            {{#t "allow_liking"}}Allow liking{{/t}}
+          </label></div>
+          <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
+            <div><label class="checkbox short-label" for="only_graders_can_rate">
+              {{checkbox "only_graders_can_rate"
+                id="only_graders_can_rate"
+                class="element_toggler"
+                checked=only_graders_can_rate}}
+              {{#t "only_graders_can_like"}}Only graders can like{{/t}}
+            </label></div>
+            <div><label class="checkbox short-label" for="sort_by_rating">
+              {{checkbox "sort_by_rating"
+                id="sort_by_rating"
+                class="element_toggler"
+                checked=sort_by_rating}}
+              {{#t "sort_by_likes"}}Sort by likes{{/t}}
+            </label></div>
+          </div>
+        {{/unless}}
+
+        {{#if ENV.STUDENT_PLANNER_ENABLED}}
+          {{#if isTopic}}
+            <div id="todo_options" style="{{hiddenIf set_assignment}}">
+              <div><label class="checkbox short-label" for="allow_todo_date">
+                {{checkbox "allow_todo_date"
+                  id="allow_todo_date"
+                  class="element_toggler"
+                  aria-controls="todo_date_input"}}
+                {{#t}}Add to student to-do{{/t}}
+              </label></div>
+              <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;" />
+            </div>
+          {{/if}}
+        {{/if}}
+      </div>
+    </div>
+    {{/ifAny}}
+
+  </fieldset>
+
+  {{#if isTopic}}
+    {{#unless isLargeRoster}}
+      {{#if contextIsCourse}}
+        <div id="group_category_options" class="control-group" style="width: 295px"></div>
+      {{/if}}
+    {{/unless}}
+
+    {{#if contextIsCourse}}
+      <div id="availability_options" style="{{hiddenIf set_assignment}}">
+        <fieldset>
+          <div class="control-group" style="margin-left: -66px">
+            <label class="control-label" for="delayed_post_at">
+              {{#t "available_from"}}Available From{{/t}}
+            </label>
+            <label class="screenreader-only" id="discussion_topic_available_from_accessible_label">
+              {{#t}}Discussion Topic will be available starting at{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <div class="controls">
+              <input type="text"
+                     class="datetime_field input-medium"
+                     style="width: 122px"
+                     name="delayed_post_at"
+                     id="delayed_post_at"
+                     aria-labelledby="discussion_topic_available_from_accessible_label"
+                     {{! TODO: what would be the best way to get this formatted right? }}
+                     value="{{datetimeFormatted delayed_post_at}}"
+                     data-tooltip='{"position":"top","force_position":"true"}'
+                     {{#unless lockedItems.availability_dates}}
+                      title="{{accessibleDateFormat}}"
+                     {{/unless}}
+                     {{readonlyIf lockedItems.availability_dates}}
+              />
+            </div>
+          </div>
+        </fieldset>
+
+        {{#if isTopic}}
+          <fieldset>
+            <div class="control-group" style="margin-left: -66px">
+              <label class="control-label" for="lock_at">{{#t "until"}}Until{{/t}}</label>
+              <label class="screenreader-only" id="discussion_topic_available_until_accessible_label">
+                {{#t}}Discussion Topic will be available until{{/t}}
+                {{datepickerScreenreaderPrompt}}
+              </label>
+              <div class="controls">
+                <input type="text"
+                       class="datetime_field input-medium"
+                       style="width: 122px"
+                       name="lock_at"
+                       id="lock_at"
+                       aria-labelledby="discussion_topic_available_until_accessible_label"
+                       {{! TODO: what would be the best way to get this formatted right? }}
+                       value="{{datetimeFormatted lock_at}}"
+                       data-tooltip='{"position":"top","force_position":"true"}'
+                       {{#unless lockedItems.availability_dates}}
+                        title="{{accessibleDateFormat}}"}}
+                       {{/unless}}
+                       {{readonlyIf lockedItems.availability_dates}}
+                />
+              </div>
+            </div>
+          </fieldset>
+        {{/if}}
+      </div>
+    {{/if}}
+  {{/if}}
+
+  {{#if showAssignment}}
+    <div id="assignment_options" style="{{hiddenUnless set_assignment}}">
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" for="discussion_topic_assignment_points_possible">
+            {{#t "points_possible"}}Points Possible{{/t}}
+          </label>
+          <div class="controls">
+            <input type="text"
+                   id="discussion_topic_assignment_points_possible"
+                   name="assignment[points_possible]"
+                   class="input-small"
+                   value="{{n assignment.pointsPossible}}"
+                   {{readonlyIf lockedItems.points}} />
+          </div>
+            <div id=discussion_point_change_warning class="alert form-column-right">
+                {{#t}}If you change an assignment's points possible you must regrade the assignment.{{/t}}
+            </div>
+        </div>
+
+        <div id="grading_type_options" class="control-group"></div>
+
+        <div id="post_to_sis_options" class="control-group"></div>
+
+        <div id="assignment_group_options" class="control-group"></div>
+
+        {{#unless isLargeRoster}}
+          <div id="peer_review_options" class="control-group"></div>
+        {{/unless}}
+      </fieldset>
+
+      <div id="overrides-wrapper">
+        <div class="form-column-left">
+          {{#t}}Assign{{/t}}
+        </div>
+        <div class="overrides-column-right js-assignment-overrides overrideFormFlex">
+        </div>
+      </div>
+
+    </div>
+  {{/if}}
+</div>
+{{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED }}
+  {{#unless isAnnouncement }}
+    <div id="mastery-paths-editor">
+      <div id="conditional-release-target" />
+    </div>
+  {{/unless}}
+{{/if}}
+</div>
+
+<div id="assignment_external_tools"></div>
+
+<div id="edit_discussion_form_buttons" class="form-actions flush" style="padding-left: 0px; margin-right: -0.75em">
+  <button type="button" class="btn cancel_button">
+    {{#t}}Cancel{{/t}}
+  </button>
+  {{#if canPublish}}
+    <button type="button"
+            data-text-while-loading="{{#t "saving"}}Saving...{{/t}}"
+            class="btn btn-default save_and_publish">
+      {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
+    </button>
+  {{/if}}
+  <button type="submit"
+          data-text-while-loading="{{#t "saving"}}Saving...{{/t}}"
+          class="btn btn-primary">{{#t "save"}}Save{{/t}}</button>
+</div>

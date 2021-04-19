@@ -19,7 +19,7 @@
 @import "base/environment";
 
 .group-user {
-  border: 1px solid #ccc;
+  border: 1px solid $ic-color-medium;
   background: #fff;
   margin-bottom: 3px;
   padding: direction-sides(0 15px 0 0);
@@ -121,7 +121,7 @@
   white-space: nowrap;
   margin-#{direction(right)}: 10px;
   font-weight: bold;
-  color: #777;
+  color: $ic-color-medium;
 }
 
 .group-users .paginatedLoadingIndicator {

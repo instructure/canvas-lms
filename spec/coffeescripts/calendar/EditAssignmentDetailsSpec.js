@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import EditAssignmentDetails from 'compiled/calendar/EditAssignmentDetails'
-import fcUtil from 'compiled/util/fcUtil'
-import tz from 'timezone'
+import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails.js'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
-import commonEventFactory from 'compiled/calendar/commonEventFactory'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 const fixtures = $('#fixtures')
 

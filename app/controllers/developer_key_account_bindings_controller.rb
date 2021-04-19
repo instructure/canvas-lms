@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -50,7 +52,7 @@
 #            "description": "True if the requested context owns the binding",
 #            "example": "true",
 #            "type": "boolean"
-#          },
+#          }
 #       }
 #     }
 class DeveloperKeyAccountBindingsController < ApplicationController

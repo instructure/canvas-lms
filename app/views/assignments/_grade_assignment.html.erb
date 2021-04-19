@@ -18,29 +18,22 @@
 <ul class='page-action-list'>
   <h2><%= t 'titles.related_items', "Related Items" %></h2>
   <% if @assignment_presenter.can_view_speed_grader_link?(@current_user) %>
-    <li id="assignment-speedgrader-link"
-      <% if @assignment.unpublished? %>
-        class="hidden"
-      <% end %>
-    >
-    <a
-      target="_blank"
-      href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"
-      class="icon-speed-grader">
-        <%= t(:speed_grader, "SpeedGrader™") %>
-      </a>
+    <li id="assignment-speedgrader-link">
+      <div id="student_group_filter_mount_point"></div>
+      <div id="speed_grader_link_mount_point"></div>
     </li>
   <% end %>
 
   <% if @current_student_submissions.present? %>
     <% if @assignment.submission_types && @assignment.submission_types.match(/(online_upload|online_text_entry|online_url)/) && @downloadable_submissions %>
-      <div>
+      <li>
         <%= render :partial => 'submissions/submission_download' %>
         <a href="<%= context_url(@context, :context_assignment_submissions_url, @assignment.id, :zip => 1) %>"
           id="download_submission_button"
           class="download_submissions_link icon-download">
           <%= t 'links.download_submissions', "Download Submissions" %>
         </a>
+
         <% if @can_grade %>
           <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>">
             <%= t 'links.reupload_submissions', "Re-Upload Submissions" %>
@@ -66,6 +59,14 @@
         <% end %>
       </li>
     <% end %>
+  <% end %>
+
+  <% if @can_grade && @assignment.submission_reupload_progress.present? %>
+    <li>
+      <a href="<%= context_url(@context, :show_submissions_upload_context_gradebook_url, @assignment) %>" class="icon-clock">
+        <%= t "View Uploads Status" %>
+      </a>
+    </li>
   <% end %>
 
   <% if @can_grade && @assignment.has_peer_reviews? %>

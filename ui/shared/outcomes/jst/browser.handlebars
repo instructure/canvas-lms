@@ -1,0 +1,41 @@
+<div class="outcomes-browser content-box">
+
+  {{#unless skipToolbar}}
+  <div class="toolbar outcomes-toolbar">
+    <button class="go_back ui-button ui-widget ui-state-default ui-corner-all" style="display:none">
+      {{#t}}Back{{/t}}
+    </button>
+
+    {{#if canManageOutcomes}}
+    <button class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Add a New Outcome{{/t}}">
+      <i class="icon-plus"></i>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Outcome{{/t}}</span>
+    </button>
+    <button class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Add a New Outcome Group{{/t}}">
+      <i class="icon-plus"></i>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Group{{/t}}</span>
+    </button>
+    {{#if canImportOutcomes }}
+      <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
+        <i class="icon-upload"></i>
+        <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
+      </button>
+    {{/if}}
+    <button class="find_outcome ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Find an Outcome{{/t}}">
+      <i class="icon-search"></i>
+      <span class="ui-button-text" aria-hidden="true">{{#t}}Find{{/t}}</span>
+    </button>
+    {{/if}}
+  </div>
+  {{/unless}}
+
+
+
+  <div class="outcomes-main">
+    <div class="outcomes-sidebar">
+      <div class="wrapper"></div>
+    </div>
+    <div class="outcomes-content">
+    </div>
+  </div>
+</div>

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DateHelper from 'jsx/shared/helpers/dateHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {isDate, isNull, isUndefined} from 'lodash'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 

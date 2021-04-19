@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -56,6 +58,8 @@ class FilePreviewsController < ApplicationController
         return render template: 'file_previews/img_preview', layout: false
       # media files
       elsif @file.content_type =~ %r{\A(audio|video)/}
+        js_env NEW_FILES_PREVIEW: 1
+        js_bundle :file_preview
         return render template: 'file_previews/media_preview', layout: false
       # html files
       elsif @file.content_type == 'text/html'

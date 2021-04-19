@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -57,6 +59,13 @@ describe Login::CanvasController do
       confirm_mobile_layout { post 'create' }
     end
 
+    it "should render a plain text error message on mobile, not the hash" do
+      controller.js_env.clear
+      request.env['HTTP_USER_AGENT'] = mobile_agents[0]
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
+      expect(flash[:error]).to be_a(String)
+    end
+
   end
 
   it "should show sso buttons on load" do
@@ -85,11 +94,12 @@ describe Login::CanvasController do
     expect(response).to render_template(:new)
   end
 
-  it "should re-render if no password given" do
+  it "should re-render if no password given and render a hash for the error" do
     post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
     assert_status(400)
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/no password/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/no password/i)
   end
 
   it "password auth should work" do
@@ -125,7 +135,8 @@ describe Login::CanvasController do
     assert_status(400)
     expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/invalid authenticity token/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
   it "should re-render if authenticity token is invalid and referer is trusted" do
@@ -134,7 +145,8 @@ describe Login::CanvasController do
          :authenticity_token => '42'}
     assert_status(400)
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/invalid authenticity token/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
   it "should login if authenticity token is invalid and referer is trusted" do
@@ -226,6 +238,50 @@ describe Login::CanvasController do
       p = Account.default.pseudonyms.active.by_unique_id(unique_id).first!
       expect(p.authentication_provider).to eq ap
     end
+
+    context 'should properly set the session[:login_aac]' do
+      it 'when an ldap authentication provider was used with identifier_format' do
+        user_with_pseudonym(:username => '12345', :active_all => 1)
+        @pseudonym.update_attribute(:sis_user_id, '12345')
+        aac1 = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        expect_any_instantiation_of(aac1).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return(nil)
+        aac2 = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        expect_any_instantiation_of(aac2).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return([{ 'uid' => ['12345'] }])
+
+        post 'create', params: {:pseudonym_session => {:unique_id => 'username', :password => 'password'}}
+        expect(session[:login_aac]).to eq aac2.id
+      end
+
+      it 'when an ldap authentication provider was used without an identifier_format' do
+        user_with_pseudonym(username: 'username', active_all: 1)
+        aac1 = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: nil)
+        expect_any_instantiation_of(aac1).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return(nil)
+        aac2 = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: nil)
+        expect_any_instantiation_of(aac2).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return([true])
+
+        post 'create', params: {pseudonym_session: {unique_id: 'username', password: 'password'}}
+        expect(session[:login_aac]).to eq aac2.id
+      end
+
+      it 'when canvas authentication was used' do
+        password = 'correct-horse-battery-staple'
+        user_with_pseudonym(:username => '12345', :active_all => 1, :password => password)
+        aac1 = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        expect_any_instantiation_of(aac1).to receive(:ldap_bind_result).once.and_return(nil)
+        aac2 = Account.default.authentication_providers.find_by(auth_type: 'canvas')
+
+        post 'create', params: {:pseudonym_session => { :unique_id => '12345', :password => password}}
+        expect(session[:login_aac]).to eq aac2.id
+      end
+    end
   end
 
   context "trusted logins" do
@@ -236,6 +292,33 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account)
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(flash[:notice]).to be_present
+    end
+
+    it "should send users to their home domain if they have no associations with the current account" do
+      account = Account.create!
+      allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
+      user_with_pseudonym(username: 'jt@instructure.com',
+                          active_all: 1,
+                          password: 'qwertyuiop',
+                          account: account)
+      allow(HostUrl).to receive(:context_host).with(account, 'test.host').and_return("account2")
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
+      expect(response).to redirect_to(dashboard_url(host: 'account2', cross_domain_login: 'test.host'))
+    end
+
+    it "doesn't send admins elsewhere" do
+      account = Account.create!
+      allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
+      user_with_pseudonym(username: 'jt@instructure.com',
+                          active_all: 1,
+                          password: 'qwertyuiop',
+                          account: account)
+      Account.default.account_users.create!(user: @user)
+      allow(HostUrl).to receive(:context_host).with(account, 'test.host').and_return("account2")
       post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(flash[:notice]).to be_present
@@ -247,6 +330,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account1)
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
       @pseudonym = @user.pseudonyms.create!(account: Account.site_admin,
                                             unique_id: 'jt@instructure.com',
                                             password: 'qwertyuiop',
@@ -285,6 +369,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: Account.site_admin)
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
       post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       # it should have preferred the site admin pseudonym
@@ -299,6 +384,7 @@ describe Login::CanvasController do
                             active_all: 1,
                             password: 'qwertyuiop',
                             account: Account.site_admin)
+        Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
         @shard1.activate do
           account = Account.create!
           allow(HostUrl).to receive(:default_domain_root_account).and_return(account)
@@ -312,7 +398,7 @@ describe Login::CanvasController do
 
   context "merging" do
     it "should redirect back to merge users" do
-      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
+      communication_channel(@user, {username: 'jt+1@instructure.com'})
       session[:confirm] = @cc.confirmation_code
       session[:expected_user_id] = @user.id
       post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' }}
@@ -340,7 +426,7 @@ describe Login::CanvasController do
       Account.default.save!
 
       user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
-      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_secret_key = ROTP::Base32.random
       @user.save!
     end
 
@@ -369,7 +455,7 @@ describe Login::CanvasController do
     it "should ignore a cookie from an old secret_key" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, '127.0.0.1')
 
-      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_secret_key = ROTP::Base32.random
       @user.save!
 
       post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}

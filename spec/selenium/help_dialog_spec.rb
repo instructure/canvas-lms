@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -136,7 +138,7 @@ describe "help dialog" do
       settings_menu.click
 
       trigger = f('ul[role=menu] span[name=help][role=menuitem]')
-      make_full_screen
+
       trigger.location_once_scrolled_into_view
       expect(trigger).to be_displayed
     end
@@ -165,6 +167,113 @@ describe "help dialog" do
       f('#global_nav_help_link').click
       wait_for_ajaximations
       expect(f("#help_tray")).to_not include_text("Customize this menu")
+    end
+  end
+
+  context "featured and new links" do
+    before :each do
+      user_logged_in(:active_all => true)
+      Setting.set('show_feedback_link', 'true')
+      Account.site_admin.enable_feature! :featured_help_links
+      Account.default.account_users.create!(:user => @user)
+    end
+
+    it "should have the default link at the top of the tray" do
+      get "/accounts/#{Account.default.id}/settings"
+      f('.HelpMenuOptions__Container button').click
+      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'FEATURED LINK'
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'FEATURED subtext'
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://featuredurl.example.com'
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
+      f('#custom_help_link_settings button[type="submit"]').click
+      form = f('#account_settings')
+      form.submit
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(fxpath("//span[img[@alt = 'Cheerful panda holding a map']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
+    end
+
+    it "should have a New Link in the tray" do
+      get "/accounts/#{Account.default.id}/settings"
+      f('.HelpMenuOptions__Container button').click
+      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'NEW LINK'
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'NEW subtext'
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://newurl.example.com'
+      fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
+      f('#custom_help_link_settings button[type="submit"]').click
+      form = f('#account_settings')
+      form.submit
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(fxpath("//*[*/a[contains(text(),'NEW LINK')]]//*[text() = 'NEW']")).to include_text("NEW")
+    end
+  end
+  
+  context 'welcome tour' do
+    before :each do
+      course_with_student_logged_in(active_all: true)
+      Account.default.enable_feature!('product_tours')
+    end
+
+    it 'opens up the welcome tour on page load and shows the welcome tour link and opens the tour when clicked' do
+      Setting.set('show_feedback_link', 'true')
+
+      course_with_ta(course: @course)
+      get "/"
+      driver.local_storage.clear
+      wait_for_ajaximations
+      
+      get "/courses/#{@course.id}"
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 1) { f('#___reactour').displayed? }
+      # Welcome tour is already opened
+      expect(f('#___reactour')).to include_text(
+        "Here's some quick tips to get you started in Canvas!"
+      )
+
+      # Close the currently-open tutorial overlay
+      close = f('#___reactour .tour-close-button button')
+      close.click
+      wait_for_ajaximations
+
+      expect(f('#___reactour')).to include_text(
+        'You can access the Welcome Tour here any time as well as other new resources.'
+      )
+      close = f('#___reactour .tour-close-button button')
+      close.click
+    end
+
+    it 'shows the welcome tour for Account Admins' do
+      Setting.set('show_feedback_link', 'true')
+
+      Account.default.account_users.create!(:user => @user)
+      get "/"
+      driver.local_storage.clear
+      wait_for_ajaximations
+      
+      # Reload so the local storage clearing take effect
+      get "/"
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 1) { f('#___reactour').displayed? }
+      # Welcome tour is already opened
+      expect(f('#___reactour')).to include_text(
+        "We know it's a priority to transition your institution for online learning during this time."
+      )
+
+      # Close the currently-open tutorial overlay
+      close = f('#___reactour .tour-close-button button')
+      close.click
+      wait_for_ajaximations
+
+      expect(f('#___reactour')).to include_text(
+        'You can access the Welcome Tour here any time as well as other new resources.'
+      )
+      close = f('#___reactour .tour-close-button button')
+      close.click
     end
   end
 end

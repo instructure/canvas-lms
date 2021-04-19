@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 #
 # Copyright (C) 2018 - present Instructure, Inc.
@@ -18,29 +19,70 @@
 
 module Canvas::Oauth
   class ClientCredentialsProvider < Provider
-    AUD_PROTOCOL = 'https://'.freeze
-
-    def initialize(jwt, host, scopes = nil)
-      @client_id = JSON::JWT.decode(jwt, :skip_verification)[:sub]
+    def initialize(client_id, host, scopes = nil, protocol = 'http://')
+      @client_id = client_id
       @scopes = scopes || []
       @expected_aud = Rails.application.routes.url_helpers.oauth2_token_url(
         host: host,
-        protocol: AUD_PROTOCOL
+        protocol: protocol
       )
-      if key.nil? || key.public_jwk.nil?
+    end
+
+    def generate_token
+      claims, scopes, ttl = generate_claims
+      {
+        access_token: key.issue_token(claims),
+        token_type: 'Bearer',
+        expires_in: ttl.seconds,
+        scope: scopes
+      }
+    end
+
+    def valid?
+      raise 'Abstract Method'
+    end
+
+    def error_message
+      raise 'Abstract Method'
+    end
+
+    private
+
+    def allowed_scopes
+      @allowed_scopes ||= @scopes.join(' ')
+    end
+
+    def generate_claims
+      scopes = allowed_scopes
+      timestamp = Time.zone.now.to_i
+      ttl = Setting.get("oauth2_jwt_exp_in_seconds", 1.hour.to_s).to_i
+      claims = {
+        iss: Canvas::Security.config['lti_iss'],
+        sub: @client_id,
+        aud: @expected_aud,
+        iat: timestamp,
+        exp: timestamp + ttl,
+        jti: SecureRandom.uuid,
+        scopes: scopes
+      }
+      if key.account_id
+        # if developer key is account scoped, add namespaced custom claim about
+        # account id
+        claims["canvas.instructure.com"] = { "account_uuid" => key.account.uuid }
+      end
+      return claims, scopes, ttl
+    end
+  end
+
+  class AsymmetricClientCredentialsProvider < ClientCredentialsProvider
+    def initialize(jwt, host, scopes = nil, protocol = 'http://')
+      super(JSON::JWT.decode(jwt, :skip_verification)[:sub], host, scopes, protocol)
+      @errors = []
+      if key.nil? || (key.public_jwk.nil? && key.public_jwk_url.nil?)
         @invalid_key = true
       else
         decoded_jwt(jwt)
       end
-    end
-
-    def generate_token
-      {
-        access_token: Canvas::Security.create_jwt(generate_jwt).to_s,
-        token_type: 'Bearer',
-        expires_in: Setting.get("oauth2_jwt_exp_in_seconds", 1.hour.to_s).to_i.seconds,
-        scope: allowed_scopes
-      }
     end
 
     def valid?
@@ -50,10 +92,13 @@ module Canvas::Oauth
 
     def error_message
       return 'JWS signature invalid.' if @invalid_key
+      return "JWK Error: #{errors.first.message}" if errors.present?
       validator.error_message
     end
 
     private
+
+    attr_accessor :errors
 
     def validator
       @validator ||= Canvas::Security::JwtValidator.new(
@@ -65,27 +110,32 @@ module Canvas::Oauth
       )
     end
 
-    def allowed_scopes
-      @allowed_scopes ||= @scopes.join(' ')
-    end
-
     def decoded_jwt(jwt = nil)
-      @decoded_jwt ||= JSON::JWT.decode(jwt, JSON::JWK.new(key.public_jwk), :RS256)
+      @decoded_jwt ||= if key.public_jwk_url.present?
+          get_jwk_from_url(jwt)
+        else
+          JSON::JWT.decode(jwt, JSON::JWK.new(key.public_jwk), :RS256)
+        end
     rescue JSON::JWS::VerificationFailed, JSON::JWS::UnexpectedAlgorithm
       @invalid_key = true
     end
 
-    def generate_jwt
-      timestamp = Time.zone.now.to_i
-      {
-        iss: Canvas::Security.config['lti_iss'],
-        sub: @client_id,
-        aud: @expected_aud,
-        iat: timestamp,
-        exp: (timestamp + Canvas::Security.config.fetch('jwt_exp_in_seconds', 1.hour.to_i)),
-        jti: SecureRandom.uuid,
-        scopes: allowed_scopes
-      }
+    def get_jwk_from_url(jwt = nil)
+      pub_jwk_from_url = HTTParty.get(key.public_jwk_url)
+      JSON::JWT.decode(jwt, JSON::JWK::Set.new(pub_jwk_from_url.parsed_response))
+    rescue JSON::JWT::Exception => e
+      errors << e
+      raise JSON::JWS::VerificationFailed
+    end
+  end
+
+  class SymmetricClientCredentialsProvider < ClientCredentialsProvider
+    def valid?
+      key.present?
+    end
+
+    def error_message
+      valid? ? "" : "Unknown client_id"
     end
   end
 end

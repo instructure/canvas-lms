@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -40,6 +42,14 @@ class AnonymousSubmissionsController < SubmissionsBaseController
   end
 
   def update
+    @assignment = @context.assignments.active.find(params.fetch(:assignment_id))
+    @submission = @assignment.submissions.find_by!(anonymous_id: params.fetch(:anonymous_id))
+    @user = @submission.user
+
+    super
+  end
+
+  def redo_submission
     @assignment = @context.assignments.active.find(params.fetch(:assignment_id))
     @submission = @assignment.submissions.find_by!(anonymous_id: params.fetch(:anonymous_id))
     @user = @submission.user

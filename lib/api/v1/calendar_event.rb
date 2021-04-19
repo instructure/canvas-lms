@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -24,6 +26,7 @@ module Api::V1::CalendarEvent
   include Api::V1::User
   include Api::V1::Course
   include Api::V1::Group
+  include Api::V1::Conferences
 
   def event_json(event, user, session, options={})
     hash = if event.is_a?(::CalendarEvent)
@@ -43,7 +46,18 @@ module Api::V1::CalendarEvent
     duplicates = options[:duplicates] || []
     participant = nil
 
-    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state comments))
+    hash = api_json(
+      event,
+      user,
+      session,
+      :only => %w(id created_at updated_at start_at end_at all_day all_day_date title workflow_state comments)
+    )
+
+    if user
+      hash['location_address'] = event.location_address
+      hash['location_name'] = event.location_name
+    end
+
     hash['type'] = 'event'
     if event.context_type == "CourseSection"
       hash['title'] += " (#{context.name})"
@@ -85,6 +99,7 @@ module Api::V1::CalendarEvent
       hash['all_context_codes'] = Context.context_code_for(event)
     end
     hash['context_code'] ||= Context.context_code_for(event)
+    hash['context_name'] = context.try(:nickname_for, user)
 
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
@@ -151,6 +166,13 @@ module Api::V1::CalendarEvent
       end
     end
 
+    if Account.site_admin.feature_enabled?(:calendar_conferences) &&
+      include.include?('web_conference') &&
+      event.web_conference_id.present? &&
+      event.web_conference.grants_right?(user, session, :read)
+      hash['web_conference'] = api_conference_json(event.web_conference, user, session)
+    end
+
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)
     hash['html_url'] = calendar_url_for(options[:effective_context] || event.effective_context, :event => event)
     hash['duplicates'] = duplicates
@@ -159,8 +181,11 @@ module Api::V1::CalendarEvent
 
   def assignment_event_json(assignment, user, session, options={})
     excludes = options[:excludes] || []
-    hash = api_json(assignment, user, session, :only => %w(created_at updated_at title all_day all_day_date workflow_state))
-    hash['description'] = api_user_content(assignment.description, assignment.context) unless excludes.include?('description')
+    target_fields = %w(created_at updated_at title all_day all_day_date workflow_state)
+    target_fields << 'description' unless excludes.include?('description')
+    hash = api_json(assignment, user, session, only: target_fields)
+    hash['description'] = api_user_content(hash['description'], assignment.context) unless excludes.include?('description')
+
     hash['id'] = "assignment_#{assignment.id}"
     hash['type'] = 'assignment'
 
@@ -171,6 +196,7 @@ module Api::V1::CalendarEvent
       hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
     end
     hash['context_code'] = Context.context_code_for(assignment)
+    hash['context_name'] = assignment.context.try(:nickname_for, user)
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
     if assignment.applied_overrides.present?
@@ -185,7 +211,18 @@ module Api::V1::CalendarEvent
     @user_json_is_admin = nil # when returning multiple groups, @current_user may be admin over some contexts but not others. so we need to recheck
 
     include = options[:include] || []
-    hash = api_json(group, user, session, :only => %w{id created_at description end_at location_address location_name max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility}, :methods => :sub_context_codes)
+
+    hash = api_json(
+      group,
+      user,
+      session,
+      :only => %w{id created_at description end_at max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility}, :methods => :sub_context_codes
+    )
+
+    if user
+      hash['location_address'] = group.location_address
+      hash['location_name'] = group.location_name
+    end
 
     hash['participant_count'] = group.appointments_participants.count if include.include?('participant_count')
     hash['reserved_times'] = group.reservations_for(user).map{|event| {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -17,8 +19,9 @@
 
 require_relative '../../common'
 require_relative '../../helpers/assignments_common'
+require_relative '../pages/gradebook_page'
 
-describe 'omit from final grade assignments' do
+describe 'Gradebook omit from final grade assignments' do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 
@@ -73,25 +76,6 @@ describe 'omit from final grade assignments' do
       submit_assignment_form
 
       expect(f('.omit-from-final-warning')).to include_text('This assignment does not count toward the final grade.')
-    end
-  end
-
-  context 'in gradebook' do
-    before(:each) do
-      enroll_teacher_and_students
-      assignment_1.grade_student(student, grade: 10, grader: teacher)
-      assignment_3.grade_student(student, grade: 5, grader: teacher)
-      user_session(teacher)
-      get "/courses/#{test_course.id}/gradebook"
-    end
-
-    it 'displays triangle warning' do
-      expect(f(".slick-header-column[title='Also not for final grade'] i")).to have_class('icon-warning')
-    end
-
-    it 'does not include omitted assignment in final' do
-      total_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')
-      expect(total_grade).to include_text('10')
     end
   end
 

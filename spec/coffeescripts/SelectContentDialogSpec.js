@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SelectContentDialog from 'select_content_dialog'
+import SelectContentDialog from '@canvas/select-content-dialog'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 
@@ -52,7 +52,7 @@ QUnit.module('SelectContentDialog', {
   }
 })
 
-test('it creates a confirm alert before closing the modal', function() {
+test('it creates a confirm alert before closing the modal', () => {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
@@ -67,7 +67,14 @@ test('sets the iframe allowances', function() {
   equal($dialog.find('#resource_selection_iframe').attr('allow'), this.allowances.join('; '))
 })
 
-test('it removes the confirm alert if a selection is passed back', function() {
+test('sets the iframe "data-lti-launch" attribute', function() {
+  const l = document.getElementById('test-tool')
+  SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
+  const $dialog = $('#resource_selection_dialog')
+  equal($dialog.find('#resource_selection_iframe').attr('data-lti-launch'), 'true')
+})
+
+test('it removes the confirm alert if a selection is passed back', () => {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
@@ -81,5 +88,27 @@ test('it removes the confirm alert if a selection is passed back', function() {
     ]
   })
   $dialog.trigger(selectionEvent)
+  strictEqual(window.confirm.callCount, 0)
+})
+
+test('close resource selection dialog when content items attribute is empty', async () => {
+  const $testTool = document.getElementById('test-tool')
+  SelectContentDialog.Events.onContextExternalToolSelect.bind($testTool)(clickEvent)
+
+  const $resourceSelectionDialog = $('#resource_selection_dialog')
+
+  strictEqual($resourceSelectionDialog.is(':visible'), true)
+
+  const deepLinkingEvent = {
+    data: {
+      messageType: 'LtiDeepLinkingResponse',
+      content_items: [],
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
+    }
+  }
+
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+
+  strictEqual($resourceSelectionDialog.is(':visible'), false)
   strictEqual(window.confirm.callCount, 0)
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -50,6 +52,11 @@
 #           "example": "",
 #           "type": "string"
 #         },
+#         "current_points": {
+#           "description": "The total points the user has earned in the class. Only included if user has permissions to view this score and 'current_points' is passed in the request's 'include' parameter.",
+#           "example": 150,
+#           "type": "integer"
+#         },
 #         "unposted_current_grade": {
 #           "description": "The user's current grade in the class including muted/unposted assignments. Only included if user has permissions to view this grade, typically teachers, TAs, and admins.",
 #           "example": "",
@@ -69,6 +76,11 @@
 #           "description": "The user's final score for the class including muted/unposted assignments. Only included if user has permissions to view this score, typically teachers, TAs, and admins..",
 #           "example": "",
 #           "type": "string"
+#         },
+#         "unposted_current_points": {
+#           "description": "The total points the user has earned in the class, including muted/unposted assignments. Only included if user has permissions to view this score (typically teachers, TAs, and admins) and 'current_points' is passed in the request's 'include' parameter.",
+#           "example": 150,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -352,15 +364,18 @@ class EnrollmentsApiController < ApplicationController
   #   roles created by the {api:RoleOverridesController#add_role Add Role API}
   #   as well as the base enrollment types accepted by the `type` argument above.
   #
-  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"]
+  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"|"current_and_invited"|"current_and_future"|"current_and_concluded"]
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
-  #   are returned. When querying a user's enrollments (either via user_id
-  #   argument or via user enrollments endpoint), the following additional
-  #   synthetic states are supported: "current_and_invited"|"current_and_future"|"current_and_concluded"
+  #   are returned. The following synthetic states are supported only when
+  #   querying a user's enrollments (either via user_id argument or via user
+  #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_and_concluded+
   #
-  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"]
+  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"|"current_points"]
   #   Array of additional information to include on the enrollment or user records.
-  #   "avatar_url" and "group_ids" will be returned on the user record.
+  #   "avatar_url" and "group_ids" will be returned on the user record. If "current_points"
+  #   is specified, the fields "current_points" and (if the caller has
+  #   permissions to manage grades) "unposted_current_points" will be included
+  #   in the "grades" hash for student enrollments.
   #
   # @argument user_id [String]
   #   Filter by user_id (only valid for course or section enrollment
@@ -403,15 +418,21 @@ class EnrollmentsApiController < ApplicationController
   #
   # @returns [Enrollment]
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
 
       return unless enrollments = @context.is_a?(Course) ?
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      enrollments = enrollments.joins(:user).select("enrollments.*").
-        order(:type, User.sortable_name_order_by_clause("users"), :id)
+      # a few specific developer keys temporarily need bookmarking disabled, see INTEROP-5326
+      pagination_override_key_list = Setting.get("pagination_override_key_list", "").split(',').map(&:to_i)
+      use_numeric_pagination_override = pagination_override_key_list.include?(@access_token&.global_developer_key_id)
+      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index) && !use_numeric_pagination_override
+      enrollments = use_bookmarking ?
+        enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name") :
+        enrollments.joins(:user).select("enrollments.*").
+          order(:type, User.sortable_name_order_by_clause("users"), :id)
 
       has_courses = enrollments.where_clause.instance_variable_get(:@predicates).
         any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
@@ -464,8 +485,16 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
+      collection =
+        if use_bookmarking
+          bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
+            {:type => {:skip_collation => true}, :sortable_name => {:type => :string, :null => false}}, :id)
+          BookmarkedCollection.wrap(bookmarker, enrollments)
+        else
+          enrollments
+        end
       enrollments = Api.paginate(
-        enrollments,
+        collection,
         self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
       ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section, :root_account, :sis_pseudonym])
@@ -475,8 +504,8 @@ class EnrollmentsApiController < ApplicationController
       user_json_preloads(enrollments.map(&:user), false, {group_memberships: include_group_ids})
 
       render :json => enrollments.map { |e|
-        enrollment_json(e, @current_user, session, includes,
-                        grading_period: grading_period)
+        enrollment_json(e, @current_user, session, includes: includes,
+                        opts: { grading_period: grading_period })
       }
     end
   end
@@ -488,7 +517,7 @@ class EnrollmentsApiController < ApplicationController
   #  The ID of the enrollment object
   # @returns Enrollment
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       enrollment = @context.all_enrollments.find(params[:id])
       if enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
         render :json => enrollment_json(enrollment, @current_user, session)
@@ -498,6 +527,12 @@ class EnrollmentsApiController < ApplicationController
 
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
+  #
+  # @argument enrollment[start_at] [DateTime]
+  #   The start time of the enrollment, in ISO8601 format. e.g. 2012-04-18T23:08:51Z
+  #
+  # @argument enrollment[end_at] [DateTime]
+  #   The end time of the enrollment, in ISO8601 format. e.g. 2012-04-18T23:08:51Z
   #
   # @argument enrollment[user_id] [Required, String]
   #   The ID of the user to be enrolled in the course.
@@ -553,8 +588,7 @@ class EnrollmentsApiController < ApplicationController
   #   students the ability to drop the course if desired. Defaults to false.
   #
   # @argument enrollment[associated_user_id] [Integer]
-  #   For an observer enrollment, the ID of a student to observe. The
-  #   caller must have +manage_students+ permission in the course.
+  #   For an observer enrollment, the ID of a student to observe. 
   #   This is a one-off operation; to automatically observe all a
   #   student's enrollments (for example, as a parent), please use
   #   the {api:UserObserveesController#create User Observees API}.
@@ -593,7 +627,7 @@ class EnrollmentsApiController < ApplicationController
         role = @context.account.get_course_role_by_name(role_name)
       else
         type = "StudentEnrollment" if type.blank?
-        role = Role.get_built_in_role(type)
+        role = Role.get_built_in_role(type, root_account_id: @context.root_account_id)
         if role.nil? || !role.course_role?
           errors << @@errors[:bad_type]
         end
@@ -662,6 +696,9 @@ class EnrollmentsApiController < ApplicationController
     end
     if options[:user_id] != 'self'
       errors << "enrollment[user_id] must be 'self' when self-enrolling"
+    end
+    if MasterCourses::MasterTemplate.is_master_course?(@context)
+      errors << "course is not open for self-enrollment"
     end
     return render_create_errors(errors) if errors.present?
 
@@ -839,17 +876,26 @@ class EnrollmentsApiController < ApplicationController
       return scope && scope.where(course_id: @context.id)
     end
 
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+    if @context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
       scope = @context.apply_enrollment_visibility(@context.all_enrollments, @current_user).where(enrollment_index_conditions)
 
       unless params[:state].present?
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
         scope = include_inactive ? scope.all_active_or_pending : scope.active_or_pending
       end
-      scope
-    else
-      false
+      return scope
+    elsif @context.user_has_been_observer?(@current_user)
+      # Observers can see enrollments for the users they're observing, as well
+      # as their own enrollments
+      observer_enrollments = @context.observer_enrollments.active.where(user_id: @current_user)
+      observed_student_ids = observer_enrollments.pluck(:associated_user_id).uniq.compact
+
+      return @context.enrollments.where(user: @current_user).where(enrollment_index_conditions).union(
+        @context.student_enrollments.where(user_id: observed_student_ids).where(enrollment_index_conditions)
+      )
     end
+
+    render_unauthorized_action and return false
   end
 
   # Internal: Collect user enrollments that @current_user has permissions to
@@ -863,7 +909,8 @@ class EnrollmentsApiController < ApplicationController
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
       if params[:state].present?
-        enrollments = user.enrollments.where(enrollment_index_conditions(true))
+        enrollments = user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state).
+            where("enrollment_states.state IN (?)", enrollment_states_for_state_param)
       else
         enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions).
             joins(:enrollment_state).where("enrollment_states.state<>'completed'")
@@ -919,12 +966,6 @@ class EnrollmentsApiController < ApplicationController
       role_ids = Array(role_ids).map(&:to_i)
       condition = 'enrollments.role_id IN (:role_ids)'
       replacements[:role_ids] = role_ids
-
-      built_in_roles = role_ids.map{|r_id| Role.built_in_roles_by_id[r_id]}.compact
-      if built_in_roles.present?
-        condition = "(#{condition} OR (enrollments.role_id IS NULL AND enrollments.type IN (:built_in_role_types)))"
-        replacements[:built_in_role_types] = built_in_roles.map(&:name)
-      end
       clauses << condition
     elsif type.present?
       clauses << 'enrollments.type IN (:type)'
@@ -947,6 +988,14 @@ class EnrollmentsApiController < ApplicationController
     end
 
     [ clauses.join(' AND '), replacements ]
+  end
+
+  def enrollment_states_for_state_param
+    states = Array(params[:state]).uniq
+    states.concat(%w(active invited)) if states.delete 'current_and_invited'
+    states.concat(%w(active invited creation_pending pending_active pending_invited)) if states.delete 'current_and_future'
+    states.concat(%w(active completed)) if states.delete 'current_and_concluded'
+    states.uniq
   end
 
   def check_sis_permissions(sis_context)

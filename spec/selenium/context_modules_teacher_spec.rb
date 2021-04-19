@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,7 +38,6 @@ describe "context modules" do
 
       @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
       @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
-
       @course.reload
     end
 
@@ -71,18 +72,6 @@ describe "context modules" do
       module_with_two_items
       wait_for_animations
       expect(f('.context_module .content')).not_to be_displayed
-    end
-
-    it "should create a new module using enter key", priority: "2", test_id: 126705 do
-      get "/courses/#{@course.id}/modules"
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")
-      3.times do
-        driver.action.send_keys(:tab).perform
-        wait_for_ajaximations
-      end
-      driver.action.send_keys(:return).perform
-      expect(f('.name')).to be_present
     end
 
     it "should rearrange child objects in same module", priority: "1", test_id: 126733 do
@@ -256,24 +245,6 @@ describe "context modules" do
       expect(f("#context_module_item_#{tag.id} .title").text).to eq item_edit_text
     end
 
-    it "should focus close button on open edit modal" do
-      get "/courses/#{@course.id}/modules"
-
-      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      edit_module_item(module_item) do
-        divs = ff('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')
-        close_button = nil
-
-        divs.each do |div|
-          title_span = div.find_element(:css, '.ui-dialog-title')
-          if title_span.text == "Edit Item Details"
-            close_button = div.find_element(:css, '.ui-dialog-titlebar-close.ui-corner-all')
-          end
-        end
-        check_element_has_focus(close_button)
-      end
-    end
-
     it "should rename all instances of an item" do
       get "/courses/#{@course.id}/modules"
 
@@ -303,29 +274,6 @@ describe "context modules" do
       @assignment.context_module_tags.each { |tag| expect(tag.title).to eq 'again' }
     end
 
-    it "should not create a duplicate page if you publish after renaming" do
-      mod = @course.context_modules.create! name: 'TestModule'
-      page = @course.wiki_pages.create title: 'A Page'
-      page.workflow_state = 'unpublished'
-      page.save!
-      page_count = @course.wiki_pages.count
-      tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
-
-      get "/courses/#{@course.id}/modules"
-
-      item = f("#context_module_item_#{tag.id}")
-      edit_module_item(item) do |edit_form|
-        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
-      end
-
-      item = f("#context_module_item_#{tag.id}")
-      item.find_element(:css, '.publish-icon').click
-      wait_for_ajax_requests
-
-      expect(@course.wiki_pages.count).to eq page_count
-      expect(page.reload).to be_published
-    end
-
     it "publishes a newly created item", :xbrowser do
       @course.context_modules.create!(name: "Content Page")
       get "/courses/#{@course.id}/modules"
@@ -350,48 +298,6 @@ describe "context modules" do
 
       ig_rows = ff("#context_module_item_#{tag.id} .with-completion-requirements")
       expect(ig_rows).not_to be_empty
-    end
-
-    it "should add a title attribute to the text header" do
-      text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'
-      mod = @course.context_modules.create! name: 'TestModule'
-      tag1 = mod.add_item(title: text_header, type: 'sub_header')
-
-      get "/courses/#{@course.id}/modules"
-      locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
-
-      expect(locked_title[0]).to have_attribute("title", text_header)
-    end
-
-    it "should not rename every text header when you rename one" do
-      mod = @course.context_modules.create! name: 'TestModule'
-      tag1 = mod.add_item(title: 'First text header', type: 'sub_header')
-      tag2 = mod.add_item(title: 'Second text header', type: 'sub_header')
-
-      get "/courses/#{@course.id}/modules"
-      item2 = f("#context_module_item_#{tag2.id}")
-      edit_module_item(item2) do |edit_form|
-        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
-      end
-
-      item1 = f("#context_module_item_#{tag1.id}")
-      expect(item1).not_to include_text('Renamed!')
-    end
-
-    it "should not rename every external tool link when you rename one" do
-      tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
-      mod = @course.context_modules.create! name: 'TestModule'
-      tag1 = mod.add_item(title: 'A', type: 'external_tool', id: tool.id, url: 'http://what.example.org/A')
-      tag2 = mod.add_item(title: 'B', type: 'external_tool', id: tool.id, url: 'http://what.example.org/B')
-
-      get "/courses/#{@course.id}/modules"
-      item2 = f("#context_module_item_#{tag2.id}")
-      edit_module_item(item2) do |edit_form|
-        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
-      end
-
-      item1 = f("#context_module_item_#{tag1.id}")
-      expect(item1).not_to include_text('Renamed!')
     end
 
     it "should add a new quiz to a module in a specific assignment group" do
@@ -472,6 +378,21 @@ describe "context modules" do
           to eq(['Delete prerequisite First module', 'Delete prerequisite Second module'])
     end
 
+    it "updates the name of edited prerequisite modules" do
+      add_modules_and_set_prerequisites
+      get "/courses/#{@course.id}/modules"
+      get "/courses/#{@course.id}/modules"
+      move_to_click("#context_module_#{@module1.id}")
+      f("#context_module_#{@module1.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{@module1.id} .edit_module_link").click
+      add_form = f('#add_context_module_form')
+      expect(add_form).to be_displayed
+      replace_content(f('#context_module_name'), 'FRIST!!')
+      f('#add_context_module_form .submit_button').click
+      wait_for_ajaximations
+      expect(f("#context_module_#{@module3.id} .prerequisites_message").text).to include 'FRIST!!, Second module'
+    end
+
     it "does not have a prerequisites section when creating the first module" do
       get "/courses/#{@course.id}/modules"
 
@@ -500,24 +421,6 @@ describe "context modules" do
       f('.edit_module_link', mod1).click
       edit_form = f('#add_context_module_form')
       expect(f('.prerequisites_entry', edit_form)).to be_displayed
-    end
-
-    it "retains focus when deleting prerequisites" do
-      modules = create_modules(2)
-      get "/courses/#{@course.id}/modules"
-      mod1 = f("#context_module_#{modules[1].id}")
-      f(".ig-header-admin .al-trigger", mod1).click
-      f('.edit_module_link', mod1).click; wait_for_ajaximations
-      add_button = f(".add_prerequisite_link")
-      2.times { add_button.click; wait_for_animations }
-      links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
-      expect(links.size).to eq 2
-      links[1].click
-      wait_for_animations
-      check_element_has_focus(links[0])
-      links[0].click
-      wait_for_animations
-      check_element_has_focus(add_button)
     end
 
     it "should save the requirement count chosen in the Edit Module form" do
@@ -673,67 +576,6 @@ describe "context modules" do
       end
     end
 
-    context "module item cog focus management", priority: "1" do
-
-      before :once do
-        create_modules(1)[0].add_item({id: @assignment.id, type: 'assignment'})
-        @tag = ContentTag.last
-      end
-
-      before :each do
-        get "/courses/#{@course.id}/modules"
-        f("#context_module_item_#{@tag.id} .al-trigger").click
-      end
-
-      it "should return focus to the cog menu when closing the edit dialog for an item" do
-        hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        f('.cancel_button.ui-button').click
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
-      end
-
-      it "should return focus to the module item cog when indenting" do
-        hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
-        wait_for_ajaximations
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
-      end
-
-      it "should return focus to the module item cog when outdenting" do
-        hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
-        f("#context_module_item_#{@tag.id} .al-trigger").click
-        hover_and_click("#context_module_item_#{@tag.id} .outdent_item_link")
-        wait_for_ajaximations
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
-      end
-
-      it "should return focus to the module item cog when cancelling a delete" do
-        hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.dismiss
-        wait_for_ajaximations
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
-      end
-
-      it "should return focus to the previous module item link when deleting a module item." do
-        add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-        @tag2 = ContentTag.last
-        hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        wait_for_ajaximations
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .item_link"))
-      end
-
-      it "should return focus to the parent module's cog when deleting the first module item." do
-        first_tag = ContentTag.first
-        hover_and_click("#context_module_item_#{first_tag.id} .delete_item_link")
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        wait_for_ajaximations
-        check_element_has_focus(f("#context_module_#{first_tag.context_module_id} .al-trigger"))
-      end
-    end
-
-
     it "should still display due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
@@ -792,93 +634,6 @@ describe "context modules" do
       module_item = f("#context_module_item_#{tag.id}")
       due_date_assertion
       points_possible_assertion(module_item, tag)
-    end
-
-    context "Keyboard Accessibility", priority: "1" do
-      before :once do
-        modules = create_modules(2, true)
-        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-        modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
-        modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
-      end
-
-      before :each do
-        skip_if_chrome('skipped - research find html')
-        get "/courses/#{@course.id}/modules"
-
-        # focus the first item
-        f('html').send_keys("j")
-      end
-
-      let(:context_modules) { ff('.context_module .collapse_module_link') }
-      let(:context_module_items) { ff('.context_module_item a.title') }
-
-      # Test these shortcuts (access menu by pressing comma key):
-      # Up : Previous Module/Item
-      # Down : Next Module/Item
-      # Space : Move Module/Item
-      # k : Previous Module/Item
-      # j : Next Module/Item
-      # e : Edit Module/Item
-      # d : Delete Current Module/Item
-      # i : Increase Indent
-      # o : Decrease Indent
-      # n : New Module
-      it "should navigate through modules and module items" do
-
-        # Navigate through modules and module items
-        check_element_has_focus(context_modules[0])
-
-        send_keys(:arrow_down)
-        check_element_has_focus(context_module_items[0])
-
-        send_keys("j")
-        check_element_has_focus(context_module_items[1])
-
-        send_keys("k")
-        check_element_has_focus(context_module_items[0])
-
-        send_keys(:arrow_up)
-        check_element_has_focus(context_modules[0])
-      end
-
-      it "should edit modules" do
-
-        send_keys("e")
-        expect(f('#add_context_module_form')).to be_displayed
-      end
-
-      it "should create a module" do
-
-        send_keys("n")
-        expect(f('#add_context_module_form')).to be_displayed
-      end
-
-
-      it "should indent / outdent" do
-
-        send_keys(:arrow_down)
-        check_element_has_focus(context_module_items[0])
-
-        # Test Indent / Outdent
-        expect(f('.context_module_item')).to have_class('indent_0')
-
-        send_keys("i")
-        wait_for_ajax_requests
-        expect(f('.context_module_item')).to have_class('indent_1')
-
-        send_keys("o")
-        wait_for_ajax_requests
-        expect(f('.context_module_item')).to have_class('indent_0')
-      end
-
-      it "should delete" do
-
-        # Test Delete key
-        send_keys("d")
-        driver.switch_to.alert.accept
-        expect(context_module_items).to have_size(2)
-      end
     end
 
     context "multiple overridden due dates", priority: "2" do
@@ -965,25 +720,6 @@ describe "context modules" do
       end
     end
 
-    it "should preserve completion criteria after indent change" do
-      mod = @course.context_modules.create! name: 'Test Module'
-      tag = mod.add_item(type: 'assignment', id: @assignment2.id)
-      mod.completion_requirements = {tag.id => {type: 'must_submit'}}
-      mod.save!
-
-      get "/courses/#{@course.id}/modules"
-
-      # indent the item
-      f("#context_module_item_#{tag.id} .al-trigger").click
-      f('.indent_item_link').click
-
-      # make sure the completion criterion was preserved
-      module_item = f("#context_module_item_#{tag.id}")
-      expect(module_item).to have_class 'must_submit_requirement'
-      expect(f('.criterion', module_item)).to have_class 'defined'
-      expect(driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()")).to eq "must_submit"
-    end
-
     it "should show a vdd tooltip summary for assignments with multiple due dates" do
       selector = "li.Assignment_#{@assignment2.id} .due_date_display"
       get "/courses/#{@course.id}/modules"
@@ -1000,7 +736,7 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/modules"
       expect(f(selector)).to include_text "Multiple Due Dates"
-      driver.mouse.move_to f("#{selector} a")
+      driver.action.move_to(f("#{selector} a")).perform
       wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
@@ -1019,6 +755,7 @@ describe "context modules" do
       f(".permissions-dialog-form [type='submit']").click
       wait_for_ajaximations
       expect(@file.reload).to be_published
+      expect(f("[data-id='#{@file.id}'] > button.published-status")[:title]).to eq("Published")
     end
 
     it "should show the file publish button on course home" do
@@ -1043,166 +780,23 @@ describe "context modules" do
       f('.expand_module_link').click
       expect(f(".context_module_item.assignment .icon-publish")).to be_displayed
     end
-  end
-
-  context "as a teacher through course home page (set to modules)", priority: "1" do
-    before(:once) do
-      course_with_teacher(name: 'teacher', active_all: true)
-    end
-
-    context "when adding new module" do
-      before(:each) do
-        user_session(@teacher)
-        get "/courses/#{@course.id}"
-      end
-
-      it "should render as course home page", priority: "1", test_id: 126740 do
-        create_modules(1)
-        @course.default_view = 'modules'
-        @course.save!
-        get "/courses/#{@course.id}"
-        expect(f('.add_module_link').text).not_to be_nil
-      end
-
-      it "should add a new module", priority: "1", test_id: 126704 do
-        add_module('New Module')
-        mod = @course.context_modules.first
-        expect(mod.name).to eq 'New Module'
-      end
-
-      it "publishes an unpublished module", priority: "1", test_id: 280195 do
-        add_module('New Module')
-        expect(f('.context_module')).to have_class('unpublished_module')
-        expect(@course.context_modules.count).to eq 1
-        mod = @course.context_modules.first
-        expect(mod.name).to eq 'New Module'
-        publish_module
-        mod.reload
-        expect(mod).to be_published
-        expect(f('#context_modules .publish-icon-published')).to be_displayed
-      end
-    end
-
-    context "when working with existing module" do
-      before :once do
-        @course.context_modules.create! name: "New Module"
-      end
-
-      before :each do
-        user_session(@teacher)
-        get "/courses/#{@course.id}"
-        wait_for_modules_ui
-      end
-
-      it "unpublishes a published module", priority: "1", test_id: 280196 do
-        mod = @course.context_modules.first
-        expect(mod).to be_published
-        unpublish_module
-        mod.reload
-        expect(mod).to be_unpublished
-      end
-
-      it "should edit a module", priority: "1", test_id: 126738 do
-        edit_text = 'Module Edited'
-        f('.ig-header-admin .al-trigger').click
-        f('.edit_module_link').click
-        expect(f('#add_context_module_form')).to be_displayed
-        edit_form = f('#add_context_module_form')
-        edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
-        submit_form(edit_form)
-        expect(edit_form).not_to be_displayed
-        expect(f('.context_module > .header')).to include_text(edit_text)
-      end
-
-      it "should delete a module", priority: "1", test_id: 126736 do
-        skip_if_safari(:alert)
-        f('.ig-header-admin .al-trigger').click
-        f('.delete_module_link').click
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        refresh_page
-        expect(f('#no_context_modules_message')).to be_displayed
-        expect(f('.context_module > .header')).not_to be_displayed
-      end
-
-      it "should add an assignment to a module", priority: "1", test_id: 126723 do
-        add_new_module_item('#assignments_select', 'Assignment', '[ New Assignment ]', 'New Assignment Title')
-        expect(fln('New Assignment Title')).to be_displayed
-      end
-
-      it "should add a assignment item to a module, publish new assignment refresh page and verify", priority: "2", test_id: 441358 do
-        # this test basically verifies that the published icon is accurate after a page refresh
-        mod = @course.context_modules.first
-        assignment = @course.assignments.create!(title: "assignment 1")
-        assignment.unpublish!
-        tag = mod.add_item({id: assignment.id, type: 'assignment'})
-        refresh_page
-        item = f("#context_module_item_#{tag.id}")
-        expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
-        item.find_element(:css, '.publish-icon').click
-        wait_for_ajax_requests
-        expect(tag.reload).to be_published
-        refresh_page
-        driver.mouse.move_to f('i.icon-unpublish')
-        expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
-        expect(tag).to be_published
-      end
-
-      it "should add a quiz to a module", priority: "1", test_id: 126719 do
-        mod = @course.context_modules.first
-        quiz = @course.quizzes.create!(title: "New Quiz Title")
-        mod.add_item({id: quiz.id, type: 'quiz'})
-        refresh_page
-        verify_persistence('New Quiz Title')
-      end
-
-      it "should add a content page item to a module", priority: "1", test_id: 126708 do
-        mod = @course.context_modules.first
-        page = @course.wiki_pages.create!(title: "New Page Title")
-        mod.add_item({id: page.id, type: 'wiki_page'})
-        refresh_page
-        verify_persistence('New Page Title')
-      end
-
-      it "should add a content page item to a module and publish new page", priority: "2", test_id: 441357 do
-        mod = @course.context_modules.first
-        page = @course.wiki_pages.create!(title: "PAGE 2")
-        page.unpublish!
-        tag = mod.add_item({id: page.id, type: 'wiki_page'})
-        refresh_page
-        item = f("#context_module_item_#{tag.id}")
-        expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
-        item.find_element(:css, '.publish-icon').click
-        wait_for_ajax_requests
-        expect(tag.reload).to be_published
-      end
-    end
-  end
-
-  context "as a teacher" do
-    before(:once) do
-      course_factory(active_course: true)
-      @teacher = teacher_in_course(course: @course, name: 'teacher', active_all: true).user
-      @course.context_modules.create!(name: "New Module")
-    end
-
-    before(:each) do
-      user_session(@teacher)
-    end
 
     it "should add a discussion item to a module", priority: "1", test_id: 126711 do
+      @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
       verify_persistence('New Discussion Title')
     end
 
     it "should add an external url item to a module", priority: "1", test_id: 126707 do
+      @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External URL', 'www.google.com', 'Google')
       expect(fln('Google')).to be_displayed
     end
 
     it "should require a url for external url items" do
+      @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       f('.ig-header-admin .al-trigger').click
       f('.add_module_item_link').click
@@ -1220,8 +814,9 @@ describe "context modules" do
     end
 
     it "should add an external tool item to a module from apps", priority: "1", test_id: 126706 do
+      @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/settings"
-      make_full_screen
+
       f("#tab-tools-link").click
       f(".add_tool_link.lm").click
       f("#configuration_type_selector").click
@@ -1238,9 +833,84 @@ describe "context modules" do
     end
 
     it "should add an external tool item to a module", priority: "1", test_id: 2624909 do
+      @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
       expect(fln('Instructure')).to be_displayed
+    end
+
+    it "should not render links for subheader type items", priority: "1" do
+      mod = @course.context_modules.create! name: 'Test Module'
+      tag = mod.add_item(title: 'Example text header', type: 'sub_header')
+      get "/courses/#{@course.id}/modules"
+      expect(f("#context_module_item_#{tag.id}")).not_to contain_css(".item_link")
+      expect(f("#context_module_item_#{tag.id}")).not_to contain_css("a.for-nvda")
+    end
+
+    it "should render links for wiki page type items", priority: "1" do
+      mod = @course.context_modules.create! name: 'Test Module'
+      page = @course.wiki_pages.create title: 'A Page'
+      page.workflow_state = 'unpublished'
+      page.save!
+      tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
+      get "/courses/#{@course.id}/modules"
+      expect(f("#context_module_item_#{tag.id}")).to contain_css(".item_link")
+      expect(f("#context_module_item_#{tag.id}")).to contain_css("a.for-nvda")
+    end
+
+    context "expanding/collapsing modules" do
+      before :each do
+        @mod = create_modules(2, true)
+        @mod[0].add_item({id: @assignment.id, type: 'assignment'})
+        @mod[1].add_item({id: @assignment2.id, type: 'assignment'})
+        get "/courses/#{@course.id}/modules"
+      end
+
+      def assert_collapsed
+        expect(f("#context_module_#{@mod[0].id} span.expand_module_link")).to be_displayed
+        expect(f("#context_module_#{@mod[0].id} .content")).to_not be_displayed
+        expect(f("#context_module_#{@mod[1].id} span.expand_module_link")).to be_displayed
+        expect(f("#context_module_#{@mod[1].id} .content")).to_not be_displayed
+      end
+
+      def assert_expanded
+        expect(f("#context_module_#{@mod[0].id} span.collapse_module_link")).to be_displayed
+        expect(f("#context_module_#{@mod[0].id} .content")).to be_displayed
+        expect(f("#context_module_#{@mod[1].id} span.collapse_module_link")).to be_displayed
+        expect(f("#context_module_#{@mod[1].id} .content")).to be_displayed
+      end
+
+      it "should display collapse all button at top of page" do
+        button = f("button#expand_collapse_all")
+        expect(button).to be_displayed
+        expect(button.attribute("data-expand")).to eq("false")
+      end
+
+      it "should collapse and expand all modules when clicked and persist after refresh" do
+        button = f("button#expand_collapse_all")
+        button.click
+        wait_for_ajaximations
+        assert_collapsed
+        expect(button.text).to eq("Expand All")
+        refresh_page
+        assert_collapsed
+        button.click
+        wait_for_ajaximations
+        assert_expanded
+        expect(button.text).to eq("Collapse All")
+        refresh_page
+        assert_expanded
+      end
+
+      it "should collapse all after collapsing individually" do
+        f("#context_module_#{@mod[0].id} span.collapse_module_link").click
+        wait_for_ajaximations
+        button = f("button#expand_collapse_all")
+        button.click
+        wait_for_ajaximations
+        assert_collapsed
+        expect(button.text).to eq("Expand All")
+      end
     end
   end
 end

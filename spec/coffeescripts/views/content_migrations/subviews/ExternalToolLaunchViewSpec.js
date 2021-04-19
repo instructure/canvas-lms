@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import ExternalToolLaunchView from 'compiled/views/content_migrations/subviews/ExternalToolLaunchView'
+import Backbone from '@canvas/backbone'
+import ExternalToolLaunchView from 'ui/features/content_migrations/backbone/views/subviews/ExternalToolLaunchView.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('ExternalToolLaunchView', {

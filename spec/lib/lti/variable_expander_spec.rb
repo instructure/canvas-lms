@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -16,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require 'spec_helper'
 require_dependency "lti/variable_expander"
 module Lti
   describe VariableExpander do
@@ -52,11 +54,26 @@ module Lti
       allow(m).to receive(:use_1_3?).and_return(false)
       m
     end
+    let(:available_canvas_resources) {
+      [
+        {'id': '1', 'name': 'item 1'},
+        {'id': '2', 'name': 'item 2'}
+      ]
+    }
+
     let(:controller) do
       request_mock = double('request')
       allow(request_mock).to receive(:url).and_return('https://localhost')
       allow(request_mock).to receive(:host).and_return('/my/url')
       allow(request_mock).to receive(:scheme).and_return('https')
+      allow(request_mock).to receive(:parameters).and_return(
+        {
+          'com_instructure_course_accept_canvas_resource_types': ['page', 'module'],
+          'com_instructure_course_canvas_resource_type': 'page',
+          'com_instructure_course_allow_canvas_resource_selection': 'true',
+          'com_instructure_course_available_canvas_resources': available_canvas_resources
+        }.with_indifferent_access
+      )
       m = double('controller')
       allow(m).to receive(:css_url_for).with(:common).and_return('/path/to/common.scss')
       allow(m).to receive(:request).and_return(request_mock)
@@ -95,20 +112,24 @@ module Lti
       )
     end
 
+    it 'returns sis_id for enrollment' do
+      user.save!
+      course.save!
+      course.offer!
+      managed_pseudonym(user, account: root_account, username: 'login_id', sis_user_id: 'sis id!')
+      login = managed_pseudonym(user, account: root_account, username: 'login_id2', sis_user_id: 'sis id2!')
+      course.enroll_user(user, 'StudentEnrollment', sis_pseudonym_id: login.id, enrollment_state: 'active')
+
+      exp_hash = {test: '$Canvas.user.sisSourceId'}
+      variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+      variable_expander.expand_variables!(exp_hash)
+      expect(exp_hash[:test]).to eq 'sis id2!'
+    end
+
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
       variable_expander.current_user = nil
       expect(variable_expander.instance_variable_get(:"@current_user")).to be nil
-    end
-
-    it 'registers expansions' do
-      before_count = VariableExpander.expansions.count
-      VariableExpander.register_expansion('abc123', ['a'], -> { @context })
-      expansions = VariableExpander.expansions
-      expect(expansions.count - before_count).to eq 1
-      test_expan = expansions[:"$abc123"]
-      expect(test_expan.name).to eq 'abc123'
-      expect(test_expan.permission_groups).to eq ['a']
     end
 
     it 'expands registered variables' do
@@ -373,14 +394,14 @@ module Lti
       end
 
       it 'has a substitution for com.instructure.Assignment.lti.id when there is no tool setting' do
-        assignment.update_attributes(context: course)
+        assignment.update(context: course)
         variable_expander = VariableExpander.new(root_account,
                                                  account,
                                                  controller,
                                                  current_user: user,
                                                  tool: tool,
                                                  assignment: assignment)
-        assignment.update_attributes(context: course)
+        assignment.update(context: course)
         exp_hash = {test: '$com.instructure.Assignment.lti.id'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq assignment.lti_context_id
@@ -647,6 +668,56 @@ module Lti
         expect(exp_hash[:test]).to eq Shard.current.id
       end
 
+      it 'has substitution for $com.instructure.Course.accept_canvas_resource_types' do
+        exp_hash = {test: '$com.instructure.Course.accept_canvas_resource_types'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "page,module"
+      end
+
+      it 'has substitution for $com.instructure.Course.canvas_resource_type' do
+        exp_hash = {test: '$com.instructure.Course.canvas_resource_type'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "page"
+      end
+
+      it 'has substitution for $com.instructure.Course.allow_canvas_resource_selection' do
+        exp_hash = {test: '$com.instructure.Course.allow_canvas_resource_selection'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'true'
+      end
+
+      it 'has substitution for $com.instructure.Course.available_canvas_resources' do
+        exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>"1", "name"=>"item 1"}, {"id"=>"2", "name"=>"item 2"}]
+      end
+
+      context 'modules resources expansion' do
+        let(:available_canvas_resources) { [{"course_id" => course.id, "type" => "module"}] }
+
+        it 'has special substitution to get all course modules for $com.instructure.Course.available_canvas_resources' do
+          course.save!
+          m1 = course.context_modules.create!(:name => "mod1")
+          m2 = course.context_modules.create!(:name => "mod2")
+          exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>m1.id, "name"=>m1.name}, {"id"=>m2.id, "name"=>m2.name}]
+        end
+      end
+
+      context 'assignment groups resources expansion' do
+        let(:available_canvas_resources) { [{"course_id" => course.id, "type" => "assignment_group"}] }
+
+        it 'has special substitution to get all course modules for $com.instructure.Course.available_canvas_resources' do
+          course.save!
+          m1 = course.assignment_groups.create!(:name => "mod1")
+          m2 = course.assignment_groups.create!(:name => "mod2")
+          exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>m1.id, "name"=>m1.name}, {"id"=>m2.id, "name"=>m2.name}]
+        end
+      end
+
       context 'context is a group' do
         let(:variable_expander) { VariableExpander.new(root_account, group, controller, current_user: user, tool: tool) }
 
@@ -689,8 +760,8 @@ module Lti
         end
 
         before do
-          group.update_attributes!(users: [user])
-          new_assignment.update_attributes!(group_category: group_category)
+          group.update!(users: [user])
+          new_assignment.update!(group_category: group_category)
         end
 
         shared_examples 'a safe expansion when assignment is blank' do
@@ -793,6 +864,14 @@ module Lti
           expect(exp_hash[:test]).to eq '123'
         end
 
+        it 'has substitution for $Context.id.history' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return('xyz,abc')
+          exp_hash = {test: '$Context.id.history'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'xyz,abc'
+        end
+
         it 'has substitution for $vnd.instructure.Course.uuid' do
           allow(course).to receive(:uuid).and_return('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
           exp_hash = {test: '$vnd.instructure.Course.uuid'}
@@ -814,6 +893,20 @@ module Lti
           expect(exp_hash[:test]).to eq 'available'
         end
 
+        it 'has substitution for $Canvas.course.hideDistributionGraphs' do
+          course.hide_distribution_graphs = true
+          exp_hash = {test: '$Canvas.course.hideDistributionGraphs'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
+        it 'has substitution for $Canvas.course.gradePassbackSetting' do
+          course.grade_passback_setting = 'nightly sync'
+          exp_hash = {test: '$Canvas.course.gradePassbackSetting'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'nightly sync'
+        end
+
         it 'has substitution for $CourseSection.sourcedId' do
           course.sis_source_id = 'course1'
           exp_hash = {test: '$CourseSection.sourcedId'}
@@ -826,6 +919,13 @@ module Lti
           exp_hash = {test: '$Canvas.course.sisSourceId'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'course1'
+        end
+
+        it 'has substitution for $com.instructure.Course.integrationId' do
+          course.integration_id = 'integration1'
+          exp_hash = {test: '$com.instructure.Course.integrationId'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'integration1'
         end
 
         it 'has substitution for $Canvas.enrollment.enrollmentState' do
@@ -903,6 +1003,33 @@ module Lti
           expect(exp_hash[:test]).to eq course.course_code
         end
 
+        context 'when the course has multiple sections' do
+          # User.new leads to empty/null columns, which causes yet more AR
+          # complaints. The user_factory takes care of this.
+          let(:user) { user_factory }
+
+          before(:each) do
+            # AR complains if you don't save the course to the database first.
+            course.save!
+            enrolled_section = add_section("section one", { course: course })
+            add_section("section two", { course: course })
+            create_enrollment(course, user, { section: enrolled_section })
+          end
+
+          it 'has a substitution for com.instructure.User.sectionNames' do
+            exp_hash = { test: '$com.instructure.User.sectionNames' }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 'section one'
+          end
+
+          it 'works with a user enrolled in both sections' do
+            create_enrollment(course, user, { section: course.course_sections.find_by(name: 'section two') })
+            exp_hash = { test: '$com.instructure.User.sectionNames' }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test].split(',')).to match_array ['section one', 'section two']
+          end
+        end
+
         context 'when the course has groups' do
           let(:course_with_groups) do
             course = variable_expander.context
@@ -947,10 +1074,126 @@ module Lti
             end
           end
         end
+
+        describe '$com.instructure.User.observees' do
+          subject do
+            exp_hash = { test: '$com.instructure.User.observees' }
+            variable_expander.expand_variables!(exp_hash)
+            exp_hash[:test]
+          end
+
+          let(:context) do
+            c = variable_expander.context
+            c.save!
+            c
+          end
+          let(:student) { user_factory }
+          let(:observer) { user_factory }
+
+          before do
+            context.enroll_student(student)
+            variable_expander.current_user = observer
+          end
+
+          context 'when the current user is observing users in the context' do
+            before do
+              observer_enrollment = context.enroll_user(observer, 'ObserverEnrollment')
+              observer_enrollment.update!(associated_user_id: student.id)
+            end
+
+            it 'produces a comma-separated string of user UUIDs' do
+              expect(subject.split(',')).to match_array [
+                Lti::Asset.opaque_identifier_for(student)
+              ]
+            end
+
+            context 'the tool in use is an LTI 1.3 tool' do
+              before do
+                allow(tool).to receive(:use_1_3?).and_return(true)
+              end
+
+              it "returns the users' lti id instead of lti 1.1 user_id" do
+                expect(subject.split(',')).to match_array [
+                  student.lti_id
+                ]
+              end
+            end
+          end
+
+          context 'when the current user is not observing users in the context' do
+            it { is_expected.to eq "" }
+          end
+        end
+      end
+
+      describe '$com.instructure.Observee.sisIds' do
+        subject do
+          exp_hash = { observee_sis_ids: '$com.instructure.Observee.sisIds' }
+          variable_expander.expand_variables!(exp_hash)
+          exp_hash[:observee_sis_ids]
+        end
+
+        let(:student_a) { user_factory }
+        let(:student_b) { user_factory }
+        let(:student_c) { user_factory }
+        let(:observer) { user_factory }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: observer, tool: tool) }
+        let(:context) do
+          c = variable_expander.context
+          c.save!
+          c
+        end
+
+        before do
+          managed_pseudonym(student_a, account: root_account, sis_user_id: 'SIS_A')
+          managed_pseudonym(student_b, account: root_account, sis_user_id: 'SIS_B')
+
+          context.enroll_student(student_a)
+          context.enroll_student(student_b)
+          context.enroll_student(student_c)
+
+          variable_expander.current_user = observer
+        end
+
+        context 'when the current user is observing students in the course context' do
+          before do
+            student_a_enrollment = context.enroll_user(observer, 'ObserverEnrollment')
+            student_a_enrollment.update!(associated_user_id: student_a.id)
+
+            student_b_enrollment = context.enroll_user(observer, 'ObserverEnrollment')
+            student_b_enrollment.update!(associated_user_id: student_b.id)
+
+            student_c_enrollment = context.enroll_user(observer, 'ObserverEnrollment')
+            student_c_enrollment.update!(associated_user_id: student_c.id)
+          end
+
+          it 'return an array of all student that has a SIS IDs' do
+            id_set = subject.split(",").to_set
+            expect(Set['SIS_A', 'SIS_B']).to eq(id_set)
+          end
+        end
+
+        context 'when the current user is not observing students in the course context' do
+          it 'return a empty array of student SIS IDs' do
+            expect(subject).to be_empty
+          end
+        end
       end
 
       context 'context is a course and there is a user' do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+        let(:user) { user_factory }
+
+        it 'has substitution for com.instructure.User.sectionNames' do
+            course.save!
+            first_section = add_section('1', { course: course })
+            second_section = add_section('2', { course: course })
+            create_enrollment(course, user, { section: first_section })
+            create_enrollment(course, user, { section: second_section })
+            exp_hash = { test: '$com.instructure.User.sectionNames' }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test].split(',')).to match_array ['1', '2']
+        end
 
         it 'has substitution for $Canvas.xapi.url' do
           allow(Lti::XapiService).to receive(:create_token).and_return('abcd')
@@ -966,6 +1209,14 @@ module Lti
           exp_hash = {test: '$Canvas.course.sectionIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '5,6'
+        end
+
+        it 'has substitution for $Canvas.course.sectionRestricted' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:section_restricted).and_return(true)
+          exp_hash = {test: '$Canvas.course.sectionRestricted'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
         end
 
         it 'has substitution for $Canvas.course.sectionSisSourceIds' do
@@ -1003,6 +1254,14 @@ module Lti
           exp_hash = {test: '$Canvas.term.startAt'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '2015-05-21 17:01:36'
+        end
+
+        it 'has substitution for $Canvas.course.endAt' do
+          course.conclude_at = '2019-04-21 17:01:36'
+          course.save!
+          exp_hash = {test: '$Canvas.course.endAt'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '2019-04-21 17:01:36'
         end
 
         it 'has a functioning guard for $Canvas.term.name when term.name is not set' do
@@ -1152,6 +1411,70 @@ module Lti
           expect(exp_hash[:test]).to eq true
         end
 
+        describe '$Canvas.assignment.lockdownEnabled' do
+          it 'returns true when lockdown is enabled' do
+            allow(assignment).to receive(:settings).and_return({
+              'lockdown_browser' => {
+                'require_lockdown_browser' => true
+              }
+            })
+            exp_hash = {test: '$Canvas.assignment.lockdownEnabled'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq true
+          end
+
+          it 'returns false when lockdown is disabled' do
+            allow(assignment).to receive(:settings).and_return({
+              'lockdown_browser' => {
+                'require_lockdown_browser' => false
+              }
+            })
+            exp_hash = {test: '$Canvas.assignment.lockdownEnabled'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq false
+          end
+
+          it 'returns false as default' do
+            allow(assignment).to receive(:settings).and_return({})
+            exp_hash = {test: '$Canvas.assignment.lockdownEnabled'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq false
+          end
+        end
+
+        it 'has substitution for $Canvas.assignment.allowedAttempts' do
+          assignment.allowed_attempts = 5
+          exp_hash = {allowed_attempts: '$Canvas.assignment.allowedAttempts'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:allowed_attempts]).to eq 5
+        end
+
+        context '#$Canvas.assignment.submission.studentAttempts' do
+          before do
+            user.save
+            course.save
+            assignment.context = course
+            assignment.save
+            submission = submission_model(user: user, assignment: assignment)
+            submission.attempt = 2
+            submission.save
+          end
+
+          it 'does not have a substitution when the user is not a student' do
+            allow(course).to receive(:user_is_student?).and_return(false)
+            exp_hash = {attempts: '$Canvas.assignment.submission.studentAttempts'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:attempts]).to eq '$Canvas.assignment.submission.studentAttempts'
+          end
+
+          it 'has substitution when the user is a student' do
+            allow(course).to receive(:user_is_student?).and_return(true)
+            exp_hash = {attempts: '$Canvas.assignment.submission.studentAttempts'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:attempts]).to eq 2
+          end
+        end
+
         context 'iso8601' do
           it 'has substitution for $Canvas.assignment.unlockAt.iso8601' do
             allow(assignment).to receive(:unlock_at).and_return(right_now)
@@ -1247,6 +1570,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'Jake, Uncle'
         end
 
+        it 'has substitution for $com.instructure.Person.pronouns' do
+          user.pronouns = 'She/Her'
+          exp_hash = {test: '$com.instructure.Person.pronouns'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'She/Her'
+        end
+
         it 'has substitution for $Person.email.primary' do
           allow(substitution_helper).to receive(:email).and_return('someone@somewhere')
           allow(SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
@@ -1308,7 +1638,7 @@ module Lti
 
         it 'has substitution for $vnd.instructure.User.uuid and uses Past uuid' do
           allow(user).to receive(:uuid).and_return('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
-          UserPastLtiIds.create!(user: user, context: account, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
+          UserPastLtiId.create!(user: user, context: account, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
 
           exp_hash = {test: '$vnd.instructure.User.uuid'}
           variable_expander.expand_variables!(exp_hash)
@@ -1560,6 +1890,24 @@ module Lti
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'url'
         end
+      end
+
+      it 'has substitution for $Canvas.membership.permissions' do
+        course_with_student(:active_all => true)
+        exp_hash = {test: '$Canvas.membership.permissions<moderate_forum,read_forum,create_forum>'}
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+
+        expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "read_forum,create_forum"
+      end
+
+      it 'substitutes $Canvas.membership.permissions inside substring' do
+        course_with_student(:active_all => true)
+        exp_hash = {test: 'string stuff: ${Canvas.membership.permissions<moderate_forum,create_forum,read_forum>}'}
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+
+        expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "string stuff: create_forum,read_forum"
       end
     end
   end

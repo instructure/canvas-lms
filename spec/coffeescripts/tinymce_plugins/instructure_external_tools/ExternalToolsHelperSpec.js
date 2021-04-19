@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import ExternalToolsHelper from 'tinymce_plugins/instructure_external_tools/ExternalToolsHelper'
+import ExternalToolsHelper from '@canvas/tinymce-external-tools/ExternalToolsHelper'
 import $ from 'jquery'
 
 QUnit.module('ExternalToolsHelper:buttonConfig', {
@@ -87,11 +87,11 @@ test('returns a hash of markup keys and attaches click handler to value', functi
   )
   const imageKey = _.chain(mapping)
     .keys()
-    .select(k => k.match(/img/))
+    .filter(k => k.match(/img/))
     .value()[0]
   const iconKey = _.chain(mapping)
     .keys()
-    .select(k => !k.match(/img/))
+    .filter(k => !k.match(/img/))
     .value()[0]
   const imageTag = imageKey.split('&nbsp')[0]
   const iconTag = iconKey.split('&nbsp')[0]
@@ -106,7 +106,7 @@ test('returns icon markup if canvas_icon_class in button', function() {
   const mapping = ExternalToolsHelper.clumpedButtonMapping(this.clumpedButtons, () => {})
   const iconKey = _.chain(mapping)
     .keys()
-    .select(k => !k.match(/img/))
+    .filter(k => !k.match(/img/))
     .value()[0]
   const iconTag = iconKey.split('&nbsp')[0]
   equal($(iconTag).prop('tagName'), 'I')
@@ -116,7 +116,7 @@ test('returns img markup if no canvas_icon_class', function() {
   const mapping = ExternalToolsHelper.clumpedButtonMapping(this.clumpedButtons, () => {})
   const imageKey = _.chain(mapping)
     .keys()
-    .select(k => k.match(/img/))
+    .filter(k => k.match(/img/))
     .value()[0]
   const imageTag = imageKey.split('&nbsp')[0]
   equal($(imageTag).prop('tagName'), 'IMG')
@@ -138,4 +138,56 @@ test('calls dropdownList with buttons as options', function() {
   const fakeButtons = 'fb'
   ExternalToolsHelper.attachClumpedDropdown(this.fakeTarget, fakeButtons, this.fakeEditor)
   ok(this.theSpy.calledWith({options: fakeButtons}))
+})
+
+QUnit.module('ExternalToolsHelper:updateMRUList', {
+  setup() {
+    sinon.spy(window.console, 'log')
+  },
+  teardown() {
+    window.localStorage.clear()
+    window.console.log.restore()
+  }
+})
+
+test('creates the mru list if necessary', function() {
+  equal(window.localStorage.getItem('ltimru'), null)
+  ExternalToolsHelper.updateMRUList(2)
+  equal(window.localStorage.getItem('ltimru'), '[2]')
+})
+
+test('adds to tool to the mru list', function() {
+  window.localStorage.setItem('ltimru', '[1]')
+  ExternalToolsHelper.updateMRUList(2)
+  equal(window.localStorage.getItem('ltimru'), '[2,1]')
+})
+
+test('limits mru list to 5 tools', function() {
+  window.localStorage.setItem('ltimru', '[1,2,3,4]')
+  ExternalToolsHelper.updateMRUList(5)
+  equal(window.localStorage.getItem('ltimru'), '[5,1,2,3,4]')
+  ExternalToolsHelper.updateMRUList(6)
+  equal(window.localStorage.getItem('ltimru'), '[6,5,1,2,3]')
+})
+
+test("doesn't add the same tool twice", function() {
+  window.localStorage.setItem('ltimru', '[1,2,3,4]')
+  ExternalToolsHelper.updateMRUList(4)
+  equal(window.localStorage.getItem('ltimru'), '[1,2,3,4]')
+})
+
+test('copes with localStorage failure updating mru list', function() {
+  // localStorage in chrome is limitedto 5120k, and that seems to include the key
+  window.localStorage.setItem('xyzzy', 'x'.repeat(5119 * 1024) + 'x'.repeat(1016))
+  equal(window.localStorage.getItem('ltimru'), null)
+  ExternalToolsHelper.updateMRUList(1)
+  equal(window.localStorage.getItem('ltimru'), null)
+  ok(window.console.log.calledWith('Cannot save LTI MRU list'))
+})
+
+test('corrects bad data in local storage', function() {
+  window.localStorage.setItem('ltimru', 'this is not valid JSON')
+  ExternalToolsHelper.updateMRUList(1)
+  equal(window.localStorage.getItem('ltimru'), '[1]')
+  ok(window.console.log.calledWith('Found bad LTI MRU data'))
 })

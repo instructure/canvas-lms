@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,30 +21,132 @@
 require 'spec_helper'
 
 describe LiveEvents::AsyncWorker do
+  let(:put_records_return) { [] }
+  let(:stream_client) { double(stream_name: stream_name, put_records: OpenStruct.new(records: [], error_code: nil, error_message: nil)) }
+  let(:stream_name) { 'stream_name_x' }
+  let(:event_name) { 'event_name' }
+  let(:event) do
+    {
+      event_name: event_name,
+      event_time: Time.now.utc.iso8601(3),
+      attributes: attributes,
+      body: payload
+    }
+  end
+  let(:partition_key) { SecureRandom.uuid }
+  let(:payload) do
+    {
+      event: 1234
+    }
+  end
+  let(:attributes) do
+    {
+      event_name: 'event1'
+    }
+  end
+
+  class LELogger
+    def info(data)
+      data
+    end
+
+    def error(data)
+      data
+    end
+
+    def debug(data)
+      data
+    end
+  end
+
   before(:each) do
     LiveEvents.max_queue_size = -> { 100 }
-    LiveEvents.logger = double()
-    @worker = LiveEvents::AsyncWorker.new(false)
+    LiveEvents.statsd = nil
+    LiveEvents.logger = LELogger.new
+    @worker = LiveEvents::AsyncWorker.new(false, stream_client: stream_client, stream_name: stream_name)
+    allow(@worker).to receive(:at_exit)
+  end
+
+  after(:each) do
+    LiveEvents.statsd = nil
   end
 
   describe "push" do
     it "should execute stuff pushed on the queue" do
-      fired = false
+      results_double = double
+      results = OpenStruct.new(records: results_double)
+      expect(results_double).to receive(:each_with_index).and_return([])
+      allow(stream_client).to receive(:put_records).and_return(results)
 
-      @worker.push -> { fired = true }
+      @worker.push event, partition_key
 
       @worker.start!
       @worker.stop!
+    end
 
-      expect(fired).to be true
+    it "should batch write" do
+      results_double = double
+      results = OpenStruct.new(records: results_double)
+      expect(results_double).to receive(:each_with_index).and_return([])
+      allow(stream_client).to receive(:put_records).once.and_return(results)
+      @worker.start!
+
+      4.times { @worker.push event, partition_key }
+
+      @worker.stop!
+    end
+
+    it "should time batch write" do
+      results_double = double
+      results = OpenStruct.new(records: results_double)
+      allow(results_double).to receive(:each_with_index).and_return([])
+      allow(stream_client).to receive(:put_records).once.and_return(results)
+
+      statsd_double = double
+      expect(statsd_double).to receive(:time).once
+
+      LiveEvents.statsd = statsd_double
+      @worker.start!
+
+      4.times { @worker.push event, partition_key }
+
+      @worker.stop!
     end
 
     it "should reject items when queue is full" do
       LiveEvents.max_queue_size = -> { 5 }
-      5.times { expect(@worker.push -> {}).to be_truthy }
+      5.times { expect(@worker.push(event, partition_key)).to be_truthy }
 
-      expect(@worker.push -> {}).to be false
+      expect(@worker.push(event, partition_key)).to be false
+    end
+
+    context 'with error putting to kinesis' do
+      it "should write errors to logger" do
+        results = OpenStruct.new(records: [
+          OpenStruct.new(error_code: 'failure', error_message: 'failure message')
+        ])
+        allow(stream_client).to receive(:put_records).once.and_return(results)
+        statsd_double = double
+        LiveEvents.statsd = statsd_double
+        expect(statsd_double).to receive(:time).and_yield
+        expect(statsd_double).to receive(:increment).with('live_events.events.send_errors', any_args)
+        @worker.start!
+
+        4.times { @worker.push event, partition_key }
+
+        @worker.stop!
+      end
+    end
+  end
+
+  describe "exit handling" do
+    it "should drain the queue" do
+      skip("flaky spec needs fixed in PLAT-5106")
+      @worker.push(event, partition_key)
+      expect(@worker).to receive(:at_exit).and_yield
+      expect(LiveEvents.logger).not_to receive(:error)
+      @worker.start!
+      @worker.send(:at_exit)
     end
   end
 end
-

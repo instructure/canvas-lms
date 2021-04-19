@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -56,7 +58,9 @@ module Canvas::Oauth
 
     def key
       return nil unless client_id_is_valid?
-      @key ||= DeveloperKey.where(id: @client_id).first
+      @key ||= DeveloperKey.find_cached(@client_id)
+    rescue ActiveRecord::RecordNotFound
+      nil
     end
 
     # Checks to see if a token has already been issued to this client and
@@ -64,13 +68,13 @@ module Canvas::Oauth
     # user permission again. If the developer key is trusted, access
     # tokens will be automatically authorized without prompting the end-
     # user
-    def authorized_token?(user)
-      if !self.class.is_oob?(redirect_uri)
-        return true if Token.find_reusable_access_token(user, key, scopes, purpose)
+    def authorized_token?(user, real_user: nil)
+      unless self.class.is_oob?(redirect_uri)
+        return true if Token.find_reusable_access_token(user, key, scopes, purpose, real_user: real_user)
         return true if key.trusted?
       end
 
-      return false
+      false
     end
 
     def token_for(code)
@@ -99,13 +103,17 @@ module Canvas::Oauth
       @scopes.present? && @scopes.all? { |scope| key.scopes.include?(scope) }
     end
 
+    def missing_scopes
+      @scopes.reject { |scope| key.scopes.include?(scope) }
+    end
+
     def self.is_oob?(uri)
       uri == OAUTH2_OOB_URI
     end
 
     def self.confirmation_redirect(controller, provider, current_user, real_user=nil)
       # skip the confirmation page if access is already (or automatically) granted
-      if provider.authorized_token?(current_user)
+      if provider.authorized_token?(current_user, real_user: real_user)
         final_redirect(controller, final_redirect_params(controller.session[:oauth2], current_user, real_user))
       else
         controller.oauth2_auth_confirm_url
@@ -113,7 +121,7 @@ module Canvas::Oauth
     end
 
     def self.final_redirect_params(oauth_session, current_user, real_user=nil, options = {})
-      options = {:scopes => oauth_session[:scopes], :remember_access => options[:remember_access], :purpose => oauth_session[:purpose]}
+      options = {:scopes => oauth_session&.dig(:scopes), :remember_access => options&.dig(:remember_access), :purpose => oauth_session&.dig(:purpose)}
       code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
       redirect_params = { :code => code }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]

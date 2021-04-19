@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -94,6 +96,17 @@ describe ContentParticipation do
       })
       cpc = ContentParticipationCount.where(:user_id => @student).first
       expect(cpc.unread_count).to eq 0
+    end
+  end
+
+  describe 'create' do
+    it 'should set the root_account_id from the submissions assignment' do
+      participant = ContentParticipation.create_or_update({
+        :content => @content,
+        :user => @student,
+        :workflow_state => "unread",
+      })
+      expect(participant.root_account_id).to eq(@assignment.root_account_id)
     end
   end
 end

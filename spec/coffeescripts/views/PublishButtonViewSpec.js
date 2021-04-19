@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import PublishButtonView from 'compiled/views/PublishButtonView'
+import Backbone from '@canvas/backbone'
+import PublishButtonView from '@canvas/publish-button-view'
 import $ from 'jquery'
 import 'helpers/jquery.simulate'
 
@@ -38,12 +38,14 @@ QUnit.module('PublishButtonView', {
         dfrd.resolve()
         return dfrd
       }
+
       unpublish() {
         this.set('published', false)
         const dfrd = $.Deferred()
         dfrd.resolve()
         return dfrd
       }
+
       disabledMessage() {
         return "can't unpublish"
       }

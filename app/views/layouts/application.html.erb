@@ -15,17 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
 <%-
-  set_badge_counts_for(@context, @current_user, @current_enrollment) if @set_badge_counts
+  css_bundle(:instructure_eportfolio) if @eportfolio_view === true
+  css_bundle(:new_user_tutorials) if tutorials_enabled?
+  css_bundle(:k6_theme) if @context.try(:feature_enabled?, :canvas_k6_theme)
+  js_bundle(:navigation_header) unless @headers == false
 
-  @body_classes ||= []
-  keyboard_navigation = (yield :keyboard_navigation).presence
+  load_blueprint_courses_ui
+  @has_content_notices = load_content_notices
+  provide :head, include_common_stylesheets
+  set_badge_counts_for(@context, @current_user, @current_enrollment) if @set_badge_counts
+  js_env notices: flash_notices()
+-%>
+<%= render :partial => "layouts/head" %>
+<%-
   left_side = nil
   left_side_custom = nil
   right_side = (yield :right_side).presence
-  wizard = (yield :wizard_box).presence
-  top_nav = (yield :top_nav).presence
 
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')
@@ -41,44 +47,40 @@
     subnav_menu_text = t('Hide Groups Navigation Menu') if active_path?('/groups')
   end
 
-  content_for :pre_html do
-    @collapse_global_nav = @current_user.try(:collapse_global_nav?)
-    @body_class_no_headers = @headers == false
-    @show_embedded_chat = embedded_chat_visible
-    @show_fixed_bottom = (@fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user)) && (!@body_class_no_headers || @outer_frame)
-    @body_classes << "no-headers" if @body_class_no_headers
-    unless (@body_classes.include? "no-headers") || (@show_left_side == false)
+  @collapse_global_nav = @current_user.try(:collapse_global_nav?)
+  @body_class_no_headers = @headers == false
+  @show_embedded_chat = embedded_chat_visible
+  @show_fixed_bottom = (@fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user)) && (!@body_class_no_headers || @outer_frame)
+  body_classes << "no-headers" if @body_class_no_headers
+  unless (body_classes.include? "no-headers") || (@show_left_side == false)
+    left_side = nil
+    skip_for_streaming :left_side, except: ["eportfolios/show", "eportfolio_categories/show", "eportfolio_entries/show"] do
       left_side = (yield :left_side).presence
-      left_side_custom = (yield :left_side_custom).presence
-      @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length))
     end
-    @body_classes << "with-left-side" if @show_left_side
-    @body_classes << "course-menu-expanded" if @body_classes.include?("with-left-side") && !@collapse_course_menu
-    #we dont want to render a right side unless there is actually content in it.
-    @body_classes << "with-right-side" if right_side and not right_side.strip.empty?
-    @body_classes << "padless-content" if @padless
-    @body_classes << "with-embedded-chat" if @show_embedded_chat
-    @body_classes << 'with-fixed-bottom' if @show_fixed_bottom
-    @body_classes << 'pages' if controller.js_env[:WIKI_PAGE].present?
-    @body_classes << @active_tab
-    @body_classes << 'Underline-All-Links__enabled' if @current_user && @current_user.feature_enabled?(:underline_all_links)
-    @body_classes << 'is-masquerading-or-student-view' if @real_current_user && @real_current_user != @current_user
-    @body_classes << 'primary-nav-expanded' unless @collapse_global_nav
-    @body_classes << 'primary-nav-transitions' if @collapse_global_nav
-    # We probably want to consider doing this everywhere, all the time.
-    @body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
+    @show_left_side ||= (section_tabs.length > 0)
   end
-
-  css_bundle(:instructure_eportfolio) if @eportfolio_view === true
-  css_bundle(:new_user_tutorials) if tutorials_enabled?
-
-  content_for :head, include_common_stylesheets
-
-  load_blueprint_courses_ui
-  @has_content_notices = load_content_notices
+  body_classes << "with-left-side" if @show_left_side
+  body_classes << "course-menu-expanded" if body_classes.include?("with-left-side") && !@collapse_course_menu
+  #we dont want to render a right side unless there is actually content in it.
+  body_classes << "with-right-side" if right_side and not right_side.strip.empty?
+  body_classes << "padless-content" if @padless
+  body_classes << "with-embedded-chat" if @show_embedded_chat
+  body_classes << 'with-fixed-bottom' if @show_fixed_bottom
+  body_classes << 'pages' if controller.js_env[:WIKI_PAGE].present?
+  body_classes << get_active_tab
+  body_classes << 'Underline-All-Links__enabled' if @current_user && @current_user.feature_enabled?(:underline_all_links)
+  body_classes << 'is-masquerading-or-student-view' if @real_current_user && @real_current_user != @current_user
+  body_classes << 'primary-nav-expanded' unless @collapse_global_nav
+  body_classes << 'primary-nav-transitions' if @collapse_global_nav
+  # We probably want to consider doing this everywhere, all the time, but when I did
+  # for LS-1745, people complained a lot, so maybe not.
+  body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
+  body_classes << "context-#{@context.asset_string}" if @context
+  body_classes << "responsive_awareness" if !!@domain_root_account&.feature_enabled?(:responsive_awareness)
+  body_classes << "responsive_misc" if !!@domain_root_account&.feature_enabled?(:responsive_misc)
+  body_classes << "responsive_student_grades_page" if !!@domain_root_account&.feature_enabled?(:responsive_student_grades_page)
 -%>
-<%= render :partial => "layouts/head" %>
-<body class="<%= (@body_classes).uniq.join(" ") %> lato-font-not-loaded-yet">
+<body class="<%= (body_classes).uniq.join(" ") %>">
 <%if @current_user && @real_current_user && @real_current_user != @current_user %>
   <div role="alert" class="screenreader-only">
     <% if @current_user.fake_student? %>
@@ -99,13 +101,11 @@
     <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;" title="<%= t('Error') %>"></iframe>
   </div>
 
-  <%= yield :leading_content %>
-
   <div id="wrapper" class="ic-Layout-wrapper">
     <% if crumbs.length > 1 %>
       <div class="ic-app-nav-toggle-and-crumbs no-print">
         <% if @show_left_side %>
-          <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>" title="<%= subnav_menu_text %>">
+          <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>">
             <i class="icon-hamburger" aria-hidden="true"></i>
           </button>
           <div class="ic-app-crumbs">
@@ -115,6 +115,11 @@
         <% if tutorials_enabled? %>
           <div class="TutorialToggleHolder"></div>
         <% end %>
+        <% if show_student_view_button? %>
+          <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
+            <i class="icon-student-view"></i> <%= t('Student View') %>
+          <% end %>
+        <% end %>
       </div>
     <% end %>
     <div id="main" class="ic-Layout-columns">
@@ -122,15 +127,21 @@
         <div class="ic-Layout-watermark"></div>
       <% end %>
       <% if @show_left_side %>
+        <% if @no_left_side_list_view
+            list_view_class = ''
+          else
+            list_view_class = 'list-view'
+          end
+        %>
         <div id="left-side"
-          class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
+          class="ic-app-course-menu <%= list_view_class %>"
           style="display: <%= @collapse_course_menu ? "none" : "block" %>"
           >
           <% if left_side %>
             <%= left_side %>
           <% else %>
             <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
-              <a  class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
+              <a class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
                 <%= t("Switch Group")%>
                 <i class="icon-mini-arrow-down"></i>
               </a>
@@ -139,14 +150,14 @@
                   <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
                 <% end %>
               </ul>
+
+              <!-- this is so if there's more than 25 groups it doesn't immediately close the "Switch Group" menu when you open it, see: KNO-38 -->
+              <script> document.getElementById('left-side').addEventListener('click', e => e.stopPropagation()) </script>
             <% end %>
             <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
               <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
             <% end %>
             <%= section_tabs %>
-          <% end %>
-          <% if left_side_custom %>
-            <%= left_side_custom %>
           <% end %>
         </div>
       <% end %>
@@ -177,7 +188,7 @@
     <%= render :partial => 'layouts/fixed_bottom' %>
   <% end %>
 
-  <% if wizard %>
+  <% if (wizard = (yield :wizard_box).presence) %>
     <div id="wizard_box" tabindex="-1">
       <div class="wizard_content">
         <div class="links">
@@ -187,7 +198,7 @@
       </div>
     </div>
   <% end %>
-  <% if keyboard_navigation %>
+  <% if (keyboard_navigation = (yield :keyboard_navigation).presence) %>
     <div id="keyboard_navigation">
       <%= keyboard_navigation %>
       <div class='hidden-readable' tabindex='0'>

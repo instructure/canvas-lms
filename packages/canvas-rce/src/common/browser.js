@@ -16,28 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let isIE = false;
-let isEdge = false;
+let isIE = false
+let isEdge = false
 
 // expected to be called as setFromTinymce(window.tinymce) at some point where
 // window.tinymce is available
 export function setFromTinymce(tinymce) {
-  set(tinymce.Env);
+  set(tinymce.Env)
 }
 
 export function reset() {
-  set({ ie: false, edge: false });
+  set({ie: false, edge: false})
 }
 
 export function set(env) {
-  isIE = !!env.ie;
-  isEdge = isIE && !!(env.edge || env.ie == 12);
+  isIE = !!env.ie
+  isEdge = isIE && !!(env.edge || env.ie == 12)
 }
 
 export function ie() {
-  return isIE;
+  return isIE
 }
 
 export function edge() {
-  return isEdge;
+  return isEdge
 }

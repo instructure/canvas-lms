@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -99,6 +101,15 @@ describe Group do
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
+  end
+
+  it "should set the root_account_id for GroupMemberships when bulk adding users" do
+    @account = account_model
+    group_model(group_category: @communities, is_public: true, context: @account)
+    @group.bulk_add_users_to_group([@user])
+    @group.group_memberships.each do |gm|
+      expect(gm.root_account_id).not_to be nil
+    end
   end
 
   describe '#grading_standard_or_default' do
@@ -244,8 +255,12 @@ describe Group do
     teacher = e.user
     group = course.groups.create
     expect(course.grants_right?(teacher, :manage_groups)).to be_truthy
-    expect(group.grants_right?(teacher, :manage_wiki)).to be_truthy
-    expect(group.grants_right?(teacher, :manage_files)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_wiki_create)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_wiki_update)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_wiki_delete)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_add)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_edit)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_delete)).to be_truthy
     expect(group.wiki.grants_right?(teacher, :update_page)).to be_truthy
     attachment = group.attachments.build
     expect(attachment.grants_right?(teacher, :create)).to be_truthy
@@ -622,6 +637,31 @@ describe Group do
       group.add_user(user1)
       expect(group).to have_common_section_with_user(user2)
     end
+
+    it "should be true if one member is inactive" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      e = Enrollment.where(user_id: user1.id, course_id: @course.id)
+      e.update(workflow_state: 'inactive')
+      group.add_user(user2)
+      expect(group).to have_common_section_with_user(user2)
+    end
+
+    it "should be true if one member is completed" do
+      course_with_teacher(:active_all => true)
+      section1 = @course.course_sections.create
+      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      group = @course.groups.create
+      group.add_user(user1)
+      Enrollment.where(user_id: user1.id, course_id: @course.id).update(workflow_state: 'completed')
+      group.add_user(user2)
+      expect(group).to have_common_section_with_user(user2)
+    end
   end
 
   context "tabs_available" do
@@ -818,6 +858,22 @@ describe Group do
       users = @group.participating_users_in_context(include_inactive_users: true)
       expect(users.length).to eq 1
       expect(users.first.id).to eq @user.id
+    end
+  end
+
+  describe 'usage_rights_required' do
+    it 'returns true on course group' do
+      @course.update!(usage_rights_required: true)
+      expect(@group.usage_rights_required?).to be true
+    end
+
+    it 'returns true on account group' do
+      account = account_model
+      account.settings = {'usage_rights_required' => {
+        'value' => true
+      }}
+      group = group_model(context: account)
+      expect(group.usage_rights_required?).to be true
     end
   end
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'jsx/context_modules/stores/ObjectStore'
+import store from '@canvas/select-content-dialog/stores/ObjectStore'
 
 QUnit.module('ObjectStore', {
   setup() {

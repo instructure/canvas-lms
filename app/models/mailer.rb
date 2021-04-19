@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -37,14 +39,21 @@ class Mailer < ActionMailer::Base
     params[:reply_to] = reply_to if reply_to
 
     mail(params) do |format|
-      format.text{ render plain: m.body }
-      format.html{ render plain: m.html_body } if m.html_body
+      [:body, :html_body].each do |attr|
+        if m.send(attr)
+          body = m.send(attr).bytesize > Message.maximum_text_length ? Message.unavailable_message : m.send(attr)
+          attr == :body ? format.text{ render plain: body } : format.html{ render plain: body }
+        end
+      end
     end
   end
 
   # if you can't go through Message.deliver, this is a fallback that respects
   # the notification service.
   def self.deliver(mail_obj)
+    InstStatsd::Statsd.increment("message.deliver",
+                                 short_stat: 'message.deliver',
+                                 tags: { path_type: 'mailer_emails', notification_name: 'mailer_delivery' })
     if Account.site_admin.feature_enabled?(:notification_service)
       Services::NotificationService.process(
         "direct:#{SecureRandom.hex(10)}",

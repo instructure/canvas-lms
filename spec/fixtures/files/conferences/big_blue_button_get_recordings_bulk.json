@@ -1,0 +1,120 @@
+{
+  "returncode": "SUCCESS",
+  "recordings":
+  [
+    {
+      "recordID": "somerecordingidformeeting1a",
+      "meetingID": "instructure_web_conference_somemeetingkey1",
+      "name": "Conference Development 101",
+      "published": "true",
+      "protected": "false",
+      "startTime": "1513031612000",
+      "endTime": "1513031628000",
+      "metadata": {
+        "isBreakout": "false"
+      },
+      "playback":
+      [
+        {
+          "type": "statistics",
+          "url": "https://bbb.blah.com/instructure/ae094b1eb62b634c377fc255149de61a04ee8787-1521832370987/statistics/",
+          "length": null
+        },
+        {
+          "type": "presentation",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/presentation/",
+          "length": "2",
+          "preview": {
+            "images":
+            [
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/presentation/thumbnails/thumb-1.png",
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/presentation/thumbnails/thumb-2.png",
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/presentation/thumbnails/thumb-3.png"
+            ]
+          }
+        },
+        {
+          "type": "video",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/capture/",
+          "length": "2"
+        }
+      ]
+    },
+    {
+      "recordID": "somerecordingidformeeting1b",
+      "meetingID": "instructure_web_conference_somemeetingkey1",
+      "name": "Conference Development 101",
+      "published": "true",
+      "protected": "false",
+      "startTime": "1513031142000",
+      "endTime": "1513031164000",
+      "metadata": {
+        "isBreakout": "false"
+      },
+      "playback":
+      [
+        {
+          "type": "statistics",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/statistics/",
+          "length": null
+        },
+        {
+          "type": "presentation",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/",
+          "length": "2",
+          "preview": {
+            "images":
+            [
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/thumbnails/thumb-1.png",
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/thumbnails/thumb-2.png",
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/thumbnails/thumb-3.png"
+            ]
+          }
+        },
+        {
+          "type": "video",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/capture/",
+          "length": "2"
+        }
+      ]
+    },
+    {
+      "recordID": "somerecordingidformeeting2",
+      "meetingID": "instructure_web_conference_somemeetingkey2",
+      "name": "Conference Development 101",
+      "published": "true",
+      "protected": "false",
+      "startTime": "1513031142000",
+      "endTime": "1513031164000",
+      "metadata": {
+        "isBreakout": "false"
+      },
+      "playback":
+      [
+        {
+          "type": "statistics",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/statistics/",
+          "length": null
+        },
+        {
+          "type": "presentation",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/",
+          "length": "2",
+          "preview": {
+            "images":
+            [
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/thumbnails/thumb-1.png",
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/thumbnails/thumb-2.png",
+              "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/thumbnails/thumb-3.png"
+            ]
+          }
+        },
+        {
+          "type": "video",
+          "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/capture/",
+          "length": "2"
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -66,8 +68,37 @@ describe Message do
     it "should have a sane body" do
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
-      expect(msg.html_body.scan(/<html>/).length).to eq 1
+      expect(msg.html_body.scan(/<html dir="ltr" lang="en">/).length).to eq 1
       expect(msg.html_body.index('<!DOCTYPE')).to eq 0
+    end
+
+    it "should use slack template if present" do
+      @au = AccountUser.create(:account => account_model)
+      course_with_student
+      alert = @course.alerts.create!(recipients: [:student],
+        criteria: [
+          criterion_type: 'Interaction',
+          threshold: 7
+        ])
+      mock_template = "slack template"
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(mock_template)
+      msg = generate_message(:alert, :slack, alert)
+      expect(msg.body).to eq mock_template
+    end
+
+    it "should sms template if no slack template present" do
+      @au = AccountUser.create(:account => account_model)
+      course_with_student
+      alert = @course.alerts.create!(recipients: [:student],
+                                      criteria: [
+                                        criterion_type: 'Interaction',
+                                        threshold: 7
+                                      ])
+      mock_template = "sms template"
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(nil)
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.sms.erb').and_return(mock_template)
+      msg = generate_message(:alert, :slack, alert)
+      expect(msg.body).to eq mock_template
     end
 
     it "should not html escape the subject" do
@@ -80,6 +111,15 @@ describe Message do
       assignment_model(title: 'this is crazy ridiculous '*10)
       msg = generate_message(:assignment_created, :email, @assignment)
       expect(msg.subject.length).to be > 255
+    end
+
+    it "should truncate the body if it exceeds the maximum text length" do
+      allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(3)
+      assignment_model(title: 'this is a message')
+      msg = generate_message(:assignment_created, :email, @assignment)
+      msg.save!
+      expect(msg.body).to eq 'message preview unavailable'
+      expect(msg.html_body).to eq 'message preview unavailable'
     end
 
     it "should default to the account time zone if the user has no time zone" do
@@ -120,7 +160,8 @@ describe Message do
     it "displays a custom logo when configured" do
       account = account_model
       account.settings[:email_logo] = 'awesomelogo.jpg'
-      @au = AccountUser.create(:account => account)
+      account.save!
+      @au = AccountUser.create!(:account => account, user: user_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include('awesomelogo.jpg')
     end
@@ -128,8 +169,7 @@ describe Message do
     describe "course nicknames" do
       before(:once) do
         course_with_student(:active_all => true, :course_name => 'badly-named-course')
-        @student.course_nicknames[@course.id] = 'student-course-nick'
-        @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'student-course-nick')
       end
 
       def check_message(message, asset)
@@ -270,6 +310,30 @@ describe Message do
       expect{ message.deliver }.not_to raise_error
     end
 
+    it "logs stats on deliver" do
+      account = account_model
+      @message = message_model(dispatch_at: Time.now - 1,
+                               notification_name: 'my_name',
+                               workflow_state: 'staged',
+                               to: 'somebody',
+                               updated_at: Time.now.utc - 11.minutes,
+                               path_type: 'email',
+                               user: @user,
+                               root_account: account)
+
+
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
+                                                             {short_stat: "message.deliver",
+                                                              tags: {path_type: "email", notification_name: 'my_name'}})
+
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.#{@message.root_account.global_id}",
+                                                             {short_stat: "message.deliver_per_account",
+                                                              tags: {path_type: "email", root_account_id: @message.root_account.global_id}})
+
+      expect(@message).to receive(:dispatch).and_return(true)
+      @message.deliver
+    end
+
     context 'push' do
       before :once do
         user_model
@@ -281,7 +345,10 @@ describe Message do
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
       end
 
@@ -291,8 +358,65 @@ describe Message do
         expect(ne).to receive(:destroy).never
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
+        message_model(notification_name: 'Assignment Created',
+                      dispatch_at: Time.now, workflow_state: 'staged',
+                      to: 'somebody', updated_at: Time.now.utc - 11.minutes,
+                      path_type: 'push', user: @user)
         @message.deliver
+      end
+
+      context 'with the reduce_push_notifications settings' do
+        it "allows whitelisted notification types" do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'Assignment Created',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push)
+          @message.deliver
+        end
+
+        it "does not deliver notification types not on the whitelist" do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'New Wiki Page',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push).never
+          @message.deliver
+        end
+      end
+
+
+      context 'with the enable_push_notifications account setting disabled' do
+        before :each do
+          account = Account.default
+          account.settings[:enable_push_notifications] = false
+        end
+
+        after :each do
+          account = Account.default
+          account.settings[:enable_push_notifications] = true
+        end
+
+        it 'does not deliver notifications' do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'New Wiki Page',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push).never
+          @message.deliver
+        end
       end
     end
 
@@ -306,6 +430,34 @@ describe Message do
         allow(Canvas::Twilio).to receive(:enabled?).and_return(true)
       end
 
+      it "allows whitelisted notification types" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          notification_name: 'Assignment Graded',
+          user: @user
+        )
+        expect(@message).to receive(:deliver_via_sms)
+        @message.deliver
+      end
+
+      it "does not deliver notification types not on the whitelist" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          notification_name: 'Conversation Message',
+          user: @user
+        )
+        expect(@message).to receive(:deliver_via_sms).never
+        @message.deliver
+      end
+
       it "uses Twilio for E.164 paths" do
         message_model(
           dispatch_at: Time.now,
@@ -315,6 +467,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', @message.body, from_recipient_country: true)
         expect(@message).to receive(:deliver_via_email).never
         @message.deliver
@@ -329,6 +482,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(@message).to receive(:deliver_via_email)
         expect(Canvas::Twilio).to receive(:deliver).never
         @message.deliver
@@ -343,6 +497,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(@message).to receive(:deliver_via_email)
         expect(Canvas::Twilio).to receive(:deliver).never
         @message.deliver
@@ -357,6 +512,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver)
         @message.deliver
         @message.reload
@@ -372,6 +528,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver).and_raise('some error')
         @message.deliver
         @message.reload
@@ -387,6 +544,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', anything, from_recipient_country: true)
         @message.deliver
         @message.reload
@@ -526,6 +684,26 @@ describe Message do
         expect(message).to eq "value hi"
       end
     end
+
+    describe "cross-shard urls" do
+      specs_require_sharding
+
+      it 'should use relative ids in links of message body' do
+        @shard2.activate do
+          @c = Course.create!(account: Account.create!)
+          @a = @c.assignments.create!
+          @announcement = @c.announcements.create!(message: "<p>added assignment</p>\r\n<p><a title=\"assa\" href=\"/courses/#{@c.id}/assignments/#{@a.id}\"title</a></p>", title: 'title')
+        end
+        @shard1.activate do
+          @shard1_account = Account.create!(name: 'new acct')
+          expect_any_instance_of(Message).to receive(:link_root_account).at_least(:once).and_return(@shard1_account)
+          message = generate_message('New Announcement', 'email', @announcement)
+          parts = message.body.split("/courses/").second.split("/assignments/")
+          expect(parts.first.split('~')).to eq [@shard2.id.to_s, @c.local_id.to_s]
+          expect(parts.last.split(')').first.split('~')).to eq [@shard2.id.to_s, @a.local_id.to_s]
+        end
+      end
+    end
   end
 
   describe "author interface" do
@@ -582,6 +760,20 @@ describe Message do
       expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
     end
 
+    it "encodes a user's avatar_url when just a path" do
+      user.avatar_image_url = "path with spaces"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to eq "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}/path%20with%20spaces"
+    end
+
+    it "encodes a user's avatar_url when a url" do
+      user.avatar_image_url = "http://localhost/path with spaces"
+      user.save!
+      message = Message.new(context: convo_message)
+      expect(message.author_avatar_url).to eq "http://localhost/path%20with%20spaces"
+    end
+
     describe 'author_account' do
       it 'is nil if there is no author' do
         expect(authorless_message.author_account).to be_nil
@@ -625,7 +817,7 @@ describe Message do
     url = "a" * 256
     msg = Message.new
     msg.url = url
-    msg.save!
+    expect{ msg.save! }.to_not raise_error
   end
 
   describe "#context_context" do
@@ -645,6 +837,34 @@ describe Message do
       dt = discussion_topic_model
       message = Message.new(context: dt)
       expect(message.context_context).to eq dt.context
+    end
+  end
+
+  describe 'Message.in_partition' do
+    let(:partition) { { 'created_at' => DateTime.new(2020, 8, 25) } }
+
+    it 'uses the specific partition table' do
+      expect(Message.in_partition(partition).to_sql).to match(/^SELECT "messages_2020_35"\.\* FROM .*"messages_2020_35"$/)
+    end
+
+    it 'can be chained' do
+      expect(Message.in_partition(partition).where(id: 3).to_sql).to match(/^SELECT "messages_2020_35"\.\* FROM .*"messages_2020_35" WHERE "messages_2020_35"."id" = 3$/)
+    end
+
+    it 'has no side-effects on other scopes' do
+      expect(Message.in_partition(partition).unscoped.to_sql).to match(/^SELECT "messages"\.\* FROM .*"messages"$/)
+    end
+  end
+
+  describe "for_queue" do
+    it "has a clear error path for messages that are missing" do
+      queued = Message.new(id: -1, created_at: Time.zone.now).for_queue
+      begin
+        queued.deliver
+        raise RuntimeError, "#deliver should have failed because this message does not exist"
+      rescue Delayed::RetriableError => e
+        expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
+      end
     end
   end
 end

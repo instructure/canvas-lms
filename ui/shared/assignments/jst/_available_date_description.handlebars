@@ -1,0 +1,19 @@
+{{#if pending}}
+  <strong class="status-description">{{#t "not_available_until"}}Not available until{{/t}}</strong>
+  <span {{ contextSensitiveDatetimeTitle unlockAt }} aria-hidden="true">
+    {{tDateToString unlockAt 'date_at_time'}}
+  </span>
+  <span class="screenreader-only">{{contextSensitiveDatetimeTitle unlockAt justText=true}}</span>
+{{/if}}
+
+{{#if open}}
+  <strong class="status-description">{{#t "available_until"}}Available until{{/t}}</strong>
+  <span {{ contextSensitiveDatetimeTitle lockAt }} aria-hidden="true">
+    {{tDateToString lockAt 'date_at_time'}}
+  </span>
+  <span class="screenreader-only">{{contextSensitiveDatetimeTitle lockAt justText=true}}</span>
+{{/if}}
+
+{{#if closed}}
+  <span class="status-description">{{#t "closed"}}Closed{{/t}}</span>
+{{/if}}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DiscussionTopicKeyboardShortcutModal from 'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
+import DiscussionTopicKeyboardShortcutModal from 'ui/features/discussion_topic/react/DiscussionTopicKeyboardShortcutModal.js'
 import React from 'react'
 import {mount} from 'enzyme'
 
@@ -52,9 +52,10 @@ QUnit.module('DiscussionTopicKeyboardShortcutModal#render')
 test('renders shortcuts', async function() {
   const wrapper = mount(<DiscussionTopicKeyboardShortcutModal />)
 
-  // open the modal by pressing ";"
+  // open the modal by pressing "ALT + f8"
   const e = new Event('keydown')
-  e.which = 188
+  e.which = 119
+  e.altKey = true
   document.dispatchEvent(e)
 
   // have to wait for instUI modal css transitions

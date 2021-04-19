@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -66,6 +68,11 @@ module GradebooksHelper
       {
         :icon_class => 'icon-filmstrip',
         :screenreader_text => I18n.t('icons.media_submission', 'Media Submission')
+      }
+    when 'student_annotation'
+      {
+        icon_class: 'icon-annotate',
+        screenreader_text: I18n.t('Student Annotation')
       }
     end
   end

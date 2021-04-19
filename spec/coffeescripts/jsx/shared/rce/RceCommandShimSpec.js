@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
+import * as RceCommandShim from '@canvas/rce/RceCommandShim'
 import fixtures from 'helpers/fixtures'
 
 let remoteEditor = null

@@ -1,0 +1,2 @@
+onerror|img|src|flash-message
+<div id="right-side"><a class="disable-todo-item-link" href="#" data-flash-message="{&quot;html&quot;:&quot;&lt;img src=x onerror=prompt(document.cookie); /&gt;&quot;}">CORE-2935</a></div>

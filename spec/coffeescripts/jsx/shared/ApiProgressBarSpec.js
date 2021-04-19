@@ -20,8 +20,8 @@ import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ApiProgressBar from 'jsx/shared/ApiProgressBar'
-import ProgressStore from 'jsx/shared/stores/ProgressStore'
+import ApiProgressBar from '@canvas/progress/react/components/ApiProgressBar'
+import ProgressStore from '@canvas/progress/stores/ProgressStore'
 
 QUnit.module('ApiProgressBarSpec', {
   setup() {
@@ -153,7 +153,7 @@ test('poll', function() {
   component.poll()
   ok(!this.storeSpy.called, 'should not fetch from progress store without progress id')
 
-  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id}/>
+  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
   ok(this.storeSpy.called, 'should fetch when progress id is present')

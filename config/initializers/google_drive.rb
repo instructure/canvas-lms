@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -21,5 +23,5 @@ GoogleDrive::Connection.config = proc do
     settings = settings.dup
     settings[:client_secret] = settings[:client_secret_dec]
   end
-  settings || ConfigFile.load('google_drive')
+  settings || ConfigFile.load('google_drive').dup
 end

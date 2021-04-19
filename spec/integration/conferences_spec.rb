@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -75,7 +77,7 @@ describe ConferencesController, type: :request do
 
     expect(@enroll1.attributes['workflow_state']).to eq 'active'
     expect(@enroll2.attributes['workflow_state']).to eq 'active'
-    @enroll2.update_attributes('workflow_state' => 'completed')
+    @enroll2.update('workflow_state' => 'completed')
     expect(@enroll2.attributes['workflow_state']).to eq 'completed'
 
     get "/courses/#{@course.id}/conferences"

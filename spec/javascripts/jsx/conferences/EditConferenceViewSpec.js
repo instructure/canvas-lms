@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditConferenceView from 'compiled/views/conferences/EditConferenceView'
-import Conference from 'compiled/models/Conference'
-import tz from 'timezone'
+import EditConferenceView from 'ui/features/conferences/backbone/views/EditConferenceView.coffee'
+import Conference from 'ui/features/conferences/backbone/models/Conference.js'
+import tz from '@canvas/timezone'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
@@ -28,7 +28,10 @@ QUnit.module('EditConferenceView', {
     this.view = new EditConferenceView()
     this.snapshot = tz.snapshot()
     this.datepickerSetting = {field: 'datepickerSetting', type: 'date_picker'}
-    fakeENV.setup({conference_type_details: [{settings: [this.datepickerSetting]}]})
+    fakeENV.setup({
+      conference_type_details: [{settings: [this.datepickerSetting]}],
+      users: [{id: 1, name: 'Owlswick Clamp'}]
+    })
   },
   teardown() {
     this.view.$el.remove()
@@ -104,4 +107,25 @@ test('#show sets localized durataion when editing conference', function() {
   this.view.show(conference, {isEditing: true})
   const duration = this.view.$('#web_conference_duration')[0].value
   equal(duration, expectedDuration)
+})
+
+test('"remove observers" modifies "invite all course members"', function() {
+  const attributes = {
+    title: 'Making Money',
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+  const conference = new Conference(attributes)
+  this.view.show(conference, {isEditing: true})
+  ok(this.view.$('#members_list').is(':hidden'))
+  ok(this.view.$('#observers_remove').is(':enabled'))
+
+  this.view.$('#user_all').click()
+  ok(this.view.$('#members_list').is(':visible'))
+  ok(this.view.$('#observers_remove').is(':disabled'))
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -246,6 +248,16 @@ describe UserObservationLink do
         UserObservationLink.create_or_restore(observer: @parent, student: student, root_account: @other_account)
       end
       expect(@parent.enrollments.shard(@parent).first.course).to eq @course
+    end
+
+    it "allows destroying a cross-shard link" do
+      @shard2.activate do
+        other_account = Account.create!
+        parent = user_with_pseudonym(account: other_account, active_all: true)
+        @link = UserObservationLink.create_or_restore(observer: parent, student: student, root_account: other_account)
+      end
+
+      expect(@link.destroy).to be_truthy
     end
   end
 

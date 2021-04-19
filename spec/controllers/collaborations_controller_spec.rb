@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -160,7 +162,7 @@ describe CollaborationsController do
 
       it "should include collaborator old_lti_id" do
         Lti::Asset.opaque_identifier_for(@student)
-        UserPastLtiIds.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+        UserPastLtiId.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
         get 'members', params: {id: @collab.id, include: ['collaborator_lti_id']}
         @student.reload
         hash = JSON.parse(@response.body).first
@@ -198,6 +200,30 @@ describe CollaborationsController do
         title: "my collab",
         user: @teacher
       ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
+    end
+
+    context "when the collaboration includes a resource_link_lookup_uuid" do
+      subject { get 'show', params: { course_id: @course.id, id: collaboration.id } }
+
+      let(:lookup_uuid) { SecureRandom.uuid }
+      let(:collaboration) do
+        ExternalToolCollaboration.create!(
+          title: "my collab",
+          user: @teacher,
+          url: 'http://www.example.com',
+          context: @course,
+          resource_link_lookup_uuid: lookup_uuid
+        )
+      end
+
+      before { user_session(@teacher) }
+
+      it 'adds the lookup ID to the redirect URL' do
+        url = CGI.escape(collaboration[:url])
+        expect(subject).to redirect_to(
+          "/courses/#{@course.id}/external_tools/retrieve?display=borderless&resource_link_lookup_id=#{lookup_uuid}&url=#{url}"
+        )
+      end
     end
 
     it 'redirects to the lti launch url for ExternalToolCollaborations' do
@@ -268,7 +294,7 @@ describe CollaborationsController do
     it "should fail with invalid collaboration type" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :collaboration => {:title => "My Collab"}}
-      assert_status(500)
+      assert_status(400)
     end
 
     it "should create collaboration" do
@@ -282,7 +308,6 @@ describe CollaborationsController do
     end
 
     context "content_items" do
-
       let(:content_items) do
         [
           {
@@ -292,6 +317,74 @@ describe CollaborationsController do
             confirmUrl: 'http://example.com/confirm/343'
           }
         ]
+      end
+
+      context "when the content item contains a lookup_uuid" do
+        subject do
+          post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
+          Collaboration.find(assigns[:collaboration].id)
+        end
+
+        let(:lookup_uuid) { SecureRandom.uuid }
+        let(:content_items) { super().tap { |c| c.first[:lookup_uuid] = lookup_uuid } }
+
+        before { user_session(@teacher) }
+
+        it 'sets the resource_link_lookup_uuid' do
+          expect(subject.resource_link_lookup_uuid).to eq lookup_uuid
+        end
+      end
+
+      context 'with the deep linking extension' do
+        subject do
+          post :create, params: params
+          Collaboration.find(assigns[:collaboration].id)
+        end
+
+        let(:teacher) { @teacher }
+        let(:student) { student_in_course(course: course, active_all: true).user }
+        let(:course) { @course }
+        let(:params) { { course_id: course.id, contentItems: [content_item].to_json } }
+        let(:content_item) do
+          {
+            type: 'ltiResourceLink',
+            url: 'http://test-tool.docker/launch?deep_linking=true',
+            title: 'Lti 1.3 Tool Title',
+            text: 'Lti 1.3 Tool Text',
+            icon: 'https://img.icons8.com/metro/1600/unicorn.png',
+            thumbnail: 'https://via.placeholder.com/150?text=thumbnail',
+            lookup_uuid: '9446c291-168f-4f46-bf3c-785dd3d986d3'
+          }
+        end
+
+        before { user_session(teacher) }
+
+        context 'with a group set' do
+          let(:group) { group_model(course: course) }
+          let(:content_item) do
+            super().merge(
+              Collaboration::DEEP_LINKING_EXTENSION => {
+                groups: [Lti::Asset.opaque_identifier_for(group)]
+              }
+            )
+          end
+
+          before { group.add_user(student, 'active') }
+
+          it 'associates the group to the collaboration' do
+            expect(subject.collaborators.pluck(:group_id).compact).to match_array [group.id]
+          end
+        end
+
+        context 'with users set' do
+          let(:content_item) do
+            super().merge(Collaboration::DEEP_LINKING_EXTENSION => { users: [student.lti_id] })
+          end
+
+          it 'associates the users to the collaboration' do
+            expect(subject.collaborators.pluck(:user_id)).to match_array [teacher.id, student.id]
+          end
+        end
       end
 
       it "should create a collaboration using content-item" do
@@ -376,6 +469,22 @@ describe CollaborationsController do
             confirmUrl: 'http://example.com/confirm/343'
           }
         ]
+      end
+
+      context "when the content item contains a lookup_uuid" do
+        subject do
+          put 'update', params: {id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json}
+          Collaboration.find(assigns[:collaboration].id)
+        end
+
+        let(:lookup_uuid) { SecureRandom.uuid }
+        let(:content_items) { super().tap { |c| c.first[:lookup_uuid] = lookup_uuid } }
+
+        before { user_session(@teacher) }
+
+        it 'updates the resource_link_lookup_uuid' do
+          expect(subject.resource_link_lookup_uuid).to eq lookup_uuid
+        end
       end
 
       it "should update a collaboration using content-item" do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -15,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'graphql_custom_connections'
 
 class CanvasSchema < GraphQL::Schema
   use GraphQL::Execution::Interpreter
@@ -41,14 +45,18 @@ class CanvasSchema < GraphQL::Schema
 
   def self.resolve_type(type, obj, _ctx)
     case obj
+    when Account then Types::AccountType
     when Course then Types::CourseType
     when Assignment then Types::AssignmentType
     when AssignmentGroup then Types::AssignmentGroupType
+    when Conversation then Types::ConversationType
     when CourseSection then Types::SectionType
     when User then Types::UserType
     when Enrollment then Types::EnrollmentType
+    when EnrollmentTerm then Types::TermType
     when Submission then Types::SubmissionType
     when SubmissionComment then Types::SubmissionCommentType
+    when SubmissionDraft then Types::SubmissionDraftType
     when Group then Types::GroupType
     when GroupCategory then Types::GroupSetType
     when GradingPeriod then Types::GradingPeriodType
@@ -57,13 +65,22 @@ class CanvasSchema < GraphQL::Schema
     when WikiPage then Types::PageType
     when Attachment then Types::FileType
     when DiscussionTopic then Types::DiscussionType
+    when DiscussionEntry then Types::DiscussionEntryType
     when Quizzes::Quiz then Types::QuizType
+    when OutcomeCalculationMethod then Types::OutcomeCalculationMethodType
+    when OutcomeProficiency then Types::OutcomeProficiencyType
     when Progress then Types::ProgressType
+    when Rubric then Types::RubricType
     when MediaObject then Types::MediaObjectType
+    when LearningOutcomeGroup then Types::LearningOutcomeGroupType
+    when LearningOutcome then Types::LearningOutcomeType
     when ContentTag
-      if !type.nil? && type.name == "ModuleItemInterface"
-        return Types::ExternalUrlType if obj.content_type == "ExternalUrl"
-        return Types::ModuleExternalToolType if obj.content_type == "ContextExternalTool"
+      if type&.name == "ModuleItemInterface"
+        case obj.content_type
+        when "ContextModuleSubHeader" then Types::ModuleSubHeaderType
+        when "ExternalUrl" then Types::ExternalUrlType
+        when "ContextExternalTool" then Types::ModuleExternalToolType
+        end
       else
         Types::ModuleItemType
       end
@@ -71,7 +88,13 @@ class CanvasSchema < GraphQL::Schema
     end
   end
 
+  def self.unauthorized_object(error)
+    raise GraphQL::ExecutionError,
+      I18n.t("An object of type %{graphql_type} was hidden due to insufficient scopes on access token",
+             graphql_type: error.type.graphql_name)
+  end
+
   orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
                 Types::ExternalToolType, Types::ModuleExternalToolType,
-                Types::ProgressType]
+                Types::ProgressType, Types::ModuleSubHeaderType]
 end

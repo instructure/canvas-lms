@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -51,13 +53,18 @@ module EpubExports
     end
 
     def epub_exports
-      @_epub_exports ||= EpubExport.where({
-        course_id: courses_with_feature_enabled,
-        user_id: current_user,
-        type: nil
-      }).select("DISTINCT ON (epub_exports.course_id) epub_exports.*").
-      order("course_id, created_at DESC").
-      preload(:epub_attachment, :job_progress, :zip_attachment)
+      @_epub_exports ||=
+        begin
+          exports = EpubExport.where({
+            course_id: courses_with_feature_enabled,
+            user_id: current_user,
+            type: nil
+            }).select("DISTINCT ON (epub_exports.course_id) epub_exports.*").
+            order("course_id, created_at DESC").
+            preload(:epub_attachment, :job_progress, :zip_attachment).to_a
+          EpubExport.fail_stuck_epub_exports(exports)
+          exports
+        end
     end
   end
 end

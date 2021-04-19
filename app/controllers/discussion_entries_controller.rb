@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -108,7 +110,7 @@ class DiscussionEntriesController < ApplicationController
       return if context_file_quota_exceeded?
       @entry.editor = @current_user
       respond_to do |format|
-        if @entry.update_attributes(entry_params)
+        if @entry.update(entry_params)
           save_attachment
           format.html {
             flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'

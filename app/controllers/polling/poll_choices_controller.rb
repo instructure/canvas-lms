@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -151,7 +153,7 @@ module Polling
       end
 
       if authorized_action(@poll, @current_user, :update)
-        if @poll_choice.update_attributes(poll_choice_params)
+        if @poll_choice.update(poll_choice_params)
           render json: serialize_jsonapi(@poll_choice)
         else
           render json: @poll_choice.errors, status: :bad_request

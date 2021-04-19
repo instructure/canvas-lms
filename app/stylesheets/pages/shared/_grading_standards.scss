@@ -83,18 +83,6 @@
     .alert-message:focus {
       outline: none;
     }
-    .grading_standard_title {
-      width: 175px;
-    }
-    .name_header {
-      text-align: direction(left);
-      padding-#{direction(right)}: 10px;
-      width: 24%;
-    }
-    .insert_row_container {
-      padding: 2px 5px;
-      width: 4%;
-    }
     .links {
       float: direction(right);
     }
@@ -114,13 +102,6 @@
       margin-bottom: 0px;
       padding-bottom: 0px;
     }
-    .range_container {
-      width: 72%;
-      .range_label {
-        float: direction(left);
-        margin-#{direction(left)}: 10px;
-      }
-    }
     table {
       width: 100%;
       &.grading_standard_data {
@@ -130,34 +111,35 @@
   }
 }
 
+.grading_standard_headers {
+  .icon_row_cell {
+    width: 5%;
+  }
+  .name_row_cell {
+    width: 30%;
+    text-align: #{direction(left)};
+  }
+  .range_row_cell {
+    width: 60%;
+    text-align: #{direction(left)};
+  }
+}
+
 .grading_standard_row {
   &.react_grading_standard_row {
     input {
       margin-top: 5px;
       margin-bottom: 5px;
     }
-    .insert_row_icon_container {
-      padding: 2px;
-      width: 4%;
-    }
-    .row_name_container {
-      width: 24%;
-    }
-    .standard_name {
-      width: 100px;
-    }
-    .standard_value {
-      width: 37px;
-    }
-    .last_row_cell {
-      padding-#{direction(left)}: 15px;
-    }
     .row_cell {
       padding: 2px;
-      width: 24%;
+      width: 30%;
       .range_to {
         padding-#{direction(right)}: 5px;
       }
+    }
+    .delete_row_button {
+      float: #{direction(right)};
     }
     &.border_below {
       border-bottom: dashed;
@@ -165,4 +147,15 @@
       border-bottom-color: #999;
     }
   }
+}
+
+.standard_name {
+  width: 100px;
+}
+.standard_value {
+  width: 37px;
+}
+
+.add_standard_button {
+  margin-bottom: 10px;
 }

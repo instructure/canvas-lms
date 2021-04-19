@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -20,8 +22,7 @@ require 'rake'
 module NotificationsCommon
 
   def setup_comm_channel(user, path = 'test@example.com', path_type = 'email')
-    @channel = user.communication_channels.create(path: path, path_type: path_type)
-    @channel.confirm
+    @channel = communication_channel(user, {username: path, path_type: path_type, active_cc: true})
   end
 
   def setup_notification(user, params = {})

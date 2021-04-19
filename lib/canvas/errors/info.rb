@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -32,7 +34,7 @@ module Canvas
         @req = request
         @account = root_account
         @user = user
-        @rci = opts.fetch(:request_context_id, RequestContextGenerator.request_id)
+        @rci = opts.fetch(:request_context_id, RequestContext::Generator.request_id)
         @type = opts.fetch(:type, nil)
         @canvas_error_info = opts.fetch(:canvas_error_info, {})
       end

@@ -19,16 +19,13 @@
 <%
   css_bundle :login
   js_bundle :login
-  content_for :page_title, t(:page_title, "Log In to Canvas")
+  provide :page_title, t(:page_title, "Log In to Canvas")
 %>
 
 <% extend Api::V1::Account %>
 
-<% @body_classes << "full-width ic-Login-Body" if @body_classes %>
+<% add_body_class "full-width ic-Login-Body" %>
 <%= render "login/canvas/new_login_content" %>
-
-<%= # for plugin use
-    render "shared/login_trailer" %>
 
 <% if flash[:logged_out] && HostUrl.file_host(@domain_root_account, request.host_with_port) %>
   <img class="hidden-readable" src="//<%= HostUrl.file_host(@domain_root_account, request.host_with_port) %>/file_session/clear"/>

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ColumnHeaders from 'jsx/files/ColumnHeaders'
+import ColumnHeaders from 'ui/features/files/react/components/ColumnHeaders.js'
 
 QUnit.module('ColumnHeaders')
 

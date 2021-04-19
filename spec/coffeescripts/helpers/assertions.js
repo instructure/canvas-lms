@@ -54,7 +54,7 @@ module.exports = {
       }
     }
 
-    return axe.a11yCheck(el, axeConfig, function(result) {
+    return axe.a11yCheck(el, axeConfig, result => {
       const ignores = options.ignores || []
       const violations = _.reject(
         result.violations,

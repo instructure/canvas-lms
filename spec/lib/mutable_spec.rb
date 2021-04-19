@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -58,18 +60,6 @@ describe Mutable do
     it "skips update if not muted" do
       expect(@mutable).to receive(:muted?).and_return(false)
       expect(@mutable).to receive(:update_attribute).never
-      @mutable.unmute!
-    end
-
-    it "broadcasts unmute event if currently muted" do
-      expect(@mutable).to receive(:muted?).and_return(true)
-      expect(@mutable).to receive(:broadcast_unmute_event).once
-      @mutable.unmute!
-    end
-
-    it "skips unmute event if not muted" do
-      expect(@mutable).to receive(:muted?).and_return(false)
-      expect(@mutable).to receive(:broadcast_unmute_event).never
       @mutable.unmute!
     end
   end

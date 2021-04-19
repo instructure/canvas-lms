@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -16,12 +18,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class MasterCourses::MasterTemplate < ActiveRecord::Base
+  # the root of all the magic for a blueprint course
+  # is created when a course is marked as a blueprint
+  # stores the locking (aka restrictions) settings
+  # and links it to all the other models for handling associations and sync
+
   # NOTE: at some point we can use this model if we decide to allow collections of objects within a course to be pushed out
   # instead of the entire course, but for now that's what we'll roll with
 
   belongs_to :course
+  belongs_to :root_account, :class_name => 'Account'
+
+  # these store which pieces of blueprint content are locked (and how)
   has_many :master_content_tags, :class_name => "MasterCourses::MasterContentTag", :inverse_of => :master_template
+  # links the blueprint to its associated courses
   has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
+  # sync events
   has_many :master_migrations, :class_name => "MasterCourses::MasterMigration", :inverse_of => :master_template
 
   belongs_to :active_migration, :class_name => "MasterCourses::MasterMigration"
@@ -41,6 +53,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   scope :for_full_course, -> { where(:full_course => true) }
 
   before_create :set_defaults
+  before_create :set_root_account_id
 
   after_save :invalidate_course_cache
   after_update :sync_default_restrictions
@@ -51,6 +64,10 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     unless self.default_restrictions.present?
       self.default_restrictions = {:content => true}
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.course.root_account_id
   end
 
   def invalidate_course_cache
@@ -86,7 +103,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def destroy_subscriptions_later
-    self.send_later_if_production(:destroy_subscriptions)
+    delay_if_production(n_strand: ["master_courses_destroy_subscriptions", self.course.global_root_account_id],
+      priority: Delayed::LOW_PRIORITY).destroy_subscriptions
   end
 
   def destroy_subscriptions
@@ -274,30 +292,37 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     associations.keys.each_slice(50) do |master_sis_ids|
       templates = self.active.for_full_course.joins(:course).
         where(:courses => {:root_account_id => root_account, :sis_source_id => master_sis_ids}).
-        select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id").to_a
+        select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id, courses.account_id AS account_id").to_a
       if templates.count != master_sis_ids.count
         (master_sis_ids - templates.map(&:sis_source_id)).each do |missing_id|
-          messages << "Unknown blueprint course \"#{missing_id}\""
+          associations[missing_id].each do |target_course_id|
+            messages << "Unknown blueprint course \"#{missing_id}\" for course \"#{target_course_id}\""
+          end
         end
       end
+
 
       templates.each do |template|
         needs_migration = false
         associations[template.sis_source_id].each_slice(50) do |associated_sis_ids|
           data = root_account.all_courses.where(:sis_source_id => associated_sis_ids).not_master_courses.
             joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").
-            pluck(:id, :sis_source_id, "mcs.master_template_id")
+            joins(sanitize_sql(["LEFT OUTER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON
+              caa.course_id=courses.id AND caa.account_id = ?", template.account_id])).
+            pluck(:id, :sis_source_id, "mcs.master_template_id", "caa.id")
 
           if data.count != associated_sis_ids
-            (associated_sis_ids - data.map{|id, sis_id, t_id| sis_id}).each do |invalid_id|
+            (associated_sis_ids - data.map{|r| r[1]}).each do |invalid_id|
               messages << "Cannot associate course \"#{invalid_id}\" - is a blueprint course"
             end
           end
-          data.each do |id, associated_sis_id, master_template_id|
+          data.each do |id, associated_sis_id, master_template_id, course_association_id|
             if master_template_id
               if master_template_id != template.id
                 messages << "Cannot associate course \"#{associated_sis_id}\" - is associated to another blueprint course"
               end # otherwise we don't need to do anything - it's already associated
+            elsif course_association_id.nil?
+              messages << "Cannot associate course \"#{associated_sis_id}\" - is not in the same or lower account as the blueprint course"
             else
               needs_migration = true
               template.add_child_course!(id)

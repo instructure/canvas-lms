@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -38,8 +40,9 @@ class AccountReportRunner < ActiveRecord::Base
   end
 
   def write_rows
+    return unless rows
     return if rows.empty?
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       self.class.bulk_insert_objects(rows)
       @rows = []
     end
@@ -47,22 +50,20 @@ class AccountReportRunner < ActiveRecord::Base
 
   def start
     @rows ||= []
-    self.update_attributes!(workflow_state: 'running', started_at: Time.now.utc)
+    self.update!(workflow_state: 'running', started_at: Time.now.utc)
   end
 
   def complete
     write_rows
-    self.update_attributes!(workflow_state: 'completed', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'completed', ended_at: Time.now.utc)
   end
 
   def abort
-    write_rows
-    self.update_attributes!(workflow_state: 'aborted', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'aborted', ended_at: Time.now.utc)
   end
 
   def fail
-    write_rows
-    self.update_attributes!(workflow_state: 'error', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 
   scope :in_progress, -> {where(workflow_state: %w(running))}

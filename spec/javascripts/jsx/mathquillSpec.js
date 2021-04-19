@@ -17,13 +17,13 @@
  */
 
 import $ from 'jquery'
-import 'jquery.instructure_misc_helpers'
-import 'mathquill'
+import '@canvas/jquery/jquery.instructure_misc_helpers'
+import '@canvas/mathquill'
 
 let view, container, toolbar
 
 QUnit.module('MathML and MathJax test', {
-  setup () {
+  setup() {
     view = document.createElement('div')
     view.id = 'mathquill-view'
     toolbar = document.createElement('div')
@@ -35,7 +35,7 @@ QUnit.module('MathML and MathJax test', {
     $(container).mathquill('editor')
   },
 
-  teardown () {
+  teardown() {
     document.body.removeChild(view)
   }
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -22,6 +24,7 @@
 #
 # @model JWT
 #    {
+#      "id": "JWT",
 #      "properties": {
 #        "token": {
 #           "description": "The signed, encrypted, base64 encoded JWT",

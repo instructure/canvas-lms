@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -16,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'database_cleaner'
+require_relative '../../../support/test_database_utils'
 
 Pact.configure do |config|
   config.include Factories
@@ -26,7 +29,7 @@ Pact.set_up do
   DatabaseCleaner.start
 
   ActiveRecord::Base.connection.tables.each do |t|
-    ActiveRecord::Base.connection.reset_pk_sequence!(t)
+    TestDatabaseUtils.reset_pk_sequence!(t)
   end
 end
 

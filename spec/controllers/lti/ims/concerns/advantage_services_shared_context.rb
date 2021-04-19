@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,10 +19,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../../lti_1_3_tool_configuration_spec_helper.rb')
 
 shared_context 'advantage services context' do
+  include_context 'lti_1_3_tool_configuration_spec_helper'
+
   let_once(:root_account) do
-    enable_1_3(Account.default)
+    Account.default
   end
   let_once(:developer_key) do
     dk = DeveloperKey.create!(account: root_account)
@@ -28,9 +33,25 @@ shared_context 'advantage services context' do
     dk
   end
   let(:access_token_scopes) do
-    %w(https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+    %w(
+       https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
        https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
-       https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly).join(' ')
+       https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+       https://canvas.instructure.com/lti/public_jwk/scope/update
+       https://canvas.instructure.com/lti/data_services/scope/create
+       https://canvas.instructure.com/lti/data_services/scope/show
+       https://canvas.instructure.com/lti/data_services/scope/update
+       https://canvas.instructure.com/lti/data_services/scope/list
+       https://canvas.instructure.com/lti/data_services/scope/destroy
+       https://canvas.instructure.com/lti/data_services/scope/list_event_types
+       https://canvas.instructure.com/lti/account_lookup/scope/show
+       https://canvas.instructure.com/lti/feature_flags/scope/show
+       https://canvas.instructure.com/lti/account_external_tools/scope/create
+       https://canvas.instructure.com/lti/account_external_tools/scope/update
+       https://canvas.instructure.com/lti/account_external_tools/scope/list
+       https://canvas.instructure.com/lti/account_external_tools/scope/show
+       https://canvas.instructure.com/lti/account_external_tools/scope/destroy
+    ).join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }
   let(:test_request_host) { 'test.host' }
@@ -39,7 +60,7 @@ shared_context 'advantage services context' do
     {
       iss: 'https://canvas.instructure.com',
       sub: developer_key.global_id,
-      aud: "https://#{test_request_host}/login/oauth2/token",
+      aud: "http://#{test_request_host}/login/oauth2/token",
       iat: timestamp,
       exp: (timestamp + 1.hour.to_i),
       nbf: (timestamp - 30),
@@ -103,27 +124,5 @@ shared_context 'advantage services context' do
       split(' ').
       reject { |s| scopes_to_remove.include? s }.
       join(' ')
-  end
-
-  def enable_1_3(enableable)
-    if enableable.is_a?(ContextExternalTool)
-      enableable.use_1_3 = true
-    elsif enableable.is_a?(Account)
-      enableable.enable_feature!(:lti_1_3)
-    else raise "LTI 1.3/Advantage features not relevant for #{enableable.class}"
-    end
-    enableable.save!
-    enableable
-  end
-
-  def disable_1_3(enableable)
-    if enableable.is_a?(ContextExternalTool)
-      enableable.use_1_3 = false
-    elsif enableable.is_a?(Account)
-      enableable.disable_feature!(:lti_1_3)
-    else raise "LTI 1.3/Advantage features not relevant for #{enableable.class}"
-    end
-    enableable.save!
-    enableable
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -25,6 +27,11 @@ describe ContextModuleProgression do
 
     @user = User.create!(:name => "some name")
     @course.enroll_student(@user).accept!
+  end
+
+  it "populates root_account_id" do
+    progression = @module.evaluate_for(@user)
+    expect(progression.root_account).to eq @course.root_account
   end
 
   def setup_modules
@@ -96,6 +103,7 @@ describe ContextModuleProgression do
       @module.publish
       expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq false
       @module.unpublish
+      @module2.reload
       expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq true
     end
   end
@@ -162,11 +170,33 @@ describe ContextModuleProgression do
     context "when post policies enabled" do
       let(:assignment) { @course.assignments.create! }
       let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
+      let(:min_score) { 90 }
 
       before(:each) do
-        @course.enable_feature!(:post_policies)
-        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
+        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: min_score}})
         @submission = assignment.submit_homework(@user, body: "my homework")
+      end
+
+      context 'when the score is close enough' do
+        let(:min_score) { 1 }
+        let(:score) { 0.9999999999999999 } # eg 0.3 + 0.3 + 0.3 + 0.1
+
+        it 'evaluates requirement as complete' do
+          @submission.update!(score: score, posted_at: 1.second.ago)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = {id: tag.id, type: 'min_score', min_score: min_score}
+          expect(progression.requirements_met).to include requirement
+        end
+      end
+
+      it "doesn't mark students that haven't submitted as in-progress" do
+        other_student = student_in_course(:course => @course, :active_all => true).user
+        progression = @module.evaluate_for(other_student)
+        # yes technically the requirement is "incomplete" if they haven't done anything
+        # and the jerk who named the column should feel bad
+        # but we actually use it for marking requirements that they've done something for
+        # and either need to wait for grading or improve their score to continue (hence the "i" icon)
+        expect(progression.incomplete_requirements).to be_empty
       end
 
       it "does not evaluate requirements when grade has not posted" do
@@ -178,35 +208,6 @@ describe ContextModuleProgression do
 
       it "evaluates requirements when grade has posted" do
         @submission.update!(score: 100, posted_at: 1.second.ago)
-        progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = {id: tag.id, type: "min_score", min_score: 90.0}
-        expect(progression.requirements_met).to include requirement
-      end
-    end
-
-    context "when post policies not enabled" do
-      let(:assignment) { @course.assignments.create! }
-      let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
-
-      before(:each) do
-        @course.disable_feature!(:post_policies)
-        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
-        @submission = assignment.submit_homework(@user, body: "my homework")
-      end
-
-      it "does not evaluate requirements when assignment is muted" do
-        assignment.mute!
-        assignment.reload
-        @submission.update!(score: 100)
-        progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = {id: tag.id, type: "min_score", min_score: 90.0, score: nil}
-        expect(progression.incomplete_requirements).to include requirement
-      end
-
-      it "evaluates requirements when assignment is not muted" do
-        assignment.unmute!
-        assignment.reload
-        @submission.update!(score: 100)
         progression = @module.context_module_progressions.find_by(user: @user)
         requirement = {id: tag.id, type: "min_score", min_score: 90.0}
         expect(progression.requirements_met).to include requirement
@@ -313,7 +314,7 @@ describe ContextModuleProgression do
   context "assignment muting" do
     it "should work with muted assignments" do
       assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -335,7 +336,7 @@ describe ContextModuleProgression do
 
     it "should complete when the assignment is unmuted after a grade is assigned without a submission" do
       assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -354,7 +355,7 @@ describe ContextModuleProgression do
 
     it "should work with muted quiz assignments" do
       quiz = @course.quizzes.create(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest', :workflow_state => 'available')
-      quiz.assignment.mute!
+      quiz.assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => quiz.id, :type => 'quiz'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -363,7 +364,7 @@ describe ContextModuleProgression do
       expect(progression).to be_unlocked
 
       quiz_sub = quiz.generate_submission(@user)
-      quiz_sub.update_attributes(:score => 100, :workflow_state => 'complete', :submission_data => nil)
+      quiz_sub.update(:score => 100, :workflow_state => 'complete', :submission_data => nil)
       quiz_sub.with_versioning(&:save)
       expect(progression.reload).to be_started
 
@@ -378,7 +379,7 @@ describe ContextModuleProgression do
       topic.save!
       assignment.reload
 
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       tag = @module.add_item({:id => topic.id, :type => 'discussion_topic'})
       @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
       @module.save!
@@ -393,6 +394,34 @@ describe ContextModuleProgression do
 
       assignment.unmute!
       expect(progression.reload).to be_completed
+    end
+  end
+
+  describe "tweaking collapsed state" do
+    it "flips the state back and forth" do
+      progression = @module.evaluate_for(@user)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+      progression.uncollapse!
+      expect(progression.collapsed?).to be_falsey
+    end
+
+    it "doesn't bother if the state is already in the right place" do
+      progression = @module.evaluate_for(@user)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+      expect(progression).not_to receive(:save)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+    end
+
+    it "doesn't persist if you force it to skip" do
+      progression = @module.evaluate_for(@user)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+      expect(progression).not_to receive(:save)
+      progression.uncollapse!(skip_save: true)
+      expect(progression.collapsed?).to be_falsey
     end
   end
 end

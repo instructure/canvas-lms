@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Canvas::Oauth
   module GrantTypes
     class BaseType

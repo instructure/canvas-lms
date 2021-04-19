@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -29,10 +31,10 @@ module NewCourseAddPeopleModal
   end
 
   def role_options
-    ff('#peoplesearch_select_role option', add_people_modal).map(&:text)
+    INSTUI_Select_options('#peoplesearch_select_role').map(&:text)
   end
 
   def section_options
-    ff('#peoplesearch_select_section option', add_people_modal).map(&:text)
+    INSTUI_Select_options('#peoplesearch_select_section').map(&:text)
   end
 end

@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import EditorToggle from 'compiled/editor/EditorToggle'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import EditorToggle from '@canvas/editor-toggle'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 const fixtures = $('#fixtures')
 let containerDiv = null
@@ -85,7 +85,7 @@ test('@options.rceOptions can extend the default RichContentEditor opts', () => 
   equal(opts.otherStuff, rceOptions.otherStuff)
 })
 
-test("createDone does not throw error when editButton doesn't exist", function() {
+test("createDone does not throw error when editButton doesn't exist", () => {
   sandbox.stub($.fn, 'click').callsArg(0)
   EditorToggle.prototype.createDone.call({
     options: {doneText: ''},
@@ -102,7 +102,7 @@ test('createTextArea returns element with unique id', () => {
   notEqual(ta1.attr('id'), ta2.attr('id'))
 })
 
-test('replaceTextArea', function() {
+test('replaceTextArea', () => {
   sandbox.stub(RichContentEditor, 'destroyRCE')
   sandbox.stub($.fn, 'insertBefore')
   sandbox.stub($.fn, 'remove')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,13 +20,18 @@
 
 module Factories
   def resource_link_model(overrides: {})
-    return Lti::ResourceLink.find_by!(resource_link_id: overrides[:resource_link_id]) if overrides.key?(:resource_link_id)
+    return Lti::ResourceLink.find_by!(resource_link_uuid: overrides[:resource_link_uuid]) if overrides.key?(:resource_link_uuid)
+
+    context ||= Course.create!(name: 'Course')
+    assignment = Assignment.create!(course: context, name: 'Assignment')
 
     params = {
+      context: assignment,
       context_external_tool: overrides.fetch(:with_context_external_tool) do |_|
         external_tool_model(context: overrides[:context], opts: overrides.fetch(:context_external_tool, {}))
       end
     }
+
     Lti::ResourceLink.create!(params)
   end
 end

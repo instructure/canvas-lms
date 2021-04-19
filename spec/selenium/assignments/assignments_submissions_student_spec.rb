@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -42,25 +44,24 @@ describe "submissions" do
     end
 
     it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
-      skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
-      @assignment.update_attributes(submission_types: "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".submit_assignment_link").click
+      wait_for_new_page_load { f(".submit_assignment_link").click }
       type_in_tiny("#submission_body", 'text')
-      f('button[type="submit"]').click
+      wait_for_new_page_load { f('button[type="submit"]').click }
 
       expect(f("#sidebar_content")).to include_text("Submitted!")
       expect(f("#content")).not_to contain_css(".error_text")
     end
 
     it "should not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
-      @assignment.update_attributes(submission_types: "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".submit_assignment_link").click
-      f("[aria-label='Rich Content Editor'] #submission_body_ifr")
-      f('#submit_assignment_tabs button[type="submit"]').click
+      wait_for_new_page_load { f(".submit_assignment_link").click }
+      f('button[type="submit"]').click
+
       expect(f(".error_text")).to be
     end
 
@@ -124,7 +125,37 @@ describe "submissions" do
       expect(@submission.workflow_state).to eq 'submitted'
     end
 
+    it "renders the webcam wraper", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "renders the webcam wraper when allowed_extensions has png", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["png"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "doesn't render the webcam wraper when allowed_extensions doens't have png", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["pdf"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(element_exists?('.attachment_wrapper')).to be_falsy
+    end
+
     it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
+      skip('investigate in LA-843')
       skip_if_safari(:alert)
       @assignment.submission_types = 'online_upload'
       @assignment.save!
@@ -144,6 +175,7 @@ describe "submissions" do
 
 
     it "should not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
+      skip('flaky, will be fixed in ADMIN-3015')
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       filename, fullpath, data = get_file("empty_file.txt")
@@ -189,20 +221,20 @@ describe "submissions" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
       expect(f('#sidebar_content .details')).to include_text "Not Submitted!"
-      expect(f('.submit_assignment_link')).to include_text "Submit Assignment"
+      expect(f('.submit_assignment_link')).to include_text "Start Assignment"
     end
 
     it "should not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update_attributes(:submission_types => "on_paper")
+      @assignment.update(:submission_types => "on_paper")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -229,7 +261,7 @@ describe "submissions" do
     end
 
     it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')
@@ -250,7 +282,8 @@ describe "submissions" do
 
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       skip_if_safari(:alert)
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      skip('flash alert is fragile, will be addressed in ADMIN-3015')
+      @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
 
@@ -347,8 +380,7 @@ describe "submissions" do
 
     describe 'uploaded files for submission' do
       def fixture_file_path(file)
-        path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
-        return "#{path}#{file}"
+        RSpec.configuration.fixture_path.join(file).to_s
       end
 
       def make_folder_actions_visible
@@ -433,7 +465,7 @@ describe "submissions" do
 
       it "should load submission lti tool on clicking tab" do
         tool = create_submission_tool
-        @assignment.update_attributes(submission_types: "online_upload")
+        @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(".submit_assignment_link").click
@@ -445,7 +477,7 @@ describe "submissions" do
 
       it "should load submission lti tool on kb-nav to tab" do
         tool = create_submission_tool
-        @assignment.update_attributes(submission_types: "online_upload")
+        @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(".submit_assignment_link").click

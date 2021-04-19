@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -38,6 +40,7 @@ class Attachments::S3Storage
     # copying rather than moving to avoid unhappy accidents
     # note that GC of the S3 bucket isn't yet implemented,
     # so there's a bit of a cost here
+    return if attachment.instfs_hosted?
     if !exists?
       if !attachment.size
         attachment.size = bucket.object(old_full_filename).content_length
@@ -60,7 +63,7 @@ class Attachments::S3Storage
     }
   end
 
-  def amend_policy_conditions(policy, datetime:, pseudonym: nil)
+  def amend_policy_conditions(policy, datetime:)
     policy['conditions'].unshift({'bucket' => bucket.name})
     cred_params(datetime).each do |k, v|
       policy['conditions'] << { k => v }

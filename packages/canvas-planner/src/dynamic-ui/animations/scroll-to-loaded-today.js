@@ -1,4 +1,4 @@
-  /*
+/*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
@@ -16,16 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Animation from '../animation';
-import { scrollAndFocusTodayItem } from './scroll-to-today';
+import Animation from '../animation'
+import {scrollAndFocusTodayItem} from './scroll-to-today'
 
 export class ScrollToLoadedToday extends Animation {
-  uiDidUpdate () {
-    const t = this.document().querySelector('.planner-today');
-    if (t) {
-      scrollAndFocusTodayItem(this.manager(), t);
-    } else {
-      this.animator().scrollToTop();
-    }
+  uiDidUpdate() {
+    const t = this.document().querySelector('.planner-today')
+    scrollAndFocusTodayItem(this.manager(), t, false)
   }
 }

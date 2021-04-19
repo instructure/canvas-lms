@@ -212,7 +212,7 @@ $icon-size: 1.4rem;
   display: block;
 }
 
-#settings_link, #mute_link {
+#settings_link {
   position: relative;
   .ui-icon {
     display: inline-block;
@@ -446,6 +446,7 @@ $icon-size: 1.4rem;
 }
 #comments {
   overflow-y: auto;
+  word-break: break-word;
   .comment {
     .avatar {
       flex-grow: 0;
@@ -584,6 +585,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 // override the status icon color for the first item in the dropdown
 #students_selectmenu-button .ui-selectmenu-item-icon.speedgrader-selectmenu-icon:first-of-type {
   color: var(--ic-brand-global-nav-ic-icon-svg-fill);
+}
+
+.speedgrader-postgradesmenu-icon {
+  color: var(--ic-brand-global-nav-ic-icon-svg-fill) !important;
 }
 
 .ui-selectmenu-item-icon {
@@ -728,6 +733,15 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         top: 3px;
         #{direction(right)}: 1px;
         overflow: hidden;
+      }
+      .submission-file-delete {
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        top: 3px;
+        #{direction(right)}: 24px;
+        overflow: hidden;
+        font-size: 0.7rem;
       }
       .display_name {
         white-space: nowrap;
@@ -894,5 +908,27 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #grading_details_container {
   button {
     padding: 0;
+  }
+}
+
+.similarity_score_container {
+  i {
+    &.icon-empty,
+    &.icon-oval-half {
+      color: $ic-color-danger;
+    }
+
+    &.icon-certified {
+      color: $ic-color-success;
+    }
+
+    &.icon-warning,
+    &.icon-clock {
+      cursor: pointer;
+    }
+  }
+
+  .turnitin_similarity_score {
+    color: $ic-color-dark;
   }
 }

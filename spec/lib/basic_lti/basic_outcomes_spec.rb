@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -16,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 require 'nokogiri'
 
@@ -110,7 +112,7 @@ describe BasicLTI::BasicOutcomes do
 
   describe ".decode_source_id" do
     it 'successfully decodes a source_id' do
-      expect(described_class.decode_source_id(tool, source_id)).to eq [@course, assignment, @user]
+      expect(described_class.decode_source_id(tool, source_id)).to eq [assignment, @user]
     end
 
     it 'throws Invalid sourcedid if sourcedid is nil' do
@@ -141,6 +143,13 @@ describe BasicLTI::BasicOutcomes do
       @course.save!
       expect{described_class.decode_source_id(tool, source_id)}.
         to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is invalid')
+    end
+
+    it 'throws Invalid sourcedid if course is concluded' do
+      @course.soft_conclude!
+      @course.save!
+      expect{described_class.decode_source_id(tool, source_id)}.
+        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is concluded')
     end
 
     it "throws User is no longer in course isuser enrollment is missing" do
@@ -189,7 +198,7 @@ describe BasicLTI::BasicOutcomes do
       end
 
       it "decodes a jwt signed sourcedid" do
-        expect(described_class.decode_source_id(tool, jwt_source_id)).to eq [@course, assignment, @user]
+        expect(described_class.decode_source_id(tool, jwt_source_id)).to eq [assignment, @user]
       end
 
       it 'throws invalid JWT if token is unrecognized' do
@@ -212,7 +221,7 @@ describe BasicLTI::BasicOutcomes do
     end
   end
 
-  describe "#handle_replaceResult" do
+  describe "#handle_replace_result" do
     it "accepts a grade" do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -518,6 +527,31 @@ describe BasicLTI::BasicOutcomes do
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq submission_type
+      end
+    end
+
+    context 'attachments' do
+      it 'retries attachments if they fail to upload' do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          }
+        )
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+        Timecop.freeze do
+          run_jobs
+          expect(submission.reload.versions.count).to eq 2
+          expect(submission.attachments.count).to eq 1
+          expect(submission.attachments.first.file_state).to eq 'errored'
+          expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+          expect(Delayed::Job.find_by(strand: 'file_download/example.com').run_at).to be > Time.zone.now + 5.seconds
+        end
       end
     end
   end

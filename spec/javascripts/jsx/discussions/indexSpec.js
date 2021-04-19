@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnIndex from 'jsx/discussions/index'
+import createAnnIndex from 'ui/features/discussion_topics_index/react/index.js'
 
 let app = null
 const container = document.getElementById('fixtures')
@@ -33,7 +33,7 @@ QUnit.module('Discussions app', {
 
 const defaultData = () => ({
   contextCodes: ['course_1'],
-  roles: ['student', 'user'],
+  roles: ['student', 'user']
 })
 
 test('mounts Discussions to container component', () => {

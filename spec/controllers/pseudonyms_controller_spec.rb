@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -84,7 +86,7 @@ describe PseudonymsController do
 
     it "rejects an expired password-change token" do
       @cc.forgot_password!
-      @cc.update_attributes :confirmation_code_expires_at => 1.hour.ago
+      @cc.update :confirmation_code_expires_at => 1.hour.ago
       post 'change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'} }
       assert_status(400)
     end
@@ -129,6 +131,29 @@ describe PseudonymsController do
         expect(response).to be_redirect
         expect(assigns[:ccs]).not_to include(@cc)
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "finds a user through a trust on a different shard" do
+          a2 = nil
+          @shard1.activate do
+            a2 = Account.create!
+            @user = User.create!
+            pseudonym(@user, account: a2)
+            @cc.confirm!
+          end
+          allow(Account.default).to receive(:trusted_account_ids).and_return([a2.id])
+          allow(CommunicationChannel).to receive(:associated_shards).with(@pseudonym.unique_id).and_return([@shard1])
+
+          get 'forgot_password', params: {:pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}}
+          expect(response).to be_redirect
+          expect(assigns[:ccs]).to include(@cc)
+          expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_nil
+          expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_empty
+
+        end
+      end
     end
 
     it "should render confirm change password view for registered user's email" do
@@ -139,7 +164,7 @@ describe PseudonymsController do
 
     it "should not render confirm change password view for non-email channels" do
       @user.register
-      @cc.update_attributes(:path_type => 'sms')
+      @cc.update(:path_type => 'sms')
       get 'confirm_change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code}
       expect(response).to be_redirect
     end
@@ -151,7 +176,7 @@ describe PseudonymsController do
 
     it "should not render confirm change password view if token is expired" do
       @user.register
-      @cc.update_attributes :confirmation_code_expires_at => 1.hour.ago
+      @cc.update :confirmation_code_expires_at => 1.hour.ago
       get 'confirm_change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code }
       expect(response).to be_redirect
     end

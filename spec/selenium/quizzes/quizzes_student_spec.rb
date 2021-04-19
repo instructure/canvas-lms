@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -58,7 +60,7 @@ describe 'quizzes' do
 
       context 'when attempting to resume a quiz' do
         def update_quiz_lock(lock_at, unlock_at)
-          @quiz.update_attributes(lock_at: lock_at, unlock_at: unlock_at)
+          @quiz.update(lock_at: lock_at, unlock_at: unlock_at)
         end
 
         describe 'on individual quiz page' do
@@ -171,7 +173,7 @@ describe 'quizzes' do
   context 'when the \'show correct answers\' setting is on' do
     before(:once) do
       quiz_with_submission
-      @quiz.update_attributes(show_correct_answers: true)
+      @quiz.update(show_correct_answers: true)
       @quiz.save!
     end
 
@@ -191,7 +193,7 @@ describe 'quizzes' do
   context "when 'show correct answers after last attempt setting' is on" do
     before(:each) do
       quiz_with_submission
-      @quiz.update_attributes(:show_correct_answers => true,
+      @quiz.update(:show_correct_answers => true,
         :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
       @quiz.save!
     end
@@ -212,7 +214,7 @@ describe 'quizzes' do
 
     before(:once) do
       quiz_with_submission
-      @quiz.update_attributes(show_correct_answers: false)
+      @quiz.update(show_correct_answers: false)
       @quiz.save!
     end
 

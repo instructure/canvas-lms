@@ -1,0 +1,106 @@
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+ @import "base/environment";
+
+.ui-listview {
+  box-shadow: 0px 1px 4px rgba(0,0,0,.3);
+  padding: 0;
+  list-style: none;
+  min-width: 300px;
+
+  border-radius: 0.6em;
+  li:first-child {
+    border-top-#{direction(right)}-radius: 0.6em;
+    border-top-#{direction(left)}-radius: 0.6em;
+  }
+  li:last-child  {
+    border-bottom-#{direction(right)}-radius: 0.6em;
+    border-bottom-#{direction(left)}-radius: 0.6em;
+  }
+
+  &.ui-listview-no-rounded-bottom {
+    &, li:last-child {
+      border-bottom-#{direction(right)}-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
+    }
+  }
+
+/*  &, li:first-child, li:last-child {
+    @include background-clip(padding-box);
+  }*/
+
+  li {
+    border: 1px solid #ccc;
+    border-bottom-width: 0;
+    background: #eee;
+    font-weight: bold;
+    color: #444;
+    text-shadow: 0 1px 1px #f6f6f6;
+    text-decoration: none;
+    @include vertical-gradient(#fdfdfd, #eeeeee);
+    .ui-listview-text{
+      display: block;
+      position: relative;
+      height: 100%;
+      padding: direction-sides(.7em 15px .7em 44px);
+      text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
+      font-size: 1em; /*this is to override the .file, .pdf, .doc etc 10px size*/
+      background-position: 15px center; /*overrides background-position left of attachment_links*/
+    }
+    &:hover {
+      border-color: #bbb;
+      background:       #dadada;
+      font-weight: bold;
+      color:          #101010;
+      text-decoration: none;
+      text-shadow: 0 1px 1px  #fff;
+      @include vertical-gradient(#ededed, #dadada);
+      a{ text-decoration: none;}
+    }
+    &:active, &.active {
+      border-color: #999;
+      background:       #999;
+      font-weight: bold;
+      color:          #fff;
+      cursor: pointer;
+      text-shadow: 0 -1px 1px #999;
+      text-decoration: none;
+      @include vertical-gradient(#ccc, #aaa);
+      outline: none;
+      a { color: #fff; }
+    }
+    .ui-listview-right {
+      display: block;
+      float: direction(right);
+      .turnitin_similarity_score {
+        margin-#{direction(right)}: 10px;
+      }
+    }
+
+    &.ui-listview-header, &.ui-listview-header:hover  {
+      padding: .5em 15px;
+      @include fontSize($ic-font-size--small);
+      border: 1px solid #b3cbbc;
+      background: #5e87b0;
+      color: #747575;
+      font-weight: normal;
+      text-shadow: 0 -1px 1px #cce6d6;
+      @include vertical-gradient(#c8e0d1, #b3cbbc);
+    }
+  }
+}

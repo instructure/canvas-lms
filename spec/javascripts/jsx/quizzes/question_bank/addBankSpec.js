@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import addBank from 'jsx/quizzes/question_bank/addBank'
+import addBank from 'ui/features/question_bank/jquery/addBank.js'
 
 QUnit.module('addBank')
 test('is a function', () => {

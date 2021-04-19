@@ -17,16 +17,11 @@
  */
 
 module.exports = {
-  setupFiles: [
-    '<rootDir>/jest/jest-setup.js'
-  ],
+  setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
+  reporters: ['default', ['jest-junit', {outputDirectory: './coverage'}]],
   setupFilesAfterEnv: ['<rootDir>/jest/jest-setup-framework.js'],
-  testPathIgnorePatterns: [
-    "<rootDir>/node_modues",
-    "<rootDir>/lib",
-    "<rootDir>/canvas"
-  ],
-  testMatch: [
-    '**/__tests__/**/?(*.)(spec|test).js'
-  ],
+  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
+  modulePathIgnorePatterns: ['<rootDir>/lib', '<rootDir>/canvas'],
+  testEnvironment: 'jest-environment-jsdom-fourteen'
 }

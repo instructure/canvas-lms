@@ -1,0 +1,66 @@
+<form action='#' id='edit_planner_note_form' style='padding: 5px; width: 400px'>
+  <div class="event-details-content">
+    <table class="formtable" style="width: 100%;" role="presentation">
+      <tr>
+        <td style="vertical-align: top;"><label for="planner_note_title">{{#t "title"}}Title:{{/t}}</label></td>
+        <td>
+          {{#if lockedTitle}}
+            {{title}}
+          {{else}}
+            <input id="planner_note_title" name="title" size="30" maxlength="255" style="width: 150px;" type="text" value="{{title}}"/>
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><label for="planner_note_date">{{#t "date"}}Date:{{/t}}</label></td>
+        <td>
+          <div class='date_field_container'>
+            <label class='screenreader-only' id='planner_note_date_accessible_label'>
+              {{#t}}To Do Date:{{/t}}
+              {{datepickerScreenreaderPrompt 'date'}}
+            </label>
+            <input id="planner_note_date" type="text"
+              value="{{fcMomentToDateString date "medium_with_weekday"}}"
+              name="date" style="width: 100px;" class="date_field"
+              aria-labelledby='planner_note_date_accessible_label'
+              data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><label for="planner_note_time">{{#t "time"}}Time:{{/t}}</label></td>
+        <td>
+          <div style="display: inline-block;">
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='planner_note_time_accessible_label'>
+                {{#t}}To Do Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input id="planner_note_time" type="text"
+                name="time" style="width: 60px;"
+                class="time_field note_time"
+                aria-labelledby='planner_note_time_accessible_label'
+                data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr class="context_select">
+        <td><label for="planner_note_context">{{#t "calendar"}}Calendar:{{/t}}</label></td>
+        <td>
+          <select id="planner_note_context" class="context_id" name="context_code">
+            {{#each contexts}}
+              <option value="{{asset_string}}">{{name}}</option>
+            {{/each}}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><label for="details_textarea">{{#t}}Details:{{/t}}</label></td>
+        <td><textarea id="details_textarea" class="details_textarea" style="resize: none; height: 10rem;" name="details">{{convertApiUserContent details}}</textarea></td>
+    </table>
+  </div>
+  <div class="popover-links-holder event-details-footer pull-right">
+    <button type="submit" class="event_button btn btn-primary save_note">{{#t "#buttons.submit"}}Submit{{/t}}</button>
+  </div>
+</form>

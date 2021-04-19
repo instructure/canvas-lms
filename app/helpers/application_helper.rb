@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,15 +24,24 @@ module ApplicationHelper
   include HtmlTextHelper
   include LocaleSelection
   include Canvas::LockExplanation
+  include DatadogRumHelper
+
+  def context_user_name_display(user)
+    name = user.try(:short_name) || user.try(:name)
+    if user.try(:pronouns)
+      "#{name} (#{user.pronouns})"
+    else
+      name
+    end
+  end
 
   def context_user_name(context, user)
     return nil unless user
-    return user.short_name if !context && user.respond_to?(:short_name)
-    user_id = user
-    user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
+    return context_user_name_display(user) if user.respond_to?(:short_name)
+
+    user_id = user.is_a?(OpenObject) ? user.id : user
     Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
-      user = user.respond_to?(:short_name) ? user : User.find(user_id)
-      user.short_name || user.name
+      context_user_name_display(User.find(user_id))
     end
   end
 
@@ -170,43 +181,94 @@ module ApplicationHelper
     (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
-  def include_head_js
-    # This contains the webpack runtime, it needs to be loaded first
-    paths = ["#{js_base_url}/vendor"]
+  def load_scripts_async_in_order(script_urls)
+    # this is how you execute scripts in order, in a way that doesn’t block rendering,
+    # and without having to use 'defer' to wait until the whole DOM is loaded.
+    # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
+    javascript_tag "
+      ;#{script_urls.map{ |url| javascript_path(url)}}.forEach(function(src) {
+        var s = document.createElement('script')
+        s.src = src
+        s.async = false
+        document.head.appendChild(s)
+      });"
+  end
 
+  # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
+  def include_head_js
+    paths = []
+    paths << active_brand_config_url('js')
     # We preemptive load these timezone/locale data files so they are ready
     # by the time our app-code runs and so webpack doesn't need to know how to load them
     paths << "/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
     paths << "/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
     paths << "/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
-    paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
 
-    paths << "#{js_base_url}/appBootstrap"
-    paths << "#{js_base_url}/common"
-
-    js_bundles.each do |(bundle, plugin)|
-      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
+    @script_chunks = []
+    # if there is a moment locale besides english set, put a script tag for it
+    # so it is loaded and ready before we run any of our app code
+    if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
+      moment_chunks = Canvas::Cdn::RevManifest.all_webpack_chunks_for("moment/locale/#{js_env[:MOMENT_LOCALE]}")
+      @script_chunks += moment_chunks if moment_chunks
     end
-    # now that we've rendered out a script tag for each bundle we were told about in controllers,
-    # empty out the js_bundles array so we don't re-render them later
-    @js_bundles_included_in_head = js_bundles.dup
-    js_bundles.clear
+    @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("main")
+    @script_chunks.uniq!
 
-    javascript_include_tag(*paths, defer: true)
+    chunk_urls = @script_chunks.map{ |s| "#{js_base_url}/#{s}"}
+
+    capture do
+      # if we don't also put preload tags for these, the browser will prioritize and
+      # download the bundle chunks we preload below before these scripts
+      paths.each { |url| concat preload_link_tag(javascript_path(url)) }
+      chunk_urls.each { |url| concat preload_link_tag(url) }
+
+
+      concat load_scripts_async_in_order(paths + chunk_urls)
+      concat include_js_bundles
+    end
   end
 
-  # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = []
-    (js_bundles - (@js_bundles_included_in_head || [])).each do |(bundle, plugin)|
-      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
+    # This is purely a performance optimization to reduce the steps of the waterfall
+    # and let the browser know it needs to start downloading all of these chunks
+    # even before any webpack code runs. It will put a <link rel="preload" ...>
+    # for every chunk that is needed by any of the things you `js_bundle` in your rails controllers/views
+    @rendered_js_bundles ||= []
+    new_js_bundles = js_bundles - @rendered_js_bundles
+    @rendered_js_bundles += new_js_bundles
+
+    @rendered_preload_chunks ||= []
+    preload_chunks = new_js_bundles.map do |(bundle, plugin, *)|
+      key = "#{plugin ? "#{plugin}-" : ''}#{bundle}"
+      Canvas::Cdn::RevManifest.all_webpack_chunks_for(key)
+    end.flatten.uniq - @script_chunks - @rendered_preload_chunks # subtract out the ones we already preloaded in the <head>
+    @rendered_preload_chunks += preload_chunks
+
+    capture do
+      preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
+
+      # if you look the ui/main.js, there is a function there that will
+      # process anything on window.bundles and knows how to load everything it needs
+      # to load that "js_bundle". And by the time that runs, the browser will have already
+      # started downloading those script urls because of those preload tags above,
+      # so it will not cause a new request to be made.
+      #
+      # preloading works similarily for window.deferredBundles only that their
+      # execution is delayed until the DOM is ready.
+      concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
+        container = defer ? 'window.deferredBundles' : 'window.bundles'
+        "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
+      }.join("\n") if new_js_bundles.present?
     end
-    javascript_include_tag(*paths, defer: true)
   end
 
   def include_css_bundles
-    unless css_bundles.empty?
-      bundles = css_bundles.map do |(bundle,plugin)|
+    @rendered_css_bundles ||= []
+    new_css_bundles = css_bundles - @rendered_css_bundles
+    @rendered_css_bundles += new_css_bundles
+
+    unless new_css_bundles.empty?
+      bundles = new_css_bundles.map do |(bundle,plugin)|
         css_url_for(bundle, plugin)
       end
       bundles << css_url_for("disable_transitions") if disable_css_transitions?
@@ -219,20 +281,16 @@ module ApplicationHelper
     Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
-  def use_rtl?
-    I18n.rtl? || @current_user.try(:feature_enabled?, :force_rtl)
-  end
-
   # this is exactly the same as our sass helper with the same name
   # see: https://www.npmjs.com/package/sass-direction
   def direction(left_or_right)
-    use_rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
+    I18n.rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
   end
 
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (use_rtl? ? '_rtl' : '')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (I18n.rtl? ? '_rtl' : '')
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
@@ -314,8 +372,8 @@ module ApplicationHelper
       !@body_class_no_headers &&
       @current_user &&
       @context.is_a?(Course) &&
-      embedded_chat_enabled &&
-      external_tool_tab_visible('chat')
+      external_tool_tab_visible('chat') &&
+      embedded_chat_enabled
   end
 
   def active_external_tool_by_id(tool_id)
@@ -341,9 +399,10 @@ module ApplicationHelper
   end
 
   def external_tool_tab_visible(tool_id)
+    return false unless available_section_tabs.any?{|tc| tc[:external]} # if the course has no external tool tabs, we know it won't have a chat one so we can bail early before querying the db/redis for it
     tool = active_external_tool_by_id(tool_id)
     return false unless tool
-    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
+    available_section_tabs.find {|tc| tc[:id] == tool.asset_string}.present?
   end
 
   def license_help_link
@@ -412,17 +471,24 @@ module ApplicationHelper
 
   def inst_env
     global_inst_object = { :environment =>  Rails.env }
+
+    # TODO: get these kaltura settings out of the global INST object completely.
+    # Only load them when trying to record a video
+    if @context.try_rescue(:allow_media_comments?) || controller_name == 'conversations'
+      kalturaConfig = CanvasKaltura::ClientV3.config
+      if kalturaConfig
+        global_inst_object[:allowMediaComments] = true
+        global_inst_object[:kalturaSettings] = kalturaConfig.try(:slice,
+          'domain', 'resource_domain', 'rtmp_domain',
+          'partner_id', 'subpartner_id', 'player_ui_conf',
+          'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
+          'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'
+        )
+      end
+    end
+
     {
-      :allowMediaComments       => CanvasKaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice,
-                                    'domain', 'resource_domain', 'rtmp_domain',
-                                    'partner_id', 'subpartner_id', 'player_ui_conf',
-                                    'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
-                                    'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
-      :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
-      :http_status              => @status,
-      :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
@@ -454,7 +520,7 @@ module ApplicationHelper
 
   def dataify(obj, *attributes)
     hash = obj.respond_to?(:to_hash) && obj.to_hash
-    res = ""
+    res = +""
     if !attributes.empty?
       attributes.each do |attribute|
         res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
@@ -640,7 +706,7 @@ module ApplicationHelper
   def active_brand_config_url(type, opts={})
     path = active_brand_config(opts).try("public_#{type}_path")
     path ||= BrandableCSS.public_default_path(type, @current_user&.prefers_high_contrast? || opts[:force_high_contrast])
-    "#{Canvas::Cdn.config.host}/#{path}"
+    "#{Canvas::Cdn.add_brotli_to_host_if_supported(request)}/#{path}"
   end
 
   def brand_config_account(opts={})
@@ -667,8 +733,17 @@ module ApplicationHelper
   end
   private :brand_config_account
 
-  def include_account_js(options = {})
+  def pseudonym_can_see_custom_assets
+    # custom JS could be used to hijack user stuff.  Let's not allow
+    # it to be rendered unless the pseudonym is really
+    # from this account (or trusts, etc).
+    return true unless @current_pseudonym
+    @current_pseudonym.works_for_account?(brand_config_account, ignore_types: [:site_admin])
+  end
+
+  def include_account_js
     return if params[:global_includes] == '0' || !@domain_root_account
+    return unless pseudonym_can_see_custom_assets
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:js_overrides]
@@ -677,8 +752,9 @@ module ApplicationHelper
     end
 
     if includes.present?
-      includes.unshift("/node_modules/jquery/jquery.js") if options[:raw]
-      javascript_include_tag(*includes, defer: true)
+      # Loading them like this puts them in the same queue as our script tags we load in
+      # include_head_js. We need that because we need them to load _after_ our jquery loads.
+      load_scripts_async_in_order(includes)
     end
   end
 
@@ -694,6 +770,7 @@ module ApplicationHelper
 
   def include_account_css
     return if disable_account_css?
+    return unless pseudonym_can_see_custom_assets
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:css_overrides]
@@ -825,15 +902,24 @@ module ApplicationHelper
   end
 
   def custom_dashboard_url
-    url = @domain_root_account.settings[:dashboard_url]
+    url = @domain_root_account.settings["#{ApplicationController.test_cluster_name}_dashboard_url".to_sym] if ApplicationController.test_cluster_name
+    url ||= @domain_root_account.settings[:dashboard_url]
     if url.present?
       url += "?current_user_id=#{@current_user.id}" if @current_user
       url
     end
   end
 
+  def content_for_head(string)
+    (@content_for_head ||= []) << string
+  end
+
+  def add_meta_tag(tag)
+    @meta_tags ||= []
+    @meta_tags << tag
+  end
+
   def include_custom_meta_tags
-    add_csp_for_root
     js_env(csp: csp_iframe_attribute) if csp_enforced?
 
     output = []
@@ -842,7 +928,7 @@ module ApplicationHelper
     end
 
     # set this if you want android users of your site to be prompted to install an android app
-    # you can see an example of the one that instructure uses in public/web-app-manifest/manifest.json
+    # you can see an example of the one that instructure uses in InfoController#web_app_manifest
     manifest_url = Setting.get('web_app_manifest_url', '')
     output << tag("link", rel: 'manifest', href: manifest_url) if manifest_url.present?
 
@@ -863,7 +949,7 @@ module ApplicationHelper
           # search for an attachment association
           aas = attachment.attachment_associations.where(context_type: 'Submission').preload(:context).to_a
           ActiveRecord::Associations::Preloader.new.preload(aas.map(&:submission), assignment: :context)
-          courses = aas.map { |aa| aa.submission.assignment.course }.uniq
+          courses = aas.map { |aa| aa&.submission&.assignment&.course }.uniq
           if courses.length == 1
             @csp_context_is_submission = true
             courses.first
@@ -907,10 +993,10 @@ module ApplicationHelper
   end
 
   def csp_header
-    header = "Content-Security-Policy"
+    header = +"Content-Security-Policy"
     header << "-Report-Only" unless csp_enforced?
 
-    header
+    header.freeze
   end
 
   def include_files_domain_in_csp
@@ -919,6 +1005,7 @@ module ApplicationHelper
   end
 
   def add_csp_for_root
+    return unless response.media_type == 'text/html'
     return unless csp_enabled?
     return if csp_report_uri.empty? && !csp_enforced?
 
@@ -938,9 +1025,10 @@ module ApplicationHelper
     script_domains = csp_context.csp_whitelisted_domains(request, include_files: include_files_domain_in_csp, include_tools: false)
     if include_files_domain_in_csp
       frame_domains = %w{'self'} + frame_domains
+      object_domains = %w{'self'} + script_domains
       script_domains = %w{'self' 'unsafe-eval' 'unsafe-inline'} + script_domains
     end
-    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}"
+    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}"
   end
 
   # Returns true if the current_path starts with the given value
@@ -980,8 +1068,7 @@ module ApplicationHelper
   end
 
   def planner_enabled?
-    !!(@current_user && @domain_root_account&.feature_enabled?(:student_planner) &&
-      @current_user.has_student_enrollment?)
+    !!(@current_user&.has_student_enrollment?)
   end
 
   def will_paginate(collection, options = {})
@@ -991,14 +1078,15 @@ module ApplicationHelper
     super
   end
 
-  def generate_access_verifier(return_url: nil)
+  def generate_access_verifier(return_url: nil, fallback_url: nil)
     Users::AccessVerifier.generate(
       user: @current_user,
       real_user: logged_in_user,
       developer_key: @access_token&.developer_key,
       root_account: @domain_root_account,
       oauth_host: request.host_with_port,
-      return_url: return_url
+      return_url: return_url,
+      fallback_url: fallback_url
     )
   end
 
@@ -1050,7 +1138,7 @@ module ApplicationHelper
   def context_module_sequence_items_by_asset_id(asset_id, asset_type)
     # assemble a sequence of content tags in the course
     # (break ties on module position by module id)
-    tag_ids = @context.sequential_module_item_ids & Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id) }
+    tag_ids = @context.sequential_module_item_ids & GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id) }
 
     # find content tags to include
     tag_indices = []
@@ -1153,15 +1241,28 @@ module ApplicationHelper
     )
   end
 
+  def file_location_mode?
+    in_app? && request.headers["X-Canvas-File-Location"] == "True"
+  end
+
+  def render_file_location(location)
+    headers["X-Canvas-File-Location"] = "True"
+    render json: {
+      location: location,
+      token: file_authenticator.instfs_bearer_token
+    }
+  end
+
   def authenticated_download_url(attachment)
-    file_authenticator.download_url(attachment)
+    file_authenticator.download_url(attachment, options: {original_url: request.original_url})
   end
 
   def authenticated_inline_url(attachment)
-    file_authenticator.inline_url(attachment)
+    file_authenticator.inline_url(attachment, options: {original_url: request.original_url})
   end
 
   def authenticated_thumbnail_url(attachment, options={})
+    options[:original_url] = request.original_url
     file_authenticator.thumbnail_url(attachment, options)
   end
 
@@ -1172,8 +1273,36 @@ module ApplicationHelper
     super(attachment, uuid || attachment.uuid, url_options)
   end
 
-  def browser_performance_monitor_embed
-    # stub
+  def prefetch_assignment_external_tools
+    content_tag(:div, id: 'assignment_external_tools') do
+      prefetch_xhr(api_v1_course_launch_definitions_path(
+        @context,
+        'placements[]' => 'assignment_view'
+      ))
+    end
   end
 
+  def prefetch_xhr(url, id: nil, options: {})
+    id ||= url
+    opts = {
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json+canvas-string-ids, application/json'
+      }
+    }.deep_merge(options)
+    javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"
+  end
+
+  def mastery_scales_js_env
+    if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      js_env(
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        IMPROVED_OUTCOMES_MANAGEMENT: @domain_root_account.feature_enabled?(:improved_outcomes_management),
+        MASTERY_SCALE: {
+          outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
+          outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json
+        }
+      )
+    end
+  end
 end

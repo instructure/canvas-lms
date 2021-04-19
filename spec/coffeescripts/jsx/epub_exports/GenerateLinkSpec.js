@@ -21,8 +21,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import GenerateLink from 'jsx/epub_exports/GenerateLink'
-import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
+import GenerateLink from 'ui/features/epub_exports/react/GenerateLink.js'
+import CourseEpubExportStore from 'ui/features/epub_exports/react/CourseStore.js'
 import I18n from 'i18n!epub_exports'
 
 QUnit.module('GenerateLink', {
@@ -70,7 +70,7 @@ test('render', function() {
 
   let wrapper = mount(<GenerateLink {...this.props} />)
   equal(wrapper.children().type(), 'button', 'tag should be a button')
-  ok(wrapper.text().match(I18n.t('Generate ePub')),'should show generate text')
+  ok(wrapper.text().match(I18n.t('Generate ePub')), 'should show generate text')
 
   wrapper.simulate('click')
   equal(wrapper.children().type(), 'span', 'tag should be span')

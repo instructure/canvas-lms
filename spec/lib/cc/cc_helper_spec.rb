@@ -1,5 +1,5 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -23,6 +23,14 @@ require 'nokogiri'
 describe CC::CCHelper do
   context 'map_linked_objects' do
     it 'should find linked canvas items in exported html content' do
+      content = '<a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>' \
+                '<img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />'
+      linked_objects = CC::CCHelper.map_linked_objects(content)
+      expect(linked_objects[0]).to eq({identifier: '123456789', type: 'assignments'})
+      expect(linked_objects[1]).to eq({local_path: '/media/folder 1/file.jpg', type: 'Attachment'})
+    end
+
+    it 'should find linked canvas items in exported html content with old escapes' do
       content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
                 '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
       linked_objects = CC::CCHelper.map_linked_objects(content)
@@ -96,6 +104,49 @@ describe CC::CCHelper do
       expect(translated).to eq html
     end
 
+    it "translates new RCE media iframes" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      translated = @exporter.html_content(html)
+      expect(translated).to include %{src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4"}
+      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'one'
+    end
+
+    it "links media to exported file if it exists" do
+      folder = folder_model(name: 'something', context: @course)
+      att = attachment_model(display_name: 'lolcats.mp4', context: @course, folder: folder, uploaded_data: stub_file_data('lolcats_.mp4', '...', 'video/mp4'))
+      @obj.attachment = att
+      @obj.save!
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      translated = @exporter.html_content(html)
+      expect(translated).to include %{src="$IMS-CC-FILEBASE$/something/lolcats.mp4"}
+    end
+
+    it "does not link media to file in another course" do
+      temp = @course
+      other_course = course_factory
+      folder = folder_model(name: 'something', context: other_course)
+      att = attachment_model(display_name: 'lolcats.mp4', context: other_course, folder: folder, uploaded_data: stub_file_data('lolcats_.mp4', '...', 'video/mp4'))
+      @obj.attachment = att
+      @obj.save!
+      @course = temp
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      translated = @exporter.html_content(html)
+      expect(translated).to include %{src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4"}
+    end
+
+
+    it "ignores new RCE media iframes with an unknown media id" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/deadbeef?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="deadbeef"></iframe>}
+      translated = @exporter.html_content(html)
+      expect(translated).to eq html
+      expect(@exporter.media_object_infos).to be_empty
+    end
+
     it "should find media objects outside the context (because course copy)" do
       other_course = course_factory
       @exporter = CC::CCHelper::HtmlContentExporter.new(other_course, @user)
@@ -107,17 +158,17 @@ describe CC::CCHelper do
 
     it "should export html with a utf-8 charset" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %{<div>My Title\302\240</div>}
+      html = %{<div>My Title\u0278</div>}
       exported = @exporter.html_page(html, "my title page")
-      doc = Nokogiri::HTML(exported)
+      doc = Nokogiri::HTML5(exported)
       expect(doc.encoding.upcase).to eq 'UTF-8'
-      expect(doc.at_css('html body div').to_s).to eq "<div>My Title\302\240</div>"
+      expect(doc.at_css('html body div').to_s).to eq "<div>My Titleɸ</div>"
     end
 
     it "html-escapes the title" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       exported = @exporter.html_page('', '<style> upon style')
-      doc = Nokogiri::HTML.parse(exported)
+      doc = Nokogiri::HTML5(exported)
       expect(doc.title).to eq '<style> upon style'
       expect(doc.at_css('style')).to be_nil
     end
@@ -125,7 +176,7 @@ describe CC::CCHelper do
     it "html-escapes the meta fields" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       exported = @exporter.html_page('', 'title', { name: '"/><script>alert("wat")</script><meta name="lol' })
-      doc = Nokogiri::HTML.parse(exported)
+      doc = Nokogiri::HTML5(exported)
       expect(doc.at_css('meta[name="name"]').attr('content')).to include '<script>'
       expect(doc.at_css('script')).to be_nil
     end
@@ -155,9 +206,9 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/wiki/front-page">This course's front page</a>
         <a href="/courses/#{@othercourse.id}/wiki/front-page">Other course's front page</a>
       HTML
-      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css('a').map{ |attr| attr[:href] }
-      expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/front-page"
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/front-page"
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
@@ -169,9 +220,9 @@ describe CC::CCHelper do
       html = <<-HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
-      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css('a').map{ |attr| attr[:href] }
-      expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/#{page.url}"
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 
     it "should copy pages correctly when the title consists only of a number" do
@@ -182,9 +233,9 @@ describe CC::CCHelper do
       html = <<-HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
-      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css('a').map{ |attr| attr[:href] }
-      expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/#{page.url}"
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 
     it "uses the key_generator to translate links" do
@@ -197,7 +248,7 @@ describe CC::CCHelper do
       keygen = double()
       expect(keygen).to receive(:create_key).and_return("silly-migration-id")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true, :key_generator => keygen)
-      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      doc = Nokogiri::HTML5(@exporter.html_content(html))
       expect(doc.at_css("a").attr('href')).to eq "$CANVAS_OBJECT_REFERENCE$/assignments/silly-migration-id"
     end
 

@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ colors, typography }) {
+export default function generator({colors, typography}) {
   const cssVars = {
     background: colors.white
-  };
-  return cssVars;
+  }
+  return cssVars
 }

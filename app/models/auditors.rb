@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -15,24 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'audits'
 
 module Auditors
-  def self.stream(&block)
-    ::EventStream::Stream.new(&block).tap do |stream|
-      stream.raise_on_error = Rails.env.test?
-
-      stream.on_insert do |record|
-        Canvas::EventStreamLogger.info('AUDITOR', identifier, 'insert', record.to_json)
-      end
-
-      stream.on_error do |operation, record, exception|
-        next unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
-        Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
-      end
-    end
-  end
-
-  def self.logger
-    Rails.logger
+  # TODO: this module is currently being extracted to the
+  # audits engine.  This module shim is remaining in place
+  # to ease the transition and prevent surprise breakages. Once all callsites are patched,
+  # remove this shim entirely.
+  def self.method_missing(message, *args, &block)
+    Rails.logger.warn("[DEPRECATION] The Auditors module is being relocated, change callsites to use the 'Audits' module")
+    Audits.send(message, *args, &block)
   end
 end

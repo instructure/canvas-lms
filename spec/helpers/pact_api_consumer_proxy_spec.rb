@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ describe PactApiConsumerProxy do
       # This happens when our Pact tests run -- we need to make it happen
       # here, too.
       ActiveRecord::Base.connection.tables.each do |t|
-        ActiveRecord::Base.connection.reset_pk_sequence!(t)
+        TestDatabaseUtils.reset_pk_sequence!(t)
       end
 
       @student1 = User.create!(name: 'Student1')

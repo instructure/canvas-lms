@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -54,18 +56,24 @@ class EpubExport < ActiveRecord::Base
     state :deleted
   end
 
+  def course_broadcast_data
+    course.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
     p.to { [user] }
     p.whenever do |record|
       record.changed_state(:generated)
     end
+    p.data { course_broadcast_data }
 
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever do |record|
       record.changed_state(:failed)
     end
+    p.data { course_broadcast_data }
   end
 
   after_create do
@@ -116,7 +124,7 @@ class EpubExport < ActiveRecord::Base
     content_export.export
     true
   end
-  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :mark_as_failed
+  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, on_permanent_failure: :mark_as_failed
 
   def mark_exported
     if content_export.failed?
@@ -127,14 +135,14 @@ class EpubExport < ActiveRecord::Base
       generate
     end
   end
-  handle_asynchronously :mark_exported, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :mark_exported, priority: Delayed::LOW_PRIORITY
 
   def generate
     job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:generating])
     update_attribute(:workflow_state, 'generating')
     convert_to_epub
   end
-  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :mark_as_failed
+  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, on_permanent_failure: :mark_as_failed
 
   def mark_as_generated
     job_progress.complete! if job_progress.running?
@@ -155,6 +163,11 @@ class EpubExport < ActiveRecord::Base
     self.content_export.attachment
   end
 
+  def self.fail_stuck_epub_exports(exports)
+    cutoff = Setting.get("epub_generation_expiration_minutes", "120").to_i.minutes.ago
+    exports.select{|e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
+  end
+
   def convert_to_epub
     begin
       set_locale
@@ -171,7 +184,7 @@ class EpubExport < ActiveRecord::Base
     mark_as_generated
     file_paths.each {|file_path| cleanup_file_path!(file_path) }
   end
-  handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY
 
   def create_attachment_from_path!(file_path)
     begin

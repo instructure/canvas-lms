@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -90,7 +92,6 @@ module BroadcastPolicies
       specify { wont_send_when { allow(assignment).to receive(:just_created).and_return true } }
       specify { wont_send_when { allow(assignment).to receive(:changed_in_state).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:due_at).and_return assignment.due_at_before_last_save } }
-      specify { wont_send_when { allow(assignment).to receive(:created_at).and_return 2.hours.ago } }
     end
 
     describe '#should_dispatch_assignment_changed?' do
@@ -112,27 +113,28 @@ module BroadcastPolicies
       specify { wont_send_when { allow(assignment).to receive(:just_created).and_return true } }
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:muted?).and_return true } }
-      specify { wont_send_when { allow(assignment).to receive(:created_at).and_return 20.minutes.ago } }
       specify { wont_send_when { allow(assignment).to receive(:saved_change_to_points_possible?).and_return false } }
     end
 
-    describe '#should_dispatch_assignment_unmuted?' do
-      before do
-        allow(assignment).to receive(:recently_unmuted).and_return true
-      end
+    describe "#should_dispatch_submissions_posted" do
+      let(:posting_params) { { graded_only: false } }
 
-      it 'is true when the dependent inputs are true' do
-        expect(policy.should_dispatch_assignment_unmuted?).to be_truthy
+      before(:each) do
+        allow(assignment).to receive(:posting_params_for_notifications).and_return posting_params
       end
 
       def wont_send_when
         yield
-        expect(policy.should_dispatch_assignment_unmuted?).to be_falsey
+        expect(policy.should_dispatch_submissions_posted?).to be false
+      end
+
+      it "is true when the dependent inputs are true" do
+        expect(policy.should_dispatch_submissions_posted?).to be true
       end
 
       specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(assignment).to receive(:recently_unmuted).and_return false } }
-
+      specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:posting_params_for_notifications).and_return nil } }
     end
   end
 end

@@ -18,18 +18,17 @@
 
 import {logTrackers} from './logging'
 
-async function ensure(tryFn, alwaysFn) {
-  let error, value
-  try {
-    value = await tryFn()
-  } catch (e) {
-    error = e
+// this will exhaustively run every fn in arrayOfFunctions one at a time,
+// waiting for the previous to fulfill if it is a promise
+function runAllOneAtATime(arrayOfFunctions) {
+  function run(i) {
+    if (i < arrayOfFunctions.length) {
+      return Promise.resolve(arrayOfFunctions[i]()).then(() => run(i + 1))
+    } else {
+      return Promise.resolve()
+    }
   }
-  await alwaysFn()
-  if (error) {
-    throw error
-  }
-  return value
+  return run(0)
 }
 
 export default class ContextTracker {
@@ -87,6 +86,10 @@ export default class ContextTracker {
         })
       },
 
+      getTimeElapsed() {
+        return stack.length ? new Date() - stack[0].startTime : 0
+      },
+
       stack
     }
   }
@@ -100,45 +103,41 @@ export default class ContextTracker {
           module.testEnvironment = module.testEnvironment || {}
           const {testEnvironment} = module
 
-          const beforeEach = testEnvironment.beforeEach
-          const afterEach = testEnvironment.afterEach
+          const {beforeEach, afterEach} = testEnvironment
 
-          testEnvironment.beforeEach = async function() {
-            for (let i = 0; i < onContextStart.length; i++) {
-              await onContextStart[i]() // eslint-disable-line no-await-in-loop
-            }
-            if (beforeEach) {
-              await beforeEach.call(this)
-            }
+          testEnvironment.beforeEach = function() {
+            return runAllOneAtATime(onContextStart).then(() => {
+              if (beforeEach) return beforeEach.call(this)
+            })
           }
 
-          testEnvironment.afterEach = async function() {
-            await ensure(
-              async () => {
-                for (let i = 0; i < beforeContextEnd.length; i++) {
-                  await beforeContextEnd[i]() // eslint-disable-line no-await-in-loop
-                }
-                if (afterEach) {
-                  await afterEach.call(this)
-                }
-              },
-              async () => {
-                for (let i = 0; i < onContextEnd.length; i++) {
-                  await onContextEnd[i]() // eslint-disable-line no-await-in-loop
-                }
-              }
-            )
+          testEnvironment.afterEach = function() {
+            return runAllOneAtATime(beforeContextEnd)
+              .then(() => {
+                if (afterEach) return afterEach.call(this)
+              })
+              .finally(() => runAllOneAtATime(onContextEnd))
           }
         }
       })
     })
 
     this._qunit.moduleStart(moduleInfo => {
-      this._stack.push({description: moduleInfo.name, failures: [], type: 'module'})
+      this._stack.push({
+        description: moduleInfo.name,
+        failures: [],
+        startTime: new Date(),
+        type: 'module'
+      })
     })
 
     this._qunit.testStart(testInfo => {
-      this._stack.push({description: testInfo.name, failures: [], type: 'test'})
+      this._stack.push({
+        description: testInfo.name,
+        failures: [],
+        startTime: new Date(),
+        type: 'test'
+      })
     })
 
     this._qunit.testDone(() => {

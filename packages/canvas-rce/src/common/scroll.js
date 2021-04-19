@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import scrollIntoView from "scroll-into-view";
+import scrollIntoView from 'scroll-into-view'
 
 export default {
   // scrolling in react is kinda messed up. it would
@@ -39,7 +39,7 @@ export default {
   INTERIM_DELAY: 100,
   scrollIntoViewWDelay(target, config) {
     setTimeout(() => {
-      scrollIntoView.scrollIntoView(target, config);
-    }, this.INTERIM_DELAY);
+      scrollIntoView.scrollIntoView(target, config)
+    }, this.INTERIM_DELAY)
   }
-};
+}

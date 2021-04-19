@@ -67,6 +67,7 @@
         <xs:element name="allow_student_assignment_edits" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hashtag" type="xs:string" minOccurs="0"/>
         <xs:element name="show_public_context_messages" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="filter_speed_grader_by_student_group" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_forum_attachments" type="xs:boolean" minOccurs="0"/>
         <xs:element name="default_wiki_editing_roles" type="xs:string" minOccurs="0"/>
         <xs:element name="allow_student_organized_groups" type="xs:boolean" minOccurs="0"/>
@@ -84,6 +85,7 @@
         <xs:element name="lock_all_announcements" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="usage_rights_required" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_editing" type="xs:boolean" minOccurs="0"/>
         <xs:element name="show_announcements_on_home_page" type="xs:boolean" minOccurs="0"/>
@@ -92,9 +94,12 @@
         <xs:element name="restrict_student_past_view" type="xs:boolean" minOccurs="0"/>
         <xs:element name="restrict_enrollments_to_course_dates" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus_to_auth" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="syllabus_course_summary" type="xs:boolean" minOccurs="0"/>
         <xs:element name="show_total_grade_as_points" type="xs:boolean" minOccurs="0"/>
         <xs:element name="organize_epub_by_content_type" type="xs:boolean" minOccurs="0"/>
         <xs:element name="enable_offline_web_export" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="homeroom_course" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="course_color" type="xs:string" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
@@ -131,6 +136,7 @@
           </xs:simpleType>
         </xs:element>
         <xs:element name="root_account_uuid" type="xs:string" minOccurs="0"/>
+        <xs:element name="default_post_policy" type="postPolicyType" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>
@@ -188,6 +194,7 @@
       <xs:element name="external_tool_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_url" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_new_tab" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="external_tool_data_json" type="xs:string" minOccurs="0"/>
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>
       <xs:element name="module_locked" type="xs:boolean" minOccurs="0"/>
       <xs:element name="muted" type="xs:boolean" minOccurs="0"/>
@@ -228,6 +235,26 @@
                 <xs:attribute name="due_at_overridden" type="xs:boolean"/>
                 <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
                 <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="post_policy" type="postPolicyType" minOccurs="0"/>
+      <xs:element name="line_items" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="line_item">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="coupled" type="xs:boolean" minOccurs="1"/>
+                  <xs:element name="tag" type="xs:string" minOccurs="0"/>
+                  <xs:element name="resource_id" type="xs:string" minOccurs="0"/>
+                  <xs:element name="extensions" type="xs:string" minOccurs="0"/>
+                  <xs:element name="client_id" type="xs:ID" minOccurs="0"/>
+                  <xs:element name="label" type="xs:string" minOccurs="0"/>
+                  <xs:element name="score_maximum" type="xs:float" minOccurs="0"/>
+                </xs:all>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -475,6 +502,12 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="postPolicyType">
+    <xs:all>
+      <xs:element name="post_manually" type="xs:boolean" minOccurs="1"/>
+    </xs:all>
+  </xs:complexType>
+
   <xs:element name="learningOutcomes" type="learningOutcomesType"/>
   <xs:complexType name="learningOutcomesType">
     <xs:choice  minOccurs="0" maxOccurs="unbounded">
@@ -491,6 +524,7 @@
             <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
             <xs:element name="alignments" minOccurs="0">
               <xs:complexType>
                 <xs:sequence>
@@ -519,6 +553,7 @@
             <xs:element name="title" type="xs:string" minOccurs="0"/>
             <xs:element name="description" type="xs:string" minOccurs="0"/>
             <xs:element name="learningOutcomes" type="learningOutcomesType" minOccurs="0"/>
+            <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>
@@ -629,6 +664,7 @@
         <xs:element name="could_be_locked" type="xs:boolean" minOccurs="0"/>
         <xs:element name="available" type="xs:boolean" minOccurs="0"/>
         <xs:element name="time_limit" type="optional_integer" minOccurs="0"/>
+        <xs:element name="disable_timer_autosubmission" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allowed_attempts" type="optional_integer" minOccurs="0"/>
         <xs:element name="one_question_at_a_time" type="xs:boolean" minOccurs="0"/>
         <xs:element name="cant_go_back" type="xs:boolean" minOccurs="0"/>

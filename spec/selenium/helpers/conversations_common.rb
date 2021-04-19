@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -41,10 +43,7 @@ module ConversationsCommon
     term.root_account_id = @course.root_account_id
     term.save!
 
-    @course.update_attributes! :enrollment_term => term
-
-    @user.watched_conversations_intro
-    @user.save
+    @course.update! :enrollment_term => term
   end
 
   def conversation_elements
@@ -150,6 +149,8 @@ module ConversationsCommon
     wait_for_ajaximations
     if is_group
       fj("a:contains('Groups')", message_course).click
+    else
+      fj("a:contains('Favorite Courses')", message_course).click
     end
     fj("a:contains('#{new_course}')", message_course).click
   end
@@ -230,7 +231,7 @@ module ConversationsCommon
     # First case is for clicking on message gear menu
     when opts[:message]
       # The More Options gear menu only shows up on mouse over of message
-      driver.mouse.move_to ff('.message-item-view')[message]
+      driver.action.move_to(ff('.message-item-view')[message]).perform
       wait_for_ajaximations
       f('.actions li .inline-block .al-trigger').click
     # This case is for clicking on gear menu at conversation heading level
@@ -273,7 +274,7 @@ module ConversationsCommon
 
   # makes a message's star and unread buttons visible via mouse over
   def hover_over_message(msg)
-    driver.mouse.move_to(msg)
+    driver.action.move_to(msg).perform
     wait_for_ajaximations
   end
 

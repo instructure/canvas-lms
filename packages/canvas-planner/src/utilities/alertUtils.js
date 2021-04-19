@@ -15,24 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-let visualSuccessFunc = null;
-let visualErrorFunc = null;
-let srAlertFunc = null;
+let visualSuccessFunc = null
+let visualErrorFunc = null
+let srAlertFunc = null
 
-export function initialize ({ visualSuccessCallback = visualSuccessFunc, visualErrorCallback = visualErrorFunc, srAlertCallback = srAlertFunc }) {
-  visualSuccessFunc = visualSuccessCallback;
-  visualErrorFunc = visualErrorCallback;
-  srAlertFunc = srAlertCallback;
+export function initialize({
+  visualSuccessCallback = visualSuccessFunc,
+  visualErrorCallback = visualErrorFunc,
+  srAlertCallback = srAlertFunc
+}) {
+  visualSuccessFunc = visualSuccessCallback
+  visualErrorFunc = visualErrorCallback
+  srAlertFunc = srAlertCallback
 }
 
-export function alert (message, isError = false) {
+export function alert(message, isError = false) {
   if (isError) {
-    visualErrorFunc(message);
+    visualErrorFunc(message)
   } else {
-    visualSuccessFunc(message);
+    visualSuccessFunc(message)
   }
 }
 
-export function srAlert (message) {
-  srAlertFunc(message);
+export function srAlert(message) {
+  srAlertFunc(message)
 }

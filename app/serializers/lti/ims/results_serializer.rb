@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -29,8 +31,8 @@ module Lti::Ims
         userId: result.user.lti_id,
         resultScore: result.result_score,
         resultMaximum: result.result_maximum,
-        comment:result.comment
-      }.compact
+        comment: result.comment
+      }.merge(result.extensions).compact
     end
 
     private

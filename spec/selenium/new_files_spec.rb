@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -20,9 +22,37 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
   include FilesCommon
+
+  before do
+    set_granular_permission
+  end
+
+  context "On user's root /files page" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    before(:each) do
+      user_session @teacher
+    end
+
+    it "should work in the user's root /files page, not just /courses/x/files" do
+      get "/files"
+      add_folder("A New Folder")
+      created_folder = @teacher.folders.find_by(name: "A New Folder")
+      expect(created_folder).to be_present
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @user, "example.pdf", created_folder)
+      fj('a.treeLabel:contains("A New Folder")').click
+      wait_for_ajaximations
+      expect(ff('.ef-name-col__text')[0]).to include_text 'example.pdf'
+    end
+  end
 
   context "As a teacher" do
     before(:once) do
@@ -137,7 +167,8 @@ describe "better_file_browsing" do
 
       it "tabs through all buttons in the header button bar", priority: "1", test_id: 193816 do
         buttons = ff('.ef-file-preview-header-buttons > *')
-        driver.execute_script("$('.ef-file-preview-header-buttons').children().first().focus()")
+        buttons.first.send_keys "" # focuses on the first button
+
         buttons.each do |button|
           check_element_has_focus(button)
           button.send_keys("\t")
@@ -302,9 +333,9 @@ describe "better_file_browsing" do
     it "should set focus to the close button when opening the dialog", priority: "1", test_id: 194243 do
       f('.btn-link.published-status').click
       wait_for_ajaximations
-      shouldFocus = f('.ui-dialog-titlebar-close')
+      should_focus = f('.ui-dialog-titlebar-close')
       element = driver.switch_to.active_element
-      expect(element).to eq(shouldFocus)
+      expect(element).to eq(should_focus)
     end
   end
 
@@ -344,7 +375,8 @@ describe "better_file_browsing" do
 
     before :once do
       course_with_teacher(active_all: true)
-      Account.default.enable_feature!(:usage_rights_required)
+      @course.usage_rights_required = true
+      @course.save!
       add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
                @course, "a_file.txt")
       add_file(fixture_file_upload('files/amazing_file.txt', 'text/plan'),
@@ -452,7 +484,8 @@ describe "better_file_browsing" do
   context "When Require Usage Rights is turned-off" do
     it "sets files to published by default", priority: "1", test_id: 133136 do
       course_with_teacher_logged_in
-      Account.default.disable_feature!(:usage_rights_required)
+      @course.usage_rights_required = true
+      @course.save!
       add_file(fixture_file_upload("files/b_file.txt", 'text/plain'), @course, 'b_file.txt')
 
       get "/courses/#{@course.id}/files"
@@ -487,5 +520,18 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files/folder/eh%3F"
       expect(ff('.ef-plain-link').first.attribute('href')).to include '/files/folder/eh%3F?sort'
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

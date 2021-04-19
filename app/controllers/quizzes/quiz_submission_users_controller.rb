@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -92,7 +94,7 @@ module Quizzes
       if includes.include? 'quiz_submissions'
         quiz_submissions = QuizSubmission.where(user_id: @users.to_a, quiz_id: @quiz).index_by(&:user_id)
       end
-      UserPastLtiIds.manual_preload_past_lti_ids(@users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+      UserPastLtiId.manual_preload_past_lti_ids(@users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
       users_json = Canvas::APIArraySerializer.new(@users, {
         quiz: @quiz,
         root: :users,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -58,11 +60,75 @@ describe SisBatch do
 
   def process_csv_data(data, opts = {})
     create_csv_data(data) do |batch|
-      batch.update_attributes(opts) if opts.present?
+      batch.update(opts) if opts.present?
       batch.process_without_send_later
       run_jobs
       batch.reload
     end
+  end
+
+  it 'should see pending imports as not completed' do
+    batch = process_csv_data([%{user_id,login_id,status
+                                user_1,user_1,active},
+                              %{course_id,short_name,long_name,term_id,status
+                                course_1,course_1,course_1,term_1,active}])
+    ParallelImporter.where(sis_batch_id: batch).update_all(workflow_state: 'pending')
+    expect(batch.parallel_importers.not_completed.count).to eq 2
+  end
+
+  it 'should restore scores when restoring enrollments' do
+    course = @account.courses.create!(name: 'one', sis_source_id: 'c1')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
+    enrollment = course.enroll_user(user, 'StudentEnrollment', enrollment_state: 'active')
+    assignment = assignment_model(course: course)
+    submission = assignment.find_or_create_submission(user)
+    submission.submission_type = "online_quiz"
+    submission.save!
+    batch = process_csv_data([%{course_id,user_id,role,status,section_id
+                                c1,u1,student,deleted,}])
+    expect(submission.reload.workflow_state).to eq 'deleted'
+    expect(enrollment.reload.workflow_state).to eq 'deleted'
+    expect(enrollment.scores.exists?).to eq false
+    batch.restore_states_for_batch
+    expect(submission.reload.workflow_state).to eq 'submitted'
+    expect(enrollment.reload.workflow_state).to eq 'active'
+    expect(enrollment.scores.exists?).to eq true
+  end
+
+  it 'should restore linked observers when restoring enrollments' do
+    course = @account.courses.create!(name: 'one', sis_source_id: 'c1', workflow_state: 'available')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
+    observer = user_with_managed_pseudonym(account: @account)
+    UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
+    student_enrollment = course.enroll_user(user, 'StudentEnrollment', enrollment_state: 'active')
+    observer_enrollment = course.observer_enrollments.where(:user_id => observer).take
+
+    batch = process_csv_data([%{course_id,user_id,role,status,section_id
+                                c1,u1,student,deleted,}])
+    expect(student_enrollment.reload.workflow_state).to eq 'deleted'
+    expect(observer_enrollment.reload.workflow_state).to eq 'deleted'
+    batch.restore_states_for_batch
+    run_jobs
+    expect(student_enrollment.reload.workflow_state).to eq 'active'
+    expect(observer_enrollment.reload.workflow_state).to eq 'active'
+  end
+
+  it 'should create new linked observer enrollments when restoring enrollments' do
+    course = @account.courses.create!(name: 'one', sis_source_id: 'c1', workflow_state: 'available')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
+    observer = user_with_managed_pseudonym(account: @account)
+    student_enrollment = course.enroll_user(user, 'StudentEnrollment', enrollment_state: 'active')
+
+    batch = process_csv_data([%{course_id,user_id,role,status,section_id
+                                c1,u1,student,deleted,}])
+    expect(student_enrollment.reload.workflow_state).to eq 'deleted'
+    UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
+    expect(course.observer_enrollments.where(:user_id => observer).take).to be_nil # doesn't make a new enrollment
+    batch.restore_states_for_batch
+    run_jobs
+    expect(student_enrollment.reload.workflow_state).to eq 'active'
+    observer_enrollment = course.observer_enrollments.where(:user_id => observer).take # until now
+    expect(observer_enrollment.workflow_state).to eq 'active'
   end
 
   it "should not add attachments to the list" do
@@ -510,12 +576,43 @@ s2,test_1,section2,active},
 
       batch = create_csv_data([%{user_id,login_id,status
                                  user_1,user_1,active}])
-      batch.update_attributes(batch_mode: true, batch_mode_term: @term)
+      batch.update(batch_mode: true, batch_mode_term: @term)
       expect_any_instantiation_of(batch).to receive(:remove_previous_imports).once
       expect_any_instantiation_of(batch).to receive(:non_batch_courses_scope).never
       batch.process_without_send_later
       run_jobs
     end
+
+    it "should have correct counts for batch_mode" do
+      @term = @account.enrollment_terms.first
+      @term.update_attribute(:sis_source_id, 'term_1')
+      @previous_batch = @account.sis_batches.create!
+
+      process_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,active},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,active},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,active}
+        ])
+
+      b = process_csv_data(
+        [
+          %{user_id,login_id,status},
+          %{course_id,short_name,long_name,term_id,status},
+          %{section_id,course_id,name,status},
+          %{section_id,user_id,role,status}
+        ], batch_mode: true, batch_mode_term: @term
+      )
+      expect(b.data[:counts][:batch_enrollments_deleted]).to eq 1
+      expect(b.data[:counts][:batch_sections_deleted]).to eq 1
+      expect(b.data[:counts][:batch_courses_deleted]).to eq 1
+    end
+
 
     it "should only do batch mode removals for supplied data types" do
       @term = @account.enrollment_terms.first
@@ -679,10 +776,10 @@ s2,test_1,section2,active},
 
     it 'should not fail for empty diff file' do
       batch0 = create_csv_data([%{user_id,login_id,status}], add_empty_file: true)
-      batch0.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch0.update(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
       batch0.process_without_send_later
       batch1 = create_csv_data([%{user_id,login_id,status}], add_empty_file: true)
-      batch1.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch1.update(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
       batch1.process_without_send_later
 
       zip = Zip::File.open(batch1.generated_diff.open.path)
@@ -692,10 +789,10 @@ s2,test_1,section2,active},
 
     it 'should not fail for completely empty files' do
       batch0 = create_csv_data([], add_empty_file: true)
-      batch0.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch0.update(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
       batch0.process_without_send_later
       batch1 = create_csv_data([], add_empty_file: true)
-      batch1.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch1.update(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
       batch1.process_without_send_later
       expect(batch1.reload).to be_imported
     end
@@ -786,6 +883,8 @@ test_4,TC 104,Test Course 104,,term1,active
 }], diffing_data_set_identifier: 'default')
 
       expect(batch.data[:diffed_against_sis_batch_id]).to eq b1.id
+      expect(batch.parallel_importers.count).to eq 1
+      expect(batch.parallel_importers.completed.count).to eq 1
       # test_1 should not have been toched by this last batch, since it was diff'd out
       expect(@account.courses.find_by_sis_source_id('test_1').sis_batch_id).to eq b1.id
       expect(@account.courses.find_by_sis_source_id('test_4').sis_batch_id).to eq batch.id
@@ -832,6 +931,69 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
       expect(b4.generated_diff_id).to_not be_nil
+    end
+
+    it 'should not diff outside of diff row count threshold' do
+      b1 = process_csv_data([
+        %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104,,term1,active
+      }], diffing_data_set_identifier: 'default')
+
+      # only one row change
+      b2 = process_csv_data([
+        %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104b,,term1,active
+      }], diffing_data_set_identifier: 'default', diff_row_count_threshold: 1)
+
+      # whoops two row changes
+      b2b = process_csv_data([
+        %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101b,,term1,active
+        test_4,TC 104,Test Course 104c,,term1,active
+      }], diffing_data_set_identifier: 'default', diff_row_count_threshold: 1)
+      expect(b2b).to be_imported_with_messages
+      expect(b2b.processing_warnings.first.last).to include("Diffing not performed")
+
+      # whoops left out the whole file, don't delete everything.
+      b3 = process_csv_data([
+        %{course_id,short_name,long_name,account_id,term_id,status
+      }], diffing_data_set_identifier: 'default', diff_row_count_threshold: 1)
+      expect(b3).to be_imported_with_messages
+      expect(b3.processing_warnings.first.last).to include("Diffing not performed")
+
+      # no change threshold, _should_ delete everything maybe?
+      b4 = process_csv_data([
+        %{course_id,short_name,long_name,account_id,term_id,status
+      }], diffing_data_set_identifier: 'default')
+
+      expect(b2.data[:diffed_against_sis_batch_id]).to eq b1.id
+      expect(b2.generated_diff_id).not_to be_nil
+      expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
+      expect(b3.generated_diff_id).to be_nil
+      expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
+      expect(b4.generated_diff_id).to_not be_nil
+    end
+
+    it "should mark files separately when created for diffing" do
+      f1 = %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active}
+      b1 = process_csv_data([f1], diffing_data_set_identifier: 'default')
+
+      f2 = %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104,,term1,active}
+      b2 = process_csv_data([f2], diffing_data_set_identifier: 'default')
+
+      uploaded = b2.downloadable_attachments(:uploaded)
+      expect(uploaded.count).to eq 1
+      expect(uploaded.first.open.read).to match_ignoring_whitespace(f2)
+      diffed = b2.downloadable_attachments(:diffed)
+      expect(diffed.count).to eq 1
+      expected_diff = %{course_id,short_name,long_name,account_id,term_id,status
+        test_4,TC 104,Test Course 104,,term1,active}
+      expect(diffed.first.open.read).to match_ignoring_whitespace(expected_diff)
     end
 
     it 'should compare files for diffing correctly' do
@@ -1012,7 +1174,7 @@ test_1,u1,student,active}
           expect(@c1.reload).to be_deleted
           expect(@c2.reload).to be_deleted
           expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 2
-          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 6
+          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 4
           expect(batch.reload.workflow_state).to eq 'imported'
           # there will be no progress for this batch, but it should still work
           batch.restore_states_for_batch
@@ -1045,6 +1207,68 @@ test_1,u1,student,active}
         end
       end
 
+    end
+  end
+
+  describe 'remove_previous_imports' do
+    it 'refuses to do anything if the batch is already failed' do
+      term = Account.default.enrollment_terms.first
+      batch = create_csv_data([
+                                %{course_id,short_name,long_name,account_id,term_id,status},
+                                %{course_id,user_id,role,status},
+                              ]) do |batch|
+        batch.options = {}
+        batch.batch_mode = true
+        batch.options[:multi_term_batch_mode] = true
+        batch.batch_mode_term = term
+        batch.save!
+      end
+      ['failed', 'failed_with_messages', 'aborted' ].each do |status|
+        batch.workflow_state = status
+        batch.save!
+        expect(batch.remove_previous_imports).to be_falsey
+      end
+    end
+  end
+
+  describe 'live events' do
+
+    def test_batch
+      allow(LiveEvents).to receive(:post_event)
+      SisBatch.create(account: @account, workflow_state: :initializing)
+    end
+
+    it 'should trigger live event when created' do
+      expect(LiveEvents).to receive(:post_event).with(hash_including({
+        event_name: 'sis_batch_created',
+        payload: hash_including({
+          account_id: @account.id.to_s,
+          workflow_state: "initializing"
+        }),
+      }))
+      test_batch
+    end
+
+    it 'should trigger live event when workflow state is updated' do
+      batch = test_batch
+      expect(LiveEvents).to receive(:post_event).with(hash_including({
+        event_name: 'sis_batch_updated',
+        payload: hash_including({
+          account_id: @account.id.to_s,
+          workflow_state: "failed"
+        }),
+      }))
+      batch.workflow_state = :failed
+      batch.save!
+    end
+
+    it 'should not trigger live event when workflow state is unchanged' do
+      batch = test_batch
+      expect(LiveEvents).not_to receive(:post_event).with(hash_including({
+        event_name: 'sis_batch_updated'
+      }))
+      batch.progress = 1
+      batch.save!
     end
   end
 end

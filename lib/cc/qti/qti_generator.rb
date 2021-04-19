@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC
-  module QTI
-    class QTIGenerator
+  module Qti
+    class QtiGenerator
       include CC::CCHelper
-      include QTIItems
+      include QtiItems
       delegate :add_error, :export_object?, :add_exported_asset, :create_key, :to => :@manifest
 
       def initialize(manifest, resources_node, html_exporter)
@@ -32,7 +34,7 @@ module CC
       end
 
       def self.generate_qti(*args)
-        qti = QTI::QTIGenerator.new(*args)
+        qti = Qti::QtiGenerator.new(*args)
         qti.generate
       end
 
@@ -203,6 +205,7 @@ module CC
           q_node.anonymous_submissions quiz.anonymous_submissions unless quiz.anonymous_submissions.nil?
           q_node.could_be_locked quiz.could_be_locked unless quiz.could_be_locked.nil?
           q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?
+          q_node.disable_timer_autosubmission quiz.disable_timer_autosubmission unless quiz.disable_timer_autosubmission.nil?
           q_node.allowed_attempts quiz.allowed_attempts unless quiz.allowed_attempts.nil?
           q_node.one_question_at_a_time quiz.one_question_at_a_time?
           q_node.cant_go_back quiz.cant_go_back?

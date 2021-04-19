@@ -16,16 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let externalConversion;
+import formatMessage from '../format-message'
 
-export function initializeContent (options) {
-  externalConversion = options.convertApiUserContent;
+let externalConversion
+
+export function initializeContent(options) {
+  externalConversion = options.convertApiUserContent
 }
 
-export function convertApiUserContent (content) {
+export function convertApiUserContent(content) {
   // allow tests to work without initialization
   if (process.env.NODE_ENV === 'test') {
-    return content;
+    return content
   }
-  return externalConversion(content);
+  return externalConversion(content)
+}
+
+export function assignmentType(itemType) {
+  switch (itemType) {
+    case 'Quiz':
+      return formatMessage('Quiz')
+    case 'Discussion':
+      return formatMessage('Discussion')
+    case 'Assignment':
+      return formatMessage('Assignment')
+    case 'Page':
+      return formatMessage('Page')
+    case 'Announcement':
+      return formatMessage('Announcement')
+    case 'To Do':
+      return formatMessage('To Do')
+    case 'Calendar Event':
+      return formatMessage('Calendar Event')
+    case 'Peer Review':
+      return formatMessage('Peer Review')
+    default:
+      return formatMessage('Task')
+  }
 }

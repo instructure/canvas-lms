@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -149,9 +151,15 @@ module Importers
           Importers::AssignmentImporter.process_migration(data, migration); migration.update_import_progress(80)
         end
 
-        Importers::ContextModuleImporter.process_migration(data, migration); migration.update_import_progress(85)
+        module_id = migration.migration_settings[:insert_into_module_id].presence
+        unless module_id && course.context_modules.where(:id => module_id).exists? # we're importing into a module so don't create new ones
+          Importers::ContextModuleImporter.process_migration(data, migration)
+        end
+
+        migration.update_import_progress(85)
         Importers::WikiPageImporter.process_migration_course_outline(data, migration)
         Importers::CalendarEventImporter.process_migration(data, migration)
+        Importers::LtiResourceLinkImporter.process_migration(data, migration)
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
         if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
@@ -161,8 +169,9 @@ module Importers
 
         # be very explicit about draft state courses, but be liberal toward legacy courses
         if course.wiki.has_no_front_page
-          if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
-            mig_id = CC::CCHelper.create_key(source.wiki.front_page)
+          if migration.for_course_copy? && !migration.for_master_course_import? &&
+              (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
+            mig_id = migration.content_export.create_key(source.wiki.front_page)
             if new_front_page = course.wiki_pages.where(migration_id: mig_id).first
               course.wiki.set_front_page_url!(new_front_page.url)
             end
@@ -185,6 +194,13 @@ module Importers
         if data['external_content']
           Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
         end
+        migration.update_import_progress(97)
+
+        insert_into_module(course, migration)
+        migration.update_import_progress(98)
+
+        move_to_assignment_group(course, migration)
+        migration.update_import_progress(99)
 
         adjust_dates(course, migration)
 
@@ -196,19 +212,63 @@ module Importers
         migration.migration_settings[:imported_assets] = imported_asset_hash
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
-        ActiveRecord::Base.skip_touch_context(false)
+
+        if migration.for_master_course_import? && migration.migration_settings[:publish_after_completion]
+          if course.unpublished?
+            # i could just do it directly but this way preserves the audit trail
+            course.update_one({:event => 'offer'}, migration.user, :blueprint_sync)
+          end
+        end
+
         if course.changed?
           course.save!
         else
           course.touch
         end
 
-        DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
+        clear_assignment_and_quiz_caches(migration)
       end
 
       migration.trigger_live_events!
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
       migration.imported_migration_items
+    ensure
+      ActiveRecord::Base.skip_touch_context(false)
+    end
+
+    def self.insert_into_module(course, migration)
+      module_id = migration.migration_settings[:insert_into_module_id]
+      return unless module_id.present?
+
+      mod = course.context_modules.find_by_id(module_id)
+      return unless mod
+
+      imported_items = migration.imported_migration_items_for_insert_type
+      return unless imported_items.any?
+
+      start_pos = migration.migration_settings[:insert_into_module_position]
+      start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
+      mod.insert_items(imported_items, start_pos)
+    end
+
+    def self.move_to_assignment_group(course, migration)
+      ag_id = migration.migration_settings[:move_to_assignment_group_id]
+      return unless ag_id.present?
+
+      ag = course.assignment_groups.find_by_id(ag_id)
+      return unless ag
+
+      assignments = migration.imported_migration_items_by_class(Assignment)
+      return unless assignments.any?
+
+      # various callbacks run on assignment_group_id change, so we'll do these one by one
+      # (the expected use case for this feature is a migration containing a single assignment anyhow)
+      assignments.each do |assignment|
+        next if assignment.assignment_group == ag
+        assignment.assignment_group = ag
+        assignment.position = nil
+        assignment.save!
+      end
     end
 
     def self.adjust_dates(course, migration)
@@ -224,6 +284,7 @@ module Importers
               event.lock_at = shift_date(event.lock_at, shift_options)
               event.unlock_at = shift_date(event.unlock_at, shift_options)
               event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+              event.needs_update_cached_due_dates = true if event.update_cached_due_dates?
               event.save_without_broadcasting
               if event.errors.any?
                 migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
@@ -311,6 +372,16 @@ module Importers
       end
     end
 
+    def self.clear_assignment_and_quiz_caches(migration)
+      assignments = migration.imported_migration_items_by_class(Assignment).select(&:needs_update_cached_due_dates)
+      if assignments.any?
+        Assignment.clear_cache_keys(assignments, :availability)
+        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user)
+      end
+      quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
+      Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
+    end
+
     def self.post_processing?(migration)
       migration.quizzes_next_migration?
     end
@@ -335,7 +406,8 @@ module Importers
                 course.context_external_tools.having_setting('course_navigation') :
                 ContextExternalTool.find_all_for(course, :course_navigation)
             if tool = (all_tools.detect{|t| t.migration_id == tool_mig_id} ||
-                all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id})
+                all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id ||
+                  CC::CCHelper.create_key(t, global: true) == tool_mig_id})
               # translate the migration_id to a real id
               tab['id'] = "context_external_tool_#{tool.id}"
               tab_config << tab
@@ -408,6 +480,11 @@ module Importers
       if settings[:lock_all_announcements]
         Announcement.lock_from_course(course)
       end
+
+      if settings.key?(:default_post_policy)
+        post_manually = Canvas::Plugin.value_to_boolean(settings.dig(:default_post_policy, :post_manually))
+        course.default_post_policy.update!(post_manually: post_manually)
+      end
     end
 
     def self.shift_date_options(course, options={})
@@ -427,8 +504,8 @@ module Importers
       result[:time_zone] = Time.find_zone(options[:time_zone])
       result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
       time_zone = result[:time_zone] || Time.zone
-      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue result[:new_start_date]
-      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue result[:new_end_date]
+      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue nil
+      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue nil
       result
     end
 

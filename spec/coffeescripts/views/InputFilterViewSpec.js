@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import InputFilterView from 'compiled/views/InputFilterView'
+import InputFilterView from 'backbone-input-filter-view'
 import 'helpers/jquery.simulate'
 
 let view = null
@@ -45,7 +45,7 @@ const simulateKeyup = function(opts = {}) {
   return clock.tick(view.options.onInputDelay)
 }
 
-test('fires input event, sends value', function() {
+test('fires input event, sends value', () => {
   const spy = sinon.spy()
   view.on('input', spy)
   setValue('foo')
@@ -54,7 +54,7 @@ test('fires input event, sends value', function() {
   ok(spy.calledWith('foo'))
 })
 
-test('does not fire input event if value has not changed', function() {
+test('does not fire input event if value has not changed', () => {
   const spy = sinon.spy()
   view.on('input', spy)
   setValue('foo')
@@ -63,14 +63,14 @@ test('does not fire input event if value has not changed', function() {
   ok(spy.calledOnce)
 })
 
-test('updates the model attribute', function() {
+test('updates the model attribute', () => {
   view.model = new Backbone.Model()
   setValue('foo')
   simulateKeyup()
   equal(view.model.get('filter'), 'foo')
 })
 
-test('updates the collection parameter', function() {
+test('updates the collection parameter', () => {
   view.collection = new Backbone.Collection()
   setValue('foo')
   simulateKeyup()
@@ -78,7 +78,7 @@ test('updates the collection parameter', function() {
   equal(actual, 'foo')
 })
 
-test('gets modelAttribute from input name', function() {
+test('gets modelAttribute from input name', () => {
   const input = $('<input name="couch">').appendTo($('#fixtures'))
   view = new InputFilterView({
     el: input[0]
@@ -86,7 +86,7 @@ test('gets modelAttribute from input name', function() {
   equal(view.modelAttribute, 'couch')
 })
 
-test('sets model attribute to empty string with empty value', function() {
+test('sets model attribute to empty string with empty value', () => {
   view.model = new Backbone.Model()
   setValue('foo')
   simulateKeyup()
@@ -95,7 +95,7 @@ test('sets model attribute to empty string with empty value', function() {
   equal(view.model.get('filter'), '')
 })
 
-test('deletes collection paramater on empty value', function() {
+test('deletes collection paramater on empty value', () => {
   view.collection = new Backbone.Collection()
   setValue('foo')
   simulateKeyup()
@@ -105,14 +105,14 @@ test('deletes collection paramater on empty value', function() {
   strictEqual(view.collection.options.params.filter, undefined)
 })
 
-test('does nothing with model/collection when the value is less than the minLength', function() {
+test('does nothing with model/collection when the value is less than the minLength', () => {
   view.model = new Backbone.Model({filter: 'foo'})
   setValue('ab')
   simulateKeyup()
   equal(view.model.get('filter'), 'foo', 'filter attribute did not change')
 })
 
-test('does setParam false when the value is less than the minLength and setParamOnInvalid=true', function() {
+test('does setParam false when the value is less than the minLength and setParamOnInvalid=true', () => {
   view.model = new Backbone.Model({filter: 'foo'})
   view.options.setParamOnInvalid = true
   setValue('ab')
@@ -120,7 +120,7 @@ test('does setParam false when the value is less than the minLength and setParam
   equal(view.model.get('filter'), false, 'filter attribute is false')
 })
 
-test('updates filter with small number', function() {
+test('updates filter with small number', () => {
   view.model = new Backbone.Model({filter: 'foo'})
   view.options.allowSmallerNumbers = false
   setValue('1')

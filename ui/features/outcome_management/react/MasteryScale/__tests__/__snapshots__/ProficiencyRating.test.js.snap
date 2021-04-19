@@ -1,0 +1,460 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`] = `
+<Flex
+  alignItems="start"
+  as="span"
+  direction="row"
+  display="flex"
+  elementRef={[Function]}
+  justifyItems="start"
+  padding="0 small small small"
+  width="100%"
+  withVisualDebug={false}
+  wrap="no-wrap"
+>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    padding="0 medium 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+    textAlign="center"
+  >
+    <div
+      className="mastery null"
+    >
+      <RadioInput
+        checked={false}
+        context="success"
+        disabled={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Mastery false for mastery level 1
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        onClick={[Function]}
+        readOnly={false}
+        size="medium"
+        variant="simple"
+      />
+    </div>
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="40%"
+  >
+    <div
+      className="description"
+    >
+      <TextInput
+        defaultValue="Stellar"
+        display="block"
+        inputContainerRef={[Function]}
+        inputRef={[Function]}
+        isRequired={false}
+        messages={null}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
+          <ScreenReaderContent
+            as="span"
+          >
+            Change description for mastery level 1
+          </ScreenReaderContent>
+        }
+        shouldNotWrap={false}
+        size="medium"
+        textAlign="start"
+        type="text"
+        width="100%"
+      />
+    </div>
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+  >
+    <div
+      className="points"
+    >
+      <TextInput
+        defaultValue="10"
+        display="block"
+        inputContainerRef={[Function]}
+        inputRef={[Function]}
+        isRequired={false}
+        messages={null}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
+          <ScreenReaderContent
+            as="span"
+          >
+            Change points for mastery level 1
+          </ScreenReaderContent>
+        }
+        shouldNotWrap={false}
+        size="medium"
+        textAlign="start"
+        type="text"
+        width="4rem"
+      />
+      <div
+        aria-hidden="true"
+        className="pointsDescription"
+      >
+        points
+      </div>
+    </div>
+  </Item>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <div
+      className="color"
+    >
+      <Popover
+        color="primary"
+        constrain="window"
+        contentRef={[Function]}
+        defaultIsShowingContent={false}
+        insertAt="bottom"
+        offsetX={0}
+        offsetY={0}
+        on="click"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onHideContent={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseOut={[Function]}
+        onMouseOver={[Function]}
+        onPositionChanged={[Function]}
+        onPositioned={[Function]}
+        onShow={[Function]}
+        onShowContent={[Function]}
+        onToggle={[Function]}
+        placement="bottom center"
+        renderTrigger={null}
+        shadow="resting"
+        shouldAlignArrow={false}
+        shouldCloseOnDocumentClick={true}
+        shouldCloseOnEscape={true}
+        shouldContainFocus={true}
+        shouldFocusContentOnTriggerBlur={true}
+        shouldRenderOffscreen={false}
+        shouldReturnFocus={true}
+        shouldTrackPosition={true}
+        show={false}
+        stacking="topmost"
+        withArrow={true}
+      >
+        <PopoverTrigger>
+          <Button
+            as="button"
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
+            size="medium"
+            textAlign="center"
+            type="button"
+            variant="link"
+            withBackground={true}
+          >
+            <div>
+              <span
+                className="colorPickerIcon"
+                style={
+                  Object {
+                    "background": "#00ff00",
+                  }
+                }
+              />
+              <ScreenReaderContent
+                as="span"
+              >
+                Change color for mastery level 1
+              </ScreenReaderContent>
+              <span
+                aria-hidden="true"
+              >
+                Change
+              </span>
+            </div>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <ColorPicker
+            afterClose={[Function]}
+            allowWhite={false}
+            colors={
+              Array [
+                Object {
+                  "hexcode": "#BD3C14",
+                  "name": "Brick",
+                },
+                Object {
+                  "hexcode": "#FF2717",
+                  "name": "Red",
+                },
+                Object {
+                  "hexcode": "#E71F63",
+                  "name": "Magenta",
+                },
+                Object {
+                  "hexcode": "#8F3E97",
+                  "name": "Purple",
+                },
+                Object {
+                  "hexcode": "#65499D",
+                  "name": "Deep Purple",
+                },
+                Object {
+                  "hexcode": "#4554A4",
+                  "name": "Indigo",
+                },
+                Object {
+                  "hexcode": "#1770AB",
+                  "name": "Blue",
+                },
+                Object {
+                  "hexcode": "#0B9BE3",
+                  "name": "Light Blue",
+                },
+                Object {
+                  "hexcode": "#06A3B7",
+                  "name": "Cyan",
+                },
+                Object {
+                  "hexcode": "#009688",
+                  "name": "Teal",
+                },
+                Object {
+                  "hexcode": "#009606",
+                  "name": "Green",
+                },
+                Object {
+                  "hexcode": "#8D9900",
+                  "name": "Olive",
+                },
+                Object {
+                  "hexcode": "#D97900",
+                  "name": "Pumpkin",
+                },
+                Object {
+                  "hexcode": "#FD5D10",
+                  "name": "Orange",
+                },
+                Object {
+                  "hexcode": "#F06291",
+                  "name": "Pink",
+                },
+              ]
+            }
+            currentColor="#00ff00"
+            focusOnMount={false}
+            hideOnScroll={false}
+            hidePrompt={true}
+            nonModal={true}
+            parentComponent="ProficiencyRating"
+            setStatusColor={[Function]}
+            withAnimation={false}
+            withArrow={false}
+            withBorder={false}
+            withBoxShadow={false}
+            withDarkCheck={false}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  </Item>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 small"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="10%"
+  >
+    <div
+      className="deleteButton"
+    >
+      <IconButton
+        as="button"
+        color="secondary"
+        cursor="pointer"
+        disabled={false}
+        elementRef={[Function]}
+        margin="0"
+        onClick={[Function]}
+        renderIcon={<IconTrashLine />}
+        screenReaderLabel="Delete mastery level 1"
+        shape="rectangle"
+        size="medium"
+        type="button"
+        withBackground={false}
+        withBorder={false}
+      />
+      <ConfirmMasteryModal
+        confirmButtonText="Confirm"
+        isOpen={false}
+        modalText="This will remove the mastery level from your mastery scale."
+        onClose={[Function]}
+        onConfirm={[Function]}
+        title="Remove Mastery Level"
+      />
+    </div>
+  </Item>
+</Flex>
+`;
+
+exports[`ProficiencyRating can not manage renders the ProficiencyRating component 1`] = `
+<Flex
+  alignItems="start"
+  as="span"
+  direction="row"
+  display="flex"
+  elementRef={[Function]}
+  justifyItems="start"
+  padding="0 small small small"
+  width="100%"
+  withVisualDebug={false}
+  wrap="no-wrap"
+>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    padding="0 medium 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+    textAlign="center"
+  >
+    <div
+      className="mastery view-only"
+    />
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="40%"
+  >
+    <div
+      className="description"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        wrap="normal"
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          Description for mastery level 1: Stellar
+        </ScreenReaderContent>
+        <PresentationContent
+          as="span"
+        >
+          Stellar
+        </PresentationContent>
+      </Text>
+    </div>
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+  >
+    <div
+      className="points"
+    >
+      <View
+        borderColor="primary"
+        display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        margin="0 0 0 small"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+        withVisualDebug={false}
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          Points for mastery level 1: 10.0
+        </ScreenReaderContent>
+        <PresentationContent
+          as="span"
+        >
+          10
+          <div
+            className="pointsDescription view-only"
+          >
+            points
+          </div>
+        </PresentationContent>
+      </View>
+    </div>
+  </Item>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <div
+      className="color"
+    >
+      <span
+        className="colorPickerIcon"
+        style={
+          Object {
+            "background": "#00ff00",
+            "marginLeft": "2rem",
+          }
+        }
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          Color #00ff00 for mastery level 1
+        </ScreenReaderContent>
+      </span>
+    </div>
+  </Item>
+</Flex>
+`;

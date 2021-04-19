@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -18,6 +20,9 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe FoldersController do
   def io
     fixture_file_upload('docs/doc.doc', 'application/msword', true)
@@ -35,6 +40,7 @@ describe FoldersController do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     root_folder
+    set_granular_permission
   end
 
   describe "GET 'show'" do
@@ -59,6 +65,7 @@ describe FoldersController do
 
   describe "PUT 'update'" do
     before(:once) { course_folder }
+
     it "should require authorization" do
       put 'update', params: {:course_id => @course.id, :id => @folder.id, :folder => {:name => "hi"}}
       assert_unauthorized
@@ -108,6 +115,7 @@ describe FoldersController do
 
   describe "DELETE 'destroy'" do
     before(:once) { course_folder }
+
     it "should require authorization" do
       delete 'destroy', params: {:course_id => @course.id, :id => @folder.id}
       assert_unauthorized
@@ -134,5 +142,18 @@ describe FoldersController do
         @folder.sub_folders.create!(:name => "folder2", :context => @course)
       end
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { @course.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import _ from 'underscore'
-import GradingPeriodSetForm from 'jsx/grading/EditGradingPeriodSetForm'
+import GradingPeriodSetForm from 'ui/features/account_grading_standards/react/EditGradingPeriodSetForm.js'
 
 const wrapper = document.getElementById('fixtures')
 
@@ -148,7 +148,7 @@ test("calls the 'onCancel' callback when the cancel button is clicked", function
 
 test("does not call 'onSave' when the set has no title", function() {
   const spy = sinon.spy()
-  const updatedSet = _.extend({}, exampleSet, {title: '', enrollmentTermIDs: ['1']})
+  const updatedSet = {...exampleSet, title: '', enrollmentTermIDs: ['1']}
   const form = this.renderComponent({onSave: spy, set: updatedSet})
   const saveButton = ReactDOM.findDOMNode(form.refs.saveButton)
   Simulate.click(saveButton)

@@ -15,18 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
+<% provide :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 
-<%
-  js_env ga_page_title: "#{@context.name} People"
-%>
-<%
-  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
-  add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
-  @active_tab="people"
-%>
-<% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
-
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
       <a class="btn button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>">
@@ -41,12 +32,12 @@
       </a>
     <% end %>
     <% if @context.is_a?(Course)%>
-      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
+      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_course_teacher_activity_url(@user, @context) %>" class="btn button-sidebar-wide">
           <i class="icon-chat" aria-hidden="true"></i>
           <%= t 'Student Interactions Report' %>
         </a>
-      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_student_teacher_activity_url(@current_user, @user) %>" class="btn button-sidebar-wide">
           <i class="icon-chat" aria-hidden="true"></i>
           <%= t 'Interactions Report' %>
@@ -86,13 +77,11 @@
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
 <% end %>
 
-<% js_bundle :user_name %>
-<% css_bundle :roster_user, :pairing_code %>
-
 <%= render :partial => 'shared/profile' %>
 
+<% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
-<% can_manage_admins = can_do(@context, @current_user, :manage_admin_users) %>
+<% can_manage_admins = can_do(@context, @current_user, manage_perm) %>
 
 <% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
 <div class="more_user_information">
@@ -146,7 +135,7 @@
             <% end %>
           </tr>
         <% end %>
-        <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+        <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
           <tr id="priveleges">
             <td scope="row">
               <%= before_label('user_privileges', %{Privileges}) %>
@@ -164,7 +153,7 @@
           </tr>
         <% end %>
       </table>
-      <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+      <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
         <div id="student_last_attended__component"></div>
       <% end %>
     </fieldset>
@@ -174,4 +163,3 @@
 </div>
 <% end %>
 
-<% js_bundle 'legacy/context_roster_user' %>

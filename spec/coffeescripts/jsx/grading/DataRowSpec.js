@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
-import DataRow from 'jsx/grading/dataRow'
+import DataRow from '@canvas/grading-standard-collection/react/dataRow'
 
 QUnit.module('DataRow not being edited, without a sibling', {
   setup() {
@@ -100,12 +100,16 @@ test('on change, accepts arbitrary input and saves to state', function() {
   changeMinScore.restore()
 })
 
-test('screenreader text contains contextual label describing inserting row', function() {
+test('screenreader text contains contextual label describing inserting row', () => {
   const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
-  ok(screenreaderTexts.find(screenreaderText => screenreaderText.textContent === 'Insert row below A'))
+  ok(
+    screenreaderTexts.find(
+      screenreaderText => screenreaderText.textContent === 'Insert row below A'
+    )
+  )
 })
 
-test('screenreader text contains contextual label describing removing row', function() {
+test('screenreader text contains contextual label describing removing row', () => {
   const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
   ok(screenreaderTexts.find(screenreaderText => screenreaderText.textContent === 'Remove row A'))
 })

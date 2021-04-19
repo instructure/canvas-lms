@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -38,13 +40,13 @@ class SummaryMessageConsolidator
       update_sql = DelayedMessage.send(:sanitize_sql_array, ["UPDATE #{DelayedMessage.quoted_table_name}
                     SET workflow_state='sent', updated_at=?, batched_at=?
                     WHERE workflow_state='pending' AND id IN (?) RETURNING id", Time.now.utc, Time.now.utc, ids_to_update])
-      updated_ids = Shard.current.database_server.unshackle{ DelayedMessage.connection.select_values(update_sql)}
+      updated_ids = Shard.current.database_server.unguard{ DelayedMessage.connection.select_values(update_sql)}
 
       Delayed::Batch.serial_batch do
         batches.each do |dm_ids|
           dm_ids = dm_ids & updated_ids
           next unless dm_ids.any?
-          DelayedMessage.send_later_enqueue_args(:summarize, { :priority => Delayed::LOWER_PRIORITY }, dm_ids)
+          DelayedMessage.delay(priority: Delayed::LOWER_PRIORITY).summarize(dm_ids)
         end
       end
     end
@@ -52,7 +54,7 @@ class SummaryMessageConsolidator
   end
 
   def delayed_message_batch_ids
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       DelayedMessage.connection.select_all(
         DelayedMessage.select('communication_channel_id').select('root_account_id').distinct.
           where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db)).

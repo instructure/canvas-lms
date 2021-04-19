@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CourseFindSelectView from 'compiled/views/content_migrations/subviews/CourseFindSelectView'
+import Backbone from '@canvas/backbone'
+import CourseFindSelectView from 'ui/features/content_migrations/backbone/views/subviews/CourseFindSelectView.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CourseFindSelectView: #setSourceCourseId', {
   setup() {
     fakeENV.setup()
-    this.url = '/users/101/manageable_courses'
+    this.urlPattern = /\/users\/101\/manageable_courses/
     this.server = sinon.fakeServer.create()
     this.courses = [
       {
@@ -58,7 +58,7 @@ QUnit.module('CourseFindSelectView: #setSourceCourseId', {
         enrollment_start: '2016-10-01T09:00:00Z'
       }
     ]
-    return this.server.respondWith('GET', this.url, [
+    return this.server.respondWith('GET', this.urlPattern, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(this.courses)
@@ -77,7 +77,7 @@ test('it should be accessible', assert => {
   assertions.isAccessible(courseFindSelectView, done, {a11yReport: true})
 })
 
-test('Triggers "course_changed" when course is found by its id', function() {
+test('Triggers "course_changed" when course is found by its id', () => {
   const courseFindSelectView = new CourseFindSelectView({model: new Backbone.Model()})
   const course = {id: 42}
   courseFindSelectView.courses = [course]

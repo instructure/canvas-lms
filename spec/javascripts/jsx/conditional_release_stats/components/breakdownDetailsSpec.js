@@ -19,7 +19,7 @@
 import React from 'react'
 
 import ReactDOM from 'react-dom'
-import BreakdownDetails from 'jsx/conditional_release_stats/components/breakdown-details'
+import BreakdownDetails from '@canvas/conditional-release-stats/react/components/breakdown-details'
 
 let clock
 let container

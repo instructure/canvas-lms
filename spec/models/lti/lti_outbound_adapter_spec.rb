@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -214,6 +216,15 @@ describe Lti::LtiOutboundAdapter do
       adapter.generate_post_payload
     end
 
+    it "errors if the url is ridiculous" do
+      tool_launch = double('tool launch')
+      expect(tool_launch).to receive_messages(generate: {})
+      allow(tool_launch).to receive_messages(url: "wat;no-way")
+      allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      expect{ adapter.generate_post_payload }.to raise_error(::Lti::Errors::InvalidLaunchUrlError)
+    end
+
     it "does not copy query params to the post body if oauth_compliant tool setting is enabled" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
       tool.settings = {oauth_compliant: true}
@@ -246,7 +257,7 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "includes the 'ext_lti_assignment_id' if the optional assignment parameter is present" do
-      assignment.update_attributes(lti_context_id: SecureRandom.uuid)
+      assignment.update(lti_context_id: SecureRandom.uuid)
       adapter.prepare_tool_launch(return_url, variable_expander)
       payload = adapter.generate_post_payload(assignment: assignment)
       expect(payload['ext_lti_assignment_id']).to eq assignment.lti_context_id
@@ -276,7 +287,7 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "includes the 'ext_lti_assignment_id' parameter" do
-      assignment.update_attributes(lti_context_id: SecureRandom.uuid)
+      assignment.update(lti_context_id: SecureRandom.uuid)
       adapter.prepare_tool_launch(return_url, variable_expander)
       expect(tool_launch).to receive(:for_assignment!).with(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       payload = adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
@@ -351,7 +362,7 @@ describe Lti::LtiOutboundAdapter do
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
-      assignment.update_attributes!(
+      assignment.update!(
         external_tool_tag: ContentTag.create!(
           context: assignment,
           content: tool,
@@ -359,6 +370,7 @@ describe Lti::LtiOutboundAdapter do
           url: tool.url
         )
       )
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
     end
 
     it 'builds the expected encrypted JWT with the correct course data' do

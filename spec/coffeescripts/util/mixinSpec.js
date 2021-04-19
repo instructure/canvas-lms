@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mixin from 'compiled/util/mixin'
+import mixin from '@canvas/backbone/mixin.coffee'
 
 QUnit.module('mixin')
 
-test('merges objects without blowing away events or defaults', 4, function() {
+test('merges objects without blowing away events or defaults', 4, () => {
   const mixin1 = {
     events: {'click .foo': 'foo'},
     defaults: {foo: 'bar'},

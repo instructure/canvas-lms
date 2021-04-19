@@ -26,6 +26,7 @@ import 'translations/_core'
 import 'translations/_core_en'
 
 import bigeasyLocales from 'timezone/locales'
+import bigeasyLocale_ca_ES from 'custom_timezone_locales/ca_ES'
 import bigeasyLocale_cy_GB from 'custom_timezone_locales/cy_GB'
 import bigeasyLocale_de_DE from 'custom_timezone_locales/de_DE'
 import bigeasyLocale_fr_FR from 'custom_timezone_locales/fr_FR'
@@ -44,6 +45,7 @@ import bigeasyLocale_tr_TR from 'custom_timezone_locales/tr_TR'
 import bigeasyLocale_uk_UA from 'custom_timezone_locales/uk_UA'
 import bigeasyLocale_el_GR from 'custom_timezone_locales/el_GR'
 
+import 'custom_moment_locales/ca'
 import 'custom_moment_locales/de'
 import 'custom_moment_locales/he'
 import 'custom_moment_locales/pl'
@@ -60,6 +62,7 @@ let originalFallbacksMap
 
 const bigeasyLocalesWithCustom = [
   ...bigeasyLocales,
+  bigeasyLocale_ca_ES,
   bigeasyLocale_cy_GB,
   bigeasyLocale_de_DE,
   bigeasyLocale_fr_FR,
@@ -85,29 +88,31 @@ const preloadedData = bigeasyLocalesWithCustom.reduce((memo, locale) => {
 }, {})
 
 QUnit.module('Parsing locale formatted dates', {
-  setup () {
+  setup() {
     originalLocale = I18n.locale
     sinon.stub(tz, 'preload').callsFake(name => preloadedData[name])
     originalFallbacksMap = I18n.fallbacksMap
     I18n.fallbacksMap = null
   },
 
-  teardown () {
+  teardown() {
     I18n.locale = originalLocale
     I18n.fallbacksMap = originalFallbacksMap
     tz.preload.restore()
   }
 })
 
-const locales = Object.keys(localeConfig).map((key) => {
-  const locale = localeConfig[key]
-  const base = key.split('-')[0]
-  return {
-    key,
-    moment: locale.moment_locale || key.toLowerCase(),
-    bigeasy: locale.bigeasy_locale || localeConfig[base].bigeasy_locale
-  }
-}).filter(l => l.key)
+const locales = Object.keys(localeConfig)
+  .map(key => {
+    const locale = localeConfig[key]
+    const base = key.split('-')[0]
+    return {
+      key,
+      moment: locale.moment_locale || key.toLowerCase(),
+      bigeasy: locale.bigeasy_locale || localeConfig[base].bigeasy_locale
+    }
+  })
+  .filter(l => l.key)
 
 const dates = []
 const currentYear = parseInt(tz.format(new Date(), '%Y'), 10)
@@ -119,7 +124,7 @@ for (let i = 0; i < 12; ++i) {
   dates.push(new Date(Date.UTC(otherYear, i, 15, 23, 59)))
 }
 
-function assertFormattedParsesToDate (formatted, date) {
+function assertFormattedParsesToDate(formatted, date) {
   const parsed = tz.parse(formatted)
   const formattedDate = tz.format(parsed, 'date.formats.medium')
   const formattedTime = tz.format(parsed, 'time.formats.tiny')
@@ -127,12 +132,12 @@ function assertFormattedParsesToDate (formatted, date) {
   equal(date.getTime(), parsed.getTime(), `${formatted} incorrectly parsed as ${formattedParsed}`)
 }
 
-locales.forEach((locale) => {
+locales.forEach(locale => {
   test(`timezone -> moment for ${locale.key}`, () => {
     I18n.locale = locale.key
     try {
       tz.changeLocale(locale.bigeasy, locale.moment)
-      dates.forEach((date) => {
+      dates.forEach(date => {
         const formattedDate = $.dateString(date)
         const formattedTime = tz.format(date, 'time.formats.tiny')
         const formatted = `${formattedDate} ${formattedTime}`
@@ -148,9 +153,10 @@ locales.forEach((locale) => {
     const config = DatetimeField.prototype.datepickerDefaults()
     try {
       tz.changeLocale(locale.bigeasy, locale.moment)
-      dates.forEach((date) => {
+      dates.forEach(date => {
         const formattedDate = $.datepicker.formatDate(config.dateFormat, date, config)
         const formattedTime = $.timeString(date)
+
         const formatted = `${formattedDate} ${formattedTime}`
         assertFormattedParsesToDate(formatted, date)
       })
@@ -172,7 +178,10 @@ locales.forEach((locale) => {
     const invalid = key => {
       const format = I18n.lookup(key)
       // ok(/%p/i.test(format) === tz.hasMeridian(), `format: ${format}, hasMeridian: ${tz.hasMeridian()}`)
-      ok(tz.hasMeridian() || !/%p/i.test(format), `format: ${format}, hasMeridian: ${tz.hasMeridian()}`)
+      ok(
+        tz.hasMeridian() || !/%p/i.test(format),
+        `format: ${format}, hasMeridian: ${tz.hasMeridian()}`
+      )
     }
     ok(!formats.forEach(invalid))
   })

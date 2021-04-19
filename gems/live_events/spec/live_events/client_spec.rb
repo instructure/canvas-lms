@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -30,35 +32,51 @@ describe LiveEvents::Client do
   end
 
   class FakeStreamClient
-    attr_accessor :data
+    attr_accessor :data, :stream, :stream_name
 
-    def put_record(stream_name:, data:, partition_key:) # rubocop:disable Lint/UnusedMethodArgument
-      @data = JSON.parse(data)
+    def initialize(stream_name = 'stream')
+      @stream_name = stream_name
+    end
+
+    def put_records(stream_name:, records:)
+      @data = records
+      @stream = stream_name
     end
   end
+
+  class LELogger
+    def info(data)
+      data
+    end
+
+    def error(data)
+      data
+    end
+
+    def warn(data)
+      data
+    end
+  end
+
+  let(:test_stream_name) { 'my_stream' }
+  let(:fclient) { FakeStreamClient.new(test_stream_name) }
 
   before(:each) do
     stub_config
-    LiveEvents.logger = double()
+    LiveEvents.logger = LELogger.new
     LiveEvents.max_queue_size = -> { 100 }
-    LiveEvents.stream_client = nil
+    LiveEvents.stream_client = fclient
     LiveEvents.clear_context!
 
-    @kclient = double()
-    allow(Aws::Kinesis::Client).to receive(:new).and_return(@kclient)
-
-    @client = LiveEvents::Client.new
+    @client = LiveEvents::Client.new nil, fclient, test_stream_name
+    LiveEvents.worker.start!
   end
 
-  RSpec::Matchers.define :a_live_events_payload do |payload|
-    match do |actual|
-      to_compare = actual.merge({ data: JSON.parse(actual[:data]) })
-      to_compare == payload
-    end
-  end
-
-  def expect_put_record(payload, stream_client = @kclient)
-    expect(stream_client).to receive(:put_record).with(a_live_events_payload(payload))
+  def expect_put_records(payload, stream_client = LiveEvents.stream_client)
+    expect(stream_client.data.size).to eq(payload.size)
+    expect(JSON.parse(stream_client.data.first[:data])).to eq(payload.first[:data])
+    expect(stream_client.data.first[:partition_key]).to eq(payload.first[:partition_key])
+    expect(stream_client.stream).to eq test_stream_name
   end
 
   describe "config" do
@@ -68,39 +86,61 @@ describe LiveEvents::Client do
       })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
+      LiveEvents.worker.stop!
+    end
+
+    it "should ignore invalid endpoints" do
+      res = LiveEvents::Client.aws_config({
+        "aws_endpoint" => "example.com:6543/"
+      })
+
+      expect(res.key?(:endpoint)).to eq false
+      LiveEvents.worker.stop!
+    end
+
+    it "should load custom creds" do
+      LiveEvents.aws_credentials = -> (settings) {
+        settings['value_to_return']
+      }
+
+      res = LiveEvents::Client.aws_config({
+        'custom_aws_credentials' => 'true',
+        'value_to_return' => 'a_value'
+      })
+
+      expect(res[:credentials]).to eq('a_value')
+      LiveEvents.worker.stop!
     end
   end
 
   describe "post_event" do
     now = Time.now
 
-    it "should call put_record on the kinesis stream" do
-      expect_put_record({
-        stream_name: 'stream',
+    it "should call put_records on the kinesis stream" do
+      @client.post_event('event', {}, now, {}, "123")
+      LiveEvents.worker.stop!
+      expect_put_records([{
         data: {
           "attributes" => {
             "event_name" => 'event',
-            "event_time" => now.utc.iso8601
+            "event_time" => now.utc.iso8601(3)
           },
           "body" => {}
         },
         partition_key: "123"
-      })
-
-      @client.post_event('event', {}, now, {}, "123")
-
-      LiveEvents.worker.stop!
+      }])
     end
 
     it "should include attributes when supplied via ctx" do
       now = Time.now
 
-      expect_put_record({
-        stream_name: 'stream',
+      @client.post_event('event', {}, now, { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent' }, 'pkey')
+      LiveEvents.worker.stop!
+      expect_put_records([{
         data: {
           "attributes" => {
             "event_name" => 'event',
-            "event_time" => now.utc.iso8601,
+            "event_time" => now.utc.iso8601(3),
             "user_id" => 123,
             "real_user_id" => 321,
             "login" => 'loginname',
@@ -109,35 +149,33 @@ describe LiveEvents::Client do
           "body" => {}
         },
         partition_key: 'pkey'
-      })
-
-      @client.post_event('event', {}, now, { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent' }, 'pkey')
-      LiveEvents.worker.stop!
+      }])
     end
 
-    context 'when injecting a custom stream client' do
-      it 'should call put_record on the custom stream client' do
-        fake_stream_client = FakeStreamClient.new
-        config = LiveEvents::Client.config
-        expect_put_record(
-          {
-            stream_name: 'stream',
-            data: {
-              "attributes" => {
-                "event_name" => 'event',
-                "event_time" => now.utc.iso8601
-              },
-              "body" => {}
-            },
-            partition_key: "123"
+    it "should not send blacklisted conxted attributes" do
+      now = Time.now
+      @client.post_event(
+        'event',
+        {},
+        now,
+        { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent', compact_live_events: true },
+        'pkey'
+      )
+      LiveEvents.worker.stop!
+      expect_put_records([{
+        data: {
+          "attributes" => {
+            "event_name" => 'event',
+            "event_time" => now.utc.iso8601(3),
+            "user_id" => 123,
+            "real_user_id" => 321,
+            "login" => 'loginname',
+            "user_agent" => 'agent'
           },
-          fake_stream_client
-        )
-
-        LiveEvents::Client.new(config, fake_stream_client).post_event('event', {}, now, {}, "123")
-
-        LiveEvents.worker.stop!
-      end
+          "body" => {}
+        },
+        partition_key: 'pkey'
+      }])
     end
   end
 
@@ -147,19 +185,6 @@ describe LiveEvents::Client do
 
       now = Time.now
 
-      expect_put_record({
-        stream_name: 'stream',
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601,
-            "user_id" => 123
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      })
-
       LiveEvents.post_event(
         event_name: 'event',
         payload: {},
@@ -167,6 +192,17 @@ describe LiveEvents::Client do
         partition_key: 'pkey'
       )
       LiveEvents.worker.stop!
+      expect_put_records([{
+        data: {
+          "attributes" => {
+            "event_name" => 'event',
+            "event_time" => now.utc.iso8601(3),
+            "user_id" => 123
+          },
+          "body" => {}
+        },
+        partition_key: 'pkey'
+      }])
     end
 
     it "should clear context on clear_context!" do
@@ -175,18 +211,6 @@ describe LiveEvents::Client do
 
       now = Time.now # rubocop:disable Rails/SmartTimeZone
 
-      expect_put_record({
-        stream_name: 'stream',
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      })
-
       LiveEvents.post_event(
         event_name: 'event',
         payload: {},
@@ -194,36 +218,52 @@ describe LiveEvents::Client do
         partition_key: 'pkey'
       )
       LiveEvents.worker.stop!
+      expect_put_records(
+        [
+          {
+            data: {
+              "attributes" => {
+                "event_name" => 'event',
+                "event_time" => now.utc.iso8601(3)
+              },
+              "body" => {}
+            },
+            partition_key: 'pkey'
+          }
+        ]
+      )
     end
 
-    it "should use custom stream client when defined" do
-      fake_stream_client = FakeStreamClient.new
-      LiveEvents.stream_client = fake_stream_client
+    context do
+      let(:test_stream_name) { 'custom_stream_name' }
 
-      now = Time.now # rubocop:disable Rails/SmartTimeZone
+      it "should use custom stream client when defined" do
+        fake_stream_client = FakeStreamClient.new test_stream_name
+        LiveEvents.stream_client = fake_stream_client
 
-      expect_put_record(
-        {
-          stream_name: 'stream',
-          data: {
-            "attributes" => {
-              "event_name" => 'event',
-              "event_time" => now.utc.iso8601
-            },
-            "body" => {}
-          },
+        now = Time.now # rubocop:disable Rails/SmartTimeZone
+
+        LiveEvents.post_event(
+          event_name: 'event',
+          payload: {},
+          time: now,
           partition_key: 'pkey'
-        },
-        fake_stream_client
-      )
-
-      LiveEvents.post_event(
-        event_name: 'event',
-        payload: {},
-        time: now,
-        partition_key: 'pkey'
-      )
-      LiveEvents.worker.stop!
+        )
+        LiveEvents.worker.stop!
+        expect_put_records(
+          [{
+            data: {
+              "attributes" => {
+                "event_name" => 'event',
+                "event_time" => now.utc.iso8601(3)
+              },
+              "body" => {}
+            },
+            partition_key: 'pkey'
+          }],
+          fake_stream_client
+        )
+      end
     end
   end
 end

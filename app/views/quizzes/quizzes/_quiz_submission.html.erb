@@ -128,7 +128,7 @@
 </p>
 <% else %>
 <% css_bundle :quizzes %>
-<% js_bundle 'legacy/quiz_submission' %>
+<% js_bundle 'quiz_submission' %>
 <div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (show_correct_answers? ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>

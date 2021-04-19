@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2012 - present Instructure, Inc.
@@ -129,7 +131,7 @@ describe ContentMigration do
     it "should strip invalid utf8" do
       data = {
         'assessment_questions' => [{
-          'question_name' => "hai\xfbabcd"
+          'question_name' => +"hai\xfbabcd"
         }]
       }
       expect(ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name]).to eq "haiabcd"
@@ -184,11 +186,12 @@ describe ContentMigration do
   end
 
   context "zip file import" do
-    def test_zip_import(context, filename="file.zip", filecount=1)
+    def setup_zip_import(context, filename="file.zip", import_immediately = false)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
       cm = ContentMigration.new(:context => context, :user => @user)
       cm.migration_type = 'zip_file_importer'
       cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
+      cm.migration_settings['import_immediately'] = import_immediately
       cm.save!
 
       attachment = Attachment.new
@@ -201,27 +204,61 @@ describe ContentMigration do
       cm.save!
 
       cm.queue_migration
+      cm
+    end
+
+    def test_zip_import(context, cm, filecount = 1)
       run_jobs
       expect(cm.reload).to be_imported
       expect(context.reload.attachments.count).to eq filecount
     end
 
     it "should import into a course" do
-      test_zip_import(@course)
+      cm = setup_zip_import(@course)
+      expect(cm.root_account).to eq @course.root_account
+      test_zip_import(@course, cm)
+    end
+
+    it "should go through instfs if enabled" do
+      cm = setup_zip_import(@course)
+      allow(InstFS).to receive(:enabled?).and_return(true)
+      @uuid = "1234-abcd"
+      allow(InstFS).to receive(:direct_upload).and_return(@uuid)
+
+      test_zip_import(@course, cm)
+      attachment = @course.attachments.last
+      expect(attachment.instfs_uuid).to eq(@uuid)
     end
 
     it "should import into a user" do
-      test_zip_import(@user)
+      cm = setup_zip_import(@user)
+      expect(cm.root_account_id).to eq 0
+      test_zip_import(@user, cm)
     end
 
     it "should import into a group" do
       group_with_user
-      test_zip_import(@group)
+      cm = setup_zip_import(@group)
+      expect(cm.root_account).to eq @group.root_account
+      test_zip_import(@group, cm)
     end
 
     it "should not expand the mac system folder" do
-      test_zip_import(@course, "macfile.zip", 4)
+      cm = setup_zip_import(@course, "macfile.zip")
+      test_zip_import(@course, cm, 4)
       expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
+    end
+
+    it "should update unzip progress often" do
+      cm = setup_zip_import(@course, "macfile.zip")
+      expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
+      run_jobs
+    end
+
+    it "should update unzip progress often with fast import" do
+      cm = setup_zip_import(@course, "macfile.zip", true)
+      expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
+      run_jobs
     end
   end
 
@@ -252,6 +289,7 @@ describe ContentMigration do
       qb_name = 'Import Unfiled Questions Into Me'
       cm.migration_settings['question_bank_name'] = qb_name
       cm.save!
+      expect(cm.root_account_id).to eq account.id
 
       package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.zip")
       attachment = Attachment.new
@@ -477,6 +515,28 @@ describe ContentMigration do
     cm.queue_migration
     run_jobs
     expect(@course.quizzes.active.find_by_migration_id("blah!_#{teh_quiz.migration_id}")).not_to be_nil
+  end
+
+  it "escapes html in plain text nodes into qti" do
+    skip unless Qti.qti_enabled?
+
+    cm = @cm
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/plaintext_qti.zip")
+    attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    html_text = @course.quiz_questions.where(:migration_id => "ID_5eb2ac5ba1c19_100").first.question_data[:question_text]
+    expect(html_text).to eq "This is <b>Bold</b>"
+    plain_text = @course.quiz_questions.where(:migration_id => "ID_5eb2ac5ba1c19_104").first.question_data[:question_text]
+    expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 
   it "should identify and import compressed tarball archives" do
@@ -708,9 +768,9 @@ describe ContentMigration do
 
   context 'Quizzes.Next CC import' do
     before do
-      allow(@cm.root_account).
+      allow(@cm.context).
         to receive(:feature_enabled?).
-        with(:import_to_quizzes_next).
+        with(:quizzes_next).
         and_return(true)
       allow(@cm.migration_settings).
         to receive(:[]).
@@ -729,6 +789,77 @@ describe ContentMigration do
         to receive(:new).and_return(importer)
       expect(importer).to receive(:import_content)
       @cm.import!({})
+    end
+  end
+
+  context "migration issues" do
+    let(:err){ StandardError.new("TestError") }
+
+    it "doesn't overreeact to todo issues" do
+      expect{
+        @cm.add_todo("test todo", {exception: err})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "doesn't overreeact to warning issues" do
+      expect{
+        @cm.add_warning("test warn", {exception: err})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "reports error issues appropriately" do
+      expect{
+        @cm.add_error("test error", {exception: err})
+      }.to change{ ErrorReport.count }.by(1)
+    end
+
+    it "accepts downgrades for real errors" do
+      expect{
+        @cm.add_error("test error", {exception: err, issue_level: :warning})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "accepts issue level option when failing a migration" do
+      expect{
+        @cm.fail_with_error!(err, error_message: "foo", issue_level: :warning)
+      }.to change{ ErrorReport.count }.by(0)
+    end
+  end
+
+  describe "imported_migration_items_for_insert_type" do
+    it "does not explode if the import type isn't in the migration item hash" do
+      @cm.migration_settings[:insert_into_module_type] = "assignment"
+      output = @cm.imported_migration_items_for_insert_type
+      expect(output).to eq([])
+    end
+  end
+
+  describe "import_class_name" do
+    it "converts various forms of name to the proper AR class name" do
+      expect(ContentMigration.import_class_name('assignment')).to eq 'Assignment'
+      expect(ContentMigration.import_class_name('assignments')).to eq 'Assignment'
+      expect(ContentMigration.import_class_name('announcement')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('announcements')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('discussion_topic')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('discussion_topics')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('attachment')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('attachments')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('file')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('files')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('page')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('pages')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('wiki_page')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('wiki_pages')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('quiz')).to eq 'Quizzes::Quiz'
+      expect(ContentMigration.import_class_name('quizzes')).to eq 'Quizzes::Quiz'
+      expect(ContentMigration.import_class_name('module')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('modules')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('context_module')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('context_modules')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('module_item')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('module_items')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('content_tag')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('content_tags')).to eq 'ContentTag'
     end
   end
 end

@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
   add_crumb t('titles.sub_accounts', "Sub-Accounts")
-  @active_tab = "sub_accounts"
-  content_for :page_title, t('titles.sub_accounts', 'Sub-Accounts')
+  set_active_tab "sub_accounts"
+  provide :page_title, t('titles.sub_accounts', 'Sub-Accounts')
   css_bundle :sub_accounts
-  js_bundle :sub_accounts 
+  js_bundle :sub_accounts
 %>
 
 <h1 class="screenreader-only"><%= t :page_header_title, 'Sub Accounts' %></h1>

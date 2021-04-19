@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import LinkableEditor from 'tinymce_plugins/instructure_links/linkable_editor'
-import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
-import links from 'tinymce_plugins/instructure_links/links'
+import LinkableEditor from '@canvas/tinymce-links/linkable_editor'
+import * as RceCommandShim from '@canvas/rce/RceCommandShim'
+import links from '@canvas/tinymce-links'
 
 let rawEditor = null
 
@@ -45,14 +45,16 @@ test('can load the original element from the editor id', () => {
   equal(editor.getEditor().data('value'), '42')
 })
 
-test('createLink passes data attributes to create_link command', function() {
+test('createLink passes data attributes to create_link command', () => {
   sandbox.stub(RceCommandShim, 'send')
   const dataAttrs = {}
-  const le = new LinkableEditor({selection: {
-    getContent: () => ({}),
-    getNode: () => {},
-    getRng: () => {}
-  }})
+  const le = new LinkableEditor({
+    selection: {
+      getContent: () => ({}),
+      getNode: () => {},
+      getRng: () => {}
+    }
+  })
   le.createLink('text', 'classes', dataAttrs)
   equal(RceCommandShim.send.firstCall.args[2].dataAttributes, dataAttrs)
 })

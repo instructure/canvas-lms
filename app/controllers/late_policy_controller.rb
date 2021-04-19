@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -98,7 +100,8 @@
 #
 class LatePolicyController < ApplicationController
   before_action :require_user
-  before_action :render_json_unauthorized, unless: :can_manage_grades_for_course?
+  before_action :require_manage_grades_for_course, except: [:show]
+  before_action :require_view_or_manage_grades_for_course, only: [:show]
 
   rescue_from 'RecordAlreadyExists', with: :record_already_exists
 
@@ -195,8 +198,12 @@ class LatePolicyController < ApplicationController
 
   private
 
-  def can_manage_grades_for_course?
-    course.grants_right?(@current_user, :manage_grades)
+  def require_manage_grades_for_course
+    render_json_unauthorized unless course.grants_right?(@current_user, :manage_grades)
+  end
+
+  def require_view_or_manage_grades_for_course
+    render_json_unauthorized unless course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
   end
 
   def course

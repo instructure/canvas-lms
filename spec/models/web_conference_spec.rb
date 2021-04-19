@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,6 +21,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
+  include ExternalToolsSpecHelper
+
   before(:each)   { stub_plugins }
 
   def stub_plugins
@@ -63,9 +67,25 @@ describe WebConference do
       conference.settings = {:record => true, :not => :for_user}
       conference.save
       conference.reload
-      expect(conference.user_settings).to eql({:record => true})
+      expect(conference.user_settings).not_to have_key(:not)
     end
 
+    it "should not mark object dirty if settings are unchanged" do
+      email = "email@email.com"
+      allow(@user).to receive(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      user_settings = conference.user_settings.dup
+      conference.user_settings = user_settings
+      expect(conference).not_to be_changed
+    end
+
+    it "should mark object dirty if  settings are changed" do
+      email = "email@email.com"
+      allow(@user).to receive(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: {record: true})
+      conference.user_settings = {record: false}
+      expect(conference).to be_changed
+    end
   end
 
   context "starting and ending" do
@@ -167,6 +187,32 @@ describe WebConference do
         conference.restart
         expect(conference.end_at).to be_nil
       end
+    end
+  end
+
+  context "invite users" do
+    it "invites users from a specified set of user ids" do
+      user1 = user_factory(active_all: true)
+      user2 = user_factory(active_all: true)
+      course = course_factory(active_all: true)
+      course.enroll_student(user1).accept!
+      course.enroll_student(user2).accept!
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference.save
+      conference.invite_users_from_context([user2.id])
+      expect(conference.invitees.pluck(:user_id)).to match_array([user2.id])
+    end
+
+    it "invites all users from context" do
+      user1 = user_factory(active_all: true)
+      user2 = user_factory(active_all: true)
+      course = course_factory(active_all: true)
+      course.enroll_student(user1).accept!
+      course.enroll_student(user2).accept!
+      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference.save
+      conference.invite_users_from_context
+      expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
     end
   end
 
@@ -308,4 +354,153 @@ describe WebConference do
     end
   end
 
+  context "calendar events" do
+
+    it "nullifies event conference when a conference is destroyed" do
+      course_with_teacher(active_all: true)
+      conference = WimbaConference.create!(title: "my conference", user: @user, context: @course)
+      event = calendar_event_model web_conference: conference
+      conference.web_conference_participants.scope.delete_all
+      conference.destroy!
+      expect(event.reload.web_conference).to be nil
+    end
+  end
+
+  context "LTI conferences" do
+    let_once(:course) { course_model }
+    let_once(:tool) do
+      new_valid_tool(course).tap do |t|
+        t.name = 'course tool'
+        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.save!
+      end
+    end
+    let_once(:user) { user_model }
+
+    it "should not include LTI conference types without the feature flag enabled" do
+      expect(WebConference.conference_types(course).pluck(:conference_type)).not_to include 'LtiConference'
+    end
+
+    context "with conference_selection_lti_placement FF" do
+      before do
+        Account.site_admin.enable_feature! :conference_selection_lti_placement
+      end
+
+      context "self.conference_types" do
+        it "should include  an LTI conference type" do
+          expect(WebConference.conference_types(course).pluck(:conference_type)).to include 'LtiConference'
+          expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
+        end
+
+        it "should include LTI tools from reachable contexts" do
+          tool.update! context: Account.default
+          expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
+        end
+
+        it "can include multiple LTI conference type" do
+          another_tool = new_valid_tool(course)
+          another_tool.name = 'same course tool'
+          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+          expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
+          expect(WebConference.conference_types(course).pluck(:name)).to include another_tool.name
+        end
+
+        it "should only include tools with conference_selection placements" do
+          editor_button = new_valid_tool(course)
+          editor_button.name = 'different type of tool'
+          editor_button.editor_button = { message_type: 'LtiResourceLinkRequest' }
+          editor_button.save!
+
+          expect(WebConference.conference_types(course).pluck(:name)).not_to include editor_button.name
+        end
+
+        it "should only include types from the given context" do
+          another_course = course_model
+          another_tool = new_valid_tool(another_course)
+          another_tool.name = 'another course tool'
+          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+
+          expect(WebConference.conference_types(course).pluck(:name)).not_to include another_tool.name
+          expect(WebConference.conference_types(another_course).pluck(:name)).to include another_tool.name
+        end
+      end
+
+      context ".active scope" do
+        it "should not include LTI conferences" do
+          conference = course.web_conferences.create! do |c|
+            c.user = user
+            c.conference_type = 'LtiConference'
+            c.lti_settings = { tool_id: tool.id }
+          end
+          expect(WebConference.active.pluck(:id)).not_to include conference.id
+        end
+      end
+
+      context "instance methods" do
+        it "should allow creating an LTI conference" do
+          conference = course.web_conferences.create! do |c|
+            c.user = user
+            c.conference_type = 'LtiConference'
+            c.lti_settings = { tool_id: tool.id }
+          end
+          expect(conference).not_to be_nil
+        end
+
+        it "should require an external tool be specified" do
+          conference = course.web_conferences.build
+          conference.user = user
+          conference.conference_type = 'LtiConference'
+          conference.lti_settings = { foo: 'bar' }
+          expect(conference).not_to be_valid
+          expect(conference.errors[:settings].to_s).to include('must exist')
+        end
+
+        it "should require the external tool be visible from the conference context" do
+          another_tool = new_valid_tool(course_model)
+          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+
+          conference = course.web_conferences.build
+          conference.user = user
+          conference.conference_type = 'LtiConference'
+          conference.lti_settings = { tool_id: another_tool.id }
+          expect(conference).not_to be_valid
+          expect(conference.errors[:settings].to_s).to include('visible in context')
+        end
+
+        it "should require the external tool have a conference_selection placement" do
+          another_tool = new_valid_tool(course)
+          another_tool.editor_button = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.save!
+
+          conference = course.web_conferences.build
+          conference.user = user
+          conference.conference_type = 'LtiConference'
+          conference.lti_settings = { tool_id: another_tool.id }
+          expect(conference).not_to be_valid
+          expect(conference.errors[:settings].to_s).to include('conference_selection placement')
+        end
+      end
+    end
+  end
+
+  context 'record creation' do
+    it 'sets the root_account_id using course context' do
+      course_factory
+      user_factory
+      tool = new_valid_tool(@course)
+      tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+      tool.save!
+
+      conference = @course.web_conferences.build
+      conference.user = @user
+      conference.conference_type = 'LtiConference'
+      conference.lti_settings = { tool_id: tool.id }
+      conference.save!
+
+      expect(conference.root_account_id).to eq @course.root_account_id
+    end
+  end
 end

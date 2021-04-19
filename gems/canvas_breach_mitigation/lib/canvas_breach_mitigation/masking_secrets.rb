@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -37,9 +39,9 @@ module CanvasBreachMitigation
         encoded_masked_token
       end
 
-      def reset_authenticity_token!(cookies)
+      def reset_authenticity_token!(cookies, options={})
         cookies['_csrf_token'] = nil
-        masked_authenticity_token(cookies)
+        masked_authenticity_token(cookies, options)
       end
 
       def valid_authenticity_token?(cookies, encoded_masked_token)

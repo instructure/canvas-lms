@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -26,7 +28,7 @@ module Lti
     def self.begin_exports(course, options = {})
       # Select tools with proper configs
       configured_tools = []
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(course).find_each do |tool|
           configured_tools << tool if tool.content_migration_configured?
         end

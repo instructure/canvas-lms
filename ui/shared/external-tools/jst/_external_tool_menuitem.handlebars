@@ -1,0 +1,10 @@
+{{#if this}}
+  <a class="menu_tool_link" href="{{url}}" data-tool-id="{{id}}">
+    {{#if canvas_icon_class}}
+      <i class="{{canvas_icon_class}}"></i>
+    {{else}}
+      {{#if icon_url}}<img class="icon" alt="" src="{{icon_url}}" />{{/if}}
+    {{/if}}
+    {{title}}
+  </a>
+{{/if}}

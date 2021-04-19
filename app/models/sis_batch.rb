@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ class SisBatch < ActiveRecord::Base
   include Workflow
   belongs_to :account
   serialize :data
-  serialize :options
+  serialize :options, Hash
   serialize :processing_errors, Array
   serialize :processing_warnings, Array
   belongs_to :attachment
@@ -32,6 +34,10 @@ class SisBatch < ActiveRecord::Base
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
+  has_many :auditor_course_records,
+    class_name: "Auditors::ActiveRecord::CourseRecord",
+    dependent: :destroy,
+    inverse_of: :course
 
   validates_presence_of :account_id, :workflow_state
   validates_length_of :diffing_data_set_identifier, maximum: 128
@@ -69,7 +75,7 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = create_data_attachment(batch, attachment)
+      att = Attachment.create_data_attachment(batch, attachment)
       batch.attachment = att
 
       yield batch if block_given?
@@ -78,20 +84,6 @@ class SisBatch < ActiveRecord::Base
 
       batch
     end
-  end
-
-  def self.create_data_attachment(batch, data, display_name=nil)
-    batch.shard.activate do
-      Attachment.new.tap do |att|
-        Attachment.skip_3rd_party_submits(true)
-        att.context = batch
-        att.display_name = display_name if display_name
-        Attachments::Storage.store_for_attachment(att, data)
-        att.save!
-      end
-    end
-  ensure
-    Attachment.skip_3rd_party_submits(false)
   end
 
   def self.add_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
@@ -121,7 +113,7 @@ class SisBatch < ActiveRecord::Base
     # Try to have 100 jobs but don't have a job that processes less than 25
     # rows but also not more than 1000 rows.
     # Progress is calculated on the number of jobs remaining.
-    [[(rows/100.to_f).ceil, 25].max, 1000].min
+    [[(rows/99.to_f).ceil, 25].max, 1000].min
   end
 
   workflow do
@@ -167,7 +159,7 @@ class SisBatch < ActiveRecord::Base
       end
     end
 
-    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [account])
+    work = SisBatch::Work.new(SisBatch, :process_all_for_account, args: [account])
     Delayed::Job.enqueue(work, job_args)
   end
 
@@ -181,9 +173,8 @@ class SisBatch < ActiveRecord::Base
       job_args = {
         singleton: "account:update_account_associations:#{Shard.birth.activate { account.id }}",
         priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1,
       }
-      account.send_later_enqueue_args(:update_account_associations, job_args)
+      account.delay(**job_args).update_account_associations
     end
   end
 
@@ -192,7 +183,6 @@ class SisBatch < ActiveRecord::Base
   # can rename this to something more sensible.
   def process_without_send_later
     self.class.transaction do
-      self.options ||= {}
       if self.workflow_state == 'aborted'
         self.progress = 100
         self.save
@@ -255,7 +245,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def skip_deletes?
-    self.options ||= {}
     !!self.options[:skip_deletes]
   end
 
@@ -282,7 +271,7 @@ class SisBatch < ActiveRecord::Base
   def fast_update_progress(val)
     return true if val == self.progress
     self.progress = val
-    state = SisBatch.connection.select_value(<<-SQL)
+    state = SisBatch.connection.select_value(<<~SQL)
       UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state
     SQL
     raise SisBatch::Aborted if state == 'aborted'
@@ -311,6 +300,13 @@ class SisBatch < ActiveRecord::Base
                                        clear_sis_stickiness: options[:clear_sis_stickiness])
   end
 
+  def compute_file_size(file)
+    CanvasUnzip.compute_uncompressed_size(file.path)
+  rescue CanvasUnzip::UnknownArchiveType
+    # if it's not a zip file, just return the size of the file itself
+    file.size
+  end
+
   def generate_diff
     return if self.diffing_remaster # joined the chain, but don't actually want to diff this one
     return unless self.diffing_data_set_identifier
@@ -327,17 +323,27 @@ class SisBatch < ActiveRecord::Base
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
-    if change_threshold && file_diff_percent(@data_file.size, previous_zip.size) > change_threshold
+    current_file_size = compute_file_size(@data_file)
+    previous_zip_size = compute_file_size(previous_zip)
+    if change_threshold && file_diff_percent(current_file_size, previous_zip_size) > change_threshold
       SisBatch.add_error(nil, "Diffing not performed because file size difference exceeded threshold", sis_batch: self)
       return
     end
 
-    diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
-    return :empty_diff_file unless diffed_data_file # just end if there's nothing to import
+    diff = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
+    return :empty_diff_file unless diff # just end if there's nothing to import
+
+    diffed_data_file = diff[:file_io]
+
+    if self.diff_row_count_threshold && diff[:row_count] > self.diff_row_count_threshold
+      diffed_data_file.close
+      SisBatch.add_error(nil, "Diffing not performed because difference row count exceeded threshold", sis_batch: self)
+      return
+    end
 
     self.data[:diffed_against_sis_batch_id] = previous_batch.id
 
-    self.generated_diff = SisBatch.create_data_attachment(
+    self.generated_diff = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(diffed_data_file.path, 'application/zip'),
       t(:diff_filename, "sis_upload_diffed_%{id}.zip", :id => self.id)
@@ -346,6 +352,14 @@ class SisBatch < ActiveRecord::Base
     # Success, swap out the original update for this new diff and continue.
     @data_file.try(:close)
     @data_file = diffed_data_file
+  end
+
+  def diff_row_count_threshold=(val)
+    self.options[:diff_row_count_threshold] = val
+  end
+
+  def diff_row_count_threshold
+    self.options[:diff_row_count_threshold]
   end
 
   def file_diff_percent(current_file_size, previous_zip_size)
@@ -369,7 +383,7 @@ class SisBatch < ActiveRecord::Base
     @has_errors = self.sis_batch_errors.exists?
     import_finished = !(@has_errors && self.sis_batch_errors.failed.exists?) if import_finished
     finalize_workflow_state(import_finished)
-    self.send_later_if_production_enqueue_args(:write_errors_to_file, {max_attempts: 5}) if @has_errors
+    delay_if_production(max_attempts: 5).write_errors_to_file if @has_errors
     populate_old_warnings_and_errors
     statistics
     self.progress = 100 if import_finished
@@ -438,11 +452,11 @@ class SisBatch < ActiveRecord::Base
 
   def stat_active_state(type)
     case type
-    when GroupMembership
+    when 'GroupMembership'
       'accepted'
-    when Group
+    when 'Group'
       'available'
-    when Course
+    when 'Course'
       ['claimed', 'created', 'available']
     else
       'active'
@@ -451,7 +465,7 @@ class SisBatch < ActiveRecord::Base
 
   def stat_deleted_state(type)
     case type
-    when CommunicationChannel
+    when 'CommunicationChannel'
       'retired'
     else
       'deleted'
@@ -460,11 +474,11 @@ class SisBatch < ActiveRecord::Base
 
   def stat_restored_from(type)
     case type
-    when CommunicationChannel
+    when 'CommunicationChannel'
       ['retired', 'unconfirmed']
-    when Course
+    when 'Course'
       ['completed', 'deleted']
-    when Enrollment
+    when 'Enrollment'
       ['inactive', 'completed', 'rejected', 'deleted']
     else
       'deleted'
@@ -486,7 +500,7 @@ class SisBatch < ActiveRecord::Base
 
   def term_course_scope
     if data[:supplied_batches].include?(:course)
-      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil)
+      scope = account.all_courses.active.where.not(sis_batch_id: nil).where.not(sis_source_id: nil)
       scope.where(enrollment_term_id: batch_mode_terms)
     end
   end
@@ -499,15 +513,17 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_courses(courses, total_rows, current_row)
     # delete courses that weren't in this batch, in the selected term
+    course_count = 0
     current_row ||= 0
     courses.find_in_batches do |batch|
       count = Course.destroy_batch(batch, sis_batch: self, batch_mode: true)
       finish_course_destroy(batch)
       current_row += count
+      course_count += count
       self.fast_update_progress(current_row.to_f / total_rows * 100)
     end
 
-    self.data[:counts][:batch_courses_deleted] = current_row
+    self.data[:counts][:batch_courses_deleted] = course_count
     current_row
   end
 
@@ -524,7 +540,7 @@ class SisBatch < ActiveRecord::Base
   def term_sections_scope
     if data[:supplied_batches].include?(:section)
       scope = self.account.course_sections.active.where(courses: {enrollment_term_id: batch_mode_terms})
-      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil)
+      scope = scope.where.not(sis_batch_id: nil).where.not(sis_source_id: nil)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
     end
   end
@@ -578,6 +594,15 @@ class SisBatch < ActiveRecord::Base
   end
 
   def remove_previous_imports
+    # we should not try to cleanup if the batch didn't work out, we could delete
+    # stuff we still need
+    current_workflow_state = self.class.where(id: id).pluck(:workflow_state).first.to_s
+    # ^reloading the whole batch can be a problem because we might be tracking data
+    # we haven't persisted yet on model attributes...
+    if ['failed', 'failed_with_messages', 'aborted'].include?(current_workflow_state)
+      Rails.logger.info("[SIS_BATCH] Refusing to cleanup after batch #{self.id} because workflow state is #{current_workflow_state}")
+      return false
+    end
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term || options[:multi_term_batch_mode]
     supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }
@@ -640,7 +665,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def as_json(options={})
-    self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
       "id" => self.id,
       "created_at" => self.created_at,
@@ -661,6 +685,7 @@ class SisBatch < ActiveRecord::Base
       "diffing_drop_status" => self.options[:diffing_drop_status],
       "skip_deletes" => self.options[:skip_deletes],
       "change_threshold" => self.change_threshold,
+      "diff_row_count_threshold" => self.options[:diff_row_count_threshold]
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
@@ -704,7 +729,7 @@ class SisBatch < ActiveRecord::Base
         csv << row
       end
     end
-    self.errors_attachment = SisBatch.create_data_attachment(
+    self.errors_attachment = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(file, 'csv', true),
       "sis_errors_attachment_#{id}.csv"
@@ -737,14 +762,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_enrollment_data(scope, restore_progress, count, total)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope.active.where(previous_workflow_state: 'deleted').find_in_batches do |batch|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           Enrollment::BatchStateUpdater.destroy_batch(batch.map(&:context_id))
           count = update_restore_progress(restore_progress, batch, count, total)
         end
       end
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         count = restore_workflow_states(scope, 'Enrollment', restore_progress, count, total)
       end
     end
@@ -752,15 +777,15 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_group_categories(scope, restore_progress, count, total)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope.active.where(previous_workflow_state: 'active').find_in_batches do |gcs|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: nil, updated_at: Time.zone.now)
           count = update_restore_progress(restore_progress, gcs, count, total)
         end
       end
       scope.active.where.not(previous_workflow_state: 'active').find_in_batches do |gcs|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: Time.zone.now, updated_at: Time.zone.now)
           count = update_restore_progress(restore_progress, gcs, count, total)
         end
@@ -770,18 +795,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_workflow_states(scope, type, restore_progress, count, total)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           ActiveRecord::Base.unique_constraint_retry do |retry_count|
             if retry_count == 0
               # restore the items and return the ids of the items that changed
               ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
-              if type == 'Enrollment'
-                ids.each_slice(1000) do |slice|
-                  Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: ["restore_states_batch_updater", account.global_id]}, slice, self.account)
-                end
-              end
+              finalize_enrollments(ids) if type == 'Enrollment'
               count += update_restore_progress(restore_progress, data, count, total)
             else
               # try to restore each row one at a time
@@ -797,9 +818,7 @@ class SisBatch < ActiveRecord::Base
                   end
                 end
               end
-              successful_ids.each_slice(1000) do |slice|
-                Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: ["restore_states_batch_updater", account.global_id]}, slice, self.account)
-              end
+              finalize_enrollments(successful_ids) if type == 'Enrollment'
               count += update_restore_progress(restore_progress, data - failed_data, count, total)
               roll_back_data.active.where(id: failed_data).update_all(workflow_state: 'failed', updated_at: Time.zone.now)
             end
@@ -808,6 +827,19 @@ class SisBatch < ActiveRecord::Base
       end
     end
     count
+  end
+
+  def finalize_enrollments(ids)
+    ids.each_slice(1000) do |slice|
+      Enrollment::BatchStateUpdater.delay(n_strand: ["restore_states_batch_updater", account.global_id]).
+        run_call_backs_for(slice, self.account)
+    end
+    # we know enrollments are not deleted, but we don't know what the previous
+    # state was, we will assume deleted and restore the scores and submissions
+    # for students, if it was not deleted, it will not break anything.
+    Enrollment.where(id: ids, type: 'StudentEnrollment').order(:course_id).preload(:course).find_in_batches do |batch|
+      Enrollment.restore_submissions_and_scores_for_enrollments(batch)
+    end
   end
 
   def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)
@@ -858,7 +890,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_sql(type, data)
-    <<-SQL
+    <<~SQL
       UPDATE #{type.constantize.quoted_table_name} AS t
         SET workflow_state = x.workflow_state,
             updated_at = NOW()
@@ -878,15 +910,30 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def downloadable_attachments
-    @downloadable_attachments ||=
-      begin
-        ids = data[:downloadable_attachment_ids]
-        if ids.present?
-          self.shard.activate { Attachment.where(:id => ids).polymorphic_where(:context => self).to_a }
-        else
-          []
+  def downloadable_attachments(type=:all)
+    return [] unless data
+    self.shard.activate do
+      @downloadable_attachments ||=
+        begin
+          ids = data[:downloadable_attachment_ids]
+          if ids.present?
+            Attachment.where(:id => ids).polymorphic_where(:context => self).to_a
+          else
+            []
+          end
         end
+
+      diff_att_ids = data[:diffed_attachment_ids] || []
+      case type
+      when :all
+        @downloadable_attachments
+      when :uploaded
+        @downloadable_attachments.reject{|att| diff_att_ids.include?(att.id)}
+      when :diffed
+        @downloadable_attachments.select{|att| diff_att_ids.include?(att.id)}
+      else
+        raise "invalid attachment type"
       end
+    end
   end
 end

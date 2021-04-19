@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -106,16 +108,18 @@ class RespondusAPIPort
     end
 
     Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
-    pseudonym_session = domain_root_account.pseudonym_sessions.new(:unique_id => userName, :password => password)
-    pseudonym_session.remote_ip = request.remote_ip
-    # don't actually want to create a session, so call `valid?` rather than `save`
-    if pseudonym_session.valid?
-      pseudonym = pseudonym_session.attempted_record
-      @user = pseudonym.login_assertions_for_user
-    elsif domain_root_account.delegated_authentication?
-      raise(NeedDelegatedAuthError)
-    else
-      raise(BadAuthError)
+    domain_root_account.pseudonyms.scoping do
+      pseudonym_session = PseudonymSession.new(:unique_id => userName, :password => password)
+      pseudonym_session.remote_ip = request.remote_ip
+      # don't actually want to create a session, so call `valid?` rather than `save`
+      if pseudonym_session.valid?
+        pseudonym = pseudonym_session.attempted_record
+        @user = pseudonym.login_assertions_for_user
+      elsif domain_root_account.delegated_authentication?
+        raise(NeedDelegatedAuthError)
+      else
+        raise(BadAuthError)
+      end
     end
   end
 
@@ -246,7 +250,7 @@ Implemented for: Canvas LMS}]
       list.item << NVPair.new("uploadTypes", "zipPackage")
     when "course"
       raise(OtherError, 'Item type incompatible with selection state') unless selection_state.empty?
-      @user.cached_current_enrollments(preload_courses: true).select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
+      @user.cached_currentish_enrollments(preload_courses: true).select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
         list.item << NVPair.new(course.name, course.to_param)
       end
     when "quiz", "qdb"
@@ -257,7 +261,7 @@ Implemented for: Canvas LMS}]
     else
       raise OtherError, "Invalid item type"
     end
-    raise(OtherError, "No items found") if list.item.empty?
+    raise(OtherError, "No items found") if list.item.empty? && !["quiz", "qdb"].include?(itemType)
     return [list]
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -46,7 +48,11 @@ class GraphQLTypeTester
   def initialize(test_object, context = {})
     @obj = test_object
     @context = context
+    @extract_result = true
   end
+
+  attr_accessor :extract_result
+  # _extract_result_ is an boolean to call extract_result function or return raw result.
 
 
   # returns the value (or list of values) for the resolved field.  This can be
@@ -84,11 +90,15 @@ class GraphQLTypeTester
     GQL
 
     if result["errors"]
-      raise "QraphQL query error: #{result["errors"].inspect}"
+      raise Error, result["errors"].inspect
     else
-      extract_results(result)
+      return extract_results(result) if @extract_result
+
+      result["data"]["node"]
     end
   end
+
+  Error = Class.new(StandardError)
 
   private
 

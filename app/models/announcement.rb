@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -60,6 +62,10 @@ class Announcement < DiscussionTopic
     ).update_all(:locked => true)
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy! do
     dispatch :new_announcement
     to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
@@ -67,6 +73,7 @@ class Announcement < DiscussionTopic
       record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
+    data { course_broadcast_data }
 
     dispatch :announcement_created_by_you
     to { user }
@@ -74,6 +81,7 @@ class Announcement < DiscussionTopic
       record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
+    data { course_broadcast_data }
   end
 
   set_policy do
@@ -113,6 +121,10 @@ class Announcement < DiscussionTopic
   end
 
   def is_announcement; true end
+
+  def homeroom_announcement?(context)
+    context.is_a?(Course) && context.elementary_homeroom_course?
+  end
 
   # no one should receive discussion entry notifications for announcements
   def subscribers

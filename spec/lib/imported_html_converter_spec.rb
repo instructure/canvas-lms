@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -147,7 +149,7 @@ describe ImportedHtmlConverter do
 
     it "should leave invalid and absolute urls alone" do
       test_string = %{<a href="stupid &^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="stupid%20&amp;%5E%%24%20url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
+      expect(convert_and_replace(test_string)).to eq %{<a href="stupid &amp;^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
     end
 
     it "should prepend course files for unrecognized relative urls" do
@@ -176,6 +178,17 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
     end
 
+    it "should preserve new RCE media iframes" do
+      test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>}
+      expect(convert_and_replace(test_string)).to eq test_string
+    end
+
+    it "should handle and repair half broken new RCE media iframes" do
+      test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
+      repaired_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
+      expect(convert_and_replace(test_string)).to eq repaired_string
+    end
+
     it "should only convert url params" do
       test_string = <<-HTML
 <object>
@@ -196,7 +209,7 @@ describe ImportedHtmlConverter do
 <param name="autostart" value="false">
 <param name="loop" value="false">
 <param name="src" value="/courses/#{@course.id}/file_contents/course%20files/test.mp3">
-<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></embed></object>
+<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></object>
     HTML
     end
 

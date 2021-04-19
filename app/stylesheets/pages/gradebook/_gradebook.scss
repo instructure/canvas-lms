@@ -27,34 +27,128 @@ a#accessibility_warning {
   display: none;
 }
 
-$cell_height: 33px;
+#keyboard-shortcuts:focus {
+  margin: -1px;
+  border-radius: 0.25rem;
 
-// ******* overrides of the default slick.grid.css styles ********
-.slick-sort-indicator {
-  position: absolute;
-  bottom: 4px;
-  #{direction(left)}: 0px;
+  // from app/stylesheets/vendor/bootstrap/_forms.scss .uneditable-input:focus
+  border: 1px solid var(--ic-link-color-lightened-10);
+  outline: 0;
+}
+
+$row-height: 35px;
+$cell_height: 33px;
+$cell-icon-height: 31px;
+$cell-icon-width: 32px;
+$header-height: 38px;
+$header-content-height: $header-height - 2px; // subtract border
+
+$grid-border-color: #c7cdd1;
+$active-border-color: #1790df;
+
+$gradebook_cell_padding_top: 8px;
+
+/* GridSupport Styles */
+
+.slick-row .slick-cell.active.primary-column {
+  border: 1px solid $active-border-color;
+  height: $row-height - 2px;
+}
+
+.slick-row .slick-cell.active:not(.primary-column) {
+  border: 2px solid $active-border-color;
+  height: $row-height - 4px;
 }
 
 .container_0,
 .container_1 {
-  .slick-cell {
-    border-bottom: 1px dotted #ccc;
-    border-#{direction(right)}: 1px dotted #ccc;
+  .slick-header.ui-state-default { // header container with full width of grid
+    background: transparent;
+    border: none;
+  }
+
+  .slick-cell { // each cell of the body
+    border-bottom: 1px solid $grid-border-color;
+    border-#{direction(right)}: 1px solid $grid-border-color;
     padding: 0;
     overflow: visible;
+
     &.editable {
       background: transparent;
-      border: none;
     }
   }
 }
 
-#gradebook_grid .slick-cell.meta-cell {
-  padding: 0;
+.container_0 {
+  .slick-header-column:first-child {
+    border-#{direction(left)}: 1px solid $grid-border-color;
+    padding-#{direction(left)}: 0px;
+  }
+
+  .slick-cell:first-child {
+    border-#{direction(left)}: 1px solid $grid-border-color;
+  }
 }
 
-// ******* END overrides of the default slick.grid.css styles ********
+.slick-cell {
+  &.active {
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.1), 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.16);
+    z-index: 5;
+
+    &.assignment-group-cell .gradebook-cell {
+      padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
+    }
+
+    &.total_grade .gradebook-cell {
+      padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
+    }
+
+    &.assignment .gradebook-cell {
+      &:not(.Grid__GradeCell) {
+        padding-top: $gradebook_cell_padding_top - 2px; // subtract 2px top border
+        height: $row-height - $gradebook_cell_padding_top - 3px;
+      }
+    }
+  }
+
+  &:not(.active) {
+    &.assignment .gradebook-cell:not(.Grid__GradeCell) {
+      padding: 1px; // maintain extra spacing from active border
+    }
+
+    &.assignment .gradebook-cell:not(.Grid__GradeCell) {
+      padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
+    }
+  }
+
+  &.custom_column {
+    &:not(.active) {
+      border-top: 0;
+      height: $row-height - 4px;
+      padding-top: 2px;
+      padding-bottom: 1px;
+    }
+
+    color: #333333;
+    @include fontSize(12px);
+    text-align: center;
+    line-height: 35px;
+  }
+}
+
+.slick-row.active {
+  .slick-cell:not(.active) {
+    &.custom_column {
+      height: $row-height - 4px;
+      padding-top: 1px;
+      padding-bottom: 1px;
+    }
+  }
+}
+
+.slick-cell.meta-cell {
+  padding: 0;
+}
 
 .gradebook .ic-Layout-contentMain {
   position: relative;
@@ -68,49 +162,30 @@ $cell_height: 33px;
 .student-name {
   color: #1b7eda;
   text-shadow: #fbf8f8 0 0 1px;
+  padding-#{direction(left)}: 2px;
 }
 
 .student-grades-link {
   @if $use_high_contrast { color: var(--ic-link-color-darkened-10); }
 }
 
-.meta-cell .avatar {
-  width: 25px;
-  height: 25px;
-  margin-top: 3px;
-  margin-#{direction(right)}: 4px;
-  float: direction(left);
-  position: relative;
-  z-index: 1;
-}
-
 .student-placeholder {
   display: none;
 }
 
-.student-section {
+.secondary-info {
   margin-top: -5px;
   @include fontSize(12px);
 }
 
-.secondary_identifier_cell, .custom_column {
-  color: #333333;
-  @include fontSize(12px);
-  text-align: center;
-  line-height: 35px;
-}
+.student-name,
+.secondary-info,
+.student-section,
+.student-placeholder,
+.Gradebook__ColumnHeaderDetail--secondary {
 
-// show and hide student names using a parent css class.
-.hide-students {
-  .student-name, .avatar {
-    display: none;
-  }
-  .student-placeholder {
-    display: block;
-  }
-  .secondary_identifier_cell {
-    text-indent: -9999em;
-  }
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // override the default jquery ui top border
@@ -121,119 +196,121 @@ $cell_height: 33px;
 .slick-header-column {
   background-color: $ic-bg-light-neutral;
   background-image: none;
-  padding: 10px;
   @include fontSize(12px);
   text-align: center;
   font-weight: normal;
+
   // override jqueryUI style
   &.ui-state-default {
-    height: 30px;
-  }
-  &.hovered-column,
-  &.slick-header-column-active,
-  &.ui-state-hover {
-    background-color: $ic-bg-light-primary;
-  }
-  .slick-column-name {
-    font-weight: bold;
-    color: #2f2a34;
-    text-shadow: white 0 0 1px;
-  }
-  a.assignment-name {
-    font-weight: normal;
+    border-top: 1px solid $grid-border-color;
+    border-#{direction(right)}: 1px solid $grid-border-color;
+    border-bottom: 1px solid $grid-border-color;
+    border-#{direction(left)}: none;
+    height: $header-content-height;
+    padding-bottom: 0;
+    padding-#{direction(left)}: 1px;
+    padding-#{direction(right)}: 0;
+    padding-top: 0;
 
-    text-shadow: white 0 0 1px;
-    //this is for the ellipses
+    @if $direction == 'rtl' {
+      .ui-widget &.ui-sortable-helper {
+        /* because in rtl we set the "right" property, but during drag jqueryUI uses the "left" property */
+        #{direction(right)}: auto;
+        border-#{direction(right)}: 1px solid $grid-border-color;
+      }
+    }
+  }
+
+  .assignment-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @if $use_high_contrast {
-      &:hover, &:focus { text-decoration: underline; }
-    }
-    @else { color: var(--ic-link-color); }
-  }
-  .muted i {
-    color: $ic-color-medium-darker;
-  }
-  .assignment-points-possible {
-    font-weight: normal;
-    @include fontSize(12px);
-    margin: {
-      #{direction(left)}: 10px;
-      #{direction(right)}: 14px;
-    };
-    // If high contrast, default to regular dark text
-    @if not $use_high_contrast { color: var(--ic-brand-font-color-dark-lightened-15); }
-  }
-  .gradebook-header-drop {
-    //put it above the "out of"
-    z-index: 1;
-    width: 14px;
-    height: 14px;
-    position: absolute;
-    bottom: 3px;
-    #{direction(right)}: 3px;
-    text-indent: 999px;
-    opacity: 0;
-    //override jqueryui blue border
-    border: 0 none;
 
-    @if $use_high_contrast {
-      background: url("/images/jqueryui/gradebook-header-drop2-high-contrast.png") no-repeat top left;
-      @media (min--moz-device-pixel-ratio: 1.5),
-      (-o-min-device-pixel-ratio: 3/2),
-      (-webkit-min-device-pixel-ratio: 1.5),
-      (min-device-pixel-ratio: 1.5),
-      (min-resolution: 1.5dppx) {
-        background-image: url("/images/jqueryui/gradebook-header-drop2-high-contrast@2x.png");
-        background-size: 14px 28px;
+    a {
+      color: var(--ic-link-color);
+    }
+  }
+
+  .Gradebook__ColumnHeaderContent {
+    align-items: center;
+    display: flex;
+    height: 36px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .Gradebook__ColumnHeaderIndicators,
+  .Gradebook__ColumnHeaderAction {
+    text-align: center;
+    width: $header-content-height - 2px;
+  }
+
+  .Gradebook__ColumnHeaderIndicators {
+    padding: direction-sides(0 0 0 2px);
+  }
+
+  .Gradebook__ColumnHeaderAction {
+    padding: direction-sides(0 2px 0 0);
+  }
+
+  .Gradebook__ColumnHeaderDetail {
+    display: block;
+    height: $header-content-height;
+    line-height: $header-content-height;
+  }
+
+  .Gradebook__ColumnHeaderDetail--OneLine {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .Gradebook__ColumnHeaderDetailLine {
+    display: block;
+    height: $header-content-height / 2;
+    line-height: $header-content-height / 2;
+  }
+
+  .Gradebook__ColumnHeaderAction {
+    button {
+      opacity: 0;
+
+      &:focus, &:hover {
+        opacity: 1;
       }
     }
 
-    @else {
-      background: url("/images/jqueryui/gradebook-header-drop2.png") no-repeat top left;
-      @media (min--moz-device-pixel-ratio: 1.5),
-      (-o-min-device-pixel-ratio: 3/2),
-      (-webkit-min-device-pixel-ratio: 1.5),
-      (min-device-pixel-ratio: 1.5),
-      (min-resolution: 1.5dppx) {
-        background-image: url("/images/jqueryui/gradebook-header-drop2@2x.png");
-        background-size: 14px 28px;
+    &.menuShown {
+      button {
+        opacity: 1;
       }
     }
+  }
 
-    &:hover, &.ui-menu-trigger-menu-is-open {
-      background-position: bottom left;
+  &:hover .Gradebook__ColumnHeaderAction button {
+    opacity: 1;
+  }
+
+  .Gradebook__ColumnHeaderContent.focused {
+    .Gradebook__ColumnHeaderAction button {
       opacity: 1;
     }
-  }
-  &:hover .gradebook-header-drop {
-    opacity: 1;
   }
 }
 
 .odd .slick-cell {
-  background-color: #f5f6f7;
+  background-color: $ic-bg-light-neutral;
+
+  &.minimized {
+    background-color: darken($ic-bg-light-neutral, 4%);
+  }
 }
 
 .even .slick-cell {
-  background-color: #fcfcfc;
-}
+  background-color: #ffffff;
 
-.odd .meta-cell {
-  background-color: #eff3f4;
-}
-
-.even .meta-cell {
-  background-color: #e6eaec;
-}
-
-.odd .total-cell {
-  background-color: #e0e6e8;
-}
-
-.even .total-cell {
-  background-color: #d7dee1;
+  &.minimized {
+    background-color: darken(#ffffff, 4%);
+  }
 }
 
 // overrides of jqueryUI theme
@@ -244,28 +321,37 @@ $cell_height: 33px;
   border: none;
 }
 
+.slick-row {
+  &.active {
+    .slick-cell:not(.active) {
+      border-bottom: 1px solid $active-border-color;
+      border-top: 1px solid $active-border-color;
+      height: $row-height - 2px; // subtract top and bottom border
+    }
+
+    .slick-cell.primary-column {
+      border-#{direction(left)}: 1px solid $active-border-color;
+      border-#{direction(right)}: 1px solid $active-border-color;
+      height: $row-height - 2px; // subtract top and bottom border
+    }
+  }
+}
+
+.container_1 {
+  .slick-row.active {
+    .slick-cell:not(.active):last-child {
+      border-#{direction(right)}: 1px solid $active-border-color;
+    }
+  }
+}
+
 // my styles
 .slick-row.ui-state-active  .slick-cell {
   background-color: #dfe9f2;
 }
 
-.slick-row.ui-state-active .slick-cell.selected {
-  @include vertical-gradient(#d7eaf9, #bedff6);
-  background-color: #ccddff;
-}
-
-.slick-cell div.cell-content {
-  text-align: center;
-  vertical-align: middle;
-}
-
-.slick-cell {
-  // we're adding this further in
-  // border-#{direction(right)}: none
-}
-
 .slick-cell.editable {
-  border-color: #2fa1ff;
+  border-color: $active-border-color;
 }
 
 .slick-cell.ungraded {
@@ -330,7 +416,7 @@ $cell_height: 33px;
   }
 }
 
-.slick-row:first-child {
+.slick-row.first-row {
   .gradebook-tooltip {
     @include first-row-tooltip();
   }
@@ -342,46 +428,31 @@ $cell_height: 33px;
   white-space: pre-line;
   padding-top: 5px;
   padding-bottom: 55px;
-  margin-top: -25px;
   margin-bottom: -50px;
 }
 
-.slick-cell.completely-hidden {
-  display: none;
-}
-
-.gradebook-tooltip-last {
+.container_1 .slick-cell:last-child .gradebook-tooltip {
   #{direction(left)}: auto;
   #{direction(right)}: 0;
+
   &:after {
     #{direction(left)}: auto;
     #{direction(right)}: 15px;
   }
 }
 
-$gradebook_cell_padding_top: 8px;
-
 .gradebook-cell {
-  padding-top: $gradebook_cell_padding_top;
-  height: $cell_height - $gradebook_cell_padding_top;
-  position: relative;
-  text-align: center;
-  background-repeat: repeat;
-  border: none;
-  &.late {
-    background-image: url("/images/gradebook-late-indicator.png");
+  &:not(.Grid__GradeCell) {
+    border: none;
+    height: $cell_height - $gradebook_cell_padding_top;
+    padding-top: $gradebook_cell_padding_top;
+    position: relative;
+    text-align: center;
   }
-  &.resubmitted {
-    background-image: url("/images/gradebook-resubmitted-indicator.png");
-  }
+
   &.grayed-out {
     background-color: $grayLighter;
   }
-}
-
-.slick-cell.dropped {
-  background-image: url("/images/gradebook-dropped-indicator.png");
-  background-repeat: repeat;
 }
 
 .gradebook-cell-turnitin {
@@ -417,91 +488,264 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.gradebook-cell-comment {
-  position: absolute;
-  top: -1px;
-  #{direction(right)}: -1px;
-  height: 12px;
-  width: 12px;
-  visibility: hidden;
-  //needs to be above "normal but below tooltips"
-  z-index: 2;
-  overflow: hidden;
-
-  @if $use_high_contrast {
-    background: url("/images/gradebook-comments-sprite3-high-contrast.png") no-repeat 100% 0;
-    @media (min--moz-device-pixel-ratio: 1.5),
-    (-o-min-device-pixel-ratio: 3/2),
-    (-webkit-min-device-pixel-ratio: 1.5),
-    (min-device-pixel-ratio: 1.5),
-    (min-resolution: 1.5dppx) {
-      background-image: url("/images/gradebook-comments-sprite3-high-contrast@2x.png");
-      background-size: 17px 105px;
-    }
-  }
-
-  @else {
-    background: url("/images/gradebook-comments-sprite3.png") no-repeat 100% 0;
-    @media (min--moz-device-pixel-ratio: 1.5),
-    (-o-min-device-pixel-ratio: 3/2),
-    (-webkit-min-device-pixel-ratio: 1.5),
-    (min-device-pixel-ratio: 1.5),
-    (min-resolution: 1.5dppx) {
-      background-image: url("/images/gradebook-comments-sprite3@2x.png");
-      background-size: 17px 105px;
-    }
-  }
-
-
-  #gradebook_grid.editable &:hover,
-  #gradebook_grid.editable &:focus {
-    visibility: visible;
-    background-position: 100% -88px !important;
-    width: 17px;
-    height: 17px;
-  }
-  .slick-cell.with-comments & {
-    visibility: visible;
-  }
-  #gradebook_grid.editable .slick-cell.focus &,
-  #gradebook_grid.editable .slick-cell.hover &,
-  #gradebook_grid.editable .slick-cell.active & {
-    visibility: visible;
-    background-position: 100% -41px;
-    width: 25px;
-    height: 25px;
-  }
-
-  .slick-cell.cannot_edit & {
-    display: none;
-  }
-}
-
-.gradebook-cell-comment-label {
-  display: inline-block;
-}
-
 .gradebook-cell-editable {
-  height: $cell_height - 1px -8px;
+  height: $cell_height - 8px;
   padding-top: 8px;
   margin: 0;
-  border: 1px solid #35a5e5;
   background-color: white;
-  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 }
 
-#gradebook_grid .slick-cell {
+.slick-cell {
   z-index: auto;
+
+  &.custom_column {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.assignment {
+    .gradebook-cell,
+    .Grid__GradeCell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &.assignment-group-cell {
+    .gradebook-cell .percentage {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+  }
+
+  &.total_grade {
+    .gradebook-cell .grades {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+  }
+
+  &.total-grade-override {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   &.active {
     background-color: inherit;
     z-index: 5;
-    border: 1px solid #35a5e5;
+
     &.editable {
       top: 0;
-      border: 0;
     }
   }
 }
+
+/* Assignment Cell */
+
+.slick-cell {
+  &.assignment,
+  &.total-grade-override {
+    .Grid__GradeCell {
+      height: $row-height - 4px;
+    }
+
+    // Inactive Cell
+    &:not(.active) {
+      .Grid__GradeCell {
+        padding: 1px;
+        height: $row-height - 4px;
+      }
+    }
+
+    // Inactive or Active Cell
+    &:not(.editable) {
+      // Inner Elements
+      .Grid__GradeCell__OriginalityScore {
+        padding-bottom: 2px; // match the icon container size from InstUI
+      }
+    }
+  }
+}
+
+.Grid__GradeCell {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: $cell_height;
+  justify-content: space-between;
+}
+
+.Grid__GradeCell__InvalidGrade,
+.Grid__GradeCell__OriginalityScore {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  width: $cell-icon-width;
+}
+
+.Grid__GradeCell__InvalidGrade {
+  i {
+    padding-bottom: 2px; // match the icon container size from InstUI
+
+    &.icon-warning {
+      color: $ic-color-danger;
+    }
+  }
+}
+
+.Grid__GradeCell__OriginalityScore {
+  i {
+    &.icon-empty,
+    &.icon-oval-half {
+      color: $ic-color-danger;
+    }
+
+    &.icon-certified {
+      color: $ic-color-success;
+    }
+  }
+}
+
+.Grid__GradeCell__UnpostedGrade {
+  background-color: $ic-color-alert;
+  border-radius: 50%;
+  height: 0.4rem;
+  position: absolute;
+  width: 0.4rem;
+}
+
+.Grid__GradeCell__StartContainer,
+.Grid__GradeCell__EndContainer {
+  display: flex;
+  flex-basis: $cell-icon-width * 2;
+  flex-grow: 1;
+  flex-shrink: 1;
+  height: 100%;
+  white-space: nowrap;
+}
+
+.Grid__GradeCell__EndContainer {
+  justify-content: flex-end;
+}
+
+.Grid__GradeCell__Content {
+  flex-basis: auto;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  .Grade {
+    display: flex;
+  }
+
+  .Grade--complete {
+    color: $ic-color-success;
+  }
+}
+
+.Grid__GradeCell {
+  &.gradingScheme,
+  &.passFail {
+    .Grid__GradeCell__EndContainer {
+      flex-basis: $cell-icon-width;
+    }
+  }
+}
+
+.Grid__GradeCell {
+  // This nesting is required to ensure higher specificity than InstUI styles
+  .Grid__GradeCell__PercentInput,
+  .Grid__GradeCell__PointsInput {
+    // wide enough to fit "Excused"
+    width: 78px;
+  }
+
+  .Grid__GradeCell__GradingSchemeInput {
+    // wide enough to fit "Excused," input padding, and the menu button
+    width: 78px + $cell-icon-width;
+  }
+
+  .Grid__GradeCell__CompleteIncompleteInput {
+    // wide enough to fit "Excused" and the menu button
+    width: 64px + $cell-icon-width;
+  }
+
+  .HorizontalFlex {
+    align-content: space-between;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .Grid__GradeCell__PercentInput,
+  .Grid__GradeCell__PointsInput,
+  .Grid__GradeCell__GradingSchemeInput {
+    // clip any input messages
+    span > span {
+      margin-bottom: 0;
+    }
+
+    label > span > span + span {
+      display: none;
+    }
+  }
+}
+
+.Grid__GradeCell__CompleteIncompleteValue {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  overflow: hidden;
+
+  > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  svg {
+    display: flex;
+  }
+}
+
+.Grid__GradeCell__EndText {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 0;
+  min-width: $cell-icon-width;
+  overflow: hidden;
+  padding-#{direction(left)}: 2px;
+  text-align: direction(left);
+  white-space: nowrap;
+}
+
+.Grid__GradeCell__CompleteIncompleteMenu,
+.Grid__GradeCell__GradingSchemeMenu,
+.Grid__GradeCell__Options {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  height: $cell-icon-height;
+  justify-content: center;
+  width: $cell-icon-width;
+}
+
+.Grid__GradeCell__CompleteIncompleteMenu,
+.Grid__GradeCell__GradingSchemeMenu {
+  flex-basis: auto;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+/* End Styles for Assignment Cells */
 
 .gradebook-cell {
   .grade {
@@ -523,49 +767,6 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.gradebook-cell-out-of-formatter {
-  padding-top: 0;
-  height: $cell_height - 1px;
-  .overflow-wrapper {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    height: $cell_height - 1px;
-  }
-  .grade-and-outof-wrapper {
-    position: absolute;
-    top: 50%;
-    #{direction(left)}: 50%;
-    width: 400px;
-    margin-#{direction(left)}: -200px;
-    //changeme
-    margin-top: -10px;
-    .divider {
-      padding: direction-sides(0 1px 0 2px);
-    }
-    .outof, .grade {
-      width: 200px;
-      display: inline-block;
-      background: transparent;
-    }
-    .outof {
-      user-select: none;
-      text-align: direction(left);
-      // if high contrast, no color value (default to regular dark text color)
-      @if $use_high_contrast == false { color: #888888; }
-    }
-    .grade {
-      border: none;
-      text-align: direction(right);
-      outline: none;
-      @include fontSize(12px);
-    }
-    .grade::-webkit-outer-spin-button {
-      display: none;
-    }
-  }
-}
-
 $gradebook_checkbox_size: 16px;
 
 .gradebook-checkbox {
@@ -582,50 +783,94 @@ $gradebook_checkbox_size: 16px;
 }
 
 .minimized {
-  background-image: url("/images/4_percent_opacity.png");
+  background-color: darken($ic-bg-light-neutral, 4%);
+
+  .gradebook-cell,
+  .Gradebook__ColumnHeaderContent {
+    display: none;
+  }
+}
+
+/* Total Grade Override Cell START */
+
+.slick-cell.total-grade-override {
   .gradebook-cell {
-    font-size: 0px;
-    * {
-      display: none;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: center;
+    padding: 0;
+
+    .grade {
+      flex: 1 1;
+      text-align: center;
     }
   }
 }
 
-.minimized .slick-column-name {
-  display: none;
-}
+/* Total Grade Override Cell END */
 
 // STUFF FOR HEADER
 #gradebook-toolbar {
   position: relative;
-  padding: $ic-sp;
+  padding: $ic-sp 0;
   border-top: none;
   @include breakpoint(desktop) {
     display: flex;
     align-items: center;
+    justify-content: space-between;
   }
 }
 
-.gradebook_dropdowns {
+.section-button-placeholder {
   display: inline-block;
+}
+
+.gradebook-menus {
+  display: inline-block;
+  flex: 0 1 auto;
+}
+
+#gradebook-actions {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  justify-content: flex-end;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+.gradebook-filter-container {
+  display: inline-block;
+  flex: 0 1 auto;
+  margin-#{direction(left)}: $ic-sp/2;
 }
 
 .gradebook_filter {
   display: inline-block;
+  margin-#{direction(left)}: $ic-sp/2;
+
   input {
-    width: 248px;
-  }
-  @include breakpoint(desktop) {
-    margin-#{direction(left)}: $ic-sp/3;
+    @include desktop-only {
+      width: 248px;
+    }
+
+    @include mobile-only {
+      padding-#{direction(right)}: 0;
+    }
   }
 }
 
 .gradebook_menu {
-  margin-top: $ic-sp/3;
+  margin-#{direction(left)}: $ic-sp/2;
+  flex: 0 1 auto;
+
   @include breakpoint(desktop) {
     white-space: nowrap;
-    margin-top: 0;
-    flex: 1;
     text-align: direction(right);
   }
 }
@@ -656,32 +901,6 @@ $gradebook_checkbox_size: 16px;
   display: inline-block;
 }
 
-.submission_type_icon {
-  display: block;
-  width: 100%;
-  height: 22px;
-  background-position: center center;
-  background-repeat: no-repeat;
-  .online_text_entry & {
-    background-image: url("/images/text_entry.png");
-  }
-  .discussion_topic & {
-    background-image: url("/images/word_bubble.png");
-  }
-  .online_upload & {
-    background-image: url("/images/file.png");
-  }
-  .pending_review & {
-    background-image: url("/images/pending_review.png");
-  }
-  .media_comment &, .media_recording & {
-    background-image: url("/images/media_comment.gif");
-  }
-  .quiz & {
-    background-image: url("/images/quiz.png");
-  }
-}
-
 .letter-grade-points,
 .gpa-scale-points {
   position: absolute;
@@ -692,6 +911,10 @@ $gradebook_checkbox_size: 16px;
   .muted & {
     @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
     @else { color: $ic-hint-text; }
+  }
+
+  .total_grade & {
+    position: static;
   }
 }
 
@@ -754,4 +977,106 @@ $gradebook_checkbox_size: 16px;
   li:first-of-type.ui-state-disabled {
     opacity: 0.8;
   }
+}
+
+.Gradebook__StatusModalListItem {
+  padding: 7px;
+  margin-bottom: 5px;
+  border: 1px solid #C7CDD1;
+  border-radius: 3px;
+}
+
+.Gradebook__StatusModalList {
+  margin: 0px;
+  list-style-type: none;
+}
+
+#LatePoliciesTabPanel__Container-noContent {
+  text-align: center;
+  min-height: 30rem;
+}
+
+#LatePoliciesTabPanel__Container {
+  min-height: 30rem;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+
+  input[type="text"] {
+    line-height: 1;
+    margin: 0;
+    padding: auto;
+    box-shadow: none;
+    border: none;
+  }
+}
+
+.NumberInput__Container {
+  display: flex;
+  align-items: center;
+}
+
+.NumberInput__Container-LeftIndent {
+  margin-#{direction(left)}: 1.5rem
+}
+
+.SubmissionTray__Container {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 1.5rem;
+
+  input[type="text"] {
+    height: auto;
+    line-height: 1;
+    margin: 0;
+    padding: auto;
+    box-shadow: none;
+    border: none;
+  }
+}
+
+.with-fixed-bottom #SubmissionTray__Content::after {
+  content: ' ';
+  height: 60px; // ref: app/stylesheets/components/_g_instructure.scss
+  display: block;
+}
+
+.SubmissionTray__RadioInput {
+  padding: 0.4rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.SubmissionTray__RadioInput-WithBackground {
+  border: 1px solid $ic-border-color;
+  border-radius: 0.25rem;
+}
+
+#SubmissionTray__Content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#SubmissionTray__Avatar {
+  min-height: 2rem;
+  padding: 0.7rem;
+  text-align: center;
+  font-size: 1.375rem;
+}
+
+#SubmissionTray__Comments {
+  line-height: 1;
+}
+
+#SubmissionTray__StudentName {
+  text-align: center;
+  padding: 0.7rem;
+}
+
+// Specific width to ensure the text of the dialog doesn't wrap by default
+#anonymous-speed-grader-alert-container {
+  min-width: 35rem;
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TatlTael
   module Linters
     # TODO: inherit from SimpleLinter
@@ -43,7 +45,7 @@ module TatlTael
 
       def needs_public_js_specs?
         changes_exist?(include: config[:globs][:public_js],
-                       whitelist: config[:globs][:public_js_whitelist])
+                       allowlist: config[:globs][:public_js_allowlist])
       end
 
       def public_js_specs?
@@ -57,7 +59,7 @@ module TatlTael
 
       def needs_coffee_specs?
         changes_exist?(include: config[:globs][:coffee],
-                       whitelist: config[:globs][:coffee_whitelist])
+                       allowlist: config[:globs][:coffee_allowlist])
       end
 
       def coffee_specs?
@@ -88,7 +90,7 @@ module TatlTael
 
       def ruby_specs?
         changes_exist?(include: config[:globs][:ruby_spec],
-                       whitelist: config[:globs][:selenium_spec])
+                       allowlist: config[:globs][:selenium_spec])
       end
     end
   end

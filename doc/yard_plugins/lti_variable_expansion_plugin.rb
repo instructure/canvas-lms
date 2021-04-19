@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -26,6 +28,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
     variable_substitution = statement.parameters.first.jump(:tstring_content, :ident).source
 
     object = register YARD::CodeObjects::MethodObject.new(namespace, variable_substitution)
+    return if object.tags(:internal).any?
     parse_block(statement, :owner => object)
 
     deprecated_str = ''
@@ -121,7 +124,12 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when launched in a course"
       when 'TERM_START_DATE_GUARD'
         "when launched in a course that has a term with a start date"
+      when 'STUDENT_ASSIGNMENT_GUARD'
+        "when launched as an assignment by a student"
+      when 'EDITOR_GUARD'
+        "when the tool is launched from the editor_button placement"
       end
+
     end.compact
     "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size
   end

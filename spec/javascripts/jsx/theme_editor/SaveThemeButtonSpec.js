@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {shallow} from 'enzyme'
 import jQuery from 'jquery'
-import SaveThemeButton from 'jsx/theme_editor/SaveThemeButton'
-import 'jquery.ajaxJSON'
+import SaveThemeButton from 'ui/features/theme_editor/react/SaveThemeButton.js'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 let elem, props
 
@@ -48,7 +48,7 @@ QUnit.module('SaveThemeButton Component', {
   }
 })
 
-test('save', function(assert) {
+test('save', assert => {
   const done = assert.async()
   let component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
   const updatedBrandConfig = {}
@@ -80,7 +80,7 @@ test('save', function(assert) {
   })
 })
 
-test('modal visibility', function() {
+test('modal visibility', () => {
   const wrapper = shallow(<SaveThemeButton {...props} />)
 
   let modal = wrapper.find('CanvasInstUIModal')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -42,7 +44,7 @@ module Api::V1::RubricAssessment
     json_attributes = API_ALLOWED_RUBRIC_ASSESSMENT_OUTPUT_FIELDS
     hash = api_json(rubric_assessment, user, session, json_attributes)
     hash['data'] = rubric_assessment.data if opts[:style] == "full"
-    if opts[:style] == "full" && rubric_assessment.rubric_association.present?
+    if opts[:style] == "full" && rubric_assessment.active_rubric_association?
       hash['rubric_association'] = rubric_assessment.rubric_association.as_json['rubric_association']
     end
     hash['comments'] = rubric_assessment.data.map{|rad| rad[:comments]} if opts[:style] == "comments_only"
@@ -53,5 +55,13 @@ module Api::V1::RubricAssessment
     rubric_assessment.data.map do |r|
       [r[:criterion_id], { rating_id: r[:id] }.merge(r.slice(:comments, :points))]
     end.to_h
+  end
+
+  def full_rubric_assessment_json_for_submissions(rubric_assessment, user, session)
+    hash = rubric_assessment_json(rubric_assessment, user, session, {:style=> "full"})
+    assessor = User.find(rubric_assessment.assessor_id)
+    hash['assessor_name'] = assessor.name
+    hash['assessor_avatar_url'] = assessor.avatar_image_url
+    hash
   end
 end

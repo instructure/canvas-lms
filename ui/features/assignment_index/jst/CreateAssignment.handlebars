@@ -1,0 +1,171 @@
+<div class="form-dialog-content create_assignment_dialog">
+  <div class="{{#unless small_tablet}}form-horizontal{{/unless}}">
+    {{#if canChooseType}}
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_type">
+        {{#t "assignment_type"}}Type:{{/t}}
+      </label>
+      <div class="controls">
+        <select type="text" id="{{uniqLabel}}_assignment_type" name="submission_types">
+          {{#if defaultToolName}}
+            <option value="default_external_tool" data-default-tool="true">{{defaultToolName}}</option>
+          {{/if}}
+          <option value="none">{{#t "assignment"}}Assignment{{/t}}</option>
+          <option value="discussion_topic">{{#t "discussion_type"}}Discussion{{/t}}</option>
+          <option value="online_quiz">{{#t "quiz_type"}}Quiz{{/t}}</option>
+          <option value="external_tool">{{#t "external_tool_type"}}External Tool{{/t}}</option>
+          <option value="not_graded">{{#t "not_graded_type"}}Not Graded{{/t}}</option>
+        </select>
+      </div>
+    </div>
+    {{/if}}
+
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_name">
+        {{#t "assignment_name"}}Name:{{/t}}
+      </label>
+      <div class="controls">
+        {{#if master_course_restrictions.content}}
+          <h3 id="{{uniqLabel}}_assignment_name">{{name}}</h3>
+          <input
+            type="hidden"
+            name="name"
+            value="{{name}}"
+            {{disabledIfIncludes frozenAttributes "title"}}/>
+        {{else}}
+          <input
+            id="{{uniqLabel}}_assignment_name"
+            type={{#if master_course_restrictions.content}}"hidden"{{else}}"text"{{/if}}
+            name="name"
+            value="{{name}}"
+            {{disabledIfIncludes frozenAttributes "title"}}/>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#if hasDueDate}}
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_due_at">
+        {{#t "assignment_due_at"}}Due:{{/t}}
+      </label>
+      <div class="controls">
+      {{#ifAny multipleDueDates isOnlyVisibleToOverrides nonBaseDates}}
+        <span class="datetime_field multiple_due_dates" title
+              data-tooltip-selector="#vdd_tooltip_{{uniqLabel}}"
+              aria-labelledby="vdd_tooltip_{{uniqLabel}}">
+            <input
+              id="{{uniqLabel}}_assignment_due_at"
+              class="input-medium"
+              type="text"
+              {{#if multipleDueDates}}
+                value="{{#t 'multiple_due_dates'}}Multiple due dates{{/t}}"
+              {{else}}
+                value="{{#t 'differentiated_due_dates'}}Differentiated due date{{/t}}"
+              {{/if}}
+              disabled="disabled" />
+        </span>
+
+        <div id="vdd_tooltip_{{uniqLabel}}" style="display:none;">
+          <dl class="vdd_tooltip_content dl-horizontal">
+            {{#each allDates}}
+              <div class="clearfix">
+                <dt>{{dueFor}}</dt>
+                <dd>{{#if dueAt}} {{tDateToString dueAt 'short'}} {{else}} - {{/if}}</dd>
+              </div>
+            {{/each}}
+          </dl>
+        </div>
+
+      {{else}}
+        <div class="date_field_container {{#if master_course_restrictions.due_dates}}readonly{{/if}}">
+          {{#unless master_course_restrictions.due_dates}}
+            <label class="screenreader-only" id="due_at_label_{{uniqLabel}}">
+              {{#t}}Due At: {{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+          {{/unless}}
+          <input
+            id="{{uniqLabel}}_assignment_due_at"
+            class="datetime_field input-medium"
+            type="text"
+            name="due_at"
+            value="{{datetimeFormatted dueAt}}"
+            {{#unless master_course_restrictions.due_dates}}
+              aria-labelledby="due_at_label_{{uniqLabel}}"
+              title="{{accessibleDateFormat}}"
+            {{/unless}}
+            data-tooltip
+            {{disabledIf disableDueAt}}
+            {{#if master_course_restrictions.due_dates}}readonly{{/if}}
+          />
+            {{#if isInClosedPeriod}}
+            <div>
+              <span>{{#t}}Due date falls in a closed Grading Period{{/t}}</span>
+            </div>
+            {{/if}}
+          </div>
+      {{/ifAny}}
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if hasPointsPossible}}
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_points">
+        {{#t "assignment_points"}}Points:{{/t}}
+      </label>
+      <div class="controls">
+        <input
+          id="{{uniqLabel}}_assignment_points"
+          class="input-small points_possible"
+          type="text"
+          name="points_possible"
+          value="{{n pointsPossible}}"
+          {{disabledIfIncludes frozenAttributes "points_possible"}}
+          {{#if master_course_restrictions.points}}readonly{{/if}}
+        />
+      </div>
+    </div>
+    {{/if}}
+
+    {{#if postToSISEnabled}}
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" id="post_to_sis_label">
+            {{#t}}Sync to {{postToSISName}}:{{/t}}
+          </label>
+          <label>
+            {{checkbox "postToSIS"
+              id="assignment_post_to_sis"
+              name="post_to_sis"
+              aria-labelledby="post_to_sis_label"
+              class="post_to_sis_checkbox"
+            }}
+          </label>
+        </div>
+      </fieldset>
+    {{/if}}
+  </div>
+</div>
+<div class="form-controls">
+  <button
+    class="more_options btn pull-left"
+    type="button"
+  >{{#t "more"}}More Options{{/t}}</button>
+  <button
+    class="cancel_button btn dialog_closer"
+    type="button"
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+  {{#unless published}}
+    <button
+      class="btn btn-default save_and_publish"
+      data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'
+      type="button"
+    >{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
+  {{/unless}}
+  <button
+    class="create_assignment btn btn-primary"
+    data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'
+    type="submit"
+  >{{#t "save"}}Save{{/t}}</button>
+</div>

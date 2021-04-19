@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -228,6 +230,38 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           )
         end
       end
+
+      context "when nil is present in an attempt history" do
+        let(:url_grades) { [] }
+        let(:submission_version_data) do
+          time_now = Time.zone.now
+          [
+            { score: 50, url: 'http://url1', submitted_at: time_now - 10.days },
+            { score: 25, url: 'http://url2', submitted_at: time_now - 8.days },
+            { score: 55, url: 'http://url1', submitted_at: time_now - 9.days },
+            { score: nil, url: 'http://url1', submitted_at: time_now - 3.days }
+          ]
+        end
+
+        before do
+          s = Submission.find_or_initialize_by(assignment: assignment, user: @user)
+
+          submission_version_data.each do |d|
+            s.score = d[:score]
+            s.submitted_at = d[:submitted_at]
+            s.grader_id = -1
+            s.url = d[:url]
+            s.with_versioning(:explicit => true) { s.save! }
+          end
+          s
+        end
+
+        it "outputs only attempts without being masked by a (score) nil version" do
+          expect(subject.grade_history.count).to be(1)
+          expect(subject.grade_history.first[:url]).to eq('http://url2')
+          expect(subject.grade_history.first[:score]).to eq(25)
+        end
+      end
     end
   end
 
@@ -253,7 +287,10 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     it "sends notification to users" do
       expect(submission).to receive(:without_versioning).and_call_original
-      expect(submission).to receive(:with_versioning).twice.and_call_original
+      # expect 4 :save! calls:
+      # 1 - save an initial unsubmitted version; 2 - create a new data version;
+      # 3 - update status to submitted; 4 - update actual data (score, url, ...)
+      expect(submission).to receive(:save!).exactly(4).times.and_call_original
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
         submission,
         "Assignment Submitted",
@@ -261,7 +298,104 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         any_args
       )
 
-      subject.commit_history('url', '77', -1)
+      subject.commit_history('http://url', '77', -1)
+    end
+
+    it "sends an 'Assignment Submitted' notification for each new attempt that is submitted" do
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Assignment Submitted",
+        notification,
+        any_args
+      ).exactly(3).times
+
+      subject.commit_history('http://url', '77', -1)
+      subject.commit_history('http://url2', '100', -1)
+      subject.commit_history('http://url3', '90', -1)
+    end
+
+    it "does not send an 'Assignment Submitted' notification when an existing attempt is regraded" do
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Assignment Submitted",
+        notification,
+        any_args
+      ).exactly(1).time
+
+      subject.commit_history('http://url', '77', -1)
+      subject.commit_history('http://url', '100', -1)
+      subject.commit_history('http://url', '80', -1)
+    end
+
+    it "sends a 'Submission Graded' notification when a submission is regraded" do
+      graded_notification = Notification.create!(
+        name: "Submission Graded",
+        workflow_state: "active",
+        subject: "No Subject",
+        category: "TestImmediately"
+      )
+      subject.commit_history('http://url', '77', -1)
+
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Submission Graded",
+        graded_notification,
+        any_args
+      ).exactly(2).times
+
+      subject.commit_history('http://url', '100', -1)
+      subject.commit_history('http://url', '80', -1)
+    end
+
+    context 'when grading period is closed' do
+      before do
+        gpg = GradingPeriodGroup.create(
+          course_id: @course.id,
+          workflow_state: 'active',
+          title: 'some school',
+          weighted: true,
+          display_totals_for_all_grading_periods: true
+        )
+        gp = GradingPeriod.create(
+          weight: 40.0,
+          start_date: Time.zone.now - 10.days,
+          end_date: Time.zone.now - 1.day,
+          title: 'some title',
+          workflow_state: 'active',
+          grading_period_group_id: gpg.id,
+          close_date: Time.zone.now - 1.day
+        )
+
+        submission.grading_period_id = gp.id
+        submission.without_versioning(&:save!)
+      end
+
+      it "returns without processing" do
+        expect(subject).not_to receive(:valid?)
+
+        subject.commit_history('url', '77', -1)
+      end
+    end
+
+    describe "submission posting" do
+      it "posts the submission when the assignment is automatically posted" do
+        subject.commit_history('url', '77', -1)
+        expect(submission.reload).to be_posted
+      end
+
+      it "does not post the submission when the assignment is manually posted" do
+        assignment.ensure_post_policy(post_manually: true)
+
+        subject.commit_history('url', '77', -1)
+        expect(submission.reload).not_to be_posted
+      end
+
+      it "does not update the submission's posted_at date when it is already posted" do
+        submission.update!(posted_at: 1.day.ago)
+        expect {
+          subject.commit_history('url', '77', -1)
+        }.not_to change { submission.reload.posted_at }
+      end
     end
   end
 end

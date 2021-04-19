@@ -19,8 +19,8 @@
 <%
   css_bundle :login
   @headers = false
-  content_for :page_title, t(:page_title, "Log Out")
-  @body_classes << "full-width ic-Login-Body" if @body_classes
+  provide :page_title, t(:page_title, "Log Out")
+  add_body_class "full-width ic-Login-Body"
 %>
 <div class="ic-Login">
   <div class="ic-Login__container">

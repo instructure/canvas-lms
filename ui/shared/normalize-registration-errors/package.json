@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/normalize-registration-errors",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./index.coffee"
+}

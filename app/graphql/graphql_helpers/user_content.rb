@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # provides a wrapper with all the methods needed to call `api_user_content`
 # like we do in the app controllers
 module GraphQLHelpers

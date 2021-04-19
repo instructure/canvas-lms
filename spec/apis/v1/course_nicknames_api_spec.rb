@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2015 Instructure, Inc.
 #
@@ -35,7 +37,7 @@ describe 'Course Nicknames API', type: :request do
 
     describe "index" do
       it "lists all nicknames" do
-        @student.course_nicknames[@course.id] = 'nickname'; @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'nickname')
         json = api_call(:get, "/api/v1/users/self/course_nicknames", @params.merge(:action => 'index'))
         expect(json).to eq([{ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => 'nickname' }])
       end
@@ -48,7 +50,7 @@ describe 'Course Nicknames API', type: :request do
 
     describe "show" do
       it "returns a single nickname" do
-        @student.course_nicknames[@course.id] = 'nickname'; @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'nickname')
         json = api_call(:get, "/api/v1/users/self/course_nicknames/#{@course.id}",
                         @params.merge(:action => 'show', :course_id => @course.to_param))
         expect(json).to eq({ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => 'nickname' })
@@ -78,7 +80,7 @@ describe 'Course Nicknames API', type: :request do
       end
 
       it "updates a course nickname" do
-        @student.course_nicknames[@course.id] = 'old_nickname'; @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'old_nickname')
         json = api_call(:put, "/api/v1/users/self/course_nicknames/#{@course.id}?nickname=new_nickname",
                         @params.merge(:action => 'update', :course_id => @course.to_param,
                         :nickname => 'new_nickname'))
@@ -118,7 +120,7 @@ describe 'Course Nicknames API', type: :request do
 
     describe "delete" do
       it "deletes a single nickname" do
-        @student.course_nicknames[@course.id] = 'nickname'; @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'nickname')
         json = api_call(:delete, "/api/v1/users/self/course_nicknames/#{@course.id}",
                         @params.merge(:action => 'delete', :course_id => @course.to_param))
         expect(json).to eq({ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => nil })
@@ -129,12 +131,11 @@ describe 'Course Nicknames API', type: :request do
     describe "clear" do
       it "removes all course nicknames" do
         other_course = Course.create!
-        @student.course_nicknames[@course.id] = 'nickname1'
-        @student.course_nicknames[other_course.id] = 'nickname2'
-        @student.save!
+        @student.set_preference(:course_nicknames, @course.id, 'nickname1')
+        @student.set_preference(:course_nicknames, other_course.id, 'nickname2')
         json = api_call(:delete, "/api/v1/users/self/course_nicknames",
                         @params.merge(:action => 'clear'))
-        expect(@student.reload.course_nicknames).to eq({})
+        expect(@student.reload.preferences[:course_nicknames]).to eq({})
       end
     end
   end

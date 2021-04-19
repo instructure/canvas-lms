@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "pages/shared/message_students.scss";
 @import "base/environment";
-@import "pages/gradebook/learning_outcome_gradebook.scss";
+@import "pages/shared/message_students.scss";
 @import "pages/gradebook/gradebook.scss";
 @import "pages/gradebook/grade_passback.scss";
+@import "components/carousel.scss";
+@import "components/grade_detail_tray.scss";

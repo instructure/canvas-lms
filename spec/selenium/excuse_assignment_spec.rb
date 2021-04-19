@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -15,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
+require_relative './helpers/gradebook_common'
+require_relative './helpers/groups_common'
+require_relative './grades/pages/gradebook_page'
+require_relative './grades/pages/gradebook_cells_page'
 
 describe 'Excuse an Assignment' do
   include_context "in-process server selenium tests"
@@ -68,7 +72,6 @@ describe 'Excuse an Assignment' do
 
   it 'Gradebook import accounts for excused assignment', priority: "1", test_id: 223509 do
     skip_if_chrome('fragile upload process')
-    excused_text = @course.feature_enabled?(:new_gradebook) ? 'Excused' : 'EX'
     @course.assignments.create! title: 'Excuse Me', points_possible: 20
     rows = ['Student Name,ID,Section,Excuse Me',
             "Student,#{@student.id},,EX"]
@@ -88,7 +91,7 @@ describe 'Excuse an Assignment' do
     run_jobs
 
     get "/courses/#{@course.id}/gradebook"
-    expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq excused_text
+    expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq "Excused"
 
     # Test case insensitivity on 'EX'
     assign = @course.assignments.create! title: 'Excuse Me 2', points_possible: 20
@@ -115,9 +118,8 @@ describe 'Excuse an Assignment' do
       click_option f('#grading-box-extended'), 'Excused'
 
       get "/courses/#{@course.id}/grades"
-      dropped = f('#gradebook_grid .container_1 .slick-row :first-child')
-      expect(dropped.text).to eq 'EX'
-      expect(dropped).to have_class 'dropped'
+      expect(Gradebook::Cells.get_grade(@course.students[0], assignment)).to eq "Excused"
+      expect(Gradebook::Cells.grading_cell(@course.students[0], assignment)).to contain_css(".excused")
     end
 
     it 'excuses an assignment properly', priority: "1", test_id: 201949 do
@@ -127,22 +129,17 @@ describe 'Excuse an Assignment' do
       a2.grade_student(@student, grade: 5, grader: @teacher)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{a2.id}"
-      replace_content f('#grading-box-extended'), "EX\n"
+      replace_content f('#grading-box-extended'), "EX", press_return: true
 
       get "/courses/#{@course.id}/grades"
-      row = ff('#gradebook_grid .container_1 .slick-row .slick-cell')
 
-      expect(row[0].text).to eq '20'
-      # this should show 'EX' and have dropped class
-      expect(row[1].text).to eq('EX')
-      expect(row[1]).to have_class 'dropped'
+      expect(Gradebook::Cells.get_grade(@student, a1)).to eq "20"
 
-      # only one cell should have 'dropped' class
-      dropped = ff('#gradebook_grid .container_1 .slick-row .dropped')
-      expect(dropped.length).to eq 1
+      # this should show 'EX' and have excused class
+      expect(Gradebook::Cells.get_grade(@student, a2)).to eq "Excused"
+      expect(Gradebook::Cells.grading_cell(@student, a2)).to contain_css(".excused")
 
-      # 'EX' should only affect that one cell
-      expect(row[2].text).to eq '100%'
+      expect(Gradebook::Cells.get_total_grade(@student)).to eq "100%"
     end
 
     it 'indicates excused assignment as graded', priority: "1", test_id: 209316 do
@@ -192,8 +189,7 @@ describe 'Excuse an Assignment' do
           get "/courses/#{@course.id}/gradebook/"
           wait_for_ajaximations
           score_values = ff('.canvas_1 .slick-row .slick-cell:first-child').map(& :text)
-          excused_text = @course.feature_enabled?(:new_gradebook) ? 'Excused' : 'EX'
-          expect(score_values).to eq ['15', excused_text, '15', '15']
+          expect(score_values).to eq ['15', "Excused", '15', '15']
         end
       end
 
@@ -247,7 +243,7 @@ describe 'Excuse an Assignment' do
         get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
         click_option f('#assignment_select'), assignment.title
         click_option f('#student_select'), @student.name
-        replace_content f('#student_and_assignment_grade'), "EX\t"
+        replace_content f('#student_and_assignment_grade'), "EX", tab_out: true
         wait_for_ajaximations
       else
         assignment.grade_student(@student, excuse: true, grader: @teacher)
@@ -289,20 +285,18 @@ describe 'Excuse an Assignment' do
           expect(total).to eq '83%'
 
           click_option f('#assignment_select'), a1.title
-          replace_content f('#student_and_assignment_grade'), "EX\t"
+          replace_content f('#student_and_assignment_grade'), "EX", tab_out: true
           wait_for_ajaximations
           total = f('span.total-grade').text[/\d+(\.\d+)?%/]
         else
           get "/courses/#{@course.id}/gradebook/"
 
-          total = f('.canvas_1 .slick-row .slick-cell:last-child').text
+          total = Gradebook::Cells.get_total_grade(@course.students[0])
           expect(total).to eq '83%'
 
-          excused = f('.canvas_1 .slick-row .slick-cell:first-child')
-          excused.click
-          replace_content f('.grade', excused), "EX\n"
-
-          total = f('.canvas_1 .slick-row .slick-cell:last-child').text
+          Gradebook::Cells.edit_grade(@course.students[0], a1, "EX")
+          wait_for_ajaximations
+          total = Gradebook::Cells.get_total_grade(@course.students[0])
         end
         expect(total).to eq '100%'
       end
@@ -315,11 +309,10 @@ describe 'Excuse an Assignment' do
     it 'default grade cannot be set to excused', priority: "1", test_id: 209380 do
       assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
       get "/courses/#{@course.id}/grades"
-      f('.assignment_header_drop').click
-      f('.gradebook-header-menu [data-action="setDefaultGrade"]').click
+      Gradebook.click_assignment_header_menu_element(assignment.id, 'set default grade')
 
       ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
-        replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
+        replace_content f("#student_grading_#{assignment.id}"), ex, press_return: true
         wait_for_ajaximations
         expect(ff('.ic-flash-error').length).to be i + 1
         expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
@@ -327,52 +320,14 @@ describe 'Excuse an Assignment' do
 
     end
 
-    it 'excused grade shows up in grading modal', priority: "1", test_id: 209324 do
-      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
-      assignment.grade_student @student, excuse: true, grader: @teacher
-
-      get "/courses/#{@course.id}/gradebook/"
-      driver.action.move_to(f('.canvas_1 .slick-cell')).perform
-      wait_for_ajaximations
-      f('a.gradebook-cell-comment').click
-      wait_for_ajaximations
-
-      expect(f("#student_grading_#{assignment.id}")).to have_value 'EX'
-    end
-
-    it 'assignments can be excused from grading modal', priority: "1", test_id: 217594 do
-      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
-
-      get "/courses/#{@course.id}/gradebook/"
-
-      ['EX', 'ex', 'Ex', 'eX'].each do |ex|
-        driver.action.move_to(f('.canvas_1 .slick-cell')).perform
-        f('a.gradebook-cell-comment').click
-        wait_for_ajaximations
-
-        arr = f("#student_grading_#{assignment.id}")
-        replace_content arr, "#{ex}\n"
-        wait_for_ajaximations
-
-        f('.canvas_1 .slick-row .slick-cell:first-child .grade-and-outof-wrapper input').send_keys "\n"
-        wait_for_ajaximations
-        expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq 'EX'
-      end
-    end
-
     ['EX', 'ex', 'Ex', 'eX'].each do |ex|
       it "'#{ex}' can be used to excuse assignments", priority: "1", test_id: 225630 do
-        @course.assignments.create! title: 'Excuse Me', points_possible: 20
+        assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
 
         get "/courses/#{@course.id}/gradebook/"
 
-        excused = f('.canvas_1 .slick-row .slick-cell:first-child')
-        excused.click
-        replace_content f('.grade', excused), "#{ex}\n"
-
-        excused = f('.canvas_1 .slick-row .slick-cell:first-child')
-        expect(excused.text).to eq 'EX'
-        expect(excused).to have_class 'dropped'
+        Gradebook::Cells.edit_grade(@course.students[0], assignment, ex)
+        expect { Gradebook::Cells.get_grade(@course.students[0], assignment) }.to become 'Excused'
       end
     end
   end

@@ -1,0 +1,114 @@
+<form action='#' id='edit_appointment_form'>
+  <div class="left-column-wrapper event-details-content">
+    <p>
+      <label for="edit-appointment-name-{{uniqid}}"><b>{{#t "name"}}Name{{/t}}</b></label><br />
+      <input type="text" id="edit-appointment-name-{{uniqid}}" name="title" value="{{appointment_group.title}}"/>
+    </p>
+    <p>
+      <label for="edit-appointment-location-{{uniqid}}"><b>{{#t "location"}}Location{{/t}}</b></label><br />
+      <input type="text" id="edit-appointment-location-{{uniqid}}" name="location" value="{{appointment_group.location_name}}"/>
+    </p>
+    <div class="select-calendar-container">
+        <b>{{#t "calendar"}}Calendar{{/t}}</b><br />
+      <button class="btn ag_contexts_selector"></button>
+      <div class="ag-menu-container"></div>
+    </div>
+    <p>
+      {{checkbox "use_group_signup" id="group-signup-checkbox" uniqid=true class="group-signup-checkbox"}}
+      <label for="group-signup-checkbox-{{uniqid}}">{{#t "group_signup"}}Have students sign up in groups.{{/t}}</label>
+    </p>
+    <div class="group-signup" style="display: none">
+      <label for="edit-appointment-group-cat-{{uniqid}}"><b>{{#t "group_category"}}Group Category{{/t}}</b></label><br />
+      <div class="group_select">
+        <select id="edit-appointment-group-cat-{{uniqid}}" name="group_category_id"></select>
+      </div>
+    </div>
+  </div>
+  <div class="right-column-wrapper">
+    <div class="time-block-list-wrapper">
+      <div class="time-block-list">
+        <table class="time-block-list-header" role="presentation">
+          <tr>
+            <td class="date-column">{{#t "date"}}Date{{/t}}</td>
+            <td class="time-range-column" colspan="4">{{#t "time_range"}}Time Range{{/t}}</td>
+          </tr>
+        </table>
+        <div class="time-block-list-body-wrapper form-inline">
+          <table class="time-block-list-body"></table>
+        </div>
+        <div class="splitter">
+          <p>
+            {{#t}}
+              Divide into equal slots of {{{num_minutes}}} minutes. <a class="split-link Button" href="#">Go</a>
+            {{/t}}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 1.5em">
+      <div id="options_help_dialog" style="display: none;">
+        <p>{{#t "appt_group_options_help1"}}Some existing reservations are over the limit you have added. These will not be affected, this change only prevents new reservations from being made.{{/t}}</p>
+        <p>{{#t "appt_group_options_help2"}}You can, however, manually remove any existing reservations.{{/t}}</p>
+      </div>
+      <b>{{#t}}Options{{/t}}</b>
+      <ul class="ag-options">
+        <li>
+          {{checkbox "per_slot_option" id="appointment-blocks-per-slot-option-button"
+            class="appointment-blocks-per-slot-option-button" uniqid=true
+          }}
+          {{#ifEqual participant_type "Group"}}
+            <label for="appointment-blocks-per-slot-option-button">
+              {{#t}}
+                Limit each time slot to {{{num_participants}}}
+                <span class="per_appointment_groups_label">groups.</span>
+                <span style="display:none;" class="per_appointment_users_label">users.</span>
+              {{/t}}
+            </label>
+          {{else}}
+            <label for="appointment-blocks-per-slot-option-button">
+              {{#t}}
+                Limit each time slot to {{{num_participants}}}
+                <span style="display:none;" class="per_appointment_groups_label">groups.</span>
+                <span class="per_appointment_users_label">users.</span>
+              {{/t}}
+            </label>
+          {{/ifEqual}}
+          <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
+            <img alt="Help" src="/images/help.png">
+          </a>
+        </li>
+        <li>
+          <label for="appointment-blocks-participant-visibility-button-{{uniqid}}">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button" uniqid=true}}
+            {{#t}}Allow students to see who has signed up for time slots that are still available.{{/t}}
+          </label>
+        </li>
+        <li>
+          {{checkbox "max_appointments_per_participant_option"
+            id="max-per-student-option" uniqid=true class="max-per-student-option"
+          }}
+          <label for="max-per-student-option">
+            {{#t}}
+              Limit participants to attend {{{num_appointments}}} appointment(s).
+            {{/t}}
+          </label>
+          <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
+            <img alt="Help" src="/images/help.png">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="details-wrapper">
+    <label for="edit-appointment-details-{{uniqid}}"><b>{{#t "details"}}Details:{{/t}}</b></label><br />
+    <textarea id="edit-appointment-details-{{uniqid}}" name="description" class="input-block-level">{{appointment_group.description}}</textarea>
+  </div>
+  <div class="popover-links-holder event-details-footer pull-right scheduler-event-details-footer">
+    {{#if use_scheduler}}
+      <a href="#" class="event_button btn btn-secondary more_options_link cancel_btn">{{#t}}Cancel{{/t}}</a>
+      <button type="submit" class="event_button btn btn-primary">{{#t}}Publish{{/t}}</button>
+    {{else}}
+       <a href="#" class="event_button btn btn-secondary more_options_link save_without_publishing_link">{{#t}}Save{{/t}}</a>
+       <button type="submit" class="event_button btn btn-primary">{{#t}}Save & Publish{{/t}}</button>
+    {{/if}}
+  </div>
+</form>

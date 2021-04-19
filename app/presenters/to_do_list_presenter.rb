@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -59,7 +61,7 @@ class ToDoListPresenter
 
   def assignments_needing(type, opts = {})
     if @user
-      @user.send("assignments_needing_#{type}", {contexts: @contexts, limit: ASSIGNMENT_LIMIT}.merge(opts)).map do |assignment|
+      @user.send("assignments_needing_#{type}", **{contexts: @contexts, limit: ASSIGNMENT_LIMIT}.merge(opts)).map do |assignment|
         AssignmentPresenter.new(@view, assignment, @user, type)
       end
     else
@@ -222,6 +224,9 @@ class ToDoListPresenter
     delegate :context, :context_name, :short_context_name, to: :assignment_presenter
     attr_reader :assignment
 
+    include ApplicationHelper
+    include Rails.application.routes.url_helpers
+
     def initialize(view, assessment_request, user)
       @view = view
       @assessment_request = assessment_request
@@ -238,7 +243,11 @@ class ToDoListPresenter
     end
 
     def submission_path
-      @view.course_assignment_submission_path(@assignment.context_id, @assignment.id, @assessment_request.user_id)
+      if @assignment.anonymous_peer_reviews?
+        context_url(context, :context_assignment_anonymous_submission_url, @assignment.id, @assessment_request.submission.anonymous_id)
+      else
+        @view.course_assignment_submission_path(@assignment.context_id, @assignment.id, @assessment_request.user_id)
+      end
     end
 
     def ignore_url

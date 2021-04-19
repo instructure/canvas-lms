@@ -47,7 +47,7 @@
           <th><%= before_label(:time, "Time") %></th>
           <td><%= duration_in_minutes((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at) %></td>
         </tr>
-        <% unless @quiz.assignment.present? && @quiz.assignment.muted? %>
+        <% if @submission.posted? %>
         <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
           <th><%= before_label(:current_score, "Current Score") %></th>
           <td><%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
@@ -74,7 +74,7 @@
     <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
       <div style="margin-<%= direction('left') %>: 20px; margin-top: 20px; line-height: 1.3em;">
         <% if (@submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update))) &&
-            (can_do(@quiz, @current_user, :grade) || !@quiz.muted?) %>
+            (can_do(@quiz, @current_user, :grade) || @submission.posted?) %>
           <%= t(:attempts_so_far, {:one => "1 Attempt so far", :other => "%{count} Attempts so far"}, :count => @submission.attempt) %><br/>
           <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>" class="icon-clock"><%= t(:view_previous_attempts, "View Previous Attempts") %></a>
           <br/>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require 'zip'
-require 'action_controller_test_process'
 require 'tmpdir'
 require 'set'
 
@@ -55,9 +56,7 @@ class ContentZipper
       when Quizzes::Quiz then zip_quiz(attachment, attachment.context)
       end
     rescue => e
-      Canvas::Errors.capture(e, message: "Content zipping failed")
-      @logger.debug(e.to_s)
-      @logger.debug(e.backtrace.join('\n'))
+      Canvas::Errors.capture(e, { message: "Content zipping failed" }, :warn)
       attachment.update_attribute(:workflow_state, 'to_be_zipped')
     end
   end
@@ -85,7 +84,7 @@ class ContentZipper
       # This neglects the complexity of group assignments
       students = User.where(id: submissions.pluck(:user_id)).index_by(&:id)
     else
-      students    = assignment.representatives(user).index_by(&:id)
+      students    = assignment.representatives(user: user).index_by(&:id)
       submissions = assignment.submissions.where(user_id: students.keys,
                                                  submission_type: downloadable_submissions)
     end
@@ -141,7 +140,7 @@ class ContentZipper
 
       index = rewrite_eportfolio_richtext_entry(index, rich_text_attachments, entry, zip_attachment.user)
 
-      static_attachments += entry.attachments
+      static_attachments += entry.attachments.select {|x| x.grants_right?(zip_attachment.user, :download)}
       submissions += entry.submissions
     end
 
@@ -190,8 +189,7 @@ class ContentZipper
     @portfolio = @portfolio
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
-    av = ActionView::Base.new()
-    av.view_paths = ActionController::Base.view_paths
+    av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
     res = av.render(:partial => "eportfolios/static_page", :locals => {:page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash})
     res
@@ -250,11 +248,17 @@ class ContentZipper
     # not logged in - OR -
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
-    attachments = if !@check_user || folder.context.grants_right?(@user, :manage_files)
-                    folder.active_file_attachments
-                  else
-                    folder.visible_file_attachments
-                  end
+    attachments =
+      if !@check_user ||
+           folder.context.grants_any_right?(
+             @user,
+             :manage_files,
+             *RoleOverride::GRANULAR_FILE_PERMISSIONS
+           )
+        folder.active_file_attachments
+      else
+        folder.visible_file_attachments
+      end
 
     attachments = attachments.select{|a| opts[:exporter].export_object?(a)} if opts[:exporter]
     attachments.select{|a| !@check_user || a.grants_right?(@user, :download)}.each do |attachment|
@@ -314,7 +318,12 @@ class ContentZipper
     begin
       handle = attachment.open(:need_local_file => true)
       zipfile.get_output_stream(filename){|zos| Zip::IOExtras.copy_stream(zos, handle)}
+    rescue Attachment::FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
+      Canvas::Errors.capture_exception(:content_export, e, :warn)
+      @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
+      return false
     rescue => e
+      Canvas::Errors.capture_exception(:content_export, e, :error)
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
       return false
     ensure
@@ -358,8 +367,8 @@ class ContentZipper
     if entry.content.is_a?(Array) && entry.content.present?
       entry.content.select { |c| c.is_a?(Hash) && c[:section_type] == "rich_text" }.each do |rt|
         rt[:content].gsub!(StaticAttachment::FILES_REGEX) do |match|
-          att = Attachment.find_by_id(Regexp.last_match(:obj_id))
-          if att.nil? || !att.grants_right?(user, :read)
+          att = Attachment.find_by(id: Regexp.last_match(:obj_id))
+          if att.nil? || !att.grants_right?(user, :download)
             match
           else
             sa = StaticAttachment.new(att, index)
@@ -436,7 +445,8 @@ class ContentZipper
   end
 
   def get_filename(users_name, submission)
-    filename = [users_name, submission.late? ? 'LATE' : nil, submission.user_id].compact.join('_')
+    id = @assignment.anonymize_students? ? "anon_#{submission.anonymous_id}" : submission.user_id
+    filename = [users_name, submission.late? ? 'LATE' : nil, id].compact.join('_')
     sanitize_file_name(filename)
   end
 
@@ -445,7 +455,7 @@ class ContentZipper
     # they do not include submissions for group assignments for anyone
     # but the original submitter of the group submission
     attachment_ids = submission.attachment_ids.try(:split, ",")
-    Attachment.where(id: Array.wrap(attachment_ids))
+    submission.shard.activate { Attachment.where(id: Array.wrap(attachment_ids)) }
   end
 
   def get_user_name(students, submission)
@@ -456,7 +466,7 @@ class ContentZipper
   end
 
   def sanitize_file_name(filename)
-    filename.gsub(/[^[[:word:]]]/, '').downcase
+    filename.gsub(/[^[[:word:]]]/, '')
   end
 
   def sanitize_attachment_filename(filename)
@@ -468,6 +478,6 @@ class ContentZipper
     # ids when teachers upload graded submissions
     user_name.gsub!(/_(\d+)_/, '\1')
     user_name.gsub!(/^(\d+)$/, '\1')
-    user_name
+    user_name.downcase
   end
 end

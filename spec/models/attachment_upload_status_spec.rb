@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ RSpec.describe AttachmentUploadStatus, type: :model do
     Rails.cache.clear
   end
 
-  it { is_expected.to belong_to(:attachment) }
+  it { is_expected.to belong_to(:attachment).required }
 
   it 'is valid' do
     expect(upload).to be_valid
@@ -66,8 +68,6 @@ RSpec.describe AttachmentUploadStatus, type: :model do
 
   describe '.upload_status' do
     context 'for pending' do
-      let(:pending_progress) { Progress.create!(context: assignment_model, tag: 'tag') }
-
       it 'sets pendings status' do
         described_class.pending!(attachment)
         expect(described_class.upload_status(attachment)).to eq 'pending'
@@ -75,10 +75,8 @@ RSpec.describe AttachmentUploadStatus, type: :model do
     end
 
     context 'for success' do
-      let(:success_attachment) { Progress.create!(context: assignment_model, tag: 'tag') }
-
       it 'sets success status' do
-        expect(described_class.upload_status(success_attachment)).to eq 'success'
+        expect(described_class.upload_status(attachment)).to eq 'success'
       end
     end
 

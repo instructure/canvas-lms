@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -38,7 +40,7 @@ class ContextController < ApplicationController
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
-      render :json => @media_object
+      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_path(@media_object.media_id))
     end
   end
 
@@ -121,6 +123,7 @@ class ContextController < ApplicationController
     log_asset_access([ "roster", @context ], 'roster', 'other')
 
     if @context.is_a?(Course)
+      return unless tab_enabled?(Course::TAB_PEOPLE)
       if @context.concluded?
         sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
         concluded_sections = sections.select{|s| s.concluded?}.map{|s| "section_#{s.id}"}
@@ -131,44 +134,55 @@ class ContextController < ApplicationController
 
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
+      manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
+      manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
+        @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+      else
+        @context.grants_right?(@current_user, session, :manage_admin_users)
+      end
+      can_add_enrollments = @context.grants_any_right?(@current_user, session, *add_enrollment_permissions(@context))
+      js_permissions = {
+        read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
+        view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
+        manage_students: manage_students,
+        add_users_to_course: can_add_enrollments,
+        read_reports: @context.grants_right?(@current_user, session, :read_reports)
+      }
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
+        js_permissions[:can_allow_course_admin_actions] = manage_admins
+      else
+        js_permissions[:manage_admin_users] = manage_admins
+      end
       js_env({
-        :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name} },
-        :CONCLUDED_SECTIONS => concluded_sections,
-        :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
-        :ENROLL_USERS_URL => course_enroll_users_url(@context),
-        :SEARCH_URL => search_recipients_url,
-        :COURSE_ROOT_URL => "/courses/#{ @context.id }",
-        :CONTEXTS => @contexts,
-        :resend_invitations_url => course_re_send_invitations_url(@context),
-        :permissions => {
-          :read_sis => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
-          :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
-          :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
-          :add_users => manage_students || manage_admins,
-          :read_reports => @context.grants_right?(@current_user, session, :read_reports)
-        },
-        :course => {
-          :id => @context.id,
-          :completed => @context.completed?,
-          :soft_concluded => @context.soft_concluded?,
-          :concluded => @context.concluded?,
-          :teacherless => @context.teacherless?,
-          :available => @context.available?,
-          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
+        ALL_ROLES: all_roles,
+        SECTIONS: sections.map { |s| { id: s.id.to_s, name: s.name} },
+        CONCLUDED_SECTIONS: concluded_sections,
+        SEARCH_URL: search_recipients_url,
+        COURSE_ROOT_URL: "/courses/#{@context.id}",
+        CONTEXTS: @contexts,
+        resend_invitations_url: course_re_send_invitations_url(@context),
+        permissions: js_permissions,
+        course: {
+          id: @context.id,
+          completed: @context.completed?,
+          soft_concluded: @context.soft_concluded?,
+          concluded: @context.concluded?,
+          teacherless: @context.teacherless?,
+          available: @context.available?,
+          pendingInvitationsCount: @context.invited_count_visible_to(@current_user),
+          hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
         }
       })
-
       set_tutorial_js_env
 
-      if manage_students || manage_admins
-        js_env :ROOT_ACCOUNT_NAME => @domain_root_account.name
+      if can_add_enrollments
+        js_env({ROOT_ACCOUNT_NAME: @domain_root_account.name})
         if @context.root_account.open_registration? || @context.root_account.grants_right?(@current_user, session, :manage_user_logins)
-          js_env({:INVITE_USERS_URL => course_invite_users_url(@context)})
+          js_env({INVITE_USERS_URL: course_invite_users_url(@context)})
         end
       end
-      if @context.grants_right? @current_user, session, :read_as_admin
-        js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+      if @context.grants_right?(@current_user, session, :read_as_admin)
+        set_student_context_cards_js_env
       end
     elsif @context.is_a?(Group)
       if @context.grants_right?(@current_user, :read_as_admin)
@@ -187,7 +201,10 @@ class ContextController < ApplicationController
   end
 
   def prior_users
-    if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
+    manage_admins = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
+      :allow_course_admin_actions :
+      :manage_admin_users
+    if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
       @prior_users = @context.prior_users.
         by_top_enrollment.merge(Enrollment.not_fake).
         paginate(:page => params[:page], :per_page => 20)
@@ -209,10 +226,10 @@ class ContextController < ApplicationController
       @users_order_hash = {}
       @users.each_with_index{|u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
       @current_user_services = {}
-      @current_user.user_services.each{|s| @current_user_services[s.service] = s }
+      @current_user.user_services.select{|s| feature_and_service_enabled?(s.service)}.each{|s| @current_user_services[s.service] = s }
       @services = UserService.for_user(@users.except(:select, :order)).sort_by{|s| @users_order_hash[s.user_id] || CanvasSort::Last}
       @services = @services.select{|service|
-        !UserService.configured_service?(service.service) || feature_and_service_enabled?(service.service.to_sym)
+        feature_and_service_enabled?(service.service.to_sym)
       }
       @services_hash = @services.to_a.inject({}) do |hash, item|
         mapped = item.service
@@ -224,7 +241,7 @@ class ContextController < ApplicationController
   end
 
   def roster_user_usage
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if authorized_action(@context, @current_user, :read_reports)
         @user = @context.users.find(params[:user_id])
         contexts = [@context] + @user.group_memberships_for(@context).to_a
@@ -267,7 +284,12 @@ class ContextController < ApplicationController
           @enrollments = scope.to_a
           js_env(COURSE_ID: @context.id,
                  USER_ID: user_id,
-                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at)
+                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
+                 :course => {
+                     id: @context.id,
+                     hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+                 })
+
           log_asset_access(@membership, "roster", "roster")
         end
       elsif @context.is_a?(Group)
@@ -288,6 +310,10 @@ class ContextController < ApplicationController
 
       js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
 
+      js_bundle :user_name, "context_roster_user"
+      css_bundle :roster_user, :pairing_code
+      @google_analytics_page_title = "#{@context.name} People"
+
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(
           @user.profile,
@@ -295,7 +321,14 @@ class ContextController < ApplicationController
           session,
           ['links', 'user_services']
         )
-        render :new_roster_user
+        add_body_class 'not-editing'
+
+        add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
+        add_crumb(@user.name, context_url(@context, :context_user_url, @user))
+        add_crumb(t('#crumbs.access_report', "Access Report"))
+        set_active_tab "people"
+
+        render :new_roster_user, stream: can_stream_template?
         return false
       end
 
@@ -311,25 +344,33 @@ class ContextController < ApplicationController
         @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
       end
 
+      add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
+      add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
+      set_active_tab "people"
+
+      render stream: can_stream_template?
       true
     end
   end
 
-  WORKFLOW_TYPES = [
-    :all_discussion_topics, :assignments, :assignment_groups,
-    :enrollments, :rubrics, :collaborations, :quizzes, :context_modules, :wiki_pages
-  ].freeze
-  ITEM_TYPES = WORKFLOW_TYPES + [:attachments].freeze
+  WORKFLOW_TYPES = [:all_discussion_topics, :assignment_groups, :assignments,
+                    :collaborations, :context_modules, :enrollments, :groups,
+                    :quizzes, :rubrics, :wiki_pages, :rubric_associations_with_deleted].freeze
+  ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(type.to_s) }.
-          map { |type| @context.association(type).reader }
+      @item_types = WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
+        if @context.class.reflections.key?(workflow_type.to_s)
+          item_types << @context.association(workflow_type).reader
+        end
+      end
 
       @deleted_items = []
       @item_types.each do |scope|
         @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).to_a
       end
       @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).to_a
+      @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a if @context.grants_right?(@current_user, :manage_groups)
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
@@ -342,11 +383,34 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
+      type = 'all_group_category' if type == 'group_category'
+      if ['all_group_category', 'group'].include?(type)
+        return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_groups)
+      end
       type = type.pluralize
+      type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
       raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
+
       @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item
+    end
+  end
+
+  def add_enrollment_permissions(context)
+    if context.root_account.feature_enabled?(:granular_permissions_manage_users)
+      [
+        :add_teacher_to_course,
+        :add_ta_to_course,
+        :add_designer_to_course,
+        :add_student_to_course,
+        :add_observer_to_course,
+      ]
+    else
+      [
+        :manage_students,
+        :manage_admin_users
+      ]
     end
   end
 end

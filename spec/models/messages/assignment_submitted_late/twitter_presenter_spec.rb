@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -26,7 +28,11 @@ describe Messages::AssignmentSubmittedLate::TwitterPresenter do
   let(:student) do
     course_with_user("StudentEnrollment", course: course, name: "Adam Jones", active_all: true).user
   end
-  let(:submission) { assignment.submit_homework(student) }
+  let(:submission) do
+    @submission = assignment.submit_homework(student)
+    assignment.grade_student(student, grade: 5, grader: teacher)
+    @submission.reload
+  end
 
   describe "Presenter instance" do
     let(:message) { Message.new(context: submission, user: teacher) }
@@ -63,6 +69,7 @@ describe Messages::AssignmentSubmittedLate::TwitterPresenter do
 
       context "when grades have been posted" do
         before(:each) do
+          submission
           assignment.unmute!
         end
 
@@ -113,6 +120,7 @@ describe Messages::AssignmentSubmittedLate::TwitterPresenter do
 
       context "when grades have been posted" do
         before(:each) do
+          submission
           assignment.unmute!
         end
 

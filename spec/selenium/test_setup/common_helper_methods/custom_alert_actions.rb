@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ module CustomAlertActions
     is_present = true
     begin
       driver.switch_to.alert
-    rescue Selenium::WebDriver::Error::NoAlertPresentError
+    rescue Selenium::WebDriver::Error::NoSuchAlertError
       is_present = false
     end
     is_present
@@ -36,6 +38,7 @@ module CustomAlertActions
   end
 
   def accept_alert
+    wait_for(method: nil, timeout: 5) { alert_present? }
     keep_trying_until do
       alert = driver.switch_to.alert
       alert.accept
@@ -71,7 +74,7 @@ module CustomAlertActions
   def close_modal_if_present
     # if an alert is present, this will trigger the error below
     block_given? ? yield : driver.title
-  rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
+  rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError, Selenium::WebDriver::Error::UnknownError
     driver.switch_to.alert.accept
     # try again
     yield if block_given?

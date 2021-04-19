@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,8 +21,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CutyCapt do
-  before(:each) do 
+  before(:each) do
     CutyCapt.config = nil
+  end
+
+  after :each do
+    CutyCapt.config = nil
+    ConfigFile.unstub
   end
 
   context "configuration" do
@@ -50,7 +57,7 @@ describe CutyCapt do
 
     it "should check for blacklisted ip blocks" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
-      
+
       expect(CutyCapt.verify_url("http://10.0.1.1/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://169.254.169.254/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://4.4.4.4/blah")).to be_truthy
@@ -73,6 +80,15 @@ describe CutyCapt do
       expect {
         Timeout::timeout(10) { CutyCapt.snapshot_url("http://google.com/") }
       }.not_to raise_error
+    end
+  end
+
+  describe ".snapshot_attachment_for_url" do
+    it "should return an attachment" do
+      path = File.join(self.class.fixture_path, "files/instructure.png")
+      expect(CutyCapt).to receive(:snapshot_url).and_yield(path)
+      attachment = CutyCapt.snapshot_attachment_for_url("blah")
+      expect(attachment).not_to be_nil
     end
   end
 end

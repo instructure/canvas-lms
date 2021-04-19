@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -64,6 +66,16 @@ describe LiveAssessments::Submission do
       submission.create_outcome_result(alignment)
       expect(alignment.learning_outcome_results.count).to eq 1
       expect(result.reload.percent).to eq 0.8
+    end
+
+    it 'restores a deleted outcome result' do
+      submission.create_outcome_result(alignment)
+      result = alignment.learning_outcome_results.first
+      result.destroy
+      submission.score = 80
+      submission.possible = 100
+      submission.create_outcome_result(alignment)
+      expect(result.reload).to be_active
     end
 
     it "scales the score to the outcome rubric criterion if present" do

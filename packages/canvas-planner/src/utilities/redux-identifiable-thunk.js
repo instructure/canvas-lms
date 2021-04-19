@@ -42,17 +42,25 @@
 // afterEach(() => someComplexAction.resetArgs())
 //
 export function identifiableThunk(fn) {
-  let thunk = undefined // remember the return value of fn, which should be a thunk
-  let fnArgs = undefined // only need to remember this for tests to check
+  let thunk // remember the return value of fn, which should be a thunk
+  let fnArgs // only need to remember this for tests to check
   const identifiableFn = (...args) => {
-    if (typeof args[0] === 'function') { // called as a thunk
-      if (thunk === undefined) throw new Error('identifiableThunk was called as a thunk before it was called as a normal function. The action\'s first parameter must not be a function.');
+    if (typeof args[0] === 'function') {
+      // called as a thunk
+      if (thunk === undefined)
+        throw new Error(
+          "identifiableThunk was called as a thunk before it was called as a normal function. The action's first parameter must not be a function."
+        )
       // reset first so the thunk can dispatch the action recursively
       const rememberThunk = thunk
       identifiableFn.reset()
       return rememberThunk(...args) // forward the thunk's return value
-    } else { // called as a normal function
-      if (thunk !== undefined) throw new Error('identifiableThunk was called as a normal function twice in a row. If testing, You may need to add `action.resetArgs()` to your beforeEach or afterEach.');
+    } else {
+      // called as a normal function
+      if (thunk !== undefined)
+        throw new Error(
+          'identifiableThunk was called as a normal function twice in a row. If testing, You may need to add `action.resetArgs()` to your beforeEach or afterEach.'
+        )
       thunk = fn(...args) // remember the thunk for the next call
       fnArgs = args // remember args for checking in tests
       return identifiableFn // so it can be called again as a thunk
@@ -60,8 +68,11 @@ export function identifiableThunk(fn) {
   }
 
   // useful methods for testing
-  identifiableFn.reset = () => { thunk = undefined; fnArgs = undefined }
+  identifiableFn.reset = () => {
+    thunk = undefined
+    fnArgs = undefined
+  }
   identifiableFn.args = () => fnArgs
   identifiableFn.fn = () => fn
-  return identifiableFn;
+  return identifiableFn
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -17,6 +19,10 @@
 #
 
 class Login::Oauth2Controller < Login::OauthBaseController
+  skip_before_action :verify_authenticity_token
+
+  rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
+
   def new
     super
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
@@ -29,7 +35,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
       @aac.debug_set(:authorize_url, authorize_url)
     end
 
-    redirect_to delegated_auth_redirect_uri(authorize_url)
+    redirect_to authorize_url
   end
 
   def create
@@ -47,7 +53,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
     provider_attributes = {}
     return unless timeout_protection do
       begin
-        token = @aac.get_token(params[:code], oauth2_login_callback_url)
+        token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
       rescue => e
         @aac.debug_set(:get_token_response, e) if debugging
         raise
@@ -55,6 +61,10 @@ class Login::Oauth2Controller < Login::OauthBaseController
       begin
         unique_id = @aac.unique_id(token)
         provider_attributes = @aac.provider_attributes(token)
+      rescue OauthValidationError => e
+        unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
+        flash[:delegated_message] = e.message
+        return redirect_to unknown_user_url
       rescue => e
         @aac.debug_set(:claims_response, e) if debugging
         raise
@@ -65,6 +75,11 @@ class Login::Oauth2Controller < Login::OauthBaseController
   end
 
   protected
+
+  def handle_expired_token
+    flash[:delegated_message] = t("It took too long to login. Please try again")
+    redirect_to login_url
+  end
 
   def validate_request
     if params[:error_description]
@@ -78,8 +93,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
         raise ActionController::InvalidAuthenticityToken
       end
     rescue Canvas::Security::TokenExpired
-      flash[:delegated_message] = t("It took too long to login. Please try again")
-      redirect_to login_url
+      handle_expired_token
       return false
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,5 +21,11 @@
 class WebConferenceParticipant < ActiveRecord::Base
   belongs_to :web_conference
   belongs_to :user
+
+  before_create :set_root_account_id
+
+  def set_root_account_id
+    self.root_account_id ||= web_conference.root_account_id
+  end
 
 end

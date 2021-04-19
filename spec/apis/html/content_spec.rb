@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 Instructure, Inc.
 #
@@ -23,7 +25,7 @@ describe Api::Html::Content, type: :request do
     context "valid latex" do
       before do
         @latex = '\frac{a}{b}'
-        @node = Nokogiri::HTML::DocumentFragment.parse("<img alt='#{@latex}' />").children.first
+        @node = Nokogiri::HTML5.fragment("<img alt='#{@latex}' />").children.first
       end
 
       it "retains the alt attribute" do
@@ -31,16 +33,16 @@ describe Api::Html::Content, type: :request do
         expect(@node['alt']).to eql(@latex)
       end
 
-      it "sets data-mathml" do
+      it "sets x-canvaslms-safe-mathml" do
         Api::Html::Content.apply_mathml(@node)
-        expect(@node['data-mathml']).to eql(Ritex::Parser.new.parse(@latex))
+        expect(@node['x-canvaslms-safe-mathml']).to eql(Ritex::Parser.new.parse(@latex))
       end
     end
 
     context "invalid latex" do
       before do
         @latex = '\frac{a}{' # incomplete
-        @node = Nokogiri::HTML::DocumentFragment.parse("<img alt='#{@latex}' />").children.first
+        @node = Nokogiri::HTML5.fragment("<img alt='#{@latex}' />").children.first
       end
 
       it "handles error gracefully" do
@@ -52,9 +54,9 @@ describe Api::Html::Content, type: :request do
         expect(@node['alt']).to eql(@latex)
       end
 
-      it "doesn't set data-mathml" do
+      it "doesn't set x-canvaslms-safe-mathml" do
         Api::Html::Content.apply_mathml(@node)
-        expect(@node['data-mathml']).to be_nil
+        expect(@node['x-canvaslms-safe-mathml']).to be_nil
       end
     end
   end

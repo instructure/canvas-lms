@@ -17,22 +17,23 @@
  */
 
 import $ from 'jquery'
-import WikiPageRevision from 'compiled/models/WikiPageRevision'
-import WikiPageRevisionsCollection from 'compiled/collections/WikiPageRevisionsCollection'
-import WikiPageRevisionView from 'compiled/views/wiki/WikiPageRevisionView'
+import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
+import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection.js'
+import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView.js'
 
 QUnit.module('WikiPageRevisionView')
 
-test('binds to model change triggers', function() {
+test('binds to model change triggers', () => {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
-  sandbox.mock(view)
+  sandbox
+    .mock(view)
     .expects('render')
     .atLeast(1)
   revision.set('body', 'A New Body')
 })
 
-test('restore delegates to model.restore', function() {
+test('restore delegates to model.restore', () => {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
   sandbox.stub(view, 'windowLocation').returns({
@@ -41,7 +42,8 @@ test('restore delegates to model.restore', function() {
       return true
     }
   })
-  sandbox.mock(revision)
+  sandbox
+    .mock(revision)
     .expects('restore')
     .atLeast(1)
     .returns($.Deferred().resolve())

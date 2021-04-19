@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/keyboard-nav-dialog",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./backbone/views/index.coffee"
+}

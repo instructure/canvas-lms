@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 require_relative '../../spec_helper'
 require_relative '../views_helper'
 
-describe '/shared/_grading_standard' do
+describe 'shared/_grading_standard' do
 
   let(:grading_standard) do
     @course.grading_standards.create!(:title => 'My Grading Standard', :standard_data => {
@@ -30,7 +32,7 @@ describe '/shared/_grading_standard' do
   end
 
   let(:doc) do
-    Nokogiri::HTML(response.body)
+    Nokogiri::HTML5(response.body)
   end
 
   before do

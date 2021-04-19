@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function generator ({ colors }) {
+export default function generator({colors}) {
   return {
-    courseColor: colors.brand,
-  };
+    courseColor: colors.brand
+  }
 }
 
-generator['canvas-a11y'] = generator['modern-a11y'] = function ({ colors }) {
+generator['canvas-a11y'] = generator['modern-a11y'] = function({colors}) {
   return {
-    courseColor: colors.licorice,
-  };
-};
+    courseColor: colors.licorice
+  }
+}
 
-generator.canvas = function (variables) {
+generator.canvas = function(variables) {
   return {
-    courseColor: variables["ic-brand-primary"],
-  };
-};
+    courseColor: variables['ic-brand-primary']
+  }
+}

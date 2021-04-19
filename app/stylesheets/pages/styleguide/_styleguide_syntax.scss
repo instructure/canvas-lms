@@ -46,6 +46,7 @@
   margin: 15px 0 0;
   padding: 50px 10px 10px;
   position: relative;
+  overflow: auto;
   &:after {
     content: 'Example';
     position: absolute;

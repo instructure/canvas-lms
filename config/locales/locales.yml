@@ -3,7 +3,7 @@ ar:
   bigeasy_locale: ar_SA
   date:
     abbr_month_names:
-    -
+    - 
     - يناير
     - فبراير
     - مارس
@@ -41,6 +41,29 @@ ar:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}"
+ca:
+  bigeasy_locale: ca_ES
+  dow_offset: 1
+  locales:
+    ca: Català
+  date:
+    formats:
+      default: '%d/%m/%Y'
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  helpers:
+    accessible_date_only_format: "DD/MM/YYYY"
+    accessible_date_format: "DD/MM/YYYY hh:mm"
+  # this is for accessibleDateFormat.js
+  yyyy_mm_dd_hh_mm_a01b6081: "DD/MM/YYYY hh:mm"
+  proper_noun_singular_genitive: de %{noun}
 cy:
   locales:
     cy: Cymraeg
@@ -63,7 +86,7 @@ cy:
       short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     abbr_month_names:
-    -
+    - 
     - Ion
     - Chwe
     - Maw
@@ -81,11 +104,12 @@ cy:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}-"
 da:
   bigeasy_locale: da_DK
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -121,11 +145,20 @@ da:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}s"
 da-x-k12:
   bigeasy_locale: da_DK
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -163,11 +196,20 @@ da-x-k12:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}s"
 de:
   bigeasy_locale: de_DE
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - März
@@ -203,12 +245,21 @@ de:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}s"
 el:
   bigeasy_locale: el_GR
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - Ιαν
     - Φεβ
     - Μαρ
@@ -244,6 +295,15 @@ el:
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 en:
   bigeasy_locale: en_US
   locales:
@@ -251,7 +311,7 @@ en:
 en-AU:
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -290,7 +350,7 @@ en-AU:
 en-CA:
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -328,7 +388,7 @@ en-CA:
 en-GB:
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -368,7 +428,7 @@ es:
   bigeasy_locale: es_ES
   date:
     abbr_month_names:
-    -
+    - 
     - ene
     - feb
     - mar
@@ -404,12 +464,13 @@ es:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: de %{noun}
 fa:
   bigeasy_locale: fa_IR
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - ژانویه
     - فوریه
     - مارس
@@ -446,11 +507,53 @@ fa:
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
+  proper_noun_singular_genitive: "%{noun}"
+fi:
+  bigeasy_locale: fi_FI
+  date:
+    abbr_month_names:
+      -
+      - tammi
+      - helmi
+      - maalis
+      - huhti
+      - touko
+      - kesä
+      - heinä
+      - elo
+      - syys
+      - loka
+      - marras
+      - joulu
+    formats:
+      default: "%Y-%m-%d"
+      short: "%b %-d"
+      long: "%B %-d, %Y"
+      weekday: "%A"
+      short_weekday: "%a"
+      medium_with_weekday: "%a %b %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%b %-d, %Y"
+      short_with_weekday: "%a, %b %-d"
+      short_month: "%b"
+      medium_month: "%b %Y"
+      date_at_time: "%b %-d kohteessa %k:%M"
+      full: "%b %-d, %Y %k:%M"
+      full_with_weekday: "%a %b %-d, %Y %k:%M"
+  dow_offset: 1
+  locales:
+    fi: Suomi
+  time:
+    event: "%{date} kohteessa %{time}"
+    formats:
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k%M"
+  proper_noun_singular_genitive: "%{noun}"
 fr:
   bigeasy_locale: fr_FR
   date:
     abbr_month_names:
-    -
+    - 
     - Janv
     - Févr
     - Mars
@@ -486,11 +589,20 @@ fr:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: de %{noun}
 fr-CA:
   bigeasy_locale: fr_CA
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Fév
     - Mar
@@ -526,12 +638,21 @@ fr-CA:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: de %{noun}
 he:
   bigeasy_locale: he_IL
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - ינו׳
     - פבר׳
     - מרץ
@@ -567,11 +688,12 @@ he:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}"
 ht:
   bigeasy_locale: ht_HT
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - fev
     - mas
@@ -608,12 +730,21 @@ ht:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 hu:
   bigeasy_locale: hu_HU
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - márc
@@ -649,12 +780,21 @@ hu:
     formats:
       tiny: "%H:%M "
       tiny_on_the_hour: "%H:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 hy:
   bigeasy_locale: hy_AM
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - Հնվ
     - Փտր
     - Մրտ
@@ -692,11 +832,12 @@ hy:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}-ի"
 is:
   bigeasy_locale: is_IS
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -732,11 +873,20 @@ is:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 it:
   bigeasy_locale: it_IT
   date:
     abbr_month_names:
-    -
+    - 
     - gen
     - feb
     - mar
@@ -772,11 +922,20 @@ it:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: di %{noun}
 ja:
   bigeasy_locale: ja_JP
   date:
     abbr_month_names:
-    -
+    - 
     - 1月
     - 2月
     - 3月
@@ -811,6 +970,7 @@ ja:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k.%M"
+  proper_noun_singular_genitive: "%{noun}"
 ko:
   bigeasy_locale: ko_KR
   crowdsourced: true
@@ -825,7 +985,7 @@ ko:
       - 금
       - 토
     abbr_month_names:
-    -
+    - 
     - 1월
     - 2월
     - 3월
@@ -857,11 +1017,12 @@ ko:
     formats:
       tiny: "%P %l:%M"
       tiny_on_the_hour: "%l%P"
+  proper_noun_singular_genitive: "%{noun}"
 mi:
   bigeasy_locale: mi_NZ
   date:
     abbr_month_names:
-    -
+    - 
     - Hān
     - Pēp
     - Māe
@@ -898,11 +1059,12 @@ mi:
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
+  proper_noun_singular_genitive: "%{noun}'s"
 nb:
   bigeasy_locale: nb_NO
   date:
     abbr_month_names:
-    -
+    - 
     - jan.
     - feb.
     - mars
@@ -938,11 +1100,20 @@ nb:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}'s"
 nb-x-k12:
   bigeasy_locale: nb_NO
   date:
     abbr_month_names:
-    -
+    - 
     - jan.
     - feb.
     - mars
@@ -980,12 +1151,21 @@ nb-x-k12:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}'s"
 nl:
   bigeasy_locale: nl_NL
   crowdsourced: false
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mrt
@@ -1021,12 +1201,21 @@ nl:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: van %{noun}
 nn:
   bigeasy_locale: nn_NO
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mars
@@ -1063,11 +1252,20 @@ nn:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}s"
 pl:
   bigeasy_locale: pl_PL
   date:
     abbr_month_names:
-    -
+    - 
     - Sty
     - Lut
     - Mar
@@ -1103,11 +1301,20 @@ pl:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 pt:
   bigeasy_locale: pt_PT
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - fev
     - mar
@@ -1143,10 +1350,19 @@ pt:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: de %{noun}
 pt-BR:
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - fev
     - mar
@@ -1181,11 +1397,20 @@ pt-BR:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: de %{noun}
 ru:
   bigeasy_locale: ru_RU
   date:
     abbr_month_names:
-    -
+    - 
     - Янв
     - Фев
     - Мар
@@ -1221,11 +1446,20 @@ ru:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 sl:
   bigeasy_locale: sl_SI
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mar
@@ -1260,11 +1494,12 @@ sl:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}"
 sv:
   bigeasy_locale: sv_SE
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mar
@@ -1300,11 +1535,20 @@ sv:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}s"
 sv-x-k12:
   bigeasy_locale: sv_SE
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mar
@@ -1342,12 +1586,13 @@ sv-x-k12:
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k.%M"
+  proper_noun_singular_genitive: "%{noun}s"
 tr:
   bigeasy_locale: tr_TR
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - Oca
     - Şub
     - Mar
@@ -1383,12 +1628,21 @@ tr:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%l%P"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}'nın"
 uk:
   bigeasy_locale: uk_UA
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - січ
     - лют
     - бер
@@ -1424,12 +1678,21 @@ uk:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: " "
+        separator: ","
+    format:
+      delimiter: " "
+      separator: ","
+  proper_noun_singular_genitive: "%{noun}"
 zh-Hans:
   aliases: zh-CN
   bigeasy_locale: zh_CN
   date:
     abbr_month_names:
-    -
+    - 
     - 1月
     - 2月
     - 3月
@@ -1467,12 +1730,13 @@ zh-Hans:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}"
 zh-Hant:
   aliases: zh-TW
   bigeasy_locale: zh_HK
   date:
     abbr_month_names:
-    -
+    - 
     - 1月
     - 2月
     - 3月
@@ -1510,3 +1774,4 @@ zh-Hant:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  proper_noun_singular_genitive: "%{noun}"

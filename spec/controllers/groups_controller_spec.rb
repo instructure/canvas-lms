@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -83,7 +85,7 @@ describe GroupsController do
     end
 
     it "should return groups in sorted by group category name, then group name for student view" do
-      skip "requires pg_collkey on the server" if Group.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
+      skip_unless_pg_collkey_present
       user_session(@student)
       category1 = @course.group_categories.create(:name => "1")
       category2 = @course.group_categories.create(:name => "2")
@@ -753,7 +755,7 @@ describe GroupsController do
         @group.add_user(@student2)
         @group.add_user(@student3)
         @student2.enrollments.first.deactivate
-        @student3.enrollments.first.update_attributes(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
+        @student3.enrollments.first.update(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
       end
 
       it "include active status if requested" do

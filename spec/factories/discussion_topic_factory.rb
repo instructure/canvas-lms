@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -67,6 +69,12 @@ module Factories
     @topic.reload
   end
 
+  def create_valid_discussion_entry
+    course_with_teacher(:active_all => true)
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: 'threaded')
+    @topic.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
+  end
+
   def group_discussion_assignment
     course = @course || course_factory(active_all: true)
     group_category = course.group_categories.create!(:name => "category")
@@ -90,5 +98,15 @@ module Factories
     group_model(name: 'Project Group 1', group_category: @group_category, context: @context)
     opts[:group_category] = @group_category
     @group_topic = @context.discussion_topics.create!(valid_discussion_topic_attributes.merge(opts))
+  end
+
+  def graded_discussion_topic(opts = {})
+    @topic = discussion_topic_model(opts)
+    @assignment = @topic.context.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+    @assignment.infer_times
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+    @topic.save
+    @topic
   end
 end

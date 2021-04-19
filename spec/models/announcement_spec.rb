@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -68,6 +70,21 @@ describe Announcement do
       expect {
         course.announcements.create!(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
       }.to change(Delayed::Job, :count).by(1)
+    end
+
+    it "should unlock the attachment when the job runs" do
+      course_factory(:active_all => true)
+      att = attachment_model(context: @course)
+      announcement = @course.announcements.create!(valid_announcement_attributes.
+        merge(:delayed_post_at => Time.now + 1.week, :workflow_state => 'post_delayed', :attachment => att))
+      att.reload
+      expect(att).to be_locked
+
+      Timecop.freeze(2.weeks.from_now) do
+        run_jobs
+        expect(announcement.reload).to be_active
+        expect(att.reload).to_not be_locked
+      end
     end
   end
 
@@ -185,8 +202,7 @@ describe Announcement do
       n = Notification.create(:name => notification_name, :category => "TestImmediately")
       n2 = Notification.create(:name => "Announcement Created By You", :category => "TestImmediately")
 
-      channel = @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email")
-      channel.confirm
+      channel = communication_channel(@teacher, {username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true})
 
       NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
       NotificationPolicy.create(:notification => n, :communication_channel => @observer.communication_channel, :frequency => "immediately")
@@ -219,7 +235,7 @@ describe Announcement do
       section2 = @course.course_sections.create!
       other_student = user_factory(:active_all => true)
       @course.enroll_student(other_student, :section => section2, :enrollment_state => 'active')
-      section2.update_attributes(:start_at => 2.months.ago, :end_at => 1.month.ago, :restrict_enrollments_to_section_dates => true)
+      section2.update(:start_at => 2.months.ago, :end_at => 1.month.ago, :restrict_enrollments_to_section_dates => true)
 
       notification_name = "New Announcement"
       n = Notification.create(:name => notification_name, :category => "TestImmediately")

@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { RECEIVE_SESSION } from "../actions/session";
+import {RECEIVE_SESSION} from '../actions/session'
 
-const defaultState = {};
+const defaultState = {}
 
 export default function sessionReducer(state = defaultState, action) {
   switch (action.type) {
     case RECEIVE_SESSION:
-      return { ...state, ...action.data };
+      return {...state, ...action.data}
     default:
-      return state;
+      return state
   }
 }

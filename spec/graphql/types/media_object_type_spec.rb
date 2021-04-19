@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -69,6 +71,15 @@ describe Types::MediaObjectType do
         random_url,
         random_url2
       ])
+    end
+
+    it 'returns the correct media tracks for the media object' do
+      @media_object.media_tracks.create!(kind: 'subtitles', locale: 'en', content: 'blah')
+      expect(resolve_media_object_field('mediaTracks { content }')).to eq(['blah'])
+    end
+
+    it 'returns an empty list if there are no media tracks' do
+      expect(resolve_media_object_field('mediaTracks { content }')).to eq([])
     end
 
     it 'returns nil when presented with an unrecognized media type' do
