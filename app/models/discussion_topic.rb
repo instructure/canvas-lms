@@ -1148,6 +1148,9 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read) }
     can :read
 
+    given {|user, session| self.context.grants_all_rights?(user, session, :moderate_forum, :read_forum)}
+    can :moderate_forum
+
     given do |user, session|
       self.allow_rating && (!self.only_graders_can_rate ||
                             self.course.grants_right?(user, session, :manage_grades))

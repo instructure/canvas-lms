@@ -71,5 +71,10 @@ module Types
     def rate
       object.load(:rate)
     end
+
+    field :moderate_forum, Boolean, null: true
+    def moderate_forum
+      object.load(:moderate_forum)
+    end
   end
 end

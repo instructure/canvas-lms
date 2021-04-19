@@ -134,13 +134,30 @@ describe Types::DiscussionType do
   end
 
   it 'returns the current user permissions' do
-    expect(discussion_type.resolve('permissions { delete }')).to eq true
-    expect(discussion.grants_right?(@teacher, nil, :delete)).to eq true
+    permissions = {
+      attach: 'attach',
+      create: 'create',
+      delete: 'delete',
+      duplicate: 'duplicate',
+      moderate_forum: 'moderateForum',
+      rate: 'rate',
+      read: 'read',
+      read_as_admin: 'readAsAdmin',
+      read_replies: 'readReplies',
+      reply: 'reply',
+      update: 'update'
+    }
 
     student_in_course(active_all: true)
-    type = GraphQLTypeTester.new(discussion, current_user: @student)
-    expect(type.resolve('permissions { delete }')).to eq false
-    expect(discussion.grants_right?(@student, nil, :delete)).to eq false
+    type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
+
+    permissions.keys.each do |key|
+      permission = discussion.grants_right?(@teacher, nil, key)
+      expect(discussion_type.resolve("permissions { #{permissions[key]} }")).to eq permission
+
+      permission = discussion.grants_right?(@student, nil, key)
+      expect(type_with_student.resolve("permissions { #{permissions[key]} }")).to eq permission
+    end
   end
 
   it 'returns the course sections' do

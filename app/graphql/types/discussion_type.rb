@@ -125,7 +125,9 @@ module Types
 
     field :permissions, Types::DiscussionPermissionsType, null: true
     def permissions
-      Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+      load_association(:context).then do
+        Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+      end
     end
 
     field :course_sections, [Types::SectionType], null: false
