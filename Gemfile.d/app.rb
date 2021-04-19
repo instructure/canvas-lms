@@ -129,6 +129,7 @@ gem 'switchman', '2.0.9'
 gem 'switchman-inst-jobs', '3.1.2'
 gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.7'
+gem 'tzinfo-data', '1.2021.1'
 gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'week_of_month', '1.2.5',
