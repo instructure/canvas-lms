@@ -2107,7 +2107,7 @@ QUnit.module('EditView student annotation submission', hooks => {
       strictEqual(file.textContent, filename)
     })
 
-    test('hide a11y notice when annotated document type is unchecked', function () {
+    test('hide a11y notice when annotated document type is initially unchecked', function () {
       view = editView(assignmentOpts)
       view.$el.appendTo($('#fixtures'))
       view.$el.find('#assignment_annotated_document').prop('checked', false)
@@ -2116,13 +2116,34 @@ QUnit.module('EditView student annotation submission', hooks => {
       strictEqual(getComputedStyle(info).getPropertyValue('display'), 'none')
     })
 
-    test('show a11y notice when annotated document type is checked', function () {
+    test('show a11y notice if annotated document type is initially checked', function () {
       view = editView(assignmentOpts)
       view.$el.appendTo($('#fixtures'))
       view.$el.find('#assignment_annotated_document').prop('checked', true)
       view.afterRender()
       const info = document.getElementById('assignment_annotated_document_info')
       strictEqual(getComputedStyle(info).getPropertyValue('display'), 'block')
+    })
+
+    test('show a11y notice when annotated document type is clicked', function () {
+      assignmentOpts = {submissionTypes: ['online_text_entry']}
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.afterRender()
+      view.$el.find('#assignment_annotated_document').click()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'block')
+    })
+
+    test('hide a11y notice when annotated document type is deselected', function () {
+      assignmentOpts = {submissionTypes: ['online_text_entry']}
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.afterRender()
+      view.$el.find('#assignment_annotated_document').click()
+      view.$el.find('#assignment_annotated_document').click()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'none')
     })
 
     test('renders a remove button if attachment is present', function () {
