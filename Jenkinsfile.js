@@ -53,7 +53,6 @@ def cleanupFn() {
     if(env.TEST_SUITE != 'upload') {
       archiveArtifacts artifacts: 'tmp/**/*.xml'
       junit "tmp/**/*.xml"
-      sh 'find ./tmp -path "*.xml"'
     }
   }
 }

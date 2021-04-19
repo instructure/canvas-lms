@@ -21,27 +21,23 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def cleanupFn() {
-  try {
-    def htmlFiles
+  def htmlFiles
 
-    sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
+  sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
 
-    dir ('spec_results') {
-      sh 'mv report.html canvas_i18nliner_results.html'
-      htmlFiles = findFiles glob: '*results.html'
-    }
-
-    publishHTML target: [
-      allowMissing: false,
-      alwaysLinkToLastBuild: false,
-      keepAll: true,
-      reportDir: "spec_results",
-      reportFiles: htmlFiles.join(','),
-      reportName: 'Test Results'
-    ]
-  } finally {
-    sh 'rm -vrf ./spec_results/'
+  dir ('spec_results') {
+    sh 'mv report.html canvas_i18nliner_results.html'
+    htmlFiles = findFiles glob: '*results.html'
   }
+
+  publishHTML target: [
+    allowMissing: false,
+    alwaysLinkToLastBuild: false,
+    keepAll: true,
+    reportDir: "spec_results",
+    reportFiles: htmlFiles.join(','),
+    reportName: 'Test Results'
+  ]
 }
 
 pipeline {

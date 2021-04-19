@@ -172,12 +172,8 @@ def sendSlack(success) {
 }
 
 def cleanupFn(status) {
-  try {
-    if(fsc_status != 'aborted') {
-      sendSlack(status == 'SUCCESS')
-    }
-  } finally {
-    sh 'rm -vrf ./tmp/'
+  if(fsc_status != 'aborted') {
+    sendSlack(status == 'SUCCESS')
   }
 }
 
@@ -267,13 +263,8 @@ pipeline {
                         "FSC_TESTS=${partitions[index].join(',')}",
                         "NODE_NUMBER=$node_number"
                       ]) {
-                        try {
-                          setupNode()
-                          executeFlakeySpecCatcher("node$node_number")
-                        }
-                        finally {
-                          sh 'rm -vrf ./tmp'
-                        }
+                        setupNode()
+                        executeFlakeySpecCatcher("node$node_number")
                       }
                     }
                   }

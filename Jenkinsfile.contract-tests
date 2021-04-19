@@ -21,14 +21,10 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def cleanupFn(status) {
-  try {
-    junit "tmp/spec_results/**/*.xml"
+  junit "tmp/spec_results/**/*.xml"
 
-    if(status == 'SUCCESS' && configuration.isChangeMerged()) {
-      sh 'build/new-jenkins/pact/contracts-publish-api.sh'
-    }
-  } finally {
-    sh 'rm -vrf tmp/spec_results'
+  if(status == 'SUCCESS' && configuration.isChangeMerged()) {
+    sh 'build/new-jenkins/pact/contracts-publish-api.sh'
   }
 }
 
