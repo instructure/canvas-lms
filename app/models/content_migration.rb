@@ -662,6 +662,10 @@ class ContentMigration < ActiveRecord::Base
       migration_settings[:import_quizzes_next]
   end
 
+  def quizzes_next_banks_migration?
+    self.quizzes_next_migration? && Account.site_admin.feature_enabled?(:new_quizzes_bank_migrations)
+  end
+
   def import_quizzes_next!(data)
     quizzes2_importer =
       QuizzesNext::Importers::CourseContentImporter.new(data, self)
