@@ -34,6 +34,7 @@ module MicrosoftSync
     # Database batch size for users without AAD ids. Should be an even multiple of
     # GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE:
     ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
+    STANDARD_RETRY_DELAY = {delay_amount: [5, 20, 100].freeze}.freeze
 
     attr_reader :group
     delegate :course, to: :group
@@ -100,14 +101,16 @@ module MicrosoftSync
       StateMachineJob::DelayedNextStep.new(
         :step_update_group_with_course_data, 2.seconds, new_group_id
       )
+    rescue *Errors::INTERMITTENT => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY)
     end
 
     def step_update_group_with_course_data(_mem_state, group_id)
       graph_service_helpers.update_group_with_course_data(group_id, course)
       group.update! ms_group_id: group_id
       StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
-    rescue Errors::HTTPNotFound => e
-      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100], job_state_data: group_id)
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY, job_state_data: group_id)
     end
 
     # Gets users enrolled in course, get UPNs ("userPrincipalName"s, e.g. email
@@ -131,8 +134,8 @@ module MicrosoftSync
       end
 
       StateMachineJob::NextStep.new(:step_generate_diff)
-    rescue Errors::HTTPNotFound => e
-      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100])
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY)
     end
 
     # Get group members/owners from the API and local enrollments and calculate
@@ -147,8 +150,8 @@ module MicrosoftSync
       end
 
       StateMachineJob::NextStep.new(:step_execute_diff, diff)
-    rescue Errors::HTTPNotFound => e
-      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100])
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY)
     end
 
     # Run the API calls to add/remove users.
@@ -172,8 +175,8 @@ module MicrosoftSync
       end
 
       StateMachineJob::NextStep.new(:step_check_team_exists)
-    rescue Errors::HTTPNotFound => e
-      StateMachineJob::Retry.new(error: e, delay_amount: [5, 20, 100], step: :step_generate_diff)
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY, step: :step_generate_diff)
     end
 
     def step_check_team_exists(_mem_data, _job_state_data)
@@ -183,6 +186,8 @@ module MicrosoftSync
       else
         StateMachineJob::COMPLETE
       end
+    rescue *Errors::INTERMITTENT => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY)
     end
 
     def step_create_team(_mem_data, _job_state_data)
@@ -199,6 +204,8 @@ module MicrosoftSync
       # in the generate_diff step. This is rare, but we can also sleep in that
       # case. We'll eventually fail but the team will be created next time we sync.
       StateMachineJob::Retry.new(error: e, delay_amount: [30, 90, 270])
+    rescue *Errors::INTERMITTENT => e
+      StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY)
     end
 
     def tenant
