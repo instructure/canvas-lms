@@ -43,8 +43,15 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_import_enabled?).to eq false
     end
 
-    it 'should be true when new_quizzes enabled' do
+    it 'should be false when new_quizzes disabled and allowed' do
       allow(@course).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
+      allow(@course).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(new_quizzes_import_enabled?).to eq false
+    end
+
+    it 'should be true when new_quizzes enabled' do
+      allow(@course).to receive(:feature_allowed?).with(:quizzes_next).and_return(false)
+      allow(@course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
       expect(new_quizzes_import_enabled?).to eq true
     end
   end
