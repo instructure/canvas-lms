@@ -776,7 +776,7 @@ acknowledge that you have read and agreed to the
               else
                 options << [t("Inherit (%{course_name})", course_name: @account.parent_account.effective_course_template&.name || t("No Template Selected")), nil ]
                 options << [t("No Template Selected"), 0]
-                disabled.concast(0, nil) unless @account.course_template_id == 0 || @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
+                disabled.concat([0, nil]) unless @account.course_template_id == 0 || @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
               end
 
               visible_templates = @account.
