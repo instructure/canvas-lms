@@ -86,11 +86,9 @@
           disabled=submissionTypesFrozen}}
           {{#t "labels.allows_annotated_document"}}Student Annotation{{/t}}
         </label>
-        <div style="{{hiddenUnless acceptsAnnotatedDocument}}">
-          <div id="assignment_annotated_document_info">
-            {{#t}}Consider selecting multiple submission types to accommodate students who may not be able to create
-            annotations.{{/t}}
-          </div>
+        <div id="assignment_annotated_document_info" style="{{hiddenUnless acceptsAnnotatedDocument}}">
+          {{#t}}Consider selecting multiple submission types to accommodate students who may not be able to create
+          annotations.{{/t}}
         </div>
         <div id="annotated_document_chooser_container" class="nested" aria-expanded="{{acceptsAnnotatedDocument}}"
           style="{{hiddenUnless acceptsAnnotatedDocument}}; padding: 0 0 0 42px;">
