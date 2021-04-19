@@ -600,5 +600,22 @@ describe "accounts/settings.html.erb" do
       expect(select.css('option').map { |o| o['value'] }).to eq ["", c.id.to_s]
       expect(select.css('option').map { |o| o['disabled'] }).to eq [nil, "disabled"]
     end
+
+    it "disables if you don't have permission in a sub-account" do
+      c = account.courses.create!(template: true)
+      account.role_overrides.create!(role: admin.account_users.first.role, permission: :edit_course_template, enabled: false)
+      account.role_overrides.create!(role: admin.account_users.first.role, permission: :delete_course_template, enabled: false)
+
+      a2 = account.sub_accounts.create!
+      view_context(a2, admin)
+      assign(:context, a2)
+      assign(:account, a2)
+
+      render
+      doc = Nokogiri::HTML5(response.body)
+      select = doc.at_css('#account_course_template_id')
+      expect(select.css('option').map { |o| o['value'] }).to eq ["", "0", c.id.to_s]
+      expect(select.css('option').map { |o| o['disabled'] }).to eq ["disabled", "disabled", "disabled"]
+    end
   end
 end
