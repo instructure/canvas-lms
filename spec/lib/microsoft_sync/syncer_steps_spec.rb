@@ -25,8 +25,8 @@ describe MicrosoftSync::SyncerSteps do
     course_model(name: 'sync test course')
   end
   let(:group) { MicrosoftSync::Group.create(course: course) }
-  let(:graph_service) { double('GraphService') }
-  let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: graph_service) }
+  let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: double('GraphService')) }
+  let(:graph_service) { graph_service_helpers.graph_service }
   let(:tenant) { 'mytenant123' }
   let(:sync_enabled) { true }
 
@@ -110,6 +110,27 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
+  shared_examples_for 'a step that returns retry on intermittent error' do |retry_args|
+    let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
+
+    [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
+      context "when hitting the Microsoft API raises a #{error_class}" do
+        it 'returns a Retry object' do
+          expect(graph_service).to receive(:request).and_raise(error_class.new)
+          expect_retry(subject, error_class: error_class, **retry_args)
+        end
+      end
+    end
+
+    context "when Microsoft API returns a 500" do
+      it 'returns a Retry object' do
+        expect(graph_service).to receive(:request).and_raise(new_http_error(500))
+        expect_retry(subject,
+                     error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
+      end
+    end
+  end
+
   describe '#step_ensure_class_group_exists' do
     subject { syncer_steps.step_ensure_class_group_exists(nil, nil) }
 
@@ -120,6 +141,8 @@ describe MicrosoftSync::SyncerSteps do
 
     shared_examples_for 'a group record which requires a new or updated MS group' do
       let(:education_class_ids) { [] }
+
+      it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
 
       context 'when no remote MS group exists for the course' do
         # admin deleted the MS group we created, or a group never existed
@@ -210,6 +233,9 @@ describe MicrosoftSync::SyncerSteps do
       syncer_steps.step_update_group_with_course_data(nil, 'newid')
     end
 
+    it_behaves_like 'a step that returns retry on intermittent error',
+                    delay_amount: [5, 20, 100], job_state_data: 'newid'
+
     context 'on success' do
       it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
         expect(graph_service_helpers).to \
@@ -270,59 +296,11 @@ describe MicrosoftSync::SyncerSteps do
         communication_channel(teacher, path_type: 'email', username: "teacher#{i}@example.com")
       end
 
-      allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-        raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
-
-        upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
-      end
     end
 
-    it 'creates a mapping for each of the enrollments' do
-      expect_next_step(subject, :step_generate_diff)
-      expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
-        students.each_with_index.map{|student, n| [student.id, "student#{n}-aad"]}.sort +
-        teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-aad"]}.sort
-      )
-    end
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
 
-    it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
-      expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
-      expect_next_step(subject, :step_generate_diff)
-    end
-
-    context "when Microsoft doesn't have AADs for the UPNs" do
-      it "doesn't add any UserMappings" do
-        expect(graph_service_helpers).to receive(:users_upns_to_aads).
-          at_least(:once).and_return({})
-        expect { subject }.to_not \
-          change { MicrosoftSync::UserMapping.count }.from(0)
-        expect_next_step(subject, :step_generate_diff)
-      end
-    end
-
-    context 'when some users already have a mapping for that root account id' do
-      before do
-        MicrosoftSync::UserMapping.create!(
-          user: students.first, root_account_id: course.root_account_id, aad_id: 'manualstudent1'
-        )
-        MicrosoftSync::UserMapping.create!(
-          user: students.second, root_account_id: 0, aad_id: 'manualstudent2-wrong-rootaccount'
-        )
-      end
-
-      it "doesn't lookup aads for those users" do
-        upns_looked_up = []
-        expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-          upns_looked_up += upns
-          {}
-        end
-        expect_next_step(subject, :step_generate_diff)
-        expect(upns_looked_up).to_not include("student0@example.com")
-        expect(upns_looked_up).to include("student1@example.com")
-      end
-    end
-
-    context 'on 404' do
+    context "when Microsoft's API returns 404" do
       it 'retries with a delay' do
         expect(graph_service_helpers).to receive(:users_upns_to_aads).and_raise(new_http_error(404))
         expect_retry(
@@ -331,10 +309,67 @@ describe MicrosoftSync::SyncerSteps do
         )
       end
     end
+
+    context "when Microsoft's API returns success" do
+      before do
+        allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
+          raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
+
+          upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+        end
+      end
+
+      it 'creates a mapping for each of the enrollments' do
+        expect_next_step(subject, :step_generate_diff)
+        expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
+          students.each_with_index.map{|student, n| [student.id, "student#{n}-aad"]}.sort +
+          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-aad"]}.sort
+        )
+      end
+
+      it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
+        expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
+        expect_next_step(subject, :step_generate_diff)
+      end
+
+      context "when Microsoft doesn't have AADs for the UPNs" do
+        it "doesn't add any UserMappings" do
+          expect(graph_service_helpers).to receive(:users_upns_to_aads)
+            .at_least(:once).and_return({})
+          expect { subject }.to_not \
+            change { MicrosoftSync::UserMapping.count }.from(0)
+          expect_next_step(subject, :step_generate_diff)
+        end
+      end
+
+      context 'when some users already have a mapping for that root account id' do
+        before do
+          MicrosoftSync::UserMapping.create!(
+            user: students.first, root_account_id: course.root_account_id, aad_id: 'manualstudent1'
+          )
+          MicrosoftSync::UserMapping.create!(
+            user: students.second, root_account_id: 0, aad_id: 'manualstudent2-wrong-rootaccount'
+          )
+        end
+
+        it "doesn't lookup aads for those users" do
+          upns_looked_up = []
+          expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
+            upns_looked_up += upns
+            {}
+          end
+          expect_next_step(subject, :step_generate_diff)
+          expect(upns_looked_up).to_not include("student0@example.com")
+          expect(upns_looked_up).to include("student1@example.com")
+        end
+      end
+    end
   end
 
   describe '#step_generate_diff' do
     subject { syncer_steps.step_generate_diff(nil, nil) }
+
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
 
     before do
       course.enrollments.to_a.each_with_index do |enrollment, i|
@@ -379,6 +414,9 @@ describe MicrosoftSync::SyncerSteps do
 
     let(:diff) { double('MembershipDiff') }
 
+    it_behaves_like 'a step that returns retry on intermittent error',
+                    delay_amount: [5, 20, 100], step: :step_generate_diff
+
     before do
       group.update!(ms_group_id: 'mygroup')
 
@@ -419,6 +457,8 @@ describe MicrosoftSync::SyncerSteps do
 
     before { group.update!(ms_group_id: 'mygroupid') }
 
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+
     context 'when there are no teacher/ta/designer enrollments' do
       it "doesn't check for team existence or create a team" do
         course.enrollments.to_a.each do |e|
@@ -448,6 +488,8 @@ describe MicrosoftSync::SyncerSteps do
     subject { syncer_steps.step_create_team(nil, nil) }
 
     before { group.update!(ms_group_id: 'mygroupid') }
+
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
 
     it 'creates the team' do
       expect(graph_service).to receive(:create_education_class_team).with('mygroupid')

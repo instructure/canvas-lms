@@ -82,7 +82,12 @@ describe MicrosoftSync::Errors do
     describe '.for' do
       {
         400 => MicrosoftSync::Errors::HTTPBadRequest,
-        404 => MicrosoftSync::Errors::HTTPNotFound
+        404 => MicrosoftSync::Errors::HTTPNotFound,
+        409 => MicrosoftSync::Errors::HTTPConflict,
+        500 => MicrosoftSync::Errors::HTTPInternalServerError,
+        502 => MicrosoftSync::Errors::HTTPBadGateway,
+        503 => MicrosoftSync::Errors::HTTPServiceUnavailable,
+        504 => MicrosoftSync::Errors::HTTPGatewayTimeout,
       }.each do |status_code, error_class|
         context "when the response status code is #{status_code}" do
           let(:code) { status_code }

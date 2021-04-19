@@ -60,6 +60,10 @@ module MicrosoftSync
           400 => HTTPBadRequest,
           404 => HTTPNotFound,
           409 => HTTPConflict,
+          500 => HTTPInternalServerError,
+          502 => HTTPBadGateway,
+          503 => HTTPServiceUnavailable,
+          504 => HTTPGatewayTimeout,
         }
       end
 
@@ -79,5 +83,24 @@ module MicrosoftSync
     class HTTPNotFound < HTTPInvalidStatus; end
     class HTTPBadRequest < HTTPInvalidStatus; end
     class HTTPConflict < HTTPInvalidStatus; end
+    class HTTPInternalServerError < HTTPInvalidStatus; end
+    class HTTPBadGateway < HTTPInvalidStatus; end
+    class HTTPServiceUnavailable < HTTPInvalidStatus; end
+    class HTTPGatewayTimeout < HTTPInvalidStatus; end
+
+    INTERMITTENT = [
+      EOFError,
+      Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EINVAL, Errno::ETIMEDOUT,
+      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
+      OpenSSL::SSL::SSLError,
+      SocketError,
+      Timeout::Error,
+
+      HTTPBadGateway, HTTPGatewayTimeout, HTTPInternalServerError, HTTPServiceUnavailable,
+    ].freeze
+
+    # Microsoft's API being eventually consistent requires us to retry 404s
+    # (HTTPNotFound) is many cases, particularly when first adding a group.
+    INTERMITTENT_AND_NOTFOUND = [*INTERMITTENT, HTTPNotFound].freeze
   end
 end
