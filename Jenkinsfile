@@ -319,9 +319,11 @@ pipeline {
 
           def buildSummaryReportHooks = [
             onStageEnded: { stageName, _, buildResult ->
-              buildSummaryReport.addFailureRun(stageName, buildResult)
-              buildSummaryReport.addRunTestActions(stageName, buildResult)
-              buildSummaryReport.setStageIgnored(stageName)
+              if(buildResult) {
+                buildSummaryReport.addFailureRun(stageName, buildResult)
+                buildSummaryReport.addRunTestActions(stageName, buildResult)
+                buildSummaryReport.setStageIgnored(stageName)
+              }
             }
           ]
 
