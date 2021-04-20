@@ -16,6 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import groovy.transform.Field
+
+@Field static dockerVolumeName = "gergich-results-${System.currentTimeMillis()}"
+
 def _getDockerInputs() {
   def inputVars = [
     "--volume $WORKSPACE/.git:/usr/src/app/.git",
@@ -43,7 +47,7 @@ def _getDockerInputs() {
   return inputVars.join(' ')
 }
 
-def call() {
+def setupNode() {
   credentials.withStarlordCredentials {
     sh "./build/new-jenkins/linters/docker-build.sh local/gergich"
 
@@ -54,21 +58,36 @@ def call() {
       """
     }
 
-    credentials.withGerritCredentials {
-      withEnv([
-        "DOCKER_INPUTS=${_getDockerInputs()}",
-        "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
-        "GERGICH_VOLUME=gergich-results-${System.currentTimeMillis()}",
-        "PLUGINS_LIST=${configuration.plugins().join(' ')}",
-        "SKIP_ESLINT=${configuration.getString('skip-eslint', 'false')}",
-      ]) {
-        sh 'build/new-jenkins/linters/run-gergich.sh'
-      }
+    sh "docker volume create $dockerVolumeName"
+  }
+}
+
+def tearDownNode() {
+  withEnv([
+    "DOCKER_INPUTS=${_getDockerInputs()}",
+    "GERGICH_VOLUME=$dockerVolumeName",
+  ]) {
+    sh './build/new-jenkins/linters/run-gergich-publish.sh'
+  }
+}
+
+def call() {
+  setupNode()
+
+  credentials.withGerritCredentials {
+    withEnv([
+      "DOCKER_INPUTS=${_getDockerInputs()}",
+      "GERGICH_VOLUME=${dockerVolumeName}",
+      "PLUGINS_LIST=${configuration.plugins().join(' ')}",
+      "SKIP_ESLINT=${configuration.getString('skip-eslint', 'false')}",
+    ]) {
+      sh 'build/new-jenkins/linters/run-gergich.sh'
     }
-    if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
-      credentials.withMasterBouncerCredentials {
-        sh 'build/new-jenkins/linters/run-master-bouncer.sh'
-      }
-    }
+  }
+
+  tearDownNode()
+
+  if(configuration.getBoolean('force-failure-linters', 'false')) {
+    error "lintersStage: force failing due to flag"
   }
 }

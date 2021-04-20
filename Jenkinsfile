@@ -417,6 +417,14 @@ pipeline {
                   .required(!configuration.isChangeMerged())
                   .queue(stages, { lintersStage() })
 
+                extendedStage('Master Bouncer')
+                  .required(env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged())
+                  .queue(stages) {
+                    credentials.withMasterBouncerCredentials {
+                      sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+                    }
+                  }
+
                 extendedStage('Consumer Smoke Test').queue(stages) {
                   sh 'build/new-jenkins/consumer-smoke-test.sh'
                 }
