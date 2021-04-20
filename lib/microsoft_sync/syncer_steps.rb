@@ -36,6 +36,16 @@ module MicrosoftSync
     ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
     STANDARD_RETRY_DELAY = {delay_amount: [5, 20, 100].freeze}.freeze
 
+    # SyncCanceled errors are semi-expected errors -- so we raise them they will
+    # cleanup_after_failure but not produce a failed job.
+    class SyncCanceled < Errors::PublicError
+      include StateMachineJob::GracefulCancelErrorMixin
+    end
+
+    class MissingOwners < SyncCanceled; end
+    # Can happen when User disables sync on account-level when jobs are running:
+    class TenantMissingOrSyncDisabled < SyncCanceled; end
+
     attr_reader :group
     delegate :course, to: :group
 
@@ -62,13 +72,6 @@ module MicrosoftSync
 
     def after_complete
       group.update!(last_synced_at: Time.zone.now)
-    end
-
-    # This is semi-expected (user disables sync on account-level when jobs are
-    # running), so we raise this which will cleanup_after_failure but not
-    # produce a failed job.
-    class TenantMissingOrSyncDisabled < StandardError
-      include StateMachineJob::GracefulCancelErrorMixin
     end
 
     # First step of a full sync. Create group on the Microsoft side.
@@ -156,6 +159,14 @@ module MicrosoftSync
 
     # Run the API calls to add/remove users.
     def step_execute_diff(diff, _job_state_data)
+      # TODO: If there are no instructor enrollments, we actually want to
+      # remove the group on the Microsoft side (INTEROP-6672)
+      if diff.local_owners.empty?
+        raise MissingOwners, 'A Microsoft 365 Group must have owners, and no users ' \
+          'corresponding to the instructors of the Canvas course could be found on the ' \
+          'Microsoft side.'
+      end
+
       batch_size = GraphService::GROUP_USERS_ADD_BATCH_SIZE
       diff.additions_in_slices_of(batch_size) do |members_and_owners|
         graph_service.add_users_to_group(group.ms_group_id, members_and_owners)
@@ -163,9 +174,7 @@ module MicrosoftSync
 
       # Microsoft will not let you remove the last owner in a group, so it's
       # slightly safer to remove owners last in case we need to completely
-      # change owners. TODO: A class could still have all of its teacher
-      # enrollments removed, need to remove the group when this happens
-      # (INTEROP-6672)
+      # change owners.
       diff.members_to_remove.each do |aad|
         graph_service.remove_group_member(group.ms_group_id, aad)
       end

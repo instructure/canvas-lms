@@ -28,10 +28,36 @@ describe MicrosoftSync::Errors do
         end
       end
 
+      class MicrosoftSync::Errors::TestError2 < MicrosoftSync::Errors::PublicError; end
+
       it 'shows the error class name and the public_message' do
         error = MicrosoftSync::Errors::TestError.new("abc")
         expect(described_class.user_facing_message(error)).to \
           eq("Microsoft Sync Errors Test Error: the public message")
+      end
+
+      context 'when there is no public_message but there is a message' do
+        it 'shows the error class name and the message' do
+          error = MicrosoftSync::Errors::TestError2.new('some message')
+          expect(described_class.user_facing_message(error)).to \
+            eq("Microsoft Sync Errors Test Error2: some message")
+        end
+      end
+
+      context 'when there is no public message or message' do
+        it 'shows just the error class name' do
+          error = MicrosoftSync::Errors::TestError2.new
+          expect(described_class.user_facing_message(error)).to \
+            eq("Microsoft Sync Errors Test Error2")
+        end
+      end
+
+      context 'when the public message is just the error class name' do
+        it 'shows just the error class name' do
+          error = MicrosoftSync::Errors::TestError2.new('MicrosoftSync::Errors::TestError2')
+          expect(described_class.user_facing_message(error)).to \
+            eq("Microsoft Sync Errors Test Error2")
+        end
       end
     end
 

@@ -28,8 +28,9 @@ module MicrosoftSync
   module Errors
     def self.user_facing_message(error)
       error_name = error.class.name.underscore.split(%r{[_/]}).map(&:capitalize).join(' ')
-      case error
-      when MicrosoftSync::Errors::PublicError
+
+      if error.is_a?(MicrosoftSync::Errors::PublicError) && error.public_message.present? &&
+          error.public_message != error.class.name
         "#{error_name}: #{error.public_message}"
       else
         error_name

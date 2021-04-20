@@ -166,4 +166,13 @@ describe MicrosoftSync::MembershipDiff do
         eq(%w[teacher1 teacher3])
     end
   end
+
+  describe '#local_owners' do
+    it 'returns the local owners' do
+      set_local_members 'teacher', [1], member_enrollment_type
+      set_local_members 'teacher', [2, 4], owner_enrollment_type
+      set_local_members 'teacher', [4, 5, 6], owner_enrollment_type
+      expect(subject.local_owners).to eq(Set.new(%w[teacher2 teacher4 teacher5 teacher6]))
+    end
+  end
 end
