@@ -1487,6 +1487,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :accounts) do
       get 'accounts', action: :index, as: :accounts
       get 'course_accounts', :action => :course_accounts, :as => :course_accounts
+      get 'manageable_accounts', :action => :manageable_accounts, :as => :manageable_accounts
       get 'accounts/:id', action: :show, as: :account
       put 'accounts/:id', action: :update
       get 'accounts/:account_id/terms_of_service', action: :terms_of_service

@@ -339,6 +339,25 @@ class AccountsController < ApplicationController
     end
   end
 
+  # @API Get accounts that admins can manage
+  # A paginated list of accounts where the current user has permission to create
+  # or manage courses. List will be empty for students and teachers as only admins
+  # can view which accounts they are in.
+  #
+  # @returns [Account]
+  def manageable_accounts
+    @accounts = @current_user ? @current_user.adminable_accounts : []
+    @all_accounts = Set.new
+    @accounts.each do |a|
+      if a.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+        @all_accounts << a
+        @all_accounts.merge Account.active.sub_accounts_recursive(a.id)
+      end
+    end
+    @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
+    render :json => @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
+  end
+
   # @API List accounts for course admins
   # A paginated list of accounts that the current user can view through their
   # admin course enrollments. (Teacher, TA, or designer enrollments).

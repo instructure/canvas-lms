@@ -2546,6 +2546,25 @@ describe UsersController do
         end
       end
     end
+
+    context "ENV.PERMISSIONS" do
+      before :once do
+        course_with_student
+      end
+
+      it "sets :create_courses to true if user is admin" do
+        account_admin_user
+        user_session @user
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses]).to be_truthy
+      end
+
+      it "sets :create_courses to false if user is not admin" do
+        user_session @student
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses]).to be_falsey
+      end
+    end
   end
 
   describe "#pandata_events_token" do

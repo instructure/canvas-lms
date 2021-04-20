@@ -128,6 +128,26 @@ export const sendMessage = (recipientId, message, subject) =>
     body: {recipients: [recipientId], body: message, group_conversation: false, subject}
   })
 
+/* Creates a new course with name in provided account */
+export const createNewCourse = (accountId, courseName) =>
+  doFetchApi({
+    path: `/api/v1/accounts/${accountId}/courses`,
+    method: 'POST',
+    params: {'course[name]': courseName}
+  }).then(data => data.json)
+
+/* Enrolls the current user as a teacher in the provided course */
+export const enrollAsTeacher = courseId =>
+  doFetchApi({
+    path: `/api/v1/courses/${courseId}/enrollments`,
+    method: 'POST',
+    params: {
+      'enrollment[type]': 'TeacherEnrollment',
+      'enrollment[user_id]': 'self',
+      'enrollment[enrollment_state]': 'active'
+    }
+  })
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',

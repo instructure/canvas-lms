@@ -17,17 +17,22 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, act, fireEvent, waitFor} from '@testing-library/react'
 import {HomeroomPage} from '../HomeroomPage'
 
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({
     visible: true,
+    canCreateCourses: true,
     ...overrides
   })
 
   beforeEach(() => {
     window.ENV.INITIAL_NUM_K5_CARDS = 3
+  })
+
+  afterAll(() => {
+    window.ENV = {}
   })
 
   it('shows loading skeletons while loading for announcements and cards', () => {
@@ -63,5 +68,38 @@ describe('HomeroomPage', () => {
     const {queryAllByText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
     expect(queryAllByText('Loading Card').length).toBe(0)
     expect(getByText('Computer Science 101')).toBeInTheDocument()
+  })
+
+  it('shows a panda and message if the user has no cards', () => {
+    const {getByText, getByTestId} = render(<HomeroomPage {...getProps({cards: []})} />)
+    expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
+    expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
+  })
+
+  describe('start a new course button', () => {
+    it('is not present if canCreateCourses is false', () => {
+      const {queryByText} = render(<HomeroomPage {...getProps({canCreateCourses: false})} />)
+      expect(queryByText('Open new course modal')).not.toBeInTheDocument()
+    })
+
+    describe('with canCreateCourses set to true', () => {
+      it('is visible', () => {
+        const {getByText} = render(<HomeroomPage {...getProps()} />)
+        expect(getByText('Open new course modal')).toBeInTheDocument()
+      })
+
+      it('shows a tooltip on hover', async () => {
+        const {getByText, queryByText} = render(<HomeroomPage {...getProps()} />)
+        await waitFor(() => expect(queryByText('Start a new course')).not.toBeVisible())
+        fireEvent.focus(getByText('Open new course modal'))
+        await waitFor(() => expect(getByText('Start a new course')).toBeVisible())
+      })
+
+      it('opens up the modal on click', () => {
+        const {getByText} = render(<HomeroomPage {...getProps()} />)
+        act(() => getByText('Open new course modal').click())
+        expect(getByText('Create Course')).toBeInTheDocument()
+      })
+    })
   })
 })

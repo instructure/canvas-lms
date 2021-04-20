@@ -85,7 +85,8 @@ export const K5Dashboard = ({
   toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
-  responsiveSize = 'large'
+  responsiveSize = 'large',
+  canCreateCourses = false
 }) => {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [cards, setCards] = useState(null)
@@ -140,6 +141,7 @@ export const K5Dashboard = ({
           isStudent={plannerEnabled}
           responsiveSize={responsiveSize}
           visible={currentTab === TAB_IDS.HOMEROOM}
+          canCreateCourses={canCreateCourses}
         />
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
@@ -165,7 +167,8 @@ K5Dashboard.propTypes = {
   toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  responsiveSize: PropTypes.string
+  responsiveSize: PropTypes.string,
+  canCreateCourses: PropTypes.bool
 }
 
 const mapDispatchToProps = {
