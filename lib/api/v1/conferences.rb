@@ -29,13 +29,6 @@ module Api::V1::Conferences
     ).freeze
   }.freeze
 
-  UI_CONFERENCE_JSON_ONLY = %w(
-    id title conference_type description
-    duration ended_at started_at long_running
-    recordings join_url has_advanced_settings conference_key
-    context_type context_id
-  ).freeze
-
   def api_conferences_json(conferences, user, session)
     json = conferences.map {|c| api_conference_json(c, user, session)}
     {'conferences' => json}
@@ -56,7 +49,6 @@ module Api::V1::Conferences
     cs = conferences.map do |c|
       begin
         c.as_json(
-          only: UI_CONFERENCE_JSON_ONLY,
           permissions: {
             user: user,
             session: session,
@@ -80,7 +72,6 @@ module Api::V1::Conferences
     )
 
     conference.as_json(
-      only: UI_CONFERENCE_JSON_ONLY,
       permissions: {
         user: user,
         session: session,
