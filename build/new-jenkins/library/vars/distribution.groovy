@@ -40,7 +40,7 @@ def appendStagesAsBuildNodes(nodes,
     // we cant use String.format, so... yea
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
-    extendedStage(stage_name).nodeRequirements(label: 'canvas-docker').queue(nodes) {
+    extendedStage(stage_name).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').queue(nodes) {
       echo "Running on node ${env.NODE_NAME}"
       def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
       // make sure to unstash

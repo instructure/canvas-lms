@@ -83,7 +83,7 @@ def slackSendCacheBuild(block) {
 }
 
 def jsImage() {
-  credentials.withStarlordCredentials {
+  credentials.withStarlordDockerLogin {
     try {
       def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
@@ -110,7 +110,7 @@ def jsImage() {
 }
 
 def premergeCacheImage() {
-  credentials.withStarlordCredentials {
+  credentials.withStarlordDockerLogin {
     withEnv([
       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
@@ -144,7 +144,7 @@ def premergeCacheImage() {
 }
 
 def patchsetImage() {
-  credentials.withStarlordCredentials {
+  credentials.withStarlordDockerLogin {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
     slackSendCacheBuild {

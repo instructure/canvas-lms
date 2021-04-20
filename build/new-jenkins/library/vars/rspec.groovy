@@ -105,7 +105,7 @@ def _runRspecTestSuite(
     try {
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 15) {
-        credentials.withStarlordCredentials { ->
+        credentials.withStarlordDockerLogin { ->
           sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
         }
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')

@@ -70,6 +70,7 @@ pipeline {
   }
 
   environment {
+    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_DOCKER_CLI_BUILD=1
     COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
     DOCKER_BUILDKIT=1
@@ -85,7 +86,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: 'canvas-docker').obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             stage('Setup') {
               timeout(time: 3) {
                 sh 'rm -vrf ./tmp/*'
@@ -93,7 +94,7 @@ pipeline {
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
 
-                credentials.withStarlordCredentials { ->
+                credentials.withStarlordDockerLogin { ->
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
                 }
               }

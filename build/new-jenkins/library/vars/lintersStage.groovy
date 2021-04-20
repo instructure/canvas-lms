@@ -48,7 +48,7 @@ def _getDockerInputs() {
 }
 
 def setupNode() {
-  credentials.withStarlordCredentials {
+  credentials.withStarlordDockerLogin {
     sh "./build/new-jenkins/linters/docker-build.sh local/gergich"
 
     if(configuration.getBoolean('upload-linter-debug-image', 'false')) {

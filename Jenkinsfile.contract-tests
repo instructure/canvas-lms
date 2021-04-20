@@ -50,6 +50,7 @@ pipeline {
   }
 
   environment {
+    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-contract-tests.yml'
     DOCKER_PROCESSES = '7'
     POSTGRES_PASSWORD = 'sekret'
@@ -62,14 +63,14 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: 'canvas-docker').obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             stage('Start Docker Images') {
               timeout(time: 3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
 
-                credentials.withStarlordCredentials { ->
+                credentials.withStarlordDockerLogin { ->
                   sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
                 }
                 sh 'build/new-jenkins/pact/docker-compose-pact-setup.sh'
