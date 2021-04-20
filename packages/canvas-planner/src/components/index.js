@@ -20,4 +20,5 @@
 // to make them themeable by consumers.
 export {default as Day} from './Day'
 export {default as Grouping} from './Grouping'
+export {default as JumpToHeaderButton} from './JumpToHeaderButton'
 export {default as PlannerItem} from './PlannerItem'

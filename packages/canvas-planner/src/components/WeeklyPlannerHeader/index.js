@@ -35,6 +35,8 @@ import {isInMomentRange} from '../../utilities/dateUtils'
 import theme from './theme'
 import styles from './styles.css'
 
+export const WEEKLY_PLANNER_ACTIVE_BTN_ID = 'weekly-header-active-button'
+
 // Breaking our encapsulation by reaching outside our dom sub-tree
 // I suppose we could wire up the event handlers in K5Dashboard.js
 // and pass the height as a prop to all the pages. Maybe it will be
@@ -69,7 +71,6 @@ export class WeeklyPlannerHeader extends Component {
       loadingError: PropTypes.string
     }).isRequired,
     visible: PropTypes.bool,
-    isFooter: PropTypes.bool,
     todayMoment: momentObj,
     weekStartMoment: momentObj,
     weekEndMoment: momentObj,
@@ -88,9 +89,7 @@ export class WeeklyPlannerHeader extends Component {
     prevEnabled: true,
     nextEnabled: true,
     focusedButtonIndex: 1, // start with the today button
-    buttons: [this.prevButtonRef, this.todayButtonRef, this.nextButtonRef],
-    focused: false,
-    activeButton: 0 // -1 for prev, 0 for today, 1 for next
+    buttons: [this.prevButtonRef, this.todayButtonRef, this.nextButtonRef]
   }
 
   handleStickyOffset = () => {
@@ -100,14 +99,14 @@ export class WeeklyPlannerHeader extends Component {
   handlePrev = () => {
     this.prevButtonRef.current.focus()
     this.props.loadPastWeekItems()
-    this.setState({focusedButtonIndex: 0, activeButton: -1})
+    this.setState({focusedButtonIndex: 0})
   }
 
   handleToday = () => {
     this.todayButtonRef.current.focus()
     this.props.loadThisWeekItems()
     this.setState((state, _props) => {
-      return {focusedButtonIndex: state.prevEnabled ? 1 : 0, activeButton: 0}
+      return {focusedButtonIndex: state.prevEnabled ? 1 : 0}
     })
   }
 
@@ -115,7 +114,7 @@ export class WeeklyPlannerHeader extends Component {
     this.nextButtonRef.current.focus()
     this.props.loadNextWeekItems({loadMoreButtonClicked: true})
     this.setState((state, _props) => {
-      return {focusedButtonIndex: state.prevEnabled ? 2 : 1, activeButton: 1}
+      return {focusedButtonIndex: state.prevEnabled ? 2 : 1}
     })
   }
 
@@ -131,14 +130,6 @@ export class WeeklyPlannerHeader extends Component {
     }
     this.state.buttons[newFocusedIndex].current?.focus()
     this.setState({focusedButtonIndex: newFocusedIndex})
-  }
-
-  handleFocus = () => {
-    this.setState({focused: true})
-  }
-
-  handleBlur = () => {
-    this.setState({focused: false})
   }
 
   updateButtons() {
@@ -187,7 +178,7 @@ export class WeeklyPlannerHeader extends Component {
     // 2. the window becomes narrow enough for the tabs to wrap.
     // We need to relocate the WeeklyPlannerHeader so it sticks
     // to the bottom of the tabs panel.
-    if (!this.props.isFooter && this.props.visible !== prevProps.visible) {
+    if (this.props.visible !== prevProps.visible) {
       if (this.props.visible) {
         const focusTarget = processFocusTarget()
         this.handleStickyOffset()
@@ -215,7 +206,7 @@ export class WeeklyPlannerHeader extends Component {
     ) {
       const buttons = this.updateButtons()
 
-      if (!this.props.isFooter && prevState.buttons.length === 3 && buttons.length === 2) {
+      if (prevState.buttons.length === 3 && buttons.length === 2) {
         // when prev or next buttons go away, move focus to Today
         this.todayButtonRef.current.focus()
       }
@@ -237,30 +228,21 @@ export class WeeklyPlannerHeader extends Component {
     }
   }
 
+  getButtonId(which) {
+    return this.getButtonTabIndex(which) === 0 ? WEEKLY_PLANNER_ACTIVE_BTN_ID : undefined
+  }
+
   render() {
-    let prevButtonId, todayButtonId, nextButtonId
-    if (!this.props.isFooter) {
-      prevButtonId = this.state.activeButton === -1 ? 'weekly-header-active-button' : undefined
-      todayButtonId = this.state.activeButton === 0 ? 'weekly-header-active-button' : undefined
-      nextButtonId = this.state.activeButton === 1 ? 'weekly-header-active-button' : undefined
-    }
     return (
       <div
-        id={this.props.isFooter ? 'weekly_planner_footer' : 'weekly_planner_header'}
-        data-testid={this.props.isFooter ? 'WeeklyPlannerFooter' : 'WeeklyPlannerHeader'}
-        className={`${styles.root} ${
-          this.props.isFooter ? 'WeeklyPlannerFooter' : 'WeeklyPlannerHeader'
-        }`}
-        style={{
-          top: `${this.state.stickyOffset}px`,
-          opacity: `${this.props.isFooter && !this.state.focused ? 0 : 1}`
-        }}
+        id="weekly_planner_header"
+        data-testid="WeeklyPlannerHeader"
+        className={`${styles.root} WeeklyPlannerHeader`}
+        style={{top: `${this.state.stickyOffset}px`}}
         role="toolbar"
         aria-label={formatMessage('Weekly schedule navigation')}
-        onFocus={this.handleFocus}
-        onBlur={this.handleBlur}
       >
-        {this.props.loading.loadingError && !this.props.isFooter && (
+        {this.props.loading.loadingError && (
           <div className={styles.errorbox}>
             <ErrorAlert error={this.props.loading.loadingError} margin="xx-small">
               {formatMessage('Error loading items')}
@@ -275,7 +257,7 @@ export class WeeklyPlannerHeader extends Component {
           onKeyDown={this.handleKey}
         >
           <IconButton
-            id={prevButtonId}
+            id={this.getButtonId('prev')}
             onClick={this.handlePrev}
             screenReaderLabel={formatMessage('View previous week')}
             interaction={this.state.prevEnabled ? 'enabled' : 'disabled'}
@@ -285,7 +267,7 @@ export class WeeklyPlannerHeader extends Component {
             <IconArrowOpenStartLine />
           </IconButton>
           <Button
-            id={todayButtonId}
+            id={this.getButtonId('today')}
             margin="0 xx-small"
             onClick={this.handleToday}
             ref={this.todayButtonRef}
@@ -296,7 +278,7 @@ export class WeeklyPlannerHeader extends Component {
             </AccessibleContent>
           </Button>
           <IconButton
-            id={nextButtonId}
+            id={this.getButtonId('next')}
             onClick={this.handleNext}
             screenReaderLabel={formatMessage('View next week')}
             interaction={this.state.nextEnabled ? 'enabled' : 'disabled'}

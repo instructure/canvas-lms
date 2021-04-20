@@ -394,14 +394,27 @@ describe('K-5 Dashboard', () => {
 
       const header = await findByTestId('WeeklyPlannerHeader')
       expect(header).toBeInTheDocument()
+    })
 
-      const footer = await findByTestId('WeeklyPlannerFooter')
-      expect(footer).toBeInTheDocument()
+    it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
+      const {findByRole} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const jumpToNavButton = await findByRole('button', {name: 'Jump to navigation toolbar'})
+      expect(jumpToNavButton).not.toBeVisible()
+
+      act(() => jumpToNavButton.focus())
+      expect(jumpToNavButton).toBeVisible()
+
+      act(() => jumpToNavButton.click())
+      expect(document.activeElement.id).toBe('weekly-header-active-button')
+      expect(jumpToNavButton).not.toBeVisible()
     })
 
     it('displays a teacher preview if the user has no student enrollments', async () => {
       const {findByTestId, getByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={false} />
       )
 
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()

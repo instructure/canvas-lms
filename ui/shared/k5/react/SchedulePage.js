@@ -19,7 +19,11 @@
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 
-import {createPlannerApp, renderWeeklyPlannerHeader} from '@instructure/canvas-planner'
+import {
+  createPlannerApp,
+  renderWeeklyPlannerHeader,
+  JumpToHeaderButton
+} from '@instructure/canvas-planner'
 
 const SchedulePage = ({visible = false}) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
@@ -41,7 +45,7 @@ const SchedulePage = ({visible = false}) => {
     >
       {renderWeeklyPlannerHeader({visible})}
       {isPlannerCreated && plannerApp.current}
-      {isPlannerCreated && renderWeeklyPlannerHeader({visible, isFooter: true})}
+      {isPlannerCreated && <JumpToHeaderButton />}
     </section>
   )
 }
