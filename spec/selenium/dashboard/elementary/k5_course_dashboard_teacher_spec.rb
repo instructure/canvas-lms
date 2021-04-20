@@ -100,4 +100,56 @@ describe "teacher k5 course dashboard" do
       expect(driver.current_url).to include("/courses/#{@subject_course.id}/assignments")
     end
   end
+
+  context 'course modules tab' do
+    before :once do
+      create_course_module
+    end
+
+    it 'has module present when provisioned' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      expect(module_item(@module_title)).to be_displayed
+    end
+
+    it 'provides a no modules defined message when there are no modules' do
+      course_with_teacher(active_all: true, user: @homeroom_teacher)
+
+      get "/courses/#{@course.id}#modules"
+
+      expect(module_empty_state_button).to be_displayed
+    end
+
+    it 'navigates to module task in edit mode when clicked' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      click_module_assignment(@module_assignment_title)
+      wait_for_ajaximations
+
+      expect(assignment_page_title.text).to eq(@module_assignment_title)
+      expect(assignment_edit_button).to be_displayed
+    end
+
+    it 'shows add module modal when +Module button is clicked' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      click_add_module_button
+
+      expect(add_module_modal).to be_displayed
+    end
+
+    it 'shows add module items modal when + button is clicked' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      click_add_module_item_button
+
+      expect(add_module_item_modal).to be_displayed
+    end
+
+    it 'provides drag handles for item moves' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      expect(drag_handle).to be_displayed
+    end
+  end
 end

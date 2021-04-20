@@ -68,4 +68,43 @@ describe "student k5 course dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
   end
+
+  context 'course modules tab' do
+    before :once do
+      create_course_module
+    end
+
+    it 'has module present when provisioned' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      expect(module_item(@module_title)).to be_displayed
+    end
+
+    it 'provides a no modules defined message when there are no modules' do
+      course_with_student(active_all: true, user: @student)
+
+      get "/courses/#{@course.id}#modules"
+
+      expect(no_module_content).to be_displayed
+    end
+
+    it 'allows for expand and collapse of module' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      expect(module_assignment(@module_assignment_title)).to be_displayed
+      expect(expand_collapse_module).to be_displayed
+
+      click_expand_collapse
+      expect(module_assignment(@module_assignment_title)).not_to be_displayed
+    end
+
+    it 'navigates to module tasks when clicked' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      click_module_assignment(@module_assignment_title)
+      wait_for_ajaximations
+
+      expect(assignment_page_title.text).to eq(@module_assignment_title)
+    end
+  end
 end
