@@ -37,9 +37,9 @@ fi
 
 function setup_docker_environment {
   if [[ $OS == 'Darwin' ]]; then
-    . script/common/os/mac_setup.sh
+    . script/common/os/mac/dev_setup.sh
   elif [[ $OS == 'Linux' ]]; then
-    . script/common/os/linux_setup.sh
+    . script/common/os/linux/dev_setup.sh
   else
     echo 'This script only supports MacOS and Linux :('
     exit 1
