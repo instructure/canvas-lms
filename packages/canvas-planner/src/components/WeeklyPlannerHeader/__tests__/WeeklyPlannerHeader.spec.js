@@ -62,10 +62,11 @@ afterEach(() => {
 
 describe('WeeklyPlannerHeader', () => {
   it('renders the component', () => {
-    const {getByText} = render(<WeeklyPlannerHeader {...defaultProps()} />)
+    const {getByLabelText, getByText} = render(<WeeklyPlannerHeader {...defaultProps()} />)
     expect(getByText('View previous week')).toBeInTheDocument()
     expect(getByText('Today')).toBeInTheDocument()
     expect(getByText('View next week')).toBeInTheDocument()
+    expect(getByLabelText('Weekly schedule navigation')).toBeInTheDocument()
   })
 
   it('calls loadPastWeekItems when previous week button is clicked', () => {

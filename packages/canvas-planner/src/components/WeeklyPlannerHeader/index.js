@@ -255,6 +255,7 @@ export class WeeklyPlannerHeader extends Component {
           opacity: `${this.props.isFooter && !this.state.focused ? 0 : 1}`
         }}
         role="toolbar"
+        aria-label={formatMessage('Weekly schedule navigation')}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
       >
