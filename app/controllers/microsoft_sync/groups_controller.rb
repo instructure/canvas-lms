@@ -84,6 +84,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   before_action :validate_user_permissions
   before_action :require_feature
   before_action :require_cooldown, only: :sync
+  before_action :require_currently_not_syncing, only: :sync
 
   # Create a new MicrosoftSync::Group for
   # the specified course.
@@ -139,13 +140,32 @@ class MicrosoftSync::GroupsController < ApplicationController
 
   private
 
+  # Don't allow scheduling a new job
+  # if one is already running
+  def require_currently_not_syncing
+    return unless MicrosoftSync::Group::RUNNING_STATES.include?(
+      group.workflow_state.to_sym
+    )
+
+    render(
+      json: { errors: ['A sync job is already running for the specified group'] },
+      status: :bad_request
+    )
+  end
+
+  # Prevents users from queueing a large number
+  # of manual sync jobs by requiring a cooldown
+  # period.
+  #
+  # Site admins can bypass this cooldown period.
+  #
+  # There are some states in which we allow scheduling
+  # another manual sync right away. (errored, for example).
+  # This method also allows scheduling the sync if the
+  # group is in one of those states.
   def require_cooldown
-    # Prevents users from queueing a large number
-    # of manual sync jobs by requiring a cooldown
-    # period.
-    #
-    # Site admins can bypass this cooldown period.
     return if Account.site_admin.account_users_for(@current_user).present?
+    return if MicrosoftSync::Group::COOLDOWN_NOT_REQUIRED_STATES.include?(group.workflow_state.to_sym)
     return if group.last_manually_synced_at.blank?
     return if Time.zone.now.to_i - group.last_manually_synced_at.to_i >= MicrosoftSync::Group.manual_sync_cooldown
 

@@ -111,6 +111,32 @@ describe('MicrosoftSyncButton', () => {
         expect(component.getByText('Sync Now').closest('button').disabled).toBeFalsy()
       )
     })
+
+    describe('and then succeeds on retry', () => {
+      const onSuccess = jest.fn()
+      const onError = jest.fn()
+
+      afterEach(() => {
+        onSuccess.mockClear()
+        onError.mockClear()
+      })
+
+      it('clears the first error', async () => {
+        const component = subject({onError, onSuccess})
+
+        // The first attempt fails
+        fireEvent.click(component.getByText('Sync Now'))
+        await waitFor(() => expect(onError).toHaveBeenCalled())
+
+        // The second attempt succeeds
+        doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
+        fireEvent.click(component.getByText('Sync Now'))
+        await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+
+        // onError should have been called again, this time removing the error
+        await waitFor(() => expect(onError).toHaveBeenLastCalledWith(false))
+      })
+    })
   })
 
   describe('when the sync request succeeds', () => {
@@ -171,6 +197,22 @@ describe('MicrosoftSyncButton', () => {
       await waitFor(() =>
         expect(component.getByText('Sync Now').closest('button').disabled).toBeTruthy()
       )
+    })
+
+    describe('and the group is in an error state', () => {
+      it('enables the sync button', async () => {
+        const component = subject({
+          ...overrides,
+          group: {
+            ...props().group,
+            workflow_state: 'errored'
+          }
+        })
+
+        await waitFor(() =>
+          expect(component.getByText('Sync Now').closest('button').disabled).toBeFalsy()
+        )
+      })
     })
   })
 })

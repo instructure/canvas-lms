@@ -39,7 +39,7 @@ const Integrations = () => {
     setMSGroup
   ] = useMicrosoftSettings(ENV.COURSE_ID)
 
-  const [msExpanded, setMSExpanded] = useState(false)
+  const [msExpanded, setMSExpanded] = useState(!!msError)
   const [msInfo, setMSInfo] = useState()
 
   return (
@@ -62,14 +62,15 @@ const Integrations = () => {
         onChange={msToggleEnabled}
         error={msError}
         info={msInfo}
-        expanded={msExpanded || !!msError}
+        expanded={msExpanded}
         onToggle={() => setMSExpanded(expanded => !expanded)}
       >
-        <MicrosoftSync enabled={msEnabled} group={msGroup} loading={msLoading}>
+        <MicrosoftSync group={msGroup} loading={msLoading}>
           <MicrosoftSyncButton
             courseId={ENV.COURSE_ID}
             enabled={msEnabled}
             group={msGroup}
+            error={msError}
             onError={setMSError}
             onInfo={setMSInfo}
             onSuccess={setMSGroup}

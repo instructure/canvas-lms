@@ -23,12 +23,13 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
-const readyStates = ['pending', 'completed', 'errored']
+const readyStates = ['pending', 'errored', 'completed']
+const coolDownRequiredStates = ['completed', 'scheduled']
 
 const syncReducer = (state, action) => {
   switch (action.type) {
     case 'SCHEDULE':
-      return {...state, loading: true}
+      return {...state, loading: true, error: false, previousError: state.error}
     case 'SCHEDULE_SUCCESS': {
       const {group} = action.payload
       const newSecondsRemaining = secondsUntilEditable(group, state.coolDownSeconds)
@@ -38,10 +39,11 @@ const syncReducer = (state, action) => {
         loading: false,
         group,
         enabled: false,
-        error: false,
         previousError: state.error,
+        error: false,
         secondsRemaining: newSecondsRemaining,
-        readyForManualSync: readyStates.includes(group.workflow_state)
+        readyForManualSync: readyStates.includes(group.workflow_state),
+        showCountdown: coolDownRequiredStates.includes(group.workflow_state)
       }
     }
     case 'SCHEDULE_FAILED':
@@ -62,14 +64,15 @@ const secondsUntilEditable = (group, coolDownSeconds) => {
   return coolDownSeconds - secondsElapsed
 }
 
-const MicrosoftSyncButton = ({enabled, group, onError, onSuccess, onInfo, courseId}) => {
+const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo, courseId}) => {
   const [state, dispatch] = useReducer(syncReducer, {
     loading: false,
-    error: false,
+    error,
     coolDownSeconds: ENV.MANUAL_MSFT_SYNC_COOLDOWN,
-    previousError: false,
+    previousError: error,
     secondsRemaining: secondsUntilEditable(group, ENV.MANUAL_MSFT_SYNC_COOLDOWN),
     readyForManualSync: readyStates.includes(group.workflow_state),
+    showCountdown: coolDownRequiredStates.includes(group.workflow_state),
     enabled,
     group
   })
@@ -109,7 +112,7 @@ const MicrosoftSyncButton = ({enabled, group, onError, onSuccess, onInfo, course
     }
 
     // No sync is running, but the cooldown period has not completed
-    if (state.secondsRemaining > 0) {
+    if (state.secondsRemaining > 0 && state.showCountdown) {
       onInfo(
         I18n.t(
           'Manual syncs are available every %{coolDown} minutes. Please wait %{minutesRemaining} minutes to sync again.',
@@ -124,7 +127,13 @@ const MicrosoftSyncButton = ({enabled, group, onError, onSuccess, onInfo, course
 
     // Manual sync is available, clear info message
     onInfo()
-  }, [state.secondsRemaining, state.readyForManualSync, state.coolDownSeconds, onInfo])
+  }, [
+    state.secondsRemaining,
+    state.readyForManualSync,
+    state.coolDownSeconds,
+    state.showCountdown,
+    onInfo
+  ])
 
   const scheduleSync = () => {
     dispatch({type: 'SCHEDULE'})
@@ -144,7 +153,9 @@ const MicrosoftSyncButton = ({enabled, group, onError, onSuccess, onInfo, course
       color="primary"
       margin="none small none none"
       interaction={
-        state.enabled && !state.loading && state.secondsRemaining <= 0 ? 'enabled' : 'disabled'
+        state.enabled && !state.loading && (state.secondsRemaining <= 0 || !state.showCountdown)
+          ? 'enabled'
+          : 'disabled'
       }
       onClick={scheduleSync}
       display="block"
