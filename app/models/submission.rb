@@ -2321,7 +2321,7 @@ class Submission < ActiveRecord::Base
 
     def time_of_submission
       time = submitted_at || Time.zone.now
-      time -= 60.seconds if submission_type == 'online_quiz'
+      time -= 60.seconds if submission_type == 'online_quiz' || self.assignment.quiz_lti?
       time
     end
     private :time_of_submission
