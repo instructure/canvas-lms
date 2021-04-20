@@ -348,7 +348,7 @@
     "upgrade-instructure-ui": "script/upgrade-instructure-ui",
     "dedupe-yarn": "npx --yes yarn-deduplicate",
     "clean": "yarn workspace-run-serial clean",
-    "storybook": "start-storybook -p 6006 --no-dll =s ../public/javascripts",
+    "storybook": "start-storybook -p 6006 --no-dll --static-dir ./public/javascripts,./public",
     "test-storybook": "yarn jest --roots .storybook --testMatch **/storybook.test.js"
   },
   "resolutions": {
