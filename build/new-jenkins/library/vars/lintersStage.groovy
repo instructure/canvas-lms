@@ -16,6 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def _getDockerInputs() {
+  def inputVars = [
+    "--volume $WORKSPACE/.git:/usr/src/app/.git",
+    "--env GERGICH_DB_PATH=/home/docker/gergich",
+    "--env GERGICH_PUBLISH=$GERGICH_PUBLISH",
+    "--env GERGICH_KEY=$GERGICH_KEY",
+    "--env GERRIT_HOST=$GERRIT_HOST",
+    "--env GERRIT_PROJECT=$GERRIT_PROJECT",
+    "--env GERRIT_BRANCH=$GERRIT_BRANCH",
+    "--env GERRIT_EVENT_ACCOUNT_EMAIL=$GERRIT_EVENT_ACCOUNT_EMAIL",
+    "--env GERRIT_PATCHSET_NUMBER=$GERRIT_PATCHSET_NUMBER",
+    "--env GERRIT_PATCHSET_REVISION=$GERRIT_PATCHSET_REVISION",
+    "--env GERRIT_CHANGE_ID=$GERRIT_CHANGE_ID",
+    "--env GERRIT_CHANGE_NUMBER=$GERRIT_CHANGE_NUMBER",
+    "--env GERRIT_REFSPEC=$GERRIT_REFSPEC",
+  ]
+
+  if(env.GERRIT_PROJECT != "canvas-lms") {
+    inputVars.addAll([
+      "--volume $WORKSPACE/gems/plugins/$GERRIT_PROJECT/.git:/usr/src/app/gems/plugins/$GERRIT_PROJECT/.git",
+      "--env GERGICH_GIT_PATH=/usr/src/app/gems/plugins/$GERRIT_PROJECT",
+    ])
+  }
+
+  return inputVars.join(' ')
+}
+
 def call() {
   credentials.withStarlordCredentials {
     sh "./build/new-jenkins/linters/docker-build.sh local/gergich"
@@ -29,7 +56,9 @@ def call() {
 
     credentials.withGerritCredentials {
       withEnv([
+        "DOCKER_INPUTS=${_getDockerInputs()}",
         "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
+        "GERGICH_VOLUME=gergich-results-${System.currentTimeMillis()}",
         "PLUGINS_LIST=${configuration.plugins().join(' ')}",
         "SKIP_ESLINT=${configuration.getString('skip-eslint', 'false')}",
       ]) {
