@@ -65,7 +65,7 @@ module Types
 
     field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true
     def root_entry_participant_counts
-      Loaders::RootEntryParticipantCountsLoader.for(current_user: current_user).load(object)
+      Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
     end
 
     field :discussion_topic, Types::DiscussionType, null: false

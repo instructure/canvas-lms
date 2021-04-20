@@ -18,7 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Loaders::DiscussionTopicEntryCountsLoader < GraphQL::Batch::Loader
+# This is a custom loader to perform one query for a group of discussion topics,
+# or root_discussion_entries,
+class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   def initialize(current_user:)
     @current_user = current_user
   end
@@ -31,24 +33,41 @@ class Loaders::DiscussionTopicEntryCountsLoader < GraphQL::Batch::Loader
     SQL
   end
 
-  def counts_sql
+  def counts_sql(id_string)
     <<~SQL
-      discussion_topic_id, COUNT(discussion_entries.id) AS replies,
+      #{id_string}, COUNT(discussion_entries.id) AS replies,
       SUM(CASE WHEN discussion_entry_participants.workflow_state = 'read' THEN 1 ELSE 0 END) AS read
     SQL
   end
 
-  def perform(discussion_topics)
+  def perform(objects)
+    object_id = object_id_string(objects.first)
     counts = DiscussionEntry.joins(join_sql)
-      .where(discussion_entries: { workflow_state: 'active', discussion_topic_id: discussion_topics })
-      .group('discussion_entries.discussion_topic_id')
-      .select(counts_sql).index_by(&:discussion_topic_id)
+      .where(discussion_entries: object_specific_hash(objects))
+      .group("discussion_entries.#{object_id}")
+      .select(counts_sql(object_id)).index_by(&object_id.to_sym)
 
-    discussion_topics.each do |dt|
-      topic_counts = {}
-      topic_counts["replies_count"] = counts[dt.id]&.replies || 0
-      topic_counts["unread_count"] = topic_counts["replies_count"] - (counts[dt.id]&.read || 0)
-      fulfill(dt, topic_counts)
+    objects.each do |object|
+      object_counts = {}
+      object_counts["replies_count"] = counts[object.id]&.replies || 0
+      object_counts["unread_count"] = object_counts["replies_count"] - (counts[object.id]&.read || 0)
+      fulfill(object, object_counts)
+    end
+  end
+
+  def object_specific_hash(objects)
+    if objects.first.is_a?(DiscussionTopic)
+      { discussion_topic_id: objects }
+    elsif objects.first.is_a?(DiscussionEntry)
+      { root_entry_id: objects }
+    end
+  end
+
+  def object_id_string(object)
+    if object.is_a?(DiscussionTopic)
+      'discussion_topic_id'
+    elsif object.is_a?(DiscussionEntry)
+      'root_entry_id'
     end
   end
 end

@@ -104,7 +104,7 @@ module Types
 
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
-      Loaders::DiscussionTopicEntryCountsLoader.for(current_user: current_user).load(object)
+      Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
     end
 
     field :subscribed, Boolean, null: false
