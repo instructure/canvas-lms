@@ -33,6 +33,7 @@ class Folder < ActiveRecord::Base
   PROFILE_PICS_FOLDER_NAME = "profile pictures"
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
+  STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE = "student annotation documents"
 
   belongs_to :context, polymorphic: [:user, :group, :account, :course], optional: false
   belongs_to :cloned_item
@@ -484,6 +485,10 @@ class Folder < ActiveRecord::Base
       (self.lock_at && Time.zone.now > self.lock_at) ||
       (self.unlock_at && Time.zone.now < self.unlock_at) ||
       self.parent_folder&.locked?
+  end
+
+  def for_student_annotation_documents?
+    self.unique_type == Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE
   end
 
   def for_submissions?

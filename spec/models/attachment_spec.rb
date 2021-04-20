@@ -249,6 +249,7 @@ describe Attachment do
 
   context "canvadocs" do
     before :once do
+      course_model
       configure_canvadocs
     end
 
@@ -279,6 +280,22 @@ describe Attachment do
         a = attachment_model
         a.submit_to_canvadocs
         expect(a.canvadoc).to be_nil
+      end
+
+      it "submits images when they are in the Student Annotation Documents folder" do
+        att = attachment_model(
+          context: @course,
+          content_type: "image/jpeg",
+          folder: @course.student_annotation_documents_folder
+        )
+        att.submit_to_canvadocs
+        expect(att.canvadoc).not_to be_nil
+      end
+
+      it "does not submit images when they are not in the Student Annotation Documents folder" do
+        att = attachment_model(context: @course, content_type: "image/jpeg")
+        att.submit_to_canvadocs
+        expect(att.canvadoc).to be_nil
       end
 
       it "tries again later when upload fails" do
@@ -2497,6 +2514,29 @@ describe Attachment do
       weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
       atts = Attachment.copy_attachments_to_submissions_folder(@course, [weird_file])
       expect(atts).to eq [weird_file]
+    end
+  end
+
+  describe "#copy_to_student_annotation_documents_folder" do
+    before(:once) do
+      course_model
+    end
+
+    it "copies attachment into the course Student Annotation Documents folder if not present already" do
+      att = attachment_model(context: @course)
+      att_clone = att.copy_to_student_annotation_documents_folder(@course)
+
+      aggregate_failures do
+        expect(att_clone.id).not_to be att.id
+        expect(att_clone.folder).to eq @course.student_annotation_documents_folder
+      end
+    end
+
+    it "does not copy attachment into the course Student Annotation Documents folder if already present" do
+      att = attachment_model(context: @course, folder: @course.student_annotation_documents_folder)
+      same_att = att.copy_to_student_annotation_documents_folder(@course)
+
+      expect(same_att).to eq att
     end
   end
 end
