@@ -20,7 +20,7 @@
 
 module NewQuizzesFeaturesHelper
   def new_quizzes_import_enabled?
-    @context.instance_of?(Course) && @context.feature_allowed?(:quizzes_next)
+    @context.instance_of?(Course) && @context.feature_enabled?(:quizzes_next)
   end
 
   def new_quizzes_migration_enabled?
