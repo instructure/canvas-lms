@@ -20,12 +20,18 @@ def call() {
   credentials.withStarlordCredentials {
     sh "./build/new-jenkins/linters/docker-build.sh local/gergich"
 
+    if(configuration.getBoolean('upload-linter-debug-image', 'false')) {
+      sh """
+      docker tag local/gergich $LINTER_DEBUG_IMAGE
+      docker push $LINTER_DEBUG_IMAGE
+      """
+    }
+
     credentials.withGerritCredentials {
       withEnv([
         "FORCE_FAILURE=${configuration.getBoolean('force-failure-linters', 'false')}",
         "PLUGINS_LIST=${configuration.plugins().join(' ')}",
         "SKIP_ESLINT=${configuration.getString('skip-eslint', 'false')}",
-        "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
       ]) {
         sh 'build/new-jenkins/linters/run-gergich.sh'
       }

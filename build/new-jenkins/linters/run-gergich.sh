@@ -33,11 +33,6 @@ inputs+=("--env GERRIT_REFSPEC=$GERRIT_REFSPEC")
 GERGICH_VOLUME="gergich-results-$(date +%s)"
 docker volume create $GERGICH_VOLUME
 
-if [ "$UPLOAD_DEBUG_IMAGE" = "true" ]; then
-  docker tag local/gergich $LINTER_DEBUG_IMAGE
-  docker push $LINTER_DEBUG_IMAGE
-fi
-
 DOCKER_INPUTS=${inputs[@]} \
   GERGICH_VOLUME=$GERGICH_VOLUME \
   ./build/new-jenkins/linters/run-gergich-webpack.sh &
