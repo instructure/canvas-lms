@@ -32,7 +32,7 @@ pipeline {
 
   environment {
     JENKINS = 'true'
-    DOCKER='y'
+    DOCKER='true'
   }
 
   stages {

@@ -8,7 +8,7 @@ trap "printf '\nTerminated\n' && exit 130" SIGINT
 LOG="$(pwd)/log/docker_dev_setup.log"
 SCRIPT_NAME=$0
 OS="$(uname)"
-DOCKER='y'
+DOCKER='true'
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 

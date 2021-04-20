@@ -37,7 +37,7 @@ function is_git_dir {
 function run_command {
   if is_running_on_jenkins; then
     docker-compose exec -T web "$@"
-  elif [ "${DOCKER:-}" == 'y' ]; then
+  elif [ "${DOCKER:-}" == 'true' ]; then
     docker-compose exec -e TELEMETRY_OPT_IN web "$@"
   else
     "$@"
