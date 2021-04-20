@@ -184,12 +184,10 @@ describe MicrosoftSync::SyncerSteps do
         it 'raises a graceful cleanup error with a end-user-friendly name' do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
-          begin
-            subject
-          rescue => e
+          expect { subject }.to raise_error do |e|
+            expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
+            expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
           end
-          expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
-          expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
         end
       end
 
@@ -392,6 +390,11 @@ describe MicrosoftSync::SyncerSteps do
         receive(:new).with(%w[m1 m2], %w[o1 o2]).and_return(diff)
       members_and_enrollment_types = []
       expect(diff).to receive(:set_local_member) { |*args| members_and_enrollment_types << args }
+      allow(diff).to receive(:local_owners) do
+        members_and_enrollment_types.select do |me|
+          MicrosoftSync::MembershipDiff::OWNER_ENROLLMENT_TYPES.include?(me.last)
+        end.map(&:first)
+      end
 
       expect_next_step(subject, :step_execute_diff, diff)
       expect(members_and_enrollment_types).to eq([['0', 'TeacherEnrollment']])
@@ -427,6 +430,8 @@ describe MicrosoftSync::SyncerSteps do
         with(MicrosoftSync::GraphService::GROUP_USERS_ADD_BATCH_SIZE).
         and_yield(owners: %w[o3], members: %w[o1 o2]).
         and_yield(members: %w[o3])
+
+      allow(diff).to receive(:local_owners).and_return Set.new(%w[o3])
     end
 
     it 'adds/removes users based on the diff' do
@@ -448,6 +453,19 @@ describe MicrosoftSync::SyncerSteps do
           subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
           delay_amount: [5, 20, 100], step: :step_generate_diff
         )
+      end
+    end
+
+    context 'when there are no local owners (course teacher enrollments)' do
+      it 'raises a graceful exit error informing the user' do
+        expect(diff).to receive(:local_owners).and_return Set.new
+        expect { subject }.to raise_error do |error|
+          expect(error).to be_a(MicrosoftSync::Errors::PublicError)
+          expect(error.public_message).to match(
+            /no users corresponding to the instructors of the Canvas course could be found/
+          )
+          expect(error).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+        end
       end
     end
   end
