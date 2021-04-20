@@ -90,6 +90,7 @@ describe 'as a student' do
       end
 
       it 'should be able to be submitted', custom_timeout: 30 do
+        skip("Skip for now and fix with LS-2164")
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.submit_assignment
@@ -98,6 +99,7 @@ describe 'as a student' do
       end
 
       it 'should be able to be saved as a draft' do
+        skip("Skip for now and fix with LS-2164")
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.edit_text_entry_button.click
