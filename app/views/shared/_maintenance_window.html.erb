@@ -5,7 +5,7 @@
                 time_range: time_string(next_window[0], next_window[1]),
                 utc_time_range: time_string(next_window[0], next_window[1], ActiveSupport::TimeZone['UTC']) }) %>
 <br/>
-<%= t("Next maintenance at: %{window}", {
+<%= t("Next window: %{window}", {
     window: datetime_string(next_window[0], :verbose, next_window[1], with_weekday: true) }) %>
 <p>
 <%= Setting.get('global_maintenance_notice', '').html_safe %>
