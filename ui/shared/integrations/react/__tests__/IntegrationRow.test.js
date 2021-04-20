@@ -70,6 +70,14 @@ describe('IntegrationRow', () => {
     })
   })
 
+  describe('when the error is an object with a message', () => {
+    const propOverrides = {error: {message: 'a custom error message!'}, expanded: true}
+
+    it('shows the error', () => {
+      expect(subject(propOverrides).getByText('a custom error message!')).toBeInTheDocument()
+    })
+  })
+
   describe('when "info" is set', () => {
     const propOverrides = {info: 'Hello there', expanded: true}
 

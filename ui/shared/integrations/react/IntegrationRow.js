@@ -22,6 +22,7 @@ import I18n from 'i18n!course_settings'
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
+import {IconWarningLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -43,6 +44,12 @@ const IntegrationRow = ({
     <Flex justifyItems="space-between">
       <Flex.Item>
         <Text>{name}</Text>
+        {error && (
+          <View>
+            &nbsp;
+            <IconWarningLine color="error" title={I18n.t('Integration error')} />
+          </View>
+        )}
       </Flex.Item>
       <Flex.Item>
         <Flex>
@@ -84,7 +91,10 @@ const IntegrationRow = ({
       <div role="region" aria-live="polite">
         {error && !loading && (
           <Alert variant="error" margin="small">
-            <Text>{I18n.t('An error occurred, please try again. Error: %{error}', {error})}</Text>
+            <Text>
+              {error.message ||
+                I18n.t('An error occurred, please try again. Error: %{error}', {error})}
+            </Text>
           </Alert>
         )}
         {((!enabled && !loading) || info) && (

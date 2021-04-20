@@ -24,6 +24,17 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {InlineList} from '@instructure/ui-list'
+
+const stateMap = {
+  pending: I18n.t('Ready for sync'),
+  scheduled: I18n.t('Sync scheduled'),
+  running: I18n.t('Sync currently running'),
+  retrying: I18n.t('Sync currently running'),
+  errored: I18n.t('The sync encountered an error and did not complete'),
+  completed: I18n.t('Sync completed successfully'),
+  deleted: I18n.t('Sync not enabled')
+}
 
 const MicrosoftSync = ({group, loading, children}) => {
   if (loading) {
@@ -42,11 +53,22 @@ const MicrosoftSync = ({group, loading, children}) => {
           {children}
         </Flex.Item>
         <Flex.Item>
-          <Text fontStyle="italic">
-            {I18n.t('Last Sync: %{lastSyncTime}', {
-              lastSyncTime: $.datetimeString(group.last_synced_at)
-            })}
-          </Text>
+          <InlineList delimiter="pipe">
+            <InlineList.Item>
+              <Text weight="bold">Status:</Text>
+              <Text fontStyle="italic"> {stateMap[group.workflow_state]}</Text>
+            </InlineList.Item>
+            <InlineList.Item>
+              <Text weight="bold">{I18n.t('Last Sync:')}</Text>
+              <Text fontStyle="italic">
+                {' '}
+                {$.datetimeString(group.last_synced_at) || I18n.t('never')}
+              </Text>
+            </InlineList.Item>
+            {group.workflow_state !== 'errored' && (
+              <InlineList.Item>{I18n.t('No errors')}</InlineList.Item>
+            )}
+          </InlineList>
         </Flex.Item>
       </Flex>
     </>

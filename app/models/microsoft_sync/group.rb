@@ -41,6 +41,17 @@ class MicrosoftSync::Group < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
 
+  # States at which a manual sync is allowed
+  COOLDOWN_NOT_REQUIRED_STATES = %i(
+    pending
+    errored
+  ).freeze
+
+  RUNNING_STATES = %i(
+    running
+    retrying
+  ).freeze
+
   belongs_to :course
   validates_presence_of :course
   validates_uniqueness_of :course_id

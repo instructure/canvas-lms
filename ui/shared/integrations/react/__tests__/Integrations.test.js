@@ -53,6 +53,12 @@ describe('Integrations', () => {
       })
 
       const subject = render(<Integrations />)
+      expect(subject.getByText('Integration error')).toBeInTheDocument()
+
+      act(() => {
+        fireEvent.click(subject.getByText('Show Microsoft Sync details'))
+      })
+
       expect(
         subject.getByText('An error occurred, please try again. Error: error')
       ).toBeInTheDocument()
