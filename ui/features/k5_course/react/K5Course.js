@@ -217,7 +217,7 @@ export function K5Course({
           )}
           <CourseHeaderHero name={name} image={imageUrl} backgroundColor={DEFAULT_COLOR} />
         </K5Tabs>
-        {currentTab === TAB_IDS.OVERVIEW && <OverviewPage content={courseOverview} />}
+        {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}

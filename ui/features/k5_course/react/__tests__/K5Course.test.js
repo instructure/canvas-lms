@@ -47,7 +47,8 @@ const defaultProps = {
   name: 'Arts and Crafts',
   id: '30',
   timeZone: defaultEnv.TIMEZONE,
-  canManage: false
+  canManage: false,
+  courseOverview: '<h2>Time to learn!</h2>'
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
@@ -154,6 +155,13 @@ describe('K-5 Subject Course', () => {
     it('Does not show a manage button when the user does not have manage permissions', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} />)
       expect(queryByRole('button', {name: 'Manage'})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('overview tab', () => {
+    it('shows front page content if a front page is set', () => {
+      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
+      expect(getByText('Time to learn!')).toBeInTheDocument()
     })
   })
 

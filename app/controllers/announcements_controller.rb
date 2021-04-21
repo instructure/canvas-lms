@@ -26,6 +26,8 @@ class AnnouncementsController < ApplicationController
   before_action :require_context, :except => :public_feed
   before_action { |c| c.active_tab = "announcements" }
 
+  include K5Mode
+
   module AnnouncementsIndexHelper
     def announcements_locked?
       return false unless @context.is_a?(Course)

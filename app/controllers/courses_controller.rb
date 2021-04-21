@@ -363,6 +363,7 @@ class CoursesController < ApplicationController
 
   include Api::V1::Course
   include Api::V1::Progress
+  include K5Mode
 
   # @API List your courses
   # Returns the paginated list of active courses for the current user.
@@ -2044,8 +2045,8 @@ class CoursesController < ApplicationController
 
       @context_enrollment ||= @pending_enrollment
       if @context.grants_right?(@current_user, session, :read)
-        # Temporarily disabled in production (see https://instructure.atlassian.net/browse/LS-2118)
-        @k5_mode = @context.elementary_subject_course? && !Rails.env.production?
+        # No matter who the user is we want the course dashboard to hide the left nav
+        set_k5_mode
         @show_left_side = !@k5_mode
 
         check_for_readonly_enrollment_state
@@ -2070,7 +2071,6 @@ class CoursesController < ApplicationController
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
         js_env({
-                 K5_MODE: @k5_mode,
                  COURSE: {
                    id: @context.id.to_s,
                    name: @context.name,

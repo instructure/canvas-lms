@@ -353,6 +353,16 @@ describe "course settings" do
       expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
       expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
     end
+
+    it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
+      @account.root_account.enable_feature!(:canvas_for_elementary)
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      course_with_teacher_logged_in(:active_all => true)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#course_status_form")).to be_present
+      expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
+    end
   end
 
   it "should disable inherited settings if locked by the account" do
