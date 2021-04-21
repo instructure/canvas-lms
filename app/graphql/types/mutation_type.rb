@@ -84,6 +84,8 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
   field :import_outcomes, mutation: Mutations::ImportOutcomes
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
+  field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
+  field :delete_comment_bank_item, mutation: Mutations::DeleteCommentBankItem
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.
