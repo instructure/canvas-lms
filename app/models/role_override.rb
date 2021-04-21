@@ -306,6 +306,12 @@ class RoleOverride < ActiveRecord::Base
       :true_for => %w(AccountAdmin),
       :available_to => %w(AccountAdmin AccountMembership),
     },
+    :manage_release_notes => {
+      :label => lambda { t('Manage release notes') },
+      :account_only => :site_admin,
+      :true_for => %w(AccountAdmin),
+      :available_to => %w(AccountAdmin AccountMembership),
+    },
     :manage_master_courses => {
       :label => lambda { t('Blueprint Courses (create / edit / associate / delete)') },
       :label_v2 => lambda { t("Blueprint Courses - add / edit / associate / delete") },

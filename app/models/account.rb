@@ -1700,6 +1700,7 @@ class Account < ActiveRecord::Base
   TAB_PLUGINS = 14
   TAB_JOBS = 15
   TAB_DEVELOPER_KEYS = 16
+  TAB_RELEASE_NOTES = 17
 
   def external_tool_tabs(opts, user)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
@@ -1716,6 +1717,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
       tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if root_account? && self.grants_right?(user, :manage_site_settings)
+      tabs << { :id => TAB_RELEASE_NOTES, :label => t("Release Notes"), :css_class => "release_notes", :href => :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && self.grants_right?(user, :manage_release_notes)
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if root_account? && self.grants_right?(user, :view_jobs)
     else
       tabs = []
