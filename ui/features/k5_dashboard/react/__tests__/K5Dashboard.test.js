@@ -181,7 +181,7 @@ beforeAll(() => {
     status: 200,
     response: dashboardCards
   })
-  moxios.stubRequest(/api\/v1\/planner\/items.*/, {
+  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
     status: 200,
     headers: {link: 'url; rel="current"'},
     response: [
@@ -213,6 +213,54 @@ beforeAll(() => {
           redo_request: false,
           submitted: false
         }
+      }
+    ]
+  })
+  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*per_page=1/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: [
+      {
+        context_name: 'Course2',
+        context_type: 'Course',
+        course_id: '1',
+        html_url: '/courses/2/announcements/12',
+        new_activity: false,
+        plannable: {
+          created_at: '2020-03-16T17:17:17Z',
+          id: '12',
+          title: 'Announcement 12',
+          updated_at: '2020-03-16T17:31:52Z'
+        },
+        plannable_date: moment().subtract(6, 'months').toISOString(),
+        plannable_id: '12',
+        plannable_type: 'announcement',
+        planner_override: null,
+        submissions: {}
+      }
+    ]
+  })
+  moxios.stubRequest(/api\/v1\/planner\/items\?end_date=.*per_page=1/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: [
+      {
+        context_name: 'Course2',
+        context_type: 'Course',
+        course_id: '1',
+        html_url: '/courses/2/discussion_topics/8',
+        new_activity: false,
+        plannable: {
+          created_at: '2022-03-16T17:17:17Z',
+          id: '8',
+          title: 'Discussion 8',
+          updated_at: '2022-03-16T17:31:52Z'
+        },
+        plannable_date: moment().add(6, 'months').toISOString(),
+        plannable_id: '8',
+        plannable_type: 'discussion',
+        planner_override: null,
+        submissions: {}
       }
     ]
   })
@@ -410,6 +458,18 @@ describe('K-5 Dashboard', () => {
       act(() => jumpToNavButton.click())
       expect(document.activeElement.id).toBe('weekly-header-active-button')
       expect(jumpToNavButton).not.toBeVisible()
+    })
+
+    it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
+      const {findByRole, getByRole} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+      const todayButton = await findByRole('button', {name: 'Jump to Today'})
+      expect(todayButton).toBeEnabled()
+      const previousButton = getByRole('button', {name: 'View previous week'})
+      await waitFor(() => expect(previousButton).toBeEnabled())
+      const nextButton = getByRole('button', {name: 'View next week'})
+      expect(nextButton).toBeEnabled()
     })
 
     it('displays a teacher preview if the user has no student enrollments', async () => {

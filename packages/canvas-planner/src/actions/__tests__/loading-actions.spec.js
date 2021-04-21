@@ -271,12 +271,12 @@ describe('api actions', () => {
         // the future request
         moxios.stubRequest(/\/api\/v1\/planner\/items\?end_date=/, {
           status: 200,
-          response: [{plannable: {due_at: '2017-05-01T:00:00:00Z'}}]
+          response: [{plannable_date: '2017-05-01T:00:00:00Z'}]
         })
         // the past request
         moxios.stubRequest(/\/api\/v1\/planner\/items\?start_date=/, {
           status: 200,
-          response: [{plannable: {due_at: '2017-01-01T:00:00:00Z'}}]
+          response: [{plannable_date: '2017-01-01T:00:00:00Z'}]
         })
 
         Actions.getWeeklyPlannerItems(today)(mockDispatch, getBasicState)
@@ -421,7 +421,7 @@ describe('api actions', () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
-        response: [{plannable: {due_at: '2017-05-01T:00:00:00Z'}}]
+        response: [{plannable_date: '2017-05-01T:00:00:00Z'}]
       })
 
       const mockCourses = [{id: 7}]

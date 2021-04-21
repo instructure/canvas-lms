@@ -272,7 +272,7 @@ function getWayFutureItem(fromMoment) {
     return request
       .then(response => {
         if (response.data.length) {
-          const wayFutureItemDate = response.data[0].plannable.due_at
+          const wayFutureItemDate = response.data[0].plannable_date
           dispatch(gotWayFutureItemDate(wayFutureItemDate))
         }
       })
@@ -296,11 +296,13 @@ function getWayPastItem(fromMoment) {
     return request
       .then(response => {
         if (response.data.length) {
-          const wayPastItemDate = response.data[0].plannable.due_at
+          const wayPastItemDate = response.data[0].plannable_date
           dispatch(gotWayPastItemDate(wayPastItemDate))
         }
       })
-      .catch(() => alert(formatMessage('Failed peeking into your past'), true))
+      .catch(() => {
+        alert(formatMessage('Failed peeking into your past'), true)
+      })
   }
 }
 // --------------------------------------------
