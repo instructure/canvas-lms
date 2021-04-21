@@ -549,7 +549,7 @@ module K5PageObject
   end
 
   def create_dated_assignment(assignment_title, assignment_due_at)
-    @course.assignments.create!(
+    @subject_course.assignments.create!(
       title: assignment_title,
       grading_type: 'points',
       points_possible: 100,
@@ -595,9 +595,9 @@ module K5PageObject
   end
 
   def create_lti_resource(resource_name)
-    @rendered_icon='https://lor.instructure.com/img/icon_commons.png'
-    @lti_resource_url='http://www.example.com'
-    @tool =
+    rendered_icon='https://lor.instructure.com/img/icon_commons.png'
+    lti_resource_url='http://www.example.com'
+    tool =
       Account.default.context_external_tools.new(
         {
           name: resource_name,
@@ -607,20 +607,21 @@ module K5PageObject
           is_rce_favorite: 'true'
         }
       )
-    @tool.set_extension_setting(
+    tool.set_extension_setting(
       :editor_button,
       {
         message_type: 'ContentItemSelectionRequest',
-        url: @lti_resource_url,
-        icon_url: @rendered_icon,
+        url: lti_resource_url,
+        icon_url: rendered_icon,
         text: "#{resource_name} Favorites",
         enabled: 'true',
         use_tray: 'true',
         favorite: 'true'
       }
     )
-    @tool.course_navigation = {enabled: true}
-    @tool.save!
+    tool.course_navigation = {enabled: true}
+    tool.save!
+    tool
   end
 
   def click_dashboard_card
@@ -654,18 +655,65 @@ module K5PageObject
   def student_setup
     feature_setup
     @course_name = "K5 Course"
+    @teacher_name = 'K5Teacher'
     course_with_teacher(
       active_course: 1,
       active_enrollment: 1,
       course_name: @course_name,
-      name: 'K5Teacher1'
+      name: @teacher_name,
+      email: 'teacher_person@example.com'
     )
-    course_with_student_logged_in(active_all: true, new_user: true, user_name: 'KTStudent1', course: @course)
+    @homeroom_teacher = @teacher
+    course_with_student(
+      active_all: true,
+      new_user: true,
+      user_name: 'KTStudent',
+      course: @course
+    )
+    @course.update!(homeroom_course: true)
+    @homeroom_course = @course
+
+    @subject_course_title = "Science"
+    course_with_student(
+      active_all: true,
+      user: @student,
+      course_name: @subject_course_title
+    )
+    @subject_course = @course
   end
 
   def teacher_setup
     feature_setup
     @course_name = "K5 Course"
-    course_with_teacher_logged_in(active_all: true, new_user: true, user_name: 'K5Teacher', course_name: @course_name)
+    course_with_teacher(
+      active_course: 1,
+      active_enrollment: 1,
+      course_name: @course_name,
+      name: 'K5Teacher'
+    )
+    @homeroom_teacher = @teacher
+    @course.update!(homeroom_course: true)
+    @homeroom_course = @course
+
+    @subject_course_title = "Math"
+    course_with_teacher(
+      active_course: 1,
+      active_enrollment: 1,
+      user: @homeroom_teacher,
+      course_name: @subject_course_title
+    )
+    @subject_course = @course
+  end
+
+  def create_and_submit_assignment(course)
+    assignment = course.assignments.create!(
+      title: "Math Assignment 5",
+      description: "General Assignment",
+      points_possible: 100,
+      submission_types: 'online_text_entry',
+      workflow_state: 'published'
+    )
+    assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    assignment
   end
 end

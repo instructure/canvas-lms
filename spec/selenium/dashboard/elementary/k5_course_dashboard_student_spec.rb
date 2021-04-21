@@ -26,8 +26,12 @@ describe "student k5 course dashboard" do
   include K5PageObject
   include K5Common
 
-  before :each do
+  before :once do
     student_setup
+  end
+
+  before :each do
+    user_session @student
   end
 
   context 'course dashboard standard' do
@@ -37,7 +41,7 @@ describe "student k5 course dashboard" do
       click_dashboard_card
       wait_for_ajaximations
 
-      expect(retrieve_title_text).to match(/#{@course_name}/)
+      expect(retrieve_title_text).to match(/#{@subject_course_title}/)
       expect(home_tab).to be_displayed
       expect(schedule_tab).to be_displayed
       expect(modules_tab).to be_displayed
@@ -46,7 +50,7 @@ describe "student k5 course dashboard" do
     end
 
     it 'saves tab information for refresh' do
-      get "/courses/#{@course.id}#overview"
+      get "/courses/#{@subject_course.id}#home"
 
       select_schedule_tab
       refresh_page
@@ -57,9 +61,9 @@ describe "student k5 course dashboard" do
 
     it 'has front page displayed if there is one' do
       wiki_page_data = "Here's where we have content"
-      @course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
+      @subject_course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
 
-      get "/courses/#{@course.id}#home"
+      get "/courses/#{@subject_course.id}#home"
 
       expect(front_page_info.text).to eq(wiki_page_data)
     end

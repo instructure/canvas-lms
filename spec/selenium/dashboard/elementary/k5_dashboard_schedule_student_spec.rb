@@ -28,8 +28,12 @@ describe "student k5 dashboard schedule" do
   include K5Common
   include GradebookSetup
 
-  before :each do
+  before :once do
     student_setup
+  end
+
+  before :each do
+    user_session @student
     @now = Time.zone.now
   end
 

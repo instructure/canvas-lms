@@ -26,8 +26,12 @@ describe "teacher k5 course dashboard" do
   include K5PageObject
   include K5Common
 
-  before :each do
+  before :once do
     teacher_setup
+  end
+
+  before :each do
+    user_session @homeroom_teacher
   end
 
   context 'course dashboard standard' do
@@ -37,7 +41,7 @@ describe "teacher k5 course dashboard" do
       click_dashboard_card
       wait_for_ajaximations
 
-      expect(retrieve_title_text).to match(/#{@course_name}/)
+      expect(retrieve_title_text).to match(/#{@subject_course_title}/)
       expect(home_tab).to be_displayed
       expect(schedule_tab).to be_displayed
       expect(modules_tab).to be_displayed
@@ -46,7 +50,7 @@ describe "teacher k5 course dashboard" do
     end
 
     it 'saves tab information for refresh' do
-      get "/courses/#{@course.id}#home"
+      get "/courses/#{@subject_course.id}#home"
 
 
       select_schedule_tab
@@ -62,19 +66,19 @@ describe "teacher k5 course dashboard" do
       wiki_page_data = "Here's where we have content"
       @course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
 
-      get "/courses/#{@course.id}#home"
+      get "/courses/#{@subject_course.id}#home"
 
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
     it 'has manage button' do
-      get "/courses/#{@course.id}#home"
+      get "/courses/#{@subject_course.id}#home"
 
       expect(manage_button).to be_displayed
     end
 
     it 'slides out manage tray when manage button is clicked and closes with X' do
-      get "/courses/#{@course.id}#home"
+      get "/courses/#{@subject_course.id}#home"
 
       click_manage_button
 
@@ -86,14 +90,14 @@ describe "teacher k5 course dashboard" do
     end
 
     it 'navigates to the assignment index page when clicked from nav tray' do
-      get "/courses/#{@course.id}#home"
+      get "/courses/#{@subject_course.id}#home"
 
       click_manage_button
 
       click_assignments_link
       wait_for_ajaximations
 
-      expect(driver.current_url).to include("/courses/#{@course.id}/assignments")
+      expect(driver.current_url).to include("/courses/#{@subject_course.id}/assignments")
     end
   end
 end
