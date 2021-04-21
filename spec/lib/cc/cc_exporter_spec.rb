@@ -28,6 +28,7 @@ describe "Common Cartridge exporting" do
   end
 
   it "should collect errors and finish running" do
+    skip("skip and fix with LS-2168")
     course = course_model
     user = user_model
     message = "fail"
