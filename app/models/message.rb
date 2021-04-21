@@ -370,21 +370,29 @@ class Message < ActiveRecord::Base
   end
 
   # infer a root account associated with the context that the user can log in to
-  def link_root_account
+  def link_root_account(pre_loaded_account: nil)
+    context = pre_loaded_account
     @root_account ||= begin
-      context = self.context
+      context ||= self.context
       if context.is_a?(CommunicationChannel) && @data&.root_account_id
         root_account = Account.where(id: @data.root_account_id).first
         context = root_account if root_account
       end
 
-      context = context.assignment if context.respond_to?(:assignment) && context.assignment
+      # root_account is on lots of objects, use it when we can.
+      context = context.root_account if context.respond_to?(:root_account)
+      # some of these `context =` may not be relevant now that we have
+      # root_account on many classes, but root_account doesn't respond to them
+      # and so it's fast, and there are a lot of ways to generate a message.
+      context = context.assignment.root_account if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
       context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group
       context = context.master_template.course if context.respond_to?(:master_template) && context.master_template
       context = context.context if context.respond_to?(:context)
       context = context.account if context.respond_to?(:account)
       context = context.root_account if context.respond_to?(:root_account)
+
+      # Going through SisPseudonym.for is important since the account could change
       if context && context.respond_to?(:root_account)
         p = SisPseudonym.for(user, context, type: :implicit, require_sis: false)
         context = p.account if p
@@ -606,9 +614,12 @@ class Message < ActiveRecord::Base
   # path_type - The path to send the message across, e.g, 'email'.
   #
   # Returns nothing.
-  def parse!(path_type=nil)
+  def parse!(path_type=nil, root_account: nil)
     raise StandardError, "Cannot parse without a context" unless self.context
 
+    # set @root_account using our pre_loaded_account, because link_root_account
+    # is called many times.
+    link_root_account(pre_loaded_account: root_account)
     # Get the users timezone but maintain the original timezone in order to set it back at the end
     original_time_zone = Time.zone.name || "UTC"
     user_time_zone     = self.user.try(:time_zone) || root_account_time_zone || original_time_zone
