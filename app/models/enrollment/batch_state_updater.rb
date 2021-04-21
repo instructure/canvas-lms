@@ -183,7 +183,6 @@ class Enrollment::BatchStateUpdater
         studs.map(&:user_id),
         course,
         nil,
-        singleton: ('EnrollmentBatchStateUpdater_' + root_account.global_id.to_s),
         executing_user: updating_user
       )
     end
