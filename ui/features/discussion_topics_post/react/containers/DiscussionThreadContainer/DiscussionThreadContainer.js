@@ -149,7 +149,7 @@ export const DiscussionThreadContainer = props => {
 
   return (
     <>
-      <div style={{marginLeft: marginDepth + 'rem'}}>
+      <div style={{marginLeft: marginDepth + 'rem', paddingLeft: '0.75rem'}}>
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
             {renderPostMessage()}

@@ -51,6 +51,10 @@ const DiscussionTopicManager = props => {
     return <LoadingIndicator />
   }
 
+  if (!discussionTopicQuery?.data?.legacyNode) {
+    return null
+  }
+
   return (
     <>
       <DiscussionTopicContainer discussionTopic={discussionTopicQuery.data.legacyNode} />

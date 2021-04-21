@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Alert} from '../../components/Alert/Alert'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
@@ -28,7 +28,11 @@ import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
-import {PUBLISH_DISCUSSION_TOPIC, SUBSCRIBE_TO_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
+import {
+  PUBLISH_DISCUSSION_TOPIC,
+  SUBSCRIBE_TO_DISCUSSION_TOPIC,
+  DELETE_DISCUSSION_TOPIC
+} from '../../../graphql/Mutations'
 import React, {useContext, useState} from 'react'
 import {useMutation} from 'react-apollo'
 
@@ -39,55 +43,51 @@ const dateOptions = {
   minute: 'numeric'
 }
 
+const getDate = date =>
+  date ? Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(new Date(date)) : ''
+
 export const DiscussionTopicContainer = props => {
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
 
   const discussionTopicData = {
+    _id: props.discussionTopic._id,
     authorName: props.discussionTopic?.author?.name || '',
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
-    can_unpublish: props.discussionTopic.canUnpublish || false,
-    _id: props.discussionTopic._id,
-    isGraded: !!props.discussionTopic?.assignment && !!props.discussionTopic.assignment.dueAt,
-    message: props.discussionTopic.message || '',
-    permissions: {
-      update: props.discussionTopic.permissions.update
-    },
-    postedAt: props.discussionTopic?.postedAt
-      ? Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-          new Date(props.discussionTopic?.postedAt)
-        )
-      : '',
+    message: props.discussionTopic?.message || '',
+    permissions: props.discussionTopic?.permissions || {},
+    postedAt: getDate(props.discussionTopic?.postedAt),
     published: props.discussionTopic?.published || false,
-    readAsAdmin: !!props.discussionTopic?.permissions?.readAsAdmin,
-    replies: props.discussionTopic?.entryCounts?.repliesCount || 0,
     subscribed: props.discussionTopic?.subscribed || false,
     title: props.discussionTopic?.title || '',
-    unread: props.discussionTopic?.entryCounts?.unreadCount || 0
+    unread: props.discussionTopic?.entryCounts?.unreadCount,
+    replies: props.discussionTopic?.entryCounts?.repliesCount,
+    assignment: props.discussionTopic?.assignment
   }
 
-  if (discussionTopicData.isGraded) {
-    discussionTopicData.dueAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-      new Date(props.discussionTopic.assignment.dueAt)
-    )
+  const isGraded =
+    discussionTopicData.assignment !== null &&
+    (discussionTopicData.assignment.dueAt || discussionTopicData.assignment.pointsPossible)
+  const canDelete = discussionTopicData?.permissions?.delete || false
+  const canReadAsAdmin = !!discussionTopicData?.permissions?.readAsAdmin || false
+  const canUpdate = discussionTopicData?.permissions?.update || false
+  const canUnpublish = props.discussionTopic.canUnpublish || false
+
+  if (isGraded) {
+    discussionTopicData.dueAt = getDate(props.discussionTopic.assignment.dueAt)
     discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
   }
 
-  const infoTextStrings = {
-    replies: I18n.t('%{replies} replies', {replies: discussionTopicData.replies}),
-    unread: I18n.t(', %{unread} unread', {unread: discussionTopicData.unread})
-  }
-
-  const getInfoText = () => {
-    let infoText = ''
-    if (discussionTopicData.replies && discussionTopicData.replies > 0) {
-      infoText = infoTextStrings.replies
-      if (discussionTopicData.unread && discussionTopicData.unread > 0) {
-        infoText += infoTextStrings.unread
-      }
+  const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
+    onCompleted: () => {
+      setOnSuccess(I18n.t('The topic was successfully deleted.'))
+      window.location.href = `/courses/${ENV.course_id}/discussion_topics`
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error deleting the topic.'))
     }
-    return infoText
-  }
+  })
 
   const course = {
     id: ENV?.context_asset_string
@@ -114,8 +114,6 @@ export const DiscussionTopicContainer = props => {
       setCopyToOpen(false)
     }
   }
-
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [publishDiscussionTopic] = useMutation(PUBLISH_DISCUSSION_TOPIC, {
     onCompleted: data => {
@@ -186,7 +184,7 @@ export const DiscussionTopicContainer = props => {
         </Flex.Item>
         <Flex.Item>
           <div style={{border: '1px solid #c7cdd1', borderRadius: '5px'}}>
-            {discussionTopicData.isGraded && (
+            {isGraded && (
               <div style={{padding: '0 1.5rem 0'}}>
                 <Alert
                   contextDisplayText="Section 2"
@@ -223,32 +221,44 @@ export const DiscussionTopicContainer = props => {
               <Flex.Item>
                 <PostToolbar
                   onReadAll={() => {}}
-                  onDelete={discussionTopicData.readAsAdmin ? () => {} : null}
-                  onToggleComments={discussionTopicData.readAsAdmin ? () => {} : null}
-                  infoText={getInfoText()}
+                  onToggleComments={canReadAsAdmin ? () => {} : null}
+                  onDelete={
+                    canDelete
+                      ? () => {
+                          if (
+                            // eslint-disable-next-line no-alert
+                            window.confirm(I18n.t('Are you sure you want to delete this topic?'))
+                          ) {
+                            deleteDiscussionTopic({
+                              variables: {
+                                id: discussionTopicData._id
+                              }
+                            })
+                          }
+                        }
+                      : null
+                  }
+                  repliesCount={discussionTopicData.replies}
+                  unreadCount={discussionTopicData.unread}
                   onSend={
-                    discussionTopicData.readAsAdmin
+                    canReadAsAdmin
                       ? () => {
                           setSendToOpen(true)
                         }
                       : null
                   }
                   onCopy={
-                    discussionTopicData.readAsAdmin
+                    canReadAsAdmin
                       ? () => {
                           setCopyToOpen(true)
                         }
                       : null
                   }
-                  onEdit={discussionTopicData.readAsAdmin ? () => {} : null}
-                  onTogglePublish={
-                    discussionTopicData.permissions.update && discussionTopicData.readAsAdmin
-                      ? onPublish
-                      : null
-                  }
+                  onEdit={canReadAsAdmin ? () => {} : null}
+                  onTogglePublish={canReadAsAdmin && canUpdate ? onPublish : null}
                   onToggleSubscription={onSubscribe}
                   isPublished={discussionTopicData.published}
-                  canUnpublish={discussionTopicData.can_unpublish}
+                  canUnpublish={canUnpublish}
                   isSubscribed={discussionTopicData.subscribed}
                   commentsEnabled
                 />

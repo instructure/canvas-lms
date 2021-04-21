@@ -44,16 +44,30 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-export function PostToolbar({...props}) {
+function InfoText({repliesCount, unreadCount}) {
+  const infoText = []
+
+  if (repliesCount > 0) {
+    infoText.push(I18n.t('%{repliesCount} replies', {repliesCount}))
+  }
+
+  if (unreadCount > 0) {
+    infoText.push(I18n.t('%{unreadCount} unread', {unreadCount}))
+  }
+
+  return infoText.length > 0 ? (
+    <View padding="0 x-small 0 0">
+      <Text weight="light" size="small" data-testid="replies-counter">
+        {infoText.join(', ')}
+      </Text>
+    </View>
+  ) : null
+}
+
+export function PostToolbar({repliesCount, unreadCount, ...props}) {
   return (
     <>
-      {props.infoText && (
-        <View padding="0 x-small 0 0">
-          <Text weight="light" size="small" data-testid="replies-counter">
-            {props.infoText}
-          </Text>
-        </View>
-      )}
+      <InfoText repliesCount={repliesCount} unreadCount={unreadCount} />
       {props.onTogglePublish && (
         <ToggleButton
           isEnabled={props.isPublished}
@@ -188,7 +202,7 @@ const getMenuConfigs = props => {
 
 const renderMenuItem = ({selectionCallback, icon, label, key}) => {
   return (
-    <Menu.Item key={key} onSelect={selectionCallback}>
+    <Menu.Item key={key} onSelect={selectionCallback} data-testid={key}>
       <Flex>
         <Flex.Item>{icon}</Flex.Item>
         <Flex.Item padding="0 0 0 xx-small">
@@ -259,10 +273,6 @@ PostToolbar.propTypes = {
    */
   isSubscribed: PropTypes.bool,
   /**
-   * Text to be displayed with the toolbar
-   */
-  infoText: PropTypes.string,
-  /**
    * Callback to be fired when Speedgrader actions are fired.
    */
   onOpenSpeedgrader: PropTypes.func,
@@ -273,7 +283,22 @@ PostToolbar.propTypes = {
   /**
    * Callback to be fired when Share to Commons action is fired.
    */
-  onShareToCommons: PropTypes.func
+  onShareToCommons: PropTypes.func,
+
+  /**
+   * Indicate the replies count associated with the Post.
+   */
+  repliesCount: PropTypes.number,
+
+  /**
+   * Indicate the unread count associated with the Post.
+   */
+  unreadCount: PropTypes.number
+}
+
+PostToolbar.defaultProps = {
+  repliesCount: 0,
+  unreadCount: 0
 }
 
 export default PostToolbar

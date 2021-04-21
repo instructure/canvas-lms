@@ -27,8 +27,8 @@ const setup = props => {
 describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
-      const {queryByText} = setup({infoText: 'info text'})
-      expect(queryByText('info text')).toBeTruthy()
+      const {queryByText} = setup({repliesCount: 1})
+      expect(queryByText('1 replies')).toBeTruthy()
     })
   })
 

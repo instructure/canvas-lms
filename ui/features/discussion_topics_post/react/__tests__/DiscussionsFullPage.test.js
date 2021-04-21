@@ -51,7 +51,7 @@ describe('DiscussionsFullPage', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <DiscussionTopicManager discussionTopicId={1} />
+          <DiscussionTopicManager discussionTopicId="1" />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
