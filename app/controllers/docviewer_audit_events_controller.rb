@@ -89,12 +89,24 @@ class DocviewerAuditEventsController < ApplicationController
   end
 
   def canvadoc_from_submission(submission, document_id)
-    submission.submission_history.reverse_each do |versioned_submission|
-      attachments = versioned_submission.versioned_attachments
+    if submission.assignment.annotated_document?
+      canvadoc = submission.assignment.annotatable_attachment.canvadoc
+      return canvadoc if canvadoc.document_id == document_id
+    end
 
-      attachments.each do |attachment|
-        canvadoc = attachment.canvadoc
-        return canvadoc if canvadoc&.document_id == document_id
+    submission.submission_history.reverse_each do |versioned_submission|
+      if versioned_submission.submission_type == "student_annotation"
+        annotation_context = versioned_submission.annotation_context(attempt: versioned_submission.attempt)
+        attachment = annotation_context.attachment
+
+        return attachment.canvadoc if attachment.canvadoc&.document_id == document_id
+      else
+        attachments = versioned_submission.versioned_attachments
+
+        attachments.each do |attachment|
+          canvadoc = attachment.canvadoc
+          return canvadoc if canvadoc&.document_id == document_id
+        end
       end
     end
 
