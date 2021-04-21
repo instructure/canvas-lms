@@ -144,7 +144,7 @@ module MicrosoftSync
       end
 
       url = path.start_with?('https:') ? path : BASE_URL + path
-      Rails.logger.debug("MicrosoftSync::GraphClient: #{method} #{url}")
+      Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{url}")
 
       response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
         HTTParty.send(method, url, options)
