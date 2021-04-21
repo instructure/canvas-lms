@@ -487,7 +487,7 @@ class GradeCalculator
   def save_scores
     return if @current_updates.empty? && @final_updates.empty?
     return if joined_enrollment_ids.blank?
-    return if @grading_period && @grading_period.deleted?
+    return if @grading_period&.deleted?
 
     save_scores_in_transaction
   end
@@ -590,6 +590,7 @@ class GradeCalculator
           FROM #{Enrollment.quoted_table_name} enrollments
           WHERE
             enrollments.id IN (#{joined_enrollment_ids})
+          ORDER BY enrollment_id
       ON CONFLICT #{conflict_target}
       DO UPDATE SET
           #{columns_to_insert_or_update[:update_values].join(', ')},
@@ -632,6 +633,7 @@ class GradeCalculator
           scores.enrollment_id IN (#{joined_enrollment_ids}) AND
           scores.assignment_group_id IS NULL AND
           #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'}
+        ORDER BY enrollment_id
       ON CONFLICT (score_id)
       DO UPDATE SET
         calculation_details = excluded.calculation_details,
@@ -694,7 +696,7 @@ class GradeCalculator
             assignment_group_id,
             #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
           )
-        ORDER BY enrollment_id, assignment_group_id
+        ORDER BY assignment_group_id, enrollment_id
       ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
       DO UPDATE SET
         #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
