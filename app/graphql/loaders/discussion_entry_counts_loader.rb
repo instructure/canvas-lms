@@ -48,6 +48,11 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
       .select(counts_sql(object_id)).index_by(&object_id.to_sym)
 
     objects.each do |object|
+      # if we are not a root_entry, we are not returning counts
+      if object.is_a?(DiscussionEntry) && object.root_entry_id
+        fulfill(object, nil)
+        next
+      end
       object_counts = {}
       object_counts["replies_count"] = counts[object.id]&.replies || 0
       object_counts["unread_count"] = object_counts["replies_count"] - (counts[object.id]&.read || 0)

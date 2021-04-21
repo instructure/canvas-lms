@@ -69,6 +69,12 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve('rootEntryParticipantCounts { repliesCount }')).to eq 3
   end
 
+  it 'does not allows querying for participant counts on non root_entries' do
+    child = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id)
+    de_type = GraphQLTypeTester.new(child, current_user: @teacher)
+    expect(de_type.resolve('rootEntryParticipantCounts { unreadCount }')).to be_nil
+  end
+
   it 'returns a null message when entry is marked as deleted' do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil
