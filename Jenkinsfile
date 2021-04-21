@@ -413,9 +413,25 @@ pipeline {
               extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
                 def stages = [:]
 
+                def linterHooks = [
+                  onNodeAcquired: lintersStage.&setupNode,
+                  onNodeReleasing: lintersStage.&tearDownNode,
+                ]
+
                 extendedStage('Linters')
+                  .hooks(linterHooks)
                   .required(!configuration.isChangeMerged())
-                  .queue(stages, { lintersStage() })
+                  .queue(stages, {
+                    def nestedStages = [:]
+
+                    extendedStage('Linters - Run Tests - Code').queue(nestedStages, lintersStage.&codeStage)
+                    extendedStage('Linters - Run Tests - Webpack').queue(nestedStages, lintersStage.&webpackStage)
+                    extendedStage('Linters - Run Tests - Yarn')
+                      .required(env.GERRIT_PROJECT == "canvas-lms" && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+                      .queue(nestedStages, lintersStage.&yarnStage)
+
+                    parallel(nestedStages)
+                  })
 
                 extendedStage('Master Bouncer')
                   .required(env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged())

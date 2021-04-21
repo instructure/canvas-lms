@@ -71,21 +71,41 @@ def tearDownNode() {
   }
 }
 
-def call() {
-  setupNode()
-
-  credentials.withGerritCredentials {
-    withEnv([
-      "DOCKER_INPUTS=${_getDockerInputs()}",
-      "GERGICH_VOLUME=${dockerVolumeName}",
-      "PLUGINS_LIST=${configuration.plugins().join(' ')}",
-      "SKIP_ESLINT=${configuration.getString('skip-eslint', 'false')}",
-    ]) {
-      sh 'build/new-jenkins/linters/run-gergich.sh'
-    }
+def codeStage() {
+  withEnv([
+    "DOCKER_INPUTS=${_getDockerInputs()}",
+    "GERGICH_VOLUME=$dockerVolumeName",
+    "SKIP_ESLINT=${configuration.getBoolean('skip-eslint', 'false')}",
+  ]) {
+    sh './build/new-jenkins/linters/run-gergich-linters.sh'
   }
 
-  tearDownNode()
+  if(configuration.getBoolean('force-failure-linters', 'false')) {
+    error "lintersStage: force failing due to flag"
+  }
+}
+
+def webpackStage() {
+  withEnv([
+    "DOCKER_INPUTS=${_getDockerInputs()}",
+    "GERGICH_VOLUME=$dockerVolumeName",
+  ]) {
+    sh './build/new-jenkins/linters/run-gergich-webpack.sh'
+  }
+
+  if(configuration.getBoolean('force-failure-linters', 'false')) {
+    error "lintersStage: force failing due to flag"
+  }
+}
+
+def yarnStage() {
+  withEnv([
+    "DOCKER_INPUTS=${_getDockerInputs()}",
+    "GERGICH_VOLUME=$dockerVolumeName",
+    "PLUGINS_LIST=${configuration.plugins().join(' ')}",
+  ]) {
+    sh './build/new-jenkins/linters/run-gergich-yarn.sh'
+  }
 
   if(configuration.getBoolean('force-failure-linters', 'false')) {
     error "lintersStage: force failing due to flag"

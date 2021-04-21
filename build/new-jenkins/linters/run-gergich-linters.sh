@@ -27,14 +27,14 @@ if ! git diff --exit-code Dockerfile.jenkins; then
   gergich comment "{\"path\":\"\Dockerfile.jenkins\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
 
-./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'"
-./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake i18n:check'"
-./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/brakeman"
-./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/tatl_tael"
-./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/stylelint"
-./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/rlint"
-[ "\${SKIP_ESLINT-}" != "true" ] && ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/eslint"
-./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/lint_commit_message"
+gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'
+gergich capture i18nliner 'rake i18n:check'
+bundle exec ruby script/brakeman
+bundle exec ruby script/tatl_tael
+bundle exec ruby script/stylelint
+bundle exec ruby script/rlint
+[ "\${SKIP_ESLINT-}" != "true" ] && bundle exec ruby script/eslint
+bundle exec ruby script/lint_commit_message
 
 gergich status
 echo "LINTER OK!"
