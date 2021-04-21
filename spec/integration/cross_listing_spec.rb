@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -54,7 +56,7 @@ describe "cross listing" do
         "X1,S2,active",
         "C4,S3,active")
 
-      expect(CommunicationChannel.by_path('u1@example.com').first.user.cached_current_enrollments.map(&:course).map(&:sis_source_id).sort).to eq ["C1", "X1", "C4"].sort
+      expect(CommunicationChannel.by_path('u1@example.com').first.user.cached_currentish_enrollments.map(&:course).map(&:sis_source_id).sort).to eq ["C1", "X1", "C4"].sort
     end
     
   end

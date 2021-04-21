@@ -1,0 +1,76 @@
+{
+  "name": "assignment_created",
+  "definition": "The event is emitted anytime a new assignment is created by an end user or API request.",
+  "trigger": "Triggered when a new assignment is created in a course.",
+  "schema": {
+    "assignment_group_id": "The Canvas id of the assignment group.",
+    "assignment_id": "The Canvas id of the new assignment.",
+    "context_id": "The type of context the assignment is used in.",
+    "context_type": "The type of context the assignment is used in.",
+    "context_uuid": "The uuid of the context associated with the assignment.",
+    "description": "The description of the assignment. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "due_at": "The due date for the assignment.",
+    "lock_at": "The lock date (assignment is locked after this date).",
+    "lti_assignment_id": "The LTI assignment guid for the assignment.",
+    "lti_resource_link_id": "The unique identifier of the assignment resource in the LTI specification ",
+    "lti_resource_link_id_duplicated_from": "The LTI resource link ID of the original assignment . ",
+    "points_possible": "The maximum points possible for the assignment.",
+    "submission_types": "Valid methods for submitting the assignment, may include multiple comma separated options of: discussion_topic, external_tool, media_recording, none, not_graded, online_quiz, online_text_entry, online_upload, online_url, on_paper.",
+    "title": "The title of the assignment. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "unlock_at": "The unlock date (assignment is unlocked after this date).",
+    "updated_at": "The time at which this assignment was last modified in any way.",
+    "workflow_state": "Workflow state of the assignment. E.g duplicating, fail_to_import, failed_to_duplicate, published, unpublished. See API documentation for more details. "
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_role": "TeacherEnrollment",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "developer_key_id": "170000000056",
+          "event_name": "assignment_created",
+          "event_time": "2019-11-01T19:11:11.323Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": null,
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/Los_Angeles",
+          "url": "https://oxana.instructure.com/api/v1/courses/565/assignments",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "assignment_group_id": "210700000000101907",
+          "assignment_id": "21070000000000371",
+          "context_id": "21070000000000565",
+          "context_type": "Course",
+          "context_uuid": "a1b2c3c4z9x8a1s2q5w6p9o8i7u6y5t6a2s3d4f5",
+          "description": "<p>test assignment</p>",
+          "due_at": "2018-10-01T05:59:59Z",
+          "lock_at": "2018-10-01T05:59:59Z",
+          "lti_assignment_id": "8b81d12c-fda4-4317-8d83-e987a6d2014a",
+          "lti_resource_link_id": "a1b2c3c4z9x8a1s2q5w6p9o8i7u6y5t6a2s3d8h9",
+          "lti_resource_link_id_duplicated_from": "a1b2c3c4z9x8a1s2q5w6p9o8i7u6y5t6a2s3d8h9",
+          "points_possible": 100,
+          "submission_types": "online_url,online_upload",
+          "title": "add_new_assignment_3",
+          "unlock_at": "2018-09-24T06:00:00Z",
+          "updated_at": "2018-10-03T14:50:31Z",
+          "workflow_state": "created"
+        }
+      }
+    }
+  ]
+}

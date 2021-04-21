@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -25,7 +27,6 @@ describe "assignments" do
   include AssignmentsCommon
 
   context "as a student" do
-
     before(:each) do
       course_with_student_logged_in
     end
@@ -41,6 +42,8 @@ describe "assignments" do
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
+      wait_for_ajaximations
       titles = ff('.ig-title')
       expect(titles[0].text).to eq @fourth_assignment.title
       expect(titles[1].text).to eq @assignment.title
@@ -59,7 +62,7 @@ describe "assignments" do
     it "should not show submission data when muted" do
       assignment = @course.assignments.create!(:title => 'test assignment', :name => 'test assignment')
 
-      assignment.update_attributes(:submission_types => "online_url,online_upload")
+      assignment.update(:submission_types => "online_url,online_upload", muted: false)
       submission = assignment.submit_homework(@student)
       submission.submission_type = "online_url"
       submission.save!
@@ -134,7 +137,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
       expect(f('#content')).to include_text(format_date_for_view(unlock_time))
-      locked_assignment.update_attributes(:unlock_at => Time.now)
+      locked_assignment.update(:unlock_at => Time.now)
       refresh_page # to show the updated assignment
       expect(f('#content')).not_to include_text('This assignment is locked until')
     end
@@ -142,8 +145,10 @@ describe "assignments" do
     it "should verify due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
+      wait_for_ajaximations
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
-      due_date_assignment.update_attributes(:due_at => 2.days.from_now)
+      due_date_assignment.update(:due_at => 2.days.from_now)
       refresh_page # to show the updated assignment
       expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
     end
@@ -183,7 +188,7 @@ describe "assignments" do
       end
 
       it "should allow submission when within override locks" do
-        @assignment.update_attributes(:submission_types => 'online_text_entry')
+        @assignment.update(:submission_types => 'online_text_entry')
         # Change unlock dates to be valid for submission
         @override.unlock_at = Time.now.utc - 1.days   # available now
         @override.save!
@@ -212,7 +217,7 @@ describe "assignments" do
       end
 
       it "should expand the comments box on click" do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -227,7 +232,7 @@ describe "assignments" do
       it "should validate file upload restrictions" do
         filename_txt, fullpath_txt, data_txt, tempfile_txt = get_file("testfile4.txt")
         filename_zip, fullpath_zip, data_zip, tempfile_zip = get_file("testfile5.zip")
-        @assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
+        @assignment.update(:submission_types => 'online_upload', :allowed_extensions => '.txt')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
 
@@ -250,8 +255,12 @@ describe "assignments" do
         setup_google_drive()
       end
 
+      after(:each) do
+        click_away_accept_alert
+      end
+
       it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         wait_for_animations
@@ -274,7 +283,7 @@ describe "assignments" do
           allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
           # create assignment
-          @assignment.update_attributes(:submission_types => 'online_upload')
+          @assignment.update(:submission_types => 'online_upload')
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           f('.submit_assignment_link').click
           f("a[href*='submit_google_doc_form']").click
@@ -305,7 +314,7 @@ describe "assignments" do
         allow(google_drive_connection).to receive(:authorized?).and_return(nil)
         allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         f("a[href*='submit_google_doc_form']").click
@@ -320,6 +329,7 @@ describe "assignments" do
       ag = @course.assignment_groups.first
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       move_to_click("label[for=show_by_type]")
@@ -332,6 +342,7 @@ describe "assignments" do
       ag = @course.assignment_groups.first
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       expect(f("#content")).not_to contain_css('.new_assignment')
@@ -345,6 +356,7 @@ describe "assignments" do
       @course.assignments.create!(:title => 'undated assignment', :name => 'undated assignment')
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       expect(is_checked('#show_by_date')).to be_truthy
@@ -358,6 +370,7 @@ describe "assignments" do
       ag = @course.assignment_groups.first
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       move_to_click("label[for=show_by_type]")
@@ -365,6 +378,7 @@ describe "assignments" do
       expect(f("#assignment_group_#{ag.id}")).not_to be_nil
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
       expect(is_checked('#show_by_type')).to be_truthy
     end
@@ -374,6 +388,7 @@ describe "assignments" do
       empty_ag = @course.assignment_groups.create!(:name => "Empty")
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       expect(f("#content")).not_to contain_css('#assignment_group_overdue')
@@ -394,6 +409,7 @@ describe "assignments" do
       empty_ag = @course.assignment_groups.create!(:name => "Empty", :group_weight => 10)
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       move_to_click("label[for=show_by_type]")
@@ -405,6 +421,7 @@ describe "assignments" do
       undated, upcoming = @course.assignments.partition{ |a| a.due_date.nil? }
 
       get "/courses/#{@course.id}/assignments"
+      wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
 
       undated.each do |a|
@@ -413,6 +430,39 @@ describe "assignments" do
 
       upcoming.each do |a|
         expect(f("#assignment_group_upcoming #assignment_#{a.id}")).not_to be_nil
+      end
+    end
+
+    context "with more than one page of assignment groups" do
+      before do
+        ApplicationController::ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 10
+        @count_to_make = ApplicationController::ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX + 2
+
+        # we suspend these callbacks here to speed up the spec
+        AssignmentGroup.suspend_callbacks(kind: :save) do
+          Assignment.suspend_callbacks(kind: :save) do
+            @count_to_make.times do |i|
+              ag = @course.assignment_groups.create!(name: "AG #{i}")
+              ag.assignments.create!(context: @course, name: "assignment #{i}")
+            end
+          end
+        end
+        # by enrolling a new user it will do all the DuedateCacher stuff we skipped above
+        course_with_student_logged_in(course: @course)
+      end
+
+      it "should exhaust all pagination of assignment groups" do
+        get "/courses/#{@course.id}/assignments"
+        wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
+        wait_for_ajaximations
+        # if there are more assignment_groups visible than we fetch per page,
+        # it must mean that it paginated succcessfully
+
+        count_to_expect = @count_to_make + 1 # add one for the @assignment created in the root `before` block
+        expect(ff('[data-view="assignmentGroups"] .assignment').length).to eq(count_to_expect)
+
+        move_to_click("label[for=show_by_type]")
+        expect(ff('[data-view="assignmentGroups"] .assignment_group').length).to eq(count_to_expect)
       end
     end
   end

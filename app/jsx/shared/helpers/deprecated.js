@@ -26,25 +26,25 @@
  * There are 3 ways you can use this:
  * @example
  * // Most basic usage, just logs supplied deprecation message
- * $.somethingOld = deprecated("use '@instructure/ui-core/lib/somethingBetter' instead", () => { ...})
+ * $.somethingOld = deprecated("use '@instructure/ui-something-better' instead", () => { ...})
  * @example
  * // Will log a more helpful deprecation method than the first example because
  * // it will tell you the host object and name of the method that is deprecated.
- * deprecated("use '@instructure/ui-core/lib/somethingBetter' instead", $, 'somethingOld', () => { ...} )
+ * deprecated("use '@instructure/ui-something-better' instead", $, 'somethingOld', () => { ...} )
  * @example
  * // if you want to mark a method defined somewhere else (like a lib you don't control) as deprecated
- * deprecated("use '@instructure/ui-core/lib/somethingBetter' instead", $, 'somethingOld')
+ * deprecated("use '@instructure/ui-something-better' instead", $, 'somethingOld')
  */
 export default function deprecated(message, obj, method, fn) {
   const isBareFn = !method
-  const originalFn = isBareFn ? obj : (typeof fn === 'function' ? fn : obj[method])
+  const originalFn = isBareFn ? obj : typeof fn === 'function' ? fn : obj[method]
   if (process.env.NODE_ENV !== 'production') {
     let warned = false
-    const newFn = Object.assign(function () {
+    const newFn = Object.assign(function() {
       if (!warned && console) {
         const warningArgs = isBareFn
           ? [originalFn]
-          : [(obj && obj.name ? obj.name: obj), `.${method} (aka: `, originalFn, ')']
+          : [obj && obj.name ? obj.name : obj, `.${method} (aka: `, originalFn, ')']
         console.warn(...warningArgs, 'is deprecated.', message)
       }
       warned = true

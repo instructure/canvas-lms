@@ -30,7 +30,7 @@ const defaultProps = () => ({
   terms: getSampleData().terms,
   isLoadingCourses: false,
   loadCourses: () => {},
-  onSelectedChanged: () => {},
+  onSelectedChanged: () => {}
 })
 
 test('renders the CoursePicker component', () => {
@@ -56,7 +56,7 @@ test('calls loadCourses when filters are updated', () => {
   picker.onFilterChange({
     term: '',
     subAccount: '',
-    search: 'one',
+    search: 'one'
   })
 
   ok(props.loadCourses.calledOnce)

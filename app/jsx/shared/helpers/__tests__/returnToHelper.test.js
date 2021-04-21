@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { isValid } from '../returnToHelper'
+import {isValid} from '../returnToHelper'
 
 describe('returnToHelper', () => {
   describe('isValid', () => {
@@ -34,9 +34,28 @@ describe('returnToHelper', () => {
       expect(isValid('JaVaScRiPt:alert("nice try")')).toEqual(false)
     })
 
-    test('returns true for other urls', () => {
-      expect(isValid('https://github.com')).toEqual(true)
+    test('returns false for data: protocol', () => {
+      expect(isValid('data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
+        false
+      )
+      expect(isValid('  data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
+        false
+      )
+      expect(isValid('DaTa:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
+        false
+      )
+    })
+
+    test('returns true for relative urls', () => {
       expect(isValid('/')).toEqual(true)
+    })
+
+    test('returns true for absolute urls in the same origin', () => {
+      expect(isValid(window.location.origin + '/courses/1/assignments')).toEqual(true)
+    })
+
+    test('returns false for absolute urls in a different origin', () => {
+      expect(isValid('http://evil.com')).toEqual(false)
     })
   })
 })

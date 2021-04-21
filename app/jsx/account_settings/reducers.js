@@ -28,7 +28,8 @@ import {
   SET_CSP_INHERITED,
   SET_CSP_INHERITED_OPTIMISTIC,
   SET_DIRTY,
-  COPY_INHERITED_SUCCESS
+  COPY_INHERITED_SUCCESS,
+  WHITELISTS_LOADED
 } from './actions'
 
 export function cspEnabled(state = false, action) {
@@ -54,6 +55,15 @@ export function cspInherited(state = false, action) {
 export function isDirty(state = false, action) {
   switch (action.type) {
     case SET_DIRTY:
+      return action.payload
+    default:
+      return state
+  }
+}
+
+export function whitelistsHaveLoaded(state = false, action) {
+  switch (action.type) {
+    case WHITELISTS_LOADED:
       return action.payload
     default:
       return state
@@ -128,5 +138,6 @@ export default combineReducers({
   cspEnabled,
   cspInherited,
   isDirty,
-  whitelistedDomains
+  whitelistedDomains,
+  whitelistsHaveLoaded
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,38 +38,34 @@ describe NotificationPolicy do
     end
 
     it "should cause message dispatch to specified channel on triggered policies" do
-      @default_cc = @student.communication_channels.create(:path => "default@example.com")
-      @default_cc.confirm!
-      @cc = @student.communication_channels.create(:path => "secondary@example.com")
-      @cc.confirm!
+      communication_channel(@student, {username: 'default@example.com', active_cc: true})
+      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
       @assignment = @course.assignments.create!(:title => "test assignment")
       expect(@assignment.messages_sent).to be_include("Assignment Created")
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
       expect(m).not_to be_nil
     end
 
     it "should prevent message dispatches if set to 'never' on triggered policies" do
-      @cc = @student.communication_channels.create(:path => "secondary@example.com")
-      @cc.confirm!
+      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
       @assignment = @course.assignments.create!(:title => "test assignment")
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
       expect(m).to be_nil
     end
 
     it "should prevent message dispatches if no policy setting exists" do
-      @cc = @student.communication_channels.create(:path => "secondary@example.com")
-      @cc.confirm!
+      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
       NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
       @assignment = @course.assignments.create!(:title => "test assignment")
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
       expect(m).to be_nil
     end
   end
@@ -76,7 +74,7 @@ describe NotificationPolicy do
     Notification.create! :name => "Hello",
                          :subject => "Hello",
                          :category => "TestImmediately"
-    allow_any_instance_of(Message).to receive(:get_template).and_return("here's a free <%= data.favorite_soda %>")
+    allow_any_instance_of(Message).to receive(:get_template).and_return("here's a free id <%= data.course_id %>")
     class DataTest < ActiveRecord::Base
       self.table_name = :courses
 
@@ -94,7 +92,7 @@ describe NotificationPolicy do
           u
         }
         whenever { true }
-        data { {:favorite_soda => 'mtn dew'} }
+        data { {course_id: 'this is a real course_id', root_account_id: Account.default.id} }
       end
       def root_account
         Account.default
@@ -107,7 +105,7 @@ describe NotificationPolicy do
     dt.save!
     msg = dt.messages_sent["Hello"].find { |m| m.to == "blarg@example.com" }
     expect(msg).not_to be_nil
-    expect(msg.body).to include "mtn dew"
+    expect(msg.body).to include "this is a real course_id"
   end
 
   context "named scopes" do
@@ -138,21 +136,21 @@ describe NotificationPolicy do
       end
 
       it "should have a scope to differentiate by frequency" do
-        expect(NotificationPolicy.by(:immediately)).to eq [@n1]
-        expect(NotificationPolicy.by(:daily)).to eq [@n2]
-        expect(NotificationPolicy.by(:weekly)).to eq [@n3]
-        expect(NotificationPolicy.by(:never)).to eq [@n4]
+        expect(NotificationPolicy.by_frequency(:immediately)).to eq [@n1]
+        expect(NotificationPolicy.by_frequency(:daily)).to eq [@n2]
+        expect(NotificationPolicy.by_frequency(:weekly)).to eq [@n3]
+        expect(NotificationPolicy.by_frequency(:never)).to eq [@n4]
       end
 
       it "should be able to differentiate by several frequencies at once" do
-        expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n1)
-        expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n2)
+        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to be_include(@n1)
+        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to be_include(@n2)
       end
 
       it "should be able to combine an array of frequencies with a for scope" do
-        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n2)
-        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n3)
-        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).not_to be_include(@n1)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to be_include(@n2)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to be_include(@n3)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).not_to be_include(@n1)
       end
     end
 
@@ -170,19 +168,19 @@ describe NotificationPolicy do
 
       n1 = notification_policy_model
 
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq []
 
       n1.update_attribute(:frequency, 'never')
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq []
 
       n1.update_attribute(:frequency, 'daily')
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
 
       n1.update_attribute(:frequency, 'weekly')
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
     end
 
@@ -197,6 +195,25 @@ describe NotificationPolicy do
       params[:root_account] = Account.default
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
       NotificationPolicy.setup_for(@user, params)
+    end
+
+    it "should update send_observed_names_in_notifications when included" do
+      user_model
+      communication_channel_model
+      params = { :channel_id => @communication_channel.id }
+      params[:root_account] = Account.default
+      params[:user] = { :send_observed_names_in_notifications => 'true' }
+      NotificationPolicy.setup_for(@user, params)
+      expect(@user.send_observed_names_in_notifications?).to eq true
+      params[:user] = { :send_observed_names_in_notifications => 'false' }
+      NotificationPolicy.setup_for(@user, params)
+      expect(@user.send_observed_names_in_notifications?).to eq false
+
+      # Verify KNO-298
+      params[:root_account].settings[:allow_sending_scores_in_emails] = false
+      params[:user] = { :send_observed_names_in_notifications => 'true' }
+      NotificationPolicy.setup_for(@user, params)
+      expect(@user.send_observed_names_in_notifications?).to eq true
     end
 
     it "should set all notification entries within the same category" do
@@ -249,7 +266,7 @@ describe NotificationPolicy do
   describe "setup_with_default_policies" do
     before :once do
       @user = User.create!
-      @communication_channel = @user.communication_channels.create!(path: 'email@example.com')
+      @communication_channel = communication_channel(@user, {username: 'email@example.com'})
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
     end
 
@@ -325,6 +342,24 @@ describe NotificationPolicy do
           expect(@policy.reload.frequency).to eq Notification::FREQ_NEVER
         }
       end
+    end
+  end
+
+  context 'find_all_for' do
+    it 'should only return course type notification policies if provided a course context type' do
+      student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
+      channel = communication_channel(student, {username: 'default@example.com', active_cc: true})
+
+      course_type_notification = Notification.create!(:name => "Course Type", :subject => "Test", :category => 'Due Date')
+      notification = Notification.create!(:name => "Panda Express", :subject => "Test", :category => 'Whatever')
+
+      NotificationPolicy.create(:notification => course_type_notification, :communication_channel => channel, :frequency => "immediately")
+      NotificationPolicy.create(:notification => notification, :communication_channel => channel, :frequency => "daily")
+      NotificationPolicy.create(:communication_channel => channel, :frequency => "daily")
+
+      policies = NotificationPolicy.find_all_for(channel, context_type: 'Course')
+      expect(policies.count).to eq 1
+      expect(policies.first.notification.name).to eq course_type_notification.name
     end
   end
 end

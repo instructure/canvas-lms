@@ -18,24 +18,45 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const ConferencesTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Conferences')}
-    subheading={I18n.t('Virtual lectures in real-time')}
-    image="/images/tutorial-tray-images/conferences.svg"
-  >
-    <Text as="p">
+    subheading={I18n.t('Host virtual lectures in real time')}
+    image="/images/tutorial-tray-images/Panda_Conferences.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
       {
-        I18n.t(`Conduct virtual lectures, virtual office hours, and student
-          groups. Broadcast real-time audio and video, share presentation
-          slides, give demonstrations of applications and online resources,
-          and more.`)
+        label: I18n.t('How do I create a conference in a course?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156'
+      },
+      {
+        label: I18n.t('How do I start a conference?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074'
+      },
+      {
+        label: I18n.t('How do I conclude a conference?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606'
+      },
+      {
+        label: I18n.t('How do I record a conference?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840'
       }
-    </Text>
+    ]}
+  >
+    {I18n.t(`Conduct lectures, office hours, and student group meetings all
+      from your computer. Broadcast real-time audio and video, share presentation
+      slides, give demonstrations of applications and online resources,
+      and more.`)}
   </TutorialTrayContent>
-);
+)
 
-export default ConferencesTray;
+export default ConferencesTray

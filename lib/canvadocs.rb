@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -145,7 +147,12 @@ module Canvadocs
       response = @http.request(request)
 
       unless response.code =~ /\A20./
-        raise Canvadocs::Error, "HTTP Error #{response.code}: #{response.body}"
+        err_message = "HTTP Error #{response.code}: #{response.body}"
+        klass = Canvadocs::HttpError
+        klass = Canvadocs::ServerError if response.code.to_s == "500"
+        klass = Canvadocs::BadGateway if response.code.to_s == "502"
+        klass = Canvadocs::BadRequest if response.code.to_s == "400"
+        raise klass, err_message
       end
       response.body
     end
@@ -192,6 +199,10 @@ module Canvadocs
   end
 
   class Error < StandardError; end
+  class HttpError < Error; end
+  class ServerError < HttpError; end
+  class BadGateway < HttpError; end
+  class BadRequest < HttpError; end
 
   def self.config
     PluginSetting.settings_for_plugin(:canvadocs)
@@ -221,12 +232,43 @@ module Canvadocs
     assignment = submission.assignment
     enrollments = assignment.course.enrollments.index_by(&:user_id)
     session_params = current_user_session_params(submission, current_user, enrollments)
+
+    # Graders may not have access to other graders' annotations if the
+    # assignment is set that way.
     if assignment.moderated_grading?
       session_params[:user_filter] = moderated_grading_user_filter(submission, current_user, enrollments)
       session_params[:restrict_annotations_to_user_filter] = true
     elsif assignment.anonymize_students?
       session_params[:user_filter] = anonymous_unmoderated_user_filter(submission, current_user, enrollments)
       session_params[:restrict_annotations_to_user_filter] = current_user.id == submission.user_id
+    end
+
+    # Set visibility for students and peer reviewers.
+    if !submission.user_can_read_grade?(current_user)
+      session_params[:restrict_annotations_to_user_filter] = true
+      session_params[:user_filter] ||= [
+        user_filter_entry(
+          current_user,
+          submission,
+          role: canvadocs_user_role(submission.assignment.course, current_user, enrollments),
+          anonymize: false
+        )
+      ]
+
+      if assignment.peer_reviews? && submission.user == current_user
+        session_params[:user_filter] = session_params[:user_filter] | peer_review_user_filter(submission, current_user, enrollments)
+      end
+    end
+
+    # For Annotated Document assignments, the Canvadoc won't have a
+    # relationship with the Submission through CanvadocsSubmission, so we set
+    # a blank user_filter here to avoid the default of restricting to only the
+    # viewing user's annotations (default is in Canvadocs::Session). If we the
+    # user_filter is nil here, then we know we didn't have any other reason to
+    # be restrictive.
+    if session_params[:user_filter].nil? && submission.submission_type == "annotated_document"
+      session_params[:restrict_annotations_to_user_filter] = false
+      session_params[:user_filter] = []
     end
 
     session_params
@@ -257,8 +299,21 @@ module Canvadocs
       current_user_params
     end
 
+    def peer_review_user_filter(submission, current_user, enrollments)
+      assessors = User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+
+      assessors.push(current_user).map do |assessor|
+        user_filter_entry(
+          assessor,
+          submission,
+          role: canvadocs_user_role(submission.assignment.course, assessor, enrollments),
+          anonymize: false
+        )
+      end
+    end
+
     def moderated_grading_user_filter(submission, current_user, enrollments)
-      submission.moderation_whitelist_for_user(current_user).map do |user|
+      submission.moderation_allow_list_for_user(current_user).map do |user|
         user_filter_entry(
           user,
           submission,

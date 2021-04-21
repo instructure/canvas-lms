@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -92,8 +94,11 @@ class SubAccountsController < ApplicationController
   def show
     @sub_account = subaccount_or_self(params[:id])
     ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{:sub_accounts => [:parent_account, :root_account]}])
-    render :json => @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count],
-                                         :include => [:sub_accounts => {:only => [:id, :name], :methods => [:course_count, :sub_account_count]}])
+    sub_account_json = @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count])
+    sort_key = Account.best_unicode_collation_key('accounts.name')
+    sub_accounts = @sub_account.sub_accounts.order(sort_key).as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
+    sub_account_json[:account][:sub_accounts] = sub_accounts
+    render json: sub_account_json
   end
 
   # @API Create a new sub-account
@@ -144,7 +149,7 @@ class SubAccountsController < ApplicationController
   def update
     @sub_account = subaccount_or_self(params[:id])
     params[:account].delete(:parent_account_id)
-    if @sub_account.update_attributes(account_params)
+    if @sub_account.update(account_params)
       render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors, status: 400

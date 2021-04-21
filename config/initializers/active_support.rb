@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -24,38 +26,40 @@ end
 
 module ActiveSupport::Cache
   module RailsCacheShim
-    def normalize_key(key, options)
-      result = super
-      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS5_1
-        result = "rails52:#{result}"
-      end
-      result
+    def delete(key, options = nil)
+      r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS6_0)) # prefer rails new if on old rails and vice versa
+      r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS6_0))
+      r1 || r2
     end
 
-    def delete(key, options = nil)
-      r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS5_1)) # prefer rails 3 if on rails 3 and vis versa
-      r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS5_1))
-      r1 || r2
+    private
+
+    def normalize_key(key, options)
+      result = super
+      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+        result = "rails61:#{result}"
+      end
+      result
     end
   end
   Store.prepend(RailsCacheShim)
 
-  unless CANVAS_RAILS5_1
-    module AllowMocksInStore
-      def compress!(*args)
-        if @value && Rails.env.test?
-          begin
-            super
-          rescue TypeError => e
-            return
-          end
-        else
+  Store.prepend(Canvas::CacheRegister::ActiveSupport::Cache::Store)
+
+  module AllowMocksInStore
+    def compress!(*args)
+      if @value && Rails.env.test?
+        begin
           super
+        rescue TypeError => e
+          return
         end
+      else
+        super
       end
     end
-    Entry.prepend(AllowMocksInStore)
   end
+  Entry.prepend(AllowMocksInStore)
 end
 
 
@@ -85,11 +89,12 @@ module IgnoreMonkeyPatchesInDeprecations
     return true if path&.start_with?(File.expand_path(File.dirname(__FILE__) + "/../../gems/activesupport-suspend_callbacks"))
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/support/blank_slate_protection.rb")
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/selenium/common.rb")
-    @switchman ||= File.expand_path('..', Gem.loaded_specs['switchman'].full_gem_path) + "/"
+    @switchman ||= File.expand_path(Gem.loaded_specs['switchman'].full_gem_path) + "/"
     return true if path&.start_with?(@switchman)
     return true if label == 'render' && path&.end_with?("application_controller.rb")
     return true if label == 'named_context_url' && path&.end_with?("application_controller.rb")
     return true if label == 'redirect_to' && path&.end_with?("application_controller.rb")
+    return true if label == 'block in wrap_block_in_transaction' && path == File.expand_path(File.dirname(__FILE__) + "/../../spec/spec_helper.rb")
 
     return false unless path
     super(path)

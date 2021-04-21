@@ -15,27 +15,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-  '../models/DaySubstitution'
-], (_, Backbone, DaySubstitution) ->
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import DaySubstitution from '../models/DaySubstitution'
 
-  class DaySubstitutionCollection extends Backbone.Collection
-    model: DaySubstitution
+export default class DaySubstitutionCollection extends Backbone.Collection
+  model: DaySubstitution
 
-    # This rips out the day sub days from their respective models as well as
-    # eliminates any duplicated days. For instance, a daySub might have
-    # the following attributes: 
-    #    "0" : "5"
-    #  Another subDay might have
-    #    "3" : "4"
-    # This will take all of those attributes and put them in one object. The 
-    # result will look like this. 
-    #   {"0" : "5", "3" : "4"}
-    #
-    # @api public backbone override 
-    toJSON: -> 
-     @reduce(
-        (memo, daySub) => _.extend(memo, daySub.attributes)
-      , {})
+  # This rips out the day sub days from their respective models as well as
+  # eliminates any duplicated days. For instance, a daySub might have
+  # the following attributes: 
+  #    "0" : "5"
+  #  Another subDay might have
+  #    "3" : "4"
+  # This will take all of those attributes and put them in one object. The 
+  # result will look like this. 
+  #   {"0" : "5", "3" : "4"}
+  #
+  # @api public backbone override 
+  toJSON: -> 
+    @reduce(
+      (memo, daySub) => _.extend(memo, daySub.attributes)
+    , {})

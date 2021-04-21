@@ -35,30 +35,6 @@ import 'jquery.elastic'
 // #
 // reusable message composition dialog
 export default class MessageFormDialog extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.onCourse = this.onCourse.bind(this)
-    this.recipientIdsChanged = this.recipientIdsChanged.bind(this)
-    this.recipientTotalChanged = this.recipientTotalChanged.bind(this)
-    this.canAddNotesFor = this.canAddNotesFor.bind(this)
-    this.resizeBody = this.resizeBody.bind(this)
-    this.handleBodyClick = this.handleBodyClick.bind(this)
-    this.handleAttachmentClick = this.handleAttachmentClick.bind(this)
-    this.handleAttachmentDblClick = this.handleAttachmentDblClick.bind(this)
-    this.handleAttachment = this.handleAttachment.bind(this)
-    this.handleAttachmentKeyDown = this.handleAttachmentKeyDown.bind(this)
-    this.removeAttachment = this.removeAttachment.bind(this)
-    this.focusPrevAttachment = this.focusPrevAttachment.bind(this)
-    this.focusNextAttachment = this.focusNextAttachment.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.template = template
 
@@ -91,13 +67,22 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   dialogOptions() {
+    const responsive_awareness = !!window.ENV?.FEATURES?.responsive_awareness
+
+    const smallTablet = window.matchMedia('(min-width: 550px)').matches
+    const tablet = window.matchMedia('(min-width: 700px)').matches
+
+    const responsiveMinWidth = smallTablet ? 550 : 320
+    const responsiveWidth = tablet ? 700 : smallTablet ? 550 : 320
+    const responsiveHeight = smallTablet ? 550 : 'auto'
+
     return {
       id: 'compose-new-message',
       autoOpen: false,
-      minWidth: 550,
-      width: 700,
+      minWidth: responsive_awareness ? responsiveMinWidth : 550,
+      width: responsive_awareness ? responsiveWidth : 700,
       minHeight: 500,
-      height: 550,
+      height: responsive_awareness ? responsiveHeight : 550,
       resizable: true,
       title: I18n.t('Compose Message'),
       // Event handler for catching when the dialog is closed.
@@ -196,9 +181,7 @@ export default class MessageFormDialog extends DialogBaseView {
     this.$fullDialog.addClass('compose-message-dialog')
 
     // add attachment and media buttons to bottom bar
-    this.$fullDialog
-      .find('.ui-dialog-buttonpane')
-      .prepend(composeButtonBarTemplate({isIE10: INST.browser.ie10}))
+    this.$fullDialog.find('.ui-dialog-buttonpane').prepend(composeButtonBarTemplate({}))
 
     return (this.$addMediaComment = this.$fullDialog.find('.attach-media'))
   }
@@ -230,8 +213,8 @@ export default class MessageFormDialog extends DialogBaseView {
       el: this.$recipients,
       disabled: this.model != null ? this.model.get('private') : undefined
     }).render()
-    this.recipientView.on('changeToken', this.recipientIdsChanged)
-    this.recipientView.on('recipientTotalChange', this.recipientTotalChanged)
+    this.recipientView.on('changeToken', this.recipientIdsChanged, this)
+    this.recipientView.on('recipientTotalChange', this.recipientTotalChanged, this)
 
     if (!ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT) {
       this.$messageCourse.attr('aria-required', true)
@@ -243,24 +226,25 @@ export default class MessageFormDialog extends DialogBaseView {
       el: this.$messageCourse,
       courses: this.options.courses,
       defaultOption: I18n.t('select_course', 'Select course'),
-      messageableOnly: true
+      messageableOnly: true,
+      excludeConcluded: true
     })
     if (this.model) {
       if (this.model.get('context_code')) {
         this.onCourse({id: this.model.get('context_code'), name: this.model.get('context_name')})
       } else {
-        this.courseView.on('course', this.onCourse)
+        this.courseView.on('course', c => this.onCourse(c))
         this.courseView.setValue(`course_${_.keys(this.model.get('audience_contexts').courses)[0]}`)
       }
       this.recipientView.disable(false)
     } else if (this.launchParams) {
-      this.courseView.on('course', this.onCourse)
+      this.courseView.on('course', c => this.onCourse(c))
       if (this.launchParams.context) {
         this.courseView.setValue(this.launchParams.context)
       }
       this.recipientView.disable(false)
     } else {
-      this.courseView.on('course', this.onCourse)
+      this.courseView.on('course', c => this.onCourse(c))
       this.courseView.setValue(this.defaultCourse)
     }
     if (this.model) {
@@ -326,7 +310,7 @@ export default class MessageFormDialog extends DialogBaseView {
         messages.filter(
           m =>
             new Date(m.get('created_at')) <= date &&
-            !_.find(participants, p => !_.contains(m.get('participating_user_ids'), p))
+            !_.find(participants, p => !_.includes(m.get('participating_user_ids'), p))
         )
       )
       const contextView = new ContextMessagesView({
@@ -336,17 +320,17 @@ export default class MessageFormDialog extends DialogBaseView {
       contextView.render()
     }
 
-    this.$fullDialog.on('click', '.message-body', this.handleBodyClick)
+    this.$fullDialog.on('click', '.message-body', e => this.handleBodyClick(e))
     this.$fullDialog.on('click', '.attach-file', () => this.addAttachment())
     this.$fullDialog.on(
       'click',
       '.attachment .remove_link',
       preventDefault(e => this.removeAttachment($(e.currentTarget)))
     )
-    this.$fullDialog.on('keydown', '.attachment', this.handleAttachmentKeyDown)
-    this.$fullDialog.on('click', '.attachment', this.handleAttachmentClick)
-    this.$fullDialog.on('dblclick', '.attachment', this.handleAttachmentDblClick)
-    this.$fullDialog.on('change', '.file_input', this.handleAttachment)
+    this.$fullDialog.on('keydown', '.attachment', e => this.handleAttachmentKeyDown(e))
+    this.$fullDialog.on('click', '.attachment', e => this.handleAttachmentClick(e))
+    this.$fullDialog.on('dblclick', '.attachment', e => this.handleAttachmentDblClick(e))
+    this.$fullDialog.on('change', '.file_input', e => this.handleAttachment(e))
 
     this.$fullDialog.on('click', '.attach-media', preventDefault(() => this.addMediaComment()))
     this.$fullDialog.on(
@@ -419,7 +403,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   recipientIdsChanged(recipientIds) {
-    if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/)) {
+    if (_.isEmpty(recipientIds) || _.includes(recipientIds, /(teachers|tas|observers)$/)) {
       return this.toggleUserNote(false)
     } else {
       const canAddNotes = _.map(this.recipientView.tokenModels(), tokenModel =>
@@ -492,17 +476,7 @@ export default class MessageFormDialog extends DialogBaseView {
     this.appendAddAttachmentTemplate()
     this.updateAttachmentOverflow()
 
-    // Hacky crazyness for ie10.
-    // If you try to use javascript to 'click' on a file input element,
-    // when you go to submit the form it will give you an "access denied" error.
-    // So, for IE10, we make the paperclip icon a <label>  that references the input it automatically open the file input.
-    // But making it a <label> makes it so you can't tab to it. so for everyone else me make it a <button> and open the file
-    // input dialog with a javascript "click"
-    if (INST.browser.ie10) {
-      return this.focusAddAttachment()
-    } else {
-      return this.$fullDialog.find('.file_input:last').click()
-    }
+    return this.$fullDialog.find('.file_input:last').click()
   }
 
   appendAddAttachmentTemplate() {
@@ -545,6 +519,7 @@ export default class MessageFormDialog extends DialogBaseView {
       $attachment.hide()
       return
     }
+    this.focusAddAttachment()
     $attachment.slideDown('fast')
     const $icon = $attachment.find('.attachment-icon i')
     $icon.empty()
@@ -552,6 +527,15 @@ export default class MessageFormDialog extends DialogBaseView {
     const {name} = file
     $attachment.find('.attachment-name').text(name)
     this.setAttachmentClip($attachment)
+
+    // have the alert happen later so the focus change doesn't interrupt it
+    const attachedFiles = this.$attachmentsPane.find('input:not([value=])')
+    setTimeout(() => {
+      $.screenReaderFlashMessageExclusive(
+        I18n.t('File %{count} attached: %{name}', {count: attachedFiles.length, name})
+      )
+    }, 1000)
+
     const remove = $attachment.find('.remove_link')
     remove.attr('aria-label', `${remove.attr('title')}: ${name}`)
     const extension = name
@@ -604,7 +588,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   removeEmptyAttachments() {
-    return _.each(this.$attachments.find('input[value=]'), this.removeAttachment)
+    return _.each(this.$attachments.find('input[value=]'), node => this.removeAttachment(node))
   }
 
   removeAttachment(node) {

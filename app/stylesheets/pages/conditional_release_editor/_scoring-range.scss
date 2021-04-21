@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.cr-scoring-range {
+  display: flex;
+  flex-direction: row;
+  height: 215px;
+  position: relative;
+
+  & + & {
+    border-top: 1px solid $ic-border-color;
+  }
+
+  .cr-scoring-range__bounds {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 60px;
+    padding: 10px;
+    flex-shrink: 0;
+  }
+
+  .cr-scoring-range__assignments {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    padding-#{direction(left)}: 30px;
+  }
+
+  .cr-scoring-range__add-assignment-button {
+    font-size: 26px;
+    cursor: pointer;
+    position: absolute;
+    border: 2px dashed $ic-border-color;
+    #{direction(left)}: 12px;
+    top: 30px;
+    bottom: 55px;
+    margin: auto;
+    background: transparent;
+    color: var(--ic-brand-font-color-dark);
+    width: 60px;
+  }
+
+}

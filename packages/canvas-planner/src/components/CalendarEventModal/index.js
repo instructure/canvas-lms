@@ -16,22 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import {bool, func, shape, string} from 'prop-types';
-import { momentObj } from 'react-moment-proptypes';
+import React from 'react'
+import {bool, func, shape, string} from 'prop-types'
+import {momentObj} from 'react-moment-proptypes'
 
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Link from '@instructure/ui-elements/lib/components/Link';
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import View from '@instructure/ui-layout/lib/components/View';
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
+import {List} from '@instructure/ui-list'
+import {Text} from '@instructure/ui-text'
+import {Modal} from '@instructure/ui-modal'
+import {View} from '@instructure/ui-view'
 
-import formatMessage from '../../format-message';
-import { dateString, dateTimeString, dateRangeString } from '../../utilities/dateUtils';
-import { convertApiUserContent } from '../../utilities/contentUtils';
-import { userShape } from '../plannerPropTypes';
+import formatMessage from '../../format-message'
+import {dateString, dateTimeString, dateRangeString} from '../../utilities/dateUtils'
+import {convertApiUserContent} from '../../utilities/contentUtils'
+import {userShape} from '../plannerPropTypes'
 
 export default class CalendarEventModal extends React.Component {
   static propTypes = {
@@ -47,86 +46,98 @@ export default class CalendarEventModal extends React.Component {
     startTime: momentObj.isRequired,
     endTime: momentObj,
     allDay: bool.isRequired,
-    timeZone: string.isRequired,
+    timeZone: string.isRequired
   }
 
-  renderRow (firstColumnContent, secondColumnContent) {
-    return <ListItem>
-      <Text weight="bold">{firstColumnContent}</Text>
-      <View margin="0 0 0 x-small">
-        <Text>{secondColumnContent}</Text>
-      </View>
-    </ListItem>;
+  renderRow(firstColumnContent, secondColumnContent) {
+    return (
+      <List.Item>
+        <Text weight="bold">{firstColumnContent}</Text>
+        <View margin="0 0 0 x-small">
+          <Text>{secondColumnContent}</Text>
+        </View>
+      </List.Item>
+    )
   }
 
-  renderTimeString () {
-    const {startTime, endTime, timeZone} = this.props;
+  renderTimeString() {
+    const {startTime, endTime, timeZone} = this.props
     if (this.props.allDay) {
-      return dateString(startTime, timeZone);
+      return dateString(startTime, timeZone)
     } else if (endTime && !startTime.isSame(endTime)) {
-      return dateRangeString(startTime, endTime, timeZone);
+      return dateRangeString(startTime, endTime, timeZone)
     } else {
-      return dateTimeString(startTime, timeZone);
+      return dateTimeString(startTime, timeZone)
     }
   }
 
-  renderDateTimeRow () {
-    return this.renderRow(formatMessage('Date & Time:'), this.renderTimeString());
+  renderDateTimeRow() {
+    return this.renderRow(formatMessage('Date & Time:'), this.renderTimeString())
   }
 
-  renderCalendarRow () {
-    const calendarName = this.props.courseName || this.props.currentUser.displayName;
-    return this.renderRow(formatMessage('Calendar:'), calendarName);
+  renderCalendarRow() {
+    const calendarName = this.props.courseName || this.props.currentUser.displayName
+    return this.renderRow(formatMessage('Calendar:'), calendarName)
   }
 
-  renderLocationRow () {
+  renderLocationRow() {
     if (this.props.location) {
-      return this.renderRow(formatMessage('Location:'), this.props.location);
+      return this.renderRow(formatMessage('Location:'), this.props.location)
     }
   }
 
-  renderAddressRow () {
+  renderAddressRow() {
     if (this.props.address) {
-      return this.renderRow(formatMessage('Address:'), this.props.address);
+      return this.renderRow(formatMessage('Address:'), this.props.address)
     }
   }
 
-  renderDetails () {
+  renderDetails() {
     if (this.props.details) {
-      const convertedHtml = convertApiUserContent(this.props.details);
-      return <ListItem margin="large 0 0 0">
-        <Text weight="bold">{formatMessage('Details:')}</Text>
-        <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
-      </ListItem>;
+      const convertedHtml = convertApiUserContent(this.props.details)
+      return (
+        <List.Item margin="large 0 0 0">
+          <Text weight="bold">{formatMessage('Details:')}</Text>
+          <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
+        </List.Item>
+      )
     }
   }
 
-  render () {
-    return <Modal
-      label="Calendar Event Details"
-      size="small"
-      open={this.props.open}
-      onDismiss={this.props.requestClose}
-      shouldCloseOnDocumentClick
-    >
-      <ModalHeader>
-        <Heading><Link href={this.props.html_url}>{this.props.title}</Link></Heading>
-        <CloseButton
-          placement="end"
-          onClick={this.props.requestClose}
-        >
-          {formatMessage('Close')}
-        </CloseButton>
-      </ModalHeader>
-      <ModalBody padding="medium">
-        <List variant="unstyled" itemSpacing="small">
-          {this.renderCalendarRow()}
-          {this.renderDateTimeRow()}
-          {this.renderLocationRow()}
-          {this.renderAddressRow()}
-          {this.renderDetails()}
-        </List>
-      </ModalBody>
-    </Modal>;
+  render() {
+    return (
+      <Modal
+        label="Calendar Event Details"
+        size="small"
+        open={this.props.open}
+        onDismiss={this.props.requestClose}
+        shouldCloseOnDocumentClick
+      >
+        <Modal.Header>
+          <Heading>
+            <Button
+              variant="link"
+              size="large"
+              theme={{largePadding: '0', largeHeight: 'normal'}}
+              href={this.props.html_url}
+            >
+              {this.props.title}
+            </Button>
+          </Heading>
+          <CloseButton placement="end" onClick={this.props.requestClose}>
+            {formatMessage('Close')}
+          </CloseButton>
+        </Modal.Header>
+        <Modal.Body padding="medium">
+          <List variant="unstyled" itemSpacing="small">
+            {this.renderCalendarRow()}
+            {this.renderDateTimeRow()}
+            {this.renderLocationRow()}
+            {this.renderAddressRow()}
+            {this.renderDetails()}
+          </List>
+        </Modal.Body>
+      </Modal>
+    )
   }
 }

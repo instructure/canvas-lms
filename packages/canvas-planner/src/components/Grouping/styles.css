@@ -23,6 +23,7 @@
   font-size: var(--titleFontSize);
   font-weight: var(--titleFontWeight);
   color: var(--titleColor);
+  border-top-left-radius: 0.125rem;
 
   /* handle unusually long words that break the layout */
   min-width: 1px;
@@ -50,7 +51,7 @@
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
   outline: none;

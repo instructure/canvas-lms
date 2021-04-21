@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -16,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Api::V1::MasterCourses
+  include Api::V1::User
+
   def master_template_json(template, user, session, opts={})
     hash = api_json(template, user, session, :only => %w(id course_id), :methods => %w{last_export_completed_at associated_course_count})
     migration = template.active_migration
@@ -33,6 +37,7 @@ module Api::V1::MasterCourses
       hash['template_id'] = migration.master_template_id
     end
     hash['id'] = opts[:child_migration].id if opts[:child_migration]
+    hash['user'] = user_display_json(migration.user)
     hash
   end
 
@@ -48,7 +53,7 @@ module Api::V1::MasterCourses
     when 'ContextExternalTool'
       course_external_tool_url(:course_id => asset.context.id, :id => asset.id)
     when 'LearningOutcome'
-      course_outcome_url(:course_id => asset.context.id, :id => asset.id)
+      course_outcome_url(:course_id => asset.context&.id || @course.id, :id => asset.id)
     when 'LearningOutcomeGroup'
       course_outcome_group_url(:course_id => asset.context.id, :id => asset.id)
     else
@@ -99,7 +104,13 @@ module Api::V1::MasterCourses
     hash = api_json(course, @current_user, session, :only => %w{id name course_code})
     hash['sis_course_id'] = course.sis_source_id if can_read_sis
     hash['term_name'] = course.enrollment_term.name
-    hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if opts[:include_teachers]
+    if opts[:include_teachers]
+      if course.teacher_count
+        hash['teacher_count'] = course.teacher_count
+      else
+        hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) }
+      end
+    end
     hash
   end
 

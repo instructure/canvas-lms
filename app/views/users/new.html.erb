@@ -19,9 +19,8 @@
 <%
   js_bundle :terms_of_service_modal, :registration
   css_bundle :registration
-  content_for :page_title, t('create_a_canvas_account', "Create a Canvas Account")
-  content_for :head, include_common_stylesheets
-  js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @domain_root_account.terms_of_service.terms_of_service_content&.content)
+  provide :page_title, t('create_a_canvas_account', "Create a Canvas Account")
+  provide :head, include_common_stylesheets
 %>
 
 
@@ -35,7 +34,10 @@
 
   <div id="registration_content">
     <div class="registration-content">
-      <h2 id="registration_video"><a href="http://vimeo.com/35336470" title="Play the Canvas introduction video">Watch a Video</a></h2>
+      <% if (url = Setting.get('registration_video', nil).presence) %>
+        <% js_env(:REGISTRATION_VIDEO_URL => Setting.get('registration_video_url_with_play_params', nil).presence) %>
+        <h2 id="registration_video"><a href=<%= url %> title="Play the Canvas introduction video">Watch a Video</a></h2>
+      <% end %>
       <div id="registration_options">
         <h2>Sign up now, it's free!</h2>
         <% if (url = @domain_root_account.settings[:fft_registration_url]) %>
@@ -59,5 +61,3 @@
     </div>
   </div>
 </div>
-<%= # for plugin use
-    render "shared/login_trailer" %>

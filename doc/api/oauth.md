@@ -1,13 +1,15 @@
 OAuth2
 ======
 <a name="top"></a>
-<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
+<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens" target="_blank">refresh tokens</a> to generate new access tokens.</div>
 
-[OAuth2](http://oauth.net/2/) is a protocol designed to let third-party applications
+<a href="http://oauth.net/2" target="_blank">OAuth2</a> is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
-password. Canvas uses OAuth2 (specifically [RFC-6749](http://tools.ietf.org/html/rfc6749))
-for authentication and authorization of the Canvas API.
+password. Canvas uses OAuth2 (specifically <a href="http://tools.ietf.org/html/rfc6749" target="_blank">RFC-6749</a>
+for authentication and authorization of the Canvas API. Additionally, Canvas uses OAuth2 for <a href="https://www.imsglobal.org/activity/learning-tools-interoperability" target="_blank">LTI Advantage</a> service authentication (as described in the <a href="https://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS Security Framework</a>).
 <a name="top"></a>
+
+###[Accessing the Canvas API](#accessing-canvas-api)
 - [Storing Tokens](#storing-access-tokens)
 - [Manual Token Generation](#manual-token-generation)
 - [Oauth2 Flow](#oauth2-flow)
@@ -24,6 +26,17 @@ for authentication and authorization of the Canvas API.
   - [POST login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
   - [DELETE login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
   - [GET login/session_token](file.oauth_endpoints.html#get-login-session-token)
+
+###[Accessing LTI Advantage Services](#accessing-lti-advantage-services)
+- [Step 1: Developer Key Setup](#developer-key-setup)
+- [Step 2: Request an Access Token](#request-access-token)
+- [Step 3: Use the access token to access LTI services](#use-access-token)
+
+
+
+<a name="accessing-canvas-api"></a>
+# [Accessing the Canvas API](#accessing-canvas-api)
+<small><a href="#top">Back to Top</a></small>
 
 <a name="storing-access-tokens"></a>
 ## [Storing Tokens](#storing-access-tokens)
@@ -61,8 +74,8 @@ For testing your application before you've implemented OAuth, the
 simplest option is to generate an access token on your user's profile
 page. Note that asking any other user to manually generate a token and
 enter it into your application is a violation of Canvas' terms of
-service. *Applications in use by multiple users **MUST** use OAuth to obtain
-tokens*.
+service. Applications in use by multiple users <b>MUST</b> use OAuth to obtain
+tokens.
 
 To manually generate a token for testing:
 
@@ -101,15 +114,15 @@ ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
 For Canvas Cloud (hosted by Instructure), developer keys are
-[issued by the admin of the institution](https://community.canvaslms.com/docs/DOC-5141).
+<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249" target="_blank">issued by the admin of the institution</a>.
 
 <b>NOTE for LTI providers:</b> Since developer keys are scoped to the institution they are issued
 from, tool providers that serve multiple institutions should store and look up the correct
 developer key based on the launch parameters (eg. custom_canvas_api_domain) sent during the LTI
 launch.
 
-For [open source Canvas users](https://github.com/instructure/canvas-lms/wiki),
-you can [generate a client ID](https://community.canvaslms.com/docs/DOC-5141)
+For <a href="https://github.com/instructure/canvas-lms/wiki" target="_blank">open source Canvas users</a>,
+you can <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249" target="_blank">generate a client ID</a>
 and secret in the Site Admin account of your Canvas install.
 
 <a name="oauth2-flow-1"></a>
@@ -291,3 +304,58 @@ refresh token is to be reused.
 <small><a href="#top">Back to Top</a></small>
 
 To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
+
+<a name="accessing-lti-advantage-services"></a>
+# [Accessing LTI Advantage Services](#accessing-lti-advantage-services)
+<small><a href="#top">Back to Top</a></small>
+
+<p>LTI Advantage services, such as <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank">Names and Role Provisioning Services</a> and <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">Assignment and Grade Services</a>, require use of a client credentials grant flow for request authentication. This workflow is best summarized on the IMS Security Framework (specifically <a href="https://www.imsglobal.org/spec/security/v1p0/#using-oauth-2-0-client-credentials-grant" target="_blank">Section 4</a>).</p> Our goal here is to highlight some nuances that might help you access these services in Canvas, rather than describing the specification in detail.</p>
+
+<a name="developer-key-setup"></a>
+## [Step 1: Developer Key Setup](#developer-key-setup)
+<small><a href="#top">Back to Top</a></small>
+
+<p>Before the client_credentials grant flow can be achieved, an <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140" target="_blank">LTI developer key must be created</a>. During developer key configuration, a public JWK can either be configured statically or can be dynamically rotated by providing JWKs by a URL that Canvas can reach. Tools may also use a previously issued client_credentials token to <a href="/doc/api/public_jwk.html" target="_blank">retroactively rotate the public JWK via an API request</a>. The JWK <b>must</b> include an alg and use.</p>
+
+<h4>Example JWK</h4>
+
+  <pre class="example code prettyprint">
+   "public_jwk":{  
+      "kty":"RSA",
+      "alg":"RS256",
+      "e":"AQAB",
+      "kid":"8f796179-7ac4-48a3-a202-fc4f3d814fcd",
+      "n":"nZA7QWcIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yILwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhN9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
+      "use":"sig"
+   }
+  </pre>
+
+<a name="request-access-token"></a>
+## [Step 2: Request an access token](#request-access-token)
+<small><a href="#top">Back to Top</a></small>
+
+<p>Once the developer key is configured and turned on, your tool can  <a href="/doc/api/file.oauth_endpoints.html#post-login-oauth2-token" target="_blank">request an LTI access token using the client_credentials grant</a>. This request must be signed by an RSA256 private key with a public key that is configured on the developer key as described in <a href=#developer-key-setup>Step 1: Developer Key Setup</a>.</p>
+
+<a name="use-access-token"></a>
+## [Step 3: Use the access token to access LTI services](#use-access-token)
+<small><a href="#top">Back to Top</a></small>
+
+Once you have an access token, you can use it to make LTI service requests. The access token must be included as a Bearer token in the Authorization header:
+
+```bash
+curl -H "Authorization: Bearer <ACCESS-TOKEN>" "https://<canvas_domain>/api/lti/courses/:course_id/names_and_roles"
+```
+
+<p>Access tokens only work in the context of where a tool has been deployed. Tools can only access line items that are associated with their tool.</p>
+
+The following endpoints are currently supported:
+
+###Names and Role Provisioning Services
+- <a href="/doc/api/names_and_role.html" target="_blank">Names and Role API</a>
+
+
+###Assignment and Grade Services
+
+- <a href="/doc/api/line_items.html" target="_blank">Line Items</a>
+- <a href="/doc/api/score.html" target="_blank">Score</a>
+- <a href="/doc/api/result.html" target="_blank">Result</a>

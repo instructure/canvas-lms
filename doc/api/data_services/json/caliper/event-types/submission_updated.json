@@ -1,0 +1,111 @@
+{
+  "name": "submission_updated",
+  "definition": "The event is emitted anytime an end user or API request re-submits an assignment.",
+  "trigger": "Triggered when a submission gets updated and has previously been submitted.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "submission_type": "The types of submission (basic_lti_launch, discussion_topic, media_recording, online_quiz, online_text_entry, online_upload, online_url)"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-21T22:25:55.856Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:77516df0-a8bb-49ae-a859-0471e9269378",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000054321",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana",
+                  "user_sis_id": "a10000",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "3298d98d938298kjasdgfklsdfj48348gJGJDASG",
+                  "root_account_uuid": "398DFJSAFJDfgkhdsahk439849GJSDKGJSAFKG99",
+                  "entity_id": "21070000000054321"
+                }
+              }
+            },
+            "action": "Modified",
+            "object": {
+              "id": "urn:instructure:canvas:submission:21070000002947931",
+              "type": "Attempt",
+              "dateModified": "2019-11-06T16:46:46.000Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "submission_type": "online_upload",
+                  "entity_id": "21070000002947931"
+                }
+              },
+              "assignee": {
+                "id": "urn:instructure:canvas:user:21070000000098765",
+                "type": "Person"
+              },
+              "assignable": {
+                "id": "urn:instructure:canvas:assignment:21070000000012345",
+                "type": "AssignableDigitalResource"
+              },
+              "count": 1
+            },
+            "eventTime": "2019-11-06T16:46:46.446Z",
+            "referrer": "https://oxana.instructure.com/courses/565/gradebook",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:Instructor:21070000000054321",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000054321",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              },
+              "roles": [
+                "Instructor"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:b5e43107370d071208e098b098a09845",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "129b89de-293c-4201-3201-09a90b039e09",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/courses/565/assignments/12345/submissions/98765",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -28,6 +28,13 @@
                 </div>
             </div>
         {{/if}}
+        {{#if recaptcha}}
+        <div class="control-group">
+            <div class="controls">
+            <div class="g-recaptcha"></div>
+            </div>
+        </div>
+        {{/if}}
         <div class="control-group">
         <p>{{#t}}You will be redirected to a Login page where you will need to log in with your child's credentials.{{/t}}</p>
         </div>

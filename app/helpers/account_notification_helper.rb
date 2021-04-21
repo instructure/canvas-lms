@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -81,9 +83,9 @@ module AccountNotificationHelper
 
   def roles_message(account)
     if account.root_account?
-      t "(If none are selected, send to everyone in the entire account)"
+      t "(If none are selected, show to everyone in the entire account)"
     else
-      t "(If none are selected, send to everyone in the entire sub-account)"
+      t "(If none are selected, show to everyone in the entire sub-account)"
     end
   end
 end

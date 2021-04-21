@@ -18,11 +18,10 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
-import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from '../../external_apps/components/TextInput'
-import CheckboxInput from '../../external_apps/components/CheckboxInput'
+import TextInput from './TextInput'
+import CheckboxInput from './CheckboxInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default class ConfigurationFormUrl extends React.Component {
@@ -40,7 +39,7 @@ export default class ConfigurationFormUrl extends React.Component {
   }
 
   isValid = () => {
-    let fields = ['name', 'configUrl'],
+    const fields = ['name', 'configUrl'],
       errors = {},
       formErrors = []
 
@@ -54,7 +53,7 @@ export default class ConfigurationFormUrl extends React.Component {
     this.setState({errors})
 
     let isValid = true
-    if (_.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0) {
       isValid = false
       $.screenReaderFlashError(
         I18n.t('There were errors with the form: %{errors}', {errors: formErrors.join(' ')})

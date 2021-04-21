@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,22 +29,30 @@ module Api::V1::Course
 
   def course_settings_json(course)
     settings = {}
+    settings[:allow_final_grade_override] = course.allow_final_grade_override?
     settings[:allow_student_discussion_topics] = course.allow_student_discussion_topics?
     settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments?
     settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
+    settings[:filter_speed_grader_by_student_group] = course.filter_speed_grader_by_student_group?
     settings[:grading_standard_enabled] = course.grading_standard_enabled?
     settings[:grading_standard_id] = course.grading_standard_id
+    settings[:grade_passback_setting] = course.grade_passback_setting
     settings[:allow_student_organized_groups] = course.allow_student_organized_groups?
     settings[:hide_final_grades] = course.hide_final_grades?
     settings[:hide_distribution_graphs] = course.hide_distribution_graphs?
+    settings[:hide_sections_on_course_users_page] = course.hide_sections_on_course_users_page?
     settings[:lock_all_announcements] = course.lock_all_announcements?
+    settings[:usage_rights_required] = course.usage_rights_required?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?
     settings[:restrict_student_future_view] = course.restrict_student_future_view?
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
+    settings[:syllabus_course_summary] = course.syllabus_course_summary?
+    settings[:homeroom_course] = course.homeroom_course?
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
+    settings[:course_color] = course.course_color
 
     settings
   end
@@ -89,21 +99,41 @@ module Api::V1::Course
         precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
+      if includes.include?('grading_periods')
+        hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
+           api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+        end
+      end
       if includes.include?('course_progress')
         hash['course_progress'] = CourseProgress.new(course,
                                                      subject_user,
                                                      preloaded_progressions: preloaded_progressions).to_json
       end
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
-      hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
+      if includes.include?('sections')
+        hash['sections'] = if enrollments.any?
+          section_enrollments_json(enrollments)
+        else
+          course.course_sections.map { |section| section.attributes.slice(*%w(id name start_at end_at)) }
+        end
+      end
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
-      hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
+      hash['is_favorite'] = course.favorite_for_user?(subject_user) if includes.include?('favorites')
       if includes.include?('teachers')
         if course.teacher_count
           hash['teacher_count'] = course.teacher_count
         else
           hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
+        end
+      end
+      # undocumented; used in AccountCourseUserSearch
+      if includes.include?('active_teachers')
+        course.shard.activate do
+          scope =
+            TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
+          hash['teachers'] =
+            User.where(id: scope).map { |teacher| user_display_json(teacher) }
         end
       end
       hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')
@@ -117,6 +147,7 @@ module Api::V1::Course
       hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
       hash['concluded'] = course.concluded? if includes.include?('concluded')
       apply_master_course_settings(hash, course, user)
+      hash['template'] = course.template? if course.root_account.feature_enabled?(:course_templates)
 
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
@@ -148,7 +179,7 @@ module Api::V1::Course
   end
 
   def apply_nickname(hash, course, user)
-    nickname = user.course_nickname(course)
+    nickname = course.preloaded_nickname? ? course.preloaded_nickname : user.course_nickname(course)
     if nickname
       hash['original_name'] = hash['name']
       hash['name'] = nickname
@@ -156,16 +187,16 @@ module Api::V1::Course
     hash
   end
 
-  def apply_master_course_settings(hash, course, user)
+  def apply_master_course_settings(hash, course, _user)
     is_mc = MasterCourses::MasterTemplate.is_master_course?(course)
     hash['blueprint'] = is_mc
 
     if is_mc
       template = MasterCourses::MasterTemplate.full_template_for(course)
-      if template.use_default_restrictions_by_type
+      if template&.use_default_restrictions_by_type
         hash['blueprint_restrictions_by_object_type'] = template.default_restrictions_by_type_for_api
       else
-        hash['blueprint_restrictions'] = template.default_restrictions
+        hash['blueprint_restrictions'] = template&.default_restrictions
       end
     end
   end
@@ -173,7 +204,8 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      teacher_counts = Course.where(:id => courses).joins(:teacher_enrollments).group("courses.id").count
+      scope = TeacherEnrollment.where.not(:workflow_state => %w{deleted rejected}).where(:course_id => courses).distinct.select(:user_id, :course_id)
+      teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|
         next unless count = teacher_counts[course.id]

@@ -16,12 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, string } from 'prop-types'
+import {shape, string} from 'prop-types'
+
+// corresponds to user_display_json in the Ruby json serializers
+const displayUser = shape({
+  id: string.isRequired,
+  display_name: string.isRequired,
+  avatar_image_url: string
+})
+export default displayUser
+
+// corresponds to user_json in the Ruby json serializers
+export const basicUser = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  avatar_url: string,
+  email: string
+})
 
 // we might add more comprehensive user shapes in the future
 export const author = shape({
   id: string.isRequired,
-  display_name: string.isRequired,
+  name: string.isRequired,
   avatar_image_url: string,
-  html_url: string.isRequired,
+  html_url: string.isRequired
 })

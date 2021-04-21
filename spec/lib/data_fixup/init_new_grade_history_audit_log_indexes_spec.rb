@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
   INDEX_TABLES = (NO_GRADER_REQUIRED_TABLES + GRADER_REQUIRED_TABLES).freeze
 
   before(:each) do
-    @database = Canvas::Cassandra::DatabaseBuilder.from_config(:auditors)
+    @database = CanvasCassandra::DatabaseBuilder.from_config(:auditors)
     skip("requires cassandra auditors") unless @database
 
     @values = [

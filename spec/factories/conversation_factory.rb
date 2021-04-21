@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -27,7 +29,7 @@ module Factories
       @message = @conversation.add_message('test')
     end
 
-    @conversation.update_attributes(options.slice(:subscribed, :starred, :workflow_state, :user))
+    @conversation.update(options.slice(:subscribed, :starred, :workflow_state, :user))
     @conversation.reload
   end
 end

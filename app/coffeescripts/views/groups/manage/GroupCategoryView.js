@@ -26,6 +26,9 @@ import AddUnassignedMenu from './AddUnassignedMenu'
 import template from 'jst/groups/manage/groupCategory'
 import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import GroupCategoryProgress from 'jsx/groups/components/GroupCategoryProgress'
 
 let _previousSearchTerm = ''
 export default class GroupCategoryView extends View {
@@ -87,7 +90,7 @@ export default class GroupCategoryView extends View {
 
   filterChange(event) {
     const search_term = event.target.value
-    if (search_term === _previousSearchTerm) return //Don't rerender if nothing has changed
+    if (search_term === _previousSearchTerm) return // Don't rerender if nothing has changed
 
     this.options.unassignedUsersView.setFilter(search_term)
 
@@ -107,7 +110,7 @@ export default class GroupCategoryView extends View {
     this.model.progressModel.on('change:url', () => {
       return this.model.progressModel.set({completion: 0})
     })
-    this.model.progressModel.on('change', this.render)
+    this.model.progressModel.on('change', this.render, this)
     return this.model.on('progressResolved', () => {
       return this.model.fetch({
         success: () => {
@@ -136,8 +139,19 @@ export default class GroupCategoryView extends View {
   }
 
   afterRender() {
+    this.renderProgress()
     this.setUnassignedHeading()
     return this.setGroupsHeading()
+  }
+
+  renderProgress() {
+    const container = document.getElementById('group-category-progress')
+    if (container != null) {
+      ReactDOM.render(
+        <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
+        container
+      )
+    }
   }
 
   setUnassignedHeading() {
@@ -155,8 +169,8 @@ export default class GroupCategoryView extends View {
       this.model.get('allows_multiple_memberships')
         ? I18n.t('everyone', 'Everyone (%{count})', {count})
         : ENV.group_user_type === 'student'
-          ? I18n.t('unassigned_students', 'Unassigned Students (%{count})', {count})
-          : I18n.t('unassigned_users', 'Unassigned Users (%{count})', {count})
+        ? I18n.t('unassigned_students', 'Unassigned Students (%{count})', {count})
+        : I18n.t('unassigned_users', 'Unassigned Users (%{count})', {count})
     )
   }
 

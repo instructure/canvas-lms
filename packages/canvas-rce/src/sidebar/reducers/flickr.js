@@ -21,7 +21,7 @@ import {
   RECEIVE_FLICKR_RESULTS,
   FAIL_FLICKR_SEARCH,
   TOGGLE_FLICKR_FORM
-} from "../actions/flickr";
+} from '../actions/flickr'
 
 export default function(state = {}, action) {
   switch (action.type) {
@@ -30,26 +30,26 @@ export default function(state = {}, action) {
         ...state,
         searching: true,
         searchTerm: action.term
-      };
+      }
     case RECEIVE_FLICKR_RESULTS:
       return {
         ...state,
         searching: false,
         searchResults: action.results
-      };
+      }
     case FAIL_FLICKR_SEARCH:
       return {
         ...state,
         searching: false,
-        searchTerm: "",
+        searchTerm: '',
         searchResults: []
-      };
+      }
     case TOGGLE_FLICKR_FORM:
       return {
         ...state,
         formExpanded: !state.formExpanded
-      };
+      }
     default:
-      return state;
+      return state
   }
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,10 +19,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti_1_3_spec_helper')
 require_dependency 'lti/tool_configuration'
 
 module Lti
   describe ToolConfiguration do
+    include_context 'lti_1_3_spec_helper'
+
     let(:public_jwk) do
       {
         "kty" => "RSA",
@@ -29,48 +34,6 @@ module Lti
         "kid" => "2018-09-18T21:55:18Z",
         "alg" => "RS256",
         "use" => "sig"
-      }
-    end
-    let(:settings) do
-      {
-        'title' => 'LTI 1.3 Tool',
-        'description' => '1.3 Tool',
-        'public_jwk' => public_jwk,
-        'target_link_uri' => 'http://lti13testtool.docker/blti_launch',
-        'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
-        'extensions' =>  [
-          {
-            'platform' => 'canvas.instructure.com',
-            'privacy_level' => 'public',
-            'tool_id' => 'LTI 1.3 Test Tool',
-            'domain' => 'http://lti13testtool.docker',
-            'settings' =>  {
-              'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
-              'selection_height' => 500,
-              'selection_width' => 500,
-              'text' => 'LTI 1.3 Test Tool Extension text',
-              'placements' => [
-                {
-                  'placement' => 'course_navigation',
-                  'message_type' => 'LtiResourceLinkRequest',
-                  'canvas_icon_class' => 'icon-lti',
-                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                  'text' => 'LTI 1.3 Test Tool Course Navigation',
-                  'target_link_uri' => 'http://lti13testtool.docker/launch?placement=course_navigation',
-                  'enabled' => true
-                },
-                {
-                  'placement' => 'account_navigation',
-                  'message_type' => 'LtiResourceLinkRequest',
-                  'canvas_icon_class' => 'icon-lti',
-                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                  'text' => 'LTI 1.3 Test Tool Course Navigation',
-                  'enabled' => true
-                }
-              ]
-            }
-          }
-        ]
       }
     end
     let(:tool_configuration) { described_class.new(settings: settings) }
@@ -86,6 +49,25 @@ module Lti
         end
 
         it { is_expected.to eq true }
+      end
+
+      context 'with non-matching schema' do
+        let(:settings) do
+          s = super()
+          s.delete('target_link_uri')
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq false }
+
+        it 'is contains a message about missing target_link_uri' do
+          tool_configuration.valid?
+          expect(tool_configuration.errors[:configuration].first.message).to include('target_link_uri,')
+        end
       end
 
       context 'when developer_key already has a tool_config' do
@@ -151,100 +133,79 @@ module Lti
 
         it { is_expected.to eq true }
       end
-    end
 
-    describe 'before_validation' do
-      subject do
-        tool_configuration.validate
-        tool_configuration
-      end
-
-      context 'when "settings_url" is present' do
-        let(:url) { 'https://www.mytool.com/config/json' }
-        let(:stubbed_response) do
-          double(
-            body: settings.to_json,
-            '[]' => 'application/json;',
-            is_a?: true
-          )
+      context 'when public_jwk is not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk')
+          s['public_jwk_url'] = "https://test.com"
+          s
         end
 
         before do
-          tool_configuration.settings = nil
-          tool_configuration.settings_url = url
           tool_configuration.developer_key = developer_key
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
         end
 
-        it 'fetches JSON from the URL' do
-          expect(subject.settings['target_link_uri']).to eq settings['target_link_uri']
+        it { is_expected.to eq true }
+      end
+
+      context 'when public_jwk_url is not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk_url')
+          s['public_jwk'] = public_jwk
+          s
         end
 
-        context 'when a timeout occurs' do
-          before { allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error) }
-
-          it 'raises exception if timeout occurs' do
-            expect(subject.errors[:configuration_url]).to include 'Could not retrieve settings, the server response timed out.'
-          end
+        before do
+          tool_configuration.developer_key = developer_key
         end
 
-        context 'when the response is not a success' do
-          let(:stubbed_response) { double() }
+        it { is_expected.to eq true }
+      end
 
-          before do
-            allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
-            allow(stubbed_response).to receive('[]').and_return('application/json')
-            allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
-          end
+      context 'when public_jwk_url and public_jwk are not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk_url')
+          s.delete('public_jwk')
+          s
+        end
 
-          context 'when the response is "not found"' do
-            before do
-              allow(stubbed_response).to receive(:message).and_return('Not found')
-              allow(stubbed_response).to receive(:code).and_return('404')
-            end
+        before do
+          tool_configuration.developer_key = developer_key
+        end
 
-            it 'adds a "not found error to the model' do
-              expect(subject.errors[:configuration_url]).to include 'Not found'
-            end
-          end
+        it { is_expected.to eq false }
+      end
+    end
 
-          context 'when the response is "unauthorized"' do
-            before do
-              allow(stubbed_response).to receive(:message).and_return('Unauthorized')
-              allow(stubbed_response).to receive(:code).and_return('401')
-            end
+    describe 'after_update' do
+      subject { tool_configuration.update!(changes) }
 
-            it 'adds a "unauthorized error to the model' do
-              expect(subject.errors[:configuration_url]).to include 'Unauthorized'
-            end
-          end
+      before { tool_configuration.update!(developer_key: developer_key) }
 
-          context 'when the response is "internal server error"' do
-            before do
-              allow(stubbed_response).to receive(:message).and_return('Internal server error')
-              allow(stubbed_response).to receive(:code).and_return('500')
-            end
+      context 'when a change to the settings hash was made' do
+        let(:changed_settings) do
+          s = settings
+          s['title'] = 'new title!'
+          s
+        end
+        let(:changes) { {settings: changed_settings} }
 
-            it 'adds a "internal server error to the model' do
-              expect(subject.errors[:configuration_url]).to include 'Internal server error'
-            end
-          end
-
-          context 'when the response is not JSON' do
-            before do
-              allow(stubbed_response).to receive('[]').and_return('text/html')
-              allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return true
-            end
-
-            it 'adds an error to the model' do
-              expect(subject.errors[:configuration_url]).to include 'Content type must be "application/json"'
-            end
-          end
+        it 'calls update_external_tools! on the developer key' do
+          expect(developer_key).to receive(:update_external_tools!)
+          subject
         end
       end
 
-      it 'ensures use_1_3 is set' do
-        expect(subject.settings['use_1_3']).to be true
+      context 'when a change to the settings hash was not made' do
+        let(:changes) { {disabled_placements: []} }
+
+        it 'does not call update_external_tools! on the developer key' do
+          expect(developer_key).not_to receive(:update_external_tools!)
+          subject
+        end
       end
     end
 
@@ -255,8 +216,7 @@ module Lti
 
       before do
         tool_configuration.developer_key = developer_key
-        tool_configuration.custom_fields = "key=value\nfoo=bar"
-        tool_configuration.privacy_level = 'public'
+        extensions['privacy_level'] = 'public'
       end
 
       shared_examples_for 'a new context external tool' do
@@ -293,7 +253,7 @@ module Lti
         end
 
         context 'when no privacy level is set' do
-          before { tool_configuration.privacy_level = nil }
+          before { extensions['privacy_level'] = nil }
 
           it 'sets the workflow_state to "anonymous"' do
             expect(subject.workflow_state).to eq 'anonymous'
@@ -330,7 +290,7 @@ module Lti
         end
 
         it 'uses the correct top-level custom params' do
-          expect(subject.custom_fields).to eq({"has_expansion"=>"$Canvas.user.id", "no_expansion"=>"foo", "key"=>"value", "foo"=>"bar"})
+          expect(subject.custom_fields).to eq({"has_expansion"=>"$Canvas.user.id", "no_expansion"=>"foo"})
         end
 
         it 'uses the correct icon url' do
@@ -417,16 +377,40 @@ module Lti
       end
     end
 
-    describe '#create_tool_and_key!' do
+    describe '#create_tool_config_and_key!' do
       let_once(:account) { Account.create! }
       let(:params) do
         {
-          settings: settings
+          settings: settings.with_indifferent_access
         }
       end
+      let(:tool_configuration) { described_class.create_tool_config_and_key!(account, params) }
+      let(:scopes) { ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'] }
 
       it 'creates a dev key' do
-        expect { described_class.create_tool_and_key! account, params }.to change(DeveloperKey, :count).by(1)
+        expect { described_class.create_tool_config_and_key! account, params }.to change(DeveloperKey, :count).by(1)
+      end
+
+      it 'adds scopes to dev key' do
+        expect(tool_configuration.developer_key.scopes).to eq(settings['scopes'])
+      end
+
+      it 'set `target_link_uri` to developer_key.redirect_uris' do
+        expect(tool_configuration.developer_key.redirect_uris.size).to eq 1
+        expect(tool_configuration.developer_key.redirect_uris.first).to eq settings['target_link_uri']
+      end
+
+      it 'correctly sets custom_fields' do
+        expect(tool_configuration.settings['custom_fields']).to eq settings['custom_fields']
+      end
+
+      context 'when the account is site admin' do
+        let_once(:account) { Account.site_admin }
+
+        it 'does not set the account on the key' do
+          config = described_class.create_tool_config_and_key! account, params
+          expect(config.developer_key.account).to be_nil
+        end
       end
 
       context 'when tool_config creation fails' do
@@ -434,8 +418,103 @@ module Lti
 
         it 'does not create dev key' do
           expect(DeveloperKey.where(account: account).count).to eq 0
-          expect { described_class.create_tool_and_key! account, params }.to raise_error ActiveRecord::RecordInvalid
+          expect { described_class.create_tool_config_and_key! account, params }.to raise_error ActiveRecord::RecordInvalid
           expect(DeveloperKey.where(account: account).count).to eq 0
+        end
+      end
+
+      context 'when settings_url is present' do
+        let(:params) do
+          {
+            settings_url: url
+          }
+        end
+        let(:url) { 'https://www.mytool.com/config/json' }
+        let(:stubbed_response) do
+          double(
+            body: settings.to_json,
+            '[]' => 'application/json;',
+            is_a?: true
+          )
+        end
+
+        before do
+          allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
+        end
+
+        it 'fetches JSON from the URL' do
+          expect(tool_configuration.settings['target_link_uri']).to eq settings['target_link_uri']
+        end
+
+        it 'adds scopes to dev key' do
+          expect(tool_configuration.developer_key.scopes).to eq(settings['scopes'])
+        end
+
+        it 'set `target_link_uri` to developer_key.redirect_uris' do
+          expect(tool_configuration.developer_key.redirect_uris.size).to eq 1
+          expect(tool_configuration.developer_key.redirect_uris.first).to eq settings['target_link_uri']
+        end
+
+        context 'when a timeout occurs' do
+          before { allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error) }
+
+          it 'raises exception if timeout occurs' do
+            expect{ tool_configuration }.to raise_error /Could not retrieve settings, the server response timed out./
+          end
+        end
+
+        context 'when the response is not a success' do
+          let(:stubbed_response) { double() }
+
+          before do
+            allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
+            allow(stubbed_response).to receive('[]').and_return('application/json')
+            allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
+          end
+
+          context 'when the response is "not found"' do
+            before do
+              allow(stubbed_response).to receive(:message).and_return('Not found')
+              allow(stubbed_response).to receive(:code).and_return('404')
+            end
+
+            it 'adds a "not found error to the model' do
+              expect{ tool_configuration }.to raise_error /Not found/
+            end
+          end
+
+          context 'when the response is "unauthorized"' do
+            before do
+              allow(stubbed_response).to receive(:message).and_return('Unauthorized')
+              allow(stubbed_response).to receive(:code).and_return('401')
+            end
+
+            it 'adds a "unauthorized error to the model' do
+              expect{ tool_configuration }.to raise_error /Unauthorized/
+            end
+          end
+
+          context 'when the response is "internal server error"' do
+            before do
+              allow(stubbed_response).to receive(:message).and_return('Internal server error')
+              allow(stubbed_response).to receive(:code).and_return('500')
+            end
+
+            it 'adds a "internal server error to the model' do
+              expect{ tool_configuration }.to raise_error /Internal server error/
+            end
+          end
+
+          context 'when the response is not JSON' do
+            before do
+              allow(stubbed_response).to receive('[]').and_return('text/html')
+              allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return true
+            end
+
+            it 'adds an error to the model' do
+              expect{ tool_configuration }.to raise_error /Content type must be \"application\/json\"/
+            end
+          end
         end
       end
     end

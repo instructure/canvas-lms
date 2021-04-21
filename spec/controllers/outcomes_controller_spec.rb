@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -66,12 +68,56 @@ describe OutcomesController do
       get 'index', params: {:account_id => @account.id}
     end
 
-    it "should find a common core group from settings" do
+    it "should not find a common core group from settings" do
       user_session(@admin)
       account_outcome
-      Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
+      allow(Shard.current).to receive(:settings).and_return({ common_core_outcome_group_id: @outcome_group.id })
       get 'index', params: {:account_id => @account.id}
-      expect(assigns[:js_env][:COMMON_CORE_GROUP_ID]).to eq @outcome_group.id
+      expect(assigns[:js_env]).not_to have_key(:COMMON_CORE_GROUP_ID)
+    end
+
+    it "should pass along permissions" do
+      user_session(@admin)
+      get 'index', params: {:account_id => @account.id}
+      permissions = assigns[:js_env][:PERMISSIONS]
+      [
+        :manage_outcomes, :manage_rubrics, :manage_courses, :import_outcomes, :manage_proficiency_scales,
+        :manage_proficiency_calculations
+      ].each do |permission|
+        expect(permissions).to have_key(permission)
+      end
+    end
+
+    context 'account_level_mastery_scales feature flag enabled' do
+      before(:once) do
+        @account.root_account.enable_feature! :account_level_mastery_scales
+      end
+
+      it 'includes proficiency roles' do
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+
+        %i[PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES PROFICIENCY_SCALES_ENABLED_ROLES].each do |key|
+          roles = controller.js_env[key]
+          expect(roles.length).to eq 1
+          expect(roles.dig(0, :role)).to eq 'AccountAdmin'
+        end
+      end
+    end
+
+    context "global_root_outcome_id" do
+      it "should return the global root group id for an account" do
+        global_id = LearningOutcomeGroup.global_root_outcome_group.id
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq global_id
+      end
+
+      it "should not return the global root id for a course" do
+        user_session(@admin)
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
+      end
     end
   end
 
@@ -160,6 +206,39 @@ describe OutcomesController do
       get 'user_outcome_results', params: {:account_id => @account.id, :user_id => @student.id}
       expect(response).to be_successful
       expect(response).to render_template('user_outcome_results')
+    end
+
+    context 'deleted results' do
+      before(:once) do
+        account_outcome
+        assessment_question_bank_with_questions
+        @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
+
+        @quiz = @course.quizzes.create!(:title => "a quiz")
+        @quiz.add_assessment_questions [ @q1, @q2 ]
+
+        @submission = @quiz.generate_submission @student
+        @submission.quiz_data = @quiz.generate_quiz_data
+        @submission.mark_completed
+        Quizzes::SubmissionGrader.new(@submission).grade_submission
+      end
+
+      it 'should return existing results' do
+        user_session(@admin)
+
+        get 'user_outcome_results', params: {account_id: @account.id, user_id: @student.id}
+        expect(response).to be_successful
+        expect(assigns[:results]).not_to be_empty
+      end
+
+      it 'should not return deleted results' do
+        user_session(@admin)
+        LearningOutcomeResult.find_by!(artifact: @submission, user: @student).destroy
+
+        get 'user_outcome_results', params: {account_id: @account.id, user_id: @student.id}
+        expect(response).to be_successful
+        expect(assigns[:results]).to be_empty
+      end
     end
   end
 
@@ -338,6 +417,16 @@ describe OutcomesController do
           :outcome_id => @outcome.id,
           :id => @outcome.learning_outcome_results.last}
         assert_unauthorized
+      end
+
+      it "should not return deleted results" do
+        @outcome.learning_outcome_results.last.destroy
+        user_session(@teacher)
+        get 'outcome_result',
+          params: {:course_id => @course.id,
+          :outcome_id => @outcome.id,
+          :id => @outcome.learning_outcome_results.last}
+        expect(response).to be_not_found
       end
 
       it "should redirect to show quiz when result is a quiz" do

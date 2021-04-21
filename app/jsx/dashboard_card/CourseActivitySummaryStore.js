@@ -16,32 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import createStore from '../shared/helpers/createStore'
-import $ from 'jquery'
 
 const CourseActivitySummaryStore = createStore({streams: {}})
 
 CourseActivitySummaryStore.getStateForCourse = function(courseId) {
-  if (_.isUndefined(courseId)) return CourseActivitySummaryStore.getState()
+  if (typeof courseId === 'undefined') return CourseActivitySummaryStore.getState()
 
-  if (_.has(CourseActivitySummaryStore.getState().streams, courseId)) {
-    return CourseActivitySummaryStore.getState().streams[courseId]
-  } else {
-    CourseActivitySummaryStore.getState().streams[courseId] = {}
+  const {streams} = CourseActivitySummaryStore.getState()
+  if (!(courseId in streams)) {
+    streams[courseId] = {}
     CourseActivitySummaryStore._fetchForCourse(courseId)
-    return {}
   }
+  return streams[courseId]
 }
 
 CourseActivitySummaryStore._fetchForCourse = function(courseId) {
-  let state
-
-  $.getJSON(`/api/v1/courses/${courseId}/activity_stream/summary`, stream => {
-    state = CourseActivitySummaryStore.getState()
-    state.streams[courseId] = {
-      stream
-    }
+  const fetch = window.fetchIgnoredByNewRelic || window.fetch // don't let this count against us in newRelic's SPA load time stats
+  return asJson(
+    fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions)
+  ).then(stream => {
+    const state = CourseActivitySummaryStore.getState()
+    state.streams[courseId] = {stream}
     CourseActivitySummaryStore.setState(state)
   })
 }

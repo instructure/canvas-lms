@@ -23,58 +23,141 @@ import './jquery.ajaxJSON'
 import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery.rails_flash_notifications'
 import './jquery.templateData'
 
+import {showConfirmationDialog} from 'jsx/shared/ConfirmationDialog'
+
 $(document).ready(function() {
-  $("#name_and_email").delegate('.edit_user_link', 'click', function(event) {
-    event.preventDefault();
-    $("#edit_student_dialog").dialog({
+  $('#name_and_email').delegate('.edit_user_link', 'click', event => {
+    event.preventDefault()
+    $('#edit_student_dialog').dialog({
       width: 450
-    });
-    $("#edit_student_form :text:visible:first").focus().select();
-  });
-  $("#edit_student_form").formSubmit({
-    beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true)
-        .filter(".submit_button").text(I18n.t('messages.updating_user_details', "Updating User Details..."));
+    })
+    $('#edit_student_form :text:visible:first')
+      .focus()
+      .select()
+  })
+  $('#edit_student_form').formSubmit({
+    beforeSubmit(_data) {
+      $(this)
+        .find('button')
+        .attr('disabled', true)
+        .filter('.submit_button')
+        .text(I18n.t('messages.updating_user_details', 'Updating User Details...'))
     },
-    success: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text(I18n.t('buttons.update_user', "Update User"));
-      $("#name_and_email .user_details").fillTemplateData({data: data });
-      $("#edit_student_dialog").dialog('close');
+    success(data) {
+      $(this)
+        .find('button')
+        .attr('disabled', false)
+        .filter('.submit_button')
+        .text(I18n.t('buttons.update_user', 'Update User'))
+      $('#name_and_email .user_details').fillTemplateData({data})
+      $('#edit_student_dialog').dialog('close')
     },
-    error: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text(I18n.t('errors.updating_user_details_failed', "Updating user details failed, please try again"));
+    error(_data) {
+      $(this)
+        .find('button')
+        .attr('disabled', false)
+        .filter('.submit_button')
+        .text(
+          I18n.t(
+            'errors.updating_user_details_failed',
+            'Updating user details failed, please try again'
+          )
+        )
     }
-  });
-  $("#edit_student_dialog .cancel_button").click(function() {
-    $("#edit_student_dialog").dialog('close');
-  });
-  $(".remove_avatar_picture_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    var result = confirm(I18n.t('confirms.remove_profile_picture', "Are you sure you want to remove this user's profile picture?"));
-    if(!result) { return; }
-    $link.text(I18n.t('messages.removing_image', "Removing image..."));
-    $.ajaxJSON($link.attr('href'), 'PUT', {'avatar[state]': 'none'}, function(data) {
-      $link.parents("tr").find(".avatar_image").remove();
-      $link.remove();
-    }, function(data) {
-      $link.text(I18n.t('errors.failed_to_remove_image', "Failed to remove the image, please try again"));
-    });
-  });
-  $(".report_avatar_picture_link").click(function(event) {
-    event.preventDefault();
-    event.preventDefault();
-    var $link = $(this);
-    $link.text(I18n.t('messages.reporting_image', "Reporting image..."));
-    $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-      $link.after(htmlEscape(I18n.t('notices.image_reported', "This image has been reported")));
-      $link.remove();
-    }, function(data) {
-      $link.text(I18n.t('errors.failed_to_report_image', "Failed to report the image, please try again"));
-    });
-  });
-});
+  })
+  $('#edit_student_dialog .cancel_button').click(() => {
+    $('#edit_student_dialog').dialog('close')
+  })
+  $('.remove_avatar_picture_link').click(async function(event) {
+    event.preventDefault()
+    const $link = $(this)
+    const result = await showConfirmationDialog({
+      label: I18n.t('Confirm Removal'),
+      body: I18n.t(
+        'confirms.remove_profile_picture',
+        "Are you sure you want to remove this user's profile picture?"
+      )
+    })
+    if (!result) {
+      return
+    }
+    $link.text(I18n.t('messages.removing_image', 'Removing image...'))
+    $.ajaxJSON(
+      $link.attr('href'),
+      'PUT',
+      {'avatar[state]': 'none'},
+      _data => {
+        $link
+          .parents('tr')
+          .find('.avatar_image')
+          .remove()
+        $link.remove()
+      },
+      _data => {
+        $link.text(
+          I18n.t('errors.failed_to_remove_image', 'Failed to remove the image, please try again')
+        )
+      }
+    )
+  })
+  $('.report_avatar_picture_link').click(function(event) {
+    event.preventDefault()
+    event.preventDefault()
+    const $link = $(this)
+    $link.text(I18n.t('messages.reporting_image', 'Reporting image...'))
+    $.ajaxJSON(
+      $link.attr('href'),
+      'POST',
+      {},
+      _data => {
+        $link.after(htmlEscape(I18n.t('notices.image_reported', 'This image has been reported')))
+        $link.remove()
+      },
+      _data => {
+        $link.text(
+          I18n.t('errors.failed_to_report_image', 'Failed to report the image, please try again')
+        )
+      }
+    )
+  })
+  $('.clear_user_cache_link').click(function(event) {
+    event.preventDefault()
+    const $link = $(this)
+    $.ajaxJSON(
+      $link.attr('href'),
+      'POST',
+      {},
+      _data => {
+        $.flashMessage(I18n.t('Cache cleared successfully'))
+      },
+      _data => {
+        $.flashMessage(I18n.t('Failed to clear cache'))
+      }
+    )
+  })
+  $('.destroy_user_link').click(async function(event) {
+    event.preventDefault()
+    const result = await showConfirmationDialog({
+      label: I18n.t('Confirm Deletion'),
+      body: I18n.t('Are you sure you want to permanently remove the user from ALL accounts')
+    })
+    if (!result) {
+      return
+    }
+    const $link = $(this)
+    $.ajaxJSON(
+      $link.attr('href'),
+      'DELETE',
+      {},
+      _data => {
+        $.flashMessage(I18n.t('User removed successfully'))
+      },
+      _data => {
+        $.flashMessage(I18n.t('Failed to remove user'))
+      }
+    )
+  })
+})

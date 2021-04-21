@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'compiled/handlebars_helpers';
-import developerKey from 'jst/developer_key';
-import $ from 'jquery';
-import 'jquery.instructure_date_and_time';
+import 'compiled/handlebars_helpers'
+import developerKey from 'jst/developer_key'
+import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
 
 test('renders nothing in the notes field when the value is NULL', () => {
   const data = {
@@ -31,10 +31,10 @@ test('renders nothing in the notes field when the value is NULL', () => {
     last_access: $.datetimeString('2017-05-18 22:19:41.358852'),
     inactive: false,
     notes: null
-  };
-  const $key = $(developerKey(data));
-  equal($key.find('.notes').children().length, 0);
-});
+  }
+  const $key = $(developerKey(data))
+  equal($key.find('.notes').children().length, 0)
+})
 
 test('renders nothing in the notes field when the value is an empty string', () => {
   const data = {
@@ -46,10 +46,10 @@ test('renders nothing in the notes field when the value is an empty string', () 
     last_access: $.datetimeString('2017-05-18 22:19:41.358852'),
     inactive: false,
     notes: ''
-  };
-  const $key = $(developerKey(data));
-  equal($key.find('.notes').children().length, 0);
-});
+  }
+  const $key = $(developerKey(data))
+  equal($key.find('.notes').children().length, 0)
+})
 
 test('shows the note in the notes field when one exists', () => {
   const data = {
@@ -61,7 +61,12 @@ test('shows the note in the notes field when one exists', () => {
     last_access: $.datetimeString('2017-05-18 22:19:41.358852'),
     inactive: false,
     notes: 'I am a note'
-  };
-  const $key = $(developerKey(data));
-  ok($key.find('.notes').text().match(/I am a note/));
-});
+  }
+  const $key = $(developerKey(data))
+  ok(
+    $key
+      .find('.notes')
+      .text()
+      .match(/I am a note/)
+  )
+})

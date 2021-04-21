@@ -2,7 +2,7 @@
 # # Redis can also be used as a replacement for memcache, for both session store and caching.
 #
 # # The recommended setup is to define your redis server(s) in this file, and
-# # then in cache_store.yml specify cache_store: redis_store without any servers
+# # then in cache_store.yml specify cache_store: redis_cache_store without any servers
 # # listed, which will tell Canvas to use this same server list. You can also
 # # reverse this by configuring servers in cache_store.yml, and referencing them
 # # here with servers: cache_store
@@ -22,4 +22,4 @@ test:
   # warning: the redis database will get cleared before each test, so if you
   # use this server for anything else, make sure to set aside a database id for
   # these tests to use.
-  database: 1
+  db: 1

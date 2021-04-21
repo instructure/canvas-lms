@@ -84,6 +84,7 @@
 
   &:hover, &:focus {
     box-shadow: inset 3px 0 0 var(--ic-brand-primary);
+    outline: none;
   }
 }
 
@@ -265,6 +266,8 @@ span.agendaView--no-assignments {
   }
 
   .fc-other-month {
+    color: $ic-hint-text;
+    opacity: 1;
     background: none;
   }
 

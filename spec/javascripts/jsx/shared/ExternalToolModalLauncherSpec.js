@@ -21,7 +21,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher'
-import Modal from 'jsx/shared/modal'
+import {Modal} from '@instructure/ui-modal'
 
 const defaultWidth = 700
 const defaultHeight = 700
@@ -105,7 +105,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
   })
 
   test('invokes onRequestClose prop when window receives externalContentReady event', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const stub = sandbox.stub()
     const props = generateProps({onRequestClose: stub})
 
@@ -118,7 +118,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
   })
 
   test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const stub = sandbox.stub()
     const props = generateProps({onRequestClose: stub})
 
@@ -135,5 +135,12 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
       <ExternalToolModalLauncher {...generateProps({isOpen: true})} />
     )
     equal(component.iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+  })
+
+  test('sets the iframe data-lti-launch attribute', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps({isOpen: true})} />
+    )
+    equal(component.iframe.getAttribute('data-lti-launch'), 'true')
   })
 })

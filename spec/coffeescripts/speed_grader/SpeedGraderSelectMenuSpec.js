@@ -178,6 +178,11 @@ test('renders a select control', function() {
   strictEqual(this.selectMenu.$el.prop('tagName'), 'SELECT')
 })
 
+test('renders a label for the select element', function() {
+  const label = this.testArea.querySelector('label[for="students_selectmenu"]')
+  strictEqual(label.textContent, 'Select a student')
+})
+
 test('renders the select control with an id of students_selectmenu', function() {
   strictEqual(this.selectMenu.$el.prop('id'), 'students_selectmenu')
 })
@@ -224,5 +229,8 @@ test('renders an option for Student 2', function() {
 
 test('option for Student 2 comes first as in the order of the options passed in', function() {
   const options = this.selectMenu.$el.find('> option.ui-selectmenu-hasIcon').toArray()
-  deepEqual(options.map(opt => $(opt).attr('value')), ['3', '1'])
+  deepEqual(
+    options.map(opt => $(opt).attr('value')),
+    ['3', '1']
+  )
 })

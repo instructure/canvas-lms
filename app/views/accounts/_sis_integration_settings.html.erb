@@ -29,6 +29,12 @@
     <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
     <%= f.label :allow_sis_import, t("SIS imports") %>
   </div>
+  <div>
+    <%= f.fields_for :settings do |settings| %>
+      <%= settings.check_box :include_integration_ids_in_gradebook_exports, :checked => @account.settings[:include_integration_ids_in_gradebook_exports] == true %>
+      <%= settings.label :include_integration_ids_in_gradebook_exports, t("Include Integration IDs in the gradebook exports.") %>
+    <% end %>
+  </div>
   <% if @account.feature_allowed?(:post_grades)%>
     <%= f.fields_for :settings do |settings| %>
       <%= settings.fields_for :sis_syncing do |ff_syncing| %>
@@ -104,6 +110,14 @@
                     <% end %>
                   </div>
                 </fieldset>
+              <% end %>
+              <% if @account.allow_disable_post_to_sis_when_grading_period_closed? %>
+                <% disable_post_to_sis = @account.disable_post_to_sis_when_grading_period_closed? %>
+
+                <%= settings.check_box :disable_post_to_sis_when_grading_period_closed, checked: disable_post_to_sis %>
+                <%= settings.label :disable_post_to_sis_when_grading_period_closed,
+                  t('Automatically disable "Post to SIS" on assignments when grading period closes')
+                %>
               <% end %>
             <% end %>
           <% end %>

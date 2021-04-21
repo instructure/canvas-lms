@@ -19,43 +19,38 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!webzip_exports'
-import ExportListItem from '../../webzip_export/components/ExportListItem'
-  class ExportList extends React.Component {
-    static propTypes = {
-      exports: PropTypes.arrayOf(PropTypes.shape({
+import ExportListItem from './ExportListItem'
+
+class ExportList extends React.Component {
+  static propTypes = {
+    exports: PropTypes.arrayOf(
+      PropTypes.shape({
         date: PropTypes.string.isRequired,
         link: PropTypes.string,
         workflowState: PropTypes.string.isRequired,
         newExport: PropTypes.bool.isRequired
-      })).isRequired
-    }
-
-    renderExportListItems () {
-      return this.props.exports.map((webzip, key) => (
-        <ExportListItem
-          key={key}
-          link={webzip.link}
-          date={webzip.date}
-          workflowState={webzip.workflowState}
-          newExport={webzip.newExport}
-        />
-      ))
-    }
-
-    render () {
-      if (this.props.exports.length === 0) {
-        return (
-          <p className="webzipexport__list">
-            {I18n.t('No exports to display')}
-          </p>
-        )
-      }
-      return (
-        <ul className="webzipexport__list">
-          {this.renderExportListItems()}
-        </ul>
-      )
-    }
+      })
+    ).isRequired
   }
+
+  renderExportListItems() {
+    return this.props.exports.map((webzip, key) => (
+      <ExportListItem
+        key={key}
+        link={webzip.link}
+        date={webzip.date}
+        workflowState={webzip.workflowState}
+        newExport={webzip.newExport}
+      />
+    ))
+  }
+
+  render() {
+    if (this.props.exports.length === 0) {
+      return <p className="webzipexport__list">{I18n.t('No exports to display')}</p>
+    }
+    return <ul className="webzipexport__list">{this.renderExportListItems()}</ul>
+  }
+}
 
 export default ExportList

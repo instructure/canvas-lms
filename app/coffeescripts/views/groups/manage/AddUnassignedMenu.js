@@ -20,22 +20,9 @@ import AddUnassignedUsersView from './AddUnassignedUsersView'
 import InputFilterView from '../../InputFilterView'
 import template from 'jst/groups/manage/addUnassignedMenu'
 import $ from 'jquery'
-import _ from 'underscore'
 import '../../../jquery/outerclick'
 
 export default class AddUnassignedMenu extends PopoverMenuView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.setGroup = this.setGroup.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.child('usersView', '[data-view=users]')
     this.child('inputFilterView', '[data-view=inputFilter]')
@@ -44,9 +31,10 @@ export default class AddUnassignedMenu extends PopoverMenuView {
 
     this.prototype.template = template
 
-    this.prototype.events = _.extend({}, PopoverMenuView.prototype.events, {
+    this.prototype.events = {
+      ...PopoverMenuView.prototype.events,
       'click .assign-user-to-group': 'setGroup'
-    })
+    }
   }
 
   initialize(options) {

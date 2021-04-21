@@ -17,7 +17,6 @@
 %>
 
 <%
-  @body_classes << 'padless-content'
   course_home ||= false
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
@@ -26,9 +25,9 @@
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
   })
-  js_bundle :context_modules
-  css_bundle :content_next
 %>
+<% js_bundle :module_dnd %>
+<% css_bundle :react_files %>
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>
   <h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>
@@ -46,7 +45,8 @@
 <div class="header-bar">
   <div class="header-bar-right header-bar__module-layout">
     <div class="header-bar-right__buttons">
-      <% if @can_edit %>
+      <button class="btn" id="expand_collapse_all" aria-expanded="false" data-expand="false" data-url="<%= context_url(@context, :context_url) %>/collapse_all_modules"><%= t('Collapse All') %></button>
+      <% if @can_view_grades %>
         <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
       <% end %>
       <% if @allow_web_export_download %>
@@ -64,6 +64,18 @@
           <%= t('#context_modules.buttons.add_module', 'Module') %>
         </button>
       <% end %>
+      <% if @module_index_tools.present? %>
+        <div class="inline-block module_index_tools">
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+            <i class="icon-more" aria-hidden="true"></i>
+            <span class="screenreader-only"><%= t("Modules Settings") %></span>
+          </a>
+
+          <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
+            <%= external_tools_menu_items(@module_index_tools, {link_class: "menu_tray_tool_link", settings_key: :module_index_menu, in_list: true}) %>
+          </ul>
+        </div>
+      <% end %>
     </div>
     <% if @last_web_export %>
       <small class="muted">
@@ -76,6 +88,8 @@
   </div>
 </div>
 
+<div id="external-tool-mount-point"></div>
+<div id="direct-share-mount-point"></div>
 <div class="item-group-container" id="context_modules_sortable_container">
   <div id="no_context_modules_message" style="display:none;">
     <% if can_do(@context.context_modules.temp_record, @current_user, :create) %>
@@ -184,7 +198,6 @@
 <% end %>
 <div style="display: none;">
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
   <select id="module_list" aria-label="<%= t('Select prerequisite module') %>">
     <option value="">[ <%= t('select_module.instructions', %{Select Module}) %> ]</option>
     <% @modules.each do |m| %>
@@ -235,4 +248,6 @@
   </div>
 </div>
 
-<%= render :partial => "context_modules/keyboard_navigation" %>
+<% unless @current_user.try(:prefers_no_keyboard_shortcuts?) %>
+  <%=  render :partial => "context_modules/keyboard_navigation" %>
+<% end %>

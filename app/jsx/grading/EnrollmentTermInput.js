@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import I18n from 'i18n!grading_periods'
+import I18n from 'i18n!EnrollmentTermInput'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
 const groupByTagType = function(options) {
@@ -54,7 +54,7 @@ class EnrollmentTermInput extends React.Component {
 
   handleSelect = (value, _combobox) => {
     const termIDs = _.pluck(this.props.enrollmentTerms, 'id')
-    if (_.contains(termIDs, value)) {
+    if (_.includes(termIDs, value)) {
       const selectedIDs = _.uniq(this.props.selectedIDs.concat([value]))
       this.handleChange(selectedIDs)
     }
@@ -66,7 +66,7 @@ class EnrollmentTermInput extends React.Component {
   }
 
   selectableTerms = () =>
-    _.reject(this.props.enrollmentTerms, term => _.contains(this.props.selectedIDs, term.id))
+    _.reject(this.props.enrollmentTerms, term => _.includes(this.props.selectedIDs, term.id))
 
   filteredTagsForType = type => {
     const groupedTags = groupByTagType(this.selectableTerms())
@@ -98,7 +98,7 @@ class EnrollmentTermInput extends React.Component {
   optionsForType = optionType => {
     const header = this.headerOption(optionType)
     const options = this.selectableOptions(optionType)
-    return _.any(options) ? _.union([header], options) : []
+    return _.some(options) ? _.union([header], options) : []
   }
 
   headerOption = heading => {
@@ -126,7 +126,7 @@ class EnrollmentTermInput extends React.Component {
   selectedEnrollmentTerms = () =>
     _.map(this.props.selectedIDs, id => {
       const term = _.findWhere(this.props.enrollmentTerms, {id})
-      const termForDisplay = _.extend({}, term)
+      const termForDisplay = {...term}
       termForDisplay.name = term.displayName
       return termForDisplay
     })

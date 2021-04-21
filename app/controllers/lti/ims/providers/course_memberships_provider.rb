@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -33,6 +35,7 @@ module Lti::Ims::Providers
 
       enrollments = base_enrollments_scope(user_ids)
       enrollments = preload_enrollments(enrollments)
+      preload_past_lti_ids(enrollments)
 
       memberships = to_memberships(enrollments)
       [ memberships, users_metadata ]
@@ -59,7 +62,7 @@ module Lti::Ims::Providers
         # Non-active students get an active ('submitted') Submission, so join on base_users_scope to narrow down
         # Submissions to only active students.
         students_scope = base_users_scope.where(enrollments: {type: student_queryable_roles})
-        narrowed_students_scope = students_scope.where(correlated_assignment_submissions('users.id').exists)
+        narrowed_students_scope = students_scope.where("EXISTS (?)", correlated_assignment_submissions('users.id'))
         # If we only care about students, this scope is sufficient and can avoid the ugly union down below
         return narrowed_students_scope if filter_non_students?
 
@@ -87,7 +90,7 @@ module Lti::Ims::Providers
     end
 
     def base_enrollments_scope(user_ids)
-      context.participating_enrollments.where(user_id: user_ids).order(:user_id)
+      context.participating_enrollments.where(user_id: user_ids).order(:user_id).preload(:sis_pseudonym)
     end
 
     def to_memberships(enrollments)

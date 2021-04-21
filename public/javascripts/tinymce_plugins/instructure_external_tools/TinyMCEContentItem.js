@@ -17,6 +17,8 @@
  */
 
 import $ from 'jquery'
+import {monitorLtiMessages} from '../../lti/messages'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
 const LTI_MIME_TYPES = [
   'application/vnd.ims.lti.v1.ltilink',
@@ -73,7 +75,7 @@ const TinyMCEPayloadGenerators = {
           allowfullscreen: 'true',
           webkitallowfullscreen: 'true',
           mozallowfullscreen: 'true',
-          allow: 'autoplay *'
+          allow: iframeAllowances()
         })
           .css({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
@@ -127,7 +129,7 @@ const TinyMCEPayloadGenerators = {
           alt: tinyMCEContentItem.text
         })
       )
-    } else if (window.tinyMCE.activeEditor.selection.getContent()) {
+    } else if (window.tinyMCE.activeEditor?.selection.getContent()) {
       $link[0].innerHTML = linkText(tinyMCEContentItem)
     } else {
       // don't inject tool provided content into the page HTML
@@ -140,11 +142,11 @@ const TinyMCEPayloadGenerators = {
 
 function TinyMCEContentItem(contentItem) {
   this.contentItem = contentItem
-  const decorate = function(prop, getFunc) {
+  const decorate = (prop, getFunc) => {
     Object.defineProperty(this, prop, {
       get: getFunc.bind(this)
     })
-  }.bind(this)
+  }
 
   exportPropsToSelf.call(this, contentItem, Object.getOwnPropertyNames)
 
@@ -215,5 +217,7 @@ TinyMCEContentItem.fromJSON = function(data) {
   const contentItem = ContentItem.fromJSON(data)
   return new TinyMCEContentItem(contentItem)
 }
+
+monitorLtiMessages()
 
 export default TinyMCEContentItem

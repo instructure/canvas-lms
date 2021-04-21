@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -30,20 +32,38 @@ class AccountReportRunner < ActiveRecord::Base
     state :aborted
   end
 
+  attr_accessor :rows
+
+  def initialize(*)
+    @rows = []
+    super
+  end
+
+  def write_rows
+    return unless rows
+    return if rows.empty?
+    GuardRail.activate(:primary) do
+      self.class.bulk_insert_objects(rows)
+      @rows = []
+    end
+  end
+
   def start
-    self.update_attributes!(workflow_state: 'running', started_at: Time.now.utc)
+    @rows ||= []
+    self.update!(workflow_state: 'running', started_at: Time.now.utc)
   end
 
   def complete
-    self.update_attributes!(workflow_state: 'completed', ended_at: Time.now.utc)
+    write_rows
+    self.update!(workflow_state: 'completed', ended_at: Time.now.utc)
   end
 
   def abort
-    self.update_attributes!(workflow_state: 'aborted', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'aborted', ended_at: Time.now.utc)
   end
 
   def fail
-    self.update_attributes!(workflow_state: 'error', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 
   scope :in_progress, -> {where(workflow_state: %w(running))}

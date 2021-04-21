@@ -19,12 +19,12 @@
 import $ from 'jquery'
 import I18n from 'i18n!calendar'
 import _ from 'underscore'
-import EditCalendarEventDetails from '../calendar/EditCalendarEventDetails'
-import EditAssignmentDetails from '../calendar/EditAssignmentDetails'
-import EditApptCalendarEventDialog from '../calendar/EditApptCalendarEventDialog'
-import EditAppointmentGroupDetails from '../calendar/EditAppointmentGroupDetails'
-import EditPlannerNoteDetails from '../calendar/EditPlannerNoteDetails'
-import EditToDoItemDetails from '../calendar/EditToDoItemDetails'
+import EditCalendarEventDetails from './EditCalendarEventDetails'
+import EditAssignmentDetails from './EditAssignmentDetails'
+import EditApptCalendarEventDialog from './EditApptCalendarEventDialog'
+import EditAppointmentGroupDetails from './EditAppointmentGroupDetails'
+import EditPlannerNoteDetails from './EditPlannerNoteDetails'
+import EditToDoItemDetails from './EditToDoItemDetails'
 import editEventTemplate from 'jst/calendar/editEvent'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
@@ -39,9 +39,9 @@ const dialog = $('<div id="edit_event"><div /></div>')
   })
 
 export default class EditEventDetailsDialog {
-  constructor(event, betterScheduler) {
+  constructor(event, useScheduler) {
     this.event = event
-    this.betterScheduler = betterScheduler
+    this.useScheduler = useScheduler
     this.currentContextInfo = null
     dialog.on('dialogclose', this.dialogClose)
   }
@@ -50,16 +50,15 @@ export default class EditEventDetailsDialog {
     return this.event.possibleContexts().find(context => context.asset_string === code)
   }
 
-  setupTabs = () => {
+  setupTabs = async () => {
     // Set up the tabbed view of the dialog
     const tabs = dialog.find('#edit_event_tabs')
 
-    tabs.tabs().bind('tabsselect', (event, ui) =>
-      $(ui.panel)
-        .closest('.tab_holder')
-        .data('form-widget')
-        .activate()
-    )
+    tabs
+      .tabs()
+      .bind('tabsselect', (event, ui) =>
+        $(ui.panel).closest('.tab_holder').data('form-widget').activate()
+      )
 
     // note: tabs should be removed in descending order, so numbers don't shift
     // from the indexes of the tabs in app/views/jst/calendar/editEvent.handlebars
@@ -69,7 +68,7 @@ export default class EditEventDetailsDialog {
       tabs.tabs('remove', 3)
       tabs.tabs('remove', 2)
       tabs.tabs('remove', 1)
-     this.calendarEventForm.activate()
+      this.calendarEventForm.activate()
     } else if (this.event.eventType.match(/assignment/)) {
       tabs.tabs('select', 1)
       if (this.canManageAppointments()) tabs.tabs('remove', 4)
@@ -102,12 +101,19 @@ export default class EditEventDetailsDialog {
       // to-do pages / discussions cannot be created on the calendar
       tabs.tabs('remove', 3)
 
-      // don't show To Do tab if the planner isn't enabled
-      if (!ENV.STUDENT_PLANNER_ENABLED) tabs.tabs('remove', 2)
+      // don't show To Do tab if the planner isn't enabled or a user
+      // managed calendar isn't selected
+      let shouldRenderTODO = false
+      const plannerNoteContexts = this.event.plannerNoteContexts()
+      shouldRenderTODO = plannerNoteContexts && plannerNoteContexts.length
+
+      if (!ENV.STUDENT_PLANNER_ENABLED || !shouldRenderTODO) {
+        tabs.tabs('remove', 2)
+      }
 
       // don't even show the assignments tab if the user doesn't have
       // permission to create them
-      const can_create_assignments = _.any(
+      const can_create_assignments = _.some(
         this.event.allPossibleContexts,
         c => c.can_create_assignments
       )
@@ -117,7 +123,7 @@ export default class EditEventDetailsDialog {
     }
   }
 
-  contextChange = newContext => {
+  contextChange(newContext) {
     // Update the style of the dialog box to reflect the current context
     dialog.removeClass(dialog.data('group_class'))
     dialog.addClass(`group_${newContext}`).data('group_class', `group_${newContext}`)
@@ -125,7 +131,9 @@ export default class EditEventDetailsDialog {
     if (this.assignmentDetailsForm) this.assignmentDetailsForm.setContext(newContext)
   }
 
-  closeCB = () => dialog.dialog('close')
+  closeCB() {
+    dialog.dialog('close')
+  }
 
   dialogClose = () => {
     if (this.oldFocus != null) {
@@ -136,7 +144,7 @@ export default class EditEventDetailsDialog {
 
   canManageAppointments = () => {
     if (
-      ENV.CALENDAR.BETTER_SCHEDULER &&
+      ENV.CALENDAR.SHOW_SCHEDULER &&
       _.some(this.event.allPossibleContexts, c => c.can_create_appointment_groups) &&
       (this.event.eventType.match(/appointment/) || this.event.eventType.match(/generic/))
     ) {
@@ -145,7 +153,7 @@ export default class EditEventDetailsDialog {
     return false
   }
 
-  show = () => {
+  show = async () => {
     if (this.event.isAppointmentGroupEvent()) {
       return new EditApptCalendarEventDialog(this.event).show()
     } else {
@@ -158,7 +166,7 @@ export default class EditEventDetailsDialog {
         this.calendarEventForm = new EditCalendarEventDetails(
           formHolder,
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         formHolder.data('form-widget', this.calendarEventForm)
@@ -168,7 +176,7 @@ export default class EditEventDetailsDialog {
         this.assignmentDetailsForm = new EditAssignmentDetails(
           $('#edit_assignment_form_holder'),
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         dialog.find('#edit_assignment_form_holder').data('form-widget', this.assignmentDetailsForm)
@@ -179,7 +187,7 @@ export default class EditEventDetailsDialog {
         this.plannerNoteDetailsForm = new EditPlannerNoteDetails(
           formHolder,
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         formHolder.data('form-widget', this.plannerNoteDetailsForm)
@@ -190,7 +198,7 @@ export default class EditEventDetailsDialog {
         this.toDoItemDetailsForm = new EditToDoItemDetails(
           formHolder,
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         formHolder.data('form-widget', this.toDoItemDetailsForm)
@@ -207,14 +215,14 @@ export default class EditEventDetailsDialog {
           _.filter(this.event.allPossibleContexts, c => c.can_create_appointment_groups),
           this.closeCB,
           this.event,
-          this.betterScheduler
+          this.useScheduler
         )
         dialog
           .find('#edit_appointment_group_form_holder')
           .data('form-widget', this.appointmentGroupDetailsForm)
       }
 
-      this.setupTabs()
+      await this.setupTabs()
 
       // TODO: select the tab that should be active
 

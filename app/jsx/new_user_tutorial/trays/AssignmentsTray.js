@@ -18,23 +18,48 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const AssignmentsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Assignments')}
-    subheading={I18n.t('Create content for your course')}
-    image="/images/tutorial-tray-images/assignments.svg"
-  >
-    <Text as="p">
+    subheading={I18n.t('Reinforce student understanding')}
+    image="/images/tutorial-tray-images/Panda_Assignments.svg"
+    imageWidth="11rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
       {
-        I18n.t(`Create assignments on the Assignments page. Organize assignments
-                into groups like Homework, In-class Work, Essays, Discussions
-                and Quizzes. Assignment groups can be weighted.`)
+        label: I18n.t('How do I create an assignment?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740'
+      },
+      {
+        label: I18n.t('How do I publish or unpublish an assignment as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585'
+      },
+      {
+        label: I18n.t('What assignment types can I create in a course?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627'
+      },
+      {
+        label: I18n.t('How do I add or edit details in an assignment?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971'
       }
-    </Text>
+    ]}
+  >
+    {I18n.t(`Assignments include quizzes, graded discussions, and many types
+      of online submissions (files, images, text, URLs, and media). Assign
+      them to everyone in a course, or assign different due dates for specific
+      sections or users. Create assignment groups to organize your assignments
+      and to weight groups by percentage. Enable Peer Review so students can
+      review each other's work.`)}
   </TutorialTrayContent>
-);
+)
 
 export default AssignmentsTray

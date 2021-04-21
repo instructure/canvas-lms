@@ -22,21 +22,6 @@ import template from 'jst/quizzes/QuizItemGroupView'
 import QuizItemView from './QuizItemView'
 
 export default class ItemGroupView extends CollectionView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.filterResults = this.filterResults.bind(this)
-    this.matchingCount = this.matchingCount.bind(this)
-    this.filter = this.filter.bind(this)
-    this.renderItem = this.renderItem.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.template = template
     this.prototype.itemView = QuizItemView
@@ -73,7 +58,7 @@ export default class ItemGroupView extends CollectionView {
   }
 
   matchingCount(term) {
-    return _.select(this.collection.models, m => {
+    return _.filter(this.collection.models, m => {
       return this.filter(m, term)
     }).length
   }
@@ -86,8 +71,8 @@ export default class ItemGroupView extends CollectionView {
     const title = model.get('title').toLowerCase()
     let numMatches = 0
     const keys = term.toLowerCase().split(' ')
-    for (let part of keys) {
-      //not using match to avoid javascript string to regex oddness
+    for (const part of keys) {
+      // not using match to avoid javascript string to regex oddness
       if (title.indexOf(part) !== -1) {
         numMatches++
       }

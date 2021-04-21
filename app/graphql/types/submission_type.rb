@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -16,105 +18,52 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
 
-  class LatePolicyStatusType < Types::BaseEnum
-    graphql_name "LatePolicyStatusType"
-    value "late"
-    value "missing"
-    value "none"
+#############################################################################
+# NOTE: In most cases you shouldn't add new fields here, instead they should
+#       be added to interfaces/submission_interface.rb so that they work for
+#       both submissions and submission histories
+#############################################################################
+
+
+module Types
+  class SubmissionHistoryFilterInputType < Types::BaseInputObject
+    graphql_name 'SubmissionHistoryFilterInput'
+
+    argument :states, [SubmissionStateType], required: false,
+      default_value: DEFAULT_SUBMISSION_HISTORY_STATES
+
+    argument :include_current_submission, Boolean, <<~DESC, required: false, default_value: true
+      If the most current submission should be included in the submission
+      history results. Defaults to true.
+    DESC
   end
 
   class SubmissionType < ApplicationObjectType
-    graphql_name "Submission"
+    graphql_name 'Submission'
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::SubmissionInterface
+    implements Interfaces::LegacyIDInterface
 
-    alias :submission :object
-
-    field :_id, ID, "legacy canvas id", method: :id, null: false
     global_id_field :id
 
-    field :assignment, AssignmentType, null: true
-    def assignment
-      load_association(:assignment)
+    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
+      argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
+    def submission_histories_connection(filter:)
+      filter = filter.to_h
+      states, include_current_submission = filter.values_at(:states, :include_current_submission)
 
-    field :user, UserType, null: true
-    def user
-      load_association(:user)
-    end
-
-    def protect_submission_grades(attr)
-      load_association(:assignment).then do
-        if submission.user_can_read_grade?(current_user, session)
-          submission.send(attr)
-        end
+      Promise.all([
+        load_association(:versions),
+        load_association(:assignment)
+      ]).then do
+        histories = object.submission_history
+        histories.pop unless include_current_submission
+        histories.select{ |h| states.include?(h.workflow_state) }
       end
     end
-    private :protect_submission_grades
-
-    field :comments_connection, SubmissionCommentType.connection_type, null: true
-    def comments_connection
-      load_association(:assignment).then do
-        submission.comments_for(current_user).published
-      end
-    end
-
-    field :score, Float, null: true
-    def score
-      protect_submission_grades(:score)
-    end
-
-    field :grade, String, null: true
-    def grade
-      protect_submission_grades(:grade)
-    end
-
-    field :entered_score, Float,
-      "the submission score *before* late policy deductions were applied",
-      null: true
-    def entered_score
-      protect_submission_grades(:entered_score)
-    end
-
-    field :entered_grade, String,
-      "the submission grade *before* late policy deductions were applied",
-      null: true
-    def entered_grade
-      protect_submission_grades(:entered_grade)
-    end
-
-    field :deducted_points, Float,
-      "how many points are being deducted due to late policy",
-      null: true
-    def deducted_points
-      protect_submission_grades(:points_deducted)
-    end
-
-    field :excused, Boolean,
-      "excused assignments are ignored when calculating grades",
-      method: :excused?, null: true
-
-    field :submitted_at, DateTimeType, null: true
-    field :graded_at, DateTimeType, null: true
-    field :posted_at, DateTimeType, null: true
-
-    field :state, SubmissionStateType, method: :workflow_state, null: false
-
-    field :submission_status, String, null: true
-    def submission_status
-      if submission.submission_type == "online_quiz"
-        Loaders::AssociationLoader.for(Submission, :quiz_submission).
-          load(submission).
-          then { submission.submission_status }
-      else
-        submission.submission_status
-      end
-    end
-
-    field :grading_status, String, null: true
-    field :late_policy_status, LatePolicyStatusType, null: true
   end
 end

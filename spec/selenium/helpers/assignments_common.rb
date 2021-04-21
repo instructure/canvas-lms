@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -96,8 +98,7 @@ module AssignmentsCommon
   end
 
   def submit_assignment_form
-    expect_new_page_load { f('#edit_assignment_form .btn-primary[type=submit]').click }
-    wait_for_ajaximations
+    wait_for_new_page_load { f('#edit_assignment_form .btn-primary[type=submit]').click }
   end
 
   def stub_freezer_plugin(frozen_atts = nil)

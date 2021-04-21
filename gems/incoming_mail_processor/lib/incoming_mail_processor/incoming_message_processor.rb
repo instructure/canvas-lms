@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -16,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'iconv'
 require 'mail'
 
 module IncomingMailProcessor
@@ -50,15 +51,13 @@ module IncomingMailProcessor
           if self.dedicated_workers_per_mailbox
             # Launch one per mailbox
             self.mailbox_accounts.each do |account|
-              imp.send_later_enqueue_args(:process,
-                {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}", max_attempts: 1},
-                {worker_id: worker_id, mailbox_account_address: account.address})
+              imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}").
+                process({worker_id: worker_id, mailbox_account_address: account.address})
             end
           else
             # Just launch the one
-            imp.send_later_enqueue_args(:process,
-              {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
-              {worker_id: worker_id})
+            imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}").
+              process({worker_id: worker_id})
           end
         end
       end
@@ -149,12 +148,15 @@ module IncomingMailProcessor
     end
 
     def report_stats(incoming_message, mailbox_account)
-      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}")
-
+      InstStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}",
+                                   short_stat: 'incoming_mail_processor.incoming_message_processed',
+                                   tags: {mailbox: mailbox_account.escaped_address})
       age = age(incoming_message)
       if age
         stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
-        CanvasStatsd::Statsd.timing(stat_name, age)
+        InstStatsd::Statsd.timing(stat_name, age,
+                                  short_stat: 'incoming_mail_processor.message_age',
+                                  tags: {mailbox: mailbox_account.escaped_address})
       end
     end
 
@@ -333,7 +335,7 @@ module IncomingMailProcessor
     def self.extract_address_tag(message, account)
       addr, domain = account.address.split(/@/)
       regex = Regexp.new("#{Regexp.escape(addr)}\\+([^@]+)@#{Regexp.escape(domain)}")
-      message.to.each do |address|
+      message.to&.each do |address|
         if match = regex.match(address)
           return match[1]
         end

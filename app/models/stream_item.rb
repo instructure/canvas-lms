@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -228,25 +230,32 @@ class StreamItem < ActiveRecord::Base
 
   def self.generate_or_update(object)
     item = nil
-    StreamItem.unique_constraint_retry do
-      # we can't coalesce messages that weren't ever saved to the DB
-      if !new_message?(object)
-        item = object.stream_item
-      end
-      if item
-        item.regenerate!(object)
-      else
-        item = self.new
-        item.generate_data(object)
-        item.save!
-        # prepopulate the reverse association
-        # (mostly useful for specs that regenerate stream items
-        #  multiple times without reloading the asset)
-        if !new_message?(object)
-          object.stream_item = item
+    # we can't coalesce messages that weren't ever saved to the DB
+    if !new_message?(object)
+      item = object.stream_item
+    end
+    if item
+      item.regenerate!(object)
+    else
+      item = self.new
+      item.generate_data(object)
+      StreamItem.unique_constraint_retry do |retry_count|
+        if retry_count == 0
+          item.save!
+        else
+          item = nil # if it fails just carry on - it got created somewhere else so grab it later
         end
       end
+      item ||= object.reload.stream_item
+
+      # prepopulate the reverse association
+      # (mostly useful for specs that regenerate stream items
+      #  multiple times without reloading the asset)
+      if !new_message?(object)
+        object.stream_item = item
+      end
     end
+
     item
   end
 
@@ -282,9 +291,9 @@ class StreamItem < ActiveRecord::Base
             :context_id => l_context_id,
           }
         end
-        if object.is_a?(Submission) && object.assignment.muted?
-          # set the hidden flag if an assignment and muted (for the owner of the submission)
-          if owner_insert = inserts.detect{|i| i[:user_id] == object.user_id}
+        if object.is_a?(Submission) && !object.posted?
+          # set the hidden flag if this submission is not posted
+          if (owner_insert = inserts.detect{|i| i[:user_id] == object.user_id})
             owner_insert[:hidden] = true
           end
         end
@@ -340,7 +349,9 @@ class StreamItem < ActiveRecord::Base
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
     if item = asset.stream_item
-      StreamItemInstance.where(user_id: user_id, stream_item_id: item).first.try(:update_attribute, :workflow_state, new_state)
+      Shard.shard_for(user_id).activate do
+        StreamItemInstance.where(user_id: user_id, stream_item_id: item).first&.update_attribute(:workflow_state, new_state)
+      end
     end
   end
 
@@ -384,10 +395,10 @@ class StreamItem < ActiveRecord::Base
       User.where(:id => user_ids.to_a).touch_all
     end
 
-    Shackles.activate(:deploy) do
-      Shard.current.database_server.unshackle do
-        StreamItem.connection.execute("VACUUM ANALYZE #{StreamItem.quoted_table_name}")
-        StreamItemInstance.connection.execute("VACUUM ANALYZE #{StreamItemInstance.quoted_table_name}")
+    GuardRail.activate(:deploy) do
+      Shard.current.database_server.unguard do
+        StreamItem.vacuum
+        StreamItemInstance.vacuum
         ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
       end
     end
@@ -449,8 +460,8 @@ class StreamItem < ActiveRecord::Base
     self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !self.invalidate_immediately && user_ids.count > 100
-        StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,
-          { :priority => Delayed::LOW_PRIORITY }, user_ids, self.context_type, self.context_id)
+        StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY).
+          invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       end

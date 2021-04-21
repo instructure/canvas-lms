@@ -17,9 +17,8 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui/accordion'
+import ready from '@instructure/ready'
 import 'jqueryui/tabs'
 import 'jqueryui/button'
 
-$('#theme-preview-tabs').tabs()
-$('#theme-preview-accordion').accordion({header: 'h3'})
+ready(() => $('#theme-preview-tabs').tabs())

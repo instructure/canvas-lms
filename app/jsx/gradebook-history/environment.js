@@ -30,7 +30,12 @@ function courseIsConcluded() {
   return ENV.COURSE_IS_CONCLUDED
 }
 
+function overrideGradesEnabled() {
+  return ENV.OVERRIDE_GRADES_ENABLED
+}
+
 export default {
+  overrideGradesEnabled,
   courseId,
   courseIsConcluded,
   timezone

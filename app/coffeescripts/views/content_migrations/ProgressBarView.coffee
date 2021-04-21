@@ -15,28 +15,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/ProgressBar',
-  'i18n!progressbar_view'
-], (Backbone, template, I18n) ->
-  class ProgressBarView extends Backbone.View
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/ProgressBar'
+import I18n from 'i18n!progressbar_view'
 
-    els:
-      '.progress' : '$progress'
+export default class ProgressBarView extends Backbone.View
+  template: template
 
-    initialize: =>
-      super
-      @listenTo @model, "change:completion", =>
-        integer = Math.floor @model.changed?.completion
-        message = I18n.t('Content migration running, %{percent}% complete',{
-            percent: integer
-          })
-        $.screenReaderFlashMessageExclusive(message)
-        @render()
+  els:
+    '.progress' : '$progress'
 
-    toJSON: ->
-      json = super
-      json.completion = @model.get('completion')
-      json
+  initialize: =>
+    super
+    @listenTo @model, "change:completion", =>
+      integer = Math.floor @model.changed?.completion
+      message = I18n.t('Content migration running, %{percent}% complete',{
+          percent: integer
+        })
+      $.screenReaderFlashMessageExclusive(message)
+      @render()
+
+  toJSON: ->
+    json = super
+    json.completion = @model.get('completion')
+    json

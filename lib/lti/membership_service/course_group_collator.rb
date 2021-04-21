@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -29,7 +31,7 @@ module Lti
         @context = context
       end
 
-      def memberships
+      def memberships(context: nil)
         @_memberships ||= collate_memberships
       end
 

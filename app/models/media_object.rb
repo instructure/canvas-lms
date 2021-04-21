@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,6 +22,7 @@ require 'csv'
 
 class MediaObject < ActiveRecord::Base
   include Workflow
+  include SearchTermHelper
   belongs_to :user
   belongs_to :context, polymorphic:
     [:course, :group, :conversation_message, :account, :assignment,
@@ -41,7 +44,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def update_title_on_kaltura_later
-    send_later(:update_title_on_kaltura) if @push_user_title
+    delay.update_title_on_kaltura if @push_user_title
     @push_user_title = nil
   end
 
@@ -70,7 +73,8 @@ class MediaObject < ActiveRecord::Base
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadCsv(csv)
     if !res[:ready]
-      MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], [], root_account_id)
+      MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY).
+        refresh_media_files(res[:id], [], root_account_id)
     else
       build_media_objects(res, root_account_id)
     end
@@ -131,7 +135,8 @@ class MediaObject < ActiveRecord::Base
     if !res[:ready]
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
         wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
-        MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => wait_period.minutes.from_now, :priority => Delayed::LOW_PRIORITY}, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
+        MediaObject.delay(run_at: wait_period.minutes.from_now, priority: Delayed::LOW_PRIORITY).
+          refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
         Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
@@ -146,19 +151,19 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     info = client.mediaGet(media_id)
-    return !!info[:id]
+    return !!info&.dig(:id)
   end
 
-  def self.ensure_media_object(media_id, create_opts = {})
+  def self.ensure_media_object(media_id, **create_opts)
     if !by_media_id(media_id).any?
-      self.send_later_enqueue_args(:create_if_id_exists, { :priority => Delayed::LOW_PRIORITY }, media_id, create_opts)
+      delay(priority: Delayed::LOW_PRIORITY).create_if_id_exists(media_id, **create_opts)
     end
   end
 
   # typically call this in a delayed job, since it has to contact kaltura
-  def self.create_if_id_exists(media_id, create_opts = {})
+  def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && !by_media_id(media_id).any?
-      create!(create_opts.merge(:media_id => media_id))
+      create!(**create_opts.merge(:media_id => media_id))
     end
   end
 
@@ -174,7 +179,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def retrieve_details_later
-    send_later(:retrieve_details_ensure_codecs)
+    delay.retrieve_details_ensure_codecs
   end
 
   def media_sources
@@ -185,18 +190,22 @@ class MediaObject < ActiveRecord::Base
     retrieve_details
     if !transcoded_details && self.created_at > 6.hours.ago
       if attempt < 10
-        send_at((5 * attempt).minutes.from_now, :retrieve_details_ensure_codecs, attempt + 1)
+        delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
       else
         Canvas::Errors.capture(:media_object_failure, {
           message: "Kaltura flavor retrieval failed",
           object: self.inspect.to_s,
-        })
+        }, :warn)
       end
     end
   end
 
   def name
     self.title
+  end
+
+  def guaranteed_title
+    self.user_entered_title.presence || self.title.presence || I18n.t("Untitled")
   end
 
   def process_retrieved_details(entry, media_type, assets)
@@ -220,6 +229,7 @@ class MediaObject < ActiveRecord::Base
     end
     self.total_size = [self.max_size || 0, assets.map{|a| (a[:size] || 0).to_i }.sum].max
     self.save
+    ensure_attachment
     self.data
   end
 
@@ -234,6 +244,8 @@ class MediaObject < ActiveRecord::Base
 
     entry = client.mediaGet(self.media_id)
     media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s if entry
+    # attachment#build_content_types_sql assumes the content_type has a "/"
+    media_type = "#{media_type}/*" unless media_type.blank? || media_type.include?("/")
     assets = client.flavorAssetGetByEntryId(self.media_id) || []
     process_retrieved_details(entry, media_type, assets)
   end
@@ -273,7 +285,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def viewed!
-    send_later(:updated_viewed_at_and_retrieve_details, Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
+    delay.updated_viewed_at_and_retrieve_details(Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
     true
   end
 
@@ -288,9 +300,41 @@ class MediaObject < ActiveRecord::Base
     save!
   end
 
+  def ensure_attachment
+    return if self.attachment_id
+    return unless %w{Account Course Group User}.include?(self.context_type)
+    root_account = context.is_a?(User) ? context.account : context.root_account
+    return unless root_account.feature_enabled?(:autocreate_attachment_from_media_object)
+
+    sources = self.media_sources
+    return unless sources.present?
+
+    attachment = build_attachment({
+      "context" => context,
+      "display_name" => self.title,
+      "filename" => self.title,
+      "content_type" => self.media_type,
+      "media_entry_id" => self.media_id,
+      "workflow_state" => "processed",
+      "folder_id" => Folder.media_folder(context).id
+    })
+
+    url = self.data.dig(:download_url)
+    url = sources.select { |s| s[:isOriginal] == '1' }.first&.dig(:url) if url.blank?
+    url = sources.sort_by { |a| a[:bitrate].to_i }.first&.dig(:url) if url.blank?
+
+    attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
+    attachment.file_state = "hidden" # in case teachers don't mean for this to be visible to students in the files section
+    attachment.save!
+  end
+
+  def deleted?
+    self.workflow_state == 'deleted'
+  end
+
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, lambda { |media_id| where(:media_id => media_id).or(where(:old_media_id => media_id)) }
+  scope :by_media_id, lambda { |media_id| where(:media_id => media_id).or(where(:old_media_id => media_id).where.not(:old_media_id => nil)) }
 
   scope :by_media_type, lambda { |media_type| where(:media_type => media_type) }
 

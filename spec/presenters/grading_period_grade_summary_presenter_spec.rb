@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -84,7 +86,7 @@ describe GradingPeriodGradeSummaryPresenter do
     end
 
     it "includes overridden assignments that are due for the student in the given grading period" do
-      student_override = @assignment_not_due_in_period.assignment_overrides.create!(due_at: @now)
+      student_override = @assignment_not_due_in_period.assignment_overrides.create!(due_at: @now, due_at_overridden: true)
       student_override.assignment_override_students.create!(user: @student)
       expect(presenter.assignments_visible_to_student).to include(@assignment_not_due_in_period)
     end
@@ -100,7 +102,7 @@ describe GradingPeriodGradeSummaryPresenter do
     end
 
     it "includes groups that have overridden assignments due in the given period for the given user" do
-      student_override = @assignment_not_due_in_period.assignment_overrides.create!(due_at: @now)
+      student_override = @assignment_not_due_in_period.assignment_overrides.create!(due_at: @now, due_at_overridden: true)
       student_override.assignment_override_students.create!(user: @student)
       expect(presenter.groups).to include(@second_group)
     end

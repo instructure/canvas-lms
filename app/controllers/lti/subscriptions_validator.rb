@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -22,6 +24,8 @@ module Lti
     class MissingCapability < StandardError
     end
     class ToolNotInContext < StandardError
+    end
+    class ContextNotFound < StandardError
     end
 
     CONTEXT_WHITELIST = {
@@ -59,19 +63,30 @@ module Lti
       check_tool_context!
     end
 
+    def self.validate_subscription_context!(subscription)
+      raise ContextNotFound unless retrieve_context(subscription).present?
+      true
+    end
+
+    def self.retrieve_context(subscription)
+      model = CONTEXT_WHITELIST[subscription[:ContextType]]
+      raise InvalidContextType unless model
+
+      case subscription[:ContextType]
+      when "root_account"
+        model.find_by(uuid: subscription[:ContextId])
+      else
+        model.find(subscription[:ContextId])
+      end
+    rescue ActiveRecord::RecordNotFound
+      raise ContextNotFound
+    end
+
     private
 
     def subscription_context
       @_subscription_context ||= begin
-        model = CONTEXT_WHITELIST[subscription[:ContextType]]
-        raise InvalidContextType unless model
-
-        case subscription[:ContextType]
-        when "root_account"
-          model.find_by(uuid: subscription[:ContextId])
-        else
-          model.find(subscription[:ContextId])
-        end
+        SubscriptionsValidator.retrieve_context(subscription)
       end
     end
   end

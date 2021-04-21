@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/ContentMigrationIssue'
-], (Backbone, template) -> 
-  class ContentMigrationIssueView extends Backbone.View
-    className: 'clearfix row-fluid top-padding'
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/ContentMigrationIssue'
 
-    toJSON: -> 
-      json = super
-      json.description = @model.get('description')
-      json.fix_issue_url = @model.get('fix_issue_html_url')
-      json
+export default class ContentMigrationIssueView extends Backbone.View
+  className: 'clearfix row-fluid top-padding'
+  template: template
+  tagName: 'li'
+
+  toJSON: ->
+    json = super
+    json.description = @model.get('description')
+    json.fix_issue_url = @model.get('fix_issue_html_url')
+    json

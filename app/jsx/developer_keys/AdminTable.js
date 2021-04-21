@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Table} from '@instructure/ui-table'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
-import PropTypes from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import I18n from 'i18n!react_developer_keys'
 
 import DeveloperKey from './DeveloperKey'
@@ -28,19 +28,21 @@ import DeveloperKey from './DeveloperKey'
 import 'compiled/jquery.rails_flash_notifications'
 
 class DeveloperKeysTable extends React.Component {
-  createSetFocusCallback = (developerKeyId) => {
-    const { developerKeysList, setFocus, inherited } = this.props
-    const position = developerKeyId ? (developerKeysList.findIndex((key) => key.id === developerKeyId) - 1) : undefined
+  createSetFocusCallback = developerKeyId => {
+    const {developerKeysList, setFocus, inherited} = this.props
+    const position = developerKeyId
+      ? developerKeysList.findIndex(key => key.id === developerKeyId) - 1
+      : undefined
     const devKey = developerKeysList[position]
     let ref = devKey ? this.developerKeyRef(devKey) : undefined
     // developerKeys will be populated when show more keys is resolved
-    return (developerKeys) => {
+    return developerKeys => {
       // if position is undefined it means that we are loading more keys
       // and we want to calculate the end of the list after the promise
       // resolves
       if (position === undefined) {
         const reversedList = developerKeysList.concat(developerKeys).reverse()
-        const developerKey = reversedList.find((key) => {
+        const developerKey = reversedList.find(key => {
           const component = this.developerKeyRef(key)
           return !component.isDisabled()
         })
@@ -53,20 +55,32 @@ class DeveloperKeysTable extends React.Component {
       if (ref === undefined) {
         // When INSTUI-1202 is completed and the fix in canvas this should be used
         // when inherited keys are loaded
-        srMsg = I18n.t("Developer key %{developerKeyId} deleted. Focus moved to add developer key button.", {developerKeyId})
+        srMsg = I18n.t(
+          'Developer key %{developerKeyId} deleted. Focus moved to add developer key button.',
+          {developerKeyId}
+        )
         setFocus()
       } else if (inherited) {
-        srMsg = I18n.t("Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.")
-        if (ref) { ref.focusToggleGroup() }
+        srMsg = I18n.t(
+          'Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.'
+        )
+        if (ref) {
+          ref.focusToggleGroup()
+        }
       } else {
         if (position === undefined) {
-          srMsg = I18n.t("Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.")
+          srMsg = I18n.t(
+            'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
+          )
         } else {
-          srMsg = I18n.t("Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.", {developerKeyId})
+          srMsg = I18n.t(
+            'Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.',
+            {developerKeyId}
+          )
         }
         ref.focusDeleteLink()
       }
-      $.screenReaderFlashMessageExclusive(srMsg);
+      $.screenReaderFlashMessageExclusive(srMsg)
       return ref
     }
   }
@@ -91,19 +105,25 @@ class DeveloperKeysTable extends React.Component {
           caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
           size="medium"
         >
-        <thead>
-          <tr>
-            <th scope="col">{I18n.t('Name')}</th>
-            {!inherited && <th scope="col">{I18n.t('Owner Email')}</th> }
-            <th scope="col">{I18n.t('Details')}</th>
-            {!inherited && <th scope="col">{I18n.t('Stats')}</th>}
-            <th scope="col">{I18n.t('State')}</th>
-            {!inherited &&  <th scope="col">{I18n.t('Actions')}</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {
-            this.props.developerKeysList.map((developerKey) => (
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="keystable-name">{I18n.t('Name')}</Table.ColHeader>
+              {!inherited && (
+                <Table.ColHeader id="keystable-owneremail">{I18n.t('Owner Email')}</Table.ColHeader>
+              )}
+              <Table.ColHeader id="keystable-details">{I18n.t('Details')}</Table.ColHeader>
+              {!inherited && (
+                <Table.ColHeader id="keystable-stats">{I18n.t('Stats')}</Table.ColHeader>
+              )}
+              <Table.ColHeader id="keystable-type">{I18n.t('Type')}</Table.ColHeader>
+              <Table.ColHeader id="keystable-state">{I18n.t('State')}</Table.ColHeader>
+              {!inherited && (
+                <Table.ColHeader id="keystable-actions">{I18n.t('Actions')}</Table.ColHeader>
+              )}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {this.props.developerKeysList.map(developerKey => (
               <DeveloperKey
                 ref={key => {
                   this[`developerKey-${developerKey.id}`] = key
@@ -117,7 +137,7 @@ class DeveloperKeysTable extends React.Component {
                 onDelete={this.createSetFocusCallback}
               />
             ))}
-          </tbody>
+          </Table.Body>
         </Table>
       </div>
     )
@@ -125,20 +145,20 @@ class DeveloperKeysTable extends React.Component {
 }
 
 DeveloperKeysTable.propTypes = {
-  store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+  store: shape({
+    dispatch: func.isRequired
   }).isRequired,
-  actions: PropTypes.shape({}).isRequired,
-  developerKeysList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
-  ctx: PropTypes.shape({
-    params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired
+  actions: shape({}).isRequired,
+  developerKeysList: arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+  ctx: shape({
+    params: shape({
+      contextId: string.isRequired
     })
   }).isRequired,
-  inherited: PropTypes.bool,
-  setFocus: PropTypes.func
-};
+  inherited: bool,
+  setFocus: func
+}
 
-DeveloperKeysTable.defaultProps = { inherited: false, setFocus: () => {} }
+DeveloperKeysTable.defaultProps = {inherited: false, setFocus: () => {}}
 
 export default DeveloperKeysTable

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -35,7 +37,7 @@ module LtiAdvantage::Messages
         resource_link: LtiAdvantage::Claims::ResourceLink.new(id: 1),
         roles: ['foo'],
         target_link_uri: 'https://www.example.com',
-        lti11_legacy_user_id: 'aaaaa'
+        lti11_legacy_user_id: 'bcf1466791073638f61073818abf1d32331fc893'
       )
     end
 
@@ -109,9 +111,7 @@ module LtiAdvantage::Messages
           context: LtiAdvantage::Claims::Context.new
         )
         message.validate
-        expect(message.errors.messages[:context].first.messages).to eq(
-          {:id => ["can't be blank"]}
-        )
+        expect(message.errors.messages.keys).to include(:context)
       end
 
       it 'verifies that "resource_link" is an Platform' do

@@ -16,12 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import 'jquery.cookie'
+import getCookie from 'jsx/shared/helpers/getCookie'
 
-const authenticity_token = () => $.cookie('_csrf_token')
+const authenticity_token = () => getCookie('_csrf_token')
 
-$(document).on('submit', 'form', function () {
-  $(this).find('input[name="authenticity_token"]').val(authenticity_token())
+$(document).on('submit', 'form', function() {
+  $(this)
+    .find('input[name="authenticity_token"]')
+    .val(authenticity_token())
 })
 
 // return a function to be used elsewhere

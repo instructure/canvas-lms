@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -42,7 +42,7 @@ class Quizzes::QuizSubmissionHistory
   def version_models
     last_versions.map do |version|
       model = version.model
-      model.attempt == @submission.attempt ? @submission : model
+      model&.attempt == @submission.attempt ? @submission : model
     end
   end
 

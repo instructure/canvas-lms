@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -23,9 +25,13 @@ module AcademicBenchmarks
       include Common
       def build_outcomes(ratings={}, _parent=nil)
         build_common_outcomes(ratings).merge!({
-          title: title,
-          description: title,
+          title: description_with_year,
+          description: description_with_year,
         })
+      end
+
+      def description_with_year
+        adopt_year.present? ? "#{description} (#{adopt_year})" : description
       end
     end
   end

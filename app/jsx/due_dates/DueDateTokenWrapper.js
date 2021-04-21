@@ -19,13 +19,13 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import OverrideStudentStore from '../due_dates/OverrideStudentStore'
+import OverrideStudentStore from './OverrideStudentStore'
 import Override from 'compiled/models/AssignmentOverride'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!DueDateTokenWrapper'
 import $ from 'jquery'
 import SearchHelpers from '../shared/helpers/searchHelpers'
-import DisabledTokenInput from '../due_dates/DisabledTokenInput'
+import DisabledTokenInput from './DisabledTokenInput'
 
 const DueDateWrapperConsts = {
   MINIMUM_SEARCH_LENGTH: 3,
@@ -36,7 +36,6 @@ const DueDateWrapperConsts = {
 }
 
 class DueDateTokenWrapper extends React.Component {
-
   static propTypes = {
     tokens: PropTypes.array.isRequired,
     handleTokenAdd: PropTypes.func.isRequired,
@@ -50,9 +49,13 @@ class DueDateTokenWrapper extends React.Component {
   }
 
   MINIMUM_SEARCH_LENGTH = DueDateWrapperConsts.MINIMUM_SEARCH_LENGTH
+
   MAXIMUM_STUDENTS_TO_SHOW = DueDateWrapperConsts.MAXIMUM_STUDENTS_TO_SHOW
+
   MAXIMUM_SECTIONS_TO_SHOW = DueDateWrapperConsts.MAXIMUM_SECTIONS_TO_SHOW
+
   MAXIMUM_GROUPS_TO_SHOW = DueDateWrapperConsts.MAXIMUM_GROUPS_TO_SHOW
+
   MS_TO_DEBOUNCE_SEARCH = DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH
 
   // -------------------
@@ -230,22 +233,30 @@ class DueDateTokenWrapper extends React.Component {
   conditionalReleaseOptions = () => {
     if (!ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) return []
 
-    const selectable = _.contains(this.filteredTagsForType('noop'), Override.conditionalRelease)
+    const selectable = _.includes(this.filteredTagsForType('noop'), Override.conditionalRelease)
     return selectable ? [this.headerOption('conditional_release', Override.conditionalRelease)] : []
   }
 
   optionsForType = optionType => {
     const header = this.headerOption(optionType)
     const options = this.selectableOptions(optionType)
-    return _.any(options) ? _.union([header], options) : []
+    return _.some(options) ? _.union([header], options) : []
   }
 
   headerOption = (heading, set) => {
     const headerText = {
-      student: I18n.t('Student'),
-      course_section: I18n.t('Course Section'),
-      group: I18n.t('Group'),
-      conditional_release: I18n.t('Mastery Paths')
+      get student() {
+        return I18n.t('Student')
+      },
+      get course_section() {
+        return I18n.t('Course Section')
+      },
+      get group() {
+        return I18n.t('Group')
+      },
+      get conditional_release() {
+        return I18n.t('Mastery Paths')
+      }
     }[heading]
 
     const canSelect = heading === 'conditional_release'
@@ -280,7 +291,7 @@ class DueDateTokenWrapper extends React.Component {
     const displayName = set.name || this.props.defaultSectionNamer(set.course_section_id)
     return (
       <ComboboxOption key={set.key || `${displayName}-${index}`} value={set.name} set_props={set}>
-        {displayName}
+        {displayName}{set.pronouns && ` (${set.pronouns})`}
       </ComboboxOption>
     )
   }

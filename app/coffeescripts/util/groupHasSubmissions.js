@@ -15,8 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function groupHasSubmissions (group) {
-  return group.get('has_submission') || group.users().models.reduce((hasSubmission, user) => {
-    return hasSubmission || (user.has('group_submissions') && user.get('group_submissions').length > 0)
-  }, false)
+export default function groupHasSubmissions(group) {
+  return (
+    group.get('has_submission') ||
+    group.users().models.reduce((hasSubmission, user) => {
+      return (
+        hasSubmission || (user.has('group_submissions') && user.get('group_submissions').length > 0)
+      )
+    }, false)
+  )
 }

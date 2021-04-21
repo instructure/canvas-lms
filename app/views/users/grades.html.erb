@@ -15,16 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  js_env ga_page_title: "Grades for User"
-%>
-<%
-  content_for :page_title, join_title(t(:page_title, "Grades"), @current_user.name)
-  js_bundle :user_grades
-  css_bundle :user_grades
-%>
-
+<% provide_blank :right_side %>
 <h1 class='screenreader-only'><%= t(:page_title, 'Grades') %></h1>
 <% unless @presenter.student_enrollments.empty? %>
 <h2><%= t('titles.current_student_courses', "Courses I'm Taking") %></h2>
@@ -60,7 +51,7 @@
     <td class="percent">
       <% if enrollment.course.hide_final_grades? || (@grading_periods[enrollment.course_id] && @grading_periods[enrollment.course_id][:selected_period_id] == 0) && !enrollment.course.display_totals_for_all_grading_periods?%>
         --
-      <% elsif @grades[:observed_enrollments][enrollment.course_id][enrollment.user_id] %>
+      <% elsif @grades&.dig(:observed_enrollments, enrollment.course_id, enrollment.user_id) %>
         <%= @grades[:observed_enrollments][enrollment.course_id][enrollment.user_id] %>%
       <% else %>
         <%= t('no_grade', 'no grade') %>

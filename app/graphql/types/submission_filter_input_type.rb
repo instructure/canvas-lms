@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,13 +19,18 @@
 #
 
 module Types
-  # TODO: move this into SubmissionFilterInputType when 1.8 lands
-  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded].freeze
-
   class SubmissionFilterInputType < Types::BaseInputObject
     graphql_name "SubmissionFilterInput"
 
-    argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
-    argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
+    argument :states, [SubmissionStateType],
+      required: false,
+      default_value: DEFAULT_SUBMISSION_STATES
+
+    argument :section_ids, [ID],
+      required: false,
+      prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
+
+    argument :submitted_since, DateTimeType, required: false
+    argument :graded_since, DateTimeType, required: false
   end
 end

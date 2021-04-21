@@ -22,12 +22,12 @@ import {func, bool, number} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Pagination} from '@instructure/ui-pagination'
 
 import AnnouncementRow from '../../shared/components/AnnouncementRow'
 import {ConnectedIndexHeader} from './IndexHeader'
@@ -106,7 +106,7 @@ export default class AnnouncementsIndex extends Component {
     if (condition) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner size="small" title={title} />
+          <Spinner size="small" renderTitle={title} />
           <Text size="small" as="p">
             {title}
           </Text>
@@ -145,14 +145,14 @@ export default class AnnouncementsIndex extends Component {
 
   renderPageButton(page) {
     return (
-      <PaginationButton
+      <Pagination.Page
         key={page}
         onClick={this.selectPage(page)}
         current={page === this.props.announcementsPage}
       >
         <ScreenReaderContent>{I18n.t('Page %{pageNum}', {pageNum: page})}</ScreenReaderContent>
         <span aria-hidden="true">{page}</span>
-      </PaginationButton>
+      </Pagination.Page>
     )
   }
 
@@ -194,14 +194,11 @@ export default class AnnouncementsIndex extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {
-      isCourseContext: state.contextType === 'course'
-    },
-    selectPaginationState(state, 'announcements'),
-    select(state, ['permissions', 'masterCourseData', 'announcementsLocked'])
-  )
+const connectState = state => ({
+  isCourseContext: state.contextType === 'course',
+  ...selectPaginationState(state, 'announcements'),
+  ...select(state, ['permissions', 'masterCourseData', 'announcementsLocked'])
+})
 const connectActions = dispatch =>
   bindActionCreators(
     select(actions, [
@@ -213,7 +210,4 @@ const connectActions = dispatch =>
     dispatch
   )
 
-export const ConnectedAnnouncementsIndex = connect(
-  connectState,
-  connectActions
-)(AnnouncementsIndex)
+export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

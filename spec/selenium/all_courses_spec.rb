@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -34,7 +36,8 @@ describe "course catalog" do
   end
 
   def catalog_setup
-    Account.default.enable_feature!(:course_catalog)
+    Account.default.settings[:enable_course_catalog] = true
+    Account.default.save!
     # create_courses factory returns id's of courses unless you specify return_type
     create_courses([ public_indexed_course_attrs ], {return_type: :record}).first
   end
@@ -60,7 +63,8 @@ describe "course catalog" do
   end
 
   it "should work without course catalog" do
-    Account.default.disable_feature!(:course_catalog)
+    Account.default.settings[:enable_course_catalog] = false
+    Account.default.save!
     expect(course_elements.size).to eql 1
   end
 

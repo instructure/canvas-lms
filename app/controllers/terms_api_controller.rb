@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -71,14 +73,28 @@
 #       }
 #     }
 #
+# @model EnrollmentTermsList
+#     {
+#       "id": "EnrollmentTermsList",
+#       "description": "",
+#       "properties": {
+#         "enrollment_terms": {
+#           "description": "a paginated list of all terms in the account",
+#           "type": "array",
+#           "example": [],
+#           "items": { "$ref": "EnrollmentTerm" }
+#         }
+#       }
+#     }
+#
 class TermsApiController < ApplicationController
-  before_action :require_context, :require_account_access
+  before_action :require_context, :require_root_account, :require_account_access
 
   include Api::V1::EnrollmentTerm
 
   # @API List enrollment terms
   #
-  # A paginated list of all of the terms in the account.
+  # An object with a paginated list of all of the terms in the account.
   #
   # @argument workflow_state[] [String, "active"|"deleted"|"all"]
   #   If set, only returns terms that are in the given state.
@@ -119,12 +135,8 @@ class TermsApiController < ApplicationController
   #     ]
   #   }
   #
-  # @returns [EnrollmentTerm]
+  # @returns EnrollmentTermsList
   def index
-    unless @context.root_account?
-      return render json: {message: 'Terms only belong to root_accounts.'}, status: :bad_request
-    end
-
     terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
 
     state = Array(params[:workflow_state])&['all', 'active', 'deleted']
@@ -136,7 +148,28 @@ class TermsApiController < ApplicationController
     render json: { enrollment_terms: enrollment_terms_json(terms, @current_user, session, nil, Array(params[:include])) }
   end
 
+  # @API Retrieve enrollment term
+  #
+  # Retrieves the details for an enrollment term in the account. Includes overrides by default.
+  #
+  # @example_request
+  #   curl -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/1/terms/2
+  #
+  # @returns EnrollmentTerm
+  def show
+    term = api_find(@context.enrollment_terms, params[:id])
+    render json: enrollment_term_json(term, @current_user, session, nil, %w{overrides})
+  end
+
   protected
+
+  def require_root_account
+    unless @context.root_account?
+      render json: {message: 'Terms only belong to root_accounts.'}, status: :bad_request
+      return false
+    end
+  end
 
   def require_account_access
     return false unless authorized_action(@context, @current_user, :read_terms)

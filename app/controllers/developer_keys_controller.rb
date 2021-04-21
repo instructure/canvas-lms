@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -24,25 +26,29 @@ class DeveloperKeysController < ApplicationController
 
   def index
     raise ActiveRecord::RecordNotFound unless @context.root_account?
-    scope = index_scope.nondeleted.preload(:account).order("id DESC")
-    @keys = Api.paginate(scope, self, account_developer_keys_url(@context))
     respond_to do |format|
       format.html do
         set_navigation
         js_env(
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
-          LTI_1_3_ENABLED: @context.root_account.feature_enabled?(:lti_1_3),
           validLtiScopes: TokenScopes::LTI_SCOPES,
-          validLtiPlacements: Lti::ResourcePlacement::PLACEMENTS
+          validLtiPlacements: Lti::ResourcePlacement.valid_placements(@domain_root_account),
+          includesFeatureFlagEnabled: Account.site_admin.feature_enabled?(:developer_key_support_includes)
         )
 
         render :index_react
       end
 
       format.json do
+        @keys = Api.paginate(index_scope, self, account_developer_keys_url(@context))
         render :json => developer_keys_json(
-          @keys, @current_user, session, account_context, inherited: params[:inherited].present?
+          @keys,
+          @current_user,
+          session,
+          account_context,
+          inherited: params[:inherited].present?,
+          include_tool_config: params[:inherited].blank?
         )
       end
     end
@@ -76,24 +82,33 @@ class DeveloperKeysController < ApplicationController
   protected
 
   def set_navigation
-    @active_tab = 'developer_keys'
+    set_active_tab 'developer_keys'
     add_crumb t('#crumbs.developer_keys', "Developer Keys")
   end
 
   private
 
   def index_scope
-    if params[:inherited].present?
+    scope = if params[:inherited].present?
+      # Return site admin keys that have been made
+      # visible to inheriting accounts
       return DeveloperKey.none if @context.site_admin?
       Account.site_admin.shard.activate do
-        # site_admin keys have a nil account_id
-        DeveloperKey.visible.where(account_id: nil)
+        DeveloperKey.visible.site_admin
       end
     elsif @context.site_admin?
-      DeveloperKey
+      # Return all siteadmin keys
+      if Account.site_admin.feature_enabled?(:site_admin_keys_only)
+        DeveloperKey.site_admin
+      else
+        DeveloperKey
+      end
     else
+      # Only return keys that belong to the current account
       DeveloperKey.where(account_id: @context.id)
     end
+    scope = scope.eager_load(:tool_configuration) unless params[:inherited]
+    scope.nondeleted.preload(:account).order("developer_keys.id DESC")
   end
 
   def set_key
@@ -132,7 +147,9 @@ class DeveloperKeysController < ApplicationController
       :vendor_code,
       :visible,
       :test_cluster_only,
+      :client_credentials_audience,
       :require_scopes,
+      :allow_includes,
       scopes: []
     )
   end

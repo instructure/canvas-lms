@@ -44,7 +44,7 @@ test('#constructor: it sets up the proper context', () => {
   equal(tracker.priority, K.EVT_PRIORITY_LOW)
 })
 
-test('capturing: it works', function() {
+test('capturing: it works', () => {
   const capture = sinon.stub()
   const tracker = new Subject({
     questionSelector: '.question',

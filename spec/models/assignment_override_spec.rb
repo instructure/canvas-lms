@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -432,8 +434,8 @@ describe AssignmentOverride do
   end
 
   describe_override("due_at", 5.minutes.from_now, 7.minutes.from_now)
-  describe_override("unlock_at", 5.minutes.from_now, 7.minutes.from_now)
-  describe_override("lock_at", 5.minutes.from_now, 7.minutes.from_now)
+  describe_override("unlock_at", 1.minute.ago, 2.minutes.ago)
+  describe_override("lock_at", 10.minutes.from_now, 12.minutes.from_now)
 
   describe "#due_at=" do
     def fancy_midnight(opts={})
@@ -1015,6 +1017,46 @@ describe AssignmentOverride do
         expect_any_instantiation_of(@quiz.context).to receive(:enrollments_visible_to).with(@student)
         subject
       end
+    end
+  end
+
+  describe 'update_due_date_smart_alerts' do
+    it 'creates a ScheduledSmartAlert on save with due date' do
+      override = assignment_override_model(course: @course)
+      expect(ScheduledSmartAlert).to receive(:upsert)
+
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+    end
+
+    it 'deletes the ScheduledSmartAlert if the due date is removed' do
+      override = assignment_override_model(course: @course)
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      override.update!(due_at: nil)
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+    end
+
+    it 'deletes the ScheduledSmartAlert if the due date is changed to the past' do
+      override = assignment_override_model(course: @course)
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      override.update!(due_at: 1.day.ago)
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+    end
+
+    it 'deletes associated ScheduledSmartAlerts when the override is deleted' do
+      override = assignment_override_model(course: @course)
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+      expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+      override.destroy
+      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: 'AssignmentOverride', context_id: override.id))
+    end
+  end
+
+  describe 'create' do
+    it 'sets the root_account_id using assignment' do
+      override = assignment_override_model(course: @course)
+      expect(override.root_account_id).to eq @assignment.root_account_id
     end
   end
 end

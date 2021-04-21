@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,6 +20,9 @@
 
 class SubmissionsBaseController < ApplicationController
   include GradebookSettingsHelpers
+  include AssignmentsHelper
+  include AssessmentRequestHelper
+
   include Api::V1::Rubric
   include Api::V1::SubmissionComment
 
@@ -40,19 +45,43 @@ class SubmissionsBaseController < ApplicationController
           outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
           rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
-          outcome_proficiency: outcome_proficiency
+          outcome_proficiency: outcome_proficiency,
+          media_comment_asset_string: @current_user.asset_string
         })
-         render 'submissions/show'
+
+        js_bundle :submissions
+        css_bundle :submission
+
+        add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
+        add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
+        add_crumb(user_crumb_name)
+
+        set_active_tab "assignments"
+
+        render 'submissions/show', stream: can_stream_template?
       end
+
       format.json do
+        submission_json_exclusions = []
+
+        if @submission.submission_type == "online_quiz" &&
+            @submission.hide_grade_from_student? &&
+            !@assignment.grants_right?(@current_user, :grade)
+          submission_json_exclusions << :body
+        end
+
         @submission.limit_comments(@current_user, session)
+
         render :json => @submission.as_json(
           Submission.json_serialization_full_parameters(
             except: %i(quiz_submission submission_history)
-          ).merge(permissions: {
-            user: @current_user,
-            session: session,
-            include_permissions: false
+          ).merge({
+            except: submission_json_exclusions,
+            permissions: {
+              user: @current_user,
+              session: session,
+              include_permissions: false
+            }
           })
         )
       end
@@ -60,16 +89,25 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def update
+    permissions = { user: @current_user, session: session, include_permissions: false }
     provisional = @assignment.moderated_grading? && params[:submission][:provisional]
+    submission_json_exclusions = []
+
+    if @assignment.anonymous_peer_reviews && @submission.peer_reviewer?(@current_user)
+      submission_json_exclusions << :user_id
+    end
+
+    if @submission.submission_type == "online_quiz" &&
+        @submission.hide_grade_from_student? &&
+        !@assignment.grants_right?(@current_user, :grade)
+
+      submission_json_exclusions << :body
+    end
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
 
-      render json: @submission.as_json(permissions: {
-        user: @current_user,
-        session: session,
-        include_permissions: false
-      })
+      render json: @submission.as_json(except: submission_json_exclusions, permissions: permissions)
       return
     end
 
@@ -91,6 +129,7 @@ class SubmissionsBaseController < ApplicationController
       unless @submission.grants_right?(@current_user, session, :submit)
         @request = @submission.assessment_requests.where(assessor_id: @current_user).first if @current_user
         params[:submission] = {
+          :attempt => params[:submission][:attempt],
           :comment => params[:submission][:comment],
           :comment_attachments => params[:submission][:comment_attachments],
           :media_comment_id => params[:submission][:media_comment_id],
@@ -98,11 +137,12 @@ class SubmissionsBaseController < ApplicationController
           :commenter => @current_user,
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
-          :hidden => @assignment.muted? && admin_in_context,
+          :hidden => @submission.hide_grade_from_student? && admin_in_context,
           :provisional => provisional,
           :final => params[:submission][:final],
           :draft_comment => Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
+        params[:submission].delete(:attempt) unless @context.feature_enabled?(:assignments_2_student)
       end
       begin
         @submissions = @assignment.update_submission(@user, params[:submission].to_unsafe_h)
@@ -126,7 +166,7 @@ class SubmissionsBaseController < ApplicationController
 
           json_args = Submission.json_serialization_full_parameters({
             except: [:quiz_submission, :submission_history]
-          }).merge(permissions: { user: @current_user, session: session, include_permissions: false })
+          }).merge(except: submission_json_exclusions, permissions: permissions)
           json_args[:methods] << :provisional_grade_id if provisional
 
           submissions_json = @submissions.map do |submission|
@@ -157,6 +197,16 @@ class SubmissionsBaseController < ApplicationController
           format.text { render json: {errors: error_json}, status: error_status }
         end
       end
+    end
+  end
+
+  def redo_submission
+    if @assignment.can_reassign?(@current_user) &&
+        @submission.cached_due_date
+      @submission.update!(redo_request: true)
+      head :no_content
+    else
+      render_unauthorized_action
     end
   end
 
@@ -220,7 +270,7 @@ class SubmissionsBaseController < ApplicationController
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
       url = if type == 'originality_report'
-        @submission.originality_report_url(@asset_string, @current_user)
+        @submission.originality_report_url(@asset_string, @current_user, params[:attempt])
       else
         legacy_plagiarism_report(@submission, @asset_string, type)
       end

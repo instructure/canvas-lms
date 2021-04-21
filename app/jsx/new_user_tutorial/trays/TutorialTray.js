@@ -20,13 +20,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import plainStoreShape from '../../shared/proptypes/plainStoreShape'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Tray} from '@instructure/ui-tray'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
 import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
 
 class TutorialTray extends React.Component {
-
   static propTypes = {
     // Used as a label for the content (screenreader-only)
     label: PropTypes.string.isRequired,
@@ -38,44 +38,44 @@ class TutorialTray extends React.Component {
     returnFocusToFunc: PropTypes.func.isRequired
   }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     this.state = {
       ...props.store.getState(),
       endUserTutorialShown: false
-    };
+    }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.store.addChangeListener(this.handleStoreChange)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.store.removeChangeListener(this.handleStoreChange)
   }
 
   handleStoreChange = () => {
-    this.setState(this.props.store.getState());
+    this.setState(this.props.store.getState())
   }
 
   handleToggleClick = () => {
     this.props.store.setState({
       isCollapsed: !this.state.isCollapsed
-    });
+    })
   }
 
   handleEndTutorialClick = () => {
     this.setState({
       endUserTutorialShown: true
-    });
+    })
   }
 
   closeEndTutorialDialog = () => {
     this.setState({
       endUserTutorialShown: false
-    });
+    })
     if (this.endTutorialButton) {
-      this.endTutorialButton.focus();
+      this.endTutorialButton.focus()
     }
   }
 
@@ -84,10 +84,10 @@ class TutorialTray extends React.Component {
   }
 
   handleExiting = () => {
-    this.props.returnFocusToFunc().focus();
+    this.props.returnFocusToFunc().focus()
   }
 
-  render () {
+  render() {
     return (
       <Tray
         label={this.props.label}
@@ -97,31 +97,44 @@ class TutorialTray extends React.Component {
         onExiting={this.handleExiting}
         onEntered={this.handleEntering}
         shouldContainFocus
+        size="regular"
       >
-        <div className="NewUserTutorialTray">
-          <div className="NewUserTutorialTray__ButtonContainer">
+        <View as="div" className="NewUserTutorialTray" padding="medium none none">
+          <View position="absolute" insetInlineEnd="1rem" insetBlockStart="1rem" insetBlockEnd="0">
             <NewUserTutorialToggleButton
-              ref={(c) => { this.toggleButton = c; }}
+              ref={c => {
+                this.toggleButton = c
+              }}
               onClick={this.handleToggleClick}
               store={this.props.store}
             />
-          </div>
-          {this.props.children}
-          <div className="NewUserTutorialTray__EndTutorialContainer">
+          </View>
+          <View display="block" padding="none large">
+            {this.props.children}
+          </View>
+          <View
+            display="block"
+            textAlign="end"
+            background="secondary"
+            padding="small medium"
+            borderWidth="small none none"
+          >
             <Button
               onClick={this.handleEndTutorialClick}
-              ref={(c) => { this.endTutorialButton = c; }}
+              ref={c => {
+                this.endTutorialButton = c
+              }}
             >
-              {I18n.t('End Tutorial')}
+              {I18n.t(`Don't Show Again`)}
             </Button>
-          </div>
+          </View>
           <ConfirmEndTutorialDialog
             isOpen={this.state.endUserTutorialShown}
             handleRequestClose={this.closeEndTutorialDialog}
           />
-        </div>
+        </View>
       </Tray>
-    );
+    )
   }
 }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -66,12 +68,12 @@ module CC::Importer
       blti = nil unless doc.namespaces["xmlns:#{blti}"]
       link_css_path = "cartridge_basiclti_link"
       tool = {}
-      tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")
-      tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")
+      tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")&.strip
+      tool[:title] = get_node_val(doc, "#{link_css_path} > #{blti}|title")&.strip
       tool[:url] = get_node_val(doc, "#{link_css_path} > #{blti}|secure_launch_url")
       tool[:url] ||= get_node_val(doc, "#{link_css_path} > #{blti}|launch_url")
       tool[:url] &&= tool[:url].strip
-      if custom_node = doc.css("#{link_css_path} > #{blti}|custom").first
+      if (custom_node = doc.css("#{link_css_path} > #{blti}|custom").first)
         tool[:custom_fields] = get_custom_properties(custom_node)
       end
       tool[:custom_fields] ||= {}
@@ -97,9 +99,9 @@ module CC::Importer
           tool[:extensions] << ext
         end
       end
-      if icon = get_node_val(doc, "#{link_css_path} > #{blti}|icon")
+      if (icon = get_node_val(doc, "#{link_css_path} > #{blti}|icon"))
         tool[:settings] ||= {}
-        tool[:settings][:icon_url] = icon
+        tool[:settings][:icon_url] = icon.strip
       end
       tool
     end
@@ -136,28 +138,9 @@ module CC::Importer
       end
     end
 
-    def fetch(url, limit = 10)
-      # You should choose better exception.
-      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
-
-      uri = URI.parse(url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == 'https'
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-      request = Net::HTTP::Get.new(uri.request_uri)
-      response = http.request(request)
-
-      case response
-        when Net::HTTPRedirection then fetch(response['location'], limit - 1)
-        else
-          response
-      end
-    end
-
     def retrieve_and_convert_blti_url(url)
       begin
-        response = fetch(url)
+        response = CanvasHttp.get(url, redirect_limit: 10)
         config_xml = response.body
         convert_blti_xml(config_xml)
       rescue Timeout::Error

@@ -19,7 +19,7 @@
 import _ from 'lodash'
 
 import $ from 'jquery'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradingGradeSummary'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
@@ -32,13 +32,19 @@ let exampleGrades
 
 function createAssignmentGroups() {
   return [
-    {id: '301', assignments: [{id: '201', muted: false}, {id: '202', muted: true}]},
+    {
+      id: '301',
+      assignments: [
+        {id: '201', muted: false},
+        {id: '202', muted: true}
+      ]
+    },
     {id: '302', assignments: [{id: '203', muted: true}]}
   ]
 }
 
 function createSubmissions() {
-  return [{assignment_id: '201', score: 10}, {assignment_id: '203', score: 15}]
+  return [{assignment_id: '201', score: 10}]
 }
 
 function createExampleGrades() {
@@ -108,14 +114,14 @@ function setPageHtmlFixture() {
       </div>
       <span id="aria-announcer"></span>
       <table id="grades_summary" class="editable">
-        <tr class="student_assignment editable">
+        <tr class="student_assignment editable" data-muted="false">
           <td class="assignment_score" title="Click to test a different score">
             <div class="score_holder">
               <span class="tooltip">
-                <span class="tooltip_wrap">
-                  <span class="tooltip_text score_teaser">Click to test a different score</span>
-                </span>
                 <span class="grade">
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text score_teaser">Click to test a different score</span>
+                  </span>
                   <span class="screenreader-only">Click to test a different score</span>
                 </span>
                 <span class="score_value">A</span>
@@ -130,6 +136,46 @@ function setPageHtmlFixture() {
             </div>
           </td>
         </tr>
+        <tr class="student_assignment editable" data-muted="true">
+          <td class="assignment_score" title="Muted">
+            <div class="score_holder">
+              <span class="tooltip">
+                <span class="grade">
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text score_teaser">Instructor has not posted this grade</span>
+                  </span>
+                </span>
+                <span class="score_value"></span>
+              </span>
+              <span style="display: none;">
+                <span class="original_points"></span>
+                <span class="original_score"></span>
+                <span class="what_if_score"></span>
+                <span class="assignment_id">202</span>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr class="student_assignment editable" data-muted="true">
+          <td class="assignment_score" title="Muted">
+            <div class="score_holder">
+              <span class="tooltip">
+                <span class="grade">
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text score_teaser">Instructor has not posted this grade</span>
+                  </span>
+                </span>
+                <span class="score_value"></span>
+              </span>
+              <span style="display: none;">
+                <span class="original_points"></span>
+                <span class="original_score"></span>
+                <span class="what_if_score"></span>
+                <span class="assignment_id">203</span>
+              </span>
+            </div>
+          </td>
+        </tr>
       </table>
       <input type="text" id="grade_entry" style="display: none;" />
       <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
@@ -139,7 +185,7 @@ function setPageHtmlFixture() {
 }
 
 function commonSetup() {
-  fakeENV.setup()
+  fakeENV.setup({grade_calc_ignore_unposted_anonymous_enabled: true})
   $fixtures.html('')
 }
 
@@ -167,10 +213,13 @@ QUnit.module('GradeSummary.getGradingPeriodSet', {
   }
 })
 
-test('normalizes the grading period set from the env', function() {
+test('normalizes the grading period set from the env', () => {
   ENV.grading_period_set = {
     id: '1501',
-    grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+    grading_periods: [
+      {id: '701', weight: 50},
+      {id: '702', weight: 50}
+    ],
     weighted: true
   }
   const gradingPeriodSet = GradeSummary.getGradingPeriodSet()
@@ -179,7 +228,7 @@ test('normalizes the grading period set from the env', function() {
   deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702'])
 })
 
-test('returns null when the grading period set is not defined in the env', function() {
+test('returns null when the grading period set is not defined in the env', () => {
   ENV.grading_period_set = undefined
   const gradingPeriodSet = GradeSummary.getGradingPeriodSet()
   deepEqual(gradingPeriodSet, null)
@@ -196,89 +245,89 @@ QUnit.module('GradeSummary.getAssignmentId', {
   }
 })
 
-test('returns the assignment id for the given .student_assignment element', function() {
+test('returns the assignment id for the given .student_assignment element', () => {
   const $assignment = $fixtures.find('#grades_summary .student_assignment').first()
   strictEqual(GradeSummary.getAssignmentId($assignment), '201')
 })
 
 QUnit.module('GradeSummary.parseScoreText')
 
-test('sets "numericalValue" to the parsed value', function() {
+test('sets "numericalValue" to the parsed value', () => {
   const score = GradeSummary.parseScoreText('1,234')
   strictEqual(score.numericalValue, 1234)
 })
 
-test('sets "formattedValue" to the formatted value', function() {
+test('sets "formattedValue" to the formatted value', () => {
   const score = GradeSummary.parseScoreText('1234')
   strictEqual(score.formattedValue, '1,234')
 })
 
-test('sets "numericalValue" to null when given an empty string', function() {
+test('sets "numericalValue" to null when given an empty string', () => {
   const score = GradeSummary.parseScoreText('')
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "numericalValue" to null when given null', function() {
+test('sets "numericalValue" to null when given null', () => {
   const score = GradeSummary.parseScoreText(null)
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "numericalValue" to null when given undefined', function() {
+test('sets "numericalValue" to null when given undefined', () => {
   const score = GradeSummary.parseScoreText(undefined)
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "numericalValue" to the "numericalDefault" when "numericalDefault" is a number', function() {
+test('sets "numericalValue" to the "numericalDefault" when "numericalDefault" is a number', () => {
   const score = GradeSummary.parseScoreText(undefined, 5)
   strictEqual(score.numericalValue, 5)
 })
 
-test('sets "numericalValue" to null when "numericalDefault" is a string', function() {
+test('sets "numericalValue" to null when "numericalDefault" is a string', () => {
   const score = GradeSummary.parseScoreText(undefined, '5')
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "numericalValue" to null when "numericalDefault" is null', function() {
+test('sets "numericalValue" to null when "numericalDefault" is null', () => {
   const score = GradeSummary.parseScoreText(undefined, null)
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "numericalValue" to null when "numericalDefault" is undefined', function() {
+test('sets "numericalValue" to null when "numericalDefault" is undefined', () => {
   const score = GradeSummary.parseScoreText(undefined, undefined)
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "formattedValue" to "-" when given an empty string', function() {
+test('sets "formattedValue" to "-" when given an empty string', () => {
   const score = GradeSummary.parseScoreText('')
   strictEqual(score.formattedValue, '-')
 })
 
-test('sets "formattedValue" to "-" when given null', function() {
+test('sets "formattedValue" to "-" when given null', () => {
   const score = GradeSummary.parseScoreText(null)
   strictEqual(score.formattedValue, '-')
 })
 
-test('sets "formattedValue" to "-" when given undefined', function() {
+test('sets "formattedValue" to "-" when given undefined', () => {
   const score = GradeSummary.parseScoreText(undefined)
   strictEqual(score.formattedValue, '-')
 })
 
-test('sets "formattedValue" to the "formattedDefault" when "formattedDefault" is a string', function() {
+test('sets "formattedValue" to the "formattedDefault" when "formattedDefault" is a string', () => {
   const score = GradeSummary.parseScoreText(undefined, null, 'default')
   strictEqual(score.formattedValue, 'default')
 })
 
-test('sets "formattedValue" to "-" when "formattedDefault" is a number', function() {
+test('sets "formattedValue" to "-" when "formattedDefault" is a number', () => {
   const score = GradeSummary.parseScoreText(undefined, null, 5)
   strictEqual(score.formattedValue, '-')
 })
 
-test('sets "formattedValue" to "-" when "formattedDefault" is null', function() {
+test('sets "formattedValue" to "-" when "formattedDefault" is null', () => {
   const score = GradeSummary.parseScoreText(undefined, null, null)
   strictEqual(score.formattedValue, '-')
 })
 
-test('sets "formattedValue" to "-" when "formattedDefault" is undefined', function() {
+test('sets "formattedValue" to "-" when "formattedDefault" is undefined', () => {
   const score = GradeSummary.parseScoreText(undefined, null, undefined)
   strictEqual(score.formattedValue, '-')
 })
@@ -312,7 +361,7 @@ test('sets "formattedValue" to formatted grade', function() {
   equal(score.formattedValue, 'C+ (78.5)')
 })
 
-QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
+QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
   suiteHooks.beforeEach(() => {
     commonSetup()
     ENV.assignment_groups = createAssignmentGroups()
@@ -324,7 +373,7 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
     commonTeardown()
   })
 
-  test('displays a screenreader-only alert when grades have been changed', function() {
+  test('displays a screenreader-only alert when grades have been changed', () => {
     $fixtures.find('.assignment_score .grade').addClass('changed')
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
     equal($.screenReaderFlashMessageExclusive.callCount, 1)
@@ -332,23 +381,29 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
     ok(messageText.includes('the new total is now'), 'flash message mentions new total')
   })
 
-  test('does not display a screenreader-only alert when grades have not been changed', function() {
+  test('does not display a screenreader-only alert when grades have not been changed', () => {
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
     equal($.screenReaderFlashMessageExclusive.callCount, 0)
   })
 
-  test('localizes displayed grade', function() {
+  test('localizes displayed grade', () => {
     sandbox.stub(I18n, 'n').returns('1,234')
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
     const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser')
     ok($teaser.text().includes('1,234'), 'includes internationalized score')
   })
 
-  QUnit.module('final grade override', (contextHooks) => {
+  QUnit.module('final grade override', contextHooks => {
     contextHooks.beforeEach(() => {
       exampleGrades = createExampleGrades()
       exampleGrades.current = {score: 23, possible: 100}
-      ENV.grading_scheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0]]
+      ENV.grading_scheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0]
+      ]
     })
 
     test('sets the letter grade to the effective grade', () => {
@@ -418,7 +473,6 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
   })
 })
 
-
 QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
   setup() {
     this.subtotals = createSubtotalsByGradingPeriod()
@@ -487,33 +541,33 @@ test('calculates row element ids for subtotals by assignment group', function() 
 
 QUnit.module('GradeSummary.canBeConvertedToGrade')
 
-test('returns false when possible is nonpositive', function() {
+test('returns false when possible is nonpositive', () => {
   notOk(GradeSummary.canBeConvertedToGrade(1, 0))
 })
 
-test('returns false when score is NaN', function() {
+test('returns false when score is NaN', () => {
   notOk(GradeSummary.canBeConvertedToGrade(NaN, 1))
 })
 
-test('returns true when score is a number and possible is positive', function() {
+test('returns true when score is a number and possible is positive', () => {
   ok(GradeSummary.canBeConvertedToGrade(1, 1))
 })
 
 QUnit.module('GradeSummary.calculatePercentGrade')
 
-test('returns properly computed and rounded value', function() {
+test('returns properly computed and rounded value', () => {
   const percentGrade = GradeSummary.calculatePercentGrade(1, 3)
   strictEqual(percentGrade, 33.33)
 })
 
-test('avoids floating point calculation issues', function() {
+test('avoids floating point calculation issues', () => {
   const percentGrade = GradeSummary.calculatePercentGrade(946.65, 1000)
   strictEqual(percentGrade, 94.67)
 })
 
 QUnit.module('GradeSummary.formatPercentGrade')
 
-test('returns an internationalized number value', function() {
+test('returns an internationalized number value', () => {
   sandbox
     .stub(I18n, 'n')
     .withArgs(1234)
@@ -523,17 +577,17 @@ test('returns an internationalized number value', function() {
 
 QUnit.module('GradeSummary.calculateGrade')
 
-test('returns an internationalized percentage when given a score and nonzero points possible', function() {
+test('returns an internationalized percentage when given a score and nonzero points possible', () => {
   sandbox.stub(I18n, 'n').callsFake(number => `${number}%`)
   equal(GradeSummary.calculateGrade(97, 100), '97%')
   equal(I18n.n.getCall(0).args[1].percentage, true)
 })
 
-test('returns "N/A" when given a numerical score and zero points possible', function() {
+test('returns "N/A" when given a numerical score and zero points possible', () => {
   equal(GradeSummary.calculateGrade(1, 0), 'N/A')
 })
 
-test('returns "N/A" when given a non-numerical score and nonzero points possible', function() {
+test('returns "N/A" when given a non-numerical score and nonzero points possible', () => {
   equal(GradeSummary.calculateGrade(undefined, 1), 'N/A')
 })
 
@@ -545,7 +599,10 @@ QUnit.module('GradeSummary.calculateGrades', {
     ENV.group_weighting_scheme = 'points'
     ENV.grading_period_set = {
       id: '1501',
-      grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+      grading_periods: [
+        {id: '701', weight: 50},
+        {id: '702', weight: 50}
+      ],
       weighted: true
     }
     ENV.effective_due_dates = {201: {101: {grading_period_id: '701'}}}
@@ -559,7 +616,7 @@ QUnit.module('GradeSummary.calculateGrades', {
   }
 })
 
-test('calculates grades using data in the env', function() {
+test('calculates grades using data in the env', () => {
   GradeSummary.calculateGrades()
   const args = CourseGradeCalculator.calculate.getCall(0).args
   equal(args[0], ENV.submissions)
@@ -567,49 +624,49 @@ test('calculates grades using data in the env', function() {
   equal(args[2], ENV.group_weighting_scheme)
 })
 
-test('normalizes the grading period set before calculation', function() {
+test('normalizes the grading period set before calculation', () => {
   GradeSummary.calculateGrades()
-  const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[3]
+  const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[4]
   deepEqual(gradingPeriodSet.id, '1501')
   equal(gradingPeriodSet.gradingPeriods.length, 2)
   deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702'])
 })
 
-test('scopes effective due dates to the user', function() {
+test('scopes effective due dates to the user', () => {
   GradeSummary.calculateGrades()
-  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
+  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[5]
   deepEqual(dueDates, {201: {grading_period_id: '701'}})
 })
 
-test('calculates grades without grading period data when the grading period set is not defined', function() {
+test('calculates grades without grading period data when the grading period set is not defined', () => {
   delete ENV.grading_period_set
   GradeSummary.calculateGrades()
   const args = CourseGradeCalculator.calculate.getCall(0).args
   equal(args[0], ENV.submissions)
   equal(args[1], ENV.assignment_groups)
   equal(args[2], ENV.group_weighting_scheme)
-  equal(typeof args[3], 'undefined')
   equal(typeof args[4], 'undefined')
+  equal(typeof args[5], 'undefined')
 })
 
-test('calculates grades without grading period data when effective due dates are not defined', function() {
+test('calculates grades without grading period data when effective due dates are not defined', () => {
   delete ENV.effective_due_dates
   GradeSummary.calculateGrades()
   const args = CourseGradeCalculator.calculate.getCall(0).args
   equal(args[0], ENV.submissions)
   equal(args[1], ENV.assignment_groups)
   equal(args[2], ENV.group_weighting_scheme)
-  equal(typeof args[3], 'undefined')
   equal(typeof args[4], 'undefined')
+  equal(typeof args[5], 'undefined')
 })
 
-test('returns course grades when no grading period id is provided', function() {
+test('returns course grades when no grading period id is provided', () => {
   sandbox.stub(GradeSummary, 'getSelectedGradingPeriodId').returns(null)
   const grades = GradeSummary.calculateGrades()
   equal(grades, exampleGrades)
 })
 
-test('scopes grades to the provided grading period id', function() {
+test('scopes grades to the provided grading period id', () => {
   sandbox.stub(GradeSummary, 'getSelectedGradingPeriodId').returns('701')
   const grades = GradeSummary.calculateGrades()
   equal(grades, exampleGrades.gradingPeriods[701])
@@ -794,23 +851,23 @@ QUnit.module('Grade Summary "Show All Details" button', {
   }
 })
 
-test('announces "assignment details expanded" when clicked', function() {
+test('announces "assignment details expanded" when clicked', () => {
   $('#show_all_details_button').click()
   equal($('#aria-announcer').text(), 'assignment details expanded')
 })
 
-test('changes text to "Hide All Details" when clicked', function() {
+test('changes text to "Hide All Details" when clicked', () => {
   $('#show_all_details_button').click()
   equal($('#show_all_details_button').text(), 'Hide All Details')
 })
 
-test('announces "assignment details collapsed" when clicked and already expanded', function() {
+test('announces "assignment details collapsed" when clicked and already expanded', () => {
   $('#show_all_details_button').click()
   $('#show_all_details_button').click()
   equal($('#aria-announcer').text(), 'assignment details collapsed')
 })
 
-test('changes text to "Show All Details" when clicked twice', function() {
+test('changes text to "Show All Details" when clicked twice', () => {
   $('#show_all_details_button').click()
   $('#show_all_details_button').click()
   equal($('#show_all_details_button').text(), 'Show All Details')
@@ -1059,13 +1116,15 @@ test('adds the "changed" class to the .grade element', function() {
 
 test('sets the .grade element content to the updated score', function() {
   this.onScoreChange('5')
-  equal(this.$assignment.find('.grade').html(), '5')
+  const gradeText = this.$assignment.find('.grade').text()
+  ok(gradeText.includes('5'))
 })
 
 test('sets the .grade element content to the previous score when the updated score is falsy', function() {
   this.$assignment.find('.grade').data('originalValue', '10.0')
   this.onScoreChange('')
-  equal(this.$assignment.find('.grade').html(), '10')
+  const gradeText = this.$assignment.find('.grade').text()
+  ok(gradeText.includes('10'))
 })
 
 test('updates the score for the given assignment', function() {
@@ -1077,17 +1136,17 @@ test('updates the score for the given assignment', function() {
   equal(score, 5, 'the parsed score is used to update the assignment score')
 })
 
-QUnit.module('GradeSummary - Revert Score', {
-  setup() {
-    fullPageSetup()
-    this.$assignment = $fixtures.find('#grades_summary .student_assignment').first()
-    const $assignmentScore = this.$assignment.find('.assignment_score')
+QUnit.module('GradeSummary - Revert Score', hooks => {
+  let $assignment
+
+  function simulateWhatIfUse($assignmentToEdit) {
+    const $assignmentScore = $assignmentToEdit.find('.assignment_score')
+    const $grade = $assignmentToEdit.find('.grade')
     // reproduce the What-If setup from .onEditWhatIfScore
     const $screenreaderLinkClone = $assignmentScore.find('.screenreader-only').clone(true)
     $assignmentScore.find('.grade').data('screenreader_link', $screenreaderLinkClone)
     // reproduce the What-If setup from .onScoreChange
     const $scoreTeaser = $assignmentScore.find('.score_teaser')
-    const $grade = this.$assignment.find('.grade')
     $assignmentScore.attr('title', '')
     $scoreTeaser.text('This is a What-If score')
     const $revertScore = $('#revert_score_template')
@@ -1096,105 +1155,128 @@ QUnit.module('GradeSummary - Revert Score', {
       .show()
     $assignmentScore.find('.score_holder').append($revertScore)
     $grade.addClass('changed')
-    this.$assignment.find('.original_score').text('5')
-  },
-
-  onScoreRevert() {
-    GradeSummary.onScoreRevert(this.$assignment, {refocus: false, skipEval: false})
-  },
-
-  teardown() {
-    commonTeardown()
+    $assignment.find('.original_score').text('5')
   }
-})
 
-test('sets the .what_if_score text to the .original_score text', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.what_if_score').text(), '5')
-})
+  hooks.beforeEach(() => {
+    fullPageSetup()
+    $assignment = $fixtures.find('#grades_summary .student_assignment').first()
+    simulateWhatIfUse($assignment)
+  })
 
-test('sets the .assignment_score title to the "Click to test" message', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.assignment_score').attr('title'), 'Click to test a different score')
-})
+  hooks.afterEach(() => {
+    commonTeardown()
+  })
 
-test('sets the .score_teaser text to the "Click to test" message when the assignment is not muted', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.score_teaser').text(), 'Click to test a different score')
-})
+  test('sets the .what_if_score text to the .original_score text', () => {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.what_if_score').text(), '5')
+  })
 
-test('sets the .score_teaser text to the "Instructor is working" message when the assignment is muted', function() {
-  this.$assignment.data('muted', true)
-  this.onScoreRevert()
-  equal(this.$assignment.find('.score_teaser').text(), 'Instructor is working on grades')
-})
+  test('sets the .assignment_score title to the "Click to test" message', () => {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.assignment_score').attr('title'), 'Click to test a different score')
+  })
 
-test('removes the "changed" class from the .grade element', function() {
-  this.onScoreRevert()
-  notOk(
-    this.$assignment.find('.assignment_score .grade').hasClass('changed'),
-    'changed class is not present'
-  )
-})
+  test('sets the .score_teaser text to the "Click to test" message when the assignment is not muted', () => {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_teaser').text(), 'Click to test a different score')
+  })
 
-test('removes the .revert_score_link element', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.revert_score_link').length, 0)
-})
+  test('sets the .score_teaser text to the "Instructor has not posted" message when the assignment is muted', () => {
+    $assignment.data('muted', true)
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_teaser').text(), 'Instructor has not posted this grade')
+  })
 
-test('sets the .score_value text to the .original_score text', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.score_value').text(), '5')
-})
+  test('removes the .revert_score_link element', () => {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.revert_score_link').length, 0)
+  })
 
-test('sets the .grade html to the "muted assignment" indicator when the assignment is muted', function() {
-  this.$assignment.data('muted', true)
-  this.onScoreRevert()
-  equal(this.$assignment.find('.grade .muted_icon').length, 1)
-})
+  test('sets the .score_value text to the .original_score text', () => {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_value').text(), '5')
+  })
 
-test('sets the .grade text to .original_score when the assignment is not muted', function() {
-  this.onScoreRevert()
-  const $grade = this.$assignment.find('.grade')
-  $grade.children().remove() // remove all content except score text
-  equal($grade.text(), '5')
-})
+  test('sets the .score value text to "-" when the submission was ungraded', () => {
+    $assignment.find('.original_points').text('')
+    $assignment.find('.original_score').text('')
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_value').text(), '-')
+  })
 
-test('updates the score for the assignment', function() {
-  sandbox.stub(GradeSummary, 'updateScoreForAssignment')
-  this.onScoreRevert()
-  equal(GradeSummary.updateScoreForAssignment.callCount, 1)
-  const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args
-  equal(assignmentId, '201', 'first argument is the assignment id 201')
-  strictEqual(score, 10, 'second argument is the numerical score 10')
-})
+  test('sets the .grade html to the "icon-off" indicator when the assignment is muted', () => {
+    $assignment.data('muted', true)
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.grade .icon-off').length, 1)
+  })
 
-test('updates the score for the assignment with null when the .original_points is blank', function() {
-  this.$assignment.find('.original_points').text('')
-  sandbox.stub(GradeSummary, 'updateScoreForAssignment')
-  this.onScoreRevert()
-  const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1]
-  strictEqual(score, null)
-})
+  test('removes the "changed" class from the .grade element', () => {
+    GradeSummary.onScoreRevert($assignment)
+    notOk($assignment.find('.assignment_score .grade').hasClass('changed'))
+  })
 
-test('updates the student grades after updating the assignment score', function() {
-  sandbox.stub(GradeSummary, 'updateScoreForAssignment')
-  sandbox.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
+  test('sets the .grade text to .original_score when the assignment is not muted', () => {
+    GradeSummary.onScoreRevert($assignment)
+    const $grade = $assignment.find('.grade')
+    $grade.children().remove() // remove all content except score text
+    equal($grade.text(), '5')
+  })
+
+  test('updates the score for the assignment', () => {
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment')
+    GradeSummary.onScoreRevert($assignment)
+    equal(GradeSummary.updateScoreForAssignment.callCount, 1)
+    const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args
+    equal(assignmentId, '201', 'first argument is the assignment id 201')
+    strictEqual(score, 10, 'second argument is the numerical score 10')
+  })
+
+  test('updates the score for the assignment with null when the .original_points is blank', () => {
+    $assignment.find('.original_points').text('')
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment')
+    GradeSummary.onScoreRevert($assignment)
+    const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1]
+    strictEqual(score, null)
+  })
+
+  test('updates the student grades after updating the assignment score', () => {
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment')
+    sandbox.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
+      equal(
+        GradeSummary.updateScoreForAssignment.callCount,
+        1,
+        'updateScoreForAssignment is performed first'
+      )
+    })
+    GradeSummary.onScoreRevert($assignment)
+    equal(GradeSummary.updateStudentGrades.callCount, 1, 'updateStudentGrades is called once')
+  })
+
+  test('attaches a "Click to test" .screenreader-only element to the grade element', () => {
+    const $grade = $fixtures.find('.assignment_score .grade').first()
+    GradeSummary.onScoreRevert($assignment)
+    equal($grade.find('.screenreader-only').length, 1)
+    equal($grade.find('.screenreader-only').text(), 'Click to test a different score')
+  })
+
+  test('sets the title attribute', () => {
+    const $unpostedAssignment = $fixtures.find('#grades_summary .student_assignment').eq(1)
+    simulateWhatIfUse($unpostedAssignment)
+    GradeSummary.onScoreRevert($unpostedAssignment)
     equal(
-      GradeSummary.updateScoreForAssignment.callCount,
-      1,
-      'updateScoreForAssignment is performed first'
+      $unpostedAssignment.find('.assignment_score').attr('title'),
+      'Instructor has not posted this grade'
     )
   })
-  this.onScoreRevert()
-  equal(GradeSummary.updateStudentGrades.callCount, 1, 'updateStudentGrades is called once')
-})
 
-test('attaches a "Click to test" .screenreader-only element to the grade element', function() {
-  const $grade = $fixtures.find('.assignment_score .grade').first()
-  this.onScoreRevert()
-  equal($grade.find('.screenreader-only').length, 1)
-  equal($grade.find('.screenreader-only').text(), 'Click to test a different score')
+  test('sets the unposted icon to icon-off when submission is unposted', () => {
+    const $unpostedAssignment = $fixtures.find('#grades_summary .student_assignment').eq(1)
+    simulateWhatIfUse($unpostedAssignment)
+    GradeSummary.onScoreRevert($unpostedAssignment)
+    strictEqual($unpostedAssignment.find('i.icon-off').length, 1)
+  })
 })
 
 QUnit.module('GradeSummary.updateScoreForAssignment', {
@@ -1208,21 +1290,21 @@ QUnit.module('GradeSummary.updateScoreForAssignment', {
   }
 })
 
-test('updates the score for an existing submission', function() {
+test('updates the score for an existing submission', () => {
   GradeSummary.updateScoreForAssignment('203', 20)
   equal(ENV.submissions[1].score, 20, 'the second submission is for assignment 203')
 })
 
-test('ignores submissions not having the given assignment id', function() {
+test('ignores submissions not having the given assignment id', () => {
   GradeSummary.updateScoreForAssignment('203', 20)
   equal(ENV.submissions[0].score, 10, 'the first submission is for assignment 201')
 })
 
-test('adds a submission with the score when no submission matches the given assignment id', function() {
-  GradeSummary.updateScoreForAssignment('205', 30)
-  equal(ENV.submissions.length, 3, 'submission count has changed from 2 to 3')
-  deepEqual(_.map(ENV.submissions, 'assignment_id'), ['201', '203', '205'])
-  deepEqual(_.map(ENV.submissions, 'score'), [10, 15, 30])
+test('adds a submission with the score when no submission matches the given assignment id', () => {
+  GradeSummary.updateScoreForAssignment('203', 30)
+  equal(ENV.submissions.length, 2, 'submission count has changed from 1 to 2')
+  deepEqual(_.map(ENV.submissions, 'assignment_id'), ['201', '203'])
+  deepEqual(_.map(ENV.submissions, 'score'), [10, 30])
 })
 
 QUnit.module('GradeSummary.finalGradePointsPossibleText', {
@@ -1235,20 +1317,23 @@ QUnit.module('GradeSummary.finalGradePointsPossibleText', {
   }
 })
 
-test('returns an empty string if assignment groups are weighted', function() {
+test('returns an empty string if assignment groups are weighted', () => {
   const text = GradeSummary.finalGradePointsPossibleText('percent', '50.00 / 100.00')
   strictEqual(text, '')
 })
 
-test('returns the score with points possible if assignment groups are not weighted', function() {
+test('returns the score with points possible if assignment groups are not weighted', () => {
   const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
   strictEqual(text, '50.00 / 100.00')
 })
 
-test('returns an empty string if grading periods are weighted and "All Grading Periods" is selected', function() {
+test('returns an empty string if grading periods are weighted and "All Grading Periods" is selected', () => {
   ENV.grading_period_set = {
     id: '1501',
-    grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+    grading_periods: [
+      {id: '701', weight: 50},
+      {id: '702', weight: 50}
+    ],
     weighted: true
   }
   ENV.current_grading_period_id = '0'
@@ -1256,10 +1341,13 @@ test('returns an empty string if grading periods are weighted and "All Grading P
   strictEqual(text, '')
 })
 
-test('returns the score with points possible if grading periods are weighted and a period is selected', function() {
+test('returns the score with points possible if grading periods are weighted and a period is selected', () => {
   ENV.grading_period_set = {
     id: '1501',
-    grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+    grading_periods: [
+      {id: '701', weight: 50},
+      {id: '702', weight: 50}
+    ],
     weighted: true
   }
   ENV.current_grading_period_id = '701'
@@ -1267,10 +1355,13 @@ test('returns the score with points possible if grading periods are weighted and
   strictEqual(text, '50.00 / 100.00')
 })
 
-test('returns the score with points possible if grading periods are not weighted', function() {
+test('returns the score with points possible if grading periods are not weighted', () => {
   ENV.grading_period_set = {
     id: '1501',
-    grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+    grading_periods: [
+      {id: '701', weight: 50},
+      {id: '702', weight: 50}
+    ],
     weighted: false
   }
 
@@ -1441,7 +1532,10 @@ QUnit.module('GradeSummary', () => {
     })
 
     test('sets students to the students environment variable', () => {
-      ENV.students = [{id: 42, name: 'Abel'}, {id: 43, name: 'Baker'}]
+      ENV.students = [
+        {id: 42, name: 'Abel'},
+        {id: 43, name: 'Baker'}
+      ]
 
       deepEqual(GradeSummary.getSelectMenuGroupProps().students, ENV.students)
     })

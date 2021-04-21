@@ -16,33 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { isPassedDelayedPostAt } from 'jsx/shared/date-utils'
+import {isPassedDelayedPostAt} from 'jsx/shared/date-utils'
 import moment from 'moment'
 
 QUnit.module('Util helpers for shared dates')
 
 test('isPassedDelayedPostAt correctly identifies date that is before as false', () => {
-  const checkDate = "2015-12-1"
-  const delayedDate = "2015-12-14"
-  const check = isPassedDelayedPostAt({ checkDate, delayedDate })
+  const checkDate = '2015-12-1'
+  const delayedDate = '2015-12-14'
+  const check = isPassedDelayedPostAt({checkDate, delayedDate})
   notOk(check)
 })
 
 test('isPassedDelayedPostAt correctly identifies date that is after as true', () => {
-  const checkDate = "2015-12-17"
-  const delayedDate = "2015-12-14"
-  const check = isPassedDelayedPostAt({ checkDate, delayedDate })
+  const checkDate = '2015-12-17'
+  const delayedDate = '2015-12-14'
+  const check = isPassedDelayedPostAt({checkDate, delayedDate})
   ok(check)
 })
 
 test('isPassedDelayedPostAt correctly identifies date that is before as false when using browser date', () => {
-  const delayedDate = moment().add(2, 'days');
-  const check = isPassedDelayedPostAt({ delayedDate })
+  const delayedDate = moment().add(2, 'days')
+  const check = isPassedDelayedPostAt({delayedDate})
   notOk(check)
 })
 
 test('isPassedDelayedPostAt correctly identifies date that is after as true when using browser date', () => {
-  const delayedDate = moment().subtract(2, 'days');
-  const check = isPassedDelayedPostAt({  delayedDate })
+  const delayedDate = moment().subtract(2, 'days')
+  const check = isPassedDelayedPostAt({delayedDate})
   ok(check)
 })

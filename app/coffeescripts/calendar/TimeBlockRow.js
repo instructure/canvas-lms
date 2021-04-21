@@ -21,7 +21,7 @@ import I18n from 'i18n!calendar'
 import timeBlockRowTemplate from 'jst/calendar/TimeBlockRow'
 import fcUtil from '../util/fcUtil'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
-import '../calendar/fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
+import './fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 
 export default class TimeBlockRow {
   constructor(TimeBlockList, data) {
@@ -45,7 +45,7 @@ export default class TimeBlockRow {
     this.$end_time = this.$row.find("input[name='end_time']")
 
     const $date_field = this.$date.date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))}
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
     })
     $date_field.change(this.validate)
     this.$start_time.time_field().change(this.validate)
@@ -151,10 +151,15 @@ export default class TimeBlockRow {
   }
 
   blank() {
-    return (this.$date.data('blank') && this.$start_time.data('blank') && this.$end_time.data('blank'))
+    return (
+      this.$date.data('blank') && this.$start_time.data('blank') && this.$end_time.data('blank')
+    )
   }
 
   incomplete() {
-    return (!this.blank() && (this.$date.data('blank') || this.$start_time.data('blank') || this.$end_time.data('blank')))
+    return (
+      !this.blank() &&
+      (this.$date.data('blank') || this.$start_time.data('blank') || this.$end_time.data('blank'))
+    )
   }
 }

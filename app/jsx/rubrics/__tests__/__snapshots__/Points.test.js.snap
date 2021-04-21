@@ -8,48 +8,54 @@ exports[`The Points component renders the component when assessing with the expe
     alignItems="end"
     as="span"
     direction="row"
-    inline={false}
+    display="flex"
+    elementRef={[Function]}
     justifyItems="start"
-    visualDebug={false}
+    withVisualDebug={false}
+    wrap="no-wrap"
     wrapItems={true}
   >
-    <FlexItem
+    <Item
       as="span"
-      grow={false}
+      elementRef={[Function]}
       margin="none small none none"
-      shrink={false}
+      shouldGrow={false}
+      shouldShrink={false}
       size="4rem"
     >
       <TextInput
-        disabled={false}
-        inline={true}
+        display="inline-block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
-        label={
+        isRequired={false}
+        messages={Array []}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
           <ScreenReaderContent
             as="span"
           >
             Points
           </ScreenReaderContent>
         }
-        layout="stacked"
-        messages={Array []}
-        onChange={[Function]}
-        readOnly={false}
+        shouldNotWrap={false}
         size="medium"
         textAlign="start"
         type="text"
         value="1"
         width="4rem"
       />
-    </FlexItem>
-    <FlexItem
+    </Item>
+    <Item
       as="span"
-      grow={false}
+      elementRef={[Function]}
       margin="small none none none"
-      shrink={false}
+      shouldGrow={false}
+      shouldShrink={false}
     >
       / 2 pts
-    </FlexItem>
+    </Item>
   </Flex>
 </div>
 `;

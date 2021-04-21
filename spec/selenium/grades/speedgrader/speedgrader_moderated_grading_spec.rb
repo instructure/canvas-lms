@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -50,8 +52,8 @@ describe "speed grader" do
       f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
       f("textarea[data-selenium='criterion_comments_text']").send_keys(comment)
       wait_for_ajaximations
-      f('.criterion_points input').send_keys(score.to_s)
-      f('.criterion_points input').send_keys(:tab)
+      f('td[data-testid="criterion-points"] input').send_keys(score.to_s)
+      f('td[data-testid="criterion-points"] input').send_keys(:tab)
       wait_for_ajaximations
       scroll_to(f('.save_rubric_button'))
       save_rubric_button = f('#rubric_full .save_rubric_button')

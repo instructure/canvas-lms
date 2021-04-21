@@ -17,42 +17,40 @@
  */
 import I18n from 'i18n!generic_error_page'
 import React from 'react'
-import {TextArea, TextInput} from '@instructure/ui-forms'
-import Container from '@instructure/ui-core/lib/components/Container'
+import {TextArea} from '@instructure/ui-text-area'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 
-function ErrorTextInputForm(props) {
+export default function ErrorTextInputForm(props) {
   return (
-    <Container>
+    <View margin="small">
       <TextArea
-        margin="small"
         onChange={props.handleChangeCommentBox}
         label={I18n.t('What happened?')}
+        value={props.textAreaComment}
       />
-      <Container margin="small" data-test-id="generic-error-comment-box-email">
+      <View margin="small">
         <TextInput
-          display="block"
           onChange={props.handleChangeOptionalEmail}
-          label={I18n.t('Email Address (Optional)')}
+          renderLabel={I18n.t('Email Address (Optional)')}
+          value={props.optionalEmail}
         />
-      </Container>
-      <Button
-        data-test-id="generic-error-comment-box-submit-button"
-        margin="small"
-        variant="primary"
-        onClick={props.handleSubmitErrorReport}
-      >
-        {I18n.t('Submit')}
-      </Button>
-    </Container>
+      </View>
+      <View textAlign="end" display="block">
+        <Button margin="small 0" variant="primary" onClick={props.handleSubmitErrorReport}>
+          {I18n.t('Submit')}
+        </Button>
+      </View>
+    </View>
   )
 }
 
 ErrorTextInputForm.propTypes = {
+  textAreaComment: string.isRequired,
+  optionalEmail: string.isRequired,
   handleChangeCommentBox: func.isRequired,
   handleSubmitErrorReport: func.isRequired,
   handleChangeOptionalEmail: func.isRequired
 }
-
-export default React.memo(ErrorTextInputForm)

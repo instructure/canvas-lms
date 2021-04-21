@@ -18,19 +18,28 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
+import I18n from 'i18n!paginator'
+import {Pagination} from '@instructure/ui-pagination'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const Paginator = ({loadPage, page, pageCount}) => {
+const Paginator = ({loadPage, page, pageCount, ...paginationProps}) => {
   if (pageCount <= 1) {
     return <span />
   }
 
   return (
-    <Pagination variant="compact">
+    <Pagination
+      variant="compact"
+      labelNext={I18n.t('Next Page')}
+      labelPrev={I18n.t('Previous Page')}
+      {...paginationProps}
+    >
       {Array.from(Array(pageCount)).map((v, i) => (
-        <PaginationButton onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
-          {i + 1}
-        </PaginationButton>
+        // eslint-disable-next-line react/no-array-index-key
+        <Pagination.Page onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
+          <PresentationContent>{i + 1}</PresentationContent>
+          <ScreenReaderContent>{I18n.t('Page %{page}', {page: i + 1})}</ScreenReaderContent>
+        </Pagination.Page>
       ))}
     </Pagination>
   )

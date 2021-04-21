@@ -21,52 +21,61 @@ import $ from 'jquery'
 import htmlEscape from './str/htmlEscape'
 import signupDialog from 'compiled/registration/signupDialog'
 import './jquery.fancyplaceholder' /* fancyPlaceholder */
-import './jquery.google-analytics' /* trackPage, trackPageview */
 import './jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import './jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
 
-  $("#coenrollment_link").click(function(event) {
-    event.preventDefault();
-    var template = $(this).data('template');
-    var path = $(this).data('path');
-    signupDialog(template, I18n.t("parent_signup", "Parent Signup"), path);
-  });
-  $("#register_link").click(function(){
-    $.trackPageview("/clicked_register_on_login_form");
-  });
+$('#coenrollment_link').click(function(event) {
+  event.preventDefault()
+  const template = $(this).data('template')
+  const path = $(this).data('path')
+  signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
+})
 
-  $(".field-with-fancyplaceholder input").fancyPlaceholder();
-  $("#forgot_password_form").formSubmit({
-    object_name: 'pseudonym_session',
-    required: ['unique_id_forgot'],
-    beforeSubmit: function(data) {
-      $(this).loadingImage();
-    },
-    success: function(data) {
-      $(this).loadingImage('remove');
-      $.flashMessage(htmlEscape(I18n.t("password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", {email_address: $(this).find(".email_address").val()})));
-      $(".login_link:first").click();
-    },
-    error: function(data) {
-      $(this).loadingImage('remove');
-    }
-  });
+$('.field-with-fancyplaceholder input').fancyPlaceholder()
+$('#forgot_password_form').formSubmit({
+  object_name: 'pseudonym_session',
+  required: ['unique_id_forgot'],
+  beforeSubmit(_data) {
+    $(this).loadingImage()
+  },
+  success(_data) {
+    $(this).loadingImage('remove')
+    $.flashMessage(
+      htmlEscape(
+        I18n.t(
+          'Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box.',
+          {
+            wrappers: ['<b>$1</b>'],
+            email_address: $(this)
+              .find('.email_address')
+              .val()
+          }
+        )
+      ),
+      15 * 60 * 1000 // fifteen minutes isn't forever but should be plenty
+    )
+    // Focus on the close button of the alert we just put up, per a11y
+    $('ul#flash_message_holder button.close_link').focus()
+  },
+  error(_data) {
+    $(this).loadingImage('remove')
+  }
+})
 
-  $("#login_form")
-    .submit(function(event) {
-      var data = $(this).getFormData({object_name: 'pseudonym_session'});
-      var success = true;
-      if(!data.unique_id || data.unique_id.length < 1) {
-        $(this).formErrors({
-          unique_id: I18n.t("invalid_login", 'Invalid login')
-        });
-        success = false;
-      } else if(!data.password || data.password.length < 1) {
-        $(this).formErrors({
-          password: I18n.t("invalid_password", 'Invalid password')
-        });
-        success = false;
-      }
-      return success;
-    });
+$('#login_form').submit(function(_event) {
+  const data = $(this).getFormData({object_name: 'pseudonym_session'})
+  let success = true
+  if (!data.unique_id || data.unique_id.length < 1) {
+    $(this).formErrors({
+      unique_id: I18n.t('invalid_login', 'Invalid login')
+    })
+    success = false
+  } else if (!data.password || data.password.length < 1) {
+    $(this).formErrors({
+      password: I18n.t('invalid_password', 'Invalid password')
+    })
+    success = false
+  }
+  return success
+})

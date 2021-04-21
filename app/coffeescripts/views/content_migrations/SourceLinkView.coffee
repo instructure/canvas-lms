@@ -15,15 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/SourceLink'
-], (Backbone, template) ->
-  class SourceLinkView extends Backbone.View
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/SourceLink'
 
-    toJSON: ->
-      json = super
-      json.attachment = @model.get('attachment')
-      json.settings = @model.get('settings')
-      json
+export default class SourceLinkView extends Backbone.View
+  template: template
+
+  toJSON: ->
+    json = super
+    json.attachment = @model.get('attachment')
+    json.settings = @model.get('settings')
+    json

@@ -115,9 +115,9 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
     })
 
     QUnit.module('when requesting the assessment audit trail', contextHooks => {
-      contextHooks.beforeEach(async () => {
+      contextHooks.beforeEach(() => {
         tray.show(context)
-        await onEntered
+        return onEntered
       })
 
       test('includes the given course id', () => {
@@ -137,9 +137,9 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
     })
 
     QUnit.module('when the assessment audit trail is loading', contextHooks => {
-      contextHooks.beforeEach(async () => {
+      contextHooks.beforeEach(() => {
         tray.show(context)
-        await onEntered
+        return onEntered
       })
 
       test('does not show the assessment summary', () => {
@@ -156,28 +156,28 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
     })
 
     QUnit.module('when the assessment audit trail loads', contextHooks => {
-      contextHooks.beforeEach(async () => {
+      contextHooks.beforeEach(() => {
         tray.show(context)
-        await onEntered
-
-        const auditEvents = [
-          {
-            assignmentId: '2301',
-            canvadocId: null,
-            createdAt: new Date('2018-08-28T16:46:44Z'),
-            eventType: 'grades_posted',
-            id: '4901',
-            payload: {
-              grades_published_at: [null, '2018-08-28T16:46:43Z']
-            },
-            submissionId: '2501',
-            userId: '1101'
-          }
-        ]
-        const users = [{id: '1101', name: 'A mildly discomfited grader', role: 'grader'}]
-        const externalTools = [{id: '21', name: 'Bulldog Tool', role: 'grader'}]
-        const quizzes = [{id: '123', name: 'Unicorns', role: 'grader'}]
-        resolveAuditTrail({auditEvents, users, externalTools, quizzes})
+        return onEntered.then(() => {
+          const auditEvents = [
+            {
+              assignmentId: '2301',
+              canvadocId: null,
+              createdAt: new Date('2018-08-28T16:46:44Z'),
+              eventType: 'grades_posted',
+              id: '4901',
+              payload: {
+                grades_published_at: [null, '2018-08-28T16:46:43Z']
+              },
+              submissionId: '2501',
+              userId: '1101'
+            }
+          ]
+          const users = [{id: '1101', name: 'A mildly discomfited grader', role: 'grader'}]
+          const externalTools = [{id: '21', name: 'Bulldog Tool', role: 'grader'}]
+          const quizzes = [{id: '123', name: 'Unicorns', role: 'grader'}]
+          resolveAuditTrail({auditEvents, users, externalTools, quizzes})
+        })
       })
 
       test('shows the assessment summary', () => {

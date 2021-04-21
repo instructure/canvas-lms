@@ -17,34 +17,14 @@
  */
 
 import axios from 'axios'
-import {encodeQueryString} from '../shared/queryString'
-
-function discussionQueryString(contextType, page) {
-  const params = [
-    {per_page: 50},
-    {plain_messages: true},
-    {include_assignment: true},
-    {exclude_assignment_descriptions: true},
-    {exclude_context_module_locked_topics: true},
-    {page}
-  ]
-
-  if (contextType === 'course') {
-    params.push({'include[]': 'sections_user_count'})
-    params.push({'include[]': 'sections'})
-  }
-  return encodeQueryString(params)
-}
+import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 
 export function getDiscussions({contextType, contextId}, {page}) {
-  const queryString = discussionQueryString(contextType, page)
-  return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
-}
-
-export function headDiscussions({contextType, contextId}) {
-  const page = 1
-  const queryString = discussionQueryString(contextType, page)
-  return axios.head(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
+  // In the the index.html.erb view for this page, we use prefetch_xhr to fire off
+  // `fetch` requests for all the discusisons we're going to render. We do this
+  // so they can start loading then and not have to wait until this JS file is
+  // loaded to start fetching.
+  return asAxios(getPrefetchedXHR(`prefetched_discussion_topic_page_${page - 1}`))
 }
 
 export function updateDiscussion({contextType, contextId}, discussion, updatedFields) {

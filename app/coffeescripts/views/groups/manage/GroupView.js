@@ -18,27 +18,10 @@
 import $ from 'jquery'
 import {View} from 'Backbone'
 import template from 'jst/groups/manage/group'
-import GroupUsersView from './GroupUsersView'
-import GroupDetailView from './GroupDetailView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
 export default class GroupView extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.groupsAreDifferent = this.groupsAreDifferent.bind(this)
-    this.eitherGroupHasSubmission = this.eitherGroupHasSubmission.bind(this)
-    this.isUnassignedUserWithSubmission = this.isUnassignedUserWithSubmission.bind(this)
-    this._onDrop = this._onDrop.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.tagName = 'li'
 
@@ -95,7 +78,7 @@ export default class GroupView extends View {
     } else {
       // enable droppable on the child GroupView (view)
       if (!this.$el.data('droppable')) {
-        this.$el.droppable(Object.assign({}, this.dropOptions)).on('drop', this._onDrop)
+        this.$el.droppable({...this.dropOptions}).on('drop', this._onDrop.bind(this))
       }
       return this.$el.removeClass('slots-full')
     }

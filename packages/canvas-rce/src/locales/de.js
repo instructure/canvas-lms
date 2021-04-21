@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/de.json";
-import "../rce/languages/de";
-formatMessage.addLocale({ de: locale });
+import formatMessage from '../format-message'
+import locale from '@instructure/translations/lib/canvas-rce/de.json'
+import '../rce/languages/de'
+
+formatMessage.addLocale({de: locale})

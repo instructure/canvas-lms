@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -147,7 +149,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should not choke on invalid UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=UTF-8'
-          body "he\xffllo".force_encoding(Encoding::BINARY) }, '')
+          body (+"he\xffllo").force_encoding(Encoding::BINARY) }, '')
 
       expect(message_handler.body).to eq("hello")
       expect(message_handler.html_body).to eq("hello")
@@ -156,10 +158,10 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should convert another charset to UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=Shift_JIS'
-          body "\x83\x40".force_encoding(Encoding::BINARY)
+          body (+"\x83\x40").force_encoding(Encoding::BINARY)
         }, '')
 
-      comparison_string = "\xe3\x82\xa1"
+      comparison_string = +"\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8")
       expect(message_handler.body).to eq(comparison_string)
       expect(message_handler.html_body).to eq(comparison_string)
@@ -237,20 +239,23 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       let (:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
 
       it "increments the processed count" do
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("incoming_mail_processor.incoming_message_processed.").once
+        expect(InstStatsd::Statsd).to receive(:increment).with("incoming_mail_processor.incoming_message_processed.",
+                                                               {short_stat: "incoming_mail_processor.incoming_message_processed", tags: {mailbox: nil}}).once
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
       end
 
       it "reports the age based on the date header" do
         Timecop.freeze do
           message.date = 10.minutes.ago
-          expect(CanvasStatsd::Statsd).to receive(:timing).once.with("incoming_mail_processor.message_age.", 10*60*1000)
+          expect(InstStatsd::Statsd).to receive(:timing).once.with("incoming_mail_processor.message_age.", 10*60*1000,
+                                                                   {short_stat: "incoming_mail_processor.message_age",
+                                                                    tags: {mailbox: nil}})
           IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
         end
       end
 
       it "does not report the age if there is no date header" do
-        expect(CanvasStatsd::Statsd).to receive(:timing).never
+        expect(InstStatsd::Statsd).to receive(:timing).never
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
       end
     end

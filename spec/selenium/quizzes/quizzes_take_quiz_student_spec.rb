@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -29,6 +31,21 @@ describe 'taking a quiz' do
     end
 
     before(:each) { user_session(@student) }
+
+    context 'when the quiz is past due' do
+      let(:quiz_past_due) do
+        quiz_past_due = quiz_create(course: @course)
+        quiz_past_due.due_at = default_time_for_due_date(Time.zone.now - 2.days)
+        quiz_past_due.save!
+        quiz_past_due.reload
+      end
+
+      it 'shows the submission as late on the submission details page and marks it as "late"', custom_timeout: 30 do
+        take_and_answer_quiz(quiz: quiz_past_due)
+        verify_quiz_submission_is_late
+        verify_quiz_submission_is_late_in_speedgrader
+      end
+    end
 
     context 'when the quiz has an access code' do
       let(:access_code) { '1234' }
@@ -123,7 +140,7 @@ describe 'taking a quiz' do
           begin
             fln('Quizzes').click
             driver.switch_to.alert.accept
-          rescue Selenium::WebDriver::Error::NoAlertOpenError
+          rescue Selenium::WebDriver::Error::NoSuchAlertError
             # Do nothing
           end
         end
@@ -134,14 +151,16 @@ describe 'taking a quiz' do
 
         it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
           skip_if_safari(:alert)
+          skip('investigate in CCI-182')
           start_and_exit_quiz do
-            expect_new_page_load { fj('a.ig-title', '#assignment-quizzes').click }
+            expect_new_page_load { f('a.ig-title', '#assignment-quizzes').click }
             expect_new_page_load { fln('Resume Quiz').click }
             verify_access_code_prompt
           end
         end
 
         it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
+          skip('investigate in CCI-182')
           skip_if_safari(:alert)
           start_and_exit_quiz do
             expect_new_page_load { driver.navigate.back }

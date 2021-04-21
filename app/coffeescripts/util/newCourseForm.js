@@ -18,9 +18,9 @@
 import $ from 'jquery'
 import 'jquery.disableWhileLoading'
 
-export default function newCourseForm () {
+export default function newCourseForm() {
   const changeEvents = 'change keyup input'
-  function showCourseCodeIfNeeded () {
+  function showCourseCodeIfNeeded() {
     if ($nameInput.val().trim().length > 20) {
       $nameInput.unbind(changeEvents, showCourseCodeIfNeeded)
       $('#course_code_wrapper').slideDown('fast')
@@ -29,7 +29,7 @@ export default function newCourseForm () {
 
   const $nameInput = $('#new_course_form [name="course[name]"]')
   $nameInput.bind(changeEvents, showCourseCodeIfNeeded)
-  $('#new_course_form').submit(function () {
+  $('#new_course_form').submit(function() {
     return $(this).disableWhileLoading($.Deferred())
   })
 }

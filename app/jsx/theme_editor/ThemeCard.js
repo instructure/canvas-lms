@@ -20,7 +20,9 @@ import I18n from 'i18n!theme_editor'
 import React from 'react'
 import {string, func, bool} from 'prop-types'
 import SVGWrapper from '../shared/SVGWrapper'
-import ReactCSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
+
+import Modal from '../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
 
 export default function ThemeCard(props) {
   const getVar = props.getVariable
@@ -111,7 +113,12 @@ export default function ThemeCard(props) {
       </div>
       <div className="ic-ThemeCard-main">
         <div className="ic-ThemeCard-main__name">
-          <button type="button" className="ic-ThemeCard-name-button" onClick={props.open}>
+          <button
+            type="button"
+            className="ic-ThemeCard-name-button"
+            data-testid="themecard-name-button"
+            onClick={props.open}
+          >
             <span className="screenreader-only">
               {props.isActiveBrandConfig ? I18n.t('This is your current theme') : null}
               {I18n.t('Edit this theme in Theme Editor')}
@@ -124,6 +131,7 @@ export default function ThemeCard(props) {
             <button
               type="button"
               className="Button Button--icon-action"
+              data-testid="themecard-delete-button"
               onClick={props.startDeleting}
             >
               <span className="screenreader-only">{I18n.t('Delete theme')}</span>
@@ -132,23 +140,24 @@ export default function ThemeCard(props) {
           )}
         </div>
       </div>
-      <ReactCSSTransitionGroup transitionName="ic-ThemeCard-overlay-transition">
-        {props.isBeingDeleted && (
-          <div className="ic-ThemeCard-overlay">
-            <div className="ic-ThemeCard-overlay__content">
-              <h4 className="ic-ThemeCard-overlay__heading">{I18n.t('Delete this theme?')}</h4>
-              <div className="ic-ThemeCard-overlay__actions">
-                <button type="button" className="Button" onClick={props.cancelDeleting}>
-                  {I18n.t('Cancel')}
-                </button>
-                <button type="button" className="Button Button--danger" onClick={props.onDelete}>
-                  {I18n.t('Delete')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </ReactCSSTransitionGroup>
+      {props.isBeingDeleted && (
+        <Modal
+          as="form"
+          open
+          onDismiss={props.cancelDeleting}
+          onSubmit={props.onDelete}
+          label={I18n.t('Delete Theme?')}
+        >
+          <Modal.Body>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</Modal.Body>
+          <Modal.Footer>
+            <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>
+            &nbsp;
+            <Button variant="primary" type="submit">
+              {I18n.t('Delete')}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
       {props.isActiveBrandConfig && (
         <div
           className="ic-ThemeCard-status ic-ThemeCard-status--is-active-theme"

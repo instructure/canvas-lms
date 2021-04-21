@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,11 +19,25 @@
 #
 
 class OutcomeProficiencyRating < ApplicationRecord
+  include Canvas::SoftDeletable
+  extend RootAccountResolver
+
   belongs_to :outcome_proficiency, inverse_of: :outcome_proficiency_ratings
 
   validates :description, presence: true
   validates :points, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :color, presence: true, format: /\A([A-Fa-f0-9]{6})\z/i
+  resolves_root_account through: :outcome_proficiency
+
+  alias original_destroy destroy
+  private :original_destroy
+  def destroy
+    if self.marked_for_destruction?
+      self.destroy_permanently!
+    else
+      original_destroy
+    end
+  end
 
   def as_json(_options={})
     {}.tap do |h|

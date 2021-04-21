@@ -37,7 +37,7 @@
     </div>
     <div class="bottom_links">
       <span class="id" style="display: none;"><%= question_teaser && question_teaser[:id] %></span>
-      <div class="question_points hidden" style="display: none;"><%= round_if_whole(hash_get(question_teaser, :points_possible, "0")) %></div>
+      <div class="question_points hidden" style="display: none;"><%= render_score(hash_get(question_teaser, :points_possible, "0")) %></div>
     </div>
     <div class="clear"></div>
   </div>

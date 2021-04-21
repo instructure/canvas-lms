@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,23 +20,23 @@
 require_relative '../../spec_helper'
 require_relative '../views_helper'
 
-describe "/shared/_flash_notices" do
+describe "shared/_flash_notices" do
   def local_options(overrides={})
     {
-      with_login_text: true,
+      with_login_text: 'Login with Facebook',
       auth_type: 'facebook',
       sr_message: nil
     }.merge(overrides)
   end
 
   it "puts login text with the button if flagged" do
-    render partial: "shared/auth_type_icon", locals: local_options(with_login_text: true)
-    expect(rendered).to match("Login with <span class=\"ic-Login__sso-button__title")
+    render partial: "shared/auth_type_icon", locals: local_options
+    expect(rendered).to match("Login with Facebook")
   end
 
   it "just uses the icon if flagged to not use login text" do
-    render partial: "shared/auth_type_icon", locals: local_options(with_login_text: false)
-    expect(rendered).to_not match("Login with <span class=\"ic-Login__sso-button__title")
+    render partial: "shared/auth_type_icon", locals: local_options(with_login_text: nil)
+    expect(rendered).to_not match("Login with Facebook")
   end
 
   it "renders a screenreader message if provided" do

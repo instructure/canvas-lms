@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -16,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'uri'
+
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
@@ -24,7 +28,14 @@ module Api::V1::Attachment
   include Api::V1::UsageRights
 
   def can_view_hidden_files?(context=@context, user=@current_user, session=nil)
-    context.grants_any_right?(user, session, :manage_files, :read_as_admin, :manage_contents)
+    context.grants_any_right?(
+      user,
+      session,
+      :read_as_admin,
+      :manage_contents,
+      :manage_files,
+      *RoleOverride::GRANULAR_FILE_PERMISSIONS
+    )
   end
 
   def attachments_json(files, user, url_options = {}, options = {})
@@ -43,8 +54,13 @@ module Api::V1::Attachment
       'folder_id' => attachment.folder_id,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
-      'workflow_state' => attachment.workflow_state
+      'upload_status' => AttachmentUploadStatus.upload_status(attachment)
     }
+
+    if options[:master_course_status]
+      hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
+    end
+
     return hash if options[:only] && options[:only].include?('names')
 
     options.reverse_merge!(skip_permission_checks: false)
@@ -85,6 +101,10 @@ module Api::V1::Attachment
         h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
+       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
+       if !thumbnail_url && attachment.content_type == 'image/svg+xml' && attachment.size < 16_384 #16k
+        thumbnail_url = url
+      end
     else
       thumbnail_url = ''
       url = ''
@@ -120,7 +140,7 @@ module Api::V1::Attachment
     if includes.include? 'preview_url'
 
       url_opts = {
-        moderated_grading_whitelist: options[:moderated_grading_whitelist],
+        moderated_grading_allow_list: options[:moderated_grading_allow_list],
         enable_annotations: options[:enable_annotations],
         enrollment_type: options[:enrollment_type],
         anonymous_instructor_annotations: options[:anonymous_instructor_annotations],
@@ -151,19 +171,49 @@ module Api::V1::Attachment
       hash['instfs_uuid'] = attachment.instfs_uuid
     end
 
-    if options[:master_course_status]
-      hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
-    end
-
     hash
   end
 
-  def infer_upload_filename(params)
-    params[:name] || params[:filename]
+  # First, try to find the extension using the name, filename and url parameters,
+  # otherwise, try to find using the content_type parameter.
+  # The order matters because there's more than one mime type to the same
+  # extension, like text/plain: dat,txt,hh,hlp.
+  # The `File.mime_types[mime_type]` returns the last extesion recorded in the
+  # mime_types.yml.
+  def infer_file_extension(params)
+    filenames_with_extension = filenames(params).select{ |item| item.include?('.') }
+
+    extension = filenames_with_extension&.first&.split('.')&.last&.downcase
+
+    return extension if extension
+
+    mime_type = infer_upload_content_type(params)
+
+    File.mime_types[mime_type] if mime_type
   end
 
-  def infer_upload_content_type(params)
-    params[:content_type].presence || Attachment.mimetype(infer_upload_filename(params))
+  def infer_filename_from_url(url)
+    return url if url.blank?
+
+    uri = URI.parse(url)
+
+    File.basename(uri.path)
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  def infer_upload_filename(params)
+    return nil unless params
+
+    params[:name] || params[:filename] || infer_filename_from_url(params[:url])
+  end
+
+  def infer_upload_content_type(params, default_mimetype = nil)
+    mime_type = params[:content_type].presence
+    return mime_type if valid_mime_type?(mime_type)
+
+    mime_types = valid_mime_types(params)
+    mime_types&.first || default_mimetype
   end
 
   def infer_upload_folder(context, params)
@@ -174,6 +224,21 @@ module Api::V1::Attachment
     elsif params[:parent_folder_path].is_a?(String)
       Folder.assert_path(params[:parent_folder_path], context)
     end
+  end
+
+  def filenames(params)
+    [:name, :filename, :url].map { |param| params[param] }.compact
+  end
+
+  def valid_mime_type?(mime_type)
+    mime_type.present? && mime_type != 'unknown/unknown'
+  end
+
+  def valid_mime_types(params)
+    filenames(params).map do |filename|
+      mime_type = Attachment.mimetype(filename)
+      mime_type if valid_mime_type?(mime_type)
+    end.compact
   end
 
   def validate_on_duplicate(params)
@@ -223,10 +288,20 @@ module Api::V1::Attachment
       end
     end
 
+    # allow uploading a file for a user, specifically for the LTI workflow.
+    # the Assignment and Grade Service (app/controllers/lti/ims) uses this
+    # to allow LTI tools to upload a file on behalf of a student as part
+    # of submitting an assignment.
+    current_user = opts[:override_current_user_with] || @current_user
+    # since the LTI service has no concept of masquerading, this user should
+    # be considered both current and logged in. `logged_in_user` is nil during
+    # an LTI request
+    actual_user = opts[:override_logged_in_user] ? current_user : logged_in_user
+
     # user must have permission on folder to user a custom folder other
     # than the "preferred" folder (that specified by the caller).
     folder = infer_upload_folder(context, params)
-    return if folder && !authorized_action(folder, @current_user, :manage_contents)
+    return if folder && !authorized_action(folder, current_user, :manage_contents)
 
     # no permission check required to use the preferred folder
 
@@ -236,32 +311,36 @@ module Api::V1::Attachment
     elsif params[:assignment_id].present?
       Assignment.find_by(id: params[:assignment_id])
     else
-      @current_user
+      current_user
     end
 
     if InstFS.enabled?
       additional_capture_params = {}
       progress_json_result = if params[:url]
-        progress = ::Progress.new(context: progress_context, user_id: @current_user, tag: :upload_via_url)
+        progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
         progress.start
         progress.save!
 
-        additional_capture_params = {
-          eula_agreement_timestamp: params[:eula_agreement_timestamp]
-        }
+        if progress_context.is_a? Assignment
+          additional_capture_params = {
+            eula_agreement_timestamp: params[:eula_agreement_timestamp],
+            comment: params[:comment],
+            submit_assignment: opts[:submit_assignment]
+          }
+        end
 
-        progress_json(progress, @current_user, session)
+        progress_json(progress, current_user, session)
       end
 
       json = InstFS.upload_preflight_json(
         context: context,
         root_account: context.try(:root_account) || @domain_root_account,
-        user: logged_in_user,
-        acting_as: @current_user,
+        user: actual_user,
+        acting_as: current_user,
         access_token: @access_token,
         folder: folder,
         filename: infer_upload_filename(params),
-        content_type: infer_upload_content_type(params),
+        content_type: infer_upload_content_type(params, 'unknown/unknown'),
         on_duplicate: infer_on_duplicate(params),
         quota_exempt: !opts[:check_quota],
         capture_url: api_v1_files_capture_url,
@@ -274,9 +353,9 @@ module Api::V1::Attachment
       @attachment = Attachment.new
       @attachment.shard = context.shard
       @attachment.context = context
-      @attachment.user = @current_user
+      @attachment.user = current_user
       @attachment.filename = infer_upload_filename(params)
-      @attachment.content_type = infer_upload_content_type(params)
+      @attachment.content_type = infer_upload_content_type(params, 'unknown/unknown')
       @attachment.folder = folder
       @attachment.set_publish_state_for_usage_rights
       @attachment.file_state = 'deleted'
@@ -286,21 +365,22 @@ module Api::V1::Attachment
 
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
-
-        progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
+        progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
         progress.reset!
 
         executor = Services::SubmitHomeworkService.create_clone_url_executor(
           params[:url], on_duplicate, opts[:check_quota], progress: progress
         )
-        Services::SubmitHomeworkService.submit_job(progress, @attachment, params[:eula_agreement_timestamp], executor)
 
-        json = { progress: progress_json(progress, @current_user, session) }
+        Services::SubmitHomeworkService.submit_job(
+          @attachment, progress, params[:eula_agreement_timestamp], params[:comment], executor, opts[:submit_assignment]
+        )
+
+        json = { progress: progress_json(progress, current_user, session) }
       else
         on_duplicate = nil if on_duplicate == 'overwrite'
         quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]
         json = @attachment.ajax_upload_params(
-          @current_pseudonym,
           api_v1_files_create_url(
             on_duplicate: on_duplicate,
             quota_exemption: quota_exemption,

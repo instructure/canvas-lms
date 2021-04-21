@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -26,13 +28,13 @@ PactConfig::Consumers::ALL.each do |consumer|
         account_admin = Pact::Canvas.base_state.account_admins.first
         account = account_admin.account
         @notification1 = AccountNotification.create!(
-          account: account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
         )
         @notification2 = AccountNotification.create!(
-          account: account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
         )
         @notification3 = AccountNotification.create!(
-          account: account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now, user: account_admin
         )
       end
     end

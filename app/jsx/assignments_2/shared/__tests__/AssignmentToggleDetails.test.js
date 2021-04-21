@@ -45,8 +45,6 @@ it('renders normally', () => {
     <AssignmentToggleDetails description={assignment.description} />,
     document.getElementById('fixtures')
   )
-  const toggler = $('[data-test-id="assignments-2-assignment-toggle-details"]')
-  toggler.click()
   const element = $('[data-test-id="assignments-2-assignment-toggle-details-text"]')
   expect(element.text()).toEqual(assignment.description)
 })

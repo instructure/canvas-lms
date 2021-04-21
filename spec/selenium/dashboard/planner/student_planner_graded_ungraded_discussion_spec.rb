@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -23,7 +25,6 @@ describe "student planner" do
   include PlannerPageObject
 
   before :once do
-    Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true, course_name: "Planner Course")
     @student1 = User.create!(name: 'Student First')
     @course.enroll_student(@student1).accept!
@@ -64,6 +65,7 @@ describe "student planner" do
     end
 
     it "shows the new activity button", priority: "1", test_id: 3263164 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       # create discussions in the future and in the past to be able to see the new activity button
       past_discussion = graded_discussion_in_the_past
       graded_discussion_in_the_future

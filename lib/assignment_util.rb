@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ module AssignmentUtil
     date = Assignment.due_date_compare_value date
     start_date = Assignment.due_date_compare_value start_date
     end_date = Assignment.due_date_compare_value end_date
-    date >= start_date && date <= end_date
+    (start_date.nil? || date >= start_date) && (end_date.nil? || date <= end_date)
   end
 
   def self.due_date_ok?(assignment)
@@ -66,4 +68,94 @@ module AssignmentUtil
     account = Context.get_account(context)
     account.try(:feature_enabled?, 'new_sis_integrations').present?
   end
+
+  def self.process_due_date_reminder(context_type, context_id)
+    analyzer = StudentAwarenessAnalyzer.new(context_type, context_id)
+    notification = BroadcastPolicy.notification_finder.by_name('Upcoming Assignment Alert')
+
+    # in the rather unlikely case where the due date gets reset *while* we're
+    # scheduled to do this work, we don't want to end up alerting students for
+    # something that's no longer due...
+    unless analyzer.assignment&.due_at.nil?
+      analyzer.apply do |**kwargs|
+        alert_unaware_student(notification, **kwargs)
+      end
+    end
+  end
+
+  def self.alert_unaware_student(notification, assignment:, submission:)
+    BroadcastPolicy.notifier.send_notification(
+      assignment,
+      notification.name,
+      notification,
+      [submission.student],
+      assignment_due_date: submission.cached_due_date,
+      root_account_id: assignment.root_account_id,
+      course_id: assignment.context_id
+    )
+  end
+
+  class StudentAwarenessAnalyzer
+    attr_reader :assignment
+
+    def initialize(context_type, context_id)
+      @context = case context_type
+      when 'Assignment'
+        Assignment.active.where(id: context_id).first
+      when 'AssignmentOverride'
+        AssignmentOverride.active.where(id: context_id).first
+      end
+
+      @assignment = case context_type
+      when 'Assignment'
+        @context
+      when 'AssignmentOverride'
+        @context&.assignment
+      end
+    end
+
+    def apply(&block)
+      submissions.find_each do |submission|
+        unless seen_assignment_recently?(submission.student)
+          yield assignment: assignment, submission: submission
+        end
+      end
+    end
+
+    private
+
+    def seen_assignment_recently?(student, since: 3.days.ago)
+      AssetUserAccess \
+        .where(user_id: student.id, asset_code: "assignment_#{assignment.id}") \
+        .where(AssetUserAccess.arel_table[:last_access].gteq(since)) \
+        .exists?
+    end
+
+    def submissions
+      case @context
+      when Assignment
+        @context.submissions.active.where(workflow_state: 'unsubmitted')
+      when AssignmentOverride
+        students = case @context.set_type
+        when 'ADHOC'
+          @context.assignment_override_students
+        when 'CourseSection'
+          @context.set.participating_students
+        when 'Group'
+          @context.set.participants
+        else
+          []
+        end
+
+        @context.assignment.submissions.active.where(
+          workflow_state: 'unsubmitted',
+          user_id: students
+        )
+      else
+        Submission.none
+      end
+    end
+  end
+
+  private_constant :StudentAwarenessAnalyzer
 end

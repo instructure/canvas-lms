@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ module DataFixup::MoveSubAccountGradingPeriodsToCourses
   end
 
   def self.move_sub_account_periods_to_courses_without_grading_periods
-    Account.root_accounts.active.find_each do |root_account|
+    Account.root_accounts.active.non_shadow.find_each do |root_account|
       check_if_account_periods_need_copying(root_account)
     end
   end

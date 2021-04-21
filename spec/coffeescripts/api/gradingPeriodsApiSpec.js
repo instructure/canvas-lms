@@ -97,20 +97,20 @@ QUnit.module('batchUpdate', {
   }
 })
 
-test('calls the resolved endpoint with serialized grading periods', function() {
+test('calls the resolved endpoint with serialized grading periods', () => {
   const apiSpy = sandbox.stub(axios, 'patch').returns(new Promise(() => {}))
   api.batchUpdate(123, deserializedPeriods)
   ok(axios.patch.calledWith('api/123/batch_update', serializedPeriods))
 })
 
-test('deserializes returned grading periods', function() {
+test('deserializes returned grading periods', () => {
   sandbox.stub(axios, 'patch').returns(Promise.resolve({data: periodsData}))
   return api
     .batchUpdate(123, deserializedPeriods)
     .then(periods => deepEqual(periods, deserializedPeriods))
 })
 
-test('rejects the promise upon errors', function() {
+test('rejects the promise upon errors', () => {
   sandbox.stub(axios, 'patch').returns(Promise.reject('FAIL'))
   return api.batchUpdate(123, deserializedPeriods).catch(error => equal(error, 'FAIL'))
 })

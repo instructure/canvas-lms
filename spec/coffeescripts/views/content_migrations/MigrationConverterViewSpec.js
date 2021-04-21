@@ -24,6 +24,7 @@ class SomeBackboneView extends Backbone.View {
   static initClass() {
     this.prototype.className = 'someViewRendered'
   }
+
   template() {
     return '<div id="rendered">Rendered</div>'
   }

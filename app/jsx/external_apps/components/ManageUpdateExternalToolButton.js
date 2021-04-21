@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Lti2ReregistrationUpdateModal from '../../external_apps/components/Lti2ReregistrationUpdateModal'
-import store from '../../external_apps/lib/ExternalAppsStore'
+import Lti2ReregistrationUpdateModal from './Lti2ReregistrationUpdateModal'
 
 export default class ManageUpdateExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    returnFocus: PropTypes.func.isRequired,
+    returnFocus: PropTypes.func.isRequired
   }
 
   openReregModal = e => {
@@ -52,7 +50,11 @@ export default class ManageUpdateExternalToolButton extends React.Component {
         >
           {I18n.t('Manage Update')}
         </a>
-        <Lti2ReregistrationUpdateModal ref="reregModal" tool={this.props.tool} returnFocus={this.props.returnFocus} />
+        <Lti2ReregistrationUpdateModal
+          ref="reregModal"
+          tool={this.props.tool}
+          returnFocus={this.props.returnFocus}
+        />
       </li>
     )
   }

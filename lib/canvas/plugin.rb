@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -117,6 +119,10 @@ module Canvas
 
     def has_settings_partial?
       !meta[:settings_partial].blank?
+    end
+
+    def test_cluster_inherit?
+      meta.fetch(:test_cluster_inherit, true)
     end
 
     # base class/module for this plugin

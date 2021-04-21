@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!usageRightsSelectBox'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
@@ -48,7 +47,9 @@ const CONTENT_OPTIONS = [
     value: 'public_domain'
   },
   {
-    display: I18n.t('The material is subject to fair use exception'),
+    display: I18n.t(
+      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
+    ),
     value: 'fair_use'
   },
   {
@@ -92,9 +93,7 @@ export default class UsageRightsSelectBox extends React.Component {
     let x
     const obj = {
       use_justification: this.usageRightSelection.value,
-      copyright: this.state.showTextBox
-        ? (x = this.copyright) && x.value
-        : undefined,
+      copyright: this.state.showTextBox ? (x = this.copyright) && x.value : undefined,
       cc_license: this.state.showCreativeCommonsOptions
         ? (x = this.creativeCommons) && x.value
         : undefined

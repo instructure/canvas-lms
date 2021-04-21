@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-
-import View from '@instructure/ui-layout/lib/components/View'
+import {omitProps, safeCloneElement} from '@instructure/ui-react-utils'
 import PropTypes from 'prop-types'
-
-import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
-import safeCloneElement from '@instructure/ui-utils/lib/react/safeCloneElement'
+import React, {Component} from 'react'
+import classNames from 'classnames'
+import {View} from '@instructure/ui-view'
 
 class Steps extends Component {
   static propTypes = {
@@ -68,6 +66,10 @@ class Steps extends Component {
   }
 
   handlePlacement(numSteps, index) {
+    if (this.props.isCollapsed) {
+      return 'interior'
+    }
+
     const step = index + 1
 
     if (step === 1) {
@@ -111,7 +113,7 @@ class Steps extends Component {
         <ol className="steps">
           {React.Children.map(filteredChildren, (child, index) => (
             <li
-              className="step"
+              className={classNames('step', {'step-expanded': !this.props.isCollapsed})}
               aria-current={child.props.status === 'in-progress' ? 'true' : 'false'}
             >
               {safeCloneElement(child, {

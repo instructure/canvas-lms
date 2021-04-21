@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/ExternalToolContent'
-  './MigrationView'
-],(Backbone, template, MigrationView) ->
-  class ExternalToolContentView extends MigrationView
-    template: template
+import template from 'jst/content_migrations/ExternalToolContent'
+import MigrationView from './MigrationView'
 
-    @child 'externalToolLaunch', '.externalToolLaunch'
-    @child 'selectContent', '.selectContent'
+export default class ExternalToolContentView extends MigrationView
+  template: template
+
+  @child 'externalToolLaunch', '.externalToolLaunch'
+  @child 'selectContent', '.selectContent'

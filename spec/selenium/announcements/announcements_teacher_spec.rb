@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -31,6 +33,8 @@ describe "announcements" do
 
     before :each do
       user_session(@teacher)
+      Account.default.enable_feature!(:rce_enhancements)
+      stub_rcs_config
     end
 
     it "should allow saving of section announcement", test_id:3469728, priority: "1" do
@@ -118,6 +122,8 @@ describe "announcements" do
       end
 
       it "should perform front-end validation for message", priority: "1", test_id: 220366 do
+        skip("Skip for now -- message box is not emitted with enhanced RCE LS-1851")
+
         topic_title = 'new topic with file'
         get new_url
 
@@ -132,7 +138,7 @@ describe "announcements" do
       it "should add an attachment to a graded topic", priority: "1", test_id: 220367 do
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
         if what_to_create == DiscussionTopic
-          what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
+          what_to_create.last.update(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
         end
         get url
         expect_new_page_load { f('.ic-announcement-row h3').click }
@@ -162,10 +168,12 @@ describe "announcements" do
       _, path = get_file('testfile1.txt')
       f('#discussion_attachment_uploaded_data').send_keys(path)
       expect_new_page_load { submit_form('.form-actions') }
-      expect(Announcement.last.title).to eq("First Announcement")
+      ann = Announcement.last
+      expect(ann.title).to eq("First Announcement")
       # the delayed post at should be far enough in the future to make this
       # not flaky
-      expect(Announcement.last.delayed_post_at > Time.zone.now).to eq true
+      expect(ann.delayed_post_at > Time.zone.now).to eq true
+      expect(ann.attachment).to be_locked
     end
 
     it "displayed delayed post note on page of delayed announcement" do
@@ -236,6 +244,41 @@ describe "announcements" do
       # you have not responded
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
+    end
+
+    it "should create an announcement that requires an initial post", priority: "1", test_id: 3293292 do
+      get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
+      replace_content(f('input[name=title]'), 'title')
+      type_in_tiny('textarea[name=message]', 'hi')
+      f('#allow_user_comments').click
+      f('#require_initial_post').click
+      expect_new_page_load { submit_form('.form-actions') }
+      announcement = Announcement.where(title: 'title').first
+      expect(announcement.require_initial_post).to eq(true)
+    end
+
+    context "in a homeroom course" do
+      let(:canvas_for_elem_flag) {@course.root_account.feature_enabled?(:canvas_for_elementary)}
+
+      before :each do
+        @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
+        @course.homeroom_course = true
+        @course.save!
+      end
+
+      after :each do
+        @course.root_account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
+      end
+
+      it "removes the Reply section" do
+        create_announcement
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+
+        expect(f('#discussion_topic')).to contain_css('.entry-content.no-reply')
+        expect(f('body')).not_to contain_css('.discussion-entry-reply-area')
+      end
     end
   end
 end

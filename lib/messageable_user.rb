@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 class MessageableUser < User
-  COLUMNS = ['id', 'updated_at', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" }
+  COLUMNS = ['id', 'updated_at', 'pronouns', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" }
   SELECT = COLUMNS.join(", ")
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 
@@ -206,7 +208,7 @@ class MessageableUser < User
         id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
         condition = [
-          <<-SQL,
+          <<~SQL,
             #{User.sortable_name_order_by_clause} > ? OR
             #{User.sortable_name_order_by_clause} = ? AND users.id > ?
           SQL

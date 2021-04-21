@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -120,7 +122,7 @@ module Lti
 
       it 'does not 500 if tool registration fails' do
         get 'registration_return', params: {course_id: course.id, status: 'failure'}
-        expect(response).to be_succes
+        expect(response).to be_successful
       end
     end
 
@@ -222,7 +224,7 @@ module Lti
       end
 
       before do
-        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+        message_handler.update(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
         resource_handler.message_handlers = [message_handler]
         resource_handler.save!
         lti_link.save!
@@ -235,13 +237,13 @@ module Lti
       end
 
       it 'succeeds if the tool is installed in the current course' do
-        tool_proxy.update_attributes(context: course)
+        tool_proxy.update(context: course)
         get 'resource', params: {course_id: course.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
 
       it "succeeds if the tool is installed in the current course's account" do
-        tool_proxy.update_attributes(context: account)
+        tool_proxy.update(context: account)
         get 'resource', params: {course_id: course.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
@@ -263,7 +265,7 @@ module Lti
         end
 
         it "responds with 400 if host name does not match" do
-          message_handler.update_attributes(launch_path: 'http://www.different.com')
+          message_handler.update(launch_path: 'http://www.different.com')
           get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(response).to be_bad_request
         end
@@ -272,7 +274,7 @@ module Lti
       context 'assignment' do
         let(:assignment) {course.assignments.create!(name: 'test')}
 
-        before {tool_proxy.update_attributes(context: course)}
+        before {tool_proxy.update(context: course)}
 
         it 'finds the specified assignment' do
           get 'resource', params: {course_id: course.id,
@@ -294,21 +296,55 @@ module Lti
           get 'basic_lti_launch_request', params: {course_id: course.id, message_handler_id: message_handler.id, assignment_id: assignment.id}
           expect(assigns[:lti_launch].params[:custom_anonymous_grading]).to eq true
         end
+
+        context 'when secure params are given' do
+          subject { get 'basic_lti_launch_request', params: params }
+
+          let(:due_at) { Time.zone.now }
+
+          let(:secure_params) do
+            Canvas::Security.create_jwt({lti_assignment_id: assignment.lti_context_id})
+          end
+
+          let(:params) do
+            {
+              course_id: course.id,
+              message_handler_id: message_handler.id,
+              secure_params: secure_params
+            }
+          end
+
+          before do
+            assignment.update!(due_at: due_at)
+
+            message_handler.update!(
+              parameters: [
+                { "name" => "due_date", "variable" => "Canvas.assignment.dueAt.iso8601" }
+              ]
+            )
+
+            subject
+          end
+
+          it 'expands assignment variables' do
+            expect(assigns[:lti_launch].params[:custom_due_date]).to eq due_at.utc.iso8601
+          end
+        end
       end
 
       context 'search account chain' do
         let(:root_account) {Account.create!}
 
-        before {account.update_attributes(root_account: root_account)}
+        before {account.update(root_account: root_account)}
 
         it "succeeds if the tool is installed in the current account's root account" do
-          tool_proxy.update_attributes(context: root_account)
+          tool_proxy.update(context: root_account)
           get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(response).to be_ok
         end
 
         it "succeeds if the tool is installed in the current course's root account" do
-          tool_proxy.update_attributes(context: root_account)
+          tool_proxy.update(context: root_account)
           get 'resource', params: {course_id: course.id, resource_link_id: link_id}
           expect(response).to be_ok
         end
@@ -462,7 +498,7 @@ module Lti
         it 'redirects to login page if there is no session' do
           tool_proxy.raw_data['enabled_capability'] += enabled_capability
           tool_proxy.save!
-          allow(PseudonymSession).to receive(:find).and_return(nil)
+          allow(PseudonymSession).to receive(:find_with_validation).and_return(nil)
           get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response).to redirect_to(login_url)
         end

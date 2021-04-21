@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/en_AU.json";
-import "../rce/languages/en_GB";
-formatMessage.addLocale({ "en-AU": locale });
+import formatMessage from '../format-message'
+import locale from '@instructure/translations/lib/canvas-rce/en_AU.json'
+import '../rce/languages/en_GB'
+
+formatMessage.addLocale({'en-AU': locale})

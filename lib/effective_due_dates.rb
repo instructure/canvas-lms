@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -60,7 +62,7 @@ class EffectiveDueDates
       hsh[assignment_id] ||= {}
       attributes = {}
       if include?(included, :due_at)
-        attributes[:due_at] = row["due_at"] && DateTime.parse(row["due_at"])
+        attributes[:due_at] = row["due_at"]
       end
       if include?(included, :grading_period_id)
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i
@@ -183,7 +185,7 @@ class EffectiveDueDates
       if assignment_collection.empty?
         {}
       else
-        ActiveRecord::Base.connection.select_all(<<-SQL)
+        ActiveRecord::Base.connection.select_all(<<~SQL)
           -- fetch the assignment itself
           WITH models AS (
             SELECT *

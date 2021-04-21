@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -67,7 +69,7 @@ describe OutcomeResultsController do
     find_outcome_criterion
   end
 
-  def create_result(user_id, outcome, assignment, score)
+  def create_result(user_id, outcome, assignment, score, opts = {})
     rubric_association = outcome_rubric.associate_with(outcome_assignment, outcome_course, purpose: 'grading')
 
     LearningOutcomeResult.new(
@@ -79,7 +81,8 @@ describe OutcomeResultsController do
         learning_outcome: outcome,
         content_type: 'Assignment',
         content_id: assignment.id
-      })
+      }),
+      **opts
     ).tap do |lor|
       lor.association_object = rubric_association
       lor.context = outcome_course
@@ -128,7 +131,7 @@ describe OutcomeResultsController do
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
-      points_possible: outcome_rubric.points_possible,
+      points_possible: outcome_rubric.points_possible
     )
   end
 
@@ -149,7 +152,7 @@ describe OutcomeResultsController do
   end
 
   def parse_response(response)
-    JSON.parse(response.body.gsub("while(1);", ""))
+    JSON.parse(response.body)
   end
 
   describe "retrieving outcome results" do
@@ -178,12 +181,12 @@ describe OutcomeResultsController do
                       aggregate: 'course',
                       aggregate_stat: 'powerlaw'},
                       format: "json"
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
-    context 'with muted assignment' do
+    context 'with manual post policy assignment' do
       before do
-        outcome_assignment.mute!
+        outcome_assignment.ensure_post_policy(post_manually: true)
       end
 
       it 'teacher should see result' do
@@ -194,7 +197,7 @@ describe OutcomeResultsController do
                         :user_ids => [@student.id],
                         :outcome_ids => [@outcome.id]},
                         format: "json"
-        json = JSON.parse(response.body.gsub("while(1);", ""))
+        json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
       end
 
@@ -208,6 +211,36 @@ describe OutcomeResultsController do
                         format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 0
+      end
+    end
+
+    context 'with auto post policy (default) assignment' do
+      before do
+        outcome_assignment.ensure_post_policy(post_manually: false)
+      end
+
+      it 'teacher should see result' do
+        user_session(@teacher)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = JSON.parse(response.body)
+        expect(json['outcome_results'].length).to eq 1
+      end
+
+      it 'student should see result' do
+        user_session(@student)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = parse_response(response)
+        expect(json['outcome_results'].length).to eq 1
       end
     end
 
@@ -263,26 +296,145 @@ describe OutcomeResultsController do
       expect(json['linked']['outcomes'][0]['ratings'].map { |r| r['percent'] }).to eq [50, 50]
     end
 
+    context 'with the account_mastery_scales FF' do
+      context 'enabled' do
+        before do
+          @course.account.enable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'uses the default outcome proficiency for points scaling if no outcome proficiency exists' do
+          create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
+          points_possible = OutcomeProficiency.find_or_create_default!(@course.account).points_possible
+          score = (2.to_f / 5.to_f) * points_possible
+          expect(json['rollups'][0]['scores'][0]['score']).to eq score
+        end
+
+        it 'uses resolved_outcome_proficiency for points scaling if one exists' do
+          proficiency = outcome_proficiency_model(@course)
+          create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
+          score = (2.to_f / 5.to_f) * proficiency.points_possible
+          expect(json['rollups'][0]['scores'][0]['score']).to eq score
+        end
+
+        it 'returns outcomes with outcome_proficiency.ratings and their percents' do
+          outcome_proficiency_model(@course)
+          json = parse_response(get_rollups(rating_percents: true, include: ['outcomes']))
+          ratings = json['linked']['outcomes'][0]['ratings']
+          expect(ratings.map { |r| r['percent'] }).to eq [50, 50]
+          expect(ratings.map { |r| r['points'] }).to eq [10, 0]
+        end
+      end
+
+      context 'disabled' do
+        before do
+          @course.account.disable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'ignores the outcome proficiency for points scaling' do
+          proficiency = outcome_proficiency_model(@course)
+          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
+          expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
+        end
+      end
+    end
+
+    context 'inactive/concluded LMGB filters' do
+      it 'displays rollups for concluded enrollments when they are included' do
+        StudentEnrollment.find_by(user_id: @student2.id).conclude
+        json = parse_response(get_rollups({}))
+        rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+        expect(rollups.count).to eq(1)
+        expect(rollups.first['scores'][0]['score']).to eq 1.0
+      end
+
+      it 'does not display rollups for concluded enrollments when they are not included' do
+        StudentEnrollment.find_by(user_id: @student2.id).conclude
+        json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
+        expect(json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}.count).to eq(0)
+      end
+
+      it 'displays rollups for a student who has an active and a concluded enrolllment regardless of filter' do
+        section1 = add_section 's1', course: outcome_course
+        student_in_section section1, user: @student2, allow_multiple_enrollments: true
+        StudentEnrollment.find_by(course_section_id: section1.id).conclude
+        json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
+        rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+        expect(rollups.count).to eq(2)
+        expect(rollups.first['scores'][0]['score']).to eq 1.0
+        expect(rollups.second['scores'][0]['score']).to eq 1.0
+      end
+
+      it 'displays rollups for inactive enrollments when they are included' do
+        StudentEnrollment.find_by(user_id: @student2.id).deactivate
+        json = parse_response(get_rollups({}))
+        rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+        expect(rollups.count).to eq(1)
+        expect(rollups.first['scores'][0]['score']).to eq 1.0
+      end
+
+      it 'does not display rollups for inactive enrollments when they are not included' do
+        StudentEnrollment.find_by(user_id: @student2.id).deactivate
+        json = parse_response(get_rollups(exclude: 'inactive_enrollments'))
+        expect(json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}.count).to eq(0)
+      end
+
+      context 'users with enrollments of different enrollment states' do
+        before do
+          StudentEnrollment.find_by(user_id: @student2.id).deactivate
+          @section1 = add_section 's1', course: outcome_course
+          student_in_section @section1, user: @student2, allow_multiple_enrollments: true
+          StudentEnrollment.find_by(course_section_id: @section1.id).conclude
+        end
+
+        it 'users whose enrollments are all excluded are not included' do
+          json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments']))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(0)
+        end
+
+        it 'users whose enrollments are all excluded are not included in a specified section' do
+          json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments'],
+                                            section_id: @section1.id))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(0)
+        end
+
+        it 'users who contain an active enrollment are always included' do
+          section3 = add_section 's3', course: outcome_course
+          student_in_section section3, user: @student2, allow_multiple_enrollments: true
+          json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments']))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(3)
+          expect(rollups.first['scores'][0]['score']).to eq 1.0
+          expect(rollups.second['scores'][0]['score']).to eq 1.0
+          expect(rollups.third['scores'][0]['score']).to eq 1.0
+        end
+      end
+    end
+
     context 'sorting' do
       it 'should validate sort_by parameter' do
         get_rollups(sort_by: 'garbage')
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it 'should validate sort_order parameter' do
         get_rollups(sort_by: 'student', sort_order: 'random')
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       context 'by outcome' do
         it 'should validate a missing sort_outcome_id parameter' do
           get_rollups(sort_by: 'outcome')
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it 'should validate an invalid sort_outcome_id parameter' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: 'NaN')
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
       end
 
@@ -302,23 +454,59 @@ describe OutcomeResultsController do
       context 'by student' do
         it 'should sort rollups by ascending student name' do
           get_rollups(sort_by: 'student')
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student1, @student2, @student3])
         end
 
         it 'should sort rollups by descending student name' do
           get_rollups(sort_by: 'student', sort_order: 'desc')
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student3, @student2, @student1])
         end
 
+        context 'with teachers who have limited privilege' do
+          before do
+            @section1 = add_section 's1', course: outcome_course
+            @section2 = add_section 's2', course: outcome_course
+            @section3 = add_section 's3', course: outcome_course
+
+            student_in_section @section1, user: @student1, allow_multiple_enrollments: false
+            student_in_section @section2, user: @student2, allow_multiple_enrollments: false
+            student_in_section @section3, user: @student3, allow_multiple_enrollments: false
+            @teacher = teacher_in_section(@section2, :limit_privileges_to_course_section => true)
+            user_session(@teacher)
+          end
+
+          context 'with the .limit_section_visibility_in_lmgb FF enabled' do
+            before do
+              @course.root_account.enable_feature!(:limit_section_visibility_in_lmgb)
+            end
+
+            it 'should only return students in the teachers section' do
+              get_rollups(sort_by: 'student', sort_order: 'desc')
+              json = parse_response(response)
+              expect_user_order(json['rollups'], [@student2])
+            end
+          end
+
+          context 'with the .limit_section_visibility_in_lmgb FF disabled' do
+            it 'returns students in all sections' do
+              get_rollups(sort_by: 'student', sort_order: 'desc')
+              json = parse_response(response)
+              expect_user_order(json['rollups'], [@student3, @student2, @student1])
+            end
+          end
+        end
+
+
         context 'with pagination' do
-          def expect_students_in_pagination(page, students, sort_order = 'asc')
-            get_rollups(sort_by: 'student', sort_order: sort_order, per_page: 1, page: page)
-            expect(response).to be_success
-            json = parse_response(response)
+          let(:json) { parse_response(response) }
+
+          def expect_students_in_pagination(page, students, sort_order = 'asc', include: nil)
+            get_rollups(sort_by: 'student', sort_order: sort_order, per_page: 1, page: page, include: include)
+            expect(response).to be_successful
             expect_user_order(json['rollups'], students)
           end
 
@@ -357,13 +545,45 @@ describe OutcomeResultsController do
               expect_students_in_pagination(4, [], 'desc')
             end
           end
+
+          context 'with multiple enrollments' do
+            before do
+              @section1 = add_section 's1', course: outcome_course
+              @section2 = add_section 's2', course: outcome_course
+              student_in_section @section1, user: @student2, allow_multiple_enrollments: true
+              student_in_section @section2, user: @student2, allow_multiple_enrollments: true
+              student_in_section @section2, user: @student3, allow_multiple_enrollments: true
+            end
+
+            context 'should paginate by user, rather than by enrollment' do
+              it 'should return student1 on first page' do
+                expect_students_in_pagination(1, [@student1], include: ['users'])
+                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student1.id.to_s]
+              end
+
+              it 'should return student2 on second page' do
+                expect_students_in_pagination(2, [@student2, @student2, @student2], include: ['users'])
+                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student2.id.to_s]
+              end
+
+              it 'should return student3 on third page' do
+                expect_students_in_pagination(3, [@student3, @student3], include: ['users'])
+                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student3.id.to_s]
+              end
+
+              it 'return no student in fourth page' do
+                expect_students_in_pagination(4, [], include: ['users'])
+                expect(json['linked']['users'].length).to be 0
+              end
+            end
+          end
         end
       end
 
       context 'by outcome' do
         it 'should sort rollups by ascending rollup score' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id)
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student2, @student1, @student3])
           expect_score_order(json['rollups'], [1, 3, nil])
@@ -371,7 +591,7 @@ describe OutcomeResultsController do
 
         it 'should sort rollups by descending rollup score' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: 'desc')
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student1, @student2, @student3])
           expect_score_order(json['rollups'], [3, 1, nil])
@@ -380,7 +600,7 @@ describe OutcomeResultsController do
         context 'with pagination' do
           def expect_students_in_pagination(page, students, scores, sort_order = 'asc')
             get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: sort_order, per_page: 1, page: page)
-            expect(response).to be_success
+            expect(response).to be_successful
             json = parse_response(response)
             expect_user_order(json['rollups'], students)
             expect_score_order(json['rollups'], scores)

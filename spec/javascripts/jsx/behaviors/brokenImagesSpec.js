@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 import $ from 'jquery'
-import { attachErrorHandler, getImagesAndAttach } from 'compiled/behaviors/broken-images'
+import {attachErrorHandler, getImagesAndAttach} from 'compiled/behaviors/broken-images'
 
 let server
 QUnit.module('Broken Images Behavior', {
@@ -71,7 +71,7 @@ QUnit.module('getImagesAndAttach', {
   teardown() {
     $('#fixtures').empty()
   }
-});
+})
 
 test('does not attach error handler to images with an empty source', () => {
   getImagesAndAttach()

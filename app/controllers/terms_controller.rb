@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -134,7 +136,7 @@ class TermsController < ApplicationController
 
     term_params = params.require(:enrollment_term).permit(:name, :start_at, :end_at)
     DueDateCacher.with_executing_user(@current_user) do
-      if validate_dates(@term, term_params, overrides) && @term.update_attributes(term_params)
+      if validate_dates(@term, term_params, overrides) && @term.update(term_params)
         @term.set_overrides(@context, overrides)
         render :json => serialized_term
       else
@@ -160,6 +162,11 @@ class TermsController < ApplicationController
         sis_id != @account.sis_source_id &&
         @context.root_account.grants_right?(@current_user, session, :manage_sis)
       @term.sis_source_id = sis_id.presence
+      if @term.sis_source_id && @term.sis_source_id_changed?
+        scope = @term.root_account.enrollment_terms.where(sis_source_id: @term.sis_source_id)
+        scope = scope.where("id<>?", @term) unless @term.new_record?
+        @term.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: @term.sis_source_id)) if scope.exists?
+      end
     end
   end
 

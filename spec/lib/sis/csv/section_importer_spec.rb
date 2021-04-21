@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -106,6 +108,20 @@ describe SIS::CSV::SectionImporter do
       "sec1,C001,Sec1,deleted"
     )
     expect(importer.errors).to eq []
+  end
+
+  it 'should not error trying to restore a deleted default_section' do
+    course = @account.courses.create!(:sis_source_id => "C001")
+    section = course.default_section
+    section.update(:sis_source_id => "S001", :workflow_state => "deleted")
+    new_section = course.course_sections.create!(:default_section => true)
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status",
+      "S001,C001,Sec1,active"
+    )
+    section.reload
+    expect(section).to be_active
+    expect(section.default_section).to eq false
   end
 
   it 'should create rollback data' do

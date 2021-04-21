@@ -15,63 +15,31 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-  @locale = raw I18n.locale.to_json
-  @body_classes ||= []
-  @body_classes << "context-#{@context.asset_string}" if @context
-  yield :pre_html
-
 -%><!DOCTYPE html>
-<html class="scripts-not-loaded" dir="<%= use_rtl? ? 'rtl' : 'ltr' %>"   lang=<%= @locale %>>
+<html class="scripts-not-loaded" dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
-  <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
-  <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
-  <%= browser_performance_monitor_embed %>
-  <link rel="preload" href="<%= font_path("lato/latin/LatoLatin-Regular.woff2") %>" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <% if Setting.get('disable_lato_extended', false) == 'false' %>
+    <%= stylesheet_link_tag(css_url_for('lato_extended')) %>
+  <% else %>
+    <%= stylesheet_link_tag(css_url_for('lato')) %>
+  <% end %>
+  <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
+    <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
+  <% end %>
+  <%= render_datadog_rum_js %>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
-  <%= yield :auto_discovery %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
   <%= yield :head %>
-  <%=
-    # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
-    polyfill_url = "/ie11-polyfill.js"
-    fetch_polyfill_url = 'https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js'
-    if request.user_agent.to_s =~ /Trident\/7.0.*rv:11/i
-      # If it looks like IE11, assume they are going to need the polyfill
-      # and serve it to them in the more performant way
-      javascript_include_tag(polyfill_url, fetch_polyfill_url)
-    else
-      # For other browsers, feature-detect for all the stuff we polyfill and
-      # still provide a fallback if they don't have it.
-      # The crazy string concatenation in the document.write is to trick Chrome
-      # into not preemptively downloading it anyway.
-      javascript_tag(%(
-!function(){
-  function get(u){document.write('<scr'+'ipt src="'+ u +'"></sc'+'ript>')}
-  var o,s,v;
-  if (!(window.Promise && Object.assign && Object.values && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
-    get("#{javascript_path(polyfill_url)}");
-  }
-  window.fetch || get("#{fetch_polyfill_url}");
-}();
-      ))
-    end
-  %>
-  <%=
-    # Load the fontface observer for lato async and as fast as possible so it doesn't flicker with fallback font.
-    # That's why we don't load it in a 'require' at the bottom of the page
-    javascript_include_tag("/lato-fontfaceobserver.js", async: true)
-  %>
-  <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
-  <%= include_css_bundles %>
-  <%= yield :stylesheets %>
+  <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
   <script>
-    <%# 
+    <%#
       listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
       note: the events targeted for a[data-method] elems don't get properly replayed, but
       at least we can gobble them up here to prevent errors.
@@ -89,6 +57,30 @@
     }
     document.addEventListener('click', _earlyClick)
   </script>
-  <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
-  <%= include_head_js %>
+
+  <% js_bundle :navigation_header unless @headers == false %>
+
+  <% js_env(active_context_tab: get_active_tab) %>
+  <script>
+    INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
+    ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;
+  </script>
+
+  <%= benchmark("include_head_js") { include_head_js } %>
+  <% @xhrs_to_prefetch_from_controller&.each do |(args, kwargs)| %>
+    <%= prefetch_xhr(*args, **kwargs) %>
+  <% end %>
+  <% @content_for_head&.each do |string| %>
+    <%= string %>
+  <% end %>
+  <title><%= @page_title || (yield :page_title).presence || t('default_page_title', "Canvas LMS") %></title>
+  <%= render partial: 'layouts/google_analytics_snippet' %>
+
+  <% if fullstory_enabled_for_session?(session) %>
+    <%= render :partial => "shared/fullstory_snippet" %>
+  <% end %>
+
+  <% if @include_recaptcha %>
+  <script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async defer></script>
+  <% end %>
 </head>

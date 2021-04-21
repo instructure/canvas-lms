@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -34,15 +36,7 @@ module Api::V1::Json
       permissions[:policies] = Array(permissions_to_return)
     end
 
-    json = obj.as_json({ :include_root => false,
-                  :permissions => permissions }.merge(opts))
-
-    if block_given?
-      dynamic_attributes = OpenStruct.new
-      yield dynamic_attributes, obj
-      json.merge!(dynamic_attributes.marshal_dump)
-    end
-
-    json
+    obj.as_json({ include_root: false,
+                  permissions: permissions }.merge(opts))
   end
 end

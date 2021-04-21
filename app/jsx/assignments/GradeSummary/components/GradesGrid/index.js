@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {speedGraderUrl} from '../../assignment/AssignmentApi'
@@ -65,13 +65,11 @@ function studentsToPages(props) {
 
 export default class GradesGrid extends Component {
   static propTypes = {
-    /* eslint-disable react/no-unused-prop-types */
     anonymousStudents: bool.isRequired,
     assignment: shape({
       courseId: string.isRequired,
       id: string.isRequired
     }).isRequired,
-    /* eslint-enable react/no-unused-prop-types */
     disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
@@ -101,8 +99,6 @@ export default class GradesGrid extends Component {
   constructor(props) {
     super(props)
 
-    this.setPage = this.setPage.bind(this)
-
     this.state = {
       currentPageIndex: 0,
       pages: studentsToPages(props)
@@ -117,7 +113,7 @@ export default class GradesGrid extends Component {
     }
   }
 
-  setPage(page) {
+  setPage = page => {
     this.setState({currentPageIndex: page - 1})
   }
 

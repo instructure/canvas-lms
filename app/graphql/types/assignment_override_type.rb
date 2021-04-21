@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -33,17 +34,28 @@ module Types
     end
   end
 
+  Noop = Struct.new(:id)
+
+  class NoopType < ApplicationObjectType
+    graphql_name "Noop"
+
+    description "A descriptive tag that doesn't link the assignment to a set"
+
+    field :_id, ID, method: :id, null: false
+  end
+
   class AssignmentOverrideSetUnion < BaseUnion
     graphql_name "AssignmentOverrideSet"
 
     description "Objects that can be assigned overridden dates"
 
-    possible_types SectionType, GroupType, AdhocStudentsType
+    possible_types SectionType, GroupType, AdhocStudentsType, NoopType
 
     def self.resolve_type(obj, _)
       case obj
       when CourseSection then SectionType
       when Group then GroupType
+      when Noop then NoopType
       when AssignmentOverride then AdhocStudentsType
       end
     end
@@ -54,10 +66,9 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     alias :override :object
-
-    field :_id, ID, "legacy canvas id", method: :id, null: false
 
     field :assignment, AssignmentType, null: true
     def assignment
@@ -72,6 +83,8 @@ module Types
     def set
       if override.set_type == "ADHOC"
         override
+      elsif override.set_type == 'Noop'
+        Noop.new(override.set_id)
       else
         load_association(:set)
       end

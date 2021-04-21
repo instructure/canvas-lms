@@ -26,6 +26,6 @@ export default {
     RCELoader.cachedModule = null
     RCELoader.loadingFlag = false
     RCELoader.loadingCallbacks = []
-    return Sidebar.reset()
+    Sidebar.reset()
   }
 }

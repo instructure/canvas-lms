@@ -18,29 +18,43 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const HomeTray = () => (
   <TutorialTrayContent
     name="Home"
     heading={I18n.t('Home')}
-    subheading={I18n.t('This is your course landing page')}
-    image="/images/tutorial-tray-images/publish.png"
+    subheading={I18n.t('Welcome your students')}
+    image="/images/tutorial-tray-images/Panda_Home.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
+      {
+        label: I18n.t('How do I use the Course Home Page as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250'
+      },
+      {
+        label: I18n.t(
+          'What layout options are available in the Course Home Page as an instructor?'
+        ),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291'
+      },
+      {
+        label: I18n.t('How do I change the Course Home Page?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035'
+      }
+    ]}
   >
-    <Text as="p">
-      {
-        I18n.t(`When people visit your course, this is the first page they'll see.
-          We've set your homepage to Modules, but you have the option to change it.`)
-      }
-    </Text>
-    <Text as="p">
-      {
-        I18n.t(`You can publish your course from the home page whenever you’re ready
-          to share it with students. Until your course is published, only instructors will be able to access it.`)
-      }
-    </Text>
+    {I18n.t(`The Course Home Page is the first page students see when they open
+      your course. The Home Page can display the course participation activity
+      stream, the Course Modules page, the Course Assignments list, Syllabus,
+      or a page you design as the front page.`)}
   </TutorialTrayContent>
-);
+)
 
 export default HomeTray

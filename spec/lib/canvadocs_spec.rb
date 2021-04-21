@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -120,9 +122,141 @@ describe Canvadocs do
       end
 
       describe 'user filter' do
+        let(:peer_reviewer) { User.create!(name: 'Percy the Peer Reviewer') }
+        let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: 'Percy the Peer Reviewer'} }
         let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student'} }
         let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
         let(:teacher_real_data) { {type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader'} }
+
+        context "when an assignment posts manually and a submission is unposted" do
+          before do
+            course.enroll_student(peer_reviewer).accept(true)
+            assignment.post_policy.update!(post_manually: true)
+            assignment.hide_submissions
+          end
+
+          context "when the submission's student is viewing" do
+            before do
+              @current_user = student
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes the student" do
+              expect(user_filter).to include(student_real_data)
+            end
+
+            it "includes peer reviewers if there are peer reviewers" do
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+
+              expect(user_filter).to include(peer_reviewer_real_data)
+            end
+
+            it "does not include graders in the filter" do
+              expect(user_filter).not_to include(teacher_real_data)
+            end
+          end
+
+          context "when a grader is viewing" do
+            before do
+              @current_user = teacher
+            end
+
+            it "does not set restrict_annotations_to_user_filter" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+            end
+
+            it "does not set user_filter" do
+              expect(user_filter).to be nil
+            end
+          end
+
+          context "when a peer reviewer is viewing" do
+            before do
+              @current_user = peer_reviewer
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes only the peer reviewer in the user_filter" do
+              expect(user_filter).to match [peer_reviewer_real_data]
+            end
+          end
+        end
+
+        context "when an assignment posts manually and a submission is posted" do
+          before do
+            course.enroll_student(peer_reviewer).accept(true)
+            assignment.post_policy.update!(post_manually: true)
+            assignment.post_submissions
+          end
+
+          context "when the submission's student is viewing" do
+            before do
+              @current_user = student
+            end
+
+            it "does not set restrict_annotations_to_user_filter" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+            end
+
+            it "does not set user_filter" do
+              expect(user_filter).to be nil
+            end
+          end
+
+          context "when a grader is viewing" do
+            before do
+              @current_user = teacher
+            end
+
+            it "does not set restrict_annotations_to_user_filter" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+            end
+
+            it "does not set user_filter" do
+              expect(user_filter).to be nil
+            end
+          end
+
+          context "when a peer reviewer is viewing" do
+            before do
+              @current_user = peer_reviewer
+              assignment.update!(peer_reviews: true)
+              AssessmentRequest.create!(
+                user: student,
+                asset: submission,
+                assessor: peer_reviewer,
+                assessor_asset: assignment.submission_for_student(peer_reviewer)
+              )
+            end
+
+            it "sets restrict_annotations_to_user_filter to true" do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+
+            it "includes only the peer reviewer in the user_filter" do
+              expect(user_filter).to match [peer_reviewer_real_data]
+            end
+          end
+        end
 
         context 'for an unmoderated anonymized assignment' do
           before(:each) do
@@ -222,21 +356,25 @@ describe Canvadocs do
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'excludes graders if grades are not published' do
+            it 'excludes graders if the submission is not posted' do
               expect(user_filter).not_to include(hash_including(role: 'teacher'))
             end
 
-            it 'includes the selected grader if grades are published' do
+            it 'includes the selected grader if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'excludes graders that were not selected if grades are published' do
+            it 'excludes graders that were not selected if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).not_to include(final_grader_real_data)
             end
 
@@ -496,21 +634,25 @@ describe Canvadocs do
               expect(user_filter).to include(student_real_data)
             end
 
-            it 'excludes graders if grades are not published' do
+            it 'excludes graders if the submission is not posted' do
               expect(user_filter).not_to include(hash_including(role: 'teacher'))
             end
 
-            it 'includes the selected grader if grades are published' do
+            it 'includes the selected grader if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).to include(provisional_grader_real_data)
             end
 
-            it 'excludes graders that were not selected if grades are published' do
+            it 'excludes graders that were not selected if the submission is posted' do
               submission.update!(grader: provisional_grader)
               attachment.associate_with(submission)
               assignment.update!(grades_published_at: Time.zone.now)
+              assignment.post_submissions
+              submission.reload
               expect(user_filter).not_to include(final_grader_real_data)
             end
 
@@ -601,6 +743,70 @@ describe Canvadocs do
 
             it 'requests that all returned annotations belong to users in the user_filter' do
               expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+          end
+        end
+
+        context 'for an Annotated Document assignment' do
+          before(:each) do
+            assignment.update!(submission_types: 'annotated_document', annotatable_attachment: attachment)
+            assignment.submit_homework(
+              submission.user,
+              submission_type: 'annotated_document',
+              annotated_document_id: attachment.id
+            )
+            submission.reload
+          end
+
+          context 'when the student is viewing' do
+            before(:each) do
+              @current_user = student
+            end
+
+            it 'sets the user_filter to empty if submission is posted' do
+              expect(user_filter).to be_empty
+            end
+
+            it 'sets restrict_annotations_to_user_filter to false if submission is posted' do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be false
+            end
+
+            it 'sets the user_filter to just the student if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+
+              aggregate_failures do
+                expect(user_filter.length).to be 1
+                expect(user_filter.dig(0, :id)).to eq student.global_id.to_s
+              end
+            end
+
+            it 'sets restrict_annotations_to_user_filter to true if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(session_params[:restrict_annotations_to_user_filter]).to be true
+            end
+          end
+
+          context 'when an instructor is viewing' do
+            before(:each) do
+              @current_user = teacher
+            end
+
+            it 'sets the user_filter to empty if submission is posted' do
+              expect(user_filter).to be_empty
+            end
+
+            it 'sets restrict_annotations_to_user_filter to false if submission is posted' do
+              expect(session_params[:restrict_annotations_to_user_filter]).to be false
+            end
+
+            it 'sets the user_filter to empty if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(user_filter).to be_empty
+            end
+
+            it 'sets restrict_annotations_to_user_filter to false if submission is unposted' do
+              assignment.ensure_post_policy(post_manually: true)
+              expect(session_params[:restrict_annotations_to_user_filter]).to be false
             end
           end
         end

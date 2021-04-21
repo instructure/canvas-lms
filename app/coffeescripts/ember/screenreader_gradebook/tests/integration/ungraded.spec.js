@@ -46,7 +46,7 @@ QUnit.module('include ungraded assignments setting:false', {
   }
 })
 
-test('clicking the ungraded checkbox updates includeUngradedAssignments to true', () => runTest())
+QUnit.skip('clicking the ungraded checkbox updates includeUngradedAssignments to true', () => runTest())
 
 QUnit.module('include ungraded assignments setting:true', {
   setup() {
@@ -58,4 +58,4 @@ QUnit.module('include ungraded assignments setting:true', {
   }
 })
 
-test('clicking the ungraded checkbox updates includeUngradedAssignments to false', () => runTest())
+QUnit.skip('clicking the ungraded checkbox updates includeUngradedAssignments to false', () => runTest())

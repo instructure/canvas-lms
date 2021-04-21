@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -73,6 +75,10 @@ class FavoritesController < ApplicationController
     if courses.any? && value_to_boolean(params[:exclude_blueprint_courses])
       mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => courses).pluck(:course_id)
       courses.reject!{|c| mc_ids.include?(c.id)}
+    end
+
+    if params[:sort] == "nickname"
+      courses.sort_by!{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.nickname_for(@current_user))] }
     end
 
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, [:read_sis, :manage_sis])

@@ -27,25 +27,6 @@ import {completeUpload} from 'jsx/shared/upload_file'
 import template from 'jst/profiles/avatarDialog'
 
 export default class AvatarDialogView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.updateAvatar = this.updateAvatar.bind(this)
-    this.preflightRequest = this.preflightRequest.bind(this)
-    this.onPreflight = this.onPreflight.bind(this)
-    this.onUploadSuccess = this.onUploadSuccess.bind(this)
-    this.waitAndSaveUserAvatar = this.waitAndSaveUserAvatar.bind(this)
-    this.saveUserAvatar = this.saveUserAvatar.bind(this)
-    this.updateDomAvatar = this.updateDomAvatar.bind(this)
-    this.checkFocusDeferred = this.checkFocusDeferred.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.template = template
 
@@ -78,12 +59,12 @@ export default class AvatarDialogView extends DialogBaseView {
       buttons: [
         {
           text: this.messages.cancel,
-          click: this.cancel
+          click: (...args) => this.cancel(...args)
         },
         {
           text: this.messages.selectImage,
           class: 'btn-primary select_button',
-          click: this.updateAvatar
+          click: () => this.updateAvatar()
         }
       ],
       height: 500,
@@ -122,7 +103,7 @@ export default class AvatarDialogView extends DialogBaseView {
 
   updateAvatar() {
     this.disableSelectButton()
-    if (this.currentView != null ? this.currentView.updateAvatar : undefined) {
+    if (this.currentView && this.currentView.updateAvatar) {
       return this.viewUpdateAvatar()
     } else {
       return this.imageUpdateAvatar()
@@ -149,7 +130,7 @@ export default class AvatarDialogView extends DialogBaseView {
   }
 
   imageUpdateAvatar() {
-    return $.when(this.getImage(), this.preflightRequest()).then(this.onPreflight)
+    return $.when(this.getImage(), this.preflightRequest()).then(this.onPreflight.bind(this))
   }
 
   handleErrorUpdating(response) {
@@ -169,10 +150,10 @@ export default class AvatarDialogView extends DialogBaseView {
         const message = _.isString(errors.base)
           ? errors.base
           : _.isArray(errors.base)
-            ? errors.base.reduce(errorReducer, '')
-            : I18n.t(
-                'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
-              )
+          ? errors.base.reduce(errorReducer, '')
+          : I18n.t(
+              'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
+            )
 
         $.flashError(message)
         return this.enableSelectButton()
@@ -197,7 +178,7 @@ export default class AvatarDialogView extends DialogBaseView {
   onPreflight(image, response) {
     const preflight = response[0]
     return completeUpload(preflight, image, {filename: 'profile.jpg', includeAvatar: true})
-      .then(this.onUploadSuccess)
+      .then(resp => this.onUploadSuccess(resp))
       .catch(xhr => this.handleErrorUpdating(xhr.responseText))
   }
 
@@ -235,7 +216,7 @@ export default class AvatarDialogView extends DialogBaseView {
     }).then(_.partial(this.updateDomAvatar, url))
   }
 
-  updateDomAvatar(url) {
+  updateDomAvatar = url => {
     $('.profile_pic_link, .profile-link').css('background-image', `url('${url}')`)
     return this.close()
   }
@@ -268,7 +249,7 @@ export default class AvatarDialogView extends DialogBaseView {
     return _.defer(this.checkFocusDeferred)
   }
 
-  checkFocusDeferred() {
+  checkFocusDeferred = () => {
     if (
       !$.contains(this.$el[0], document.activeElement) ||
       !$(document.activeElement).is(':visible')

@@ -19,59 +19,63 @@
 import I18n from 'i18n!quizzes.rubric'
 import $ from 'jquery'
 import 'jqueryui/dialog'
-import 'rubricEditBinding' // event handler for rubricEditDataReady
 
-  var quizRubric = {
-    ready: function() {
-      var $dialog = $("#rubrics.rubric_dialog");
-      $dialog.dialog({
-        title: I18n.t('titles.details', "Assignment Rubric Details"),
-        width: 600,
-        resizable: true
-      });
-    },
+const quizRubric = {
+  async loadBindings() {
+    await import('rubricEditBinding') // event handler for rubricEditDataReady
+  },
 
-    buildLoadingDialog: function(){
-      var $loading = $("<div/>");
-      $loading.text(I18n.t('loading', "Loading..."));
-      $("body").append($loading);
-      $loading.dialog({
-        width: 400,
-        height: 200
-      });
-      return $loading;
-    },
+  async ready() {
+    await this.loadBindings()
+    const $dialog = $('#rubrics.rubric_dialog')
+    $dialog.dialog({
+      title: I18n.t('titles.details', 'Assignment Rubric Details'),
+      width: 600,
+      resizable: true
+    })
+  },
 
-    replaceLoadingDialog: function(html, $loading){
-      $("body").append(html);
-      $loading.dialog('close');
-      $loading.remove();
-      quizRubric.ready();
-    },
+  buildLoadingDialog() {
+    const $loading = $('<div/>')
+    $loading.text(I18n.t('loading', 'Loading...'))
+    $('body').append($loading)
+    $loading.dialog({
+      width: 400,
+      height: 200
+    })
+    return $loading
+  },
 
-    createRubricDialog: function(url, preloadedHtml) {
-      var $dialog = $("#rubrics.rubric_dialog");
-      if($dialog.length) {
-        quizRubric.ready();
+  async replaceLoadingDialog(html, $loading) {
+    await this.loadBindings()
+    $('body').append(html)
+    $loading.dialog('close')
+    $loading.remove()
+    quizRubric.ready()
+  },
+
+  async createRubricDialog(url, preloadedHtml) {
+    const $dialog = $('#rubrics.rubric_dialog')
+    if ($dialog.length) {
+      await quizRubric.ready()
+    } else {
+      const $loading = quizRubric.buildLoadingDialog()
+      if (preloadedHtml === undefined || preloadedHtml === null) {
+        const html = await $.get(url)
+        await quizRubric.replaceLoadingDialog(html, $loading)
       } else {
-        var $loading = quizRubric.buildLoadingDialog();
-        if(preloadedHtml === undefined || preloadedHtml === null){
-          $.get(url, function(html) {
-            quizRubric.replaceLoadingDialog(html, $loading);
-          });
-        } else {
-          quizRubric.replaceLoadingDialog(preloadedHtml, $loading);
-        }
+        await quizRubric.replaceLoadingDialog(preloadedHtml, $loading)
       }
     }
-  };
+  }
+}
 
-  $(document).ready(function() {
-    $(".show_rubric_link").click(function(event) {
-      event.preventDefault();
-      var url = $(this).attr('rel');
-      quizRubric.createRubricDialog(url);
-    });
-  });
+$(document).ready(function() {
+  $('.show_rubric_link').click(function(event) {
+    event.preventDefault()
+    const url = $(this).attr('rel')
+    quizRubric.createRubricDialog(url)
+  })
+})
 
-export default quizRubric;
+export default quizRubric

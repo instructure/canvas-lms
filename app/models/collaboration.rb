@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,6 +21,8 @@
 class Collaboration < ActiveRecord::Base
   include Workflow
   include SendToStream
+
+  DEEP_LINKING_EXTENSION = 'https://canvas.instructure.com/lti/collaboration'
 
   attr_readonly   :collaboration_type
 

@@ -40,7 +40,7 @@ export default class ComboBox {
   // items are opaque to the combo box. Whenever the selection changes, the
   // 'change' event on this object will be triggered with the item as
   // argument.
-  constructor (items, opts = {}) {
+  constructor(items, opts = {}) {
     this.items = items
 
     // override item transforms
@@ -73,7 +73,7 @@ export default class ComboBox {
 
   // #
   // Select a specific item by value.
-  select (value) {
+  select(value) {
     const oldIndex = this._index()
     this.$menu.val(value)
 
@@ -89,21 +89,21 @@ export default class ComboBox {
 
   // #
   // Retrieve the currently selected item.
-  selected () {
+  selected() {
     return this.items[this._index()]
   }
 
   // #
   // @api private
   // The index of the selected item.
-  _index () {
+  _index() {
     return this.$menu[0].selectedIndex
   }
 
   // #
   // @api private
   // Select the previous item in the combo.
-  _previous = (e) => {
+  _previous = e => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -115,7 +115,7 @@ export default class ComboBox {
   // #
   // @api private
   // Select the next item in the combo.
-  _next = (e) => {
+  _next = e => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -126,14 +126,14 @@ export default class ComboBox {
   // #
   // @api private
   // Default item to value conversion.
-  _value (item) {
+  _value(item) {
     return item.value
   }
 
   // #
   // @api private
   // Default item to label conversion.
-  _label (item) {
+  _label(item) {
     return item.label
   }
 

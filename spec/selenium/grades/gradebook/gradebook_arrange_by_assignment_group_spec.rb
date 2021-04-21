@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -17,61 +19,65 @@
 
 require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/assignment_overrides'
+require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook_cells_page'
 
-describe "gradebook - arrange by assignment group" do
+describe "Gradebook view menu" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
   include GradebookCommon
 
-  before(:once) do
-    gradebook_data_setup
-    @assignment = @course.assignments.first
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
+
+  context "sort by assignment group order" do
+    before(:each) do
+      Gradebook.visit(@course)
+    end
+
+    it "defaults arrange by to assignment group in the grid", priority: "1", test_id: 220028 do
+      expect(Gradebook::Cells.get_grade(@student_1, @first_assignment)).to eq @assignment_1_points
+      expect(Gradebook::Cells.get_grade(@student_1, @second_assignment)).to eq @assignment_2_points
+      expect(Gradebook::Cells.get_grade(@student_1, @third_assignment)).to eq "–"
+    end
+
+    it "shows default arrange by in the menu" do
+      Gradebook.open_view_menu_and_arrange_by_menu
+
+      expect(Gradebook.popover_menu_item_checked?('Default Order')).to eq 'true'
+    end
+
+    it "validates arrange columns by assignment group option", priority: "1", test_id: 3253267 do
+      Gradebook.open_view_menu_and_arrange_by_menu
+      Gradebook.view_arrange_by_submenu_item('Default Order').click
+
+      expect(Gradebook::Cells.get_grade(@student_1, @first_assignment)).to eq @assignment_1_points
+      expect(Gradebook::Cells.get_grade(@student_1, @second_assignment)).to eq @assignment_2_points
+      expect(Gradebook::Cells.get_grade(@student_1, @third_assignment)).to eq "–"
+    end
   end
 
-  before(:each) do
-    user_session(@teacher)
-    get "/courses/#{@course.id}/gradebook"
-  end
+  context "assignment group dropdown" do
+    before(:each) do
+      Gradebook.visit(@course)
+    end
 
-  it "should default to arrange columns by assignment group", priority: "1", test_id: 220028 do
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0]).to include_text @assignment_1_points
-    expect(first_row_cells[1]).to include_text @assignment_2_points
-    expect(first_row_cells[2]).to include_text "-"
+    it "sorts assignments by grade - Low to High", priority: "1", test_id: 3253345 do
+      Gradebook.click_assignment_group_header_options(@group.name,'Grade - Low to High')
+      gradebook_student_names = Gradebook.fetch_student_names
 
-    arrange_settings = ff('input[name="arrange-columns-by"]')
-    f('#gradebook_settings').click
-    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
-    expect(arrange_settings.last.find_element(:xpath, '..')).not_to be_displayed
-  end
+      expect(gradebook_student_names[0]).to eq(@student_name_2)
+      expect(gradebook_student_names[1]).to eq(@student_name_3)
+      expect(gradebook_student_names[2]).to eq(@student_name_1)
+    end
 
-  it "should validate arrange columns by assignment group option", priority: "1", test_id: 220029 do
-    # since assignment group is the default, sort by due date, then assignment group again
-    arrange_settings = -> { ff('input[name="arrange-columns-by"]') }
-    f('#gradebook_settings').click
-    arrange_settings.call.first.find_element(:xpath, '..')
-    arrange_settings.call.last.find_element(:xpath, '..')
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0]).to include_text @assignment_1_points
-    expect(first_row_cells[1]).to include_text @assignment_2_points
-    expect(first_row_cells[2]).to include_text "-"
+    it "sorts assignments by grade - High to Low", priority: "1", test_id: 3253346 do
+      Gradebook.click_assignment_group_header_options(@group.name,'Grade - High to Low')
+      gradebook_student_names = Gradebook.fetch_student_names
 
-    arrange_settings = -> { ff('input[name="arrange-columns-by"]') }
-    f('#gradebook_settings')
-    expect(arrange_settings.call.first.find_element(:xpath, '..')).to be_displayed
-    expect(arrange_settings.call.last.find_element(:xpath, '..')).not_to be_displayed
-
-    # Setting should stick (not be messed up) after reload
-    get "/courses/#{@course.id}/gradebook"
-
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0]).to include_text @assignment_1_points
-    expect(first_row_cells[1]).to include_text @assignment_2_points
-    expect(first_row_cells[2]).to include_text "-"
-
-    arrange_settings = ff('input[name="arrange-columns-by"]')
-    f('#gradebook_settings').click
-    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
-    expect(arrange_settings.last.find_element(:xpath, '..')).not_to be_displayed
+      expect(gradebook_student_names[0]).to eq(@student_name_1)
+      expect(gradebook_student_names[1]).to eq(@student_name_3)
+      expect(gradebook_student_names[2]).to eq(@student_name_2)
+    end
   end
 end

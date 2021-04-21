@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,9 +19,6 @@
 
 module Lti::Ims
   # @API Result
-  # @internal
-  #
-  # TODO: remove internal flags
   #
   # Result API for IMS Assignment and Grade Services
   #
@@ -36,7 +35,7 @@ module Lti::Ims
   #          "userId": {
   #            "description": "The lti_user_id or the Canvas user_id",
   #            "example": "50 | 'abcasdf'",
-  #            "type": "number|string"
+  #            "type": "string"
   #          },
   #          "resultScore": {
   #            "description": "The score of the result as defined by Canvas, scaled to the resultMaximum",
@@ -44,9 +43,7 @@ module Lti::Ims
   #            "type": "number"
   #          },
   #          "resultMaximum": {
-  #            "description": "Maximum possible score for this result;
-  #                            1 is the default value and will be assumed if not specified otherwise. Minimum
-  #                            value of 0 required.",
+  #            "description": "Maximum possible score for this result; 1 is the default value and will be assumed if not specified otherwise. Minimum value of 0 required.",
   #            "example": "50",
   #            "type": "number"
   #          },
@@ -70,7 +67,6 @@ module Lti::Ims
     MIME_TYPE = 'application/vnd.ims.lis.v2.resultcontainer+json'.freeze
 
     # @API Show a collection of Results
-    # @internal
     #
     # Show existing Results of a line item. Can be used to retrieve a specific student's
     # result by adding the user_id (defined as the lti_user_id or the Canvas user_id) as
@@ -82,14 +78,13 @@ module Lti::Ims
     def index
       render(json: [], content_type: MIME_TYPE) and return if user.present? && !context.user_is_student?(user)
 
-      results = Lti::Result.where(line_item: line_item)
+      results = Lti::Result.active.where(line_item: line_item).preload(:assignment, :submission)
       results = results.where(user: user).preload(:user) if params.key?(:user_id)
       results = Api.paginate(results, self, "#{line_item_url}/results", pagination_args)
       render json: results_collection(results), content_type: MIME_TYPE
     end
 
     # @API Show a Result
-    # @internal
     #
     # Show existing Result of a line item.
     #
@@ -117,7 +112,7 @@ module Lti::Ims
     end
 
     def result
-      @_result = Lti::Result.find(params[:id])
+      @_result = Lti::Result.active.find(params[:id])
     end
 
     def results_collection(results)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -43,6 +45,6 @@ module CustomPageLoaders
   end
 
   def refresh_page
-    expect_new_page_load { driver.navigate.refresh }
+    wait_for_new_page_load { driver.navigate.refresh }
   end
 end

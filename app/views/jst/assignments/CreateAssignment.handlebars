@@ -1,6 +1,5 @@
 <div class="form-dialog-content create_assignment_dialog">
-  <div class="form-horizontal">
-
+  <div class="{{#unless small_tablet}}form-horizontal{{/unless}}">
     {{#if canChooseType}}
     <div class="control-group">
       <label class="control-label" for="{{uniqLabel}}_assignment_type">
@@ -8,6 +7,9 @@
       </label>
       <div class="controls">
         <select type="text" id="{{uniqLabel}}_assignment_type" name="submission_types">
+          {{#if defaultToolName}}
+            <option value="default_external_tool" data-default-tool="true">{{defaultToolName}}</option>
+          {{/if}}
           <option value="none">{{#t "assignment"}}Assignment{{/t}}</option>
           <option value="discussion_topic">{{#t "discussion_type"}}Discussion{{/t}}</option>
           <option value="online_quiz">{{#t "quiz_type"}}Quiz{{/t}}</option>

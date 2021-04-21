@@ -34,12 +34,12 @@ const defaultProps = {
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
   setNotificationMessage: noop,
-  includeCourseSettings: noop,
+  includeCourseSettings: noop
 }
 
 test('renders the MigrationOptions component', () => {
   const tree = enzyme.shallow(<MigrationOptions {...defaultProps} />)
-  const node = tree.find('.bcs__history-settings')
+  const node = tree.find({as: 'fieldset'})
   ok(node.exists())
 })
 

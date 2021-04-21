@@ -1,5 +1,5 @@
 test:
-  remote_url_firefox: http://seleniumff.docker/wd/hub
-  remote_url_chrome: http://seleniumch.docker/wd/hub
+  remote_url_firefox: http://selenium-firefox:4444/wd/hub
+  remote_url_chrome: http://selenium-chrome:4444/wd/hub
   browser: chrome
   # auto_open_devtools: true

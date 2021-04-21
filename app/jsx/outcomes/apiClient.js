@@ -18,7 +18,7 @@
 
 import axios from 'axios'
 
-export function createImport (contextRoot, file) {
+export function createImport(contextRoot, file) {
   const data = new FormData()
   // xsslint safeString.identifier file
   data.append('attachment', file)
@@ -26,6 +26,6 @@ export function createImport (contextRoot, file) {
   return axios.post(url, data)
 }
 
-export function queryImportStatus (contextRoot, outcomeImportId) {
+export function queryImportStatus(contextRoot, outcomeImportId) {
   return axios.get(`/api/v1${contextRoot}/outcome_imports/${outcomeImportId}`)
 }

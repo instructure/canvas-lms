@@ -1,0 +1,28 @@
+rce_auto_save:
+  state: hidden
+  display_name: RCE Auto-Save
+  description: |-
+    If RCE Enhancements are also enabled,
+    the RCE will auto-save your work as you go
+  applies_to: Course
+  root_opt_in: true
+cc_in_rce_video_tray:
+  state: hidden
+  display_name: RCE Edit Closed Captions
+  description: Edit closed captions/subtitles to videos from the video options tray in the RCE
+  applies_to: SiteAdmin
+rce_pretty_html_editor:
+  state: hidden
+  display_name: RCE Pretty HTML Editor
+  description: A much better HTML code editor for the RCE, though it suffers from being inaccessible to screenreader users.
+  applies_to: SiteAdmin
+rce_better_file_downloading:
+  state: hidden
+  display_name: RCE Better File Downloading
+  description: Include a download link next to each file link in the RCE
+  applies_to: SiteAdmin
+rce_better_file_previewing:
+  state: hidden
+  display_name: RCE Better File Previewing
+  description: Preview files linked in the RCE in an overlay rather than a new browser tab.
+  applies_to: SiteAdmin

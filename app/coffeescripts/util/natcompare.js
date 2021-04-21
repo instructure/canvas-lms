@@ -18,7 +18,7 @@
 import I18n from 'i18nObj'
 
 export default {
-  strings (x, y) {
+  strings(x, y) {
     let locale = I18n.locale || 'en-US'
     const locale_map = {zh_Hant: 'zh-Hant'}
     locale = locale_map[locale] || locale
@@ -27,19 +27,19 @@ export default {
     return x.localeCompare(y, locale, {
       sensitivity: 'variant',
       ignorePunctuation: false,
-      numeric: true,
+      numeric: true
     })
   },
 
-  by (f) {
+  by(f) {
     return (x, y) => this.strings(f(x), f(y))
   },
 
-  byKey (key) {
+  byKey(key) {
     return this.by(x => x[key])
   },
 
-  byGet (key) {
+  byGet(key) {
     return this.by(x => x.get(key))
   }
 }

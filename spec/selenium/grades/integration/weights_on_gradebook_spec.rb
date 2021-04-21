@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -16,28 +18,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook_cells_page'
 require_relative './weighting_setup'
 require_relative './a_gradebook_shared_example'
 
-describe 'classic gradebook' do
+describe 'gradebook' do
   include_context "in-process server selenium tests"
   include WeightingSetup
 
   let(:total_grade) do
-    grading_period_ids = [0, @gp1.id, @gp2.id]
+    grading_period_names = ["All Grading Periods", @gp1.title, @gp2.title]
     user_session(@teacher)
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
 
     if @grading_period_index
-      Gradebook.select_grading_period(grading_period_ids[@grading_period_index])
+      Gradebook.select_grading_period(grading_period_names[@grading_period_index])
     end
-    Gradebook.total_score_for_row(1)
+    Gradebook::Cells.get_total_grade(@student)
   end
 
   let(:individual_view) { false }
 
   before(:once) do
     weighted_grading_setup
+    update_course_preferences(@teacher, selected_view_options_filters: ['gradingPeriods'])
   end
 
   it_behaves_like 'a gradebook'

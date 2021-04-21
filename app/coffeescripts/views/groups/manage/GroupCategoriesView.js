@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
 import {View} from 'Backbone'
 import CollectionView from '../../CollectionView'
 import GroupCategoryView from './GroupCategoryView'
@@ -32,12 +31,13 @@ export default class GroupCategoriesView extends CollectionView {
 
     this.prototype.className = 'group_categories_area'
 
-    this.prototype.els = _.extend({}, CollectionView.prototype.els, {
+    this.prototype.els = {
+      ...CollectionView.prototype.els,
       '#group_categories_tabs': '$tabs',
       'li.static': '$static',
       '#add-group-set': '$addGroupSetButton',
       '.empty-groupset-instructions': '$emptyInstructions'
-    })
+    }
 
     this.prototype.events = {
       'click #add-group-set': 'addGroupSet',
@@ -47,11 +47,10 @@ export default class GroupCategoriesView extends CollectionView {
     this.prototype.itemView = View.extend({
       tagName: 'li',
       template() {
-        return tabTemplate(
-          _.extend(this.model.present(), {
-            id: this.model.id != null ? this.model.id : this.model.cid
-          })
-        )
+        return tabTemplate({
+          ...this.model.present(),
+          id: this.model.id != null ? this.model.id : this.model.cid
+        })
       }
     })
   }

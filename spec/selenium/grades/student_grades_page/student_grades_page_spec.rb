@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -73,7 +75,7 @@ describe "gradebook - logged in as a student" do
       before do
         # create term
         term = @course.root_account.enrollment_terms.create!
-        @course.update_attributes(enrollment_term: term)
+        @course.update(enrollment_term: term)
 
         # create group and periods
         group = backend_group_helper.create_for_account(@course.root_account)

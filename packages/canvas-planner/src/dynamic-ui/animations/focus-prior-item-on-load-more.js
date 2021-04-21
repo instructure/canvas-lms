@@ -16,25 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Animation from '../animation';
+import Animation from '../animation'
 
 export class FocusPriorItemOnLoadMore extends Animation {
   shouldAcceptGettingFutureItems(action) {
-    return action.payload.loadMoreButtonClicked;
+    return action.payload.loadMoreButtonClicked
   }
 
-  uiDidUpdate () {
-    const newDays = this.acceptedAction('GOT_DAYS_SUCCESS').payload.internalDays;
-    const firstNewItem = newDays[0][1][0];
-    const allRegisteredItemComponents = this.registry().getAllItemsSorted();
+  uiDidUpdate() {
+    const newDays = this.acceptedAction('GOT_DAYS_SUCCESS').payload.internalDays
+    const firstNewItem = newDays[0][1][0]
+    const allRegisteredItemComponents = this.registry().getAllItemsSorted()
     const indexOfFirstNewItemComponent = allRegisteredItemComponents.findIndex(
-      itemComponent => itemComponent.componentIds[0] === firstNewItem.uniqueId);
-    const indexOfPriorItemComponent = indexOfFirstNewItemComponent - 1;
+      itemComponent => itemComponent.componentIds[0] === firstNewItem.uniqueId
+    )
+    const indexOfPriorItemComponent = indexOfFirstNewItemComponent - 1
     if (indexOfPriorItemComponent < 0) {
-      console.error('FocusPriorItemOnLoadMore could not find the item that should receive focus');
-      return;
+      console.error('FocusPriorItemOnLoadMore could not find the item that should receive focus')
+      return
     }
-    const priorItemComponent = allRegisteredItemComponents[indexOfPriorItemComponent];
-    this.animator().focusElement(priorItemComponent.component.getFocusable());
+    const priorItemComponent = allRegisteredItemComponents[indexOfPriorItemComponent]
+    this.animator().focusElement(priorItemComponent.component.getFocusable())
   }
 }

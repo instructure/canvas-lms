@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
-
 import PaginatedCollection from '../collections/PaginatedCollection'
 import Message from '../models/Message'
 
 export default class MessageCollection extends PaginatedCollection {
   comparator(a, b) {
-    const dates = _.map([a, b], message => message.timestamp().getTime())
+    const dates = [a, b].map(message => message.timestamp().getTime())
     if (dates[0] > dates[1]) {
       return -1
     }
@@ -34,7 +32,7 @@ export default class MessageCollection extends PaginatedCollection {
 
   selectRange(model) {
     const newPos = this.indexOf(model)
-    const lastSelected = _.last(this.view.selectedMessages)
+    const lastSelected = this.view.selectedMessages[this.view.selectedMessages.length - 1]
     this.each(x => x.set('selected', false))
     const lastPos = this.indexOf(lastSelected)
     const range = this.slice(Math.min(newPos, lastPos), Math.max(newPos, lastPos) + 1)
@@ -42,7 +40,7 @@ export default class MessageCollection extends PaginatedCollection {
     if (newPos > lastPos) {
       range.reverse()
     }
-    return _.each(range, x => x.set('selected', true))
+    return range.forEach(x => x.set('selected', true))
   }
 }
 MessageCollection.prototype.model = Message

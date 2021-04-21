@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -15,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'action_controller_test_process'
 
 module CC
   class CCExporter
@@ -61,7 +62,7 @@ module CC
         create_export_dir
         create_zip_file
         if @qti_only_export
-          @manifest = CC::QTI::QTIManifest.new(self)
+          @manifest = CC::Qti::QtiManifest.new(self)
         else
           @manifest = Manifest.new(self, @manifest_opts)
         end

@@ -26,7 +26,7 @@ import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
 
 QUnit.module('DialogPreview')
 
-test('DP: single item rendered with FilesystemObjectThumbnail', function() {
+test('DP: single item rendered with FilesystemObjectThumbnail', () => {
   const file = new File({name: 'Test File', thumbnail_url: 'blah'})
   file.url = () => 'some_url'
   const fsObjStub = sandbox.stub(FilesystemObjectThumbnail.prototype, 'render').returns(<div />)

@@ -16,41 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import React from "react";
-import File from "../../../../src/common/components/FileTree/File";
-import sd from "skin-deep";
-import sinon from "sinon";
+import assert from 'assert'
+import React from 'react'
+import File from '../../../../src/common/components/FileTree/File'
+import sd from 'skin-deep'
+import sinon from 'sinon'
 
-describe("FileTree/File", () => {
-  let file;
+describe('FileTree/File', () => {
+  let file
 
   beforeEach(() => {
     file = {
       id: 1,
-      name: "foo",
-      type: "text/plain"
-    };
-  });
+      name: 'foo',
+      type: 'text/plain'
+    }
+  })
 
-  it("renders a button with file name", () => {
-    const tree = sd.shallowRender(<File file={file} />);
+  it('renders a button with file name', () => {
+    const tree = sd.shallowRender(<File file={file} />)
     const text = tree
-      .subTree("button")
+      .subTree('button')
       .text()
-      .trim();
-    assert(new RegExp(file.name).test(text));
-  });
+      .trim()
+    assert(new RegExp(file.name).test(text))
+  })
 
-  it("calls onSelect with file id when button is clicked", () => {
-    const spy = sinon.spy();
-    const tree = sd.shallowRender(<File file={file} onSelect={spy} />);
-    tree.subTree("button").props.onClick({});
-    sinon.assert.calledWith(spy, file.id);
-  });
+  it('calls onSelect with file id when button is clicked', () => {
+    const spy = sinon.spy()
+    const tree = sd.shallowRender(<File file={file} onSelect={spy} />)
+    tree.subTree('button').props.onClick({})
+    sinon.assert.calledWith(spy, file.id)
+  })
 
-  it("does not throw when onSelect is not defined", () => {
-    const tree = sd.shallowRender(<File file={file} />);
-    assert.doesNotThrow(() => tree.subTree("button").props.onClick({}));
-  });
-});
+  it('does not throw when onSelect is not defined', () => {
+    const tree = sd.shallowRender(<File file={file} />)
+    assert.doesNotThrow(() => tree.subTree('button').props.onClick({}))
+  })
+})

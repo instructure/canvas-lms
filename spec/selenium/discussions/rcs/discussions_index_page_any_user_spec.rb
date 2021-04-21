@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -36,7 +38,7 @@ describe "discussions" do
     context "as anyone" do # we actually use a student, but the idea is that it would work the same for a teacher or anyone else
       before(:each) do
         user_session(somebody)
-        enable_all_rcs @course.account
+        Account.default.enable_feature!(:rce_enhancements)
         stub_rcs_config
       end
 

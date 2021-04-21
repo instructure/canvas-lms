@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!media_comments'
+import I18n from 'i18n!media_comment_dialog_manager'
 import $ from 'jquery'
 import 'jqueryui/dialog'
 import ReactDOM from 'react-dom'
@@ -25,17 +25,12 @@ import ReactDOM from 'react-dom'
  */
 
 export default class DialogManager {
-  constructor() {
-    this.hide = this.hide.bind(this)
-    this.setCloseOption = this.setCloseOption.bind(this)
-  }
-
   initialize() {
     this.dialog = $('#media_comment_dialog')
     return this.createLoadingWindow()
   }
 
-  hide() {
+  hide = () => {
     $('#media_comment_dialog').dialog('close')
   }
 
@@ -74,9 +69,10 @@ export default class DialogManager {
     })
   }
 
-  setCloseOption(opts) {
+  setCloseOption = opts => {
     return this.dialog.dialog('option', 'close', () => {
-      ReactDOM.unmountComponentAtNode(document.getElementById('record_media_tab'))
+      const mountPoint = document.getElementById('record_media_tab')
+      if (mountPoint) ReactDOM.unmountComponentAtNode(mountPoint)
       $('#audio_record')
         .before("<div id='audio_record'/>")
         .remove()

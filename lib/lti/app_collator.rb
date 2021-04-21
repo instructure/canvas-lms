@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -46,34 +48,14 @@ module Lti
           hash
         when ToolProxy
           tool_proxy_definition(o)
-        when Hash
-          tool_config_definition(o)
         end
-      end
+      end.compact
     end
 
     private
 
-    def tool_config_definition(tool_configuration)
-      config = tool_configuration[:config]
-      {
-        app_type: config.class.name,
-        app_id: config.developer_key.id,
-        name: config[:settings]['title'],
-        description: config[:settings]['description'],
-        installed_locally: tool_configuration[:enabled],
-        enabled: tool_configuration[:enabled],
-        installed_in_current_course: tool_configuration[:installed_in_current_course],
-        tool_configuration: nil,
-        context: 'Account',
-        context_id: config.developer_key.account_id,
-        reregistration_url: nil,
-        has_update: nil
-      }
-    end
-
     def external_tool_definition(external_tool)
-      {
+      result = {
         app_type: 'ContextExternalTool',
         app_id: external_tool.id,
         name: external_tool.name,
@@ -85,8 +67,12 @@ module Lti
         context_id: external_tool.context.id,
         reregistration_url: nil,
         has_update: nil,
-        lti_version: external_tool.use_1_3? ? '1.3' : '1.1'
+        lti_version: external_tool.use_1_3? ? '1.3' : '1.1',
+        deployment_id: external_tool.deployment_id,
+        editor_button_settings: external_tool.settings[:editor_button]
       }
+      result[:is_rce_favorite] = external_tool.is_rce_favorite_in_context?(@context) if external_tool.can_be_rce_favorite?
+      result
     end
 
     def tool_proxy_definition(tool_proxy)

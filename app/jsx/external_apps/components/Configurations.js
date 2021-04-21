@@ -35,12 +35,12 @@ export default class Configurations extends React.Component {
     this.headerRef.focus()
   }
 
-  setHeaderRef = (node) => {
+  setHeaderRef = node => {
     this.headerRef = node
   }
 
   render() {
-    const appCenterLink = function() {
+    const appCenterLink = () => {
       if (!this.props.env.APP_CENTER.enabled) {
         return ''
       }
@@ -50,7 +50,7 @@ export default class Configurations extends React.Component {
           {I18n.t('View App Center')}
         </a>
       )
-    }.bind(this)
+    }
 
     return (
       <div className="Configurations">

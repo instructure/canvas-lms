@@ -141,7 +141,7 @@ function dropUnpointed(submissions, keepHighest, keepLowest) {
   const sortedSubmissions = submissions.sort(sortSubmissionsAscending)
   return _.chain(sortedSubmissions)
     .last(keepHighest)
-    .first(keepLowest)
+    .head(keepLowest)
     .value()
 }
 
@@ -168,7 +168,7 @@ function dropAssignments(allSubmissionData, rules = {}) {
   let droppableSubmissionData = allSubmissionData
   if (neverDropIds.length > 0) {
     ;[cannotDrop, droppableSubmissionData] = partition(allSubmissionData, submission =>
-      _.contains(neverDropIds, submission.submission.assignment_id)
+      _.includes(neverDropIds, submission.submission.assignment_id)
     )
   }
 
@@ -199,19 +199,20 @@ function dropAssignments(allSubmissionData, rules = {}) {
   return submissionsToKeep
 }
 
-function calculateGroupGrade(group, allSubmissions, includeUngraded) {
+function calculateGroupGrade(group, allSubmissions, opts) {
   // Remove assignments without visibility from gradeableAssignments.
   const hiddenAssignmentsById = _.chain(allSubmissions)
     .filter('hidden')
-    .indexBy('assignment_id')
+    .keyBy('assignment_id')
     .value()
   const ungradeableCriteria = assignment =>
     assignment.omit_from_final_grade ||
     hiddenAssignmentsById[assignment.id] ||
     _.isEqual(assignment.submission_types, ['not_graded']) ||
-    assignment.workflow_state === 'unpublished'
+    assignment.workflow_state === 'unpublished' ||
+    (opts.ignoreUnpostedAnonymous && assignment.anonymize_students)
   const gradeableAssignments = _.reject(group.assignments, ungradeableCriteria)
-  const assignments = _.indexBy(gradeableAssignments, 'id')
+  const assignments = _.keyBy(gradeableAssignments, 'id')
 
   // Remove submissions from other assignment groups.
   let submissions = _.filter(allSubmissions, submission => assignments[submission.assignment_id])
@@ -228,7 +229,7 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
   }))
 
   let relevantSubmissionData = submissionData
-  if (!includeUngraded) {
+  if (!opts.includeUngraded) {
     relevantSubmissionData = _.filter(
       submissionData,
       submission => submission.submitted && !submission.pending_review
@@ -288,6 +289,7 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
 // * id: <Canvas id>
 // * points_possible: non-negative number
 // * submission_types: [array of strings]
+// * anonymize_students: boolean
 //
 // An AssignmentGroup Grade has the following shape:
 // {
@@ -306,13 +308,19 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
 //   final: <AssignmentGroup Grade *see above>
 //   scoreUnit: 'points'
 // }
-function calculate(allSubmissions, assignmentGroup) {
+function calculate(allSubmissions, assignmentGroup, ignoreUnpostedAnonymous) {
   const submissions = _.uniq(allSubmissions, 'assignment_id')
   return {
     assignmentGroupId: assignmentGroup.id,
     assignmentGroupWeight: assignmentGroup.group_weight,
-    current: calculateGroupGrade(assignmentGroup, submissions, false),
-    final: calculateGroupGrade(assignmentGroup, submissions, true),
+    current: calculateGroupGrade(assignmentGroup, submissions, {
+      includeUngraded: false,
+      ignoreUnpostedAnonymous
+    }),
+    final: calculateGroupGrade(assignmentGroup, submissions, {
+      includeUngraded: true,
+      ignoreUnpostedAnonymous
+    }),
     scoreUnit: 'points'
   }
 }

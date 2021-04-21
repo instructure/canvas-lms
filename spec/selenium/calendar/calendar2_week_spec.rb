@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2014 - present Instructure, Inc.
@@ -22,6 +24,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common'
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+
+  before(:once) do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
 
   before(:each) do
     Account.default.tap do |a|
@@ -130,8 +136,7 @@ describe "calendar2" do
         events = ff('.fc-event')
 
         # Scroll the elements into view
-        events[0].location_once_scrolled_into_view
-        events[1].location_once_scrolled_into_view
+        scroll_into_view(".fc-event")
 
         # Drag object event onto target event
         driver.action.move_to(events[0]).click_and_hold.move_to(events[1]).release.perform
@@ -346,7 +351,7 @@ describe "calendar2" do
       course_with_student_logged_in
     end
 
-    it "should navigate to week view when week button is clicked", :xbrowser do
+    it "should navigate to week view when week button is clicked" do
       load_week_view
       expect(fj('.fc-agendaWeek-view:visible')).to be_present
     end

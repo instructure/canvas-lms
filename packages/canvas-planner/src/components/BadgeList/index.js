@@ -15,37 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Children, Component } from 'react';
-import themeable from '@instructure/ui-themeable/lib';
-import CustomPropTypes from '@instructure/ui-utils/lib/react/CustomPropTypes';
-import Pill from '@instructure/ui-elements/lib/components/Pill';
+import React, {Children, Component} from 'react'
+import {themeable} from '@instructure/ui-themeable'
+import {Children as ChildrenPropType} from '@instructure/ui-prop-types'
+import {Pill} from '@instructure/ui-pill'
 
-import styles from './styles.css';
-import theme from './theme.js';
+import styles from './styles.css'
+import theme from './theme'
 
 class BadgeList extends Component {
-
   static propTypes = {
-    children: CustomPropTypes.Children.oneOf([Pill])
+    children: ChildrenPropType.oneOf([Pill])
   }
 
-  renderChildren () {
-    return Children.map(this.props.children, (child) => {
+  renderChildren() {
+    return Children.map(this.props.children, child => {
       return (
         <li key={child.key} className={styles.item}>
           {child}
         </li>
-      );
-    });
+      )
+    })
   }
 
-  render () {
-    return (
-      <ul className={styles.root}>
-        {this.renderChildren()}
-      </ul>
-    );
+  render() {
+    return <ul className={styles.root}>{this.renderChildren()}</ul>
   }
 }
 
-export default themeable(theme, styles)(BadgeList);
+export default themeable(theme, styles)(BadgeList)

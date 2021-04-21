@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!roster'
-import { Model } from 'Backbone'
-import CreateUserList from 'compiled/models/CreateUserList'
+import ready from '@instructure/ready'
+import I18n from 'i18n!roster_publicjs'
+import {Model} from 'Backbone'
 import Role from 'compiled/models/Role'
-import CreateUsersView from 'compiled/views/courses/roster/CreateUsersView'
 import RoleSelectView from 'compiled/views/courses/roster/RoleSelectView'
 import rosterUsersTemplate from 'jst/courses/roster/rosterUsers'
 import RosterUserCollection from 'compiled/collections/RosterUserCollection'
@@ -37,7 +36,14 @@ import $ from 'jquery'
 import '../context_cards/StudentContextCardTrigger'
 
 const fetchOptions = {
-  include: ['avatar_url', 'enrollments', 'email', 'observed_users', 'can_be_removed', 'custom_links'],
+  include: [
+    'avatar_url',
+    'enrollments',
+    'email',
+    'observed_users',
+    'can_be_removed',
+    'custom_links'
+  ],
   per_page: 50
 }
 const users = new RosterUserCollection(null, {
@@ -45,44 +51,41 @@ const users = new RosterUserCollection(null, {
   sections: new SectionCollection(ENV.SECTIONS),
   params: fetchOptions
 })
-const rolesCollection = new RolesCollection(Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes)))
+const rolesCollection = new RolesCollection(
+  Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes))
+)
 const course = new Model(ENV.course)
-const inputFilterView = new InputFilterView({collection: users})
+const inputFilterView = new InputFilterView({collection: users, minLength: 2})
 const usersView = new PaginatedCollectionView({
   collection: users,
   itemView: RosterUserView,
   itemViewOptions: {
     course: ENV.course
   },
-  canViewLoginIdColumn: ENV.permissions.manage_admin_users || ENV.permissions.manage_students,
+  canViewLoginIdColumn: ENV.permissions.view_user_logins,
   canViewSisIdColumn: ENV.permissions.read_sis,
   buffer: 1000,
+  hideSectionsOnCourseUsersPage: ENV.course.hideSectionsOnCourseUsersPage,
   template: rosterUsersTemplate
 })
 const roleSelectView = new RoleSelectView({
   collection: users,
   rolesCollection
 })
-const createUsersView = new CreateUsersView({
-  collection: users,
-  rolesCollection,
-  model: new CreateUserList({
-    sections: ENV.SECTIONS,
-    roles: ENV.ALL_ROLES,
-    readURL: ENV.USER_LISTS_URL,
-    updateURL: ENV.ENROLL_USERS_URL
-  }),
-  courseModel: course
-})
 const resendInvitationsView = new ResendInvitationsView({
   model: course,
   resendInvitationsUrl: ENV.resend_invitations_url,
-  canResend: ENV.permissions.manage_students || ENV.permissions.manage_admin_users
+  canResend:
+    ENV.permissions.manage_students ||
+    ENV.permissions.manage_admin_users ||
+    ENV.permissions.can_allow_course_admin_actions
 })
 
-const groupCategories = new (GroupCategoryCollection.extend({
-  url: `/api/v1/courses/${ENV.course && ENV.course.id}/group_categories?per_page=50`
-}))()
+class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
+GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${ENV.course &&
+  ENV.course.id}/group_categories?per_page=50`
+
+const groupCategories = new GroupCategoryCollectionForThisCourse()
 
 const rosterTabsView = new RosterTabsView({collection: groupCategories})
 
@@ -93,7 +96,6 @@ const app = new RosterView({
   rosterTabsView,
   inputFilterView,
   roleSelectView,
-  createUsersView,
   resendInvitationsView,
   collection: users,
   roles: ENV.ALL_ROLES,
@@ -110,12 +112,16 @@ users.once('reset', () =>
     } else if (numUsers === 1) {
       msg = I18n.t('filter_one_user_found', '1 user found.')
     } else {
-      msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {userCount: numUsers})
+      msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {
+        userCount: numUsers
+      })
     }
-    return $('#aria_alerts').empty().text(msg)
+    return $('#aria_alerts')
+      .empty()
+      .text(msg)
   })
 )
 
 app.render()
-app.$el.appendTo($('#content'))
+ready(() => app.$el.appendTo($('#content')))
 users.fetch()

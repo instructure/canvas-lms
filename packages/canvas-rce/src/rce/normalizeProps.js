@@ -16,39 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sanitizeEditorOptions from "./sanitizeEditorOptions";
-import wrapInitCb from "./wrapInitCb";
-import normalizeLocale from "./normalizeLocale";
-import editorLanguage from "./editorLanguage";
-import { contentStyle } from "tinymce-light-skin";
+import formatMessage from '../format-message'
+import sanitizeEditorOptions from './sanitizeEditorOptions'
+import wrapInitCb from './wrapInitCb'
+import normalizeLocale from './normalizeLocale'
+import editorLanguage from './editorLanguage'
 
 export default function(props, tinymce, MutationObserver) {
-  let initialEditorOptions = props.editorOptions(tinymce),
+  const initialEditorOptions = props.editorOptions(tinymce),
     sanitizedEditorOptions = sanitizeEditorOptions(initialEditorOptions),
-    editorOptions = wrapInitCb(
-      props.mirroredAttrs,
-      sanitizedEditorOptions,
-      MutationObserver
-    );
+    editorOptions = wrapInitCb(props.mirroredAttrs, sanitizedEditorOptions, MutationObserver)
 
   // propagate localization prop to appropriate parameter/value on the
   // editor configuration
-  props.language = normalizeLocale(props.language);
-  const language = editorLanguage(props.language);
+  props.language = normalizeLocale(props.language)
+  const language = editorLanguage(props.language)
   if (language !== undefined) {
-    editorOptions.language = language;
-    editorOptions.language_url = "none";
+    editorOptions.language = language
+    editorOptions.language_url = 'none'
   }
 
-  // needed so brandable_css (which only exists in canvas) can load
+  // It is expected that consumers provide their own content_css so that the
+  // styles inside the editor match the styles of the site it is going to be
+  // displayed in.
   if (props.editorOptions.content_css) {
-    editorOptions.content_css =
-      window.location.origin + props.editorOptions.content_css;
+    editorOptions.content_css = props.editorOptions.content_css
   }
 
-  editorOptions.skin = false;
-  editorOptions.content_style = contentStyle;
-  editorOptions.branding = false;
+  // tell tinymce that we're handling the skin
+  editorOptions.skin = false
+
+  // when tiny formats menuitems with a style attribute, don't let it set the color so they get properly themed
+  editorOptions.preview_styles =
+    'font-family font-size font-weight font-style text-decoration text-transform border border-radius outline text-shadow'
+
+  // force tinyMCE to NOT use the "mobile" theme,
+  // see: https://stackoverflow.com/questions/54579110/is-it-possible-to-disable-the-mobile-ui-features-in-tinymce-5
+  editorOptions.mobile = {theme: 'silver'}
+
+  // tell tinyMCE not to put its own branding in the footer of the editor
+  editorOptions.branding = false
+
+  // we provide our own statusbar
+  editorOptions.statusbar = false
+
+  configureMenus(editorOptions, props.instRecordDisabled)
 
   return {
     // other props, including overrides
@@ -58,5 +70,40 @@ export default function(props, tinymce, MutationObserver) {
     // props
     editorOptions,
     tinymce
-  };
+  }
+}
+
+function configureMenus(editorOptions, instRecordDisabled) {
+  const insertMenuItems = [
+    ['instructure_links', 'instructure_image', 'instructure_document'],
+    ['instructure_equation', 'inserttable', 'instructure_media_embed'],
+    ['hr']
+  ]
+  if (!instRecordDisabled) {
+    insertMenuItems[0].splice(2, 0, 'instructure_media')
+  }
+
+  editorOptions.menubar = 'edit view insert format tools table'
+  editorOptions.menu = {
+    // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
+    // default edit menu is fine
+    view: {
+      title: formatMessage('View'),
+      items: 'fullscreen instructure_html_view'
+    },
+    insert: {
+      title: formatMessage('Insert'),
+      items: insertMenuItems.map(item => item.join(' ')).join(' | ')
+    },
+    format: {
+      title: formatMessage('Format'),
+      items:
+        'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat'
+    },
+    tools: {
+      title: formatMessage('Tools'),
+      items: 'wordcount lti_tools_menuitem'
+    }
+    // default table menu is fine
+  }
 }

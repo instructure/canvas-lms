@@ -54,6 +54,10 @@ test('generates the home, rootFolder, and other links', () => {
   ok(links.length === 4)
   equal(new URL(links[0].href).pathname, '/', 'correct home url')
   equal(new URL(links[2].href).pathname, '/courses/1/files', 'rootFolder link has correct url')
-  equal(new URL(links[3].href).pathname, '/courses/1/files/folder/test_folder_name', 'correct url for child')
+  equal(
+    new URL(links[3].href).pathname,
+    '/courses/1/files/folder/test_folder_name',
+    'correct url for child'
+  )
   equal(ReactDOM.findDOMNode(links[3]).text, 'test_folder_name', 'shows folder names')
 })

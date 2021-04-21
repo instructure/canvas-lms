@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -15,12 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
+require 'spec_helper'
 
 RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
 
   let(:account) { Account.create! }
-  let(:course) { Course.create!(account: account) }
+  let(:course) do
+    course_with_student(account: account)
+    @course
+  end
+  let(:student) { course.student_enrollments.first.user }
   let(:vendor_code) { 'com.instructure.test' }
   let(:developer_key) {DeveloperKey.create!(redirect_uri: 'http://www.example.com/redirect', vendor_code: vendor_code)}
   let(:product_family) do
@@ -32,16 +38,19 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       developer_key: developer_key
     )
   end
-  let(:tool_proxy) do
+  let(:tool_proxy_context) { account }
+  let(:tool_proxy) { create_tool_proxy(tool_proxy_context) }
+
+  def create_tool_proxy(context, overrides={})
     tp = Lti::ToolProxy.create!(
-      context: account,
+      context: context,
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
       product_family: product_family,
       product_version: '1',
       workflow_state: 'active',
       raw_data: {
-        'enabled_capability' => ['Security.splitSecret'],
+        'enabled_capability' => overrides[:enabled_capability] || ['Security.splitSecret'],
         'security_contract' => security_contract,
         'tool_profile' => {
           'lti_version' => 'LTI-2p0',
@@ -101,10 +110,12 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       },
       lti_version: '1'
     )
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+
+    Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp
   end
+
   let(:resource_handler) do
     Lti::ResourceHandler.create!(
       resource_type_code: 'code',
@@ -120,10 +131,10 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       tool_proxy: tool_proxy
     )
   end
-  let(:tool_proxy_binding) {
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+  let(:tool_proxy_binding) do
+    Lti::ToolProxyBinding.where(context_id: tool_proxy_context, context_type: tool_proxy_context.class.to_s,
                                 tool_proxy_id: tool_proxy).first_or_create!
-  }
+  end
   let(:tool_profile) do
     {
       "lti_version" => "LTI-2p0", "product_instance" => {

@@ -10,7 +10,7 @@
     {{#if migration_issues}}
       <a id='issueText{{cid}}' class='showIssues' href='#issues{{cid}}' aria-controls='issues{{cid}}'
          aria-label="{{#t "show_issues"}}Show Issues{{/t}}" title="{{#t "show_issues"}}Show Issues{{/t}}"
-         aria-haspopup="true" aria-owns="issues{{cid}}">
+         aria-haspopup="true">
         <span aria-hidden='true' data-bind="migration_issues_count">{{n issuesCount}}</span>
         <span aria-hidden='true' id="issuesButtonText{{cid}}" data-bind="issuesButtonText">{{#t "issues_text"}}issues{{/t}}</span>
       </a>
@@ -18,5 +18,4 @@
   {{/if}}
 </div>
 <div id="issues{{cid}}" class="migrationIssues clear" style="display: none" aria-expanded="false" tabindex="0"></div>
-<br />
-<hr />
+<hr role="presentation"/>

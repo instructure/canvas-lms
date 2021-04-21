@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@instructure/ui-themes/lib/canvas'
+import '@instructure/canvas-theme'
 import React from 'react'
 import {shallow} from 'enzyme'
 import MediaRecorder from '../index'
@@ -33,12 +33,11 @@ test('renders the MediaRecorder component', () => {
 test('onSaveFile calls the correct prop', () => {
   const props = defaultProps()
   const onSaveSpy = jest.fn()
-  props.onSaveFile = onSaveSpy;
+  props.onSaveFile = onSaveSpy
   const tree = shallow(<MediaRecorder {...props} />)
 
-  const FILE_NAME = "Blah blah blah file";
-  tree.instance().saveFile(FILE_NAME);
+  const FILE_NAME = 'Blah blah blah file'
+  tree.instance().saveFile(FILE_NAME)
 
   expect(onSaveSpy.mock.calls[0][0]).toMatch(FILE_NAME)
 })
-

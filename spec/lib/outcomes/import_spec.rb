@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -37,13 +39,14 @@ RSpec.describe Outcomes::Import do
     attr_reader :context
   end
 
-  let_once(:context) { account_model }
-  let_once(:course) { course_model(account: context) }
+  let_once(:root_account) { account_model }
+  let_once(:course) { course_model(account: root_account) }
   let_once(:other_context) { account_model }
-  let_once(:parent1) { outcome_group_model(context: context, vendor_guid: 'parent1') }
-  let_once(:parent2) { outcome_group_model(context: context, vendor_guid: 'parent2') }
   let_once(:outcome_vendor_guid) { 'imanoutcome' }
   let_once(:group_vendor_guid) { 'imagroup' }
+  let(:context) { root_account }
+  let(:parent1) { outcome_group_model(context: context, vendor_guid: 'parent1') }
+  let(:parent2) { outcome_group_model(context: context, vendor_guid: 'parent2') }
   let(:group_attributes) do
     {
       title: "i'm a group",
@@ -146,7 +149,6 @@ RSpec.describe Outcomes::Import do
 
       it 'uses the right vendor_guid clause' do
         different_guid = group_attributes.merge(vendor_guid: 'vg2')
-        allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
         existing_group.update! vendor_guid: different_guid[:vendor_guid]
         importer.import_group(different_guid)
         expect(existing_group.reload.title).to eq "i'm a group"
@@ -157,6 +159,16 @@ RSpec.describe Outcomes::Import do
         importer.import_group(group_attributes)
         new_group = LearningOutcomeGroup.find_by!(context: context, vendor_guid: group_vendor_guid)
         expect(new_group.id).not_to eq existing_group.id
+      end
+
+      it 'given two groups with the same guid, update an active group before resurrecting a deleted group' do
+        deleted_group = outcome_group_model(context: context, vendor_guid: group_vendor_guid, workflow_state: "deleted")
+        importer.import_group(group_attributes)
+        deleted_group.reload
+        existing_group.reload
+        expect(existing_group.title).to eq "i'm a group"
+        expect(deleted_group.workflow_state).to eq "deleted"
+        expect(deleted_group.title).not_to eq existing_group.title
       end
     end
 
@@ -278,7 +290,7 @@ RSpec.describe Outcomes::Import do
           expect do
             importer.import_outcome(
               **existing_outcome.slice(:title, :description, :display_name,
-                :workflow_state, :calculation_method, :calculation_int).symbolize_keys,
+                                       :workflow_state, :calculation_method, :calculation_int).symbolize_keys,
               vendor_guid: magic_guid
             )
             existing_outcome.reload
@@ -302,7 +314,6 @@ RSpec.describe Outcomes::Import do
 
       it 'uses the right vendor_guid clause' do
         different_guid = outcome_attributes.merge(vendor_guid: 'vg2')
-        allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
         existing_outcome.update! vendor_guid: different_guid[:vendor_guid]
         importer.import_outcome(different_guid)
         expect(existing_outcome.reload.title).to eq "i'm an outcome"
@@ -324,12 +335,29 @@ RSpec.describe Outcomes::Import do
         expect(new_outcome).not_to eq existing_outcome
         expect(new_outcome.context).to eq context
       end
+
+      it 'given two outcomes with the same guid, update an active outcome rather than a deleted outcome' do
+        new_outcome = outcome_model(context: context, vendor_guid: outcome_vendor_guid, display_name: '', calculation_method: 'highest')
+        existing_outcome.update! workflow_state: "deleted"
+        importer.import_outcome(**outcome_attributes)
+        new_outcome.reload
+        existing_outcome.reload
+        expect(new_outcome.title).to eq "i'm an outcome"
+        expect(existing_outcome.title).not_to eq new_outcome.title
+        expect(existing_outcome.workflow_state).to eq "deleted"
+      end
     end
 
     it 'updates attributes' do
       importer.import_outcome(**outcome_attributes)
       existing_outcome.reload
       expect(existing_outcome.reload).to have_attributes outcome_attributes
+    end
+
+    it 'restores deleted outcome' do
+      existing_outcome.update!(workflow_state: 'deleted')
+      importer.import_outcome(**outcome_attributes.merge(workflow_state: ''))
+      expect(existing_outcome.reload.workflow_state).to eq 'active'
     end
 
     it 'fails if outcome has already appeared in import' do
@@ -388,16 +416,25 @@ RSpec.describe Outcomes::Import do
       it 'reassigns parents of existing outcome' do
         parent1.add_outcome(existing_outcome)
         importer.import_outcome(**outcome_attributes, parent_guids: 'parent2')
-          expect(parent1.child_outcome_links.active.map(&:content)).to be_empty
+        expect(parent1.child_outcome_links.active.map(&:content)).to be_empty
+        expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
+      end
+
+      it 'reassigns parents of an aligned outcome' do
+        outcome_with_rubric(outcome: existing_outcome)
+        parent1.add_outcome(existing_outcome)
+        importer.import_outcome(**outcome_attributes, parent_guids: 'parent2')
+        expect(parent1.child_outcome_links.active.map(&:content)).to be_empty
         expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
       end
 
       context 'with outcomes from other contexts' do
-        let(:parent_context) { account_model }
+        let(:subaccount) { root_account.sub_accounts.create! }
+        let(:context) { subaccount }
 
         before do
-          context.update! parent_account: parent_context
-          existing_outcome.update! context: parent_context
+          parent1.update! context: subaccount
+          parent2.update! context: subaccount
         end
 
         it 'does not assign parents when attributes are changed' do
@@ -421,7 +458,9 @@ RSpec.describe Outcomes::Import do
         end
 
         context 'with global context' do
-          let(:parent_context) { nil }
+          before do
+            existing_outcome.update! context: nil
+          end
 
           it 'does not assign parents when attributes are changed' do
             expect do

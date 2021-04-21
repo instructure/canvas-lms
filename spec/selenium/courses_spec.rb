@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,15 +24,7 @@ describe "courses" do
 
   context "as a teacher" do
 
-    def create_new_course
-      get "/"
-      f('[aria-controls="new_course_form"]').click
-      wait_for_ajaximations
-      f('[name="course[name]"]').send_keys "testing"
-      f('.ui-dialog-buttonpane .btn-primary').click
-    end
-
-    before (:each) do
+    before(:each) do
       account = Account.default
       account.settings = {:open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true}
       account.save!
@@ -110,17 +104,6 @@ describe "courses" do
         expect(f("#content")).not_to contain_css('#course_status')
       end
 
-      it "should allow unpublishing of the course if submissions have no score or grade" do
-        course_with_student_submissions
-        @course.default_view = 'feed'
-        @course.save
-        get "/courses/#{@course.id}"
-        course_status_buttons = ff('#course_status_actions button')
-        expect_new_page_load { course_status_buttons.first.click }
-        assert_flash_notice_message('successfully updated')
-        validate_action_button(:first, 'Unpublished')
-      end
-
       it "should allow publishing/unpublishing with only change_course_state permission" do
         @course.account.role_overrides.create!(:permission => :manage_course_content, :role => teacher_role, :enabled => false)
         @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
@@ -140,121 +123,6 @@ describe "courses" do
       end
     end
 
-    describe 'course wizard' do
-      def go_to_checklist
-        get "/courses/#{@course.id}"
-        f(".wizard_popup_link").click()
-        expect(f(".ic-wizard-box")).to be_displayed
-        wait_for_ajaximations
-      end
-
-      def check_if_item_complete(item)
-        elem = "#wizard_#{item}.ic-wizard-box__content-trigger--checked"
-        expect(f(elem)).to be_displayed
-      end
-
-      def check_if_item_not_complete(item)
-        expect(f("#wizard_#{item}.ic-wizard-box__content-trigger")).to be_displayed
-        expect(f("#content")).not_to contain_css("#wizard_#{item}.ic-wizard-box__content-trigger--checked")
-      end
-
-      it "should open up the choose home page dialog from the wizard" do
-        skip_if_chrome('research')
-        course_with_teacher_logged_in
-        create_new_course
-
-        go_to_checklist
-
-        f("#wizard_home_page").click
-        f(".ic-wizard-box__message-button a").click
-        wait_for_ajaximations
-        modal = fj("h3:contains('Choose Home Page')")
-        expect(modal).to be_displayed
-      end
-
-      it "should have the correct initial state" do
-        course_with_teacher_logged_in
-        go_to_checklist
-
-        check_if_item_not_complete('content_import')
-        check_if_item_not_complete('add_assignments')
-        check_if_item_not_complete('add_students')
-        check_if_item_not_complete('add_files')
-        check_if_item_not_complete('content_import')
-        check_if_item_not_complete('select_navigation')
-        check_if_item_complete('home_page')
-        check_if_item_not_complete('course_calendar')
-        check_if_item_not_complete('add_tas')
-      end
-
-      it "should complete 'Add Course Assignments' checklist item" do
-        course_with_teacher_logged_in
-        @course.assignments.create({name: "Test Assignment"})
-        go_to_checklist
-        check_if_item_complete('add_assignments')
-      end
-
-      it "should complete 'Add Students to the Course' checklist item" do
-        course_with_teacher_logged_in
-        student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-        student_in_course(:user => student, :active_all => 1)
-        go_to_checklist
-        check_if_item_complete('add_students')
-      end
-
-      it "should complete 'Select Navigation Links' checklist item" do
-        skip_if_chrome('research')
-        course_with_teacher_logged_in
-
-        # Navigate to Navigation tab
-        go_to_checklist
-        f('#wizard_select_navigation').click
-        f('.ic-wizard-box__message-button a').click
-
-        # Modify Naviagtion
-        f('#navigation_tab').click
-        f('.navitem.enabled.modules .al-trigger.al-trigger-gray').click
-        f('.navitem.enabled.modules .admin-links .disable_nav_item_link').click
-        f('#tab-navigation .btn').click
-
-        go_to_checklist
-        check_if_item_complete('select_navigation')
-      end
-
-      it "should complete 'Add Course Calendar Events' checklist item" do
-        skip_if_chrome('research')
-
-        course_with_teacher_logged_in
-
-        # Navigate to Calendar tab
-        go_to_checklist
-        f('#wizard_course_calendar').click
-        f('.ic-wizard-box__message-button a').click
-
-        # Add Event
-        f("#create_new_event_link").click
-        wait_for_ajaximations
-        replace_content(f('#edit_calendar_event_form #calendar_event_title'), "Event")
-        f("#edit_calendar_event_form button.event_button").click
-        wait_for_ajaximations
-
-        go_to_checklist
-        check_if_item_complete('course_calendar')
-      end
-
-      it "should complete 'Publish the Course' checklist item" do
-        skip_if_chrome('research')
-        course_with_teacher_logged_in
-
-        # Publish from Checklist
-        go_to_checklist
-        f('#wizard_publish_course').click
-        f('.ic-wizard-box__message-button button').click
-
-        go_to_checklist
-        check_if_item_complete('publish_course')
-      end
-    end
 
     it "should correctly update the course quota" do
       course_with_admin_logged_in
@@ -269,23 +137,17 @@ describe "courses" do
       submit_form(form)
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
+    end
 
+    it "should save quota when not changed" do
       # then try just saving it (without resetting it)
+      course_with_admin_logged_in
+      @course.update!(storage_quota: 10.megabytes)
       get "/courses/#{@course.id}/settings"
       form = f("#course_form")
-      value = f("#course_form input#course_storage_quota_mb")['value']
-      expect(value).to eq "10"
       submit_form(form)
-      form = f("#course_form")
-      value = f("#course_form input#course_storage_quota_mb")['value']
-      expect(value).to eq "10"
-
-      # then make sure it's right after a reload
-      get "/courses/#{@course.id}/settings"
-      value = f("#course_form input#course_storage_quota_mb")['value']
-      expect(value).to eq "10"
-      @course.reload
-      expect(@course.storage_quota).to eq 10.megabytes
+      value = @course.storage_quota
+      expect(value).to eq 10.megabytes
     end
 
     it "should redirect to the gradebook when switching courses when viewing a students grades" do
@@ -303,27 +165,12 @@ describe "courses" do
       get "/courses/#{course1.id}/grades/#{student.id}"
 
       select = f('#course_select_menu')
-      options = select.find_elements(:css, 'option')
+      options = INSTUI_Select_options(select)
       expect(options.length).to eq 2
-      wait_for_ajaximations
+
       click_option('#course_select_menu', course2.name)
       expect_new_page_load { f('#apply_select_menus').click }
       expect(f('#breadcrumbs .home + li a')).to include_text(course2.name)
-    end
-
-    it "should load the users page using ajax" do
-      course_with_teacher_logged_in
-
-      # Set up the course with > 50 users (to test scrolling)
-      create_users_in_course @course, 60
-
-      @course.enroll_user(user_factory, 'TaEnrollment')
-
-      # Test that the page loads properly the first time.
-      get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
-      expect_no_flash_message :error
-      expect(ff('.roster .rosterUser').length).to eq 50
     end
 
     it "should only show users that a user has permissions to view" do
@@ -336,7 +183,7 @@ describe "courses" do
       user_logged_in
       enrollment = @course.enroll_ta(@user)
       enrollment.accept!
-      enrollment.update_attributes(:limit_privileges_to_course_section => true,
+      enrollment.update(:limit_privileges_to_course_section => true,
                                    :course_section => CourseSection.where(name: 'Two').first)
 
       # Test that only users in the approved section are displayed.
@@ -367,7 +214,6 @@ describe "courses" do
 
     context "course_home_sub_navigation lti apps" do
       def create_course_home_sub_navigation_tool(options = {})
-        @course.root_account.enable_feature!(:lor_for_account)
         defaults = {
           name: options[:name] || "external tool",
           consumer_key: 'test',
@@ -435,35 +281,6 @@ describe "courses" do
       Account.default.save!
     end
 
-    it "should auto-accept the course invitation if previews are not allowed" do
-      Account.default.settings[:allow_invitation_previews] = false
-      Account.default.save!
-      enroll_student(@student, false)
-
-      create_session(@student.pseudonym)
-      get "/courses/#{@course.id}"
-      assert_flash_notice_message "Invitation accepted!"
-      expect(f("#content")).not_to contain_css(".ic-notification button[name='accept'] ")
-    end
-
-    it "should accept the course invitation" do
-      enroll_student(@student, false)
-
-      create_session(@student.pseudonym)
-      get "/courses/#{@course.id}"
-      f(".ic-notification button[name='accept'] ").click
-      assert_flash_notice_message "Invitation accepted!"
-    end
-
-    it "should reject a course invitation" do
-      enroll_student(@student, false)
-
-      create_session(@student.pseudonym)
-      get "/courses/#{@course.id}"
-      f(".ic-notification button[name=reject]").click
-      assert_flash_notice_message "Invitation canceled."
-    end
-
     it "should display user groups on courses page" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@student)
@@ -526,10 +343,6 @@ describe "courses" do
   it "should display announcements on course home page if enabled and is wiki" do
     course_with_teacher_logged_in :active_all => true
 
-    get "/courses/#{@course.id}"
-
-    expect(element_exists?('#announcements_on_home_page')).to be_falsey
-
     text = "here's some html or whatever"
     html = "<p>#{text}</p>"
     @course.announcements.create!(:title => "something", :message => html)
@@ -547,5 +360,53 @@ describe "courses" do
     expect(f('#announcements_on_home_page')).to be_displayed
     expect(f('#announcements_on_home_page')).to include_text(text)
     expect(f('#announcements_on_home_page')).to_not include_text(html)
+  end
+
+  it "should properly apply visible sections to announcement limit" do
+    course_with_teacher(active_course: true)
+    @course.show_announcements_on_home_page = true
+    @course.home_page_announcement_limit = 2
+    @course.save!
+
+    section1 = @course.course_sections.create!(name: 'Section 1')
+    section2 = @course.course_sections.create!(name: 'Section 2')
+
+    # first, create an announcement for the entire course
+    @course.announcements.create!(
+      user: @teacher,
+      message: 'hello, course!'
+    ).save!
+
+    # next, create 2 announcements outside student1's section
+    ['sec an 1', 'sec an 2'].each do |msg|
+      sec_an = @course.announcements.create!(
+        user: @teacher,
+        message: msg
+      )
+      sec_an.is_section_specific = true
+      sec_an.course_sections = [section2]
+      sec_an.save!
+    end
+
+    # last, create 1 announcement inside student1's section
+    a2 = @course.announcements.create!(
+      user: @teacher,
+      message: 'hello, section!'
+    )
+    a2.is_section_specific = true
+    a2.course_sections = [section1]
+    a2.save!
+
+    student1, _student2 = create_users(2, return_type: :record)
+    @course.enroll_student(student1, :enrollment_state => 'active')
+    student_in_section(section1, user: student1)
+    user_session student1
+    get "/courses/#{@course.id}"
+    wait_for(method: nil, timeout: 10) { ff('div.ic-announcement-row__content') }
+    contents = ff('div.ic-announcement-row__content')
+    # these expectations make sure pagination, scope filtration, and announcement ordering works
+    expect(contents.count).to eq 2
+    expect(contents[0].text).to eq 'hello, section!'
+    expect(contents[1].text).to eq 'hello, course!'
   end
 end

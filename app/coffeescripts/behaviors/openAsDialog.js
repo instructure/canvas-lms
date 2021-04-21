@@ -19,31 +19,33 @@ import $ from 'jquery'
 import preventDefault from '../fn/preventDefault'
 import 'jqueryui/dialog'
 
-$.fn.openAsDialog = function (options) {
-  return this.click(preventDefault((e) => {
-    const $link = $(e.target)
+$.fn.openAsDialog = function(options) {
+  return this.click(
+    preventDefault(e => {
+      const $link = $(e.target)
 
-    const opts = Object.assign({
-      width: 550,
-      height: 500,
-      title: $link.attr('title'),
-      resizable: false,
-    }, options)
+      const opts = {
+        width: 550,
+        height: 500,
+        title: $link.attr('title'),
+        resizable: false,
+        ...options
+      }
 
-    const $dialog = $('<div>')
-    const $iframe = $('<iframe>', {
-      style: 'position:absolute;top:0;left:0;border:none',
-      src: `${$link.attr('href')}?embedded=1&no_headers=1`,
+      const $dialog = $('<div>')
+      const $iframe = $('<iframe>', {
+        style: 'position:absolute;top:0;left:0;border:none',
+        src: `${$link.attr('href')}?embedded=1&no_headers=1`
+      })
+      $dialog.append($iframe)
+
+      $dialog.on('dialogopen', () => {
+        const $container = $dialog.closest('.ui-dialog-content')
+        $iframe.height($container.outerHeight())
+        $iframe.width($container.outerWidth())
+      })
+      return $dialog.dialog(opts)
     })
-    $dialog.append($iframe)
-
-    $dialog.on('dialogopen', () => {
-      const $container = $dialog.closest('.ui-dialog-content')
-      $iframe.height($container.outerHeight())
-      $iframe.width($container.outerWidth())
-    })
-    return $dialog.dialog(opts)
-  })
   )
 }
 

@@ -85,7 +85,7 @@ test('it should not add errors when never_drop rules are added', () => {
   ok(isEmpty(errors))
 })
 
-test('it should create a new assignment group', function() {
+test('it should create a new assignment group', () => {
   sandbox.stub(CreateGroupView.prototype, 'close')
   const view = createView({newGroup: true})
   view.render()
@@ -93,7 +93,7 @@ test('it should create a new assignment group', function() {
   equal(view.assignmentGroups.size(), 3)
 })
 
-test('it should edit an existing assignment group', function() {
+test('it should edit an existing assignment group', () => {
   const view = createView()
   const save_spy = sandbox.stub(view.model, 'save').returns($.Deferred().resolve())
   view.render()
@@ -109,7 +109,7 @@ test('it should edit an existing assignment group', function() {
   ok(save_spy.called)
 })
 
-test('it should not save drop rules when none are given', function() {
+test('it should not save drop rules when none are given', () => {
   const view = createView()
   const save_spy = sandbox.stub(view.model, 'save').returns($.Deferred().resolve())
   view.render()
@@ -174,21 +174,21 @@ test('it should not allow NaN values for group weight', () => {
   equal(keys(errors).length, 1)
 })
 
-test('it should trigger a render event on save success when editing', function() {
+test('it should trigger a render event on save success when editing', () => {
   const triggerSpy = sandbox.spy(AssignmentGroupCollection.prototype, 'trigger')
   const view = createView()
   view.onSaveSuccess()
   ok(triggerSpy.calledWith('render'))
 })
 
-test('it should call render on save success if adding an assignmentGroup', function() {
+test('it should call render on save success if adding an assignmentGroup', () => {
   const view = createView({newGroup: true})
   sandbox.stub(view, 'render')
   view.onSaveSuccess()
   equal(view.render.callCount, 1)
 })
 
-test('it shows a success message', function() {
+test('it shows a success message', () => {
   sandbox.stub(CreateGroupView.prototype, 'close')
   sandbox.spy($, 'flashMessage')
   const clock = sinon.useFakeTimers()

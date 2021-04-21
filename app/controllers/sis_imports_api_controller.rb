@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -364,6 +366,7 @@ class SisImportsApiController < ApplicationController
   include Api::V1::SisImport
   include Api::V1::Progress
 
+
   def check_account
     return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
     return render json: {errors: ["SIS imports are not enabled for this account"]}, status: :forbidden unless @account.allow_sis_import
@@ -528,7 +531,7 @@ class SisImportsApiController < ApplicationController
   #   the enrollments the batch will abort before the enrollments are deleted.
   #   The change_threshold will be evaluated for course, sections, and
   #   enrollments independently.
-  #   If set with diffing, diffing  will not be performed if the files are
+  #   If set with diffing, diffing will not be performed if the files are
   #   greater than the threshold as a percent. If set to 5 and the file is more
   #   than 5% smaller or more than 5% larger than the file that is being
   #   compared to, diffing will not be performed. If the files are less than 5%,
@@ -538,6 +541,10 @@ class SisImportsApiController < ApplicationController
   #   |(1 - current_file_size / previous_file_size)| * 100
   #   See the SIS CSV Format documentation for more details.
   #   Required for multi_term_batch_mode.
+  #
+  # @argument diff_row_count_threshold [Integer]
+  #   If set with diffing, diffing will not be performed if the number of rows
+  #   to be run in the fully calculated diff import exceeds the threshold.
   #
   # @returns SisImport
   def create
@@ -603,7 +610,11 @@ class SisImportsApiController < ApplicationController
 
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch|
         batch.change_threshold = params[:change_threshold]
+
         batch.options ||= {}
+        if (threshold = params[:diff_row_count_threshold]&.to_i) && threshold > 0
+          batch.options[:diff_row_count_threshold] = threshold
+        end
         if batch_mode_term
           batch.batch_mode = true
           batch.batch_mode_term = batch_mode_term

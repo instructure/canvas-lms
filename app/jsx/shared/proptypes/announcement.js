@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, arrayOf, string, number, bool, oneOf } from 'prop-types'
-import { author } from './user'
+import {shape, arrayOf, string, number, bool, oneOf} from 'prop-types'
+import {author} from './user'
 
 const announcement = shape({
   id: string.isRequired,
@@ -32,7 +32,7 @@ const announcement = shape({
   discussion_subentry_count: number.isRequired,
   unread_count: number.isRequired,
   locked: bool.isRequired,
-  html_url: string.isRequired,
+  html_url: string.isRequired
 })
 
 export const announcementList = arrayOf(announcement)

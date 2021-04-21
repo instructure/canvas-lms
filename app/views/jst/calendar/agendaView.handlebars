@@ -29,7 +29,7 @@
                   {{/if}},
                 </span>
                 <span class="screenreader-only">
-                  {{#if ../../meta.better_scheduler}}
+                  {{#if ../../meta.use_scheduler}}
                     {{#if isAppointmentGroupEvent}}
                       {{#if can_edit}}
                         {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}
@@ -70,7 +70,7 @@
                     {{/if}}
                   </div>
                   <span class="agenda-event__title group_{{contextCode}} {{#if isCompleted}}calendar__event--completed{{/if}}">
-                    {{#if ../../meta.better_scheduler}}
+                    {{#if ../../meta.use_scheduler}}
                       {{#if isAppointmentGroupEvent}}
                         {{#if can_edit}}
                           {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}

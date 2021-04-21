@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 
-import _ from 'underscore'
 import h from 'str/htmlEscape'
 import Outcome from '../../models/Outcome'
 import OutcomeIconBase from './OutcomeIconBase'
@@ -27,7 +26,7 @@ import 'jquery.disableWhileLoading'
 export default class OutcomeGroupIconView extends OutcomeIconBase {
   static initClass() {
     this.prototype.className = 'outcome-group'
-    this.prototype.attributes = _.extend({}, this.attributes, {'aria-expanded': false})
+    this.prototype.attributes = {...this.attributes, 'aria-expanded': false}
   }
 
   // Internal: Treat right arrow presses like a click.

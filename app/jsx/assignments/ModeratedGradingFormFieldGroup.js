@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!ModeratedGradingFormFieldGroup'
 import FinalGraderSelectMenu from './FinalGraderSelectMenu'
 import GraderCommentVisibilityCheckbox from './GraderCommentVisibilityCheckbox'
 import GraderCountNumberInput from './GraderCountNumberInput'
@@ -28,7 +28,8 @@ import {direction} from '../shared/helpers/rtlHelper'
 
 export default class ModeratedGradingFormFieldGroup extends React.Component {
   static propTypes = {
-    availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired})).isRequired,
+    availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired}))
+      .isRequired,
     currentGraderCount: number,
     finalGraderID: string,
     graderCommentsVisibleToGraders: bool.isRequired,
@@ -37,7 +38,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     isGroupAssignment: bool.isRequired,
     isPeerReviewAssignment: bool.isRequired,
     locale: string.isRequired,
-    maxGraderCount: number.isRequired,
+    availableGradersCount: number.isRequired,
     moderatedGradingEnabled: bool.isRequired,
     onGraderCommentsVisibleToGradersChange: func.isRequired,
     onModeratedGradingChange: func.isRequired
@@ -50,7 +51,6 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
 
   constructor(props) {
     super(props)
-    this.handleModeratedGradingChange = this.handleModeratedGradingChange.bind(this)
     this.state = {
       moderatedGradingChecked: props.moderatedGradingEnabled
     }
@@ -62,7 +62,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     }
   }
 
-  handleModeratedGradingChange(moderatedGradingChecked) {
+  handleModeratedGradingChange = moderatedGradingChecked => {
     this.setState({moderatedGradingChecked})
   }
 
@@ -84,7 +84,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
               <div className="ModeratedGrading__Content">
                 <GraderCountNumberInput
                   currentGraderCount={this.props.currentGraderCount}
-                  maxGraderCount={this.props.maxGraderCount}
+                  availableGradersCount={this.props.availableGradersCount}
                   locale={this.props.locale}
                 />
 

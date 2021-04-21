@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -42,7 +44,7 @@ module Messages::SubmissionCommentForTeacher
           assignment_title: assignment.title,
           author_name: submission_comment.author_name,
           course_name: course.name,
-          user_name: submission.user.name
+          user_name: submission.user.short_name
         )
       end
     end

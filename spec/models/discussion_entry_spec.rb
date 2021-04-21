@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,11 +38,8 @@ describe DiscussionEntry do
       expect(discussion_topic_participant.reload.subscribed).to be_truthy
     end
 
-    it "should not subscribe the author on create outside of the #subscribe_author method" do
-      discussion_topic_participant = topic.discussion_topic_participants.create!(user: @teacher, subscribed: false)
-      allow_any_instance_of(DiscussionEntry).to receive_messages(subscribe_author: true)
-      entry
-      expect(discussion_topic_participant.reload.subscribed).to be_falsey
+    it 'sets the root_account_id using topic' do
+      expect(entry.root_account_id).to eq topic.root_account_id
     end
   end
 
@@ -291,6 +290,13 @@ describe DiscussionEntry do
       end
     end
 
+    it 'should allow teacher entry on assignment topic to be destroyed' do
+      assignment = @course.assignments.create!(title: @topic.title, submission_types: 'discussion_topic')
+      topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment: assignment)
+      entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
+      expect { entry.destroy }.to_not raise_error
+    end
+
     it "should decrement unread topic counts" do
       expect(@topic.unread_count(@reader)).to eq 2
 
@@ -411,6 +417,24 @@ describe DiscussionEntry do
     it "should use unique_constaint_retry when updating read state" do
       expect(DiscussionEntry).to receive(:unique_constraint_retry).once
       @entry.change_read_state("read", @student)
+    end
+
+    it "should not increment unread count for students in group topics when posting to the root" do
+      course_with_student(:active_all => true)
+      teacher1 = @teacher
+      teacher2 = teacher_in_course(:course => @course, :active_all => true).user
+
+      group_category = @course.group_categories.create(:name => "new category")
+      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      @group.add_user(@student)
+
+      root_topic = @course.discussion_topics.create!(:title => "parent topic", :message => "msg", :group_category => group_category)
+      student_participant = root_topic.discussion_topic_participants.create!(user: @student)
+      teacher_participant = root_topic.discussion_topic_participants.create!(user: teacher2)
+      root_topic.discussion_entries.create!(message: "message", user: teacher1)
+
+      expect(student_participant.reload.unread_entry_count).to eq 0
+      expect(teacher_participant.reload.unread_entry_count).to eq 1 # still count as unread for the user that can read it
     end
   end
 

@@ -3,74 +3,65 @@
     "types": [
       {
         "kind": "INTERFACE",
-        "name": "Node",
+        "name": "AssetString",
         "possibleTypes": [
           {
-            "name": "Assignment"
-          },
-          {
-            "name": "AssignmentGroup"
-          },
-          {
-            "name": "AssignmentOverride"
-          },
-          {
             "name": "Course"
-          },
-          {
-            "name": "Discussion"
           },
           {
             "name": "Enrollment"
           },
           {
-            "name": "File"
-          },
+            "name": "Group"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "AssignmentOverrideSet",
+        "possibleTypes": [
           {
-            "name": "GradingPeriod"
+            "name": "Section"
           },
           {
             "name": "Group"
           },
           {
-            "name": "GroupSet"
+            "name": "AdhocStudents"
           },
           {
-            "name": "MediaObject"
-          },
-          {
-            "name": "Module"
-          },
-          {
-            "name": "ModuleItem"
-          },
-          {
-            "name": "Page"
-          },
-          {
-            "name": "PostPolicy"
-          },
-          {
-            "name": "Progress"
-          },
-          {
-            "name": "Quiz"
-          },
-          {
-            "name": "Section"
-          },
-          {
-            "name": "Submission"
-          },
-          {
-            "name": "User"
+            "name": "Noop"
           }
         ]
       },
       {
         "kind": "INTERFACE",
-        "name": "Timestamped",
+        "name": "AssignmentsConnectionInterface",
         "possibleTypes": [
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "Course"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "ContentTagContent",
+        "possibleTypes": [
+          {
+            "name": "LearningOutcome"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "LegacyIDInterface",
+        "possibleTypes": [
+          {
+            "name": "Account"
+          },
           {
             "name": "Assignment"
           },
@@ -79,6 +70,12 @@
           },
           {
             "name": "AssignmentOverride"
+          },
+          {
+            "name": "CommunicationChannel"
+          },
+          {
+            "name": "ContentTag"
           },
           {
             "name": "Course"
@@ -108,6 +105,18 @@
             "name": "GroupMembership"
           },
           {
+            "name": "GroupSet"
+          },
+          {
+            "name": "LearningOutcome"
+          },
+          {
+            "name": "LearningOutcomeGroup"
+          },
+          {
+            "name": "MediaTrack"
+          },
+          {
             "name": "Module"
           },
           {
@@ -117,13 +126,46 @@
             "name": "ModuleItem"
           },
           {
+            "name": "Notification"
+          },
+          {
+            "name": "NotificationPolicy"
+          },
+          {
+            "name": "OutcomeCalculationMethod"
+          },
+          {
+            "name": "OutcomeProficiency"
+          },
+          {
             "name": "Page"
+          },
+          {
+            "name": "PostPolicy"
+          },
+          {
+            "name": "ProficiencyRating"
           },
           {
             "name": "Progress"
           },
           {
             "name": "Quiz"
+          },
+          {
+            "name": "Rubric"
+          },
+          {
+            "name": "RubricAssessment"
+          },
+          {
+            "name": "RubricAssociation"
+          },
+          {
+            "name": "RubricCriterion"
+          },
+          {
+            "name": "RubricRating"
           },
           {
             "name": "Section"
@@ -135,19 +177,37 @@
             "name": "SubmissionComment"
           },
           {
+            "name": "SubmissionDraft"
+          },
+          {
+            "name": "Term"
+          },
+          {
+            "name": "Trophy"
+          },
+          {
             "name": "User"
           }
         ]
       },
       {
-        "kind": "INTERFACE",
-        "name": "AssignmentsConnectionInterface",
+        "kind": "UNION",
+        "name": "Lockable",
         "possibleTypes": [
           {
-            "name": "AssignmentGroup"
+            "name": "Assignment"
           },
           {
-            "name": "Course"
+            "name": "Discussion"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Module"
           }
         ]
       },
@@ -178,42 +238,120 @@
           },
           {
             "name": "Quiz"
+          },
+          {
+            "name": "SubHeader"
           }
         ]
       },
       {
-        "kind": "UNION",
-        "name": "Lockable",
+        "kind": "INTERFACE",
+        "name": "Node",
         "possibleTypes": [
           {
+            "name": "Account"
+          },
+          {
             "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "CommunicationChannel"
+          },
+          {
+            "name": "ContentTag"
+          },
+          {
+            "name": "Conversation"
+          },
+          {
+            "name": "Course"
           },
           {
             "name": "Discussion"
           },
           {
-            "name": "Quiz"
+            "name": "Enrollment"
           },
           {
-            "name": "Page"
+            "name": "File"
           },
           {
-            "name": "Module"
-          }
-        ]
-      },
-      {
-        "kind": "UNION",
-        "name": "AssignmentOverrideSet",
-        "possibleTypes": [
-          {
-            "name": "Section"
+            "name": "GradingPeriod"
           },
           {
             "name": "Group"
           },
           {
-            "name": "AdhocStudents"
+            "name": "GroupSet"
+          },
+          {
+            "name": "LearningOutcome"
+          },
+          {
+            "name": "LearningOutcomeGroup"
+          },
+          {
+            "name": "MediaObject"
+          },
+          {
+            "name": "MessageableContext"
+          },
+          {
+            "name": "MessageableUser"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "ModuleItem"
+          },
+          {
+            "name": "Notification"
+          },
+          {
+            "name": "NotificationPolicy"
+          },
+          {
+            "name": "OutcomeCalculationMethod"
+          },
+          {
+            "name": "OutcomeProficiency"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "PostPolicy"
+          },
+          {
+            "name": "Progress"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Rubric"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "Term"
+          },
+          {
+            "name": "Trophy"
+          },
+          {
+            "name": "User"
           }
         ]
       },
@@ -235,6 +373,123 @@
           },
           {
             "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "SubmissionInterface",
+        "possibleTypes": [
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "SubmissionHistory"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "Timestamped",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "CommunicationChannel"
+          },
+          {
+            "name": "ContentTag"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "ExternalTool"
+          },
+          {
+            "name": "ExternalUrl"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "GradingPeriod"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "GroupMembership"
+          },
+          {
+            "name": "LearningOutcome"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "ModuleExternalTool"
+          },
+          {
+            "name": "ModuleItem"
+          },
+          {
+            "name": "Notification"
+          },
+          {
+            "name": "NotificationPolicy"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Progress"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "SubmissionComment"
+          },
+          {
+            "name": "SubmissionHistory"
+          },
+          {
+            "name": "Trophy"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "TurnitinContext",
+        "possibleTypes": [
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "File"
           }
         ]
       }

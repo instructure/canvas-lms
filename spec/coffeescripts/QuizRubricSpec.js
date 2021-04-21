@@ -51,8 +51,8 @@ QUnit.module('QuizRubric', {
   }
 })
 
-test('rubric editing event loads the rubric form', () => {
-  QuizRubric.createRubricDialog('#', assignmentRubricHtml)
+test('rubric editing event loads the rubric form', async () => {
+  await QuizRubric.createRubricDialog('#', assignmentRubricHtml)
   $('.add_rubric_link').click()
   const contentIndex = $('#rubrics')
     .html()

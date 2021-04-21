@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ require 'securerandom'
 
 class EportfolioCategoriesController < ApplicationController
   include EportfolioPage
-  before_action :rich_content_service_config
+  before_action :rce_js_env
   before_action :get_eportfolio
 
   def index
@@ -47,7 +49,7 @@ class EportfolioCategoriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:id])
       respond_to do |format|
-        if @category.update_attributes(eportfolio_category_params)
+        if @category.update(eportfolio_category_params)
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
           format.json { render :json => @category }
         else
@@ -74,7 +76,8 @@ class EportfolioCategoriesController < ApplicationController
         @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
         raise ActiveRecord::RecordNotFound if !@page
         eportfolio_page_attributes
-        render "eportfolios/show"
+
+        render "eportfolios/show", stream: can_stream_template?
       end
     rescue ActiveRecord::RecordNotFound
       flash[:notice] = t('errors.missing_page', "Couldn't find that page")
@@ -96,10 +99,6 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   protected
-  def rich_content_service_config
-    rce_js_env(:basic)
-  end
-
   def eportfolio_category_params
     params.require(:eportfolio_category).permit(:name)
   end

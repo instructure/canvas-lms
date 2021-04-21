@@ -20,22 +20,17 @@ import Ember from 'ember'
 
 export default class AsyncHelper {
   constructor() {
-    this.start = this.start.bind(this)
-    this.stop = this.stop.bind(this)
-    this.incrementRequest = this.incrementRequest.bind(this)
-    this.decrementRequest = this.decrementRequest.bind(this)
-    this.waitForRequests = this.waitForRequests.bind(this)
     this.pendingRequests = 0
   }
 
-  start() {
+  start = () => {
     Ember.RSVP.configure('instrument', true)
     Ember.RSVP.on('created', this.incrementRequest)
     Ember.RSVP.on('fulfilled', this.decrementRequest)
     return Ember.RSVP.on('rejected', this.decrementRequest)
   }
 
-  stop() {
+  stop = () => {
     Ember.RSVP.off('created', this.incrementRequest)
     Ember.RSVP.off('fulfilled', this.decrementRequest)
     Ember.RSVP.off('rejected', this.decrementRequest)
@@ -43,15 +38,15 @@ export default class AsyncHelper {
     return (this.pendingRequests = 0)
   }
 
-  incrementRequest() {
+  incrementRequest = () => {
     return this.pendingRequests++
   }
 
-  decrementRequest() {
+  decrementRequest = () => {
     return this.pendingRequests--
   }
 
-  waitForRequests() {
+  waitForRequests = () => {
     return new Promise(resolve => {
       var defer = () =>
         Ember.run.later(() => {

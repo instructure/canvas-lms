@@ -10,11 +10,11 @@
   %>
 <% else %>
   <h2 id="<%= item[:linked_resource_id] %>">
-    <%= item[:title] %>
+    <%= HtmlTextHelper.escape_html(item[:title]) %>
   </h2>
   <%= I18n.t(
     "File %{filename} could not be included in the ePub document. Please see separate zip file for access.", {
-      filename: item[:title]
+      filename: HtmlTextHelper.escape_html(item[:title])
     })
   %>
 <% end %>

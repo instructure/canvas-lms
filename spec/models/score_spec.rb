@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -46,7 +48,7 @@ describe Score do
 
   subject_once(:score) { student.scores.create!(params) }
 
-  it { is_expected.to belong_to(:enrollment) }
+  it { is_expected.to belong_to(:enrollment).required }
   # shoulda-matchers will have an `optional` method in version 4. As a workaround,
   # I've used the validates_presence_of matcher on the line following the belong_to matcher
   it { is_expected.to belong_to(:grading_period) }
@@ -126,6 +128,35 @@ describe Score do
         expect do
           student.scores.create!(grading_period_id: @grading_periods.first.id, **assignment_group_score_params)
         end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+  end
+
+  describe "root_account_id" do
+    context "on create" do
+      it "sets root_account_id to the enrollment's root_account_id if root_account_id is nil" do
+        score = student.scores.create!(params)
+        expect(score.root_account_id).to eq student.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        score = student.scores.create!(params.merge(root_account_id: second_account.id))
+        expect(score.root_account_id).to eq second_account.id
+      end
+    end
+
+    context "on update" do
+      it "sets root_account_id to the enrollment's root_account_id if root_account_id is nil" do
+        score.update_column(:root_account_id, nil)
+        score.update!(current_score: 0)
+        expect(score.root_account_id).to eq student.root_account_id
+      end
+
+      it "does not modify root_account_id if it is already set" do
+        second_account = account_model
+        score.update!(root_account_id: second_account.id)
+        expect(score.root_account_id).to eq second_account.id
       end
     end
   end

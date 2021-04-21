@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -21,6 +23,8 @@ class ContentParticipationCount < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course]
   belongs_to :user
+
+  before_create :set_root_account_id
 
   def self.create_or_update(opts={})
     opts = opts.with_indifferent_access
@@ -62,12 +66,12 @@ class ContentParticipationCount < ActiveRecord::Base
     end
   end
 
-  def self.unread_submission_count_for(context, user, enrollment = nil)
-    unread_count = 0
-    if context.is_a?(Course)
-      enrollment ||= context.enrollments.where(:user_id => user).order(Enrollment.state_rank_sql, Enrollment.type_rank_sql).first
-      if enrollment.try(:student?)
-        submission_conditions = sanitize_sql_for_conditions([<<-SQL, user.id, context.class.to_s, context.id])
+  def self.unread_submission_count_for(context, user)
+    return 0 unless context.is_a?(Course) && context.user_is_student?(user)
+    GuardRail.activate(:secondary) do
+      potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
+          batch_object: user, batched_keys: :submissions) do
+        submission_conditions = sanitize_sql_for_conditions([<<~SQL, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
           assignments.context_type = ? AND
           assignments.context_id = ? AND
@@ -83,23 +87,22 @@ class ContentParticipationCount < ActiveRecord::Base
         subs_with_comments = Submission.active.
             joins(:assignment, :submission_comments).
             where(submission_conditions).
-            where(<<-SQL, user).pluck(:id)
+            where(<<~SQL, user).pluck(:id)
               (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
               AND NOT submission_comments.draft
               AND submission_comments.provisional_grade_id IS NULL
               AND submission_comments.author_id <> ?
             SQL
-        potential_ids = (subs_with_grades + subs_with_comments).uniq
-        already_read_count = ContentParticipation.where(
-          :content_type => "Submission",
-          :content_id => potential_ids,
-          :user_id => user,
-          :workflow_state => "read"
-        ).count
-        unread_count = potential_ids.size - already_read_count
+        (subs_with_grades + subs_with_comments).uniq
       end
+      already_read_count = potential_ids.any? ? ContentParticipation.where(
+        :content_type => "Submission",
+        :content_id => potential_ids,
+        :user_id => user,
+        :workflow_state => "read"
+      ).count : 0
+      potential_ids.size - already_read_count
     end
-    unread_count
   end
 
   def unread_count(refresh = true)
@@ -108,10 +111,12 @@ class ContentParticipationCount < ActiveRecord::Base
   end
 
   def refresh_unread_count
-    transaction do
-      self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
-      self.save if self.changed?
-    end
+    self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
+    GuardRail.activate(:primary) {self.save} if self.changed?
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.context&.root_account_id
   end
 
   # Things we know of that will only get updated by a refresh:

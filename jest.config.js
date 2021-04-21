@@ -21,38 +21,38 @@ const {defaults} = require('jest-config')
 module.exports = {
   moduleNameMapper: {
     '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
+    '\\.svg$': '<rootDir>/jest/imageMock.js',
     '^compiled/(.*)$': '<rootDir>/app/coffeescripts/$1',
+    '^coffeescripts/(.*)$': '<rootDir>/app/coffeescripts/$1',
     '^jsx/(.*)$': '<rootDir>/app/jsx/$1',
-    "^timezone$": "<rootDir>/public/javascripts/timezone_core.js",
-    "\\.svg$": "<rootDir>/jest/imageMock.js"
+    '^jst/(.*)$': '<rootDir>/app/views/jst/$1',
+    '^timezone$': '<rootDir>/public/javascripts/timezone_core.js',
+    'node_modules-version-of-backbone': require.resolve('backbone'),
+    '^Backbone$': '<rootDir>/public/javascripts/Backbone.js'
   },
-  roots: ['app/jsx', 'app/coffeescripts'],
-  moduleDirectories: [
-    'node_modules',
-    'public/javascripts',
-    'public/javascripts/vendor'
+  roots: ['app/jsx', 'app/coffeescripts', 'public/javascripts', 'gems/plugins'],
+  moduleDirectories: ['node_modules', 'public/javascripts', 'public/javascripts/vendor'],
+  reporters: ['default', 'jest-junit'],
+  snapshotSerializers: ['enzyme-to-json/serializer'],
+  setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
+  setupFilesAfterEnv: [
+    '@testing-library/jest-dom/extend-expect',
+    './app/jsx/__tests__/ValidatedApolloCleanup'
   ],
-  reporters: [ "default", "jest-junit" ],
-  snapshotSerializers: [
-    'enzyme-to-json/serializer'
-  ],
-  setupFiles: [
-    'jest-localstorage-mock',
-    'jest-canvas-mock',
-    '<rootDir>/jest/jest-setup.js'
-  ],
-  setupTestFrameworkScriptFile: '<rootDir>/jest/jest-setup-framework.js',
-  testMatch: [
-    '**/__tests__/**/?(*.)(spec|test).js'
-  ],
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 
-  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee'],
+  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
+  restoreMocks: true,
+
+  testEnvironment: 'jest-environment-jsdom-fourteen',
 
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
-    '^.+\\.jsx?$': 'babel-jest'
-  },
+    '^.+\\.handlebars': '<rootDir>/jest/handlebarsTransformer.js',
+    '^.+\\.jsx?$': 'babel-jest',
+    '\\.graphql$': 'jest-raw-loader'
+  }
 }

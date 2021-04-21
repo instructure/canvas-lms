@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GraphiQLExplorer from 'graphiql-explorer';
+import GraphiQLExplorer from 'graphiql-explorer'
 
 // makeDefaultArg and getDefulatScalarArgValue
 // are used to fill in the default argument for
@@ -26,7 +26,7 @@ import GraphiQLExplorer from 'graphiql-explorer';
 // https://github.com/OneGraph/graphiql-explorer-example/blob/master/src/CustomArgs.js
 
 export function makeDefaultArg(_parentField, _arg) {
-  return false;
+  return false
 }
 
 export function getDefaultScalarArgValue(parentField, arg, argType) {
@@ -35,5 +35,5 @@ export function getDefaultScalarArgValue(parentField, arg, argType) {
   if (argType.name === 'ID') {
     return {kind: 'StringValue', value: '1'}
   }
-  return GraphiQLExplorer.defaultValue(argType);
+  return GraphiQLExplorer.defaultValue(argType)
 }

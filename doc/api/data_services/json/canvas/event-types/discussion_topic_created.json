@@ -1,0 +1,45 @@
+{
+  "name": "discussion_topic_created",
+  "definition": "The event is emitted anytime an new discussion topic is created by an end user or API request.",
+  "trigger": "Triggered when a new discussion topic is created in a course. Also triggered when a new course announcement is created with `is_announcement` set to TRUE.",
+  "schema": {
+    "assignment_id": "The Canvas id of the topic's associated assignment",
+    "body": "Body of the topic. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "context_id": "The Canvas id of the topic's context.",
+    "context_type": "The type of the topic's context (usually Course or Group)",
+    "discussion_topic_id": "The Canvas id of the new discussion topic.",
+    "is_announcement": "true if this topic was posted as an announcement, false otherwise.",
+    "lock_at": "The lock date (discussion is locked after this date), or null.",
+    "title": "Title of the topic. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "updated_at": "The time at which this topic was last modified in any way",
+    "workflow_state": "The state of the discussion topic (active, deleted, post_delayed, unpublished)."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "discussion_topic_created",
+          "event_time": "2019-11-01T19:11:18.208Z",
+          "job_id": "1020020528469291",
+          "job_tag": "Canvas::Migration::Worker::CourseCopyWorker#perform",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "assignment_id": "1234010",
+          "body": "<h3>Discuss this</h3> What do you think?",
+          "context_id": "1234560",
+          "context_type": "Course",
+          "discussion_topic_id": "120000001234567",
+          "is_announcement": false,
+          "lock_at": "2019-11-05T13:38:00.218Z",
+          "title": "Sample discussion",
+          "updated_at": "2019-11-05T13:38:00.218Z",
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}

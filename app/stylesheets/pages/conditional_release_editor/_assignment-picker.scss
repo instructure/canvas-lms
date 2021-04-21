@@ -1,0 +1,135 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$bg-color: $ic-color-light;
+$fg-color: $ic-color-dark;
+$cbox-color: $ic-color-medium-light;
+
+.cr-assignments-picker {
+  padding: 0px 10px
+}
+
+.cr-assignments-filter {
+  padding-bottom: 3px;
+
+  .cr-assignments-filter__name-filter {
+    width: 55%;
+    padding: 8px;
+    height: 20px;
+    margin-#{direction(right)}: 10px;
+    background-color: $bg-color;
+    border: 1px solid $ic-border-color;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+  }
+
+  .cr-assignments-filter__name-filter:focus {
+    border-color: var(--ic-brand-primary);
+    outline: 0;
+  }
+
+  .cr-assignments-filter__category-filter {
+    width: 38%;
+    background: linear-gradient($bg-color, $ic-color-medium-light);
+    border: 1px solid $ic-border-color;
+    background-color: $bg-color;
+    height: 38px;
+    line-height: 38px;
+    display: inline-block;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 0.875rem;
+    color: $fg-color;
+    border-radius: 3px;
+  }
+}
+
+.cr-assignments-list {
+  padding-#{direction(left)}: 2px;
+  list-style-type: none;
+  height: 200px;
+  overflow-y: scroll;
+  margin-#{direction(left)}: 0px;
+}
+
+.cr-assignments-list__item {
+  list-style-type: none;
+  padding: 0 3px;
+  position: relative;
+
+  input[type='checkbox'] {
+    opacity: 0;
+    margin-#{direction(right)}: 10px;
+  }
+
+  .cr-label__cbox {
+    vertical-align: middle;
+    margin-bottom: 0;
+  }
+}
+
+.cr-assignments-list__item__disabled {
+  cursor: not-allowed;
+
+  .cr-label__cbox {
+    opacity: .5;
+    text-decoration: line-through;
+
+    &:before {
+      opacity: 0;
+    }
+  }
+}
+
+.cr-assignments-list__item__icon {
+    padding: 0 6px 0 9px;
+}
+
+input[type='checkbox'] + .cr-label__cbox:before {
+  content: "";
+  transition: border-color 0.2s ease-out, outline-offset 0.2s ease-out, outline-color 0.2s ease-out;
+  box-sizing: border-box;
+  position: absolute;
+  top: 5px;
+  #{direction(left)}: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $cbox-color;
+  background-size: 16px 48px;
+  border: 1px solid $ic-border-color;
+  outline: 2px solid transparent;
+  outline-offset: -12px;
+}
+
+input[type='checkbox']:focus + .cr-label__cbox:before {
+  outline: thin dotted $ic-color-dark;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+  text-decoration: none;
+}
+
+input[type='checkbox']:checked + .cr-label__cbox:before {
+  background-color: var(--ic-brand-font-color-dark);
+  background-position: center -1px;
+  border-color: var(--ic-brand-font-color-dark);
+}
+
+.ic-Label__text {
+  font-weight: 400;
+}

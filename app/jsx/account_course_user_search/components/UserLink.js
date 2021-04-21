@@ -17,20 +17,32 @@
  */
 
 import React from 'react'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import {Avatar} from '@instructure/ui-avatar'
+import {Button} from '@instructure/ui-buttons'
 
-export default function UserLink({size, avatar_url, name, ...propsToPassOnToLink}) {
+export default function UserLink({size, avatar_url, name, avatarName, ...propsToPassOnToLink}) {
   return (
-    <Link {...propsToPassOnToLink} size={size}>
-      <Avatar size={size} name={name} src={avatar_url} margin="0 x-small xxx-small 0" />
+    <Button
+      variant="link"
+      theme={{mediumPadding: '0', mediumHeight: '1rem'}}
+      {...propsToPassOnToLink}
+    >
+      <Avatar
+        size={size}
+        name={avatarName}
+        src={avatar_url}
+        margin="0 x-small xxx-small 0"
+        data-fs-exclude
+      />
       {name}
-    </Link>
+    </Button>
   )
 }
 
 UserLink.propTypes = {
-  href: Link.propTypes.href,
+  size: Avatar.propTypes.size,
+  href: Button.propTypes.href,
   name: Avatar.propTypes.name,
+  avatarName: Avatar.propTypes.name,
   avatar_url: Avatar.propTypes.src
 }

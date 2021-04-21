@@ -23,6 +23,11 @@ function pluralize(word) {
   return word
 }
 
+export const WHITELISTS_LOADED = 'WHITELISTS_LOADED'
+export function setWhitelistsLoaded(value) {
+  return {type: WHITELISTS_LOADED, payload: value}
+}
+
 export const SET_DIRTY = 'SET_DIRTY'
 export function setDirtyAction(value) {
   if (typeof value !== 'boolean') {
@@ -113,7 +118,7 @@ export function setCspInherited(context, contextId, value) {
         // to be safe.
         dispatch(setCspEnabledAction(response.data.enabled))
         // Likewise changing the inherited status likely has an effect
-        // on what domains are whitelisted, so we update those as well.
+        // on what domains are allowed, so we update those as well.
         const addDomainMap = {
           effective: response.data.effective_whitelist || [],
           account: response.data.current_account_whitelist || [],
@@ -185,7 +190,7 @@ export function addDomainBulkAction(domainsMap, opts = {}) {
   }
 }
 
-export function addDomain(context, contextId, domain) {
+export function addDomain(context, contextId, domain, afterAdd = () => {}) {
   context = pluralize(context)
   return (dispatch, getState, {axios}) => {
     dispatch(addDomainAction(domain, 'account', {optimistic: true}))
@@ -194,10 +199,11 @@ export function addDomain(context, contextId, domain) {
         domain
       })
       .then(() => {
-        // This isn't really necessary but since the whitelist is unique,
+        // This isn't really necessary but since the allowed domain list is unique,
         // it doesn't hurt.
         dispatch(addDomainAction(domain, 'account'))
       })
+      .then(afterAdd)
   }
 }
 
@@ -211,6 +217,7 @@ export function getCurrentWhitelist(context, contextId) {
         tools: response.data.tools_whitelist || {}
       }
       dispatch(addDomainBulkAction(addDomainMap))
+      dispatch(setWhitelistsLoaded(true))
     })
 }
 

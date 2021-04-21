@@ -18,18 +18,17 @@
 
 import {bool} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!GraderNamesVisibleToFinalGraderCheckbox'
 
 export default class GraderNamesVisibleToFinalGraderCheckbox extends React.Component {
   static propTypes = {checked: bool.isRequired}
 
   constructor(props) {
     super(props)
-    this.handleChange = this.handleChange.bind(this)
     this.state = {checked: props.checked}
   }
 
-  handleChange({target: checkbox}) {
+  handleChange = ({target: checkbox}) => {
     this.setState({checked: checkbox.checked})
   }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -36,7 +38,8 @@ module ErrorContext
       end
 
       output << "  Screenshot: #{File.join(errors_path, summary.screenshot_name)}" if summary.screenshot_name
-      output << "  Screen capture: #{File.join(errors_path, summary.screen_capture_name)}" if summary.screen_capture_name
+      # TODO: doesn't work in new docker builds
+      # output << "  Screen capture: #{File.join(errors_path, summary.screen_capture_name)}" if summary.screen_capture_name
 
       if output.any?
         output.unshift RerunArgument.for(summary.example)

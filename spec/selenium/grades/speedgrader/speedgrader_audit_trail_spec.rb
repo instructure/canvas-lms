@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -99,7 +101,7 @@ describe 'Audit Trail' do
     expect(Speedgrader.audit_entries).to include_text("Grades posted")
   end
 
-  it 'show entry for grades displayed to students', priority: "1", test_id: 3513995 do
+  it 'show entry for grades posted to students', priority: "1", test_id: 3513995 do
     complete_moderation!
 
     user_session(@auditor)
@@ -186,16 +188,16 @@ describe 'Audit Trail' do
     ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
     ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
     # post the grades
-    ModeratePage.click_post_grades_button
+    ModeratePage.click_release_grades_button
     driver.switch_to.alert.accept
     wait_for_ajaximations
     # wait for element to exist, means page has loaded
-    ModeratePage.grades_posted_button
-    # unmute using Display to Students button
-    ModeratePage.click_display_to_students_button
+    ModeratePage.grades_released_button
+    # Post grades to students
+    ModeratePage.click_post_to_students_button
     driver.switch_to.alert.accept
     wait_for_ajaximations
     # wait for element to exist, means page has loaded
-    ModeratePage.grades_visible_to_students_button
+    ModeratePage.grades_posted_to_students_button
   end
 end

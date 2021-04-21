@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -166,7 +166,7 @@ describe Quizzes::QuizSubmission do
 
       context 'on a graded_survey' do
         it "should award all points for a graded_survey" do
-          @quiz.update_attributes(points_possible: 42, quiz_type: 'graded_survey')
+          @quiz.update(points_possible: 42, quiz_type: 'graded_survey')
 
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "wrong" }
@@ -500,19 +500,19 @@ describe Quizzes::QuizSubmission do
       expect(s.version_number).to eql(2)
       expect(s.kept_score).to eql(4.0)
 
-      q.update_attributes!(:scoring_policy => "keep_highest")
+      q.update!(:scoring_policy => "keep_highest")
       s.reload
       s.score = 3.0
       s.attempt = 3
       s.with_versioning(true, &:save!)
       expect(s.kept_score).to eql(5.0)
 
-      q.update_attributes!(scoring_policy: "keep_average")
+      q.update!(scoring_policy: "keep_average")
       s.reload
       s.with_versioning(true, &:save!)
       expect(s.kept_score).to eql(4.0)
 
-      q.update_attributes!(:scoring_policy => "keep_highest")
+      q.update!(:scoring_policy => "keep_highest")
       s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
       expect(s.kept_score).to eql(6.0)
     end
@@ -729,31 +729,61 @@ describe Quizzes::QuizSubmission do
     end
 
     context "update_assignment_submission" do
-      before(:once) do
+      let(:quiz) do
+        quiz = @course.quizzes.create!
+        quiz.generate_quiz_data
+        quiz.update!(
+          published_at: Time.zone.now,
+          workflow_state: "available",
+          scoring_policy: "keep_highest",
+          due_at: 5.days.from_now
+        )
+        quiz
+      end
+      let(:assignment) { quiz.assignment }
+      let(:quiz_submission) { quiz.generate_submission(@user, false) }
+      let(:submission) { quiz_submission.submission }
+
+      def save_quiz_submission
+        quiz_submission.workflow_state = "complete"
+        quiz_submission.save!
+        quiz_submission.score = 5
+        quiz_submission.fudge_points = 0
+        quiz_submission.kept_score = 5
+        quiz_submission.with_versioning(true, &:save!)
+      end
+
+      before(:each) do
         student_in_course
-        @quiz.generate_quiz_data
-        @quiz.published_at = Time.now
-        @quiz.workflow_state = 'available'
-        @quiz.scoring_policy = "keep_highest"
-        @quiz.due_at = 5.days.from_now
-        @quiz.save!
-        @assignment = @quiz.assignment
-        @quiz_sub = @quiz.generate_submission @user, false
-        @quiz_sub.workflow_state = "complete"
-        @quiz_sub.save!
-        @quiz_sub.score = 5
-        @quiz_sub.fudge_points = 0
-        @quiz_sub.kept_score = 5
-        @quiz_sub.with_versioning(true, &:save!)
-        @submission = @quiz_sub.submission
       end
 
       it "should sync the score" do
-        expect(@submission.score).to eql(5.0)
+        save_quiz_submission
+        expect(submission.score).to be 5.0
       end
 
       it "should not set graded_at to be in the future" do
-        expect(@submission.graded_at.to_i).to be <= Time.zone.now.to_i
+        save_quiz_submission
+        expect(submission.graded_at.to_i).to be <= Time.zone.now.to_i
+      end
+
+      it "posts the submission if the assignment is automatically posted" do
+        save_quiz_submission
+        expect(submission).to be_posted
+      end
+
+      it "does not post the submission if the assignment is manually posted" do
+        assignment.post_policy.update!(post_manually: true)
+        save_quiz_submission
+        expect(submission).not_to be_posted
+      end
+
+      it "does not update the posted_at date of already-posted submissions" do
+        submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          save_quiz_submission
+        }.not_to change { submission.reload.posted_at }
       end
     end
 
@@ -874,6 +904,23 @@ describe Quizzes::QuizSubmission do
         qs = @quiz.generate_submission(@student)
         expect(qs.grants_right?(@teacher, :update_scores)).to eq true
         expect(qs.grants_right?(@teacher, :add_attempts)).to eq true
+      end
+
+      it "does not take events from an anonymous user" do
+        course_with_student(:active_all => true)
+        @quiz = @course.quizzes.create!
+        qs = @quiz.generate_submission(@user)
+        expect(qs.grants_right?(nil, :record_events)).to be_falsey
+      end
+
+      it "can take events for any users for a ungraded quiz in a public course" do
+        course_with_student(:active_all => true)
+        @course.is_public = true
+        @course.is_public_to_auth_users = true
+        @course.save!
+        @quiz = @course.quizzes.create!(quiz_type: 'practice_quiz')
+        qs = @quiz.generate_submission(@user)
+        expect(qs.grants_right?(nil, { user_id: nil }, :record_events)).to be_truthy
       end
     end
 
@@ -1404,7 +1451,7 @@ describe Quizzes::QuizSubmission do
       submission_data = { 'question_1' => 'Hello' }
       survey_with_submission(questions) { submission_data }
       teacher_in_course(course: @course, active_all: true)
-      @quiz.update_attributes(points_possible: 15, quiz_type: 'graded_survey')
+      @quiz.update(points_possible: 15, quiz_type: 'graded_survey')
       Quizzes::SubmissionGrader.new(@quiz_submission.reload).grade_submission
 
       expect(@quiz_submission).to be_completed
@@ -1776,6 +1823,96 @@ describe Quizzes::QuizSubmission do
     end
     it 'should function without valid submission' do
       expect(quiz_submission.excused?).to eq nil
+    end
+  end
+
+  describe "#posted?" do
+    context "when this submission's quiz is a graded quiz" do
+      before(:each) { quiz_with_graded_submission([]) }
+
+      it "returns true if the underlying submission is posted" do
+        allow(@quiz_submission.submission).to receive(:posted?).and_return(true)
+        expect(@quiz_submission).to be_posted
+      end
+
+      it "returns false if the underlying submission is not posted" do
+        allow(@quiz_submission.submission).to receive(:posted?).and_return(false)
+        expect(@quiz_submission).not_to be_posted
+      end
+    end
+
+    it "always returns true when the associated quiz will not be graded" do
+      student_in_course
+      quiz = @course.quizzes.create!(title: "You shall digest the venom of your spleen", quiz_type: "survey")
+      quiz_submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(@student)
+
+      expect(quiz_submission).to be_posted
+    end
+  end
+
+  context 'root_account_id' do
+    before(:each) { quiz_with_graded_submission([]) }
+
+    it "uses root_account value from account" do
+      expect(@quiz_submission.root_account_id).to eq Account.default.id
+    end
+  end
+
+  describe "#filter_attributes_for_user" do
+    let(:quiz_submission) do
+      quiz_with_graded_submission([])
+      @quiz_submission
+    end
+    let(:assignment) { quiz_submission.quiz.assignment }
+    let(:student) { quiz_submission.user }
+    let(:teacher) { @course.enroll_teacher(User.create!, "workflow_state" => "active").user }
+
+    context "when the quiz is a practice quiz" do
+      let(:practice_quiz_submission) do
+        practice_quiz_with_submission
+        @qsub
+      end
+
+      it "does not remove the score or kept_score fields" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          practice_quiz_submission.filter_attributes_for_user(json, student, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+
+    context "when the quiz submission is hidden from the student" do
+      before(:each) do
+        quiz_submission.submission.update!(posted_at: nil)
+      end
+
+      it "removes the score and kept_score fields when the user cannot see the grade" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        quiz_submission.filter_attributes_for_user(json, student, nil)
+        expect(json).to eq({"id" => 1})
+      end
+
+      it "keeps the score and kept_score fields when the user can see the grade" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          quiz_submission.filter_attributes_for_user(json, teacher, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+
+    context "when the quiz submission is posted to the student" do
+      it "always keeps the score and kept_score fields" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          quiz_submission.filter_attributes_for_user(json, student, nil)
+        }.not_to change {
+          json
+        }
+      end
     end
   end
 end

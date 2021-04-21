@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from './actions'
 import initialState from './store/initialState'
-import _ from 'underscore'
 
 const courseImageHandlers = {
   MODAL_VISIBILITY(state, action) {
@@ -71,7 +69,7 @@ const courseImageHandlers = {
 
 const courseImage = (state = initialState, action) => {
   if (courseImageHandlers[action.type]) {
-    const newState = _.extend({}, state)
+    const newState = {...state}
     return courseImageHandlers[action.type](newState, action)
   } else {
     return state

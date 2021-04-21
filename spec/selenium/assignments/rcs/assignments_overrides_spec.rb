@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -30,9 +32,8 @@ describe "assignment groups" do
 
     before(:each) do
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
-      make_full_screen
+
       course_with_teacher_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

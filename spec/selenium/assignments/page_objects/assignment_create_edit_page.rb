@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -18,6 +20,11 @@
 class AssignmentCreateEditPage
   class << self
     include SeleniumDependencies
+
+    # CSS Selectors
+    def submission_type_selector
+      "#assignment_submission_type"
+    end
 
     # Selectors
     def assignment_form
@@ -46,6 +53,26 @@ class AssignmentCreateEditPage
 
     def submission_type
       f('#assignment_submission_type')
+    end
+
+    def limited_attempts_fieldset
+      f("#allowed_attempts_fields")
+    end
+
+    def limited_attempts_dropdown
+      f("#allowed-attempts-target select")
+    end
+
+    def limited_attempts_input
+      f("input[name='allowed_attempts']")
+    end
+
+    def increase_attempts_btn
+      f("button svg[name='IconArrowOpenUp']")
+    end
+
+    def decrease_attempts_btn
+      f("button svg[name='IconArrowOpenDown']")
     end
 
     # Moderated Grading Options
@@ -83,9 +110,7 @@ class AssignmentCreateEditPage
     end
 
     def add_number_of_graders(number)
-      grader_count_input.clear
-      grader_count_input.send_keys(number)
-      driver.action.send_keys(:enter).perform
+      replace_content(grader_count_input, number, tab_out: true)
     end
 
     def select_moderate_checkbox

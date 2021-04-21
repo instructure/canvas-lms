@@ -18,24 +18,48 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const ModulesTray = () => (
   <TutorialTrayContent
     name="Modules"
     heading={I18n.t('Modules')}
-    subheading={I18n.t('Organize your course content')}
-    image="/images/tutorial-tray-images/module_tutorial.svg"
-  >
-    <Text as="p">
+    subheading={I18n.t('Organize course content')}
+    image="/images/tutorial-tray-images/Panda_Modules.svg"
+    imageWidth="9rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
       {
-          I18n.t(`Organize and segment your course by topic, unit, chapter,
-                  or week. Sequence select modules by defining criteria and
-                  prerequisites.`)
-        }
-    </Text>
+        label: I18n.t('How do I add a module?'),
+        href: 'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151'
+      },
+      {
+        label: I18n.t('How do I publish or unpublish a module as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571'
+      },
+      {
+        label: I18n.t('How do I add assignment types, pages, and files as module items?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157'
+      },
+      {
+        label: I18n.t('How do I move or reorder a module?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150'
+      }
+    ]}
+  >
+    {I18n.t(`Use modules to organize your content and create a linear flow for
+      what students should do in the course. Modules can be used to organize
+      content by weeks, units, or a different organization structure.
+      Add files, discussions, assignments, quizzes, and other learning materials.
+      Require prerequisites to be completed before moving to a module or next
+      module item, or lock an entire module until a specific date.`)}
   </TutorialTrayContent>
-);
+)
 
 export default ModulesTray

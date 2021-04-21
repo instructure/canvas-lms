@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -56,8 +58,17 @@ describe QuizzesNext::Service do
       assignment_active = assignment_model(course: course, submission_types: "external_tool")
 
       lti_assignment_inactive.destroy
-      allow_any_instantiation_of(lti_assignment_active1).to receive(:quiz_lti?).and_return(true)
-      allow_any_instantiation_of(lti_assignment_active2).to receive(:quiz_lti?).and_return(true)
+      tool = course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      lti_assignment_active1.external_tool_tag_attributes = { :content => tool }
+      lti_assignment_active1.save!
+      lti_assignment_active2.external_tool_tag_attributes = { :content => tool }
+      lti_assignment_active2.save!
 
       active_lti_assignments = Service.active_lti_assignments_for_course(course)
 

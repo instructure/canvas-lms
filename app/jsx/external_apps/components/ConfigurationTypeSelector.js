@@ -50,6 +50,7 @@ export default class ConfigurationTypeSelector extends React.Component {
               <option value="manual">{I18n.t('Manual Entry')}</option>
               <option value="url">{I18n.t('By URL')}</option>
               <option value="xml">{I18n.t('Paste XML')}</option>
+              <option value="byClientId">{I18n.t('By Client ID')}</option>
               <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option>
             </select>
           </label>

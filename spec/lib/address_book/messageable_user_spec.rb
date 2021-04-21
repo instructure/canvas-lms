@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -37,6 +39,24 @@ describe AddressBook::MessageableUser do
       known_users = address_book.known_users([student1, student2])
       expect(known_users.map(&:id)).to include(student1.id)
       expect(known_users.map(&:id)).not_to include(student2.id)
+    end
+
+    it 'includes group members from different sections' do
+      course = course_factory(active_all: true)
+      section1 = course.course_sections.create!
+      section2 = course.course_sections.create!
+
+      student1 = student_in_course(user: @sender, course: course, active_all: true, section: section1, limit_privileges_to_course_section: true).user
+      student2 = student_in_course(course: course, active_all: true, section: section2, limit_privileges_to_course_section: true).user
+      student3 = student_in_course(course: course, active_all: true, section: section2, limit_privileges_to_course_section: true).user
+
+      group = group_with_user(user: student1, group_context: course).group
+      group.add_user(student2)
+
+      address_book = AddressBook::MessageableUser.new(student1)
+      known_users = address_book.known_users([student2, student3])
+      expect(known_users.map(&:id)).to include(student2.id)
+      expect(known_users.map(&:id)).not_to include(student3.id)
     end
 
     it "caches the results for known users" do
@@ -286,6 +306,16 @@ describe AddressBook::MessageableUser do
       address_book = AddressBook::MessageableUser.new(ta)
       expect(address_book.count_in_contexts([course.asset_string])).to eql({
         course.asset_string => 3
+      })
+    end
+
+    it "returns count in an unassociated :context when an admin" do
+      sender = account_admin_user(active_all: true)
+      enrollment = student_in_course(active_all: true)
+      course = enrollment.course
+      address_book = AddressBook::MessageableUser.new(sender)
+      expect(address_book.count_in_contexts([course.asset_string])).to eql({
+        course.asset_string => 2
       })
     end
   end

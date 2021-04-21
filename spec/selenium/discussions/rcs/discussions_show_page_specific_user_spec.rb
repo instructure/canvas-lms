@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -49,6 +51,7 @@ describe "discussions" do
   end
 
   before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
@@ -60,7 +63,6 @@ describe "discussions" do
 
       before(:each) do
         user_session(student)
-        enable_all_rcs @course.account
       end
 
       context "teacher topic" do
@@ -97,6 +99,22 @@ describe "discussions" do
           expect(f('.topic-unsubscribe-button')).to be_displayed
         end
 
+        it "should allow you to subscribe and unsubscribe" do
+          get url
+          expect(f('.topic-subscribe-button').text).to eq("Subscribe")
+          expect(f('.topic-unsubscribe-button')).not_to be_displayed
+          f('.topic-subscribe-button').click
+
+          get url
+          expect(f('.topic-subscribe-button')).not_to be_displayed
+          expect(f('.topic-unsubscribe-button').text).to eq("Subscribed")
+          f('.topic-unsubscribe-button').click
+
+          get url
+          expect(f('.topic-subscribe-button').text).to eq("Subscribe")
+          expect(f('.topic-unsubscribe-button')).not_to be_displayed
+        end
+
         it "should validate that a student can see it and reply to a discussion", priority: "1", test_id: 150475 do
           new_student_entry_text = 'new student entry'
           get url
@@ -128,9 +146,8 @@ describe "discussions" do
       let(:topic) { teacher_topic }
 
       before(:each) do
-        resize_screen_to_normal
+
         user_session(teacher)
-        enable_all_rcs @course.account
       end
 
       it "should create a group discussion", priority: "1", test_id: 150473 do

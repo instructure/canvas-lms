@@ -34,7 +34,10 @@ const DEFAULT_LINK = Object.freeze({
   available_to: USER_TYPES.map(type => type.value),
   is_default: 'false',
   index: 0,
-  state: 'new'
+  state: 'new',
+  is_featured: false,
+  is_new: false,
+  feature_headline: ''
 })
 
 const NAME_PREFIX = 'account[custom_help_links]'

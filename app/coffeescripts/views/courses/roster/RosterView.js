@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!roster'
+import I18n from 'i18n!RosterView'
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import template from 'jst/courses/roster/index'
@@ -23,20 +23,6 @@ import ValidatedMixin from '../../ValidatedMixin'
 import AddPeopleApp from 'jsx/add_people/add_people_app'
 
 export default class RosterView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.fetchOnCreateUsersClose = this.fetchOnCreateUsersClose.bind(this)
-    this.fetch = this.fetch.bind(this)
-    this.onFail = this.onFail.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.mixin(ValidatedMixin)
 
@@ -68,20 +54,23 @@ export default class RosterView extends Backbone.View {
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
 
     const canReadSIS = 'permissions' in ENV ? !!ENV.permissions.read_sis : true
+    const canAddUser = ENV.FEATURES.granular_permissions_manage_users
+      ? role => role.addable_by_user
+      : role => role.manageable_by_user
 
     return (this.addPeopleApp = new AddPeopleApp(this.$createUsersModalHolder[0], {
       courseId: (ENV.course && ENV.course.id) || 0,
       defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
-      roles: (ENV.ALL_ROLES || []).filter(role => role.manageable_by_user),
+      roles: (ENV.ALL_ROLES || []).filter(canAddUser),
       sections: ENV.SECTIONS || [],
-      onClose: this.fetchOnCreateUsersClose,
+      onClose: () => this.fetchOnCreateUsersClose(),
       inviteUsersURL: ENV.INVITE_USERS_URL,
       canReadSIS
     }))
   }
 
   attach() {
-    return this.collection.on('setParam deleteParam', this.fetch)
+    return this.collection.on('setParam deleteParam', this.fetch, this)
   }
 
   fetchOnCreateUsersClose() {
@@ -92,7 +81,7 @@ export default class RosterView extends Backbone.View {
     if (this.lastRequest != null) {
       this.lastRequest.abort()
     }
-    return (this.lastRequest = this.collection.fetch().fail(this.onFail))
+    return (this.lastRequest = this.collection.fetch().fail(this.onFail.bind(this)))
   }
 
   course_id() {

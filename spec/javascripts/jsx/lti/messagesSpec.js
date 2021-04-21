@@ -18,17 +18,21 @@
 
 import $ from 'jquery'
 import sinon from 'sinon'
-import { ltiMessageHandler } from 'lti/messages'
+import {ltiMessageHandler} from 'lti/messages'
 
 const intialHeight = 100
 const finalHeight = 800
 
-let clock;
-let ltiToolWrapperFixture = $('#fixtures')
+let clock
+const ltiToolWrapperFixture = $('#fixtures')
 
 const resizeMessage = {
   subject: 'lti.frameResize',
   height: finalHeight
+}
+
+const fetchWindowSize = {
+  subject: 'lti.fetchWindowSize'
 }
 
 const scrollMessage = {
@@ -36,18 +40,18 @@ const scrollMessage = {
 }
 
 const removeUnloadMessage = {
-  subject: 'lti.removeUnloadMessage',
+  subject: 'lti.removeUnloadMessage'
 }
 
 function showMessage(show = true) {
   return {
     subject: 'lti.showModuleNavigation',
-    show: show
+    show
   }
 }
 
 function alertMessage(message = 'Alert message') {
-  return  {
+  return {
     subject: 'lti.screenReaderAlert',
     body: message
   }
@@ -56,26 +60,26 @@ function alertMessage(message = 'Alert message') {
 function unloadMessage(message = 'unload message') {
   return {
     subject: 'lti.setUnloadMessage',
-    message: message
+    message
   }
 }
 
 function postMessageEvent(data, source) {
   return {
     data: JSON.stringify(data),
-    source: source
+    source
   }
 }
 
-QUnit.module('Messages', function (suiteHooks) {
-  suiteHooks.beforeEach(function () {
-    clock = sinon.useFakeTimers();
-  });
+QUnit.module('Messages', suiteHooks => {
+  suiteHooks.beforeEach(() => {
+    clock = sinon.useFakeTimers()
+  })
 
-  suiteHooks.afterEach(function () {
-    clock.restore();
+  suiteHooks.afterEach(() => {
+    clock.restore()
     ltiToolWrapperFixture.empty()
-  });
+  })
 
   test('finds and resizes the tool content wrapper', () => {
     ltiToolWrapperFixture.append(`
@@ -91,7 +95,7 @@ QUnit.module('Messages', function (suiteHooks) {
     const toolContentWrapper = el.find('.tool_content_wrapper')
 
     equal(toolContentWrapper.height(), 100)
-    ltiMessageHandler(postMessageEvent(resizeMessage));
+    ltiMessageHandler(postMessageEvent(resizeMessage))
     equal(toolContentWrapper.height(), finalHeight)
   })
 
@@ -105,8 +109,23 @@ QUnit.module('Messages', function (suiteHooks) {
     const iframe = $('iframe')
 
     equal(iframe.height(), 100)
-    ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow));
+    ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow))
     equal(iframe.height(), finalHeight)
+  })
+
+  test('returns the hight and width of the page along with the iframe offset', () => {
+    ltiToolWrapperFixture.append(`
+      <div>
+        <h1 class="page-title">LTI resize test</h1>
+        <p><iframe style="width: 100%; height: ${intialHeight}px;" src="https://canvas.example.com/courses/4/external_tools/retrieve?display=borderless" width="100%" height="${intialHeight}px" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></p>
+      </div>
+    `)
+    const iframe = $('iframe')
+
+    sinon.spy(iframe[0].contentWindow, 'postMessage')
+    notOk(iframe[0].contentWindow.postMessage.calledOnce)
+    ltiMessageHandler(postMessageEvent(fetchWindowSize, iframe[0].contentWindow))
+    ok(iframe[0].contentWindow.postMessage.calledOnce)
   })
 
   test('hides the module navigation', () => {
@@ -118,7 +137,7 @@ QUnit.module('Messages', function (suiteHooks) {
     const moduleFooter = $('#module-footer')
 
     ok(moduleFooter.is(':visible'))
-    ltiMessageHandler(postMessageEvent(showMessage(false)));
+    ltiMessageHandler(postMessageEvent(showMessage(false)))
     notOk(moduleFooter.is(':visible'))
   })
 
@@ -139,8 +158,7 @@ QUnit.module('Messages', function (suiteHooks) {
 
   test('triggers a screen reader alert', () => {
     sinon.spy($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler(postMessageEvent(alertMessage()));
+    ltiMessageHandler(postMessageEvent(alertMessage()))
     ok($.screenReaderFlashMessageExclusive.calledOnce)
   })
-
 })

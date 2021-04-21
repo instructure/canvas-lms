@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,6 +30,7 @@
 # @see AssessmentQuestion#create_quiz_question()
 # @see AssessmentQuestionBank#select_for_submission()
 class Quizzes::QuizQuestion < ActiveRecord::Base
+  extend RootAccountResolver
   self.table_name = 'quiz_questions'
 
   include Workflow
@@ -51,9 +54,11 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   serialize :question_data
   after_save :update_quiz
 
+  resolves_root_account through: :quiz
+
   include MasterCourses::CollectionRestrictor
   self.collection_owner_association = :quiz
-  restrict_columns :content, [:question_data, :position, :quiz_group_id]
+  restrict_columns :content, [:question_data, :position, :quiz_group_id, :workflow_state]
 
   workflow do
     state :active
@@ -221,19 +226,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
     set = "quiz_group_id=#{group_id}, position=CASE #{updates.join(" ")} ELSE id END"
     where(:id => questions).update_all(set)
-  end
-
-  def migrate_file_links
-    Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(self)
-  end
-
-  def self.batch_migrate_file_links(ids)
-    questions = Quizzes::QuizQuestion.preload(:quiz, :assessment_question).where(:id => ids)
-    questions.each do |question|
-      if question.migrate_file_links
-        question.save
-      end
-    end
   end
 
   alias_method :destroy_permanently!, :destroy

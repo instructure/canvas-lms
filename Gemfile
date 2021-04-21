@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # What have they done to the Gemfile???
 #
 # Relax. Breathe deep. All the gems are still there; they're just loaded in various files in Gemfile.d/
@@ -17,7 +19,7 @@ Dir[File.join(File.dirname(__FILE__), 'gems/plugins/*/Gemfile.d/_before.rb')].ea
   eval(File.read(file), nil, file)
 end
 
-require File.expand_path("../config/canvas_rails5", __FILE__)
+require File.expand_path("../config/canvas_rails_switcher", __FILE__)
 
 Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|
   eval(File.read(file), nil, file)

@@ -16,15 +16,16 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount} from 'enzyme'
+import {makeSelection, getSelect, getSelectMenuOptions, isSelectDisabled} from './SelectMenuHelpers'
 
 import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup'
 
-QUnit.module('SelectMenuGroup', function(suiteHooks) {
+QUnit.module('SelectMenuGroup', suiteHooks => {
   let props
   let wrapper
 
-  suiteHooks.beforeEach(function() {
+  suiteHooks.beforeEach(() => {
     const assignmentSortOptions = [
       ['Assignment Group', 'assignment_group'],
       ['Due Date', 'due_date'],
@@ -40,9 +41,15 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
       {id: '60', nickname: 'Firebending', url: '/courses/60/grades', gradingPeriodSetId: '4'}
     ]
 
-    const gradingPeriods = [{id: '9', title: 'Fall Semester'}, {id: '12', title: 'Spring Semester'}]
+    const gradingPeriods = [
+      {id: '9', title: 'Fall Semester'},
+      {id: '12', title: 'Spring Semester'}
+    ]
 
-    const students = [{id: '7', name: 'Bob Smith'}, {id: '11', name: 'Jane Doe'}]
+    const students = [
+      {id: '7', name: 'Bob Smith'},
+      {id: '11', name: 'Jane Doe'}
+    ]
 
     props = {
       assignmentSortOptions,
@@ -60,167 +67,149 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     }
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     wrapper.unmount()
     document.getElementById('fixtures').innerHTML = ''
   })
 
-  test('renders a student select menu if the students prop has more than 1 student', function() {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#student_select_menu').length, 1)
-  })
-
-  test('does not render a student select menu if the students prop has only 1 student', function() {
-    wrapper = shallow(<SelectMenuGroup {...props} students={[{id: '11', name: 'Jane Doe'}]} />)
-    strictEqual(wrapper.find('#student_select_menu').length, 0)
-  })
-
-  test('disables the student select menu if the course select menu has changed', function() {
+  test('renders a student select menu if the students prop has more than 1 student', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper
-      .find('#course_select_menu')
-      .last()
-      .simulate('change', {target: {value: '14'}})
-    const menu = wrapper
-      .find('#student_select_menu')
-      .last()
-      .instance()
-    strictEqual(menu.getAttribute('aria-disabled'), 'true')
+    strictEqual(wrapper.find('SelectMenu#student_select_menu').length, 1)
   })
 
-  test('renders a grading period select menu if passed any grading periods', function() {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#grading_period_select_menu').length, 1)
+  test('does not render a student select menu if the students prop has only 1 student', () => {
+    wrapper = mount(<SelectMenuGroup {...props} students={[{id: '11', name: 'Jane Doe'}]} />)
+    strictEqual(wrapper.find('SelectMenu#student_select_menu').length, 0)
   })
 
-  test('includes "All Grading Periods" as an option in the grading period select menu', function() {
+  test('disables the student select menu if the course select menu has changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'course_select_menu', '14')
+    strictEqual(isSelectDisabled(wrapper, 'student_select_menu'), true)
+  })
+
+  test('renders a grading period select menu if passed any grading periods', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
-    strictEqual(
-      wrapper
-        .find('#grading_period_select_menu option')
-        .at(0)
-        .text(),
-      'All Grading Periods'
-    )
+    strictEqual(wrapper.find('SelectMenu#grading_period_select_menu').length, 1)
   })
 
-  test('does not render a grading period select menu if passed no grading periods', function() {
-    wrapper = shallow(<SelectMenuGroup {...props} gradingPeriods={[]} />)
-    strictEqual(wrapper.find('#grading_period_select_menu').length, 0)
+  test('includes "All Grading Periods" as an option in the grading period select menu', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    const options = getSelectMenuOptions(wrapper, 'grading_period_select_menu')
+    strictEqual(options[0].textContent, 'All Grading Periods')
   })
 
-  test('disables the grading period select menu if the course select menu has changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper.find('select#course_select_menu').simulate('change', {target: {value: '14'}})
-    strictEqual(wrapper.find('select#grading_period_select_menu').prop('aria-disabled'), 'true')
+  test('does not render a grading period select menu if passed no grading periods', () => {
+    wrapper = mount(<SelectMenuGroup {...props} gradingPeriods={[]} />, {
+      attachTo: document.getElementById('fixtures')
+    })
+    strictEqual(wrapper.find('SelectMenu#grading_period_select_menu').length, 0)
   })
 
-  test('renders a course select menu if the courses prop has more than 1 course', function() {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#course_select_menu').length, 1)
+  test('disables the grading period select menu if the course select menu has changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'course_select_menu', '14')
+    strictEqual(isSelectDisabled(wrapper, 'grading_period_select_menu'), true)
   })
 
-  test('does not render a course select menu if the courses prop has only 1 course', function() {
-    wrapper = shallow(
+  test('renders a course select menu if the courses prop has more than 1 course', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    strictEqual(wrapper.find('SelectMenu#course_select_menu').length, 1)
+  })
+
+  test('does not render a course select menu if the courses prop has only 1 course', () => {
+    wrapper = mount(
       <SelectMenuGroup
         {...props}
         courses={[{id: '2', nickname: 'Autos', url: '/courses/2/grades'}]}
-      />
+      />,
+      {attachTo: document.getElementById('fixtures')}
     )
-    strictEqual(wrapper.find('#course_select_menu').length, 0)
+    strictEqual(wrapper.find('SelectMenu#course_select_menu').length, 0)
   })
 
-  test('disables the course select menu if the student select menu has changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper.find('select#student_select_menu').simulate('change', {target: {value: '7'}})
-    strictEqual(wrapper.find('select#course_select_menu').prop('aria-disabled'), 'true')
+  test('disables the course select menu if the student select menu has changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'student_select_menu', '7')
+    strictEqual(isSelectDisabled(wrapper, 'course_select_menu'), true)
   })
 
-  test('disables the course select menu if the grading period select menu has changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper.find('select#grading_period_select_menu').simulate('change', {target: {value: '12'}})
-    strictEqual(wrapper.find('select#course_select_menu').prop('aria-disabled'), 'true')
+  test('disables the course select menu if the grading period select menu has changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'grading_period_select_menu', '12')
+    strictEqual(
+      wrapper
+        .find('#course_select_menu')
+        .last()
+        .getDOMNode().disabled,
+      true
+    )
   })
 
-  test('disables the course select menu if the assignment sort order select menu has changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper
-      .find('select#assignment_sort_order_select_menu')
-      .simulate('change', {target: {value: 'title'}})
-    strictEqual(wrapper.find('select#course_select_menu').prop('aria-disabled'), 'true')
+  test('disables the course select menu if the assignment sort order select menu has changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'assignment_sort_order_select_menu', 'title')
+    strictEqual(isSelectDisabled(wrapper, 'course_select_menu'), true)
   })
 
-  test('renders an assignment sort order select menu', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('select#assignment_sort_order_select_menu').length, 1)
+  test('renders an assignment sort order select menu', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    const select = getSelect(wrapper, 'SelectMenu#assignment_sort_order_select_menu')
+    ok(select)
   })
 
-  test('disables the assignment sort order select menu if the course select menu has changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper
-      .find('#course_select_menu')
-      .last()
-      .simulate('change', {target: {value: '14'}})
-    const menu = wrapper
-      .find('#assignment_sort_order_select_menu')
-      .last()
-      .instance()
-    strictEqual(menu.getAttribute('aria-disabled'), 'true')
+  test('disables the assignment sort order select menu if the course select menu has changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'course_select_menu', '14')
+    strictEqual(isSelectDisabled(wrapper, 'assignment_sort_order_select_menu'), true)
   })
 
-  test('renders a submit button', function() {
-    wrapper = shallow(<SelectMenuGroup {...props} />)
-    strictEqual(wrapper.find('#apply_select_menus').length, 1)
+  test('renders a submit button', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    strictEqual(wrapper.find('button#apply_select_menus').length, 1)
   })
 
-  test('disables the submit button if no select menu options have changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    const submitButton = wrapper.find('Button[id="apply_select_menus"]')
+  test('disables the submit button if no select menu options have changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    const submitButton = wrapper.find('button#apply_select_menus')
     strictEqual(submitButton.prop('disabled'), true)
   })
 
-  test('enables the submit button if a select menu options is changed', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper
-      .find('#student_select_menu')
-      .last()
-      .simulate('change', {target: {value: '7'}})
-    const submitButton = wrapper.find('Button[id="apply_select_menus"]')
-    strictEqual(submitButton.prop('disabled'), false)
+  test('enables the submit button if a select menu options is changed', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    const submitButton = wrapper
+      .find('#apply_select_menus')
+      .hostNodes()
+      .getDOMNode()
+
+    strictEqual(submitButton.disabled, true)
+    makeSelection(wrapper, 'student_select_menu', '7')
+    strictEqual(submitButton.disabled, false)
   })
 
-  test('disables the submit button after it is clicked', function() {
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper
-      .find('#student_select_menu')
-      .last()
-      .simulate('change', {target: {value: '7'}})
-    wrapper
-      .find('Button[id="apply_select_menus"]')
-      .find('button')
-      .simulate('click')
-    strictEqual(wrapper.find('Button[id="apply_select_menus"]').prop('disabled'), true)
+  test('disables the submit button after it is clicked', () => {
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'student_select_menu', '7')
+    wrapper.find('button#apply_select_menus').simulate('click')
+    strictEqual(wrapper.find('button#apply_select_menus').prop('disabled'), true)
   })
 
-  test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', function() {
+  test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', () => {
     const stub = sinon.stub().resolves()
-    wrapper = shallow(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />)
-    wrapper
-      .find('#assignment_sort_order_select_menu')
-      .simulate('change', {target: {value: 'title'}})
-    const submitButton = wrapper.find('#apply_select_menus')
+    wrapper = mount(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />, {
+      attachTo: document.getElementById('fixtures')
+    })
+    makeSelection(wrapper, 'assignment_sort_order_select_menu', 'title')
+    const submitButton = wrapper.find('button#apply_select_menus')
     submitButton.simulate('click')
     strictEqual(stub.callCount, 1)
   })
 
-  test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', function() {
+  test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', () => {
     props.saveAssignmentOrder = sinon.stub().resolves()
-    wrapper = mount(<SelectMenuGroup {...props} />)
-    wrapper
-      .find('#student_select_menu')
-      .last()
-      .simulate('change', {target: {value: '7'}})
-    const submitButton = wrapper.find('#apply_select_menus').last()
+    wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
+    makeSelection(wrapper, 'student_select_menu', '7')
+    const submitButton = wrapper.find('button#apply_select_menus').last()
     submitButton.simulate('click')
     strictEqual(props.saveAssignmentOrder.callCount, 0)
   })
@@ -229,7 +218,7 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     let submitButton
 
     function mountComponent() {
-      return mount(<SelectMenuGroup {...props} />)
+      return mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
     }
 
     hooks.beforeEach(() => {
@@ -239,11 +228,8 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     QUnit.module('when the student has changed', contextHooks => {
       contextHooks.beforeEach(() => {
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus').last()
-        wrapper
-          .find('#student_select_menu')
-          .last()
-          .simulate('change', {target: {value: '7'}})
+        submitButton = wrapper.find('button#apply_select_menus').last()
+        makeSelection(wrapper, 'student_select_menu', '7')
         submitButton.simulate('click')
       })
 
@@ -261,11 +247,8 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '2'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
-          wrapper
-            .find('#course_select_menu')
-            .last()
-            .simulate('change', {target: {value: '14'}})
+          submitButton = wrapper.find('button#apply_select_menus').last()
+          makeSelection(wrapper, 'course_select_menu', '14')
           submitButton.simulate('click')
         })
 
@@ -282,11 +265,8 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '2'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
-          wrapper
-            .find('#course_select_menu')
-            .last()
-            .simulate('change', {target: {value: '21'}})
+          submitButton = wrapper.find('button#apply_select_menus').last()
+          makeSelection(wrapper, 'course_select_menu', '21')
           submitButton.simulate('click')
         })
 
@@ -305,11 +285,8 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '21'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
-          wrapper
-            .find('#course_select_menu')
-            .last()
-            .simulate('change', {target: {value: '2'}})
+          submitButton = wrapper.find('button#apply_select_menus').last()
+          makeSelection(wrapper, 'course_select_menu', '2')
           submitButton.simulate('click')
         })
 
@@ -326,11 +303,8 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '21'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
-          wrapper
-            .find('#course_select_menu')
-            .last()
-            .simulate('change', {target: {value: '42'}})
+          submitButton = wrapper.find('button#apply_select_menus').last()
+          makeSelection(wrapper, 'course_select_menu', '42')
           submitButton.simulate('click')
         })
 
@@ -347,11 +321,8 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
         contextHooks.beforeEach(() => {
           props.selectedCourseID = '21'
           wrapper = mountComponent()
-          submitButton = wrapper.find('#apply_select_menus').last()
-          wrapper
-            .find('#course_select_menu')
-            .last()
-            .simulate('change', {target: {value: '60'}})
+          submitButton = wrapper.find('button#apply_select_menus').last()
+          makeSelection(wrapper, 'course_select_menu', '60')
           submitButton.simulate('click')
         })
 

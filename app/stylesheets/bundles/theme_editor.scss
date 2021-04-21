@@ -40,7 +40,13 @@
 
 html, body { height: 100%; }
 
-body { overflow: hidden; }
+body {
+  overflow: visible;
+
+  @include breakpoint(tablet) {
+    overflow: hidden;
+  }
+}
 
 .ic-Layout-columns {
   height: 100%;
@@ -71,9 +77,12 @@ $te-footer-height: 72px;
 }
 
 .Theme__layout {
-  display: flex;
-  height: calc(100vh - #{$te-footer-height});
-  overflow: hidden;
+  @include breakpoint(tablet) {
+    display: flex;
+    height: calc(100vh - #{$te-footer-height});
+    overflow: hidden;
+  }
+
   &.Theme__layout--is-active-theme {
     border: 4px solid $ic-color-success;
     border-bottom: none;
@@ -81,30 +90,49 @@ $te-footer-height: 72px;
 }
 
 .Theme__editor {
-  flex: 0 0 $te-width;
   background: $te-bgd;
-  overflow-y: auto;
   position: relative;
   box-shadow: 2px 0 4px rgba(black, 0.3);
+
+  @include breakpoint(tablet) {
+    flex: 0 0 $te-width;
+    overflow-y: auto;
+  }
 }
 
-.Theme__preview { flex: 1; }
+.Theme__preview {
+  position: relative;
+
+  @include breakpoint(tablet) {
+    flex: 1;
+    position: static;
+  }
+}
 
 .Theme__preview-overlay {
   background: rgba(black, 0.5);
   height: calc(100% - #{$te-footer-height});
-  width: calc(100% - #{$te-width});
   z-index: 8000;
   position: absolute;
-  #{direction(left)}: $te-width; top: 0;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 100%;
+  #{direction(left)}: 0;
+
+  @include breakpoint(tablet) {
+    width: calc(100% - #{$te-width});
+    #{direction(left)}: $te-width;
+  }
+
   .Theme__layout--is-active-theme & {
     top: 4px; #{direction(left)}: $te-width + 4;
     height: calc(100% - #{$te-footer-height + 4});
     width: calc(100% - #{$te-width + 8});
   }
+
   .Button { border-color: rgba(black, 0.5); }
 }
 
@@ -116,7 +144,10 @@ $te-footer-height: 72px;
   border: none;
   width: 100%;
   height: 100vh;
-  padding-bottom: $te-footer-height;
+
+  @include breakpoint(tablet) {
+    padding-bottom: $te-footer-height;
+  }
 }
 
 //// Theme Editor content
@@ -128,6 +159,12 @@ $te-footer-height: 72px;
   width: 100%;
   background: $te-bgd-dark;
   color: $ic-color-light;
+
+  z-index: 8001; // make footer positioned higher than overlay for single-col mobile layout
+  @include breakpoint(tablet) {
+    z-index: auto;
+  }
+
   .Button { border-color: darken($te-bgd-dark, 8); }
   &.Theme__header--is-active-theme {
     background: $ic-color-success;
@@ -559,6 +596,9 @@ $te-footer-height: 72px;
     &.Theme__editor_preview-img-container--ic-brand-favicon {
       background: #ffffff; // will always be white due to xbrowsers
     }
+    &.Theme__editor_preview-img-container--ic-brand-mobile-global-nav-logo {
+      background: #ffffff;
+    }
     &.Theme__editor_preview-img-container--ic-brand-apple-touch-icon {
       background: #212121;
       .Theme__editor_preview-img {
@@ -628,14 +668,4 @@ $te-footer-height: 72px;
 
 .Theme-editor-progress-list-item__bar {
   flex: 1;
-}
-
-// ***HACK*** to make IE10 and 11 properly scale SVGs inside Theme Editor sidebar
-// (Also affects other image types because our user-uploaded image URLs do
-// not have filetype suffixes. This should be ok, though, because most
-// institutions' images should be at least 75px wide.)
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .Theme__editor-upload .Theme__editor_preview-img-container .Theme__editor_preview-img img {
-    min-width: 75px;
-  }
 }

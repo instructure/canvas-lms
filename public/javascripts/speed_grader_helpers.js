@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!speed_grader_helpers'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
@@ -51,6 +51,26 @@ export function setupAnonymizableAuthorId(isAnonymous) {
 }
 
 const speedGraderHelpers = {
+  getHistory() {
+    return window.history
+  },
+
+  getLocation() {
+    return document.location
+  },
+
+  getLocationHash() {
+    return document.location.hash
+  },
+
+  setLocation(url) {
+    document.location = url
+  },
+
+  setLocationHash(hash) {
+    document.location.hash = hash
+  },
+
   urlContainer(submission, defaultEl, originalityReportEl) {
     if (submission.has_originality_report) {
       return originalityReportEl
@@ -98,6 +118,16 @@ const speedGraderHelpers = {
       return select + currentSelectedIndex
     }
     return select + version
+  },
+
+  resourceLinkLookupUuidParam(submission) {
+    const resourceLinkLookupUuid = submission.resource_link_lookup_uuid
+
+    if (resourceLinkLookupUuid) {
+      return `&resource_link_lookup_uuid=${resourceLinkLookupUuid}`
+    }
+
+    return ''
   },
 
   setRightBarDisabled(isDisabled) {
@@ -202,6 +232,15 @@ const speedGraderHelpers = {
     } else {
       buttonContainer.show()
     }
+  },
+
+  plagiarismErrorMessage(turnitinAsset) {
+    return (
+      turnitinAsset.error_message ||
+      I18n.t(
+        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+      )
+    )
   },
 
   reloadPage() {

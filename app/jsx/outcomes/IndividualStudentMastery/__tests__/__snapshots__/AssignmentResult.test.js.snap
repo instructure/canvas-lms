@@ -5,73 +5,61 @@ exports[`renders the AlignmentResult component 1`] = `
   alignItems="stretch"
   as="span"
   direction="column"
-  inline={false}
+  display="flex"
+  elementRef={[Function]}
   justifyItems="start"
   padding="small"
-  visualDebug={false}
-  wrapItems={false}
+  withVisualDebug={false}
+  wrap="no-wrap"
 >
-  <FlexItem
+  <Item
     as="span"
-    grow={false}
-    shrink={false}
+    elementRef={[Function]}
+    shouldGrow={false}
+    shouldShrink={false}
   >
-    <Link
+    <Button
       as="button"
+      cursor="pointer"
+      display="inline-block"
+      elementRef={[Function]}
       href="http://foo"
-      iconPlacement="start"
-      linkRef={[Function]}
-      variant="default"
+      icon={[Function]}
+      margin="0"
+      size="medium"
+      textAlign="center"
+      theme={
+        Object {
+          "fontWeight": "700",
+          "mediumHeight": "normal",
+          "mediumPaddingHorizontal": "0",
+        }
+      }
+      type="button"
+      variant="link"
+      withBackground={true}
     >
-      <Flex
-        alignItems="center"
-        as="span"
-        direction="row"
-        inline={false}
-        justifyItems="start"
-        visualDebug={false}
-        wrapItems={false}
-      >
-        <FlexItem
-          as="span"
-          grow={false}
-          shrink={false}
-        >
-          <Text
-            as="span"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <IconQuiz />
-          </Text>
-        </FlexItem>
-        <FlexItem
-          as="span"
-          grow={false}
-          padding="0 x-small"
-          shrink={false}
-        >
-          <Text
-            as="span"
-            letterSpacing="normal"
-            size="medium"
-            weight="bold"
-          >
-            My assignment
-          </Text>
-        </FlexItem>
-      </Flex>
-    </Link>
-  </FlexItem>
-  <FlexItem
+      My assignment
+    </Button>
+  </Item>
+  <Item
     as="span"
-    grow={false}
+    elementRef={[Function]}
     padding="x-small 0"
-    shrink={false}
+    shouldGrow={false}
+    shouldShrink={false}
   >
     <View
+      borderColor="primary"
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
       padding="x-small 0 0 0"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <Text
         as="span"
@@ -79,16 +67,18 @@ exports[`renders the AlignmentResult component 1`] = `
         letterSpacing="normal"
         size="small"
         weight="bold"
+        wrap="normal"
       >
         Your score: 1
       </Text>
     </View>
-  </FlexItem>
-  <FlexItem
+  </Item>
+  <Item
     as="span"
     borderWidth="small"
-    grow={false}
-    shrink={false}
+    elementRef={[Function]}
+    shouldGrow={false}
+    shouldShrink={false}
   >
     <div
       className="react-rubric"
@@ -119,6 +109,6 @@ exports[`renders the AlignmentResult component 1`] = `
         />
       </div>
     </div>
-  </FlexItem>
+  </Item>
 </Flex>
 `;

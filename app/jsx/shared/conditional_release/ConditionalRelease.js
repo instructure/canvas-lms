@@ -20,10 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import Modal from 'react-modal'
-import classNames from 'classnames'
 import I18n from 'i18n!conditional_release'
-import numberHelper from '../helpers/numberHelper'
 import 'jquery.instructure_forms'
 
 const SAVE_TIMEOUT = 15000
@@ -54,7 +51,7 @@ class Editor extends React.Component {
         errors.push({message: errorRecord.error})
       })
     }
-    return errors.length == 0 ? null : errors
+    return errors.length === 0 ? null : errors
   }
 
   focusOnError = () => {
@@ -103,38 +100,33 @@ class Editor extends React.Component {
   }
 
   loadEditor = () => {
-    const url = this.props.env.editor_url
-    $.ajax({
-      url,
-      dataType: 'script',
-      cache: true,
-      success: this.createEditor
-    })
+    if (window.conditional_release_module) {
+      // spec hook
+      return new Promise(resolve =>
+        resolve({default: window.conditional_release_module.ConditionalReleaseEditor})
+      )
+    } else {
+      return import('jsx/conditional_release_editor/conditional-release-editor')
+    }
   }
 
-  createEditor = () => {
+  createNativeEditor = () => {
     const env = this.props.env
-    const editor = new conditional_release_module.ConditionalReleaseEditor({
-      jwt: env.jwt,
-      assignment: env.assignment,
-      courseId: env.context_id,
-      locale: {
-        locale: env.locale,
-        parseNumber: numberHelper.parse,
-        formatNumber: I18n.n
-      },
-      gradingType: env.grading_type,
-      baseUrl: env.base_url
+    return this.loadEditor().then(({default: ConditionalReleaseEditor}) => {
+      const editor = new ConditionalReleaseEditor({
+        assignment: env.assignment,
+        courseId: env.course_id
+      })
+      editor.attach(
+        document.getElementById('canvas-conditional-release-editor'),
+        document.getElementById('application')
+      )
+      this.setState({editor})
     })
-    editor.attach(
-      document.getElementById('canvas-conditional-release-editor'),
-      document.getElementById('application')
-    )
-    this.setState({editor})
   }
 
   componentDidMount() {
-    this.loadEditor()
+    this.createNativeEditor()
   }
 
   render() {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -24,7 +26,6 @@ describe "add content box" do
 
   before(:each) do
     course_with_student_logged_in
-    enable_all_rcs @course.account
     stub_rcs_config
     @assignment = @course.assignments.create(:name => 'new assignment')
     @assignment.submit_homework(@student)
@@ -41,6 +42,7 @@ describe "add content box" do
   end
 
   it "should preview rich text content" do
+    skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello preview"
     fj('button:contains("Preview")').click
@@ -48,6 +50,7 @@ describe "add content box" do
   end
 
   it "should add rich text content" do
+    skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello student"
     submit_form(".form_content")
@@ -57,6 +60,7 @@ describe "add content box" do
   end
 
   it "should add a user file" do
+    skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
     expect(f('.add_file_link')).to be_displayed
     f('.add_file_link').click
     wait_for_ajaximations

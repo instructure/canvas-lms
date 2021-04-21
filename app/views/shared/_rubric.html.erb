@@ -23,9 +23,10 @@
    context = @context
    context = context.context if context.is_a?(Group)
    show_grading = !@assignment || !%w{online_quiz not_graded}.include?(@assignment.submission_types)
-   rubric_association = assessment.rubric_association if assessment
+   rubric_association = assessment.rubric_association if assessment&.active_rubric_association?
+   anonymize_student ||= false
 %>
-<% cache(['rubric_render3',
+<% cache(['rubric_render4',
          (rubric.try(:cache_key) || 'no_rubric'),
          (rubric.try(:cache_key) || context.asset_string),
          (rubric_association.try(:cache_key) || 'no_association'),
@@ -87,7 +88,11 @@
         <div class="hide_outcome_results"><%= (rubric_association&.hide_outcome_results) ? "true" : nbsp %></div>
         <div class="hide_points"><%= (rubric_association&.hide_points) ? "true" : nbsp %></div>
         <div class="rubric_association_id"><%= rubric_association ? rubric_association.id : nbsp %></div>
-        <div class="user_id"><%= assessment ? assessment.user_id : nbsp %></div>
+        <% if anonymize_student %>
+          <div class="anonymous_id"><%= assessment ? assessment.asset.anonymous_id : nbsp %></div>
+        <% else %>
+          <div class="user_id"><%= assessment ? assessment.user_id : nbsp %></div>
+        <% end %>
         <div class="assessment_type"><%= assessment ? assessment.assessment_type : "" %></div>
         <a href="<%= context_url(context, :context_rubric_association_rubric_assessment_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}", (assessment ? assessment.id : "{{ assessment_id }}")) %>" rel="nofollow" class="edit_assessment_link">&nbsp;</a>
         <a href="<%= context_url(context, :context_rubric_url, "{{ rubric_id }}") %>" class="edit_rubric_url">&nbsp;</a>
@@ -159,13 +164,13 @@
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
               <%=
-                assessment ? n(assessment.score) : n((rubric.points_possible rescue 5))
+                assessment ? n(round_if_whole(assessment.score)) : n(round_if_whole((rubric.points_possible rescue 5)))
               %>
             </span>
             <%
               },
               wrapper: '<span class="assessing">\1</span>',
-              total: n((rubric.points_possible rescue 5)))
+              total: n(round_if_whole((rubric.points_possible rescue 5))))
             %>
         </span>
       </div>

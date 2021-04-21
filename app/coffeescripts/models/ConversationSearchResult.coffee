@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-], (_, {Model}) ->
+import _ from 'underscore'
+import {Model} from 'Backbone'
 
-  class ConversationSearchResult extends Model
-    parse: (data) ->
-      _.extend(data, isContext: data.type == 'context')
+export default class ConversationSearchResult extends Model
+  parse: (data) ->
+    _.extend(data, isContext: data.type == 'context')

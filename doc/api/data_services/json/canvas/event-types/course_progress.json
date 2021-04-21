@@ -1,0 +1,59 @@
+{
+  "name": "course_progress",
+  "definition": "The event is emitted anytime a course module progression requirements are met.",
+  "trigger": "Triggered when a user makes progress in a course by completing a module requirement. The following setup should be enabled in Canvas in order for this event to get triggered:\n1. Module is set to be published\n2. Module has at least one requirement enabled\n3. Student completed at least one requirement in Module",
+  "schema": {
+    "course": {
+      "account_id": "The local Canvas id of the course's account.",
+      "id": "The local Canvas id of the course.",
+      "name": "The name of the course.",
+      "sis_source_id": "The SIS identifier for the course, if defined."
+    },
+    "progress": {
+      "completed_at": "If the course has been completed, the timestamp (in ISO8601 format) when all requirements have been completed.",
+      "next_requirement_url": "Link to the module item that is next in the order of requirements to complete.",
+      "requirement_completed_count": "The count of those requirements that are done.",
+      "requirement_count": "Count of all the requirements in the course as a number."
+    },
+    "user": {
+      "email": "The student's email.",
+      "id": "The Canvas id of the student completing the course.",
+      "name": "The name of the student."
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "course_progress",
+          "event_time": "2019-11-01T19:11:13.590Z",
+          "job_id": "1020020528469291",
+          "job_tag": "ContextModuleProgression#evaluate!",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "course": {
+            "account_id": "1",
+            "id": "1234567",
+            "name": "Diff Equations",
+            "sis_source_id": "2017.102.102.102-2"
+          },
+          "progress": {
+            "completed_at": null,
+            "next_requirement_url": "http:/oxana.instructure.com/courses/1234567/modules/items/12345",
+            "requirement_completed_count": 101,
+            "requirement_count": 123
+          },
+          "user": {
+            "email": "user@domain.tld",
+            "id": "1122",
+            "name": "Gottfried Leibniz"
+          }
+        }
+      }
+    }
+  ]
+}

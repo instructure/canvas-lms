@@ -1,0 +1,34 @@
+<% define_content :link do %>
+  <%= polymorphic_url([asset.context, asset]) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t "Submissions Posted: %{title}, %{course}", title: asset.title, course: asset.context.name %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "You can view the assignment here" %>
+  </a>
+<% end %>
+
+<% body_text = "" %>
+<% conditions = @data.conditions %>
+
+<%
+  if @data.graded_only
+    if @data.section_names.present?
+      body_text = t("Grade changes and comments have been released for everyone graded in sections: %{section_names}.", section_names: @data.section_names.to_sentence)
+    else
+      body_text = t("Grade changes and comments have been released for everyone graded.")
+    end
+  else
+    if @data.section_names.present?
+      body_text = t("Grade changes and comments have been released for everyone in sections: %{section_names}.", section_names: @data.section_names.to_sentence)
+    else
+      body_text = t("Grade changes and comments have been released for everyone.")
+    end
+  end
+%>
+
+<p><%= body_text %></p>

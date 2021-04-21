@@ -18,70 +18,125 @@
 
 import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
-import I18n from 'i18n!help_dialog'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import I18n from 'i18n!HelpLinks'
+import {Link} from '@instructure/ui-link'
+import {Pill} from '@instructure/ui-pill'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {Spinner} from '@instructure/ui-spinner'
+import FeaturedHelpLink from './FeaturedHelpLink'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import tourPubSub from '../nav_tourpoints/tourPubsub'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
-  return (
-    <List variant="unstyled" margin="small 0" itemSpacing="small">
-      {hasLoaded ? (
-        links
-          .map((link, index) => (
-            <ListItem key={`link-${index}`}>
-              <Link
-                href={link.url}
-                target="_blank"
-                rel="noopener"
-                onClick={event => {
-                  if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
-                    event.preventDefault()
-                    onClick(link.url)
-                  }
-                }}
-              >
-                {link.text}
-              </Link>
-              {link.subtext && (
-                <Text as="div" size="small">
-                  {link.subtext}
-                </Text>
-              )}
-            </ListItem>
-          ))
+  const featuredLink = links.find(link => link.is_featured)
+  const featuredLinksEnabled = window.ENV.FEATURES.featured_help_links
+  const nonFeaturedLinks = featuredLinksEnabled ? links.filter(link => !link.is_featured) : links
+  const showSeparator = featuredLink && !!nonFeaturedLinks.length && featuredLinksEnabled
+
+  const handleClick = link => event => {
+    if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
+      event.preventDefault()
+      onClick(link.url)
+    }
+  }
+
+  return !hasLoaded ? (
+    <Spinner size="small" renderTitle={I18n.t('Loading')} />
+  ) : (
+    <View>
+      <FeaturedHelpLink featuredLink={featuredLink} handleClick={handleClick} />
+      {showSeparator && (
+        <View display="block" margin="medium 0 0">
+          <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
+            {I18n.t('OTHER RESOURCES')}
+          </Text>
+          <hr role="presentation" style={{marginTop: '0'}} />
+        </View>
+      )}
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
+        {nonFeaturedLinks
+          .map(link => {
+            const has_new_tag = link.is_new && featuredLinksEnabled
+            return (
+              <List.Item key={`link-${link.id}`}>
+                <Flex justifyItems="space-between" alignItems="center">
+                  <Flex.Item size={has_new_tag ? '80%' : '100%'}>
+                    <Link
+                      isWithinText={false}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener"
+                      onClick={handleClick(link)}
+                    >
+                      {link.text}
+                    </Link>
+                    {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
+                    {link.subtext && (
+                      <Text as="div" size="small">
+                        {link.subtext}
+                      </Text>
+                    )}
+                  </Flex.Item>
+                  <Flex.Item>
+                    {has_new_tag && (
+                      <PresentationContent>
+                        <Pill variant="success" text={I18n.t('NEW')} />
+                      </PresentationContent>
+                    )}
+                  </Flex.Item>
+                </Flex>
+              </List.Item>
+            )
+          })
+          .concat(
+            // if the current user is a teacher, show a link to
+            // open up the welcome tour
+            window.ENV.FEATURES?.product_tours &&
+              (window.ENV.current_user_types?.includes('Account Admin') ||
+                window.ENV.current_user_roles?.includes('teacher') ||
+                window.ENV.current_user_roles?.includes('student')) && [
+                <List.Item key="welcome_tour">
+                  <View className="welcome-tour-link">
+                    <Link isWithinText={false} onClick={() => tourPubSub.publish('tour-open')}>
+                      {I18n.t('Show Welcome Tour')}
+                    </Link>
+                  </View>
+                </List.Item>
+              ]
+          )
           .concat(
             // if the current user is an admin, show the settings link to
             // customize this menu
-            window.ENV.current_user_roles &&
-              window.ENV.current_user_roles.includes('root_admin') && [
-                <ListItem key="hr">
-                  <hr role="presentation" />
-                </ListItem>,
-                <ListItem key="customize">
-                  <Link href="/accounts/self/settings#custom_help_link_settings">
-                    {I18n.t('Customize this menu')}
-                  </Link>
-                </ListItem>
-              ]
+            window.ENV.current_user_roles?.includes('root_admin') && [
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="customize">
+                <Link isWithinText={false} href="/accounts/self/settings#custom_help_link_settings">
+                  {I18n.t('Customize this menu')}
+                </Link>
+              </List.Item>
+            ]
           )
-          .filter(Boolean)
-      ) : (
-        <ListItem>
-          <Spinner size="small" title={I18n.t('Loading')} />
-        </ListItem>
-      )}
-    </List>
+          .filter(Boolean)}
+      </List>
+    </View>
   )
 }
 
 HelpLinks.propTypes = {
   links: arrayOf(
     shape({
+      id: string.isRequired,
       url: string.isRequired,
       text: string.isRequired,
-      subtext: string
+      subtext: string,
+      feature_headline: string,
+      is_featured: bool,
+      is_new: bool
     })
   ).isRequired,
   hasLoaded: bool,

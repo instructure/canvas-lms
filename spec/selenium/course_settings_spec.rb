@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,7 +30,31 @@ describe "course settings" do
   it "should show unused tabs to teachers" do
     get "/courses/#{@course.id}/settings"
     wait_for_ajaximations
-    expect(ff("#section-tabs .section.section-tab-hidden").count).to be > 0
+    expect(ff("#section-tabs .section.section-hidden").count).to be > 0
+  end
+
+  context "considering homeroom courses" do
+    before(:each) do
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'on')
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      @course.homeroom_course = true
+      @course.save!
+    end
+
+    after(:each) do
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'off')
+    end
+
+    it 'hides most tabs if set' do
+      @account.root_account.enable_feature!(:canvas_for_elementary)
+
+      get "/courses/#{@course.id}/settings"
+      expect(ff('#course_details_tabs > ul li').length).to eq 2
+      expect(f('#course_details_tab')).to be_displayed
+      expect(f('#sections_tab')).to be_displayed
+    end
+
   end
 
   describe "course details" do
@@ -123,6 +149,17 @@ describe "course settings" do
       expect(message).not_to include_text('self_enrollment_code')
     end
 
+    it "should not show the self enrollment code and url for blueprint templates even if enabled" do
+      a = Account.default
+      a.courses << @course
+      a.settings[:self_enrollment] = 'manually_created'
+      a.save!
+      @course.update(:self_enrollment => true)
+      MasterCourses::MasterTemplate.set_as_master_course(@course)
+      get "/courses/#{@course.id}/settings"
+      expect(f('.self_enrollment_message')).to_not be_displayed
+    end
+
     it "should enable announcement limit if show announcements enabled" do
       get "/courses/#{@course.id}/settings"
 
@@ -155,7 +192,7 @@ describe "course settings" do
       expect(admin_cog('#nav_edit_tab_id_0')).to be_falsey
     end
 
-    it "should change course details", :xbrowser do
+    it "should change course details" do
       course_name = 'new course name'
       course_code = 'new course-101'
       locale_text = 'English (US)'
@@ -198,7 +235,9 @@ describe "course settings" do
       wait_for_ajaximations
       f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
       wait_for_ajaximations
-      f('.student_view_button').click
+      enter_student_view
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/settings#tab-navigation"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_link("Home")
     end
@@ -263,13 +302,6 @@ describe "course settings" do
   end
 
   context "right sidebar" do
-    it "should allow entering student view from the right sidebar" do
-      @fake_student = @course.student_view_student
-      get "/courses/#{@course.id}/settings"
-      f(".student_view_button").click
-      expect(displayed_username).to include(@fake_student.name)
-    end
-
     it "should allow leaving student view" do
       enter_student_view
       stop_link = f("#masquerade_bar .leave_student_view")

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,13 +21,13 @@
 module Api::V1::ExternalTools
   include Api::V1::Json
 
-  def external_tools_json(tools, context, user, session, extension_types = Lti::ResourcePlacement::PLACEMENTS)
+  def external_tools_json(tools, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
     tools.map do |topic|
       external_tool_json(topic, context, user, session, extension_types)
     end
   end
 
-  def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement::PLACEMENTS)
+  def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
     methods = %w[privacy_level custom_fields workflow_state vendor_help_link]
     methods += extension_types
     only = %w(id name description url domain consumer_key created_at updated_at description)
@@ -34,11 +36,12 @@ module Api::V1::ExternalTools
                   :only => only,
                   :methods => methods
     )
-
+    json['is_rce_favorite'] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?
     json['selection_width'] = tool.settings[:selection_width] if tool.settings.key? :selection_width
     json['selection_height'] = tool.settings[:selection_height] if tool.settings.key? :selection_height
     json['icon_url'] = tool.settings[:icon_url] if tool.settings.key? :icon_url
     json['not_selectable'] = tool.not_selectable
+    json['version'] = tool.use_1_3? ? '1.3' : '1.1'
     extension_types.each do |type|
       if json[type]
         json[type]['label'] = tool.label_for(type, I18n.locale)

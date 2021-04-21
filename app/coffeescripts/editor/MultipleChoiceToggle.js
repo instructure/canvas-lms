@@ -17,29 +17,26 @@
 
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import EditorToggle from '../editor/EditorToggle'
+import EditorToggle from './EditorToggle'
 import {send} from 'jsx/shared/rce/RceCommandShim'
+import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
+_inherits(MultipleChoiceToggle, EditorToggle)
 // #
 // Toggles a multiple choice quiz answer between an editor and an element
-export default class MultipleChoiceToggle extends EditorToggle {
-  // #
-  // @param {jQuery} @editButton - the edit button to trigger the toggle
-  // @param {Object} options - options for EditorToggle
-  // @api public
-  constructor(editButton, options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.editButton = editButton
-    this.cacheElements()
-    super(this.answer.find('.answer_html'), options)
-  }
 
+// #
+// @param {jQuery} @editButton - the edit button to trigger the toggle
+// @param {Object} options - options for EditorToggle
+// @api public
+export default function MultipleChoiceToggle(editButton, options) {
+  this.editButton = editButton
+  this.cacheElements()
+
+  return EditorToggle.call(this, this.answer.find('.answer_html'), options) || this
+}
+
+Object.assign(MultipleChoiceToggle.prototype, {
   // #
   // Finds all the relevant elements from the perspective of the edit button
   // that toggles the element between itself and an editor
@@ -49,25 +46,25 @@ export default class MultipleChoiceToggle extends EditorToggle {
     this.answerText = this.answer.find('input[name=answer_text]')
     this.answerText.hide()
     return (this.input = this.answer.find('input[name=answer_html]'))
-  }
+  },
 
   // #
   // Extends EditorToggle::display to @toggleIfEmpty and sets the hidden
   // input's value to the content from the editor
   // @api public
   display() {
-    super.display(...arguments)
+    EditorToggle.prototype.display.apply(this, arguments)
     this.toggleIfEmpty()
     this.input.val(this.content)
     if (this.content === '') return this.answerText.val('')
-  }
+  },
 
   // #
   // Extends EditorToggle::edit to always hide the original input
   // in case it was shown because the editor content was empty
   // @api public
   edit() {
-    super.edit(...arguments)
+    EditorToggle.prototype.edit.apply(this, arguments)
     const id = this.textArea.attr('id')
     this.answerText.hide()
     if (this.content === '') {
@@ -75,7 +72,7 @@ export default class MultipleChoiceToggle extends EditorToggle {
     } else {
       return send(this.textArea, 'set_code', this.content)
     }
-  }
+  },
 
   // #
   // Shows the original <input type=text> that the editor replaces and hides
@@ -86,7 +83,7 @@ export default class MultipleChoiceToggle extends EditorToggle {
     this.answerText.show()
     this.el.hide()
     return this.input.val('')
-  }
+  },
 
   // #
   // Shows the HTML element and hides the origina input
@@ -94,7 +91,7 @@ export default class MultipleChoiceToggle extends EditorToggle {
   showEl() {
     this.answerText.hide()
     return this.el.show()
-  }
+  },
 
   // #
   // If the editor has no content, it will show the original input
@@ -105,7 +102,7 @@ export default class MultipleChoiceToggle extends EditorToggle {
     } else {
       return this.showEl()
     }
-  }
+  },
 
   // #
   // Determines if the editor has any content
@@ -114,4 +111,4 @@ export default class MultipleChoiceToggle extends EditorToggle {
   isEmpty() {
     return $.trim(this.content) === ''
   }
-}
+})

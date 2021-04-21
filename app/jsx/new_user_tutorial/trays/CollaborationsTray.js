@@ -18,22 +18,45 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const CollaborationsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Collaborations')}
     subheading={I18n.t('Work and create together')}
-    image="/images/tutorial-tray-images/collaborations.svg"
-  >
-    <Text as="p">
+    image="/images/tutorial-tray-images/Panda_Collaborations.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
       {
-        I18n.t(`Provide a space for users to work on a single Google Doc
-          simultaneously, from within your Canvas course.`)
+        label: I18n.t('What are collaborations?'),
+        href:
+          'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61'
+      },
+      {
+        label: I18n.t('How do I use the Collaborations Index Page?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922'
+      },
+      {
+        label: I18n.t('How do I create a Google Drive collaboration as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632'
+      },
+      {
+        label: I18n.t('How do I create a Microsoft Office 365 collaboration as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629'
       }
-    </Text>
+    ]}
+  >
+    {I18n.t(`Canvas helps you leverage collaborative technology so multiple
+      users can work together on the same document at the same time. Create
+      collaborative documents that are saved in real time—a change made by
+      any user will be visible to everyone immediately.`)}
   </TutorialTrayContent>
-);
+)
 
-export default CollaborationsTray;
+export default CollaborationsTray

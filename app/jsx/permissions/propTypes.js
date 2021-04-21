@@ -26,6 +26,16 @@ export const ACCOUNT = 'Account'
 export const ALL_ROLES_VALUE = '0'
 export const ALL_ROLES_LABEL = I18n.t('All Roles')
 
+// Let's keep "none" as 0 and "all" as nonzero, so that in a pinch they
+// will Boolean-cast to false and true respsectively. This is to get a
+// bit of backward-compatibilty with the older Boolean type of the
+// `enabled` prop.
+export const ENABLED_FOR_NONE = 0
+export const ENABLED_FOR_PARTIAL = 1
+export const ENABLED_FOR_ALL = 2
+
+const ENABLED_STATES = [ENABLED_FOR_NONE, ENABLED_FOR_PARTIAL, ENABLED_FOR_ALL]
+
 propTypes.permissionDetails = shape({
   title: string.isRequired,
   description: string.isRequired
@@ -39,7 +49,7 @@ propTypes.permission = shape({
 })
 
 propTypes.rolePermission = shape({
-  enabled: bool.isRequired,
+  enabled: oneOf(ENABLED_STATES).isRequired,
   explicit: bool.isRequired,
   locked: bool.isRequired,
   readonly: bool.isRequired,

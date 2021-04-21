@@ -64,9 +64,7 @@ DashboardCardBackgroundStore.getUsedDefaults = function() {
 
 DashboardCardBackgroundStore.setColorForCourse = function(courseAssetString, colorCode) {
   const originalColors = this.getCourseColors()
-  const tmp = {}
-  tmp[courseAssetString] = colorCode
-  const newColors = _.extend({}, originalColors, tmp)
+  const newColors = {...originalColors, [courseAssetString]: colorCode}
   this.setState({courseColors: newColors})
 }
 

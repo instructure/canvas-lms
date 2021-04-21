@@ -2,52 +2,58 @@
 
 exports[`renders desert when completely empty 1`] = `
 <div
-  className="planner-empty-state"
+  className="PlannerEmptyState-styles__root planner-empty-state"
 >
   <DesertSvg
     aria-hidden="true"
-    className="desert"
+    className="PlannerEmptyState-styles__desert desert"
     height="220"
     viewBox="0 0 465 220"
     width="465"
     xmlns="http://www.w3.org/2000/svg"
   />
-  <div>
+  <div
+    className="PlannerEmptyState-styles__title"
+  >
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       No Due Dates Assigned
     </Heading>
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerEmptyState-styles__subtitlebox"
+  >
+    <div
+      className="PlannerEmptyState-styles__subtitle"
+    >
       Looks like there isn't anything here
     </div>
     <Link
-      as="button"
+      color="link"
       iconPlacement="start"
       id="PlannerEmptyState_CardView"
-      linkRef={[Function]}
+      isWithinText={true}
       onClick={[Function]}
-      variant="default"
     >
       Go to Card View Dashboard
     </Link>
-     |
+    |
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       id="PlannerEmptyState_AddToDo"
       margin="0"
       onClick={[Function]}
       size="medium"
+      textAlign="center"
       type="button"
       variant="link"
+      withBackground={true}
     >
       Add To-Do
     </Button>

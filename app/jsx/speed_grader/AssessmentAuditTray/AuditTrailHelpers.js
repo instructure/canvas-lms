@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IconAdd from '@instructure/ui-icons/lib/Line/IconAdd'
-import IconEdit from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconGradebook from '@instructure/ui-icons/lib/Line/IconGradebook'
-import IconMuted from '@instructure/ui-icons/lib/Line/IconMuted'
-import IconQuestion from '@instructure/ui-icons/lib/Line/IconQuestion'
-import IconStandards from '@instructure/ui-icons/lib/Line/IconStandards'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconUnmuted from '@instructure/ui-icons/lib/Line/IconUnmuted'
+import {
+  IconAddLine,
+  IconEditLine,
+  IconGradebookLine,
+  IconMutedLine,
+  IconQuestionLine,
+  IconStandardsLine,
+  IconTrashLine,
+  IconUnmutedLine
+} from '@instructure/ui-icons'
 import I18n from 'i18n!speed_grader'
 
 export const auditEventStudentAnonymityStates = Object.freeze({
@@ -40,15 +42,15 @@ export const overallAnonymityStates = Object.freeze({
   PARTIAL: 'PARTIAL'
 })
 
-const defaultIcon = IconQuestion
+const defaultIcon = IconQuestionLine
 const iconsByEventTrailType = {
-  anonymity: IconStandards,
-  created: IconAdd,
-  deleted: IconTrash,
-  gradebook: IconGradebook,
-  muted: IconMuted,
-  unmuted: IconUnmuted,
-  updated: IconEdit
+  anonymity: IconStandardsLine,
+  created: IconAddLine,
+  deleted: IconTrashLine,
+  gradebook: IconGradebookLine,
+  muted: IconMutedLine,
+  unmuted: IconUnmutedLine,
+  updated: IconEditLine
 }
 
 const defaultLabel = I18n.t('Unknown event')

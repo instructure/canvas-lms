@@ -18,43 +18,25 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex from '@instructure/ui-layout/lib/components/Flex'
-import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
-import IconX from '@instructure/ui-icons/lib/Line/IconX'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import CanvasTray from 'jsx/shared/components/CanvasTray'
 
 export default function ExternalToolDialogTray(props) {
-  const {open, label, onOpen, onClose, onCloseButton, closeLabel, name, children} = props
+  const {open, label, onOpen, onClose, onCloseButton, name, children} = props
   return (
-    <Tray
+    <CanvasTray
       open={open}
       label={label}
+      title={name}
       onOpen={onOpen}
       onClose={onClose}
+      onDismiss={onCloseButton}
       placement="end"
       size="regular"
+      padding="0"
+      headerPadding="small"
     >
-      <Flex direction="column" height="100vh">
-        <FlexItem padding="small">
-          <Flex>
-            <FlexItem margin="0 small 0 0">
-              <Button variant="icon" icon={IconX} onClick={onCloseButton} size="small">
-                <ScreenReaderContent>{closeLabel}</ScreenReaderContent>
-              </Button>
-            </FlexItem>
-            <FlexItem grow shrink>
-              <Heading ellipsis level="h3" as="h2">
-                {name}
-              </Heading>
-            </FlexItem>
-          </Flex>
-        </FlexItem>
-        {children}
-      </Flex>
-    </Tray>
+      {children}
+    </CanvasTray>
   )
 }
 
@@ -64,7 +46,6 @@ ExternalToolDialogTray.propTypes = {
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
   onCloseButton: PropTypes.func,
-  closeLabel: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   children: PropTypes.node
 }

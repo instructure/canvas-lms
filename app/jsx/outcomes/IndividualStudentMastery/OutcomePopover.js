@@ -18,125 +18,141 @@
 
 import React from 'react'
 import _ from 'lodash'
-import I18n from 'i18n!outcomes'
-import View from '@instructure/ui-layout/lib/components/View'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import I18n from 'i18n!IndividualStudentMasteryOutcomePopover'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import CalculationMethodContent from 'compiled/models/grade_summary/CalculationMethodContent'
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
-import IconInfo from '@instructure/ui-icons/lib/Line/IconInfo'
+import {Popover} from '@instructure/ui-popover'
+import {IconInfoLine} from '@instructure/ui-icons'
 import DatetimeDisplay from '../../shared/DatetimeDisplay'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import {CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-modal'
+import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
 import * as shapes from './shapes'
 
-export default class OutcomePopover extends React.Component {
+class OutcomePopover extends React.Component {
   static propTypes = {
     outcome: shapes.outcomeShape.isRequired,
-    outcomeProficiency: shapes.outcomeProficiencyShape
+    outcomeProficiency: shapes.outcomeProficiencyShape,
+    breakpoints: breakpointsShape
   }
 
   static defaultProps = {
-    outcomeProficiency: null
+    outcomeProficiency: null,
+    breakpoints: {}
   }
 
-  constructor () {
+  constructor() {
     super()
-    this.state = { linkHover: false, linkClicked: false }
+    this.state = {linkHover: false, linkClicked: false}
   }
 
-  getSelectedRating () {
-    const { outcomeProficiency } = this.props
-    const { points_possible, mastery_points, score } = this.props.outcome
+  getSelectedRating() {
+    const {outcomeProficiency} = this.props
+    const {points_possible, mastery_points, score} = this.props.outcome
     const hasScore = score >= 0
     if (outcomeProficiency && hasScore) {
       const totalPoints = points_possible || mastery_points
-      const percentage = totalPoints ? (score / totalPoints) : score
+      const percentage = totalPoints ? score / totalPoints : score
       const maxRating = outcomeProficiency.ratings[0].points
       const scaledScore = maxRating * percentage
-      return _.find(outcomeProficiency.ratings, (r) => (scaledScore >= r.points)) || _.last(outcomeProficiency.ratings)
+      return (
+        _.find(outcomeProficiency.ratings, r => scaledScore >= r.points) ||
+        _.last(outcomeProficiency.ratings)
+      )
     } else if (hasScore) {
-      return _.find(this.defaultProficiency(mastery_points).ratings, (r) => (score >= r.points))
+      return _.find(this.defaultProficiency(mastery_points).ratings, r => score >= r.points)
     }
     return null
   }
 
-  defaultProficiency = _.memoize((mastery_points) => (
-    {
-      ratings: [
-        {points: mastery_points * 1.5, color: '127A1B', description: I18n.t('Exceeds Mastery')},
-        {points: mastery_points, color: '00AC18', description: I18n.t('Meets Mastery')},
-        {points: mastery_points/2, color: 'FAB901', description: I18n.t('Near Mastery')},
-        {points: 0, color: 'EE0612', description: I18n.t('Well Below Mastery')}
-      ]
-    }
-  ))
+  defaultProficiency = _.memoize(mastery_points => ({
+    ratings: [
+      {points: mastery_points * 1.5, color: '127A1B', description: I18n.t('Exceeds Mastery')},
+      {points: mastery_points, color: '00AC18', description: I18n.t('Meets Mastery')},
+      {points: mastery_points / 2, color: 'FAB901', description: I18n.t('Near Mastery')},
+      {points: 0, color: 'EE0612', description: I18n.t('Well Below Mastery')}
+    ]
+  }))
 
-  latestTime () {
-    const { outcome } = this.props
+  latestTime() {
+    const {outcome} = this.props
     if (outcome.results.length > 0) {
-      return _.sortBy(outcome.results, (r) => (r.submitted_or_assessed_at))[0].submitted_or_assessed_at
+      return _.sortBy(outcome.results, r => -r.submitted_or_assessed_at)[0].submitted_or_assessed_at
     }
     return null
   }
 
-  renderPopoverContent () {
+  renderSelectedRating() {
     const selectedRating = this.getSelectedRating()
+    return (
+      <Text size="small" weight="bold">
+        <div>
+          {selectedRating && (
+            <div style={{color: `#${selectedRating.color}`}}>{selectedRating.description}</div>
+          )}
+        </div>
+      </Text>
+    )
+  }
+
+  renderPopoverContent() {
     const latestTime = this.latestTime()
     const popoverContent = new CalculationMethodContent(this.props.outcome).present()
-    const {
-      method,
-      exampleText,
-      exampleScores,
-      exampleResult
-    } = popoverContent
+    const {method, exampleText, exampleScores, exampleResult} = popoverContent
+    const {outcome, breakpoints} = this.props
+    const isVertical = !breakpoints.miniTablet
+
     return (
-      <View as='div' padding='large' maxWidth='30rem'>
-        <CloseButton placement='end' onClick={() => this.setState({linkHover: false, linkClicked: false})}>
+      <View as="div" padding="large" maxWidth="30rem">
+        <CloseButton
+          placement="end"
+          onClick={() => this.setState({linkHover: false, linkClicked: false})}
+        >
           {I18n.t('Click to close outcome details popover')}
         </CloseButton>
-        <Text size='small'>
-          <Flex
-            alignItems='stretch'
-            direction='row'
-            justifyItems='space-between'
-          >
-            <FlexItem grow shrink>
-              <div>{I18n.t('Last Assessment: ')}
-                { latestTime ?
-                  <DatetimeDisplay datetime={latestTime} format='%b %d, %l:%M %p' /> :
-                  I18n.t('No submissions')
-                }
+        <Text size="small">
+          <Flex alignItems="stretch" direction="row" justifyItems="space-between">
+            <Flex.Item grow shrink>
+              {/* word-wrap used for IE support */}
+              <div style={{wordWrap: 'break-word', overflowWrap: 'break-word'}}>
+                {outcome.title}
               </div>
-            </FlexItem>
-            <FlexItem grow shrink align='stretch'>
-              <Text size='small' weight='bold'>
-                <div>
-                  {selectedRating &&
-                  <div style={{color: `#${selectedRating.color}`, textAlign: 'end'}}>
-                    {selectedRating.description}
-                  </div>}
-                </div>
-              </Text>
-            </FlexItem>
+              <div>
+                {isVertical && <div>{this.renderSelectedRating()}</div>}
+                {I18n.t('Last Assessment: ')}
+                {isVertical && <br />}
+                {latestTime ? (
+                  <DatetimeDisplay datetime={latestTime} format="%b %d, %l:%M %p" />
+                ) : (
+                  I18n.t('No submissions')
+                )}
+              </div>
+            </Flex.Item>
+            {!isVertical && <Flex.Item align="stretch">{this.renderSelectedRating()}</Flex.Item>}
           </Flex>
-          <hr role='presentation'/>
+          <hr role="presentation" />
           <div>
-            <Text size='small' weight='bold'>{I18n.t('Calculation Method')}</Text>
+            <Text size="small" weight="bold">
+              {I18n.t('Calculation Method')}
+            </Text>
             <div>{method}</div>
-            <div style={{padding: '0.5rem 0 0 0'}}><Text size='small' weight="bold">{I18n.t('Example')}</Text></div>
+            <div style={{padding: '0.5rem 0 0 0'}}>
+              <Text size="small" weight="bold">
+                {I18n.t('Example')}
+              </Text>
+            </div>
             <div>{exampleText}</div>
-            <div>{I18n.t('1- Item Scores: %{exampleScores}', { exampleScores })}</div>
-            <div>{I18n.t('2- Final Score: %{exampleResult}', { exampleResult })}</div>
+            <div>{I18n.t('1- Item Scores: %{exampleScores}', {exampleScores})}</div>
+            <div>{I18n.t('2- Final Score: %{exampleResult}', {exampleResult})}</div>
           </div>
         </Text>
       </View>
     )
   }
 
-  render () {
-    const popoverContent = this.renderPopoverContent()
+  renderPopover() {
     return (
       <span>
         <Popover
@@ -146,25 +162,60 @@ export default class OutcomePopover extends React.Component {
           on={['hover', 'click']}
           shouldContainFocus
         >
-          <PopoverTrigger>
-            <Link
+          <Popover.Trigger>
+            <IconButton
+              size="small"
+              margin="xx-small"
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Click to expand outcome details')}
+              renderIcon={IconInfoLine}
               onClick={() => this.setState(prevState => ({linkClicked: !prevState.linkClicked}))}
               onMouseEnter={() => this.setState({linkHover: true})}
               onMouseLeave={() => this.setState({linkHover: false})}
-            >
-              <span style={{color: 'black'}}><IconInfo /></span>
-              <span>
-              {!this.state.linkClicked &&
-                <ScreenReaderContent>{I18n.t('Click to expand outcome details')}</ScreenReaderContent>
-              }
-              </span>
-            </Link>
-          </PopoverTrigger>
-          <PopoverContent>
-            {popoverContent}
-          </PopoverContent>
+            />
+          </Popover.Trigger>
+          <Popover.Content>{this.renderPopoverContent()}</Popover.Content>
         </Popover>
       </span>
     )
   }
+
+  renderModal() {
+    return (
+      <span>
+        <IconButton
+          size="small"
+          margin="xx-small"
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Click to expand outcome details')}
+          renderIcon={IconInfoLine}
+          onClick={() => this.setState(prevState => ({linkClicked: !prevState.linkClicked}))}
+        />
+        <Modal
+          open={this.state.linkClicked}
+          onDismiss={() =>
+            this.setState(prevState => prevState.linkClicked && this.setState({linkClicked: false}))
+          }
+          size="fullscreen"
+          label={I18n.t('Outcome Details')}
+        >
+          <Modal.Body>{this.renderPopoverContent()}</Modal.Body>
+        </Modal>
+      </span>
+    )
+  }
+
+  render() {
+    const {breakpoints} = this.props
+    const modalLayout = !breakpoints.miniTablet
+    if (modalLayout) {
+      return this.renderModal()
+    } else {
+      return this.renderPopover()
+    }
+  }
 }
+
+export default WithBreakpoints(OutcomePopover)

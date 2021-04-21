@@ -23,10 +23,10 @@ import unflatten from '../object/unflatten'
 const coerceTypes = {
   true: true,
   false: false,
-  null: null,
+  null: null
 }
 
-export default function deparam (params, coerce) {
+export default function deparam(params, coerce) {
   // shortcut for just deparam'ing the current querystring
   if (!params || typeof params === 'boolean') {
     const currentQueryString = window.location.search
@@ -35,24 +35,28 @@ export default function deparam (params, coerce) {
   }
 
   const obj = {}
-  params.replace(/\+/g, ' ').split('&').forEach((param) => {
-    let [key, val] = param.split('=')
-    key = decodeURIComponent(key)
-    val = decodeURIComponent(val)
+  params
+    .replace(/\+/g, ' ')
+    .split('&')
+    .forEach(param => {
+      let [key, val] = param.split('=')
+      key = decodeURIComponent(key)
+      val = decodeURIComponent(val)
 
-    // coerce values.
-    if (coerce) {
-      val = val && !isNaN(val)
-        ? +val // number
-        : val === 'undefined'
+      // coerce values.
+      if (coerce) {
+        val =
+          val && !isNaN(val)
+            ? +val // number
+            : val === 'undefined'
             ? undefined // undefined
             : coerceTypes[val] !== undefined
-                ? coerceTypes[val] // true, false, null
-                : val // string
-    }
+            ? coerceTypes[val] // true, false, null
+            : val // string
+      }
 
-    obj[key] = val
-  })
+      obj[key] = val
+    })
 
   return unflatten(obj)
 }

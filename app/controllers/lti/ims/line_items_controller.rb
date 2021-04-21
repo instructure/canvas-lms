@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 module Lti
   module Ims
     # @API Line Items
-    # @internal
+    #
     # Line Item API for IMS Assignment and Grade Services
     #
     # @model LineItem
@@ -47,8 +49,7 @@ module Lti
     #            "type": "string"
     #          },
     #          "resourceId": {
-    #            "description": "A Tool Provider specified id for the Line Item.
-    #                            Multiple line items can share the same resourceId within a given context",
+    #            "description": "A Tool Provider specified id for the Line Item. Multiple line items can share the same resourceId within a given context",
     #            "example": "50",
     #            "type": "string"
     #          },
@@ -56,12 +57,18 @@ module Lti
     #            "description": "The resource link id the Line Item is attached to",
     #            "example": "50",
     #            "type": "string"
+    #          },
+    #          "https://canvas.instructure.com/lti/submission_type": {
+    #            "description": "The extension that defines the submission_type of the line_item. Only returns if set through the line_item create endpoint.",
+    #            "example": "{\n\t\"type\":\"external_tool\",\n\t\"external_tool_url\":\"https://my.launch.url\",\n}",
+    #            "type": "string"
     #          }
     #       }
     #     }
     class LineItemsController < ApplicationController
       include Concerns::GradebookServices
 
+      before_action :prepare_line_item_for_ags!, only: :create
       before_action :verify_line_item_in_context, only: %i(show update destroy)
       before_action :verify_valid_resource_link, only: :create
 
@@ -75,6 +82,14 @@ module Lti
 
       MIME_TYPE = 'application/vnd.ims.lis.v2.lineitem+json'.freeze
       CONTAINER_MIME_TYPE = 'application/vnd.ims.lis.v2.lineitemcontainer+json'.freeze
+
+      rescue_from ActionController::BadRequest do |e|
+        unless Rails.env.production?
+          logger.error(e.message)
+          Lti::Errors::ErrorLogger.log_error(e)
+        end
+        render json: {error: e.message}, status: :bad_request
+      end
 
       # @API Create a Line Item
       # Create a new Line Item
@@ -98,6 +113,23 @@ module Lti
       # @argument resourceLinkId [String]
       #   The resource link id the Line Item should be attached to. This value should
       #   match the LTI id of the Canvas assignment associated with the tool.
+      #
+      # @argument https://canvas.instructure.com/lti/submission_type [Optional, object]
+      #   (EXTENSION) - Optional block to set Assignment Submission Type when creating a new assignment is created.
+      #   type - 'none' or 'external_tool'::
+      #   external_tool_url - Submission URL only used when type: 'external_tool'::
+      # @example_request
+      #   {
+      #     "scoreMaximum": 100.0,
+      #     "label": "LineItemLabel1",
+      #     "resourceId": 1,
+      #     "tag": "MyTag",
+      #     "resourceLinkId": "1",
+      #     "https://canvas.instructure.com/lti/submission_type": {
+      #       "type": "external_tool",
+      #       "external_tool_url": "https://my.launch.url"
+      #     }
+      #   }
       #
       # @returns LineItem
       def create
@@ -134,8 +166,8 @@ module Lti
       #
       # @returns LineItem
       def update
-        line_item.update_attributes!(line_item_params)
-        update_assignment_title if line_item.assignment_line_item?
+        line_item.update!(line_item_params)
+        update_assignment if line_item.assignment_line_item?
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
                content_type: MIME_TYPE
       end
@@ -166,7 +198,7 @@ module Lti
       # @returns LineItem
       def index
         line_items = Api.paginate(
-          Lti::LineItem.where(index_query).eager_load(:resource_link),
+          Lti::LineItem.active.where(index_query).eager_load(:resource_link),
           self,
           lti_line_item_index_url(course_id: context.id),
           pagination_args
@@ -180,7 +212,7 @@ module Lti
       #
       # @returns LineItem
       def destroy
-        head :unauthorized and return if line_item.assignment_line_item? && line_item.resource_link.present?
+        head :unauthorized and return if line_item.coupled
         line_item.destroy!
         head :no_content
       end
@@ -189,7 +221,8 @@ module Lti
 
       def line_item_params
         @_line_item_params ||= begin
-          params.permit(%i(resourceId resourceLinkId scoreMaximum label tag)).transform_keys do |k|
+          params.permit(%i(resourceId resourceLinkId scoreMaximum label tag),
+                        Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => [:type, :external_tool_url]).transform_keys do |k|
             k.to_s.underscore
           end.except(:resource_link_id)
         end
@@ -206,14 +239,19 @@ module Lti
         )
       end
 
-      def update_assignment_title
-        return if line_item_params[:label].blank?
-        line_item.assignment.update_attributes!(name: line_item_params[:label])
+      def update_assignment
+        label = line_item_params[:label]
+        score_maximum = line_item_params[:score_maximum]
+        return if label.blank? && score_maximum.blank?
+
+        line_item.assignment.name = label if label.present?
+        line_item.assignment.points_possible = score_maximum if score_maximum.present?
+        line_item.assignment.save!
       end
 
       def resource_link
         @_resource_link ||= ResourceLink.find_by(
-          resource_link_id: params[:resourceLinkId],
+          resource_link_uuid: params[:resourceLinkId],
           context_external_tool: tool
         )
       end
@@ -227,7 +265,7 @@ module Lti
             {
               context: context,
               lti_line_items: { client_id: developer_key.global_id }
-            }.merge!(rlid.present? ? { lti_resource_links: { resource_link_id: rlid } } : {})
+            }.merge!(rlid.present? ? { lti_resource_links: { resource_link_uuid: rlid } } : {})
           )
 
         {
@@ -248,7 +286,7 @@ module Lti
       end
 
       def check_for_bad_resource_link
-        resource_link.line_items.blank? ||
+        resource_link.line_items.active.blank? ||
         assignment&.context != context ||
         !assignment&.active?
       end

@@ -21,15 +21,14 @@ import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!student_groups'
-import natcompare from 'compiled/util/natcompare'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-spinner'
 import UserCollection from 'compiled/collections/UserCollection'
 import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
-import BackboneState from '../groups/mixins/BackboneState'
-import PaginatedGroupList from '../groups/components/PaginatedGroupList'
-import Filter from '../groups/components/Filter'
-import NewGroupDialog from '../groups/components/NewGroupDialog'
-import ManageGroupDialog from '../groups/components/ManageGroupDialog'
+import BackboneState from './mixins/BackboneState'
+import PaginatedGroupList from './components/PaginatedGroupList'
+import Filter from './components/Filter'
+import NewGroupDialog from './components/NewGroupDialog'
+import ManageGroupDialog from './components/ManageGroupDialog'
 
 const StudentView = createReactClass({
   displayName: 'StudentView',
@@ -40,8 +39,7 @@ const StudentView = createReactClass({
       filter: '',
       loading: false,
       userCollection: new UserCollection(null, {
-        params: {enrollment_type: 'student'},
-        comparator: natcompare.byGet('sortable_name')
+        params: {enrollment_type: 'student', per_page: 15, sort: 'username'}
       }),
       groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id})
     }
@@ -152,7 +150,7 @@ const StudentView = createReactClass({
   },
 
   _extendAttribute(model, attribute, hash) {
-    const copy = Object.assign({}, model.get(attribute))
+    const copy = {...model.get(attribute)}
     model.set(attribute, Object.assign(copy, hash))
   },
 
@@ -161,7 +159,10 @@ const StudentView = createReactClass({
   },
 
   _removeUser(groupModel, userId) {
-    groupModel.set('users', groupModel.get('users').filter(u => u.id !== userId))
+    groupModel.set(
+      'users',
+      groupModel.get('users').filter(u => u.id !== userId)
+    )
     // If user was a leader, unset the leader attribute.
     const leader = groupModel.get('leader')
     if (leader && leader.id === userId) {
@@ -248,6 +249,7 @@ const StudentView = createReactClass({
 
     return (
       <div>
+        <h1 className="screenreader-only">{I18n.t('Groups')}</h1>
         <div
           id="group_categories_tabs"
           className="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all"
@@ -267,7 +269,7 @@ const StudentView = createReactClass({
             <Filter onChange={e => this.setState({filter: e.target.value})} />
             {this.state.loading ? (
               <div className="spinner-container">
-                <Spinner title="Loading" size="large" margin="0 0 0 medium" />
+                <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
               </div>
             ) : null}
             <PaginatedGroupList

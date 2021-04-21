@@ -15,52 +15,60 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
 
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-
-import {StudentAssignmentShape} from '../assignmentData'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 
 const MAX_DISPLAYED_MODULES = 2
 
-function AssignmentGroupModuleNav(props) {
-  const {
-    assignment: {assignmentGroup, modules, env}
-  } = props
-
+export default function AssignmentGroupModuleNav({assignment}) {
+  const {assignmentGroup, modules, env} = assignment
   return (
     <Flex margin="0 0 large 0" direction="column">
       {modules.slice(0, MAX_DISPLAYED_MODULES).map(module => (
-        <FlexItem key={module.id}>
-          <Link data-test-id="module-link" href={env.moduleUrl}>
-            <Text size="medium">{module.name}</Text>
-          </Link>
-        </FlexItem>
+        <Flex.Item key={module.id} overflowY="visible">
+          <Button
+            data-testid="module-link"
+            href={env.moduleUrl}
+            variant="link"
+            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          >
+            {module.name}
+          </Button>
+        </Flex.Item>
       ))}
       {modules.length > MAX_DISPLAYED_MODULES && (
-        <FlexItem>
-          <Link data-test-id="module-link" href={env.moduleUrl}>
-            <Text size="medium">{I18n.t('More Modules')}</Text>
-          </Link>
-        </FlexItem>
+        <Flex.Item overflowY="visible">
+          <Button
+            data-testid="more-module-link"
+            href={env.moduleUrl}
+            variant="link"
+            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          >
+            {I18n.t('More Modules')}
+          </Button>
+        </Flex.Item>
       )}
 
       {assignmentGroup && (
-        <FlexItem>
-          <Link data-test-id="assignmentgroup-link" href={env.assignmentUrl}>
-            <Text size="medium">{assignmentGroup.name}</Text>
-          </Link>
-        </FlexItem>
+        <Flex.Item overflowY="visible">
+          <Button
+            data-testid="assignmentgroup-link"
+            href={env.assignmentUrl}
+            variant="link"
+            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          >
+            {assignmentGroup.name}
+          </Button>
+        </Flex.Item>
       )}
     </Flex>
   )
 }
 
 AssignmentGroupModuleNav.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: Assignment.shape
 }
-
-export default React.memo(AssignmentGroupModuleNav)

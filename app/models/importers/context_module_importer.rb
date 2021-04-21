@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -116,13 +118,19 @@ module Importers
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
       item.mark_as_importing!(migration)
+
+      if item.deleted? && migration.for_master_course_import? &&
+          migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("manually_deleted")
+        return # it's been deleted downstream, just leave it (and any imported items) alone and return
+      end
+
       if hash[:workflow_state] == 'unpublished'
         item.workflow_state = 'unpublished' if item.new_record? || item.deleted? || migration.for_master_course_import? # otherwise leave it alone
       else
         item.workflow_state = 'active'
       end
 
-      position = hash[:position] || hash[:order]
+      position = (hash[:position] || hash[:order])&.to_i
       if (item.new_record? || item.workflow_state_was == 'deleted') && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
         position = migration.last_module_position + (position || 1)
       end
@@ -134,7 +142,7 @@ module Importers
       end
 
       item.require_sequential_progress = hash[:require_sequential_progress] if hash.has_key?(:require_sequential_progress)
-      item.requirement_count = hash[:requirement_count] if hash[:requirement_count]
+      item.requirement_count = hash[:requirement_count] if hash.has_key?(:requirement_count)
 
       if hash[:prerequisites]
         preqs = []
@@ -150,8 +158,7 @@ module Importers
       item.save!
 
       item_map = {}
-      item.item_migration_position ||= item.content_tags.not_deleted.pluck(:position).compact.max
-
+      item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
       items = hash[:items] || []
       items = items.map{|item| self.flatten_item(item, 0)}.flatten
 
@@ -167,7 +174,10 @@ module Importers
       end
 
       item.content_tags.where.not(:migration_id => nil).
-        where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
+        where.not(:migration_id => imported_migration_ids).each do |tag|
+        tag.skip_downstream_changes!
+        tag.destroy # clear out missing items afterwards
+      end
 
       if hash[:completion_requirements]
         c_reqs = []
@@ -178,7 +188,7 @@ module Importers
             c_reqs << req
           end
         end
-        if c_reqs.length > 0
+        if c_reqs.length > 0 || migration.for_master_course_import? # allow clearing requirements on sync
           item.completion_requirements = c_reqs
           item.save
         end

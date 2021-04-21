@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,6 +23,8 @@
 # with this idea, such as assignment submissions.
 # The other purpose of this class is just to make rubrics reusable.
 class RubricAssociation < ActiveRecord::Base
+  include Canvas::SoftDeletable
+
   attr_accessor :skip_updating_points_possible
   attr_writer :updating_user
 
@@ -30,13 +34,15 @@ class RubricAssociation < ActiveRecord::Base
              polymorphic_prefix: :association
 
   belongs_to :context, polymorphic: [:course, :account]
-  has_many :rubric_assessments, :dependent => :nullify
-  has_many :assessment_requests, :dependent => :nullify
+  has_many :rubric_assessments
+  has_many :assessment_requests
 
   has_a_broadcast_policy
 
   validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
+  validates :workflow_state, inclusion: {in: ["active", "deleted"]}
 
+  before_create :set_root_account_id
   before_save :update_assignment_points
   before_save :update_values
   after_create :update_rubric
@@ -77,14 +83,25 @@ class RubricAssociation < ActiveRecord::Base
     klass.where(id: a_id).first if a_id.present? # authorization is checked in the calling method
   end
 
+  def restore
+    self.workflow_state = "active"
+    save
+  end
+
+  def course_broadcast_data
+    context.broadcast_data if context.is_a?(Course)
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :rubric_association_created
     p.to { self.context.students rescue [] }
     p.whenever {|record|
       record.just_created && !record.context.is_a?(Course)
     }
+    p.data { course_broadcast_data }
   end
 
+  scope :active, -> { where("rubric_associations.workflow_state<>'deleted'") }
   scope :bookmarked, -> { where(:bookmarked => true) }
   scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
   scope :for_grading, -> { where(:purpose => 'grading') }
@@ -95,7 +112,12 @@ class RubricAssociation < ActiveRecord::Base
   def assert_uniqueness
     if purpose == 'grading'
       RubricAssociation.where(association_id: association_id, association_type: association_type, purpose: 'grading').each do |ra|
-        ra.destroy unless ra == self
+        next if ra == self
+
+        ra.rubric_assessments.update_all(rubric_association_id: nil)
+        ra.assessment_requests.update_all(rubric_association_id: nil)
+        LearningOutcomeResult.where(association_object: ra).destroy_all
+        ra.destroy_permanently!
       end
     end
   end
@@ -110,10 +132,8 @@ class RubricAssociation < ActiveRecord::Base
 
   def update_alignments
     return unless assignment
-    outcome_ids = []
-    unless self.destroyed?
-      outcome_ids = rubric.learning_outcome_alignments.map(&:learning_outcome_id)
-    end
+
+    outcome_ids = self.deleted? ? [] : rubric.learning_outcome_alignments.map(&:learning_outcome_id)
     LearningOutcome.update_alignments(assignment, context, outcome_ids)
     true
   end
@@ -145,6 +165,7 @@ class RubricAssociation < ActiveRecord::Base
     self.bookmarked = true if self.purpose == 'bookmark' || self.bookmarked.nil?
     self.context_code ||= "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.title ||= (self.association_object.title rescue self.association_object.name) rescue nil
+    self.workflow_state ||= "active"
   end
   protected :update_values
 
@@ -240,9 +261,12 @@ class RubricAssociation < ActiveRecord::Base
       update_if_existing: update_if_existing
     )
     association.rubric = rubric
+    if association.rubric_id_changed? && association_object.is_a?(Assignment)
+      association_object.mark_downstream_changes(["rubric"])
+    end
     association.context = context
     association.skip_updating_points_possible = params.delete :skip_updating_points_possible
-    association.update_attributes(params)
+    association.update(params)
     association.association_object = association_object
     association
   end
@@ -370,7 +394,7 @@ class RubricAssociation < ActiveRecord::Base
   private
 
   def record_save_audit_event
-    existing_association = assignment.rubric_association
+    existing_association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     event_type = existing_association.present? ? 'rubric_updated' : 'rubric_created'
     payload = if event_type == 'rubric_created'
       {id: rubric_id}
@@ -393,5 +417,14 @@ class RubricAssociation < ActiveRecord::Base
       payload: {id: rubric_id},
       user: @updating_user
     )
+  end
+
+  def set_root_account_id
+    self.root_account_id ||=
+      if context_type == 'Account' && context.root_account?
+        self.context.id
+      else
+        self.context&.root_account_id
+      end
   end
 end

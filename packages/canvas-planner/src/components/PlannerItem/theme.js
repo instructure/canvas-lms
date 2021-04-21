@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ borders, colors, spacing, typography }) {
+export default function generator({borders, colors, spacing, typography}) {
   return {
     fontFamily: typography.fontFamily,
     lineHeight: typography.lineHeightCondensed,
     color: colors.licorice,
+    secondaryColor: colors.ash,
 
     padding: `${spacing.small} ${spacing.xSmall}`,
     paddingMedium: `${spacing.small}`,
@@ -41,12 +42,12 @@ export default function generator ({ borders, colors, spacing, typography }) {
 
     typeMargin: spacing.xxSmall,
 
-    titleLineHeight: typography.lineHeightFit,
-  };
+    titleLineHeight: typography.lineHeightFit
+  }
 }
 
 generator.canvas = function (variables) {
   return {
-    iconColor: variables["ic-brand-primary"],
-  };
-};
+    iconColor: variables['ic-brand-primary']
+  }
+}

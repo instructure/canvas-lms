@@ -77,7 +77,7 @@
 
 .navigation_title, .appointment_group_title {
   display: inline;
-  line-height: 32px;
+  line-height: 38px;
   padding-#{direction(left)}: 5px;
   white-space: nowrap;
   @include fontSize($ic-font-size--medium);

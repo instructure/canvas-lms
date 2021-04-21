@@ -1,5 +1,5 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -109,7 +109,7 @@ describe "profile" do
       f('#right-side .add_email_link').click
     end
 
-    it "should add a new email address on profile settings page", :xbrowser do
+    it "should add a new email address on profile settings page" do
       @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
@@ -137,9 +137,7 @@ describe "profile" do
 
     it "should change default email address" do
       @user.communication_channel.confirm!
-      channel = @user.communication_channels.create!(:path_type => 'email',
-                                                     :path => 'walter_white@example.com')
-      channel.confirm!
+      channel = communication_channel(@user, {username: 'walter_white@example.com', active_cc: true})
 
       get '/profile/settings'
       row = f("#channel_#{channel.id}")
@@ -190,6 +188,22 @@ describe "profile" do
       expect(get_value('#user_locale')).to eq 'es'
     end
 
+    context "when pronouns are enabled" do
+      before :each do
+        @user.account.settings = { :can_add_pronouns => true }
+        @user.account.save!
+      end
+
+      it "should change pronouns" do
+        get "/profile/settings"
+        desired_pronoun = 'She/Her'
+        edit_form = click_edit
+        click_option('#user_pronouns', desired_pronoun)
+        expect_new_page_load { submit_form(edit_form) }
+        expect(get_value('#user_pronouns')).to eq desired_pronoun
+      end
+    end
+
     it "should add another contact method - sms" do
       @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
@@ -204,6 +218,21 @@ describe "profile" do
       wait_for_ajaximations
       close_visible_dialog
       expect(f('.other_channels .path')).to include_text(test_cell_number)
+    end
+
+    it 'should add another contact method - slack' do
+      @user.account.enable_feature!(:slack_notifications)
+      test_slack_email = 'sburnett@instructure.com'
+      get '/profile/settings'
+      f('.add_contact_link').click
+      f('a[href="#register_slack_handle"]').click
+      f('#communication_channel_slack').send_keys(test_slack_email)
+      driver.action.send_keys(:tab).perform
+      register_form = f('#register_slack_handle')
+      submit_form(register_form)
+      wait_for_ajaximations
+      close_visible_dialog
+      expect(f('.other_channels .path')).to include_text(test_slack_email)
     end
 
     it "should register a service" do
@@ -358,6 +387,15 @@ describe "profile" do
 
       expect(ff('.avatar-content').length).to eq 1
     end
+  end
+
+  it 'show /profile when enable_profiles = true' do
+    user_logged_in
+    account = Account.default
+    account.settings[:enable_profiles] = true
+    account.save!
+    get '/profile'
+    expect(fj("h1:contains('User Profile')").attribute('class')).to eq 'screenreader-only'
   end
 
   describe "profile pictures s3 tests" do

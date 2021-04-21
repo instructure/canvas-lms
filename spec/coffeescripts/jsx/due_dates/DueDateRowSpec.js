@@ -147,6 +147,32 @@ test('section tokens are given their proper name if loaded', function() {
   ok(!!token)
 })
 
+test('returns correct name from nameOrLoading', function() {
+  const collection = {
+    '2': {
+      id: '2',
+      name: 'pronouns student',
+      created_at: '2019-10-28T07:53:54-06:00',
+      sortable_name: 'mileaciobonu, felix',
+      short_name: 'felix mileaciobonu',
+      pronouns: 'He/Him'
+    },
+    '5': {
+      id: '5',
+      name: 'no pronounsstudent',
+      created_at: '2019-11-18T21:31:59-07:00',
+      sortable_name: 'student, test',
+      short_name: 'test student'
+    }
+  }
+  const pronounsName = this.dueDateRow.nameOrLoading(collection, '2')
+  const noPronounsName = this.dueDateRow.nameOrLoading(collection, '5')
+  const loading = this.dueDateRow.nameOrLoading(collection, '9')
+  equal(pronounsName, `${collection['2'].name} (${collection['2'].pronouns})`)
+  equal(noPronounsName, `${collection['5'].name}`)
+  equal(loading, 'Loading...')
+})
+
 test('student tokens are their proper name if loaded', function() {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'student name')

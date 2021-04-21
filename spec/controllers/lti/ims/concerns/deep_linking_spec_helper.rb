@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -28,6 +30,7 @@ RSpec.shared_context 'deep_linking_spec_helper' do
   let(:alg) { :RS256 }
   let(:iat) { Time.zone.now.to_i }
   let(:exp) { 5.minutes.from_now.to_i }
+  let(:jti) { SecureRandom.uuid }
   let(:log) { 'log' }
   let(:error_log) { 'error log' }
   let(:deep_linking_jwt) do
@@ -36,6 +39,7 @@ RSpec.shared_context 'deep_linking_spec_helper' do
       "aud" => aud,
       "iat" => iat,
       "exp" => exp,
+      "jti" => jti,
       "nonce" => SecureRandom.uuid,
       "https://purl.imsglobal.org/spec/lti/claim/message_type" => response_message_type,
       "https://purl.imsglobal.org/spec/lti/claim/version" => lti_version,

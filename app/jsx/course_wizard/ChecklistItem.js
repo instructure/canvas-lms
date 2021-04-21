@@ -34,6 +34,7 @@ class ChecklistItem extends React.Component {
   }
 
   state = {classNameString: ''}
+
   classNameString = ''
 
   componentWillMount() {

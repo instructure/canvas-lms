@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -30,6 +32,26 @@ RSpec.describe Submissions::AnonymousPreviewsController do
     it "renders show_preview" do
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id, preview: true}
       expect(response).to render_template(:show_preview)
+    end
+
+    it "anonymizes student information when the viewer is a teacher and the assignment is currently anonymizing students" do
+      assignment = @course.assignments.create!(title: 'shhh', anonymous_grading: true)
+      user_session(@teacher)
+
+      submission = assignment.submission_for_student(@student)
+      get :show, params: {course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true}
+      expect(assigns[:anonymize_students]).to be true
+    end
+
+    it "anonymizes student information when the viewer is a peer reviewer and anonymous peer reviews are enabled" do
+      assignment = @course.assignments.create!(title: 'ok', peer_reviews: true, anonymous_peer_reviews: true)
+      reviewer = @course.enroll_student(User.create!, enrollment_state: 'active').user
+      assignment.assign_peer_review(reviewer, @student)
+      user_session(reviewer)
+
+      submission = assignment.submission_for_student(@student)
+      get :show, params: {course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true}
+      expect(assigns[:anonymize_students]).to be true
     end
   end
 end

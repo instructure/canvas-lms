@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -75,7 +77,7 @@ describe "manage groups" do
       fj(".add-group:visible:first").click
       wait_for_animations
       f("#group_name").send_keys("New Test Group A")
-      f("form.group-edit-dialog").submit
+      submit_form("span[aria-label='Add Group']")
       wait_for_ajaximations
 
       # Add user to the group
@@ -172,6 +174,7 @@ describe "manage groups" do
     end
 
     it "should allow a teacher to reassign a student with an accessible modal dialog" do
+      skip('KNO-190')
       students = groups_student_enrollment 2
       group_categories = create_categories(@course, 1)
       groups = add_groups_in_category(group_categories[0],2)
@@ -193,7 +196,6 @@ describe "manage groups" do
 
       # Move the user from one group into the other
       f(".groups .group .group-user .group-user-actions").click
-      scroll_into_view('.edit-group-assignment:first')
       fj(".edit-group-assignment:first").click
       f("div[aria-label='Move Student']") # wait for element
       f(".move-select .move-select__group option:last-child").click

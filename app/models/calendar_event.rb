@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -51,15 +53,21 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
+  belongs_to :web_conference, autosave: true
+  belongs_to :root_account, class_name: 'Account'
+
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
+  validate :validate_conference_visibility
+  before_create :set_root_account
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
   after_save :sync_parent_event
+  after_save :sync_conference
   after_update :sync_child_events
 
   # when creating/updating a calendar_event, you can give it a list of child
@@ -96,7 +104,7 @@ class CalendarEvent < ActiveRecord::Base
     @child_event_data.each do |data|
       if (event = current_events.delete(data[:context_code])&.first)
         event.updating_user = @updating_user
-        event.update_attributes(:start_at => data[:start_at], :end_at => data[:end_at])
+        event.update(:start_at => data[:start_at], :end_at => data[:end_at])
       else
         context = @child_event_contexts[data[:context_code]][0]
         event = child_events.build(:start_at => data[:start_at], :end_at => data[:end_at])
@@ -146,7 +154,7 @@ class CalendarEvent < ActiveRecord::Base
     }.join(" OR ")
     codes_conditions = self.connection.quote(false) if codes_conditions.blank?
 
-    where(<<-SQL, all_codes, codes, group_codes, effectively_courses_codes)
+    where(<<~SQL, all_codes, codes, group_codes, effectively_courses_codes)
       calendar_events.context_code IN (?)
       AND (
         ( -- explicit contexts (e.g. course_123)
@@ -164,14 +172,19 @@ class CalendarEvent < ActiveRecord::Base
     SQL
   }
 
-  scope :not_hidden, -> {
-    where("NOT EXISTS (SELECT id FROM #{CalendarEvent.quoted_table_name} sub_events WHERE sub_events.parent_calendar_event_id=calendar_events.id)")
-  }
+  scope :not_hidden, -> do
+    where("NOT EXISTS (
+      SELECT id
+      FROM #{CalendarEvent.quoted_table_name} sub_events
+      WHERE sub_events.parent_calendar_event_id=calendar_events.id
+        AND sub_events.workflow_state <> 'deleted'
+    )")
+  end
 
   scope :undated, -> { where(:start_at => nil, :end_at => nil) }
 
   scope :between, lambda { |start, ending| where(:start_at => start..ending) }
-  scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now.midnight) }
+  scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now) }
   scope :updated_after, lambda { |*args|
     if args.first
       where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)
@@ -207,31 +220,37 @@ class CalendarEvent < ActiveRecord::Base
   end
   protected :default_values
 
-  def root_account
-    if context.respond_to?(:root_account)
-      context.root_account # course, section, group
+  def set_root_account(ctx = self.context)
+    if ctx.respond_to?(:root_account)
+      self.root_account = ctx.root_account # course, section, group
     else
-      case context
+      case ctx
       when User
-        context.account
+        if self.effective_context.is_a?(User)
+          self.root_account_id = 0
+        else
+          self.set_root_account(self.effective_context)
+        end
       when AppointmentGroup
-        context.context&.root_account
+        self.root_account = context.context&.root_account
       end
     end
   end
 
   def child_event_participants_scope
     self.shard.activate do
-      User.where("id IN (?) OR id IN (?)",
-        child_events.where.not(:user_id => nil).select(:user_id), # user is set directly
-        child_events.where(:user_id => nil, :context_type => "User").select(:context_id)) # or context is user
+      # user is set directly, or context is user
+      User.where("id IN
+        (#{child_events.where.not(:user_id => nil).select(:user_id).to_sql}
+        UNION
+         #{child_events.where(:user_id => nil, :context_type => "User").select(:context_id).to_sql})")
     end
   end
 
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
     if new_record?
-      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", context.send(attr)) }
       if locked?
         self.start_at = start_at_was if !new_record? && start_at_changed?
         self.end_at   = end_at_was   if !new_record? && end_at_changed?
@@ -268,7 +287,7 @@ class CalendarEvent < ActiveRecord::Base
     if self.all_day_changed? && self.all_day?
       self.start_at = zoned_start_at.beginning_of_day rescue nil
       self.end_at = zoned_end_at.beginning_of_day rescue nil
-    elsif self.start_at_changed? || self.end_at_changed?
+    elsif self.start_at_changed? || self.end_at_changed? || Canvas::Plugin.value_to_boolean(self.remove_child_events)
       self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
     end
 
@@ -295,7 +314,8 @@ class CalendarEvent < ActiveRecord::Base
     :title,
     :description,
     :location_name,
-    :location_address
+    :location_address,
+    :web_conference
   ].freeze
   LOCKED_ATTRIBUTES = CASCADED_ATTRIBUTES + [
     :start_at,
@@ -307,6 +327,21 @@ class CalendarEvent < ActiveRecord::Base
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
     child_events.are_locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
     child_events.are_unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
+  end
+
+  def sync_conference
+    return if web_conference_id.blank?
+    if saved_change_to_title?
+      web_conference.title = title
+    end
+    if saved_change_to_start_at? && web_conference.user_settings.key?(:scheduled_date)
+      web_conference.user_settings[:scheduled_date] = start_at
+    end
+    unless web_conference.lti?
+      web_conference.invite_users_from_context
+    end
+
+    web_conference.save!
   end
 
   attr_writer :skip_sync_parent_event
@@ -354,9 +389,10 @@ class CalendarEvent < ActiveRecord::Base
         context.touch if context_type == 'AppointmentGroup' # ensures end_at/start_at get updated
         # when deleting an appointment or appointment_participant, make sure we reset the cache
         appointment_group.clear_cached_available_slots!
+        appointment_group.save!
       end
-      if parent_event && parent_event.locked? && parent_event.child_events.size == 0
-        parent_event.workflow_state = 'active'
+      if parent_event && parent_event.child_events.size == 0
+        parent_event.workflow_state = parent_event.locked? ? 'active' : 'deleted'
         parent_event.save!
       end
       true
@@ -369,12 +405,23 @@ class CalendarEvent < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def course_broadcast_data
+    return appointment_group.broadcast_data if appointment_group
+
+    if context.respond_to?(:broadcast_data)
+      context.broadcast_data
+    else
+      {}
+    end
+  end
+
   set_broadcast_policy do
     dispatch :new_event_created
     to { participants(include_observers: true) - [@updating_user] }
     whenever {
       !appointment_group && context.available? && just_created && !hidden?
     }
+    data { course_broadcast_data }
 
     dispatch :event_date_changed
     to { participants(include_observers: true) - [@updating_user] }
@@ -385,6 +432,7 @@ class CalendarEvent < ActiveRecord::Base
         changed_in_state(:active, :fields => :end_at)
       ) && !hidden?
     }
+    data { course_broadcast_data }
 
     dispatch :appointment_reserved_by_user
     to { appointment_group.instructors +
@@ -394,7 +442,7 @@ class CalendarEvent < ActiveRecord::Base
       just_created &&
       context == appointment_group.participant_for(@updating_user)
     }
-    data { {:updating_user_name => @updating_user.name} }
+    data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 
     dispatch :appointment_canceled_by_user
     to { appointment_group.instructors +
@@ -406,10 +454,7 @@ class CalendarEvent < ActiveRecord::Base
       @updating_user &&
       context == appointment_group.participant_for(@updating_user)
     }
-    data { {
-      :updating_user_name => @updating_user.name,
-      :cancel_reason => @cancel_reason
-    } }
+    data { { updating_user_name: @updating_user.name, cancel_reason: @cancel_reason }.merge(course_broadcast_data) }
 
     dispatch :appointment_reserved_for_user
     to { participants(include_observers: true) - [@updating_user] }
@@ -417,7 +462,7 @@ class CalendarEvent < ActiveRecord::Base
       appointment_group && parent_event &&
       just_created
     }
-    data { {:updating_user_name => @updating_user.name} }
+    data { { updating_user_name: @updating_user.name }.merge(course_broadcast_data) }
 
     dispatch :appointment_deleted_for_user
     to { participants(include_observers: true) - [@updating_user] }
@@ -426,10 +471,7 @@ class CalendarEvent < ActiveRecord::Base
       deleted? &&
       saved_change_to_workflow_state?
     }
-    data { {
-      :updating_user_name => @updating_user.name,
-      :cancel_reason => @cancel_reason
-    } }
+    data { { updating_user_name: @updating_user.name, cancel_reason: @cancel_reason }.merge(course_broadcast_data) }
   end
 
   def participants(include_observers: false)
@@ -539,7 +581,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def all_day
-    read_attribute(:all_day) || (self.new_record? && self.start_at && self.start_at.strftime("%H:%M") == '00:00')
+    read_attribute(:all_day) || (self.new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == '00:00')
   end
 
   def to_atom(opts={})
@@ -718,6 +760,24 @@ class CalendarEvent < ActiveRecord::Base
       cal.add_event(event) if event
 
       return cal.to_ical
+    end
+  end
+
+  def validate_conference_visibility
+    return unless web_conference_id_changed?
+    return if web_conference_id.nil?
+    unless user.blank? || web_conference.grants_right?(user, :read)
+      errors.add(:web_conference_id, 'cannot add web conference without read access for user')
+      return
+    end
+    conference_context = case context
+                         when Course, Group
+                           context
+                         when CourseSection
+                           context.course
+    end
+    if conference_context != web_conference.context
+      errors.add(:web_conference_id, 'cannot add web conference from different context')
     end
   end
 end

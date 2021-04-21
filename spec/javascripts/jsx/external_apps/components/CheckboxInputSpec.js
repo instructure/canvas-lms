@@ -21,20 +21,16 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import CheckboxInput from 'jsx/external_apps/components/CheckboxInput'
 
-QUnit.module('CheckboxInput#defaultState');
+QUnit.module('CheckboxInput#defaultState')
 
-const component = TestUtils.renderIntoDocument (
-  <CheckboxInput id="test"
-                 errors={{}} />
-);
+const component = TestUtils.renderIntoDocument(<CheckboxInput id="test" errors={{}} />)
 
 test('toggles value when checked and unchecked', () => {
   const app = TestUtils.findRenderedComponentWithType(component, CheckboxInput)
 
-  TestUtils.Simulate.change(app.refs.input, { target: { checked: true }})
+  TestUtils.Simulate.change(app.refs.input, {target: {checked: true}})
   equal(app.state.value, true)
 
-  TestUtils.Simulate.change(app.refs.input, { target: { checked: false }})
+  TestUtils.Simulate.change(app.refs.input, {target: {checked: false}})
   equal(app.state.value, false)
-});
-
+})

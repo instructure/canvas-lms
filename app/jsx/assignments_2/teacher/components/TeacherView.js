@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {bool} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {Mutation} from 'react-apollo'
 import classnames from 'classnames'
@@ -24,13 +25,19 @@ import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
 
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
+import ErrorBoundary from 'jsx/shared/components/ErrorBoundary'
+import GenericErrorPage from 'jsx/shared/components/GenericErrorPage/index'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 
-import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
+import {Alert} from '@instructure/ui-alerts'
+import {Mask} from '@instructure/ui-overlays'
+import {Portal} from '@instructure/ui-portal'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
+
+import {TeacherAssignmentShape, SAVE_ASSIGNMENT} from '../assignmentData'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
 import TeacherFooter from './TeacherFooter'
@@ -38,10 +45,18 @@ import TeacherFooter from './TeacherFooter'
 import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
+import AssignmentFieldValidator from '../AssignentFieldValidator'
+
+const pathToOverrides = /assignmentOverrides\.nodes\.\d+/
 
 export default class TeacherView extends React.Component {
   static propTypes = {
-    assignment: TeacherAssignmentShape
+    assignment: TeacherAssignmentShape,
+    readOnly: bool
+  }
+
+  static defaultProps = {
+    readOnly: window.location.hash.indexOf('readOnly') >= 0
   }
 
   constructor(props) {
@@ -53,8 +68,9 @@ export default class TeacherView extends React.Component {
       deletingNow: false,
       workingAssignment: props.assignment, // the assignment with updated fields while editing
       isDirty: false, // has the user changed anything?
-      // for now, put "#edit" in the URL and it will turn off readOnly
-      readOnly: window.location.hash.indexOf('edit') < 0
+      isSaving: false, // is save assignment in-flight?
+      isUnpublishing: false, // is saving just the unpublished state in-flight?
+      invalids: {} // keys are the  paths to invalid fields
     }
 
     // TODO: reevaluate if the context is still needed. <FriendlyDateTime> pulls the data
@@ -63,15 +79,26 @@ export default class TeacherView extends React.Component {
       locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
       timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
     }
+
+    this.fieldValidator = new AssignmentFieldValidator()
+  }
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+  }
+
+  handleBeforeUnload = event => {
+    if (this.state.isDirty) {
+      event.preventDefault()
+      event.returnValue = ''
+    }
   }
 
   // @param value: the new value. may be a scalar, an array, or an object.
-  // @param path: where w/in the assignment it should go. May be a string representing
-  //     the dot-separated path (e.g. 'assignmentOverrides.nodes.0`) or an array
-  //     of steps (e.g. ['assignmentOverrides', 'nodes', 0] (which could also be '0'))
+  // @param path: where w/in the assignment it should go as a string representing
+  //     the dot-separated path (e.g. 'assignmentOverrides.nodes.0`) to the value
   updateWorkingAssignment(path, value) {
-    const dottedpath = Array.isArray(path) ? path.join('.') : path
-    const old = get(this.state.workingAssignment, dottedpath)
+    const old = get(this.state.workingAssignment, path)
     if (old === value) {
       return this.state.workingAssignment
     }
@@ -81,17 +108,46 @@ export default class TeacherView extends React.Component {
     return updatedAssignment
   }
 
+  // add or remove path from the set of invalid fields based on the new value
+  // returns the updated set
+  updateInvalids(path, value) {
+    this.validate(path, value)
+    return this.fieldValidator.invalidFields()
+  }
+
   // if the new value is different from the existing value, update TeacherView's react state
+  // returns a boolean indicating if the value was valid and set on the working assignment
   handleChangeAssignment = (path, value) => {
     const updatedAssignment = this.updateWorkingAssignment(path, value)
     if (updatedAssignment !== this.state.workingAssignment) {
-      // the assignment can be unpublished independent from other changes
-      const isDirty = path !== 'state'
-      this.setState({workingAssignment: updatedAssignment, isDirty})
+      const updatedInvalids = this.updateInvalids(path, value)
+      this.setState({
+        workingAssignment: updatedAssignment,
+        isDirty: true,
+        invalids: updatedInvalids
+      })
     }
   }
 
-  handleUnsubmittedClick = () => {
+  // validate the value at the path
+  // if path points into an override, extract the override from the assignment
+  // and pass it as the context in which to validate the value
+  validate = (path, value) => {
+    let context = this.state.workingAssignment
+    const match = pathToOverrides.exec(path)
+    if (match) {
+      // extract the override
+      context = get(this.state.workingAssignment, match[0])
+    }
+    const isValid = this.fieldValidator.validate(path, value, context)
+    return isValid
+  }
+
+  invalidMessage = path => this.fieldValidator.errorMessage(path)
+
+  isAssignmentValid = () => Object.keys(this.state.invalids).length === 0
+
+  handleMessageStudentsClick = () => {
     this.setState({messageStudentsWhoOpen: true})
   }
 
@@ -112,7 +168,7 @@ export default class TeacherView extends React.Component {
     deleteAssignment({
       variables: {
         id: this.props.assignment.lid,
-        workflow: 'deleted'
+        state: 'deleted'
       }
     })
   }
@@ -125,26 +181,116 @@ export default class TeacherView extends React.Component {
   }
 
   handleDeleteError = apolloErrors => {
-    showFlashAlert({message: I18n.t('Unable to delete assignment'), type: 'error'})
-    console.error(apolloErrors) // eslint-disable-line no-console
+    showFlashAlert({
+      message: I18n.t('Unable to delete assignment'),
+      err: new Error(apolloErrors),
+      type: 'error'
+    })
     this.setState({confirmDelete: false, deletingNow: false})
   }
 
   handleCancel = () => {
-    this.setState({workingAssignment: this.props.assignment, isDirty: false})
+    this.setState((state, props) => {
+      // revalidate the current invalid fields with the original values
+      Object.keys(state.invalids).forEach(path => this.validate(path, get(props.assignment, path)))
+      return {
+        workingAssignment: this.props.assignment,
+        isDirty: false,
+        invalids: this.fieldValidator.invalidFields()
+      }
+    })
   }
 
-  // TODO: implement save and publish
-  handleSave = () => {
-    window.alert("pretend we're saving")
-    this.setState({isDirty: false})
+  handleSave(saveAssignment) {
+    if (this.isAssignmentValid()) {
+      this.setState(
+        (state, props) => {
+          return {
+            isSaving: true,
+            isTogglingWorkstate: state.workingAssignment.state !== props.assignment.state
+          }
+        },
+        () => {
+          const assignment = this.state.workingAssignment
+          saveAssignment({
+            variables: {
+              id: assignment.lid,
+              name: assignment.name,
+              description: assignment.description,
+              state: assignment.state,
+              pointsPossible: parseFloat(assignment.pointsPossible),
+              dueAt: assignment.dueAt && new Date(assignment.dueAt).toISOString(), // convert to iso8601 in UTC
+              unlockAt: assignment.unlockAt && new Date(assignment.unlockAt).toISOString(),
+              lockAt: assignment.lockAt && new Date(assignment.lockAt).toISOString(),
+              assignmentOverrides: assignment.assignmentOverrides.nodes.map(o => ({
+                id: o.lid,
+                dueAt: o.dueAt && new Date(o.dueAt).toISOString(),
+                lockAt: o.lockAt && new Date(o.lockAt).toISOString(),
+                unlockAt: o.unlockAt && new Date(o.unlockAt).toISOString(),
+                sectionId: o.set.__typename === 'Section' ? o.set.lid : undefined,
+                groupId: o.set.__typename === 'Group' ? o.set.lid : undefined,
+                studentIds:
+                  o.set.__typename === 'AdhocStudents' ? o.set.students.map(s => s.lid) : undefined
+              }))
+            }
+          })
+        }
+      )
+    } else {
+      showFlashAlert({
+        message: I18n.t('You cannot save while there are errors'),
+        type: 'info'
+      })
+    }
   }
 
-  handlePublish = () => {
-    const updatedAssignment = this.updateWorkingAssignment('state', 'published')
-    if (updatedAssignment !== this.state.workingAssignment) {
-      window.alert("pretend we're saving and publishing")
-      this.setState({workingAssignment: updatedAssignment, isDirty: false})
+  // if the last save was just to unpublish,
+  // then we don't change the isDirty state
+  handleSaveSuccess = () => {
+    this.setState((state, _props) => ({
+      isSaving: false,
+      isUnpublishing: false,
+      isDirty: state.isUnpublishing ? state.isDirty : false,
+      isTogglingWorkstate: false
+    }))
+  }
+
+  handleSaveError = apolloErrors => {
+    // TODO: something better
+    showFlashAlert({
+      message: I18n.t('An error occured saving the assignment'),
+      err: new Error(apolloErrors),
+      type: 'error'
+    })
+
+    this.setState((state, _props) => {
+      // reset the published toggle if necessary
+      let workingAssignment = state.workingAssignment
+      if (state.isTogglingWorkstate) {
+        workingAssignment = this.updateWorkingAssignment(
+          'state',
+          workingAssignment.state === 'published' ? 'unpublished' : 'published'
+        )
+      }
+      return {
+        isSaving: false,
+        isTogglingWorkstate: false,
+        workingAssignment
+      }
+    })
+  }
+
+  handlePublish(saveAssignment) {
+    if (this.isAssignmentValid()) {
+      // while the user can unpublish w/o saving anything,
+      // publishing implies saving any pending edits.
+      const updatedAssignment = this.updateWorkingAssignment('state', 'published')
+      this.setState({workingAssignment: updatedAssignment}, () => this.handleSave(saveAssignment))
+    } else {
+      showFlashAlert({
+        message: I18n.t('You cannot publish this assignment while there are errors'),
+        type: 'info'
+      })
     }
   }
 
@@ -168,10 +314,45 @@ export default class TeacherView extends React.Component {
     </Alert>
   )
 
+  handleSetWorkstate(saveAssignment, newState) {
+    if (this.isAssignmentValid() || newState === 'unpublished') {
+      const updatedAssignment = this.updateWorkingAssignment('state', newState)
+      this.setState(
+        {
+          workingAssignment: updatedAssignment,
+          isSaving: true,
+          isDirty: true,
+          isTogglingWorkstate: true
+        },
+        () => {
+          if (newState === 'unpublished') {
+            // just update the state
+            this.setState({isSaving: true, isUnpublishing: true}, () => {
+              saveAssignment({
+                variables: {
+                  id: this.state.workingAssignment.lid,
+                  state: this.state.workingAssignment.state
+                }
+              })
+            })
+          } else {
+            // save everything
+            this.handleSave(saveAssignment)
+          }
+        }
+      )
+    } else {
+      showFlashAlert({
+        message: I18n.t('You cannot publish this assignment while there are errors'),
+        type: 'info'
+      })
+    }
+  }
+
   renderDeleteDialog() {
     return (
       <Mutation
-        mutation={SET_WORKFLOW}
+        mutation={SAVE_ASSIGNMENT}
         onCompleted={this.handleDeleteSuccess}
         onError={this.handleDeleteError}
       >
@@ -207,34 +388,63 @@ export default class TeacherView extends React.Component {
     const assignment = this.state.workingAssignment
     const clazz = classnames('assignments-teacher', {dirty})
     return (
-      <TeacherViewContext.Provider value={this.contextValue}>
-        <div className={clazz}>
-          {this.renderDeleteDialog()}
-          <ScreenReaderContent>
-            <h1>{assignment.name}</h1>
-          </ScreenReaderContent>
-          <Header
-            assignment={assignment}
-            onChangeAssignment={this.handleChangeAssignment}
-            onUnsubmittedClick={this.handleUnsubmittedClick}
-            onDelete={this.handleDeleteButtonPressed}
-            readOnly={this.state.readOnly}
+      <ErrorBoundary
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorCategory={I18n.t('Assignments 2 Teacher View Error Page')}
           />
-          <ContentTabs
-            assignment={assignment}
-            onChangeAssignment={this.handleChangeAssignment}
-            readOnly={this.state.readOnly}
-          />
-          {this.renderMessageStudentsWhoDialog()}
-          {dirty ? (
-            <TeacherFooter
-              onCancel={this.handleCancel}
-              onSave={this.handleSave}
-              onPublish={this.handlePublish}
-            />
-          ) : null}
-        </div>
-      </TeacherViewContext.Provider>
+        }
+      >
+        <TeacherViewContext.Provider value={this.contextValue}>
+          <div className={clazz}>
+            {this.renderDeleteDialog()}
+            <ScreenReaderContent>
+              <h1>{assignment.name}</h1>
+            </ScreenReaderContent>
+            <Mutation
+              mutation={SAVE_ASSIGNMENT}
+              onCompleted={this.handleSaveSuccess}
+              onError={this.handleSaveError}
+            >
+              {saveAssignment => (
+                <>
+                  <Header
+                    assignment={assignment}
+                    onChangeAssignment={this.handleChangeAssignment}
+                    onValidate={this.validate}
+                    invalidMessage={this.invalidMessage}
+                    onSetWorkstate={newState => this.handleSetWorkstate(saveAssignment, newState)}
+                    onDelete={this.handleDeleteButtonPressed}
+                    readOnly={this.props.readOnly}
+                  />
+                  <ContentTabs
+                    assignment={assignment}
+                    onChangeAssignment={this.handleChangeAssignment}
+                    onMessageStudentsClick={this.handleMessageStudentsClick}
+                    onValidate={this.validate}
+                    invalidMessage={this.invalidMessage}
+                    readOnly={this.props.readOnly}
+                  />
+                  {this.renderMessageStudentsWhoDialog()}
+                  {dirty || !this.isAssignmentValid() ? (
+                    <TeacherFooter
+                      onCancel={this.handleCancel}
+                      onSave={() => this.handleSave(saveAssignment)}
+                      onPublish={() => this.handlePublish(saveAssignment)}
+                    />
+                  ) : null}
+                </>
+              )}
+            </Mutation>
+            <Portal open={this.state.isSaving}>
+              <Mask fullscreen>
+                <Spinner size="large" renderTitle={I18n.t('Saving assignment')} />
+              </Mask>
+            </Portal>
+          </div>
+        </TeacherViewContext.Provider>
+      </ErrorBoundary>
     )
   }
 }

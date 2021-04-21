@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -14,12 +16,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 require_relative '../../helpers/gradebook_common'
-require_relative '../../helpers/groups_common'
 require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook_cells_page'
+require_relative '../../helpers/groups_common'
 
-describe "gradebook" do
+describe "Gradebook" do
   include_context "in-process server selenium tests"
   include GradebookCommon
   include GroupsCommon
@@ -28,262 +32,230 @@ describe "gradebook" do
     gradebook_data_setup
   end
 
-  before(:each) { user_session(@teacher) }
-
-  it "page should load within acceptable time ", priority:"1" do
-    page_load_start_time = Time.zone.now
-    Gradebook.visit_gradebook(@course)
-    page_load_finish_time = Time.zone.now
-    page_load_time = page_load_finish_time - page_load_start_time
-    Rails.logger.debug "The gradebook page /courses/#{@course}/gradebook loaded in #{page_load_time} seconds"
-    expect(page_load_time).to be > 0.0
+  before(:each) do
+    user_session(@teacher)
   end
 
-  it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
+  it "shows unpublished assignments", priority: "1", test_id: 3253281 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
-    Gradebook.visit_gradebook(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header')).not_to include_text(assignment.title)
-
-    @first_assignment.publish
-    Gradebook.visit_gradebook(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
+    Gradebook.visit(@course)
+    expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(assignment.title)
   end
 
-  it "should not show 'not-graded' assignments", priority: "1", test_id: 210017 do
-    get "/courses/#{@course.id}/gradebook"
+  it "hides 'not-graded' assignments", priority: "1", test_id: 210017 do
+    Gradebook.visit(@course)
 
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
   end
 
-  def filter_student(text)
-    f('.gradebook_filter input').send_keys text
+  it 'filters students', priority: "1", test_id: 210018 do
+    Gradebook.visit(@course)
+    expect(Gradebook.fetch_student_names.size).to eq(@all_students.size)
+    f('.gradebook_filter input').send_keys @course.students[0].name
     sleep 1 # InputFilter has a delay
+    expect(Gradebook.fetch_student_names.size).to eq(1)
+    expect(Gradebook.fetch_student_names[0]).to eq(@course.students[0].name)
   end
 
-  def visible_students
-    ff('.student-name')
+  it "validates correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
+    Gradebook.visit(@course)
+    expect(Gradebook.fetch_student_names.size).to eq(@course.students.count)
   end
 
-  it 'should filter students', priority: "1", test_id: 210018 do
-    Gradebook.visit_gradebook(@course)
-    expect(visible_students).to have_size @all_students.size
-    filter_student 'student 1'
-    visible_after_filtering = visible_students
-    expect(visible_after_filtering).to have_size 1
-    expect(visible_after_filtering[0]).to include_text 'student 1'
-  end
-
-  it "should validate correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
-    get "/courses/#{@course.id}/gradebook"
-
-    expect(ff('.student-name')).to have_size @course.students.count
-  end
-
-  it "should show students sorted by their sortable_name", priority: "1", test_id: 210022 do
-    Gradebook.visit_gradebook(@course)
-    dom_names = ff('.student-name').map(&:text)
-    expect(dom_names).to eq @all_students.map(&:name)
-  end
-
-  it "should not show student avatars until they are enabled", priority: "1", test_id: 210023 do
-    Gradebook.visit_gradebook(@course)
-
-    expect(ff('.student-name')).to have_size @all_students.size
-    expect(f("body")).not_to contain_css('.avatar img')
-
-    @account = Account.default
-    @account.enable_service(:avatars)
-    @account.save!
-    expect(@account.service_enabled?(:avatars)).to be_truthy
-    get "/courses/#{@course.id}/gradebook"
-
-    expect(ff('.student-name')).to have_size @all_students.size
-    expect(ff('.avatar')).to have_size @all_students.size
-  end
-
-  it "should handle muting/unmuting correctly", priority: "1", test_id: 164227 do
-    Gradebook.visit_gradebook(@course)
-    Gradebook.toggle_assignment_mute_option(@second_assignment.id)
-    expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
-    expect(f('.total-cell .icon-muted')).to be_displayed
-    expect(@second_assignment.reload).to be_muted
-
-    # reload the page and make sure it remembered the setting
-    get "/courses/#{@course.id}/gradebook"
-    expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
-
-    # make sure you can un-mute
-    Gradebook.toggle_assignment_mute_option(@second_assignment.id)
-    expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")
-    expect(@second_assignment.reload).not_to be_muted
+  it "shows students sorted by their sortable_name", priority: "1", test_id: 210022 do
+    Gradebook.visit(@course)
+    expect(Gradebook.fetch_student_names).to eq @all_students.map(&:name)
   end
 
   context "unpublished course" do
     before do
       @course.claim!
-      Gradebook.visit_gradebook(@course)
+      Gradebook.visit(@course)
     end
 
-    it "should allow editing grades", priority: "1", test_id: 210026 do
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2')
+    it "allows editing grades", priority: "1", test_id: 210026 do
+      cell = Gradebook::Cells.grading_cell(@student_1, @first_assignment)
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
-      expect(ff('.grade', cell)).to_not be_blank
+      expect(Gradebook::Cells.grading_cell_input(@student_1, @first_assignment)).not_to be_blank
     end
   end
 
-  it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
-    Gradebook.visit_gradebook(@course)
+  context 'view ungraded as 0' do
 
-    f('#gradebook_settings').click
-    expect(f('.gradebook_dropdown')).to be_displayed
+    before(:each) do
+      @course.account.enable_feature!(:view_ungraded_as_zero)
+      Gradebook.visit(@course)
+    end
+
+    it 'persists its value when changed in the View menu' do
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+      Gradebook.select_view_dropdown
+
+      expect(Gradebook.view_ungraded_as_zero).to contain_css("svg[name='IconCheck']")
+
+      driver.navigate.refresh
+      Gradebook.select_view_dropdown
+
+      expect(Gradebook.view_ungraded_as_zero).to contain_css("svg[name='IconCheck']")
+    end
+
+    it 'toggles the presence of "Ungraded as 0" in the Total grade column header' do
+      expect(Gradebook.assignment_header_cell_element('Total').text).not_to include('UNGRADED AS 0')
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook.assignment_header_cell_element('Total').text).to include('UNGRADED AS 0')
+    end
+
+    it 'toggles the presence of "Ungraded as 0" in assignment group grade column header' do
+      expect(Gradebook.assignment_header_cell_element('first assignment group').text).not_to include('UNGRADED AS 0')
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook.assignment_header_cell_element('first assignment group').text).to include('UNGRADED AS 0')
+    end
+
+    it 'toggles which version of the total grade is displayed for a student' do
+      expect(Gradebook::Cells.get_total_grade(@student_1)).to eq "100% A"
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook::Cells.get_total_grade(@student_1)).to eq "18.75% F"
+    end
+
+    it 'does not change the grades in the backend' do
+      expect(Gradebook.scores_api(@course).first[:score]).to eq 100.0
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook.scores_api(@course).first[:score]).to eq 100.0
+    end
   end
 
-  it "View Gradebook History menu item redirects to grading history page", priority: "2", test_id: 164218 do
-    Gradebook.visit_gradebook(@course)
+  it 'gradebook settings modal is displayed when gradebook settings button is clicked',
+     priority: '1', test_id: 164219 do
+    Gradebook.visit(@course)
 
-    f('#gradebook_settings').click
-    fj('.ui-menu-item a:contains("View Gradebook History")').click
-    expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
+    Gradebook.gradebook_settings_btn_select
+    expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
   end
 
-  it "should validate assignment details", priority: "1", test_id: 210048 do
-    submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
+  it 'late policies tab is selected by default',
+     priority: '1', test_id: 164220 do
+    Gradebook.visit(@course)
 
-    Gradebook.visit_gradebook(@course)
-
-    open_assignment_options(1)
-    f('[data-action="showAssignmentDetails"]').click
-    details_dialog = f('#assignment-details-dialog')
-    expect(details_dialog).to be_displayed
-    table_rows = ff('#assignment-details-dialog-stats-table tr')
-    expect(table_rows[3].find_element(:css, 'td')).to include_text submissions_count
+    Gradebook.gradebook_settings_btn_select
+    expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
+    late_policies_tab = fj('[aria-label="Gradebook Settings"] [role="tablist"] [role="tab"]:first')
+    expect(late_policies_tab.attribute('aria-selected')).to eq('true')
   end
 
-  it "should include student view student for grading" do
+  it 'focus is returned to gradebook settings button when modal is closed', priority: '1', test_id: 164221 do
+    Gradebook.visit(@course)
+
+    Gradebook.gradebook_settings_btn_select
+    expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
+
+    f('#gradebook-settings-cancel-button').click
+    expect { driver.switch_to.active_element }.to become(f('#gradebook-settings-button'))
+  end
+
+  it "includes student view student for grading" do
     @fake_student1 = @course.student_view_student
     @fake_student1.update_attribute :workflow_state, "deleted"
     @fake_student2 = @course.student_view_student
     @fake_student1.update_attribute :workflow_state, "registered"
     @fake_submission = @first_assignment.submit_homework(@fake_student1, body: 'fake student submission')
 
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
 
     fakes = [@fake_student1.name, @fake_student2.name]
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
 
-    # test students should always be last
+    # test students will always be last
     f('.slick-header-column').click
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
   end
 
-  it "should not include non-graded group assignment in group total" do
+  it "excludes non-graded group assignment in group total" do
     gc = group_category
     graded_assignment = @course.assignments.create!({
-                                                        title: 'group assignment 1',
-                                                        due_at: (Time.zone.now + 1.week),
-                                                        points_possible: 10,
-                                                        submission_types: 'online_text_entry',
-                                                        assignment_group: @group,
-                                                        group_category: gc,
-                                                        grade_group_students_individually: true
+                                                      title: 'group assignment 1',
+                                                      due_at: (Time.zone.now + 1.week),
+                                                      points_possible: 10,
+                                                      submission_types: 'online_text_entry',
+                                                      assignment_group: @group,
+                                                      group_category: gc,
+                                                      grade_group_students_individually: true
                                                     })
     group_assignment = @course.assignments.create!({
-                                                       title: 'group assignment 2',
-                                                       due_at: (Time.zone.now + 1.week),
-                                                       points_possible: 0,
-                                                       submission_types: 'not_graded',
-                                                       assignment_group: @group,
-                                                       group_category: gc,
-                                                       grade_group_students_individually: true
+                                                     title: 'group assignment 2',
+                                                     due_at: (Time.zone.now + 1.week),
+                                                     points_possible: 0,
+                                                     submission_types: 'not_graded',
+                                                     assignment_group: @group,
+                                                     group_category: gc,
+                                                     grade_group_students_individually: true
                                                    })
     project_group = group_assignment.group_category.groups.create!(name: 'g1', context: @course)
     project_group.users << @student_1
     graded_assignment.grade_student @student_1, grade: 10, grader: @teacher # 10 points possible
     group_assignment.grade_student @student_1, grade: 2, grader: @teacher # 0 points possible
 
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
     group_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage')
     total_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')
     expect(group_grade).to include_text('100%') # otherwise 108%
     expect(total_grade).to include_text('100%') # otherwise 108%
   end
 
-  it "should not show assignment mute warning in total column for 'not_graded', muted assignments" do
+  it "hides assignment mute warning in total column for 'not_graded', muted assignments" do
     assignment = @course.assignments.create!({
-                                              title: 'Non Graded Assignment',
-                                              due_at: (Time.zone.now + 1.week),
-                                              points_possible: 10,
-                                              submission_types: 'not_graded'
-                                           })
+                                               title: 'Non Graded Assignment',
+                                               due_at: (Time.zone.now + 1.week),
+                                               points_possible: 10,
+                                               submission_types: 'not_graded'
+                                             })
 
     assignment.mute!
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
 
-    expect(f("body")).not_to contain_css(".total-cell .icon-muted")
-  end
-
-  it "should hide and show student names", priority: "2", test_id: 164220 do
-
-    def toggle_hiding_students
-      f('#gradebook_settings').click
-      student_toggle = f('.student_names_toggle')
-      expect(student_toggle).to be_displayed
-      student_toggle.click
-    end
-
-    Gradebook.visit_gradebook(@course)
-
-    toggle_hiding_students
-    expect(f("#content")).not_to contain_jqcss('.student-name:visible')
-    expect(fj('.student-placeholder:visible')).to be
-
-    toggle_hiding_students
-    expect(fj('.student-name:visible')).to be
-    expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
-  end
-
-  it "should hide and show notes", priority: "2", test_id: 164224 do
-    Gradebook.visit_gradebook(@course)
-
-    # show notes column
-    Gradebook.gb_settings_cog_select
-    Gradebook.show_notes_select
-    expect(f("#content")).to contain_jqcss('.custom_column:visible')
-
-    # hide notes column
-    Gradebook.gb_settings_cog_select
-    Gradebook.hide_notes_select
-    expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
+    expect(f("body")).not_to contain_css(".total-cell .icon-off")
   end
 
   context "downloading and uploading submissions" do
-    it "updates the dropdown menu after downloading and processes submission uploads" do
+    it "redirects to the submissions upload page after uploading submissions" do
       # Given I have a student with an uploaded submission
-      a = attachment_model(context: @student_2, content_type: 'text/plain')
+      a = attachment_model(context: @student_2, content_type:'text/plain')
       @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])
 
       # When I go to the gradebook
-      Gradebook.visit_gradebook(@course)
+      Gradebook.visit(@course)
 
-      # And I click the dropdown menu on the assignment
-      f('.gradebook-header-drop').click
+      # chrome fails to find the download submissions link because it does not fit normal screen
+
 
       # And I click the download submissions button
-      f('[data-action="downloadSubmissions"]').click
+      Gradebook.click_assignment_header_menu_element(@first_assignment.id,"download submissions")
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
 
       # And I click the dropdown menu on the assignment again
-      f('.gradebook-header-drop').click
+      Gradebook.click_assignment_header_menu(@first_assignment.id)
 
       # And I click the re-upload submissions link
-      f('[data-action="reuploadSubmissions"]').click
+      f('[data-menu-item-id="reupload-submissions"]').click
 
       # When I attach a submissions zip file
-      fixture_file = Rails.root.join('spec/fixtures/files/submissions.zip')
+      fixture_file = Rails.root.join('spec', 'fixtures', 'files', 'submissions.zip')
       f('input[name=submissions_zip]').send_keys(fixture_file)
 
       # And I upload it
@@ -291,28 +263,32 @@ describe "gradebook" do
         fj('button:contains("Upload Files")').click
       end
 
+      run_jobs
+      refresh_page
+
       # Then I should see a message indicating the file was processed
-      expect(f('#content h3')).to include_text 'Attached files to the following user submissions'
+      expect(f('#content')).to include_text 'Done! We took the files you uploaded'
     end
   end
 
-  it "should show late submissions" do
-    Gradebook.visit_gradebook(@course)
+  it "shows late submissions" do
+    Gradebook.visit(@course)
     expect(f("body")).not_to contain_css(".late")
 
     @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
     @student_3_submission.save!
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
 
     expect(ff('.late')).to have_size(1)
   end
 
-  it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
-    allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
+  it "hides the speedgrader link for large courses", priority: "2", test_id: 210099 do
+    pending('TODO: Refactor this and add it back as part of CNVS-32440')
+    allow(@course).to receive(:large_roster?).and_return(true)
 
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
 
-    f('.gradebook-header-drop').click
+    f('.Gradebook__ColumnHeaderAction button').click
     expect(f('.gradebook-header-menu')).not_to include_text("SpeedGrader")
   end
 
@@ -341,7 +317,7 @@ describe "gradebook" do
       essay_quiz.save!
       essay_quiz
     end
-    #create quiz with file upload question
+    # create quiz with file upload question
     let(:file_upload_question) do
       {
         question_name: 'File Upload',
@@ -362,39 +338,38 @@ describe "gradebook" do
     let(:essay_text) { {"question_#{essay_question.id}": "Essay Response!"} }
     let(:file_submission) { file_question.generate_submission(student) }
 
-    it 'should display the quiz icon for essay questions', priority: "1", test_id: 229430 do
+    it 'displays the "needs grading" icon for essay questions', priority: "1", test_id: 229430 do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
-      Gradebook.visit_gradebook(@course)
-      expect(f('#gradebook_grid .icon-quiz')).to be_truthy
+      Gradebook.visit(test_course)
+      expect(f('#gradebook_grid .icon-not-graded')).to be_truthy
     end
 
-    it 'should display the quiz icon for file_upload questions', priority: "1", test_id: 498844 do
+    it 'displays the "needs grading" icon for file_upload questions', priority: "1", test_id: 498844 do
       file_submission.attachments.create!({
-        filename: "doc.doc",
-        display_name: "doc.doc", user: @user,
-        uploaded_data: dummy_io
-      })
+                                            filename: "doc.doc",
+                                            display_name: "doc.doc", user: @user,
+                                            uploaded_data: dummy_io
+                                          })
       file_submission.complete!
       user_session(teacher)
 
-      Gradebook.visit_gradebook(@course)
-      expect(f('#gradebook_grid .icon-quiz')).to be_truthy
+      Gradebook.visit(test_course)
+      expect(f('#gradebook_grid .icon-not-graded')).to be_truthy
     end
 
-    it 'should remove the quiz icon when graded manually', priority: "1", test_id: 491040 do
+    it 'removes the "needs grading" icon when graded manually', priority: "1", test_id: 491040 do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
-      Gradebook.visit_gradebook(@course)
+      Gradebook.visit(test_course)
       # in order to get into edit mode with an icon in the way, a total of 3 clicks are needed
-      f('#gradebook_grid .icon-quiz').click
-      double_click('.online_quiz')
+      grading_cell = Gradebook::Cells.grading_cell(student, essay_quiz.assignment)
+      grading_cell.click
 
-      replace_value('#gradebook_grid input.grade', '10')
-      f('#gradebook_grid input.grade').send_keys(:enter)
-      expect(f('#gradebook_grid')).not_to contain_css('.icon-quiz')
+      Gradebook::Cells.edit_grade(student, essay_quiz.assignment, 10)
+      expect(grading_cell).not_to contain_css('.icon-not-graded')
     end
   end
 end

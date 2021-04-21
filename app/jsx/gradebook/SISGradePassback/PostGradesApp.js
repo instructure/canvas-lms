@@ -17,15 +17,61 @@
  */
 
 import React from 'react'
+import {bool, func, shape, string} from 'prop-types'
 import ReactDOM from 'react-dom'
+import $ from 'jquery'
 import I18n from 'i18n!modules'
-import PostGradesDialog from '../../gradebook/SISGradePassback/PostGradesDialog'
+import PostGradesDialog from './PostGradesDialog'
 import classnames from 'classnames'
 
 // The PostGradesApp mounts a single "Sync Grades" button, which pops up
 // the PostGradesDialog when clicked.
-
 class PostGradesApp extends React.Component {
+  static propTypes = {
+    labelText: string.isRequired,
+    store: shape({
+      addChangeListener: func.isRequired,
+      removeChangeListener: func.isRequired
+    }).isRequired,
+    renderAsButton: bool,
+    returnFocusTo: shape({
+      focus: func.isRequired
+    }).isRequired
+  }
+
+  static defaultProps = {
+    renderAsButton: false
+  }
+
+  static AppLaunch(store, returnFocusTo) {
+    const $dialog = $('<div class="post-grades-dialog">').dialog({
+      title: I18n.t('Sync Grades to SIS'),
+      maxWidth: 650,
+      maxHeight: 450,
+      minWidth: 650,
+      minHeight: 450,
+      width: 650,
+      height: 450,
+      resizable: false,
+      buttons: [],
+      close() {
+        ReactDOM.unmountComponentAtNode(this)
+        $(this).remove()
+        if (returnFocusTo) {
+          returnFocusTo.focus()
+        }
+      }
+    })
+
+    function closeDialog(e) {
+      e.preventDefault()
+      $dialog.dialog('close')
+    }
+
+    store.reset()
+    ReactDOM.render(<PostGradesDialog store={store} closeDialog={closeDialog} />, $dialog[0])
+  }
+
   componentDidMount() {
     this.boundForceUpdate = this.forceUpdate.bind(this)
     this.props.store.addChangeListener(this.boundForceUpdate)
@@ -33,6 +79,12 @@ class PostGradesApp extends React.Component {
 
   componentWillUnmount() {
     this.props.store.removeChangeListener(this.boundForceUpdate)
+  }
+
+  openDialog(e) {
+    e.preventDefault()
+
+    PostGradesApp.AppLaunch(this.props.store, this.props.returnFocusTo)
   }
 
   render() {
@@ -47,46 +99,11 @@ class PostGradesApp extends React.Component {
       )
     } else {
       return (
-        <a id="post-grades-button" className={navClass} onClick={this.openDialog}>
+        <a tabIndex={0} id="post-grades-button" className={navClass} onClick={this.openDialog}>
           {this.props.labelText}
         </a>
       )
     }
-  }
-
-  openDialog = e => {
-    e.preventDefault()
-    const returnFocusTo = this.props.returnFocusTo
-
-    const $dialog = $('<div class="post-grades-dialog">').dialog({
-      title: I18n.t('Sync Grades to SIS'),
-      maxWidth: 650,
-      maxHeight: 450,
-      minWidth: 650,
-      minHeight: 450,
-      width: 650,
-      height: 450,
-      resizable: false,
-      buttons: [],
-      close(e) {
-        ReactDOM.unmountComponentAtNode(this)
-        $(this).remove()
-        if (returnFocusTo) {
-          returnFocusTo.focus()
-        }
-      }
-    })
-
-    const closeDialog = function(e) {
-      e.preventDefault()
-      $dialog.dialog('close')
-    }
-
-    this.props.store.reset()
-    ReactDOM.render(
-      <PostGradesDialog store={this.props.store} closeDialog={closeDialog} />,
-      $dialog[0]
-    )
   }
 }
 

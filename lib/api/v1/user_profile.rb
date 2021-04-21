@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ module Api::V1::UserProfile
     json = user_json(user, current_user, session, 'avatar_url', context)
     # don't unintentionally include stuff added to user_json
     json.slice! :id, :name, :short_name, :sortable_name, :sis_user_id,
-                :sis_login_id, :login_id, :avatar_url, :integration_id
+                :sis_login_id, :login_id, :avatar_url, :integration_id, :pronouns
 
     json[:title] = profile.title
     json[:bio] = profile.bio
@@ -50,11 +52,18 @@ module Api::V1::UserProfile
         user.user_services :
         user.user_services.visible
 
+      services = services.select{|s| feature_and_service_enabled?(s.service)}
       json[:user_services] = services.map { |s| user_service_json(s, current_user, session) }
     end
 
     if includes.include? 'links'
       json[:links] = profile.links.map { |l| user_profile_link_json(l, current_user, session) }
+    end
+
+    if includes.include? 'uuid'
+      past_uuid = UserPastLtiId.uuid_for_user_in_context(user, context)
+      json[:past_uuid] = past_uuid unless past_uuid == user.uuid
+      json[:uuid] = user.uuid
     end
 
     json

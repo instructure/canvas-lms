@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -44,6 +46,21 @@ module TestDatabaseUtils
       puts "finished resetting test db in #{Time.now - start} seconds"
     end
 
+    # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the
+    # dummy Account (id=0) properly.
+    def reset_pk_sequence!(t)
+      if t == 'accounts' && Account.maximum('id') == 0
+        # reset_pk_sequence! crashes if the only account is the dummy Account (id=0).
+        # Reset PK sequence manually. (Code from reset_pk_sequence!)
+        conn = ActiveRecord::Base.connection
+        _pk, sequence = conn.pk_and_sequence_for('accounts')
+        quoted_sequence = conn.quote_table_name(sequence)
+        conn.query_value("SELECT setval(#{conn.quote(quoted_sequence)}, 1, false)", "SCHEMA")
+      else
+        ActiveRecord::Base.connection.reset_pk_sequence!(t)
+      end
+    end
+
    private
 
     def each_connection
@@ -59,7 +76,7 @@ module TestDatabaseUtils
 
     def get_table_names(connection)
       # use custom SQL to exclude tables from extensions
-      schema = connection.shard.name if connection.use_qualified_names?
+      schema = connection.shard.name
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT relname
          FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
@@ -75,7 +92,8 @@ module TestDatabaseUtils
     end
 
     def truncate_all_tables?
-      Account.any?
+      # Only account should be the dummy account with id=0
+      Account.where.not(id: 0).any? || Account.where(id: 0).none?
     end
 
     def truncate_all_tables!
@@ -85,10 +103,12 @@ module TestDatabaseUtils
         next if table_names.empty?
         connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
       end
+      Account.find_or_create_by!(id: 0).
+        update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     end
 
     def get_sequences(connection)
-      schema = connection.shard.name if connection.use_qualified_names?
+      schema = connection.shard.name
       sequences = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT relname
          FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid

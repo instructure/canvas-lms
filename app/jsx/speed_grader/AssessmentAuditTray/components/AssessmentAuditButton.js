@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {func} from 'prop-types'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconClock from '@instructure/ui-icons/lib/Line/IconClock'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Button} from '@instructure/ui-buttons'
+import {IconClockLine} from '@instructure/ui-icons'
 import I18n from 'i18n!speed_grader'
 
 const theme = {
@@ -32,7 +32,7 @@ const theme = {
 export default function AssessmentAuditButton(props) {
   return (
     <ApplyTheme theme={theme}>
-      <Button icon={IconClock} onClick={props.onClick} size="small" variant="link">
+      <Button icon={IconClockLine} onClick={props.onClick} size="small" variant="link">
         {I18n.t('Assessment audit')}
       </Button>
     </ApplyTheme>

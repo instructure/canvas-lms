@@ -42,7 +42,7 @@ const respond = data =>
     JSON.stringify(data)
   ])
 
-test('polls the progress api until the job is finished', function() {
+test('polls the progress api until the job is finished', () => {
   const spy = sinon.spy()
   model.on('complete', spy)
   model.poll()

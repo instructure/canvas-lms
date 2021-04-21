@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -51,29 +53,6 @@ describe "security" do
     end
   end
 
-  describe "permissions" do
-    # if we end up moving the permissions cache to memcache, this test won't be
-    # valid anymore and we need some more extensive tests for actual cache
-    # invalidation. right now, though, this is the only really valid way to
-    # test that we're actually flushing on every request.
-    it "should flush the role_override caches on every request" do
-      course_with_teacher_logged_in
-
-      get "/courses/#{@course.to_param}/users"
-      assert_response :success
-
-      expect(RoleOverride.send(:instance_variable_get, '@cached_permissions')).not_to be_empty
-      expect(RoleOverride.send(:class_variable_get, '@@role_override_chain')).not_to be_empty
-
-      get "/dashboard"
-      assert_response 301
-
-      # verify the cache is emptied on every request
-      expect(RoleOverride.send(:instance_variable_get, '@cached_permissions')).to be_empty
-      expect(RoleOverride.send(:class_variable_get, '@@role_override_chain')).to be_empty
-    end
-  end
-
   describe 'session cookies' do
     it "should always set the primary cookie to session expiration" do
       # whether they select "stay logged in" or not, the actual session cookie
@@ -115,46 +94,6 @@ describe "security" do
       expect(c1).not_to be_present
       expect(c2).to be_present
     end
-  end
-
-  it "should not prepend login json responses with protection" do
-    u = user_with_pseudonym :active_user => true,
-      :username => "nobody@example.com",
-      :password => "asdfasdf"
-    u.save!
-    post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
-      "pseudonym_session[password]" => "asdfasdf",
-      "pseudonym_session[remember_me]" => "1" },
-      headers: { 'HTTP_ACCEPT' => 'application/json' }
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).not_to match(%r{^while\(1\);})
-    json = JSON.parse response.body
-    expect(json['pseudonym']['unique_id']).to eq "nobody@example.com"
-  end
-
-  it "should prepend GET JSON responses with protection" do
-    course_with_teacher_logged_in
-    get "/courses.json"
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).to match(%r{^while\(1\);})
-  end
-
-  it "should not prepend GET JSON responses to Accept application/json requests with protection" do
-    course_with_teacher_logged_in
-    get "/courses.json", headers: { 'HTTP_ACCEPT' => 'application/json' }
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).not_to match(%r{^while\(1\);})
-  end
-
-  it "should not prepend non-GET JSON responses with protection" do
-    course_with_teacher_logged_in
-    delete "/dashboard/ignore_stream_item/1"
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).not_to match(%r{^while\(1\);})
   end
 
   describe "remember me" do
@@ -429,7 +368,7 @@ describe "security" do
 
     user_session(@student)
     post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
-    expect(response).not_to be_success
+    expect(response).not_to be_successful
 
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
@@ -702,7 +641,7 @@ describe "security" do
         course_with_teacher
         student_in_course
         @student.update_account_associations
-        @user_note = UserNote.create!(:creator => @teacher, :user => @student)
+        @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
 
         get "/accounts/#{Account.default.id}/user_notes"
         assert_status(401)
@@ -768,7 +707,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('.edit_course_link')).to be_empty
         expect(html.css('#tab-users')).to be_empty
         expect(html.css('#tab-navigation')).to be_empty
@@ -781,7 +720,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#course_form')).not_to be_empty
         expect(html.css('#tab-navigation')).not_to be_empty
       end
@@ -799,7 +738,7 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
         expect(response.body).not_to match /People/
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#tab-users')).to be_empty
 
         add_permission :read_roster
@@ -922,7 +861,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('.section .assignments')).to be_empty
         expect(html.css('.section .syllabus')).to be_empty
         expect(html.css('.section .pages')).to be_empty
@@ -971,7 +910,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('.section .assignments')).not_to be_empty
         expect(html.css('.section .syllabus')).not_to be_empty
         expect(html.css('.section .pages')).not_to be_empty
@@ -1007,7 +946,7 @@ describe "security" do
         expect(response).to be_successful
         expect(response.body).to match /Delete this Course/
 
-        html = Nokogiri::HTML(response.body)
+        html = Nokogiri::HTML5(response.body)
         expect(html.css('#course_account_id')).not_to be_empty
         expect(html.css('#course_enrollment_term_id')).not_to be_empty
 
@@ -1061,7 +1000,8 @@ describe "security" do
 
       it 'manage_sections' do
         course_with_teacher_logged_in(:active_all => 1)
-        remove_permission(:manage_sections, teacher_role)
+        remove_permission(:manage_sections_add, teacher_role)
+        remove_permission(:manage_sections_edit, teacher_role)
 
         get "/courses/#{@course.id}/settings"
         expect(response).to be_successful

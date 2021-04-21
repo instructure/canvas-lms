@@ -33,10 +33,7 @@ export default class ValidatorResults extends React.Component {
   }
 
   getDisplayMessage = number =>
-    I18n.t(
-      {one: 'Found 1 broken link', other: 'Found %{count} broken links'},
-      {count: number}
-    )
+    I18n.t({one: 'Found 1 broken link', other: 'Found %{count} broken links'}, {count: number})
 
   render() {
     let alertMessage,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 Instructure, Inc.
 #
@@ -57,13 +59,13 @@ module Lti
           get "/api/lti/tool_settings/#{@link_setting.id}.json",
               params: {tool_setting_id: @link_setting},
               headers: {'HTTP_ACCEPT' => 'application/vnd.ims.lti.v2.toolsettings.simple+json', 'Authorization' => "bearer #{access_token}"}
-          expect(response.content_type).to eq 'application/vnd.ims.lti.v2.toolsettings.simple+json'
+          expect(response.media_type).to eq 'application/vnd.ims.lti.v2.toolsettings.simple+json'
         end
 
         it 'returns toolsettings when requested' do
           get "/api/lti/tool_settings/#{@link_setting.id}.json", params: {tool_setting_id: @link_setting},
               headers: {'HTTP_ACCEPT' => 'application/vnd.ims.lti.v2.toolsettings+json', 'Authorization' => 'oauth_token'}
-          expect(response.content_type).to eq 'application/vnd.ims.lti.v2.toolsettings+json'
+          expect(response.media_type).to eq 'application/vnd.ims.lti.v2.toolsettings+json'
         end
 
         it 'returns not_found if there isn\'t a tool setting' do

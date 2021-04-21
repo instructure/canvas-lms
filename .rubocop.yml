@@ -1,11 +1,13 @@
 require:
   - rubocop-rspec
+  - rubocop-performance
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
+  - outrigger/cops/migration/tagged
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.6
 
 # our style changes: disabling style rules we aren't interested in
 Layout/AlignParameters:
@@ -26,7 +28,7 @@ Layout/EmptyLinesAroundMethodBody:
   Enabled: false
 Layout/EmptyLinesAroundModuleBody:
   Enabled: false
-Layout/IndentHash:
+Layout/IndentFirstHashElement:
   Enabled: false
 Layout/IndentationConsistency:
   Enabled: false
@@ -93,7 +95,9 @@ Style/DoubleNegation:
   Enabled: false
 Style/TrailingCommaInArguments:
   Enabled: false
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 Style/MethodCallWithoutArgsParentheses:
   Enabled: false
@@ -103,8 +107,6 @@ Layout/DotPosition:
   Enabled: true
   EnforcedStyle: trailing
 Layout/AlignHash:
-  Enabled: false
-Layout/AlignParameters:
   Enabled: false
 Style/Lambda:
   Enabled: false
@@ -128,9 +130,8 @@ Style/DateTime:
   Enabled: false
 Style/SymbolArray:
   Enabled: false
-# We may want to enable this when we start working toward Ruby 3
 Style/FrozenStringLiteralComment:
-  Enabled: false
+  Severity: error
 Style/AsciiComments:
   Enabled: false
 Style/BlockDelimiters:
@@ -169,6 +170,14 @@ Gemspec/RequiredRubyVersion:
 # Rails style changes
 Migration/ModelBehavior:
   Enabled: false
+Migration/Tagged:
+  Enabled: true
+  Severity: error
+  AllowedTags:
+    - predeploy
+    - postdeploy
+    - cassandra
+    - dynamodb
 Rails:
   Enabled: true
 Rails/TimeZone:
@@ -196,7 +205,7 @@ Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
   Severity: error
-Lint/EndAlignment:
+Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
   Severity: convention
 
@@ -214,7 +223,7 @@ Style/RescueModifier:
   Severity: warning
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   EnforcedStyle: consistent
 
 # these don't make sense pre-Rails 4
@@ -231,28 +240,10 @@ Rails/HttpPositionalArguments:
 Performance/RegexpMatch:
   Enabled: false
 
-# Things we may want to tighten down later
-Metrics/AbcSize:
+# SnR is just too low to have this enabled
+Metrics:
   Enabled: false
-Metrics/LineLength:
-  Max: 160
-Metrics/MethodLength:
-  Max: 100
-Metrics/ClassLength:
-  Enabled: false
-Metrics/ModuleLength:
-  Enabled: false
-Metrics/BlockLength:
-  Max: 50
-  Exclude:
-  - gems/*/spec/**/*.rb
-  - gems/plugins/*/spec_canvas/**/*.rb
-  - spec/**/*.rb
-  - pact/spec/**/*_spec.rb
-Metrics/CyclomaticComplexity:
-  Max: 28
-Metrics/PerceivedComplexity:
-  Max: 28
+
 RSpec/InstanceVariable:
   Enabled: false
 RSpec/ExampleWording:
@@ -280,3 +271,7 @@ Specs/EnsureSpecExtension:
   Enabled: true
   Exclude:
     - spec/shared_examples/**/*
+
+# this cops is crashing; https://github.com/rubocop-hq/rubocop/issues/6992
+Layout/IndentFirstParameter:
+  Enabled: false

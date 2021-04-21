@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -55,7 +57,7 @@ describe 'CrocodocDocument' do
       })
     end
 
-    it "should only include ids specified in the whitelist" do
+    it "should only include ids specified in the allow list" do
       expect(@crocodoc.permissions_for_user(@teacher, [@teacher.crocodoc_id!, @submitter.crocodoc_id!])).to eq({
         :filter => "#{@teacher.crocodoc_id!},#{@submitter.crocodoc_id!}",
         :admin => true,
@@ -63,16 +65,21 @@ describe 'CrocodocDocument' do
       })
     end
 
-    it "should set :admin and :editable to false if the calling user isn't whitelisted" do
+    it "should set :admin and :editable to false if the calling user isn't allowed" do
       expect(@crocodoc.permissions_for_user(@submitter, [@teacher.crocodoc_id!])).to eq({
-        :filter => "#{@teacher.crocodoc_id!}",
+        :filter => @teacher.crocodoc_id!.to_s,
         :admin => false,
         :editable => false,
       })
     end
 
     context "submitter permissions" do
-      it "should see everything (unless the assignment is muted)" do
+      before :once do
+        @assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "should see everything when grades are posted" do
+        @assignment.post_submissions
         expect(@crocodoc.permissions_for_user(@submitter)).to eq({
           :filter => 'all',
           :admin => false,
@@ -80,8 +87,7 @@ describe 'CrocodocDocument' do
         })
       end
 
-      it "should only see their own annotations when assignment is muted" do
-        @assignment.mute!
+      it "should only see their own annotations when grades are not posted" do
         expect(@crocodoc.permissions_for_user(@submitter)).to eq({
           :filter => @submitter.crocodoc_id,
           :admin => false,
@@ -107,7 +113,7 @@ describe 'CrocodocDocument' do
     end
 
     it "should not allow annotations if anonymous_peer_reviews" do
-      @submission.assignment.update_attributes anonymous_peer_reviews: true,
+      @submission.assignment.update anonymous_peer_reviews: true,
                                                peer_reviews: true
       expect(@crocodoc.permissions_for_user(@student)).to eq({
         :filter => 'none',

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!restrict_student_access'
 import Folder from '../../models/Folder'
@@ -121,22 +120,22 @@ export default {
   },
 
   /*
-     * Returns true if all the models passed in have usage rights
-     */
+   * Returns true if all the models passed in have usage rights
+   */
   usageRightsOnAll() {
     return this.props.models.every(model => model.get('usage_rights'))
   },
 
   /*
-     * Returns true if all the models passed in are folders.
-     */
+   * Returns true if all the models passed in are folders.
+   */
   allFolders() {
     return this.props.models.every(model => model instanceof Folder)
   },
 
   /*
-     * Returns true if all the models passed in are folders.
-     */
+   * Returns true if all the models passed in are folders.
+   */
   anyFolders() {
     return this.props.models.filter(model => model instanceof Folder).length
   },

@@ -20,21 +20,21 @@ import makePromisePool from 'jsx/shared/makePromisePool'
 
 QUnit.module('makePromisePool')
 
-test('makePromisePool respects the pool size', (assert) => {
+test('makePromisePool respects the pool size', assert => {
   const done = assert.async()
   const dataList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
   const options = {
     internvalTime: 10,
-    poolSize: 2,
+    poolSize: 2
   }
 
   let activeWorkers = 0
 
-  function makePromise () {
+  function makePromise() {
     activeWorkers++
     ok(activeWorkers <= options.poolSize)
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         ok(activeWorkers <= options.poolSize)
         activeWorkers--
@@ -43,20 +43,19 @@ test('makePromisePool respects the pool size', (assert) => {
     })
   }
 
-  makePromisePool(dataList, makePromise, options)
-    .then(() => done())
+  makePromisePool(dataList, makePromise, options).then(() => done())
 })
 
-test('makePromisePool reports successes and failures correctly', (assert) => {
+test('makePromisePool reports successes and failures correctly', assert => {
   const done = assert.async()
   const dataList = [1, 2, 3, 4, 5]
   const options = {
     internvalTime: 100,
-    poolSize: 3,
+    poolSize: 3
   }
 
   // fail on odd numbers
-  function makePromise (num) {
+  function makePromise(num) {
     if (num % 2 === 0) {
       return Promise.resolve({})
     } else {
@@ -64,19 +63,15 @@ test('makePromisePool reports successes and failures correctly', (assert) => {
     }
   }
 
-  makePromisePool(dataList, makePromise, options)
-    .then(results => {
-      deepEqual(results, {
-        successes: [
-          { data: 2, res: {} },
-          { data: 4, res: {} },
-        ],
-        failures: [
-          { data: 1, err: 'odd number' },
-          { data: 3, err: 'odd number' },
-          { data: 5, err: 'odd number' },
-        ],
-      })
-      done()
+  makePromisePool(dataList, makePromise, options).then(results => {
+    deepEqual(results, {
+      successes: [{data: 2, res: {}}, {data: 4, res: {}}],
+      failures: [
+        {data: 1, err: 'odd number'},
+        {data: 3, err: 'odd number'},
+        {data: 5, err: 'odd number'}
+      ]
     })
+    done()
+  })
 })

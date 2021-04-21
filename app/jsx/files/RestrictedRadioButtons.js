@@ -19,12 +19,12 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 import I18n from 'i18n!restrict_student_access'
 import $ from 'jquery'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
 import 'jquery.instructure_date_and_time'
+import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
 
 class RestrictedRadioButtons extends React.Component {
   static propTypes = {
@@ -75,66 +75,44 @@ class RestrictedRadioButtons extends React.Component {
       ref: 'unpublishInput',
       text: I18n.t('Unpublish'),
       selectedOptionKey: 'unpublished',
-      iconClasses: 'icon-unpublish RestrictedRadioButtons__unpublish_icon',
+      iconClasses: 'icon-unpublish RestrictedRadioButtons__icon',
       onChange() {
         this.updateBtnEnable()
         this.setState({selectedOption: 'unpublished'})
       }
     },
     {
-      ref: 'permissionsInput',
-      text: I18n.t('Restricted Access'),
-      selectedOptionKey: ['link_only', 'date_range'],
-      iconClasses: 'icon-cloud-lock RestrictedRadioButtons__icon-cloud-lock',
-      onChange() {
-        const selectedOption = this.state.unlock_at ? 'date_range' : 'link_only'
-        this.updateBtnEnable()
-        this.setState({selectedOption})
-      }
-    }
-  ]
-  restrictedOptions = [
-    {
-      ref: 'link_only',
+      ref: 'linkOnly',
       selectedOptionKey: 'link_only',
-      getText() {
-        if (this.allFolders()) {
-          return I18n.t('Hidden, files inside will be available with links.')
-        } else if (this.props.models.length > 1 && this.anyFolders()) {
-          return I18n.t(
-            'Files and folder contents only available to students with link. Not visible in student files.'
-          )
-        } else {
-          return I18n.t('Only available to students with link. Not visible in student files.')
-        }
+      text: I18n.t('Only available to students with link'),
+      iconClasses: 'icon-line icon-off RestrictedRadioButtons__icon',
+      onChange() {
+        this.updateBtnEnable()
+        this.setState({selectedOption: 'link_only'})
       }
     },
     {
       ref: 'dateRange',
       selectedOptionKey: 'date_range',
-      getText() {
-        return I18n.t('Schedule student availability')
+      text: I18n.t('Schedule student availability'),
+      iconClasses: 'icon-line icon-calendar-month RestrictedRadioButtons__icon',
+      onChange() {
+        this.updateBtnEnable()
+        this.setState({selectedOption: 'date_range'})
       }
     }
   ]
 
   componentDidMount() {
-    return $([
-      this.unlock_at,
-      this.lock_at
-    ]).datetime_field()
+    return $([this.unlock_at, this.lock_at]).datetime_field()
   }
 
   extractFormValues = () => ({
     hidden: this.state.selectedOption === 'link_only',
     unlock_at:
-      (this.state.selectedOption === 'date_range' &&
-        $(this.unlock_at).data('unfudged-date')) ||
-      '',
+      (this.state.selectedOption === 'date_range' && $(this.unlock_at).data('unfudged-date')) || '',
     lock_at:
-      (this.state.selectedOption === 'date_range' &&
-        $(this.lock_at).data('unfudged-date')) ||
-      '',
+      (this.state.selectedOption === 'date_range' && $(this.lock_at).data('unfudged-date')) || '',
     locked: this.state.selectedOption === 'unpublished'
   })
 
@@ -153,51 +131,24 @@ class RestrictedRadioButtons extends React.Component {
 
   isPermissionChecked = option =>
     this.state.selectedOption === option.selectedOptionKey ||
-    _.contains(option.selectedOptionKey, this.state.selectedOption)
+    _.includes(option.selectedOptionKey, this.state.selectedOption)
 
   renderPermissionOptions = () =>
     this.permissionOptions.map((option, index) => (
       <div className="radio" key={index}>
         <label>
           <input
-            ref={e => this[option.ref] = e}
+            ref={e => (this[option.ref] = e)}
             type="radio"
             name="permissions"
             checked={this.isPermissionChecked(option)}
             onChange={option.onChange.bind(this)}
-            />
+          />
           <i className={option.iconClasses} aria-hidden />
           {option.text}
         </label>
       </div>
     ))
-
-  renderRestrictedAccessOptions = () => {
-    if (this.state.selectedOption !== 'link_only' && this.state.selectedOption !== 'date_range') {
-      return null
-    }
-
-    return (
-      <div style={{marginLeft: '20px'}}>
-        {this.restrictedOptions.map((option, index) => (
-          <div className="radio" key={index}>
-            <label>
-              <input
-                ref={e => (this[option.ref] = e)}
-                type="radio"
-                name="restrict_options"
-                checked={this.state.selectedOption === option.selectedOptionKey}
-                onChange={() => {
-                  this.setState({selectedOption: option.selectedOptionKey})
-                }}
-              />
-              {option.getText.bind(this)()}
-            </label>
-          </div>
-        ))}
-      </div>
-    )
-  }
 
   renderDatePickers = () => {
     const styleObj = {}
@@ -216,6 +167,8 @@ class RestrictedRadioButtons extends React.Component {
             defaultValue={this.state.unlock_at ? $.datetimeString(this.state.unlock_at) : ''}
             className="form-control dateSelectInput"
             type="text"
+            title={accessibleDateFormat()}
+            data-tooltip=""
             aria-label={I18n.t('Available From Date')}
           />
         </div>
@@ -230,6 +183,8 @@ class RestrictedRadioButtons extends React.Component {
               defaultValue={this.state.lock_at ? $.datetimeString(this.state.lock_at) : ''}
               className="form-control dateSelectInput"
               type="text"
+              title={accessibleDateFormat()}
+              data-tooltip=""
               aria-label={I18n.t('Available Until Date')}
             />
           </div>
@@ -241,7 +196,6 @@ class RestrictedRadioButtons extends React.Component {
   renderRestrictedRadioButtons = () => (
     <div>
       {this.renderPermissionOptions()}
-      {this.renderRestrictedAccessOptions()}
       {this.renderDatePickers()}
     </div>
   )

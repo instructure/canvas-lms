@@ -15,27 +15,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!course_statistics'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'jst/recentStudent'
-], (I18n, $, _, Backbone, RecentStudentTemplate) ->
+import I18n from 'i18n!course_statistics'
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import RecentStudentTemplate from 'jst/recentStudent'
 
-  class RecentStudentView extends Backbone.View
+export default class RecentStudentView extends Backbone.View
 
-    tagName: 'li'
+  tagName: 'li'
 
-    template: RecentStudentTemplate
+  template: RecentStudentTemplate
 
-    toJSON: ->
-      data = @model.toJSON()
-      if data.last_login?
-        date = $.fudgeDateForProfileTimezone(new Date(data.last_login))
-        data.last_login = I18n.t '#time.event', '%{date} at %{time}',
-          date: I18n.l('#date.formats.short', date)
-          time: I18n.l('#time.formats.tiny', date)
-      else
-        data.last_login = I18n.t 'unknown', 'unknown'
-      data
+  toJSON: ->
+    data = @model.toJSON()
+    if data.last_login?
+      date = $.fudgeDateForProfileTimezone(new Date(data.last_login))
+      data.last_login = I18n.t '#time.event', '%{date} at %{time}',
+        date: I18n.l('#date.formats.short', date)
+        time: I18n.l('#time.formats.tiny', date)
+    else
+      data.last_login = I18n.t 'unknown', 'unknown'
+    data

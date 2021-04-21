@@ -15,38 +15,37 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  'jst/content_migrations/subviews/SelectContentCheckbox'
-  'i18n!select_content_checkbox'
-], ($, Backbone, template, I18n) -> 
-  class SelectContentCheckbox extends Backbone.View
-    template: template
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/subviews/SelectContentCheckbox'
+import I18n from 'i18n!select_content_checkbox'
 
-    events: 
-      'click [name=selective_import]' : 'updateModel'
+export default class SelectContentCheckbox extends Backbone.View
+  template: template
 
-    updateModel: (event) -> 
-      @model.set 'selective_import', $(event.currentTarget).val() == "true"
+  events:
+    'click [name=selective_import]' : 'updateModel'
 
-    # validations this form element. This validates method is a convention used 
-    # for all sub views.
-    # ie:
-    #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
-    # -----------------------------------------------------------------------
-    # @expects void
-    # @returns void | object (error)
-    # @api private
+  updateModel: (event) ->
+    @model.set 'selective_import', $(event.currentTarget).val() == "true"
 
-    validations: -> 
-      errors = {}
-      selective_import = @model.get('selective_import')
+  # validations this form element. This validates method is a convention used
+  # for all sub views.
+  # ie:
+  #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
+  # -----------------------------------------------------------------------
+  # @expects void
+  # @returns void | object (error)
+  # @api private
 
-      if selective_import == null || selective_import == undefined
-        errors.selective_import = [
-          type: "required"
-          message: I18n.t('select_content_error', "You must choose a content option")
-        ]
+  validations: ->
+    errors = {}
+    selective_import = @model.get('selective_import')
 
-      errors
+    if selective_import == null || selective_import == undefined
+      errors.selective_import = [
+        type: "required"
+        message: I18n.t('select_content_error', "You must choose a content option")
+      ]
+
+    errors

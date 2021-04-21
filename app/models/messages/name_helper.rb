@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -35,19 +37,24 @@ module Messages
     end
 
     private
+    def anonymized_name?(assignment)
+      (author_asset? && !asset.can_read_author?(message_recipient, nil)) || (assignment.anonymize_students? && source_user != message_recipient)
+    end
 
     def anonymized_user_name
-      if anonymized_asset?
-        assignment = asset.submission.assignment
-        anonymous_name = I18n.t("Anonymous User")
+      return source_user&.short_name unless anonymized_asset?
+      anonymous_name = I18n.t("Anonymous User")
 
-        if assignment.anonymize_students? && asset.author != message_recipient
-          anonymous_name
-        else
-          asset.can_read_author?(asset.recipient, nil) ? source_user.short_name : anonymous_name
-        end
+      assignment = if user_asset?
+        asset.assignment
       else
-        source_user.short_name
+        asset.submission.assignment
+      end
+
+      if anonymized_name?(assignment)
+        anonymous_name
+      else
+        source_user&.short_name
       end
     end
 
@@ -77,11 +84,13 @@ module Messages
 
     ANONYMIZED_NOTIFICATIONS = [
       "Submission Comment",
-      "Submission Comment For Teacher"
+      "Submission Comment For Teacher",
+      "Assignment Submitted",
+      "Assignment Resubmitted"
     ].freeze
 
     def anonymized_asset?
-      ANONYMIZED_NOTIFICATIONS.include?(notification_name) && asset.respond_to?(:recipient)
+      ANONYMIZED_NOTIFICATIONS.include?(notification_name) && (asset.respond_to?(:user) || asset.respond_to?(:recipient))
     end
 
     def author_asset?

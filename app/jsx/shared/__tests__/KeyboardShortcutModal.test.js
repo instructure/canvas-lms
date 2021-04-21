@@ -42,45 +42,33 @@ describe(KeyboardShortcutModal, () => {
     component.unmount()
   })
 
-  test('appears when comma key is pressed', async () => {
+  test('appears when ALT + F8 is pressed', async () => {
     expect(document.querySelector('.keyboard_navigation')).toBeNull()
     const e = new Event('keydown')
-    e.which = 188
+    e.which = 119
+    e.altKey = true
     document.dispatchEvent(e)
 
     await waitForInstUIModalCssTransitions()
 
     expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
   })
-
-  test('appears when shift + ? is pressed', async () => {
-    expect(document.querySelector('.keyboard_navigation')).toBeNull()
-    const e = new Event('keydown')
-    e.which = 191
-    e.shiftKey = true
-    document.dispatchEvent(e)
-
-    await waitForInstUIModalCssTransitions()
-
-    expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
-  })
-
 
   describe('shortcuts', () => {
     beforeEach(() => {
       const e = new Event('keydown')
-      e.which = 188
+      e.which = 119
+      e.altKey = true
       document.dispatchEvent(e)
       return waitForInstUIModalCssTransitions()
     })
 
-    test('renders shortcuts prop', function() {
+    test('renders shortcuts prop', () => {
       expect(document.querySelectorAll('.keyboard_navigation')).toHaveLength(1)
       expect(document.querySelector('.keycode').innerHTML).toBe('j')
-      expect(document.querySelector('.description').innerHTML).toBe('this is a test keyboard shortcut')
+      expect(document.querySelector('.description').innerHTML).toBe(
+        'this is a test keyboard shortcut'
+      )
     })
   })
 })
-
-
-

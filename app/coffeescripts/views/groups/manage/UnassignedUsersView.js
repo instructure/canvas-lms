@@ -64,9 +64,9 @@ export default class UnassignedUsersView extends GroupUsersView {
   }
 
   attach() {
-    this.collection.on('reset', this.render)
-    this.collection.on('remove', this.render)
-    this.collection.on('moved', this.highlightUser)
+    this.collection.on('reset', this.render, this)
+    this.collection.on('remove', this.render, this)
+    this.collection.on('moved', this.highlightUser, this)
     this.on('renderedItems', this.realAfterRender, this)
 
     this.collection.once('fetch', () => this.$noResultsWrapper.hide())
@@ -78,7 +78,7 @@ export default class UnassignedUsersView extends GroupUsersView {
     this.collection.load('first')
     this.$el
       .parent()
-      .droppable(Object.assign({}, this.dropOptions))
+      .droppable({...this.dropOptions})
       .unbind('drop')
       .on('drop', this._onDrop.bind(this))
     this.scrollContainer = this.heightContainer = this.$el

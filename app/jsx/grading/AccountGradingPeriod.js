@@ -19,14 +19,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import axios from 'axios'
-import I18n from 'i18n!grading_periods'
-import tz from 'timezone'
+import I18n from 'i18n!AccountGradingPeriod'
 import DateHelper from '../shared/helpers/dateHelper'
 import 'jquery.instructure_misc_helpers'
 
-class AccountGradingPeriod extends React.Component {
+export default class AccountGradingPeriod extends React.Component {
   static propTypes = {
     period: PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -48,6 +47,11 @@ class AccountGradingPeriod extends React.Component {
     }).isRequired,
     onDelete: PropTypes.func.isRequired,
     deleteGradingPeriodURL: PropTypes.string.isRequired
+  }
+
+  constructor(props) {
+    super(props)
+    this._refs = {}
   }
 
   promptDeleteGradingPeriod = event => {
@@ -72,11 +76,13 @@ class AccountGradingPeriod extends React.Component {
     this.props.onEdit(this.props.period)
   }
 
-  renderEditButton = () => {
+  renderEditButton() {
     if (this.props.permissions.update && !this.props.readOnly) {
       return (
         <Button
-          ref="editButton"
+          elementRef={ref => {
+            this._refs.editButton = ref
+          }}
           variant="icon"
           disabled={this.props.actionsDisabled}
           onClick={this.onEdit}
@@ -91,11 +97,13 @@ class AccountGradingPeriod extends React.Component {
     }
   }
 
-  renderDeleteButton = () => {
+  renderDeleteButton() {
     if (this.props.permissions.delete && !this.props.readOnly) {
       return (
         <Button
-          ref="deleteButton"
+          elementRef={ref => {
+            this._refs.deleteButton = ref
+          }}
           variant="icon"
           disabled={this.props.actionsDisabled}
           onClick={this.promptDeleteGradingPeriod}
@@ -110,11 +118,15 @@ class AccountGradingPeriod extends React.Component {
     }
   }
 
-  renderWeight = () => {
+  renderWeight() {
     if (this.props.weighted) {
       return (
         <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-          <span ref="weight">
+          <span
+            ref={ref => {
+              this._refs.weight = ref
+            }}
+          >
             {I18n.t('Weight:')} {I18n.n(this.props.period.weight, {percentage: true})}
           </span>
         </div>
@@ -127,20 +139,38 @@ class AccountGradingPeriod extends React.Component {
       <div className="GradingPeriodList__period">
         <div className="GradingPeriodList__period__attributes grid-row">
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
-            <span ref="title">{this.props.period.title}</span>
+            <span
+              ref={ref => {
+                this._refs.title = ref
+              }}
+            >
+              {this.props.period.title}
+            </span>
           </div>
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-            <span ref="startDate">
+            <span
+              ref={ref => {
+                this._refs.startDate = ref
+              }}
+            >
               {I18n.t('Starts:')} {DateHelper.formatDateForDisplay(this.props.period.startDate)}
             </span>
           </div>
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-            <span ref="endDate">
+            <span
+              ref={ref => {
+                this._refs.endDate = ref
+              }}
+            >
               {I18n.t('Ends:')} {DateHelper.formatDateForDisplay(this.props.period.endDate)}
             </span>
           </div>
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-            <span ref="closeDate">
+            <span
+              ref={ref => {
+                this._refs.closeDate = ref
+              }}
+            >
               {I18n.t('Closes:')} {DateHelper.formatDateForDisplay(this.props.period.closeDate)}
             </span>
           </div>
@@ -154,5 +184,3 @@ class AccountGradingPeriod extends React.Component {
     )
   }
 }
-
-export default AccountGradingPeriod

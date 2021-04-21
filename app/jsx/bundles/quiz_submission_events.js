@@ -17,18 +17,21 @@
  */
 
 import $ from 'jquery'
-import app from 'canvas_quizzes/apps/events'
+import { configure, mount } from '../canvas_quizzes/events/main.js'
+import ready from '@instructure/ready'
 
-app.configure({
-  ajax: $.ajax,
-  loadOnStartup: true,
-  quizUrl: ENV.quiz_url,
-  questionsUrl: ENV.questions_url,
-  submissionUrl: ENV.submission_url,
-  eventsUrl: ENV.events_url,
-  allowMatrixView: ENV.can_view_answer_audits
+ready(() => {
+  configure({
+    ajax: $.ajax,
+    loadOnStartup: true,
+    quizUrl: ENV.quiz_url,
+    questionsUrl: ENV.questions_url,
+    submissionUrl: ENV.submission_url,
+    eventsUrl: ENV.events_url,
+    allowMatrixView: ENV.can_view_answer_audits
+  })
+
+  mount(document.body.querySelector('#content')).then(() =>
+    console.log('Yeah, a canvas quiz app has been loaded!!!')
+  )
 })
-
-app.mount(document.body.querySelector('#content')).then(() =>
-  console.log('Yeah, a canvas quiz app has been loaded!!!')
-)

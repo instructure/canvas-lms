@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!EditRubricPage'
 import $ from 'jquery'
 import OutcomeGroup from '../../models/OutcomeGroup'
 import FindDialog from '../outcomes/FindDialog'
@@ -29,7 +29,6 @@ export default class EditRubricPage {
   }
 
   constructor() {
-    this.onFindOutcome = this.onFindOutcome.bind(this)
     this.rootOutcomeGroup = new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP)
     this.attachInitialEvent()
     this.dialogCreated = false
@@ -53,7 +52,7 @@ export default class EditRubricPage {
     return (this.dialogCreated = true)
   }
 
-  onFindOutcome(e) {
+  onFindOutcome = e => {
     e.preventDefault()
     if (!this.dialogCreated) {
       this.createDialog()

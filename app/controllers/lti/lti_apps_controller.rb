@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,10 +24,13 @@ module Lti
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)
-        if params.key? :lti_1_3_tool_configurations
-          lti_tools_1_3
-        else
-          lti_tools_1_1_and_2_0
+        collection = app_collator.bookmarked_collection
+
+        respond_to do |format|
+          app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
+
+          mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
+          format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
         end
       end
     end
@@ -43,13 +48,19 @@ module Lti
         end
         pagination_args = {max_per_page: 100}
         respond_to do |format|
-          launch_defs = Api.paginate(
-            collection,
-            self,
-            named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true),
-            pagination_args
-          )
-          format.json { render :json => AppLaunchCollator.launch_definitions(launch_defs, placements) }
+          launch_defs = GuardRail.activate(:secondary) do
+            Api.paginate(
+              collection,
+              self,
+              named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true),
+              pagination_args
+            )
+          end
+          format.json do
+            cancel_cache_buster
+            expires_in 10.minutes
+            render :json => AppLaunchCollator.launch_definitions(launch_defs, placements)
+          end
         end
       end
     end
@@ -57,64 +68,26 @@ module Lti
 
     private
 
-    def lti_tools_1_3
-      collection = tool_configs.each_with_object([]) do |tool, memo|
-        config = {}
-        config[:config] = tool
-        config[:enabled] = dev_key_ids_of_installed_tools.include?(tool.developer_key_id)
-        config[:installed_in_current_course] = context_types_of_installed_tools.include?('Course')
-        memo << config
-      end
-
-      respond_to do |format|
-        format.json {render json: app_collator.app_definitions(collection)}
-      end
-    end
-
-    def dev_key_ids_of_installed_tools
-      @installed_tools ||= active_tools_keys_and_contexts.map(&:first)
-    end
-
-    def context_types_of_installed_tools
-      @context_types_of_installed_tools ||= active_tools_keys_and_contexts.map(&:second)
-    end
-
-    def active_tools_keys_and_contexts
-      @active_tools ||= begin
-        ContextExternalTool.
-          active.
-          where(developer_key: dev_keys, context_id: [@context.id] + @context.account_chain_ids).
-          pluck(:developer_key_id, :context_type)
-      end
-    end
-
-    def tool_configs
-      @tool_configs ||= dev_keys.map(&:tool_configuration)
-    end
-
     def dev_keys
       @dev_keys ||= begin
         context = @context.is_a?(Account) ? @context : @context.account
-        bindings = DeveloperKeyAccountBinding.lti_1_3_tools(context)
-        (bindings + Account.site_admin.shard.activate { DeveloperKeyAccountBinding.lti_1_3_tools(Account.site_admin) }).
-          map(&:developer_key).
-          select(&:usable?)
-      end
-    end
+        developer_key_ids = nil
+        active_bindings = nil
 
-    def lti_tools_1_1_and_2_0
-      collection = app_collator.bookmarked_collection
+        context.shard.activate do
+          active_bindings = DeveloperKeyAccountBinding.active_in_account(context)
+          developer_key_ids = active_bindings.pluck(:developer_key_id)
+        end
 
-      respond_to do |format|
-        app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
+        local_keys = DeveloperKeyAccountBinding.lti_1_3_tools(active_bindings).map(&:developer_key)
+        site_admin_keys = DeveloperKey.site_admin_lti(developer_key_ids)
 
-        mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
-        format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
+        (local_keys + site_admin_keys).uniq.select(&:usable?)
       end
     end
 
     def app_collator
-      @app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
+      @app_collator ||= AppCollator.new(@context, method(:reregistration_url_builder))
     end
 
     def reregistration_url_builder(context, tool_proxy_id)
@@ -135,6 +108,7 @@ module Lti
     end
 
     def user_in_account?(user, account)
+      return false unless user.present?
       user.associated_accounts.include? account
     end
   end

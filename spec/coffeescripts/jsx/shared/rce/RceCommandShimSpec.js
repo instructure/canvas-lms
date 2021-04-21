@@ -17,7 +17,6 @@
  */
 
 import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
-import wikiSidebar from 'wikiSidebar'
 import fixtures from 'helpers/fixtures'
 
 let remoteEditor = null
@@ -26,7 +25,6 @@ QUnit.module('RceCommandShim - send', {
   setup() {
     fixtures.setup()
     this.$target = fixtures.create('<textarea />')
-    this.$target.editorBox = () => ({})
     remoteEditor = {
       hidden: false,
       isHidden: () => remoteEditor.hidden,
@@ -44,23 +42,13 @@ test("just forwards through target's remoteEditor if set", function() {
   ok(remoteEditor.call.calledWith('methodName', 'methodArgument'))
 })
 
-test('uses editorBox if remoteEditor is not set but rich_text is set', function() {
-  sinon.stub(this.$target, 'editorBox').returns('methodResult')
-  this.$target.data('remoteEditor', null)
-  this.$target.data('rich_text', true)
-  equal(RceCommandShim.send(this.$target, 'methodName', 'methodArgument'), 'methodResult')
-  ok(this.$target.editorBox.calledWith('methodName', 'methodArgument'))
-})
-
 test('returns false for exists? if neither remoteEditor nor rich_text are set (e.g. load failed)', function() {
   this.$target.data('remoteEditor', null)
-  this.$target.data('rich_text', null)
   equal(RceCommandShim.send(this.$target, 'exists?'), false)
 })
 
 test("returns target's val() for get_code if neither remoteEditor nor rich_text are set (e.g. load failed)", function() {
   this.$target.data('remoteEditor', null)
-  this.$target.data('rich_text', null)
   this.$target.val('current raw value')
   equal(RceCommandShim.send(this.$target, 'get_code'), 'current raw value')
 })
@@ -123,25 +111,10 @@ test("just forwards through target's remoteEditor if set", function() {
   ok(remoteEditor.focus.called)
 })
 
-test('uses wikiSidebar if remoteEditor is not set but rich_text is set', function(assert) {
-  const done = assert.async()
-  sinon.spy(wikiSidebar, 'attachToEditor')
-  this.$target.data('remoteEditor', null)
-  this.$target.data('rich_text', true)
-  RceCommandShim.focus(this.$target)
-  // wait for the async chunck to load
-  setTimeout(() => {
-    ok(wikiSidebar.attachToEditor.calledWith(this.$target))
-    wikiSidebar.attachToEditor.restore()
-    done()
-  }, 5)
-})
-
 QUnit.module('RceCommandShim - destroy', {
   setup() {
     fixtures.setup()
     this.$target = fixtures.create('<textarea />')
-    this.$target.editorBox = () => ({})
   },
   teardown() {
     fixtures.teardown()
@@ -162,17 +135,8 @@ test("clears target's remoteEditor afterwards if set", function() {
   equal(this.$target.data('remoteEditor'), undefined)
 })
 
-test('uses editorBox if remoteEditor is not set but rich_text is set', function() {
-  sinon.spy(this.$target, 'editorBox')
+test('does not except if remoteEditor is not set', function() {
   this.$target.data('remoteEditor', null)
-  this.$target.data('rich_text', true)
-  RceCommandShim.destroy(this.$target)
-  ok(this.$target.editorBox.calledWith('destroy'))
-})
-
-test('does not except if remoteEditor and editorBox are not set', function() {
-  this.$target.data('remoteEditor', null)
-  this.$target.data('rich_text', true)
   RceCommandShim.destroy(this.$target)
   ok(true, 'function did not throw an exception')
 })

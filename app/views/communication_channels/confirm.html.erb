@@ -15,16 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  js_env ga_page_title: "Register Email"
-%>
 <%
   css_bundle :login_confirm
   js_bundle :registration_confirmation
   @headers = false
-  @body_classes << "full-width modal body--login-confirmation"
-  content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
+  add_body_class "full-width modal body--login-confirmation"
+  provide :page_title, t("Register Email")
 %>
 
 <div id="modal-box" class="ic-Login-confirmation">
@@ -181,8 +177,6 @@ Which is you?", :count => @merge_opportunities.length %>
       <div class="control-group">
         <div class="controls">
           <% if @root_account.require_acceptance_of_terms?(@user) %>
-            <% TermsOfService.ensure_terms_for_account(@root_account) %>
-            <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @root_account.terms_of_service.terms_of_service_content&.content) %>
             <% js_bundle :terms_of_service_modal %>
             <div class="terms-of-service__register">
               <label for="user_terms_of_use" class="checkbox">

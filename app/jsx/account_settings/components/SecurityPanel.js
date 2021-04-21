@@ -19,12 +19,13 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {bool, oneOf, string, func} from 'prop-types'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import {bool, oneOf, string, func, number, arrayOf, element} from 'prop-types'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {Spinner} from '@instructure/ui-spinner'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {
   getCspEnabled,
   setCspEnabled,
@@ -33,8 +34,6 @@ import {
   setCspInherited
 } from '../actions'
 import {ConnectedWhitelist} from './Whitelist'
-
-import {CONFIG} from '../index'
 
 export class SecurityPanel extends Component {
   static propTypes = {
@@ -47,7 +46,11 @@ export class SecurityPanel extends Component {
     getCspInherited: func.isRequired,
     setCspInherited: func.isRequired,
     getCurrentWhitelist: func.isRequired,
-    isSubAccount: bool
+    isSubAccount: bool,
+    whitelistsHaveLoaded: bool,
+    maxDomains: number.isRequired,
+    accountId: string.isRequired,
+    liveRegion: arrayOf(element).isRequired
   }
 
   static defaultProps = {
@@ -81,18 +84,18 @@ export class SecurityPanel extends Component {
             {I18n.t(
               `The Content Security Policy allows you to restrict custom
                JavaScript that runs in your instance of Canvas. You can manually add
-               up to %{max_domains} domains to your whitelist. Wild cards are recommended
+               up to %{max_domains} allowed domains. Wild cards are recommended
                (e.g. *.instructure.com). Canvas and Instructure domains are included
                automatically and do not count against your 50 domain limit.`,
               {
-                max_domains: CONFIG.max_domains
+                max_domains: this.props.maxDomains
               }
             )}
           </Text>
         </View>
         <Grid>
-          <GridRow>
-            <GridCol>
+          <Grid.Row>
+            <Grid.Col>
               {this.props.isSubAccount && (
                 <View margin="0 xx-small">
                   <Checkbox
@@ -108,20 +111,29 @@ export class SecurityPanel extends Component {
                 label={I18n.t('Enable Content Security Policy')}
                 onChange={this.handleCspToggleChange}
                 checked={this.props.cspEnabled}
-                disabled={this.props.cspInherited}
+                disabled={this.props.cspInherited && this.props.isSubAccount}
               />
-            </GridCol>
-          </GridRow>
-          <GridRow>
-            <GridCol>
-              <ConnectedWhitelist
-                context={this.props.context}
-                contextId={this.props.contextId}
-                isSubAccount={this.props.isSubAccount}
-                inherited={this.props.cspInherited}
-              />
-            </GridCol>
-          </GridRow>
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>
+              {!this.props.whitelistsHaveLoaded ? (
+                <View as="div" margin="large" padding="large" textAlign="center">
+                  <Spinner size="large" renderTitle={I18n.t('Loading')} />
+                </View>
+              ) : (
+                <ConnectedWhitelist
+                  context={this.props.context}
+                  contextId={this.props.contextId}
+                  isSubAccount={this.props.isSubAccount}
+                  inherited={this.props.cspInherited}
+                  maxDomains={this.props.maxDomains}
+                  accountId={this.props.accountId}
+                  liveRegion={this.props.liveRegion}
+                />
+              )}
+            </Grid.Col>
+          </Grid.Row>
         </Grid>
       </div>
     )
@@ -132,7 +144,8 @@ function mapStateToProps(state, ownProps) {
   return {
     ...ownProps,
     cspEnabled: state.cspEnabled,
-    cspInherited: state.cspInherited
+    cspInherited: state.cspInherited,
+    whitelistsHaveLoaded: state.whitelistsHaveLoaded
   }
 }
 
@@ -144,7 +157,4 @@ const mapDispatchToProps = {
   getCurrentWhitelist
 }
 
-export const ConnectedSecurityPanel = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SecurityPanel)
+export const ConnectedSecurityPanel = connect(mapStateToProps, mapDispatchToProps)(SecurityPanel)

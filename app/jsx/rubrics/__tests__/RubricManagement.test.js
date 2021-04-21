@@ -17,19 +17,31 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
+import axios from 'axios'
 import RubricManagement from '../RubricManagement'
 
-const defaultProps = (props = {}) => (
-  { accountId: '1', ...props }
-)
+const defaultProps = (props = {}) => ({accountId: '1', ...props})
 
-it('renders the RubricManagement component', () => {
-  const wrapper = shallow(<RubricManagement {...defaultProps()}/>)
-  expect(wrapper).toMatchSnapshot()
-})
+describe('RubricManagement', () => {
+  let getSpy
 
-it('passes accountId to the ProficiencyTable component', () => {
-  const wrapper = shallow(<RubricManagement {...defaultProps()}/>)
-  expect(wrapper.find('ProficiencyTable').prop('accountId')).toBe('1')
+  beforeEach(() => {
+    const err = Object.assign(new Error(), {response: {status: 404}})
+    getSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
+  })
+
+  afterEach(() => {
+    getSpy.mockRestore()
+  })
+
+  it('renders the RubricManagement component', () => {
+    const wrapper = shallow(<RubricManagement {...defaultProps()} />)
+    expect(wrapper).toMatchSnapshot()
+  })
+
+  it('passes accountId to the ProficiencyTable component', () => {
+    const wrapper = shallow(<RubricManagement {...defaultProps()} />)
+    expect(wrapper.find('ProficiencyTable').prop('accountId')).toBe('1')
+  })
 })

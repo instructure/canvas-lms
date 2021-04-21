@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -28,24 +30,24 @@ module Lti
         @page = [opts[:page].to_i, 1].max
       end
 
-      def memberships
+      def memberships(context: nil)
         @memberships ||= users.to_a.slice(0, @per_page).map do |user|
-          generate_membership(user)
+          generate_membership(user, context: context)
         end
       end
 
       private
 
       def membership_type
-        User.preload(:communication_channels, :not_ended_enrollments)
+        User.preload(:communication_channels, :not_ended_enrollments, :pseudonym)
       end
 
       def users
         @users ||= bookmarked_collection.paginate(per_page: @per_page)
       end
 
-      def generate_member(user)
-        user_id = Lti::Asset.opaque_identifier_for(user)
+      def generate_member(user, context: nil)
+        user_id = Lti::Asset.opaque_identifier_for(user, context: context)
         IMS::LTI::Models::MembershipService::LISPerson.new(
           name: user.name,
           given_name: user.first_name,
@@ -53,14 +55,15 @@ module Lti
           img: user.avatar_image_url,
           email: user.email,
           result_sourced_id: nil,
-          user_id: user_id
+          user_id: user_id,
+          sourced_id: user&.pseudonym&.sis_user_id
         )
       end
 
-      def generate_membership(user)
+      def generate_membership(user, context: nil)
         IMS::LTI::Models::MembershipService::Membership.new(
           status: IMS::LIS::Statuses::SimpleNames::Active,
-          member: generate_member(user),
+          member: generate_member(user, context: context),
           role: generate_roles(user)
         )
       end

@@ -15,80 +15,129 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
-
-import {mockAssignment, mockComments} from '../../test-utils'
 import StudentContent from '../StudentContent'
-import {MockedProvider} from 'react-apollo/test-utils'
-import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
-import {waitForElement, render, fireEvent} from 'react-testing-library'
+import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
-const mocks = [
-  {
-    request: {
-      query: SUBMISSION_COMMENT_QUERY,
-      variables: {
-        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
-      }
-    },
-    result: {
-      data: {
-        submissionComments: mockComments()
-      }
-    }
-  }
-]
+jest.mock('../AttemptSelect')
 
 describe('Assignment Student Content View', () => {
-  it('renders the student header if the assignment is unlocked', () => {
-    const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByTestId} = render(<StudentContent assignment={assignment} />)
+  it('renders the student header if the assignment is unlocked', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
 
-  it('renders the student header if the assignment is locked', () => {
-    const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    const {getByTestId} = render(<StudentContent assignment={assignment} />)
-    expect(getByTestId('assignments-2-student-header')).toBeInTheDocument()
+  it('renders the student header if the assignment is locked', async () => {
+    const props = await mockAssignmentAndSubmission({
+      LockInfo: {isLocked: true}
+    })
+    const {getByTestId} = render(<StudentContent {...props} />)
+    expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
   })
 
-  it('renders the assignment details and student content tab if the assignment is unlocked', () => {
-    const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
-
-    expect(getByRole('tablist')).toHaveTextContent('Upload')
+  it('renders the assignment details and student content tab if the assignment is unlocked', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByRole, getByText, queryByText} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    expect(getByRole('tablist')).toHaveTextContent('Attempt 1')
     expect(getByText('Details')).toBeInTheDocument()
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })
 
-  it('renders the availability dates if the assignment is locked', () => {
-    const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    const {queryByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
+  describe('when the comments tab is clicked', () => {
+    const makeMocks = async () => {
+      const variables = {submissionAttempt: 0, submissionId: '1'}
+      const overrides = {
+        Node: {__typename: 'Submission'},
+        SubmissionCommentConnection: {nodes: []}
+      }
+      const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
+      const mocks = [
+        {
+          request: {
+            query: SUBMISSION_COMMENT_QUERY,
+            variables
+          },
+          result
+        }
+      ]
+      return mocks
+    }
 
-    expect(queryByRole('tablist')).not.toBeInTheDocument()
-    expect(queryByText('Details')).not.toBeInTheDocument()
-    expect(getByText('Availability Dates')).toBeInTheDocument()
+    // https://instructure.atlassian.net/browse/USERS-385
+    // eslint-disable-next-line jest/no-disabled-tests
+    it.skip('renders Comments', async () => {
+      const mocks = await makeMocks()
+      const props = await mockAssignmentAndSubmission()
+      const {getAllByText, getByText} = render(
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      fireEvent.click(await getAllByText('Comments')[0])
+      await waitFor(() => expect(getByText('Send Comment')).toBeInTheDocument())
+    })
+
+    it('renders spinner while lazy loading comments', async () => {
+      const mocks = await makeMocks()
+      const props = await mockAssignmentAndSubmission()
+      const {getByTitle, getAllByText} = render(
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      fireEvent.click(getAllByText('Comments')[0])
+      expect(getByTitle('Loading')).toBeInTheDocument()
+    })
   })
 
-  it('renders Comments', async () => {
-    const {getByText} = render(
-      <MockedProvider mocks={mocks} addTypename>
-        <StudentContent assignment={mockAssignment({lockInfo: {isLocked: false}})} />
-      </MockedProvider>
-    )
-    fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
+  describe('concluded enrollment notice', () => {
+    const concludedMatch = /your enrollment in this course has been concluded/
 
-    expect(await waitForElement(() => getByText('Send Comment'))).toBeInTheDocument()
-  })
+    let oldEnv
 
-  it('renders spinner while lazy loading comments', () => {
-    const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByTitle, getByText} = render(
-      <MockedProvider mocks={mocks} addTypename>
-        <StudentContent assignment={assignment} />
-      </MockedProvider>
-    )
-    fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
-    expect(getByTitle('Loading')).toBeInTheDocument()
+    beforeEach(() => {
+      oldEnv = window.ENV
+      window.ENV = {...window.ENV}
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders when the current enrollment is concluded', async () => {
+      window.ENV.enrollment_state = 'completed'
+
+      const props = await mockAssignmentAndSubmission()
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      expect(getByText(concludedMatch)).toBeInTheDocument()
+    })
+
+    it('does not render when the current enrollment is not concluded', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const {queryByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      expect(queryByText(concludedMatch)).not.toBeInTheDocument()
+    })
   })
 })

@@ -20,13 +20,13 @@ import _ from 'underscore'
 import preventDefault from '../fn/preventDefault'
 import 'jqueryui/dialog'
 
-$.fn.fixDialogButtons = function () {
-  return this.each(function () {
+$.fn.fixDialogButtons = function() {
+  return this.each(function() {
     const $dialog = $(this)
     const $buttons = $dialog.find('.button-container:last .btn, button[type=submit]')
     if ($buttons.length) {
       $dialog.find('.button-container:last, button[type=submit]').hide()
-      let buttons = $.map($buttons.toArray(), (button) => {
+      let buttons = $.map($buttons.toArray(), button => {
         const $button = $(button)
         let classes = $button.attr('class') || ''
         const id = $button.attr('id')

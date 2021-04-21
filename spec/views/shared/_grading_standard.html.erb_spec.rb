@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 require_relative '../../spec_helper'
 require_relative '../views_helper'
 
-describe '/shared/_grading_standard' do
+describe 'shared/_grading_standard' do
 
   let(:grading_standard) do
     @course.grading_standards.create!(:title => 'My Grading Standard', :standard_data => {
@@ -30,7 +32,7 @@ describe '/shared/_grading_standard' do
   end
 
   let(:doc) do
-    Nokogiri::HTML(response.body)
+    Nokogiri::HTML5(response.body)
   end
 
   before do
@@ -112,5 +114,34 @@ describe '/shared/_grading_standard' do
 
     expect(doc.css('.grading_standard_row:not(.blank)').length).to eq len
   end
-end
 
+  it 'screenreader text contains contextual label for editing the grading standard' do
+    render partial: 'shared/grading_standard', object: grading_standard, locals: {read_only: false}
+    label = doc.css('.edit_grading_standard_link')[0]['aria-label']
+    expect(label).to eq 'Edit Grading Scheme My Grading Standard'
+  end
+
+  it 'screenreader text contains contextual label for removing the grading standard' do
+    render partial: 'shared/grading_standard', object: grading_standard, locals: {read_only: false}
+    label = doc.css('.remove_grading_standard_link')[0]['aria-label']
+    expect(label).to eq 'Remove Grading Scheme My Grading Standard'
+  end
+
+  it 'screenreader text contains contextual label for inserting a grading standard row at the top' do
+    render partial: 'shared/grading_standard', object: grading_standard, locals: {read_only: false}
+    label = doc.css('.insert_grading_standard_link')[0]['aria-label']
+    expect(label).to eq 'insert above A'
+  end
+
+  it 'screenreader text contains contextual label for inserting a grading standard row' do
+    render partial: 'shared/grading_standard', object: grading_standard, locals: {read_only: false}
+    label = doc.css('.insert_grading_standard_link')[1]['aria-label']
+    expect(label).to eq 'insert below A'
+  end
+
+  it 'screenreader text contains contextual label for removing a grading standard row' do
+    render partial: 'shared/grading_standard', object: grading_standard, locals: {read_only: false}
+    label = doc.css('.delete_row_link')[0]['aria-label']
+    expect(label).to eq 'Remove row A'
+  end
+end

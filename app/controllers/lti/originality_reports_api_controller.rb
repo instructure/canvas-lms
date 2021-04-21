@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -91,7 +93,20 @@ module Lti
 #         },
 #         "tool_setting": {
 #            "description": "A ToolSetting object containing optional 'resource_type_code' and 'resource_url'",
-#            "type": "ToolSetting"
+#            "$ref": "ToolSetting"
+#         },
+#         "error_report": {
+#            "description": "A message describing the error. If set, the workflow_state will become 'error.'",
+#            "type": "string"
+#         },
+#         "submission_time": {
+#            "description": "The submitted_at date time of the submission.",
+#            "type": "datetime"
+#         },
+#         "root_account_id": {
+#            "description": "The id of the root Account associated with the OriginalityReport",
+#            "example": "1",
+#            "type": "integer"
 #         }
 #       }
 #     }
@@ -116,6 +131,13 @@ module Lti
     before_action :find_originality_report
     before_action :report_in_context, only: [:show, :update]
     before_action :ensure_tool_proxy_associated
+
+    # NOTE
+    # The LTI 2/Live Events plagiarism detection platform lives
+    # alongside two other plagiarism solutions:
+    # the Vericite plugin and the Turnitin plugin. When making changes
+    # to any of these three services verify no regressions are
+    # introduced in the others.
 
     # @API Create an Originality Report
     # Create a new OriginalityReport for the specified file
@@ -153,23 +175,33 @@ module Lti
     #   May be set to "pending", "error", or "scored". If an originality score
     #   is provided a workflow state of "scored" will be inferred.
     #
+    # @argument originality_report[error_message] [String]
+    #   A message describing the error. If set, the "workflow_state"
+    #   will be set to "error."
+    #
+    # @argument originality_report[attempt] [Integer]
+    #   If no `file_id` is given, and no file is required for the assignment
+    #   (that is, the assignment allows an online text entry), this parameter
+    #   may be given to clarify which attempt number the report is for (in the
+    #   case of resubmissions). If this field is omitted and no `file_id` is
+    #   given, the report will be created (or updated, if it exists) for the
+    #   first submission attempt with no associated file.
+    #
     # @returns OriginalityReport
     def create
-      begin
       if @report.present?
         update
       else
         @report = OriginalityReport.new(create_report_params)
         if @report.save
-          @report.send_later_if_production(:copy_to_group_submissions!)
+          OriginalityReport.delay_if_production.copy_to_group_submissions!(report_id: @report.id, user_id: @report.submission.user_id)
           render json: api_json(@report, @current_user, session), status: :created
         else
           render json: @report.errors, status: :bad_request
         end
       end
-      rescue StandError => e
-        puts e.message
-      end
+    rescue StandError => e
+      puts e.message
     end
 
     # @API Edit an Originality Report
@@ -205,10 +237,14 @@ module Lti
     #   May be set to "pending", "error", or "scored". If an originality score
     #   is provided a workflow state of "scored" will be inferred.
     #
+    # @argument originality_report[error_message] [String]
+    #   A message describing the error. If set, the "workflow_state"
+    #   will be set to "error."
+    #
     # @returns OriginalityReport
     def update
-      if @report.update_attributes(update_report_params)
-        @report.send_later_if_production(:copy_to_group_submissions!)
+      if @report.update(update_report_params)
+        OriginalityReport.delay_if_production.copy_to_group_submissions!(report_id: @report.id, user_id: @report.submission.user_id)
         render json: api_json(@report, @current_user, session)
       else
         render json: @report.errors, status: :bad_request
@@ -242,18 +278,24 @@ module Lti
     end
 
     def create_attributes
-      [:originality_score,
-       :file_id,
-       :originality_report_file_id,
-       :originality_report_url,
-       :workflow_state].freeze
+      [
+        :originality_score,
+        :error_message,
+        :file_id,
+        :originality_report_file_id,
+        :originality_report_url,
+        :workflow_state
+      ].freeze
     end
 
     def update_attributes
-      [:originality_report_file_id,
-       :originality_report_url,
-       :originality_score,
-       :workflow_state].freeze
+      [
+        :error_message,
+        :originality_report_file_id,
+        :originality_report_url,
+        :originality_score,
+        :workflow_state
+      ].freeze
     end
 
     def lti_link_attributes
@@ -261,7 +303,7 @@ module Lti
     end
 
     def assignment
-      @_assignment ||= Assignment.find(params[:assignment_id])
+      @_assignment ||= api_find(Assignment, params[:assignment_id])
     end
 
     def submission
@@ -294,7 +336,8 @@ module Lti
     def create_report_params
       @_create_report_params ||= begin
         report_attributes = params.require(:originality_report).permit(create_attributes).to_unsafe_h.merge(
-          {submission_id: params.require(:submission_id)}
+          submission_id: params.require(:submission_id),
+          submission_time: @version&.submitted_at
         )
         report_attributes[:lti_link_attributes] = lti_link_params
         report_attributes
@@ -346,12 +389,43 @@ module Lti
       verify_submission_attachment(attachment, submission)
     end
 
+    def report_by_attempt(attempt)
+      # Assign @version so if create a new originality report, we can match up
+      # the submission time with the version.  This is important because they
+      # could be creating a report for the version that is not the latest.
+      @version = submission.versions.map(&:model).find{|m| m.attempt.to_s == attempt.to_s}
+      raise ActiveRecord::RecordNotFound unless @version
+      submission.originality_reports.find_by(submission_time: @version.submitted_at)
+    end
+
     def find_originality_report
       raise ActiveRecord::RecordNotFound if submission.blank?
       @report = OriginalityReport.find_by(id: params[:id])
-      @report ||= (OriginalityReport.find_by(attachment_id: attachment&.id) if attachment.present?)
+      # Note: we could end up looking up by file_id, attachment: nil or attempt
+      # even in the `update` or `show` endpoints, if they give us a bogus report id :/
+      @report ||= report_by_attachment(attachment)
       return if params[:originality_report].blank? || attachment.present?
-      @report ||= submission.originality_reports.find_by(attachment: nil) unless attachment_required?
+      unless attachment_required?
+        # For Text Entry cases (there is never an attachment), in the `create`
+        # method, clients can choose which submission version the report is for
+        # by supplying the attempt number.  Thus we can tell if they are
+        # updating an exising report or making a new one for a new version.
+        @report ||=
+          if params.require(:originality_report)[:attempt].present?
+            report_by_attempt(params[:originality_report][:attempt])
+          else
+            submission.originality_reports.find_by(attachment: nil)
+          end
+      end
+    end
+
+    def report_by_attachment(attachment)
+      return if attachment.blank?
+      if submission.present?
+        OriginalityReport.find_by(attachment_id: attachment&.id, submission: submission)
+      else
+        OriginalityReport.find_by(attachment_id: attachment&.id)
+      end
     end
 
     def report_in_context

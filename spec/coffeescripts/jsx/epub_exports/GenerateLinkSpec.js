@@ -70,7 +70,7 @@ test('render', function() {
 
   let wrapper = mount(<GenerateLink {...this.props} />)
   equal(wrapper.children().type(), 'button', 'tag should be a button')
-  ok(wrapper.text().match(I18n.t('Generate ePub')),'should show generate text')
+  ok(wrapper.text().match(I18n.t('Generate ePub')), 'should show generate text')
 
   wrapper.simulate('click')
   equal(wrapper.children().type(), 'span', 'tag should be span')

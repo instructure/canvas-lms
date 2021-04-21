@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,11 +23,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
+  include Lti::RedisMessageClient
 
   before :once do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
   end
+
+  before { consider_all_requests_local(false) }
 
   describe "GET 'jwt_token'" do
 
@@ -42,7 +47,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_id param" do
       user_session(@teacher)
       get :jwt_token, params: {course_id: @course.id, tool_id: @tool.id}
-      jwt = JSON.parse(response.body[9..-1])['jwt_token']
+      jwt = JSON.parse(response.body)['jwt_token']
       decoded_token = Canvas::Security.decode_jwt(jwt, [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
@@ -68,7 +73,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
       get :jwt_token, params: {course_id: @course.id, tool_launch_url: @tool.url}
-      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body[9..-1])['jwt_token'], [:skip_verification])
+      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body)['jwt_token'], [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
@@ -117,32 +122,76 @@ describe ExternalToolsController do
       let(:redis_key) { "#{@course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
-      before do
-        allow(SecureRandom).to receive(:hex).and_return(verifier)
-        user_session(@teacher)
-        get :show, params: {:course_id => @course.id, id: tool.id}
+      before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
+
+      context 'when the current user is nil' do
+        context 'and the context is a public course' do
+          subject do
+            get :show, params: {:course_id => @course.id, id: tool.id}
+            response
+          end
+
+          before { @course.update!(is_public: true) }
+
+          it { is_expected.to be_successful }
+
+          it 'uses the public user ID as the ISS' do
+            subject
+            expect(cached_launch['sub']).to eq User.public_lti_id
+          end
+        end
       end
 
-      it 'creates a login message' do
-        expect(assigns[:lti_launch].params.keys).to match_array [
-          "iss",
-          "login_hint",
-          "target_link_uri",
-          "lti_message_hint"
-        ]
+      context 'when current user is a teacher' do
+        before do
+          user_session(@teacher)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+        end
+
+        it 'creates a login message' do
+          expect(assigns[:lti_launch].params.keys).to match_array [
+            "iss",
+            "login_hint",
+            "target_link_uri",
+            "lti_message_hint",
+            "canvas_region",
+            "client_id"
+          ]
+        end
+
+        it 'sets the "login_hint" to the current user lti id' do
+          expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
+        end
+
+        it 'caches the the LTI 1.3 launch' do
+          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+        end
+
+        it 'sets the "canvas_domain" to the request domain' do
+          message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
+          expect(message_hint['canvas_domain']).to eq 'localhost'
+        end
       end
 
-      it 'sets the "login_hint" to the current user lti id' do
-        expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
+      context "with a bad launch url" do
+        it "fails gracefully" do
+          user_session(@teacher)
+          allow(controller).to receive(:basic_lti_launch_request).and_raise(Lti::Errors::InvalidLaunchUrlError)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+          expect(response).to be_redirect
+        end
       end
 
-      it 'caches the the LTI 1.3 launch' do
-        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
-      end
+      context 'current user is a student view user' do
+        before do
+          user_session(@course.student_view_student)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+        end
 
-      it 'sets the "canvas_domain" to the request domain' do
-        message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
-        expect(message_hint['canvas_domain']).to eq 'localhost'
+        it 'returns the TestUser claim when viewing as a student' do
+          get :show, params: {:course_id => @course.id, id: tool.id}
+          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
+        end
       end
     end
 
@@ -159,6 +208,22 @@ describe ExternalToolsController do
         get :show, params: {:account_id => @course.account.id, id: tool.id}
 
         expect(response).to be_successful
+      end
+
+      context 'when required_permissions set' do
+        it "does not launch account tool for non-admins" do
+          user_session(@teacher)
+          tool = @course.account.context_external_tools.new(:name => "bob",
+                                                            :consumer_key => "bob",
+                                                            :shared_secret => "bob")
+          tool.url = "http://www.example.com/basic_lti"
+          tool.account_navigation = { enabled: true, required_permissions: 'manage_data_services' }
+          tool.save!
+
+          get :show, params: {:account_id => @course.account.id, id: tool.id}
+
+          expect(response).not_to be_successful
+        end
       end
 
       it "generates the resource_link_id correctly for a course navigation launch" do
@@ -643,6 +708,157 @@ describe ExternalToolsController do
       tool
     end
 
+    context "LTI 1.3" do
+      let(:developer_key) do
+        key = DeveloperKey.create!(account: @course.account)
+        key.generate_rsa_keypair!
+        key.developer_key_account_bindings.first.update!(
+          workflow_state: 'on'
+        )
+        key.save!
+        key
+      end
+
+      let(:lti_1_3_tool) do
+        tool = @course.context_external_tools.new(:name => "test", :consumer_key => "key",
+          :shared_secret => "secret")
+        tool.url = "http://www.example.com/launch"
+        tool.use_1_3 = true
+        tool.developer_key = developer_key
+        tool.save!
+        tool
+      end
+
+      let(:launch_hash) {
+        lti_launch = assigns[:lti_launch]
+        decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+        cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
+        JSON.parse(cached_launch)
+      }
+
+      before do
+        lti_1_3_tool
+        user_session(@teacher)
+      end
+
+      it 'assigns @lti_launch.resource_url' do
+        get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/launch"}
+        expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
+      end
+
+      context 'when resource_link_lookup_uuid is passed' do
+        include Lti::RedisMessageClient
+        let(:launch_params) do
+          JSON.parse(
+            fetch_and_delete_launch(
+              @course,
+              JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)['verifier']
+            )
+          )
+        end
+
+
+        let(:rl) {
+          Lti::ResourceLink.create!(
+            context_external_tool: lti_1_3_tool,
+            context: @course,
+            custom: {abc: 'def', expans: '$Canvas.user.id'}
+          )
+        }
+
+        let(:get_page) {
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_uuid: rl.lookup_uuid
+          }
+        }
+
+        it 'sets the custom parameters in the launch hash' do
+          get_page
+          expect(launch_hash['https://purl.imsglobal.org/spec/lti/claim/custom']).to include(
+            'abc' => 'def',
+            'expans' => @teacher.id
+          )
+        end
+
+        it 'sets the custom parameters in the launch hash when is the old parameter name `resource_link_lookup_id`' do
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_id: rl.lookup_uuid
+          }
+
+          expect(launch_hash['https://purl.imsglobal.org/spec/lti/claim/custom']).to include(
+            'abc' => 'def',
+            'expans' => @teacher.id
+          )
+        end
+
+        it 'errors if the resource_link_lookup_uuid cannot be found' do
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_uuid: 'wrong_do_it_again'
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link_lookup_uuid is for the wrong context' do
+          rl.update(context: Course.create(course_valid_attributes))
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link is inactive' do
+          rl.update(workflow_state: 'deleted')
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'does not include custom params if the resource_link is for the wrong tool' do
+          tool2 = @course.context_external_tools.create!(
+            name: 'test', consumer_key: 'key', shared_secret: 'secret',
+            url: 'http://www.example2.com/launch', use_1_3: true,
+            developer_key: DeveloperKey.create!
+          )
+          rl.update(context_external_tool: tool2)
+          get_page
+          expect(launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']).to be_blank
+        end
+
+        it 'succeeds if the resource_link is for a tool with the same host' do
+          tool2 = @course.account.context_external_tools.create!(
+            name: 'test', consumer_key: 'key', shared_secret: 'secret',
+            url: 'http://www.example.com/launch', use_1_3: true,
+            developer_key: tool.developer_key
+          )
+          rl.update(context_external_tool: tool2)
+          get_page
+          expect(
+            launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']
+          ).to eq({"abc" => "def", "expans" => @teacher.id})
+        end
+      end
+
+      context 'tool is used for assignment_selection' do
+        it 'uses secure params to pass along lti_assignment_id for 1.3' do
+          lti_1_3_tool.assignment_selection = { enable: true }
+          lti_1_3_tool.custom_fields = { assignment_id: "$com.instructure.Assignment.lti.id"}
+          lti_1_3_tool.save!
+
+          lti_assignment_id = SecureRandom.uuid
+          jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
+          get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection"}
+          expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
+        end
+      end
+
+    end
+
     it "should require authentication" do
       user_model
       user_session(@user)
@@ -694,6 +910,15 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['custom_collaboration_url']).to eq api_v1_collaboration_members_url(collab)
     end
 
+    it "messages appropriately when there is a launch error because of missing permissions" do
+      user_session(@teacher)
+      tool = new_valid_tool(@course)
+      tool.settings[:course_navigation] = { 'required_permissions' => 'not-real-permissions,nor-this-one' }
+      tool.save!
+      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti"}
+      expect(response).to be_unauthorized
+    end
+
     it "should remove query params when post_only is set" do
       u = user_factory(active_all: true)
       account.account_users.create!(user: u)
@@ -724,6 +949,41 @@ describe ExternalToolsController do
       jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
       get :retrieve, params: {url: tool.url, account_id:account.id, secure_params: jwt}
       expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
+    end
+
+    context 'for Quizzes Next launch' do
+      let(:assignment) { assignment_model(course: @course) }
+
+      before do
+        params = {
+          :name => "Quizzes.Next",
+          :url => 'http://example.com/launch',
+          :domain => "example.com",
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :privacy_level => 'public',
+          :tool_id => 'Quizzes 2'
+        }
+        account.context_external_tools.create!(params)
+        assignment.submission_types = 'external_tool'
+        assignment.external_tool_tag_attributes = {url: "http://example.com/launch"}
+        assignment.save!
+      end
+
+      it 'sets consistent resource_link_id with that in regular lti launch' do
+        u = user_factory(active_all: true)
+        account.account_users.create!(user: u)
+        user_session(@user)
+
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id:assignment.id,
+          url: 'http://example.com/launch'
+        }
+
+        expect(assigns[:lti_launch].params['resource_link_id']).to eq assignment.lti_resource_link_id
+        expect(assigns[:lti_launch].params['context_id']).to eq opaque_id(@course)
+      end
     end
 
     context 'collaborations' do
@@ -914,65 +1174,79 @@ describe ExternalToolsController do
 
   describe "POST 'create'" do
     let(:launch_url) { 'https://www.tool.com/launch' }
-      let(:consumer_key) { 'key' }
-      let(:shared_secret) { 'seekret' }
-      let(:xml) do
-        <<-XML
-          <?xml version="1.0" encoding="UTF-8"?>
-          <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-            <blti:title>Example Tool Provider</blti:title>
-            <blti:description>This is a Sample Tool Provider.</blti:description>
-            <blti:launch_url>https://www.tool.com/launch</blti:launch_url>
-            <blti:extensions platform="canvas.instructure.com">
-            </blti:extensions>
-          </cartridge_basiclti_link>
-        XML
+    let(:consumer_key) { 'key' }
+    let(:shared_secret) { 'seekret' }
+    let(:xml) do
+      <<-XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+          <blti:title>Example Tool Provider</blti:title>
+          <blti:description>This is a Sample Tool Provider.</blti:description>
+          <blti:launch_url>https://www.tool.com/launch</blti:launch_url>
+          <blti:extensions platform="canvas.instructure.com">
+          </blti:extensions>
+        </cartridge_basiclti_link>
+      XML
+    end
+    let(:xml_response) { OpenStruct.new({body: xml}) }
+
+    context 'with client id' do
+      include_context 'lti_1_3_spec_helper'
+      subject do
+        post 'create', params: params, format: 'json'
+        ContextExternalTool.find_by(id: tool_id)
       end
-      let(:xml_response) { OpenStruct.new({body: xml}) }
-
-    describe 'developer key id' do
-      subject { ContextExternalTool.find(JSON.parse(response.body)['id']).developer_key_id }
-
+      let(:tool_id) { response.status == 200 ? JSON.parse(response.body)['id'] : -1 }
+      let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
+      let(:developer_key) { DeveloperKey.create!(account: account) }
       let_once(:user) { account_admin_user(account: account) }
       let_once(:account) { account_model }
       let(:params) do
         {
-          account_id: account.id,
-          external_tool: {
-            name: 'tool name',
-            consumer_key: consumer_key,
-            shared_secret: shared_secret,
-            config_type: 'by_xml',
-            config_xml: xml,
-            developer_key_id: developer_key.id
-          }
+          client_id: developer_key.id,
+          account_id: account
         }
       end
 
       before do
         user_session(user)
-        post 'create', params: params, format: 'json'
+        tool_configuration
+        enable_developer_key_account_binding!(developer_key)
       end
 
-      context 'when the current user has rights' do
-        let(:developer_key) { DeveloperKey.create!(account: account) }
+      it { is_expected.to_not be_nil }
 
-        it { is_expected.to eq developer_key.id }
-      end
+      context 'with invalid client id' do
+        let(:params) { super().merge(client_id: "bad client id") }
 
-      context 'when the current user does not have rights' do
-        let(:developer_key) { DeveloperKey.create!(account: account) }
-        let(:user) { account_admin_user(account: account_model) }
-
-        it 'sets the develoepr key id' do
-          expect(response).to be_unauthorized
+        it 'return 404' do
+          subject
+          expect(response).to have_http_status :not_found
         end
       end
 
-      context 'when the developer key account does not match' do
-        let(:developer_key) { DeveloperKey.create! }
+      context 'with inactive developer key' do
+        let(:developer_key) do
+          dev_key = super()
+          dev_key.deactivate!
+          dev_key
+        end
 
-        it { is_expected.to be_nil }
+        it 'return 422' do
+          subject
+          expect(response).to have_http_status :unprocessable_entity
+        end
+      end
+
+      context 'with no account binding' do
+        before do
+          developer_key.developer_key_account_bindings.destroy_all
+        end
+
+        it 'return 422' do
+          subject
+          expect(response).to have_http_status :unprocessable_entity
+        end
       end
     end
 
@@ -981,7 +1255,7 @@ describe ExternalToolsController do
         let(:params) { raise "Override in specs" }
 
         before do
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(xml_response)
+          allow(CanvasHttp).to receive(:get).and_return(xml_response)
           ContextExternalTool.create!(
             context: @course,
             name: 'first tool',
@@ -1057,6 +1331,28 @@ describe ExternalToolsController do
           end
         end
       end
+
+      context 'create via client id' do
+        include_context 'lti_1_3_spec_helper'
+        let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
+        let(:developer_key) { DeveloperKey.create!(account: @course.account) }
+        before do
+          tool = tool_configuration.new_external_tool(@course)
+          tool.save!
+          enable_developer_key_account_binding!(developer_key)
+        end
+        it_behaves_like 'detects duplication in context' do
+          let(:params) do
+            {
+              client_id: developer_key.id,
+              course_id: @course.id,
+              external_tool: {
+                verify_uniqueness: 'true'
+              }
+            }
+          end
+        end
+      end
     end
 
     it "should require authentication" do
@@ -1085,6 +1381,21 @@ describe ExternalToolsController do
       expect(assigns[:tool].url).to eq "http://example.com"
       expect(assigns[:tool].consumer_key).to eq "key"
       expect(assigns[:tool].shared_secret).to eq "secret"
+    end
+
+    it "accepts is_rce_favorite parameter" do
+      user_session(account_admin_user)
+      post 'create', params: {
+        :account_id => @course.account.id,
+        :external_tool => {
+          :name => "tool name",
+          :url => "http://example.com",
+          :consumer_key => "key",
+          :shared_secret => "secret",
+          :editor_button => {url: "http://example.com", enabled: true},
+          :is_rce_favorite => true}}, :format => "json"
+      expect(response).to be_successful
+      expect(assigns[:tool].is_rce_favorite).to eq true
     end
 
     it "sets the oauth_compliant setting" do
@@ -1245,7 +1556,7 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
       XML
       obj = OpenStruct.new({:body => xml})
-      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(obj)
+      allow(CanvasHttp).to receive(:get).and_return(obj)
       post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
 
       expect(response).to be_successful
@@ -1260,7 +1571,7 @@ describe ExternalToolsController do
     end
 
     it "should fail gracefully on invalid URL retrieval or timeouts" do
-      allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
+      allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       user_session(@teacher)
       xml = "bob"
       post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
@@ -1268,6 +1579,19 @@ describe ExternalToolsController do
       expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
       expect(json['errors']['config_url'][0]['message']).to eq I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
+    end
+
+    it "should fail gracefully trying to retrieve from localhost" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
+      user_session(@teacher)
+      xml = "bob"
+      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com",
+        :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url",
+        :config_url => "http://localhost:9001"}}, :format => "json"
+      expect(response).not_to be_successful
+      expect(assigns[:tool]).to be_new_record
+      json = json_parse(response.body)
+      expect(json['errors']['config_url'][0]['message']).to eq "Invalid URL"
     end
 
     context "navigation tabs caching" do
@@ -1423,6 +1747,7 @@ describe ExternalToolsController do
     end
 
     it 'updates allow_membership_service_access if the feature flag is set' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       @tool = new_valid_tool(@course)
       user_session(@teacher)
@@ -1442,13 +1767,24 @@ describe ExternalToolsController do
       expect(response).to be_successful
       expect(@tool.reload.allow_membership_service_access).to be_falsey
     end
+
+    it "accepts is_rce_favorite parameter" do
+      user_session(account_admin_user)
+      @tool = new_valid_tool(@course.root_account)
+      @tool.editor_button = {url: 'http://example.com', icon_url: 'http://example.com', enabled: true}
+      @tool.save!
+      put :update, params: {account_id: @course.root_account.id, external_tool_id: @tool.id, external_tool: {is_rce_favorite: true}}, :format => "json"
+      expect(response).to be_successful
+      expect(assigns[:tool].is_rce_favorite).to eq true
+    end
   end
 
   describe "'GET 'generate_sessionless_launch'" do
+    let(:login_pseudonym) { pseudonym(@user) }
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
-      user_session(@user)
+      user_session(@user, login_pseudonym)
     end
 
     it "generates a sessionless launch" do
@@ -1458,7 +1794,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1478,7 +1814,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1501,7 +1837,7 @@ describe ExternalToolsController do
       get :generate_sessionless_launch, params: {course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id}
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1534,7 +1870,7 @@ describe ExternalToolsController do
       }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1580,7 +1916,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1608,7 +1944,7 @@ describe ExternalToolsController do
         module_item_id: @tg.id,
         content_type: 'ContextExternalTool'}
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1627,222 +1963,280 @@ describe ExternalToolsController do
 
     it 'redirects if there is no launch url associated with the tool' do
       no_url_tool = new_valid_tool(@course)
-      no_url_tool.update_attributes!(url: nil)
+      no_url_tool.update!(url: nil)
       params = {:course_id => @course.id, id: no_url_tool.id}
       expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
     end
 
-  end
+    context 'with 1.3 tool' do
+      include_context 'lti_1_3_spec_helper'
 
-  describe 'lti 1.3' do
-    let_once(:account) { Account.default }
-    let_once(:sub_account) { account_model(root_account: account) }
-    let_once(:course) { course_model account: sub_account }
-    let_once(:admin) { account_admin_user(account: account) }
-    let_once(:student) do
-      student_in_course
-      @student
-    end
-    let(:developer_key) { DeveloperKey.create!(account: account) }
-    let(:tool_configuration) do
-      Lti::ToolConfiguration.create!(
-        developer_key: developer_key,
-        settings: settings
-      )
-    end
-    let(:settings) do
-      {
-        'title' => 'LTI 1.3 Tool',
-        'description' => '1.3 Tool',
-        'launch_url' => 'http://lti13testtool.docker/blti_launch',
-        'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
-        'public_jwk' => {
-          "kty" => "RSA",
-          "e" => "AQAB",
-          "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
-          "kid" => "2018-09-18T21:55:18Z",
-          "alg" => "RS256",
-          "use" => "sig"
-        },
-        'extensions' =>  [
-          {
-            'platform' => 'canvas.instructure.com',
-            'privacy_level' => 'public',
-            'tool_id' => 'LTI 1.3 Test Tool',
-            'domain' => 'http://lti13testtool.docker',
-            'settings' =>  {
-              'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
-              'selection_height' => 500,
-              'selection_width' => 500,
-              'text' => 'LTI 1.3 Test Tool Extension text',
-              'course_navigation' =>  {
-                'message_type' => 'LtiResourceLinkRequest',
-                'canvas_icon_class' => 'icon-lti',
-                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                'text' => 'LTI 1.3 Test Tool Course Navigation',
-                'url' =>
-                'http://lti13testtool.docker/launch?placement=course_navigation',
-                'enabled' => true
-              }
-            }
-          }
-        ]
-      }
-    end
-    let(:dev_key_id) { developer_key.id }
-
-    before do
-      user_session(admin)
-      tool_configuration
-    end
-
-    shared_examples_for 'basic devkey behavior' do
-      context 'when the user is an admin' do
-        it { is_expected.to have_http_status :success }
+      let(:params) { {:course_id => @course.id, id: tool.id} }
+      let(:tool) do
+        t = tool_configuration.new_external_tool(@course)
+        t.save!
+        t
       end
 
-      context 'when the user is not an admin' do
-        before { user_session(student) }
+      let(:account) { @course.account }
 
-        it { is_expected.to be_unauthorized }
+		  before do
+        @backup_controller_access_token = controller.instance_variable_get(:@access_token)
+      end
+      after { controller.instance_variable_set :@access_token, @backup_controller_access_token }
+
+      it 'returns the lti 1.3 launch url with a session token' do
+				controller.instance_variable_set :@access_token, login_pseudonym.user.access_tokens.create(purpose: 'test')
+        get :generate_sessionless_launch, params: params
+        expect(response).to be_successful
+        json = JSON.parse(response.body)
+        url = URI.parse(json['url'])
+        expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
+        expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
+        token = SessionToken.parse(CGI.parse(url.query)['session_token'].first)
+        expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 
-      context 'when the developer key does not exist' do
-        before { developer_key.destroy! }
-
-        it { is_expected.to be_not_found }
-      end
-    end
-
-    describe '#create_tool_from_tool_config' do
-      subject {  post :create_tool_from_tool_config, params: params }
-
-      shared_examples_for 'tool configuration does not exist' do
-        let(:tool_configuration) { nil }
-
-        it { is_expected.to be_not_found }
+      it "doesn't work when there is no access token (non-API access)" do
+        get :generate_sessionless_launch, params: params
+        expect(response).to_not be_successful
+        expect(response.code.to_i).to eq(401)
       end
 
-      shared_examples_for 'reuses an exisiting ContextExternalTool' do
-        let(:tool_context) { raise 'Override in spec' }
-        let(:cet) do
-          cet = tool_configuration.new_external_tool(tool_context)
-          cet.save!
-          cet
+      context 'when the developer key requires scopes' do
+        before { DeveloperKey.default.update!(require_scopes: true) }
+
+        it 'responds with "unauthorized" if developer key requires scopes' do
+          controller.instance_variable_set(
+            :@access_token,
+            login_pseudonym.user.access_tokens.create(purpose: 'test')
+          )
+          get :generate_sessionless_launch, params: params
+          expect(response).to be_unauthorized
         end
+      end
+
+      context 'with a cross-shard launch' do
+        specs_require_sharding
+
+        let!(:tool) do
+          t = tool_configuration.new_external_tool(course)
+          t.save!
+          t
+        end
+
+        let(:course) do
+          course = course_model(account: account)
+          course.enroll_user(user, "StudentEnrollment", { enrollment_state: 'active' })
+          course.offer!
+          course
+        end
+
+        let(:user) { @shard2.activate {user_model(name: 'cross-shard user')} }
+        let(:developer_key) { DeveloperKey.create!(account: account) }
+        let(:account) { Account.default }
+        let(:tool_root_account) { account_model }
+        let(:access_token) { pseudonym(user).user.access_tokens.create(purpose: 'test') }
+        let(:account_host) { 'canvas-test.instructure.com' }
+        let(:tool_host) { 'canvas-test-2.instructure.com' }
+        let(:params) { {course_id: course.global_id, id: tool.global_id} }
 
         before do
-          cet
-          subject
+          tool.update_attribute(:root_account_id, tool_root_account.id)
+          tool_root_account.account_domains.create!(host: tool_host)
+          account.account_domains.create!(host: account_host)
+          user_session(user)
+          controller.instance_variable_set :@access_token, access_token
+          request.host = account_host
         end
 
-        it 'returns the existing tool' do
-          expect(json_parse['id']).to eq cet.id
+        it 'returns the lti 1.3 launch url with a session token' do
+          expect(HTTParty).to receive(:get) do |url, options|
+            expect(url).to eq "http://#{tool_host}/api/v1/courses/#{course.shard.id}~#{course.local_id}/external_tools/sessionless_launch?course_id=#{course.id}&id=#{tool.id}&redirect=true"
+            expect(options[:headers].keys).to include 'Authorization'
+          end
+
+          @shard2.activate { get :generate_sessionless_launch, params: params }
+        end
+
+        context 'with a "redirect" flag' do
+          let(:params) { {course_id: course.global_id, id: tool.global_id, redirect: true} }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+
+        context 'when the context is not a course' do
+          let!(:tool) do
+            t = tool_configuration.new_external_tool(course.account)
+            t.save!
+            t
+          end
+
+          let(:params) { {account_id: course.account.global_id, id: tool.global_id, redirect: true} }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+
+        context 'when an API token is not used' do
+          before { controller.instance_variable_set :@access_token, nil }
+
+          it 'does not return a sessionless launch URI' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(response).to be_unauthorized
+          end
+        end
+
+        context 'when the cross-account request fails' do
+          before { allow(HTTParty).to receive(:get).and_return(double('success?' => false)) }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
         end
       end
 
-      shared_examples_for 'a context that can create a tool' do
-        let(:create_tool_context) { raise 'Override in spec' }
-
-        it 'creates a ContextExternalTool' do
-          expect { subject }.to change { ContextExternalTool.count }.by(1)
-          expect(ContextExternalTool.first.context_id).to eq create_tool_context.id
+      context 'with an assignment launch' do
+        before do
+          controller.instance_variable_set(
+            :@access_token,
+            login_pseudonym.user.access_tokens.create(purpose: 'test')
+          )
+          assignment.update!(
+            external_tool_tag: content_tag,
+            submission_types: 'external_tool'
+          )
+          external_tool
         end
 
-        it_behaves_like 'reuses an exisiting ContextExternalTool' do
-          let(:tool_context) { create_tool_context }
+        let(:assignment) { assignment_model(course: @course) }
+        let(:launch_url) { 'https://www.my-tool.com/login' }
+        let(:params) { {course_id: @course.id, launch_type: :assessment, assignment_id: assignment.id} }
+        let(:content_tag) do
+          ContentTag.create!(
+            context: assignment,
+            content_type: 'ContextExternalTool',
+            url: launch_url
+          )
         end
-      end
-
-      context 'when an account' do
-        let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'basic devkey behavior'
-
-        it_behaves_like 'tool configuration does not exist'
-
-        it_behaves_like 'a context that can create a tool' do
-          let(:create_tool_context) { sub_account }
-        end
-      end
-
-      context 'when a course' do
-        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'basic devkey behavior'
-
-        it_behaves_like 'tool configuration does not exist'
-
-        it_behaves_like 'a context that can create a tool' do
-          let(:create_tool_context) { course }
+        let(:external_tool) do
+          tool = external_tool_model(
+            context: assignment.course,
+            opts: {
+              url: launch_url,
+              developer_key: DeveloperKey.create!
+            }
+          )
+          tool.settings[:use_1_3] = true
+          tool.save!
+          tool
         end
 
-        it_behaves_like 'reuses an exisiting ContextExternalTool' do
-          let(:tool_context) { sub_account }
+        it 'returns an assignment launch URL' do
+          get :generate_sessionless_launch, params: params
+          expect(json_parse["url"]).to include "http://test.host/courses/#{@course.id}/assignments/#{assignment.id}?display=borderless&session_token="
         end
 
-        it_behaves_like 'reuses an exisiting ContextExternalTool' do
-          let(:tool_context) { account }
-        end
-      end
-    end
-
-    context '#delete_tool_from_tool_config' do
-      subject {  delete :delete_tool_from_tool_config, params: params, format: 'json' }
-
-      let(:cet) do
-        tool = tool_configuration.new_external_tool(create_tool_context)
-        tool.save!
-        tool
-      end
-
-      shared_examples_for 'deletes a tool from dev key' do
-        context 'with existing cet' do
+        context 'and the assignment is missing AGS records' do
           before do
-            cet
+            assignment.line_items.destroy_all
+
+            Lti::ResourceLink.where(
+              resource_link_uuid: assignment.lti_context_id
+            ).destroy_all
+
+            get :generate_sessionless_launch, params: params
           end
 
-          it_behaves_like 'basic devkey behavior'
-
-          it 'removes a ContextExternalTool' do
-            expect { subject }.to change { ContextExternalTool.active.count }.by(-1)
+          it 'creates the missing line item' do
+            expect(assignment.reload.line_items).to be_present
           end
 
-          context 'on double deletion' do
-            before do
-              delete :delete_tool_from_tool_config, params: params
-            end
-
-            it { is_expected.to have_http_status :not_found }
+          it 'creates the missing resource link' do
+            expect(Lti::ResourceLink.where(resource_link_uuid: assignment.lti_context_id)).to be_present
           end
-        end
-
-        context 'with no cet' do
-          it { is_expected.to have_http_status :not_found }
         end
       end
 
-      context 'when an account' do
-        let(:create_tool_context) { account }
-        let(:params) { { account_id: account.id, developer_key_id: dev_key_id } }
+      context 'with a module item launch' do
+        before do
+          controller.instance_variable_set(
+            :@access_token,
+            login_pseudonym.user.access_tokens.create(purpose: 'test')
+          )
 
-        it_behaves_like 'deletes a tool from dev key'
-      end
+          external_tool
+        end
 
-      context 'when a subaccount' do
-        let(:create_tool_context) { sub_account }
-        let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
+        subject do
+          get :generate_sessionless_launch, params: params
+          json_parse['url']
+        end
 
-        it_behaves_like 'deletes a tool from dev key'
-      end
 
-      context 'when a course' do
-        let(:create_tool_context) { course }
-        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
+        let(:course) { @course }
+        let(:launch_url) { 'https://www.my-tool.com/login' }
+        let(:params) { {course_id: @course.id, launch_type: :module_item, module_item_id: module_item.id} }
+        let(:context_module) do
+          ContextModule.create!(
+            context: course,
+            name: "External Tools"
+          )
+        end
+        let(:module_item) do
+          ContentTag.create!(
+            context: course,
+            context_module: context_module,
+            content_type: 'ContextExternalTool',
+            url: launch_url
+          )
+        end
+        let(:external_tool) do
+          tool = external_tool_model(
+            context: course,
+            opts: { url: launch_url }
+          )
+          tool.settings[:use_1_3] = true
+          tool.save!
+          tool
+        end
 
-        it_behaves_like 'deletes a tool from dev key'
+        it { is_expected.to include "http://test.host/courses/#{course.id}/modules/items/#{module_item.id}" }
+
+        it { is_expected.to include "display=borderless" }
+
+        it { is_expected.to match /session_token=\w+/ }
       end
     end
+  end
+
+  describe '#sessionless_launch' do
+    before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      user_session(@user)
+    end
+
+    it "generates a sessionless launch" do
+      @tool = new_valid_tool(@course)
+
+      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body)
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+
+      expect(controller).to receive(:log_asset_access).once
+      get :sessionless_launch, params: {:course_id => @course.id, verifier: verifier}
+    end
+
   end
 
   def opaque_id(asset)
@@ -1853,4 +2247,100 @@ describe ExternalToolsController do
     end
   end
 
+  describe "GET 'visible_course_nav_tools'" do
+    def add_tool(name)
+      tool = @course.context_external_tools.new(
+        name: name,
+        consumer_key: "key1",
+        shared_secret: "secret1"
+      )
+      tool.url = "http://www.example.com/basic_lti"
+      tool.use_1_3 = true
+      tool.developer_key = DeveloperKey.create!
+      tool.save!
+      tool
+    end
+
+    before :once do
+      course_with_teacher(:active_all => true)
+    end
+
+    it "ignores requests from unauthorized users" do
+      tool1 = add_tool("Course nav tool 1")
+      tool1.course_navigation = {enabled: true}
+      tool1.save!
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      assert_unauthorized
+    end
+
+    it "handles bad requests" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => 'definitely_not_a_course'}
+      expect(response.status).to eq 404
+    end
+
+    it "shows course nav tool to teacher" do
+      name = "Course nav tool 1"
+      tool1 = add_tool(name)
+      tool1.course_navigation = {enabled: true}
+      tool1.save!
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq name
+    end
+
+    it "shows course nav tool to student" do
+      name = "Course nav tool 1"
+      tool1 = add_tool(name)
+      tool1.course_navigation = {enabled: true}
+      tool1.save!
+      student_in_course(:course => @course)
+      user_session(@student)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq name
+    end
+
+    it "returns an empty array if there are no tools" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+
+    it "doesn't return tools without course nav placement" do
+      add_tool("Random tool")
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+
+    it "doesn't return tools to student marked with admins visibility" do
+      name = "Course nav tool 2"
+      tool1 = add_tool(name)
+      tool1.course_navigation = {enabled: true, visibility: "admins"}
+      tool1.save!
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq name
+
+      student_in_course(:course => @course)
+      user_session(@student)
+      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+  end
 end

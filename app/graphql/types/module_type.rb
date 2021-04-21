@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
   end
 
   def perform(context_modules)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       context_modules.each do |context_module|
         content_tags = context_module.content_tags_visible_to(@user)
         fulfill(context_module, content_tags)
@@ -38,15 +40,17 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     alias context_module object
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
 
     field :name, String, null: true
 
     field :unlock_at, DateTimeType, null: true
+
+    field :position, Integer, null: true
 
     field :module_items, [Types::ModuleItemType], null: true
     def module_items

@@ -21,8 +21,9 @@ import Assignment from 'compiled/models/Assignment'
 import StudentGroupStore from 'jsx/due_dates/StudentGroupStore'
 import $ from 'jquery'
 
-QUnit.module('GroupCategorySelector', {
-  setup() {
+/* eslint-disable object-shorthand */
+QUnit.module('GroupCategorySelector selection', {
+  beforeEach: function() {
     this.assignment = new Assignment()
     this.assignment.groupCategoryId('1')
     this.groupCategories = [
@@ -42,15 +43,37 @@ QUnit.module('GroupCategorySelector', {
     this.groupCategorySelector.render()
     return $('#fixtures').append(this.groupCategorySelector.$el)
   },
-  teardown() {
+  afterEach: function() {
     this.groupCategorySelector.remove()
     $('#fixtures').empty()
   }
 })
 
-test("groupCategorySelected should set StudentGroupStore's group set", function() {
+QUnit.test("groupCategorySelected should set StudentGroupStore's group set", function() {
   strictEqual(StudentGroupStore.getSelectedGroupSetId(), '1')
   this.groupCategorySelector.$groupCategoryID.val(2)
   this.groupCategorySelector.groupCategorySelected()
   strictEqual(StudentGroupStore.getSelectedGroupSetId(), '2')
 })
+
+QUnit.module('GroupCategorySelector, no groups', {
+  beforeEach: function() {
+    this.assignment = new Assignment()
+    this.groupCategorySelector = new GroupCategorySelector({
+      parentModel: this.assignment,
+      groupCategories: []
+    })
+    this.groupCategorySelector.render()
+    return $('#fixtures').append(this.groupCategorySelector.$el)
+  },
+  afterEach: function() {
+    this.groupCategorySelector.remove()
+    $('#fixtures').empty()
+  }
+})
+
+QUnit.test('group category select is hidden when there are no group sets', () => {
+  const $group_category = $('#fixtures #assignment_group_category')
+  strictEqual($group_category.css('display'), 'none')
+})
+/* eslint-enable object-shorthand */

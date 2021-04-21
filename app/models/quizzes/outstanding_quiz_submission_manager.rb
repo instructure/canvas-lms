@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -33,6 +35,7 @@ module Quizzes
 
     def self.grade_by_course(course)
       Quizzes::QuizSubmission.where('quizzes.context_id =?', course.id)
+        .where(user: course.gradable_students)
         .eager_load(:quiz)
         .needs_grading
         .each do |quiz_submission|

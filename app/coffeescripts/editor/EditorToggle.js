@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import I18n from 'i18n!editor'
+import I18n from 'i18n!EditorToggle'
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import preventDefault from '../fn/preventDefault'
@@ -39,32 +39,32 @@ const nextID = () => `editor-toggle-${(_nextID += 1)}`
 
 // #
 // Toggles an element between a rich text editor and itself
-class EditorToggle {
-  options = {
+
+// @param {jQueryEl} @el - the element containing html to edit
+// @param {Object} options
+export default function EditorToggle(elem, options) {
+  this.editingElement(elem)
+  this.options = {
     // text to display in the "done" button
     doneText: I18n.t('done_as_in_finished', 'Done'),
     // whether or not a "Switch Views" link should be provided to edit the
     // raw html
-    switchViews: true
+    switchViews: true,
+    ...options
   }
+  if (this.options.view) this.view = this.options.view
+  this.textArea = this.createTextArea()
+  this.textAreaContainer = $('<div/>').append(this.textArea)
 
-  // #
-  // @param {jQueryEl} @el - the element containing html to edit
-  // @param {Object} options
-  constructor(elem, options) {
-    this.editingElement(elem)
-    this.options = $.extend({}, this.options, options)
-    this.textArea = this.createTextArea()
-    this.textAreaContainer = $('<div/>').append(this.textArea)
-
-    if (this.options.switchViews) {
-      this.switchViews = this.createSwitchViews()
-    }
-    this.done = this.createDone()
-    this.content = this.getContent()
-    this.editing = false
+  if (this.options.switchViews) {
+    this.switchViews = this.createSwitchViews()
   }
+  this.done = this.createDone()
+  this.content = this.getContent()
+  this.editing = false
+}
 
+Object.assign(EditorToggle.prototype, Backbone.Events, {
   // #
   // Toggles between editing the content and displaying it
   // @api public
@@ -74,7 +74,7 @@ class EditorToggle {
     } else {
       return this.display()
     }
-  }
+  },
 
   // #
   // Compiles the options for the RichContentEditor
@@ -91,7 +91,7 @@ class EditorToggle {
       opts.tinyOptions.aria_label = this.options.editorBoxLabel
     }
     return opts
-  }
+  },
 
   // #
   // Converts the element to an editor
@@ -100,22 +100,24 @@ class EditorToggle {
     this.textArea.val(this.getContent())
     this.textAreaContainer.insertBefore(this.el)
     this.el.detach()
-    if (this.options.switchViews) {
-      this.switchViews = this.createSwitchViews()
-      this.switchViews.insertBefore(this.textAreaContainer)
+    if (!ENV.use_rce_enhancements) {
+      if (this.options.switchViews) {
+        this.switchViews = this.createSwitchViews()
+        this.switchViews.insertBefore(this.textAreaContainer)
+      }
+      if (!this.infoIcon) {
+        this.infoIcon = new KeyboardShortcuts().render().$el
+      }
+      this.infoIcon.insertBefore($('.switch-views__link'))
+      $('<div/>', {style: 'clear: both'}).insertBefore(this.textAreaContainer)
     }
-    if (!this.infoIcon) {
-      this.infoIcon = new KeyboardShortcuts().render().$el
-    }
-    this.infoIcon.insertBefore($('.switch-views__link'))
-    $('<div/>', {style: 'clear: both'}).insertBefore(this.textAreaContainer)
     this.done.insertAfter(this.textAreaContainer)
     RichContentEditor.initSidebar()
     RichContentEditor.loadNewEditor(this.textArea, this.getRceOptions())
     this.textArea = RichContentEditor.freshNode(this.textArea)
     this.editing = true
     return this.trigger('edit')
-  }
+  },
 
   replaceTextArea() {
     this.el.insertBefore(this.textAreaContainer)
@@ -126,7 +128,7 @@ class EditorToggle {
     this.textArea = this.createTextArea()
     this.textAreaContainer.append(this.textArea)
     return this.textAreaContainer.detach()
-  }
+  },
 
   // #
   // Converts the editor to an element
@@ -141,11 +143,11 @@ class EditorToggle {
     if (this.options.switchViews) {
       this.switchViews.detach()
     }
-    this.infoIcon.detach()
+    if (!ENV.use_rce_enhancements) this.infoIcon.detach()
     this.done.detach()
     this.editing = false
     return this.trigger('display')
-  }
+  },
 
   // #
   // Assign/re-assign the jQuery element to to edit.
@@ -154,7 +156,7 @@ class EditorToggle {
   // @api public
   editingElement(elem) {
     return (this.el = elem)
-  }
+  },
 
   // #
   // method to get the content for the editor
@@ -164,7 +166,7 @@ class EditorToggle {
     const content = $('<div></div>').append(this.el.html())
     content.find('.hidden-readable').remove()
     return $.trim(content.html())
-  }
+  },
 
   // #
   // creates the textarea tinymce uses for the editor
@@ -181,7 +183,7 @@ class EditorToggle {
         .addClass('editor-toggle')
         .attr('id', nextID())
     )
-  }
+  },
 
   // #
   // creates the "done" button used to exit the editor
@@ -197,12 +199,13 @@ class EditorToggle {
           .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
           .click(
             preventDefault(() => {
+              RichContentEditor.closeRCE(this.textArea)
               this.display()
               this.editButton && this.editButton.focus()
             })
           )
       )
-  }
+  },
 
   // #
   // create the switch views links to go between rich text and a textarea
@@ -212,9 +215,9 @@ class EditorToggle {
     const $container = $("<div class='switch-views'></div>")
     ReactDOM.render(component, $container[0])
     return $container
+  },
+
+  cancel() {
+    RichContentEditor.closeRCE(this.textArea)
   }
-}
-
-_.extend(EditorToggle.prototype, Backbone.Events)
-
-export default EditorToggle
+})

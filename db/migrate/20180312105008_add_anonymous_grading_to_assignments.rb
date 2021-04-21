@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -25,13 +27,7 @@ class AddAnonymousGradingToAssignments < ActiveRecord::Migration[5.0]
 
     reversible do |dir|
       dir.up do
-        DataFixup::BackfillNulls.send_later_if_production_enqueue_args(
-          :run,
-          {priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups'},
-          Assignment,
-          :anonymous_grading,
-          default_value: false
-        )
+        DataFixup::BackfillNulls.run(Assignment, :anonymous_grading)
       end
     end
   end

@@ -16,6 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function isValid(url) {
-  return !!url && !/^\s*javascript:/i.test(url)
+export function isValid(return_to) {
+  if (!return_to) {
+    return false
+  }
+  const url = new URL(return_to, window.location.origin)
+  // eslint-disable-next-line no-script-url
+  if (url.protocol === 'javascript:' || url.protocol === 'data:') {
+    return false
+  }
+  if (url.origin !== window.location.origin) {
+    return false
+  }
+  return true
 }

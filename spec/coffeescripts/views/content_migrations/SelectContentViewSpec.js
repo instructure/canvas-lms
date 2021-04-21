@@ -27,9 +27,11 @@ class SelectContentHelper {
   static initClass() {
     this.url = '/api/v1/courses/42/content_migrations/5/selective_data'
   }
+
   static $caret() {
     return this.$fixtures.find('.checkbox-caret').first()
   }
+
   static toplevelCheckboxResponse() {
     return [
       200,
@@ -55,6 +57,7 @@ class SelectContentHelper {
       ])
     ]
   }
+
   static sublevelCheckboxResponse() {
     return [
       200,

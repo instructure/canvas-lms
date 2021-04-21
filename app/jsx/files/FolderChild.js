@@ -22,11 +22,11 @@ import createReactClass from 'create-react-class'
 import FolderChild from 'compiled/react_files/components/FolderChild'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import classnames from 'classnames'
-import ItemCog from '../files/ItemCog'
+import ItemCog from './ItemCog'
 import PublishCloud from '../shared/PublishCloud'
 import MasterCourseLock from '../shared/MasterCourseLock'
-import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
-import UsageRightsIndicator from '../files/UsageRightsIndicator'
+import FilesystemObjectThumbnail from './FilesystemObjectThumbnail'
+import UsageRightsIndicator from './UsageRightsIndicator'
 import Folder from 'compiled/models/Folder'
 import preventDefault from 'compiled/fn/preventDefault'
 import FriendlyDatetime from '../shared/FriendlyDatetime'
@@ -42,7 +42,8 @@ FolderChild.renderItemCog = function(canManage) {
       <ItemCog
         model={this.props.model}
         startEditingName={this.startEditingName}
-        userCanManageFilesForContext={canManage}
+        userCanEditFilesForContext={canManage && this.props.userCanEditFilesForContext}
+        userCanDeleteFilesForContext={canManage && this.props.userCanDeleteFilesForContext}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
         externalToolsForContext={this.props.externalToolsForContext}
@@ -59,7 +60,7 @@ FolderChild.renderPublishCloud = function(canManage) {
       <PublishCloud
         model={this.props.model}
         ref="publishButton"
-        userCanManageFilesForContext={canManage}
+        userCanEditFilesForContext={canManage && this.props.userCanRestrictFilesForContext}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
       />
     )
@@ -86,7 +87,12 @@ FolderChild.renderMasterCourseIcon = function(canManage) {
     }
   }
 
-  return <MasterCourseLock model={this.props.model} canManage={canManage} />
+  return (
+    <MasterCourseLock
+      model={this.props.model}
+      canManage={canManage && this.props.userCanEditFilesForContext}
+    />
+  )
 }
 
 FolderChild.renderEditingState = function() {
@@ -104,7 +110,7 @@ FolderChild.renderEditingState = function() {
             }
             defaultValue={this.props.model.displayName()}
             maxLength="255"
-            onKeyUp={(event) => {
+            onKeyUp={event => {
               if (event.keyCode === 27) {
                 this.cancelEditingName()
               }
@@ -136,6 +142,7 @@ FolderChild.renderEditingState = function() {
         href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
         className="ef-name-col__link"
         params={{splat: this.props.model.urlPath()}}
+        role="button"
       >
         {/* we use an internal click wrapper span and handle a native js click event so we can
               intercept the link click event before page.js gets it. We want to prevent page.js from
@@ -162,6 +169,7 @@ FolderChild.renderEditingState = function() {
         onClick={preventDefault(this.handleFileLinkClick)}
         className="ef-name-col__link"
         ref="nameLink"
+        role="button"
       >
         <span className="ef-big-icon-container">
           <FilesystemObjectThumbnail model={this.props.model} />
@@ -178,7 +186,7 @@ FolderChild.renderUsageRightsIndicator = function() {
       <div className="ef-usage-rights-col" role="gridcell">
         <UsageRightsIndicator
           model={this.props.model}
-          userCanManageFilesForContext={this.props.userCanManageFilesForContext}
+          userCanEditFilesForContext={this.props.userCanEditFilesForContext}
           userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
           modalOptions={this.props.modalOptions}
@@ -190,7 +198,9 @@ FolderChild.renderUsageRightsIndicator = function() {
 
 FolderChild.render = function() {
   const user = this.props.model.get('user') || {}
-  const selectCheckboxLabel = I18n.t('Select %{itemName}', {itemName: this.props.model.displayName()})
+  const selectCheckboxLabel = I18n.t('Select %{itemName}', {
+    itemName: this.props.model.displayName()
+  })
   const keyboardCheckboxClass = classnames({
     'screenreader-only': this.state.hideKeyboardCheck,
     'multiselectable-toggler': true
@@ -200,13 +210,12 @@ FolderChild.render = function() {
   })
   const parentFolder = this.props.model.collection && this.props.model.collection.parentFolder
   const canManage =
-    this.props.userCanManageFilesForContext &&
     (!parentFolder || !parentFolder.get('for_submissions')) &&
     !this.props.model.get('for_submissions')
 
   return (
     <div {...this.getAttributesForRootNode()}>
-      <label className={keyboardCheckboxClass} role="gridcell">
+      <label className={keyboardCheckboxClass}>
         <input
           type="checkbox"
           onFocus={() => {
@@ -248,7 +257,7 @@ FolderChild.render = function() {
 
       <div className="ef-links-col" role="gridcell">
         {this.renderMasterCourseIcon(canManage)}
-        {this.renderPublishCloud(canManage && this.props.userCanRestrictFilesForContext)}
+        {this.renderPublishCloud(canManage)}
         {this.renderItemCog(canManage)}
       </div>
     </div>

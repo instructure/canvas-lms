@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!OutcomesDirectoryView'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
@@ -26,30 +26,13 @@ import OutcomeCollection from '../../collections/OutcomeCollection'
 import OutcomeGroupCollection from '../../collections/OutcomeGroupCollection'
 import OutcomeGroupIconView from './OutcomeGroupIconView'
 import OutcomeIconView from './OutcomeIconView'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.disableWhileLoading'
 import 'jqueryui/droppable'
 import '../../jquery.rails_flash_notifications'
 
 // The outcome group "directory" browser.
 export default class OutcomesDirectoryView extends PaginatedView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.moveModelHere = this.moveModelHere.bind(this)
-    this.makeFocusable = this.makeFocusable.bind(this)
-    this.selectFirstOutcome = this.selectFirstOutcome.bind(this)
-    this.triggerSelect = this.triggerSelect.bind(this)
-    this.reset = this.reset.bind(this)
-    this.render = this.render.bind(this)
-    this.handleWarning = this.handleWarning.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.tagName = 'ul'
     this.prototype.className = 'outcome-level'
@@ -99,7 +82,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
       this.$el.disableWhileLoading((dfd = this.groups.fetch()))
     }
 
-    if (opts.selectFirstItem) return this.loadDfd.done(this.selectFirstOutcome)
+    if (opts.selectFirstItem) return this.loadDfd.done(this.selectFirstOutcome.bind(this))
   }
 
   initDroppable() {
@@ -242,7 +225,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
       this._viewsFor(this.outcomes.models, OutcomeIconView)
     )
     for (const v of this._views) {
-      v.on('select', this.triggerSelect)
+      v.on('select', this.triggerSelect.bind(this))
       if (v.model === this.selectedModel) v.select()
     }
     return this._views
@@ -302,9 +285,9 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
       _.isEmpty(this.outcomes.models) &&
       _.isEmpty(this.views())
     ) {
-      return $.publish('renderNoOutcomeWarning')
+      return publish('renderNoOutcomeWarning')
     } else {
-      return $.publish('clearNoOutcomeWarning')
+      return publish('clearNoOutcomeWarning')
     }
   }
 

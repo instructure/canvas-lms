@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -18,48 +20,48 @@
 require_relative '../../helpers/gradebook_common'
 require_relative '../pages/gradebook_page'
 
-describe "group weights" do
+describe "Gradebook - group weights" do
   include_context "in-process server selenium tests"
   include GradebookCommon
 
-  def student_totals
+  def student_totals()
     totals = ff('.total-cell')
     points = []
-    totals.each do |i|
+    for i in totals do
       points.push(i.text)
     end
     points
   end
 
   def toggle_group_weight
-    Gradebook.settings_cog.click
+    gradebook_page.settings_cog_select
     set_group_weights.click
     group_weighting_scheme.click
-    Gradebook.save_button_click
+    gradebook_page.save_button_click
     wait_for_ajax_requests
   end
 
   before(:each) do
     course_with_teacher_logged_in
     student_in_course
-    @course.update_attributes(group_weighting_scheme: 'percent')
+    @course.update(group_weighting_scheme: 'percent')
     @group1 = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 50)
     @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 50)
     @assignment1 = assignment_model({
-                                        course: @course,
-                                        name: 'first assignment',
-                                        due_at: Date.today,
-                                        points_possible: 50,
-                                        submission_types: 'online_text_entry',
-                                        assignment_group: @group1
+                                      course: @course,
+                                      name: 'first assignment',
+                                      due_at: Date.today,
+                                      points_possible: 50,
+                                      submission_types: 'online_text_entry',
+                                      assignment_group: @group1
                                     })
     @assignment2 = assignment_model({
-                                        course: @course,
-                                        name: 'second assignment',
-                                        due_at: Date.today,
-                                        points_possible: 10,
-                                        submission_types: 'online_text_entry',
-                                        assignment_group: @group2
+                                      course: @course,
+                                      name: 'second assignment',
+                                      due_at: Date.today,
+                                      points_possible: 10,
+                                      submission_types: 'online_text_entry',
+                                      assignment_group: @group2
                                     })
     @course.reload
   end
@@ -69,10 +71,10 @@ describe "group weights" do
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = true
-    @course.update_attributes(group_weighting_scheme: 'points')
+    @course.update(group_weighting_scheme: 'points')
 
     # Displays total column as points
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
     expect(student_totals).to eq(["25"])
   end
 
@@ -81,10 +83,10 @@ describe "group weights" do
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = false
-    @course.update_attributes(group_weighting_scheme: 'percent')
+    @course.update(group_weighting_scheme: 'percent')
 
     # Displays total column as points
-    Gradebook.visit_gradebook(@course)
+    Gradebook.visit(@course)
     expect(student_totals).to eq(["45%"])
   end
 
@@ -92,57 +94,52 @@ describe "group weights" do
     before(:each) do
       course_with_teacher_logged_in
       student_in_course
-      @course.update_attributes(group_weighting_scheme: 'percent')
+      @course.update(group_weighting_scheme: 'percent')
       @group1 = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 50)
       @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 50)
       @assignment1 = assignment_model({
-                                          course: @course,
-                                          name: 'first assignment',
-                                          due_at: Date.today,
-                                          points_possible: 50,
-                                          submission_types: 'online_text_entry',
-                                          assignment_group: @group1
+                                        course: @course,
+                                        name: 'first assignment',
+                                        due_at: Date.today,
+                                        points_possible: 50,
+                                        submission_types: 'online_text_entry',
+                                        assignment_group: @group1
                                       })
       @assignment2 = assignment_model({
-                                          course: @course,
-                                          name: 'second assignment',
-                                          due_at: Date.today,
-                                          points_possible: 0,
-                                          submission_types: 'online_text_entry',
-                                          assignment_group: @group2
+                                        course: @course,
+                                        name: 'second assignment',
+                                        due_at: Date.today,
+                                        points_possible: 0,
+                                        submission_types: 'online_text_entry',
+                                        assignment_group: @group2
                                       })
       @course.reload
+
+      @assignment1.grade_student @student, grade: 20, grader: @teacher
+      @assignment2.grade_student @student, grade: 5, grader: @teacher
     end
 
-    it 'should display triangle warnings for assignment groups with 0 points possible', priority: "1", test_id: 164013 do
-
-      Gradebook.visit_gradebook(@course)
-      expect(ff('.icon-warning').count).to eq(2)
+    it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
+      Gradebook.visit(@course)
+      expect(Gradebook.total_cell_warning_icon_select.size).to eq(1)
     end
 
-    it 'should not display triangle warnings if group weights are turned off in gradebook', priority: "1", test_id: 305579 do
-
+    it 'should not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
       @course.apply_assignment_group_weights = false
       @course.save!
-      Gradebook.visit_gradebook(@course)
+      Gradebook.visit(@course)
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
-    it 'should not display triangle warnings if an assignment is muted in both header and total column' do
-      Gradebook.visit_gradebook(@course)
-      Gradebook.toggle_assignment_mute_option(@assignment2.id)
-      expect(f("#content")).not_to contain_jqcss('.total-cell .icon-warning')
-      expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")
+    it 'should display "hidden" icon in total column if an assignment has unposted submissions' do
+      @assignment1.submissions.update_all(posted_at: nil)
+      Gradebook.visit(@course)
+      expect(Gradebook.content_selector).to contain_jqcss('.total-cell .icon-off')
     end
 
-    it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
-      @assignment2.muted = true
-      @assignment2.save!
-      Gradebook.visit_gradebook(@course)
-      Gradebook.toggle_assignment_mute_option(@assignment2.id)
-      expect(f('.total-cell .icon-warning')).to be_displayed
-      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed
-      expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")
+    it 'should not display "hidden" icon in total column if no assignments have unposted submissions' do
+      Gradebook.visit(@course)
+      expect(Gradebook.content_selector).not_to contain_jqcss('.total-cell .icon-off')
     end
   end
 end

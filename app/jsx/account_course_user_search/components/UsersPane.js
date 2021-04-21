@@ -17,17 +17,17 @@
  */
 
 import React from 'react'
-import {shape, func, arrayOf, string} from 'prop-types'
+import {shape, func, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
-import _ from 'underscore'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {debounce, isEmpty} from 'lodash'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'
 import SearchMessage from './SearchMessage'
 import SRSearchMessage from './SRSearchMessage'
 import UserActions from '../actions/UserActions'
 
-const MIN_SEARCH_LENGTH = 3
+const MIN_SEARCH_LENGTH = 2
 export const SEARCH_DEBOUNCE_TIME = 750
 
 export default class UsersPane extends React.Component {
@@ -55,7 +55,7 @@ export default class UsersPane extends React.Component {
     }
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.unsubscribe = this.props.store.subscribe(this.handleStateChange)
 
     // make page reflect what the querystring params asked for
@@ -65,7 +65,7 @@ export default class UsersPane extends React.Component {
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
   }
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     this.unsubscribe()
   }
 
@@ -83,7 +83,7 @@ export default class UsersPane extends React.Component {
     this.props.onUpdateQueryParams(searchFilter)
   }
 
-  debouncedDispatchApplySearchFilter = _.debounce(
+  debouncedDispatchApplySearchFilter = debounce(
     this.handleApplyingSearchFilter,
     SEARCH_DEBOUNCE_TIME
   )
@@ -93,7 +93,7 @@ export default class UsersPane extends React.Component {
     this.debouncedDispatchApplySearchFilter()
   }
 
-  handleSubmitEditUserForm = (attributes, id) => {
+  handleSubmitEditUserForm = () => {
     this.handleApplyingSearchFilter()
   }
 
@@ -124,17 +124,16 @@ export default class UsersPane extends React.Component {
           />
         }
 
-        {!_.isEmpty(users) &&
-          !isLoading && (
-            <UsersList
-              searchFilter={this.state.userList.searchFilter}
-              onUpdateFilters={this.handleUpdateSearchFilter}
-              accountId={accountId.toString()}
-              users={users}
-              handleSubmitEditUserForm={this.handleSubmitEditUserForm}
-              permissions={this.state.userList.permissions}
-            />
-          )}
+        {!isEmpty(users) && !isLoading && (
+          <UsersList
+            searchFilter={this.state.userList.searchFilter}
+            onUpdateFilters={this.handleUpdateSearchFilter}
+            accountId={accountId.toString()}
+            users={users}
+            handleSubmitEditUserForm={this.handleSubmitEditUserForm}
+            permissions={this.state.userList.permissions}
+          />
+        )}
         <SearchMessage
           collection={{data: users, loading: isLoading, links}}
           setPage={this.handleSetPage}

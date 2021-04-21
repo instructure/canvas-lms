@@ -1,0 +1,17 @@
+{
+  "name": "Caliper event actor extensions",
+  "definition": "",
+  "trigger": "",
+  "schema": {
+    "data[0].actor.extensions[\"com.instructure.canvas\"]": {
+      "entity_id": "The ID of the Canvas user who triggered the event",
+      "root_account_id": "The Canvas id of the root account associated with the context of the event",
+      "root_account_lti_guid": "The Canvas lti_guid of the root account associated with the context of the event",
+      "root_account_uuid": "The Canvas uuid of the root account associated with the context of the event",
+      "user_login": "The login of the current user. Only present in user-generated events (events emitted directly from an HTTP request)",
+      "user_sis_id": "The SIS id of the user. Only present in user-generated events (events emitted directly from an HTTP request)",
+      "real_user_id": "The ID of the Canvas user, only populated when masquerade feature is used"
+    }
+  },
+  "examples": []
+}

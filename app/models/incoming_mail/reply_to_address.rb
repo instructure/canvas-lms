@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -50,7 +52,7 @@ class IncomingMail::ReplyToAddress
   # Returns a secure ID string.
   def secure_id
     gid = message.global_id
-    Canvas::Security.hmac_sha1(Shard.short_id_for(gid).to_s)
+    Canvas::Security.hmac_sha1(Shard.short_id_for(gid).to_s)[0..15]
   end
 
   class << self

@@ -33,7 +33,7 @@ export default {
     const {updatedModels} = this.state
 
     if (currentFolder && !showingSearchResults) {
-      updatedModels.forEach(function(model, index, models) {
+      updatedModels.forEach((model, index, models) => {
         let removedModel
         if (
           currentFolder.id.toString() !== model.get('folder_id') &&

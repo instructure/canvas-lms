@@ -5,12 +5,14 @@ test:
   database: canvas_test
   host: localhost
   username: canvas
+  password: your_password
   timeout: 5000
 
 development:
   adapter: postgresql
   encoding: utf8
   database: canvas_development
+  password: your_password
   timeout: 5000
 
 production:

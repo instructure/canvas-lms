@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -24,7 +26,7 @@ RSpec.describe Lti::LineItem, type: :model do
 
     it 'requires "score_maximum"' do
       expect do
-        line_item.update_attributes!(score_maximum: nil)
+        line_item.update!(score_maximum: nil)
       end.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Score maximum can't be blank, Score maximum is not a number"
@@ -33,38 +35,40 @@ RSpec.describe Lti::LineItem, type: :model do
 
     it 'requires "label"' do
       expect do
-        line_item.update_attributes!(label: nil)
+        line_item.update!(label: nil)
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Label can't be blank")
     end
 
     it 'requires "assignment"' do
       expect do
-        line_item.update_attributes!(assignment: nil)
+        line_item.update!(assignment: nil)
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Assignment can't be blank")
     end
   end
 
+  context 'on create' do
+    it 'should add a root account id' do
+      line_item = line_item_model
+      expect(line_item.root_account).not_to be_nil
+    end
+  end
+
   describe '#assignment_line_item?' do
-    let(:resource_link) { resource_link_model }
     let(:line_item) { line_item_model }
     let(:assignment) { assignment_model }
 
-    it 'returns true if there is no resource link' do
-      expect(line_item.assignment_line_item?).to eq true
-    end
-
-    it 'returns true if the line item was created before all others in the resource' do
-      line_item_one = line_item_model(resource_link: resource_link, assignment: assignment)
-      line_item_two = line_item_model(resource_link: resource_link, assignment: assignment)
-      line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
+    it 'returns true if the line item was created before all others in the assignment' do
+      line_item_one = line_item_model(assignment: assignment)
+      line_item_two = line_item_model(assignment: assignment)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
       expect(line_item_one.assignment_line_item?).to eq true
     end
 
-    it 'returns false if there is a link and the line item is not the first in the resource' do
-      line_item_one = line_item_model(resource_link: resource_link, assignment: assignment)
-      line_item_two = line_item_model(resource_link: resource_link, assignment: assignment)
-      line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
+    it 'returns false if the line item is not the first in the assignment' do
+      line_item_one = line_item_model(assignment: assignment)
+      line_item_two = line_item_model(assignment: assignment)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
       expect(line_item_two.assignment_line_item?).to eq false
     end
@@ -80,6 +84,44 @@ RSpec.describe Lti::LineItem, type: :model do
       expect do
         line_item_two
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Assignment does not match ltiLink")
+    end
+  end
+
+  it_behaves_like "soft deletion" do
+    subject { Lti::LineItem }
+    let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
+  end
+
+  context 'when destroying a line item' do
+    let(:line_item) { line_item_model }
+    let(:assignment) { assignment_model }
+    let(:resource_link) { resource_link_model }
+
+    it 'destroys the assignment if it is the first line item and is not coupled' do
+      line_item_one = line_item_model(assignment: assignment, coupled: false)
+      line_item_two = line_item_model(assignment: assignment)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
+      expect {
+        line_item_one.destroy!
+      }.to change(assignment, :workflow_state).from('published').to('deleted')
+    end
+
+    it "doesn't destroy the assignment if the line item is not the first line item" do
+      line_item_one = line_item_model(assignment: assignment)
+      line_item_two = line_item_model(assignment: assignment, coupled: false)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
+      expect {
+        line_item_two.destroy!
+      }.not_to change(assignment, :workflow_state)
+    end
+
+    it "doesn't destroy the assignment if the line item is coupled" do
+      line_item_one = line_item_model(assignment: assignment, coupled: true)
+      line_item_two = line_item_model(assignment: assignment)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
+      expect {
+        line_item_one.destroy!
+      }.not_to change(assignment, :workflow_state)
     end
   end
 end

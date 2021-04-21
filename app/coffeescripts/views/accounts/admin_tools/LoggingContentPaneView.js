@@ -20,6 +20,7 @@ import $ from 'jquery'
 import AuthLoggingContentPaneView from './AuthLoggingContentPaneView'
 import GradeChangeLoggingContentView from './GradeChangeLoggingContentView'
 import CourseLoggingContentView from './CourseLoggingContentView'
+import GraphQLMutationContentView from './GraphQLMutationContentView'
 import template from 'jst/accounts/admin_tools/loggingContentPane'
 
 export default class LoggingContentPaneView extends Backbone.View {
@@ -27,6 +28,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     this.child('authentication', '#loggingAuthentication')
     this.child('gradeChange', '#loggingGradeChange')
     this.child('course', '#loggingCourse')
+    this.child('mutations', '#loggingMutation')
 
     this.prototype.events = {'change #loggingType': 'onTypeChange'}
 
@@ -39,6 +41,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     this.authentication = this.initAuthLogging()
     this.gradeChange = this.initGradeChangeLogging()
     this.course = this.initCourseLogging()
+    this.mutations = this.initMutationLog()
   }
 
   afterRender() {
@@ -82,6 +85,10 @@ export default class LoggingContentPaneView extends Backbone.View {
     }
 
     return new CourseLoggingContentView()
+  }
+
+  initMutationLog() {
+    return this.permissions.mutation ? new GraphQLMutationContentView() : new Backbone.View()
   }
 }
 LoggingContentPaneView.initClass()

@@ -33,7 +33,7 @@ QUnit.module('Discussions app', {
 
 const defaultData = () => ({
   contextCodes: ['course_1'],
-  roles: ['student', 'user'],
+  roles: ['student', 'user']
 })
 
 test('mounts Discussions to container component', () => {

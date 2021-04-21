@@ -15,13 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
+<% provide :page_title do %><%= @user.short_name %><% end %>
 
-<%
-  js_env ga_page_title: "User"
-%>
-<% content_for :page_title do %><%= @user.short_name %><% end %>
-
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div>
     <a href="<%= message_user_path(@user, @context) %>" class="btn button-sidebar-wide">
       <i class="icon-email"></i>
@@ -49,8 +45,13 @@
       </div>
     </div>
   <% end %>
-  <h2><%= @user.short_name %></h2>
-<% content_for :stylesheets do %>
+  <% if @user.workflow_state == 'deleted' %>
+    <div class="alert alert-danger">
+      <i class="icon-warning" aria-hidden="true"></i> <%= t("This user has been deleted") %>
+    </div>
+  <% end %>
+  <h2><%= @user.short_name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h2>
+
 <style type="text/css" media="screen">
   #user-info-fieldsets{
     margin-bottom: 2em;
@@ -63,10 +64,9 @@
     line-height: 1.0em;
   }
 </style>
-<% end %>
 
 <% css_bundle :roster_user, :context_list, :pairing_code %>
-
+<% @responsive_misc = @domain_root_account.feature_enabled?(:responsive_misc) %>
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name' %>
   <%= render :partial => 'users/logins' %>
@@ -93,8 +93,15 @@
             <% num_enrollments += 1 %>
             <li>
               <a href="<%= url_for(account) %>">
-                <span class="name ellipsis"><%= account.name %></span>
-                <span class="subtitle ellipsis"></span>
+                <span
+                  class="name<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
+                  <%= account.name %>
+                </span>
+                <span
+                  class="subtitle<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
+                </span>
               </a>
             </li>
           <% end %>
@@ -109,8 +116,16 @@
             <% num_enrollments += 1 %>
             <li>
               <a href="<%= group_path(membership.group) %>">
-                <span class="name ellipsis"><%= membership.group.name %></span>
-                <span class="subtitle ellipsis"><%= membership.group.context.name rescue "" %></span>
+                <span
+                  class="name<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
+                  <%= membership.group.name %>
+                </span>
+                <span
+                  class="subtitle<%= @responsive_misc ? '' : ' ellipsis' %>"
+                  style="<%= @responsive_misc ? 'word-break: break-word;' : '' %>">
+                  <%= membership.group.context.name rescue "" %>
+                </span>
               </a>
             </li>
           <% end %>

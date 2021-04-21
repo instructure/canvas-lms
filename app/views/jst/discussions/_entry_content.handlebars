@@ -13,7 +13,7 @@
     {{>avatar author}}
   {{/unless}}
   <div class="discussion-header-content right-of-avatar">
-    <div class="pull-left span4">
+    <div class="pull-left span4 discussion-header__metadata">
       <h2 class="discussion-title">
         {{#if hiddenName}}
           <span>{{hiddenName}}</span>
@@ -37,9 +37,14 @@
         {{else}}
           <li><a href="#topic" data-pushstate><i class="icon-discussion"></i> {{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
         {{/if}}
-        {{#ifAll canModerate canReply }}
-          <li><a data-event="edit" href="#"><i class="icon-edit"></i> {{#t "edit"}}Edit{{/t}}</a></li>
-          <li><a data-event="remove" href="#"><i class="icon-trash"></i> {{#t "delete"}}Delete{{/t}}</a></li>
+        {{#ifAll canModerate canReply}}
+          <li><a data-event="edit" href="#"><i class="icon-edit"></i> {{#t}}Edit{{/t}}</a></li>
+          <li><a data-event="remove" href="#"><i class="icon-trash"></i> {{#t}}Delete{{/t}}</a></li>
+        {{else}}
+          {{#if isAuthorsEntry}}
+            <li><a data-event="edit" class="disabled"><i class="icon-edit"></i> {{#t}}Edit (Disabled){{/t}}</a></li>
+            <li><a data-event="remove" class="disabled"><i class="icon-trash"></i> {{#t}}Delete (Disabled){{/t}}</a></li>
+          {{/if}}
         {{/ifAll}}
         {{#if speedgraderUrl}}
           <li><a href="{{speedgraderUrl}}"><i class="icon-speed-grader"></i> {{#t "open_in_speedgrader"}}Open in SpeedGrader{{/t}}</a></li>

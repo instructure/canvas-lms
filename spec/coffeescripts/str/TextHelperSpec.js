@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {delimit, truncateText, formatMessage} from 'compiled/str/TextHelper'
+import TextHelper from 'compiled/str/TextHelper'
+
+const {delimit, truncateText, formatMessage} = TextHelper
 
 QUnit.module('TextHelper')
 

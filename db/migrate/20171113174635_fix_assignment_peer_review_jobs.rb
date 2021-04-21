@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ class FixAssignmentPeerReviewJobs < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    DataFixup::FixAssignmentPeerReviewJobs.send_later_if_production_enqueue_args(:run, priority: Delayed::LOW_PRIORITY)
+    DataFixup::FixAssignmentPeerReviewJobs.delay_if_production(priority: Delayed::LOW_PRIORITY).run
   end
 
   def down

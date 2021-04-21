@@ -100,10 +100,14 @@ li[id$=service_google_docs] {
   }
 }
 
-.profile_pic_link {
+.profile_pic {
   position: relative;
   float: direction(left);
   margin-#{direction(right)}: 5px;
+}
+
+.profile_pic_link {
+  @extend .profile_pic;
 
   .icon-edit {
     background: rgba(0, 0, 0, .75);
@@ -117,6 +121,27 @@ li[id$=service_google_docs] {
 
   &:hover .icon-edit {
     visibility: visible;
+  }
+}
+
+.services-cell {
+  @include desktop-only {
+    & {
+      vertical-align: top;
+      width: 50%;
+    }
+    &:first-of-type {
+      padding-#{direction(right)}: 20px;
+    }
+    &:last-of-type {
+      padding-#{direction(left)}: 20px;
+    }
+  }
+  @include mobile-only {
+    & {
+      width: 100%;
+      display: inline-block;
+    }
   }
 }
 

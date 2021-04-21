@@ -117,7 +117,8 @@ export default class EventManager {
       headers: JSON_HEADERS,
       data: JSON.stringify({
         quiz_submission_events: eventSet.toJSON()
-      })
+      }),
+      error: options.errorHandler
     })
 
     delivery.then(

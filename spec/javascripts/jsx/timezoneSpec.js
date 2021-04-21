@@ -363,7 +363,7 @@ test('mergeTimeAndDate() finds the given time of day on the given date.', () =>
 
 QUnit.module('english tz', {
   setup() {
-    MockDate.set('2015-02-01', 'UTC');
+    MockDate.set('2015-02-01', 'UTC')
     this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
     I18nStubber.setLocale('en_US')
@@ -455,7 +455,7 @@ test('parses 24hr times even if the locale lacks them', () => {
 
 QUnit.module('french tz', {
   setup() {
-    MockDate.set('2015-02-01', 'UTC');
+    MockDate.set('2015-02-01', 'UTC')
     this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
     I18nStubber.setLocale('fr_FR')
@@ -539,7 +539,7 @@ test('parses french date times', () => {
 
 QUnit.module('chinese tz', {
   setup() {
-    MockDate.set('2015-02-01', 'UTC');
+    MockDate.set('2015-02-01', 'UTC')
     this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
     I18nStubber.setLocale('zh_CN')
@@ -598,7 +598,8 @@ test('parses chinese PM times', () => {
   const chineseTimes = [
     // '晚上6点06分',
     // '晚上6点6分22秒',
-    '18:06']
+    '18:06'
+  ]
   chineseTimes.forEach(time => {
     const d = tz.parse(time)
     equal(tz.format(d, '%H'), '18', `this works: ${time}`)
@@ -606,14 +607,11 @@ test('parses chinese PM times', () => {
 })
 
 // the 2 chinese AM specs pass in isolation, but when run as part of the whole js test suite
-// with COVERAGE=1, which serializes the tests, it fails. I suspect it's due to 
+// with COVERAGE=1, which serializes the tests, it fails. I suspect it's due to
 // pollution from another test, but cannot find it.
 // Skipping for now so the master build completes w/o error.
 QUnit.skip('parses chinese AM times', () => {
-  const chineseTimes = [
-    '6点06分',
-    '6点6分22秒',
-    '06:06']
+  const chineseTimes = ['6点06分', '6点6分22秒', '06:06']
   chineseTimes.forEach(time => {
     const d = tz.parse(time)
     equal(tz.format(d, '%H'), '06', `this works: ${time}`)
@@ -627,7 +625,7 @@ QUnit.skip('parses chinese date AM times', () => {
     '2015年8月3日星期一6点06分',
     '8月 3日 于 6:06',
     '20158月3日, 6:06',
-    '一 20158月3日, 6:06'  // this is incorrectly parsing as "Fri, 20 Mar 1908 06:06:00 GMT"
+    '一 20158月3日, 6:06' // this is incorrectly parsing as "Fri, 20 Mar 1908 06:06:00 GMT"
   ]
 
   chineseDateTimes.forEach(dateTime => {
@@ -641,7 +639,7 @@ test('parses chinese date PM times', () => {
     '2015-08-03 18:06:22',
     '2015年8月3日晚上6点06分',
     // '2015年8月3日星期一晚上6点06分', // parsing as "Mon, 03 Aug 2015 06:06:00 GMT"
-    '8月 3日, 于 18:06',
+    '8月 3日, 于 18:06'
     // '2015 8月 3日, 6:06下午',      // doesn't recognize 下午 as implying PM
     // '一 2015 8月 3日, 6:06下午'
   ]
@@ -651,4 +649,3 @@ test('parses chinese date PM times', () => {
     equal(tz.format(d, '%d %H'), '03 18', `this works: ${dateTime}`)
   })
 })
-

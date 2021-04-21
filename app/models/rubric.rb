@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -18,12 +20,16 @@
 
 class Rubric < ActiveRecord::Base
   include Workflow
+  include HtmlTextHelper
+
+  POINTS_POSSIBLE_PRECISION = 4
 
   attr_writer :skip_updating_points_possible
   belongs_to :user
   belongs_to :rubric # based on another rubric
   belongs_to :context, polymorphic: [:course, :account]
-  has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
+  has_many :rubric_associations, -> { where(workflow_state: "active") }, class_name: 'RubricAssociation', inverse_of: :rubric, dependent: :destroy
+  has_many :rubric_associations_with_deleted, class_name: 'RubricAssociation', inverse_of: :rubric
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
@@ -32,6 +38,7 @@ class Rubric < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
 
   before_validation :default_values
+  before_create :set_root_account_id
   after_save :update_alignments
   after_save :touch_associations
 
@@ -41,7 +48,7 @@ class Rubric < ActiveRecord::Base
   scope :publicly_reusable, -> { where(:reusable => true).order(best_unicode_collation_key('title')) }
   scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
   scope :before, lambda { |date| where("rubrics.created_at<?", date) }
-  scope :active, -> { where("workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
 
   set_policy do
     given {|user, session| self.context.grants_right?(user, session, :manage_rubrics)}
@@ -52,6 +59,9 @@ class Rubric < ActiveRecord::Base
 
     given {|user, session| self.context.grants_right?(user, session, :manage)}
     can :read and can :create and can :delete_associations
+
+    given {|user, session| self.context.grants_right?(user, session, :read_rubrics) }
+    can :read
 
     # read_only means "associated with > 1 object for grading purposes"
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_assignments)}
@@ -75,6 +85,41 @@ class Rubric < ActiveRecord::Base
     state :deleted
   end
 
+  def self.aligned_to_outcomes
+    where(
+      ContentTag.learning_outcome_alignments.
+        active.
+        where(content_type: 'Rubric').
+        where('content_tags.content_id = rubrics.id').
+        arel.exists
+    )
+  end
+
+  def self.with_at_most_one_association
+    joins(<<~JOINS).
+      LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_count
+      ON rubrics.id = associations_for_count.rubric_id
+      AND associations_for_count.purpose = 'grading'
+      AND associations_for_count.workflow_state = 'active'
+    JOINS
+      group('rubrics.id').
+      having('COUNT(rubrics.id) < 2')
+  end
+
+  def self.unassessed
+    joins(<<~JOINS).
+      LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_unassessed
+      ON rubrics.id = associations_for_unassessed.rubric_id
+      AND associations_for_unassessed.purpose = 'grading'
+      AND associations_for_unassessed.workflow_state = 'active'
+    JOINS
+      joins(<<~JOINS).
+        LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
+        ON associations_for_unassessed.id = assessments_for_unassessed.rubric_association_id
+      JOINS
+      where(assessments_for_unassessed: {id: nil})
+  end
+
   def default_values
     if Rails.env.test?
       populate_rubric_title # there are too many specs to change and i'm too lazy
@@ -95,14 +140,19 @@ class Rubric < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    rubric_associations.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
-    self.save
+    if self.save
+      rubric_associations.in_batches.destroy_all
+      true
+    end
   end
 
   def restore
     self.workflow_state = 'active'
-    self.save
+    if self.save
+      rubric_associations_with_deleted.where(workflow_state: "deleted").find_each(&:restore)
+      true
+    end
   end
 
   # If any rubric_associations for a given context are marked as
@@ -120,9 +170,10 @@ class Rubric < ActiveRecord::Base
         association.destroy
       end
     else
-      ras.update_all(:bookmarked => false, :updated_at => Time.now.utc)
+      ras.destroy_all
     end
-    unless rubric_associations.bookmarked.exists?
+
+    if rubric_associations.bookmarked.none?
       self.destroy
     end
   end
@@ -158,14 +209,6 @@ class Rubric < ActiveRecord::Base
 
   def criteria_object
     OpenObject.process(self.data)
-  end
-
-  def display_name
-    res = ""
-    res += self.user.name + ", " rescue ""
-    res += self.context.name rescue ""
-    res = t('unknown_details', "Unknown Details") if res.empty?
-    res
   end
 
   def criteria
@@ -224,6 +267,43 @@ class Rubric < ActiveRecord::Base
     self
   end
 
+  def update_mastery_scales(save = true)
+    return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
+
+    mastery_scale = context.resolved_outcome_proficiency
+    return if mastery_scale.nil?
+
+    self.data.each do |criterion|
+      update_criterion_from_mastery_scale(criterion, mastery_scale)
+    end
+    if self.data_changed?
+      self.points_possible = total_points_from_criteria(self.data)
+      self.save! if save
+    end
+  end
+
+  def criterion_needs_update?(criterion, mastery_scale)
+    return false if criterion[:learning_outcome_id].blank?
+
+    return true if criterion[:points] != mastery_scale.points_possible
+    return true if criterion[:mastery_points] != mastery_scale.mastery_points
+    return true if criterion[:ratings]&.length != mastery_scale.outcome_proficiency_ratings.length
+
+    criterion[:ratings].zip(mastery_scale.outcome_proficiency_ratings).any? do |criterion_rating, proficiency_rating|
+      criterion_rating[:description] != proficiency_rating.description ||
+        criterion_rating[:long_description] != '' ||
+        criterion_rating[:points] != proficiency_rating.points
+    end
+  end
+
+  def update_criterion_from_mastery_scale(criterion, mastery_scale)
+    return unless criterion_needs_update?(criterion, mastery_scale)
+
+    criterion[:points] = mastery_scale.points_possible
+    criterion[:mastery_points] = mastery_scale.mastery_points
+    criterion[:ratings] = mastery_scale.outcome_proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
+  end
+
   def update_learning_outcome_criteria(outcome)
     self.data.each do |criterion|
       update_learning_outcome_criterion(criterion, outcome) if criterion[:learning_outcome_id] == outcome.id
@@ -237,9 +317,11 @@ class Rubric < ActiveRecord::Base
   def update_learning_outcome_criterion(criterion, outcome)
     criterion[:description] = outcome.short_description
     criterion[:long_description] = outcome.description
-    criterion[:points] = outcome.points_possible
-    criterion[:mastery_points] = outcome.mastery_points
-    criterion[:ratings] = outcome.rubric_criterion.nil? ? [] : generate_criterion_ratings(outcome, criterion[:id])
+    unless context.root_account.feature_enabled?(:account_level_mastery_scales)
+      criterion[:points] = outcome.points_possible
+      criterion[:mastery_points] = outcome.mastery_points
+      criterion[:ratings] = outcome.rubric_criterion.nil? ? [] : generate_criterion_ratings(outcome, criterion[:id])
+    end
   end
 
   def generate_criterion_ratings(outcome, criterion_id)
@@ -279,32 +361,40 @@ class Rubric < ActiveRecord::Base
     (params[:criteria] || {}).each do |idx, criterion_data|
       criterion = {}
       criterion[:description] = (criterion_data[:description].presence || t('no_description', "No Description")).strip
-      criterion[:long_description] = (criterion_data[:long_description] || "").strip
+      # Outcomes descriptions are already html sanitized, so use that if an outcome criteria
+      # is present. Otherwise we need to sanitize the input ourselves.
+      unless criterion_data[:learning_outcome_id].present?
+        criterion[:long_description] = format_message((criterion_data[:long_description] || "").strip).first
+      end
       criterion[:points] = criterion_data[:points].to_f || 0
-      criterion_data[:id].strip! if criterion_data[:id]
+      criterion_data[:id] = criterion_data[:id].strip if criterion_data[:id]
       criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
       criterion[:id] = unique_item_id(criterion_data[:id])
       criterion[:criterion_use_range] = [true, 'true'].include?(criterion_data[:criterion_use_range])
-      ratings = []
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.where(id: criterion_data[:learning_outcome_id]).first
+        criterion[:long_description] = outcome&.description || ''
         if outcome
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
         end
       end
-      (criterion_data[:ratings] || {}).each do |jdx, rating_data|
-        rating_data[:id]&.strip!
-        rating = criterion_rating(rating_data, criterion[:id])
-        ratings[jdx.to_i] = rating
+
+      ratings = (criterion_data[:ratings] || {}).values.map do |rating_data|
+        rating_data[:id] = rating_data[:id].strip if rating_data[:id]
+        criterion_rating(rating_data, criterion[:id])
       end
-      criterion[:ratings] = ratings.select{|r| r}.sort_by{|r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First]}
+      criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
       criterion[:points] = criterion[:ratings].map{|r| r[:points]}.max || 0
-      criteria[idx.to_i] = criterion
+
+      # Record both the criterion data and the original ID that was passed in
+      # (we'll use the ID when we sort the criteria below)
+      criteria.push([idx, criterion])
     end
-    criteria = criteria.compact
-    points_possible = total_points_from_criteria(criteria)
+    criteria = criteria.sort_by { |criterion| criterion.first&.to_i || CanvasSort::First }.
+      map(&:second)
+    points_possible = total_points_from_criteria(criteria)&.round(POINTS_POSSIBLE_PRECISION)
     CriteriaData.new(criteria, points_possible, title)
   end
 
@@ -331,5 +421,14 @@ class Rubric < ActiveRecord::Base
     else
       criteria
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id ||=
+      if context_type == 'Account' && context.root_account?
+        self.context.id
+      else
+        self.context&.root_account_id
+      end
   end
 end

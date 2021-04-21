@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% js_bundle 'legacy/eportfolios_wizard_box' %>
+<% deferred_js_bundle 'legacy/eportfolios_wizard_box' %>
 
-<% content_for :wizard_box do %>
+<% provide :wizard_box do %>
   <div class="wizard_options" >
     <% if @owner_view %>
       <h3><%= t('headers.getting_started', "Getting Started") %></h3>

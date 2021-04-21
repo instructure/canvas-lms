@@ -22,7 +22,6 @@ import CheckboxModel from 'compiled/models/content_migrations/ContentCheckbox'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
-import 'helpers/fakeENV'
 
 class CheckboxHelper {
   static initClass() {
@@ -39,6 +38,7 @@ class CheckboxHelper {
       return $boxes
     }
   }
+
   static renderView(options) {
     if (!options) {
       options = {}
@@ -57,15 +57,19 @@ class CheckboxHelper {
     this.checkboxView = new CheckboxView({model: checkboxModel})
     return this.$fixtures.html(this.checkboxView.render().el)
   }
+
   static teardown() {
     return this.checkboxView.remove()
   }
+
   static $checkbox() {
     return this.$fixtures.find('[type=checkbox]').first()
   }
+
   static $carrot() {
     return this.$fixtures.find('.checkbox-carrot').first()
   }
+
   static serverResponse() {
     return [
       200,

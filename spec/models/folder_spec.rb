@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require 'delayed/testing'
 
 describe Folder do
   before(:once) do
@@ -24,7 +27,7 @@ describe Folder do
   end
 
   it "should create a new instance given valid attributes" do
-    folder_model
+    expect(folder_model).to be_present
   end
 
   it "should infer its full name if it has a parent folder" do
@@ -107,9 +110,42 @@ describe Folder do
   it "should not allow root folders to have their names changed" do
     f1 = Folder.root_folders(@course).first
     f1.reload
-    f1.update_attributes(:name => "something")
+    f1.update(:name => "something")
     expect(f1.save).to eq false
     expect(f1.errors.detect { |e| e.first.to_s == 'name' }).to be_present
+  end
+
+  describe "set folder root account id" do
+    before(:once) do
+      student_in_course
+      group_model(:context => @course)
+    end
+
+    it "when context is group" do
+      folder = @group.folders.create!
+      expect(folder.root_account_id).to eq @group.root_account_id
+    end
+
+    it "when context is account" do
+      account = @course.account.root_account.manually_created_courses_account
+      folder = account.folders.create!
+      expect(folder.root_account_id).to eq account.root_account_id
+    end
+
+    it "when context is a root account" do
+      folder = @course.root_account.folders.create!
+      expect(folder.root_account_id).to eq @course.root_account_id
+    end
+
+    it "when context is course" do
+      folder = @course.folders.create!
+      expect(folder.root_account_id).to eq @course.root_account_id
+    end
+
+    it "shouldn't happen when context is user" do
+      folder = @user.folders.create!
+      expect(folder.root_account_id).to eq 0
+    end
   end
 
   it "files without an explicit folder_id should be inferred" do
@@ -119,7 +155,7 @@ describe Folder do
     a.uploaded_data = default_uploaded_data
     a.save!
     nil_a = @course.attachments.new
-    nil_a.update_attributes(:uploaded_data => default_uploaded_data)
+    nil_a.update(:uploaded_data => default_uploaded_data)
     expect(nil_a.folder_id).not_to be_nil
     expect(f.active_file_attachments).to be_include(a)
     # f.active_file_attachments.should be_include(nil_a)
@@ -131,7 +167,7 @@ describe Folder do
     a.uploaded_data = default_uploaded_data
     a.save!
     nil_a = @course.attachments.new
-    nil_a.update_attributes(:uploaded_data => default_uploaded_data)
+    nil_a.update(:uploaded_data => default_uploaded_data)
     expect(f.active_file_attachments).to be_include(a)
     expect(f.active_file_attachments).to be_include(nil_a)
   end
@@ -293,6 +329,11 @@ describe Folder do
       teacher_in_course(:course => @course, :active_all => true)
     end
 
+    before(:each) do
+      # granular permissions disabled by default
+      @course.root_account.disable_feature!(:granular_permissions_course_files)
+    end
+
     it "should grant right to students and teachers" do
       expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
       expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
@@ -314,6 +355,38 @@ describe Folder do
         @teacher.enrollments.where(:course_id => @course).first.complete!
         expect(@course.grants_right?(@teacher, :manage_files)).to be_falsey
         expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+    end
+
+    context 'with granular permissions enabled' do
+      before :each do
+        @course.root_account.enable_feature!(:granular_permissions_course_files)
+      end
+
+      it "should grant right to students and teachers" do
+        expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+
+      context "with files tab hidden to students" do
+        before :once do
+          @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+          @course.save!
+          @root_folder.reload
+        end
+
+        it "should grant right to teachers but not students" do
+          expect(@root_folder.grants_right?(@student, :read_contents)).to be_falsey
+          expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+        end
+
+        it "should still grant rights to teachers even if the teacher enrollment is concluded" do
+          @teacher.enrollments.where(:course_id => @course).first.complete!
+          expect(@course.grants_right?(@teacher, :manage_files_add)).to be_falsey
+          expect(@course.grants_right?(@teacher, :manage_files_edit)).to be_falsey
+          expect(@course.grants_right?(@teacher, :manage_files_delete)).to be_falsey
+          expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+        end
       end
     end
   end
@@ -373,6 +446,89 @@ describe Folder do
       dup = @user.folders.build(name: 'dup', parent_folder: @user.submissions_folder)
       dup.submission_context_code = @course.asset_string
       expect { dup.save! }.to raise_exception(ActiveRecord::RecordNotUnique)
+    end
+  end
+
+  describe 'permissions' do
+    before(:once) do
+      @course.offer!
+      student_in_course(active_all: true)
+    end
+
+    let_once(:folder) { @course.folders.create!(name: 'f') }
+    let_once(:file) { attachment_model context: @course, display_name: 'normal.txt', folder: folder }
+
+    context 'clears own permissions' do
+      def student_can_read_contents?
+        Folder.find(folder.id).grants_right? @student, :read_contents
+      end
+
+      it 'when unlock_at set' do
+        Timecop.freeze do
+          folder.update! unlock_at: 5.minutes.from_now
+          expect(student_can_read_contents?).to be false
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be true
+        end
+      end
+
+      it 'when lock_at set' do
+        Timecop.freeze do
+          folder.update! lock_at: 5.minutes.from_now
+          expect(student_can_read_contents?).to be true
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be false
+        end
+      end
+
+      it 'when lock_at and unlock_at set' do
+        Timecop.freeze do
+          folder.update! unlock_at: 5.minutes.from_now, lock_at: 15.minutes.from_now
+          expect(student_can_read_contents?).to be false
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be true
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be false
+        end
+      end
+    end
+
+    context 'clears file permissions' do
+      def student_can_download?
+        file.reload.grants_right? @student, :download
+      end
+
+      it 'when locked' do
+        expect(student_can_download?).to be true
+        folder.update! locked: true
+        expect(student_can_download?).to be false
+      end
+
+      it 'when unlocked' do
+        folder.update! locked: true
+        expect(student_can_download?).to be false
+        folder.update! locked: false
+        expect(student_can_download?).to be true
+      end
+
+      it 'when moved' do
+        expect(student_can_download?).to be true
+        parent_folder = @course.folders.create!(name: 'parent', locked: true)
+        folder.update! parent_folder: parent_folder
+        expect(student_can_download?).to be false
+      end
+
+      it 'in subfolders' do
+        parent_folder = @course.folders.create!(name: 'parent')
+        parent_folder.sub_folders << folder
+        expect(student_can_download?).to be true
+        parent_folder.reload.update! locked: true
+        expect(student_can_download?).to be false
+      end
     end
   end
 end

@@ -39,12 +39,16 @@ test('sets existingAssociations on LOAD_LISTINGS_SUCCESS', () => {
 test('adds associations to existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
   const existing = [getSampleData().courses[0]]
   const added = [getSampleData().courses[1]]
-  const newState = reduce(actions.saveAssociationsSuccess({ added }), { existingAssociations: existing })
+  const newState = reduce(actions.saveAssociationsSuccess({added}), {
+    existingAssociations: existing
+  })
   deepEqual(newState.existingAssociations, getSampleData().courses)
 })
 
 test('removes associations froms existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
-  const newState = reduce(actions.saveAssociationsSuccess({ removed: [{id: '1'}] }), { existingAssociations: getSampleData().courses })
+  const newState = reduce(actions.saveAssociationsSuccess({removed: [{id: '1'}]}), {
+    existingAssociations: getSampleData().courses
+  })
   deepEqual(newState.existingAssociations, [getSampleData().courses[1]])
 })
 
@@ -61,12 +65,14 @@ test('resets addedAssociations on CLEAR_ASSOCIATIONS', () => {
 test('adds associations to addedAssociations on ADD_COURSE_ASSOCIATIONS', () => {
   const existing = [getSampleData().courses[0]]
   const added = [getSampleData().courses[1]]
-  const newState = reduce(actions.addCourseAssociations(added), { addedAssociations: existing })
+  const newState = reduce(actions.addCourseAssociations(added), {addedAssociations: existing})
   deepEqual(newState.addedAssociations, getSampleData().courses)
 })
 
 test('removes associations from addedAssociations on UNDO_ADD_COURSE_ASSOCIATIONS', () => {
-  const newState = reduce(actions.undoAddCourseAssociations(['1']), { addedAssociations: getSampleData().courses })
+  const newState = reduce(actions.undoAddCourseAssociations(['1']), {
+    addedAssociations: getSampleData().courses
+  })
   deepEqual(newState.addedAssociations, [getSampleData().courses[1]])
 })
 
@@ -81,12 +87,14 @@ test('resets removedAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
 })
 
 test('adds associations to removedAssociations on REMOVE_COURSE_ASSOCIATIONS', () => {
-  const newState = reduce(actions.removeCourseAssociations(['1']), { removedAssociations: ['2'] })
+  const newState = reduce(actions.removeCourseAssociations(['1']), {removedAssociations: ['2']})
   deepEqual(newState.removedAssociations, ['2', '1'])
 })
 
 test('removes associations from removedAssociations on UNDO_REMOVE_COURSE_ASSOCIATIONS', () => {
-  const newState = reduce(actions.undoRemoveCourseAssociations(['1']), { removedAssociations: [{id: '1'}, {id: '2'}] })
+  const newState = reduce(actions.undoRemoveCourseAssociations(['1']), {
+    removedAssociations: [{id: '1'}, {id: '2'}]
+  })
   deepEqual(newState.removedAssociations, [{id: '2'}])
 })
 
@@ -151,7 +159,7 @@ test('sets isLoadingBeginMigration to true on BEGIN_MIGRATION_START', () => {
 })
 
 test('sets isLoadingBeginMigration to false on BEGIN_MIGRATION_SUCCESS', () => {
-  const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
+  const newState = reduce(actions.beginMigrationSuccess({workflow_state: 'queued'}))
   equal(newState.isLoadingBeginMigration, false)
 })
 
@@ -166,7 +174,7 @@ test('sets hasCheckedMigration to true on CHECK_MIGRATION_SUCCESS', () => {
 })
 
 test('sets hasCheckedMigration to true on BEGIN_MIGRATION_SUCCESS', () => {
-  const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
+  const newState = reduce(actions.beginMigrationSuccess({workflow_state: 'queued'}))
   equal(newState.hasCheckedMigration, true)
 })
 
@@ -186,7 +194,7 @@ test('sets isCheckingMigration to false on CHECK_MIGRATION_FAIL', () => {
 })
 
 test('sets migrationStatus to true on BEGIN_MIGRATION_SUCCESS', () => {
-  const newState = reduce(actions.beginMigrationSuccess({ workflow_state: 'queued' }))
+  const newState = reduce(actions.beginMigrationSuccess({workflow_state: 'queued'}))
   equal(newState.migrationStatus, 'queued')
 })
 
@@ -262,43 +270,54 @@ test('sets willIncludeCourseSettings on INCLUDE_COURSE_SETTINGS', () => {
 })
 
 test('creates empty change log entry on SELECT_CHANGE_LOG', () => {
-  const newState = reduce(actions.realSelectChangeLog({ changeId: '5' }))
-  deepEqual(newState.changeLogs, { 5: {
-    changeId: '5',
-    status: LoadStates.states.not_loaded,
-    data: null,
-  } })
+  const newState = reduce(actions.realSelectChangeLog({changeId: '5'}))
+  deepEqual(newState.changeLogs, {
+    5: {
+      changeId: '5',
+      status: LoadStates.states.not_loaded,
+      data: null
+    }
+  })
 })
 
 test('sets change log status to loading on LOAD_CHANGE_START', () => {
-  const newState = reduce(actions.loadChangeStart({ changeId: '5' }))
-  deepEqual(newState.changeLogs, { 5: {
-    changeId: '5',
-    status: LoadStates.states.loading,
-    data: null,
-  } })
+  const newState = reduce(actions.loadChangeStart({changeId: '5'}))
+  deepEqual(newState.changeLogs, {
+    5: {
+      changeId: '5',
+      status: LoadStates.states.loading,
+      data: null
+    }
+  })
 })
 
 test('sets change log data and status to loaded on LOAD_CHANGE_SUCCESS', () => {
-  const newState = reduce(actions.loadChangeSuccess({ changeId: '5', changes: ['1', '2'] }))
-  deepEqual(newState.changeLogs, { 5: {
-    changeId: '5',
-    status: LoadStates.states.loaded,
-    data: { changeId: '5', changes: ['1', '2'] },
-  } })
+  const newState = reduce(actions.loadChangeSuccess({changeId: '5', changes: ['1', '2']}))
+  deepEqual(newState.changeLogs, {
+    5: {
+      changeId: '5',
+      status: LoadStates.states.loaded,
+      data: {changeId: '5', changes: ['1', '2']}
+    }
+  })
 })
 
 test('sets change log status to not loaded on LOAD_CHANGE_FAILED', () => {
-  const newState = reduce(actions.loadChangeFail({ changeId: '5' }))
-  deepEqual(newState.changeLogs, { 5: {
-    changeId: '5',
-    status: LoadStates.states.not_loaded,
-    data: null,
-  } })
+  const newState = reduce(actions.loadChangeFail({changeId: '5'}))
+  deepEqual(newState.changeLogs, {
+    5: {
+      changeId: '5',
+      status: LoadStates.states.not_loaded,
+      data: null
+    }
+  })
 })
 
 test('catches any action with err and message and treats it as an error notification', () => {
-  const newState = reduce({ type: '_NOT_A_REAL_ACTION_', payload: { message: 'hello world', err: 'bad things happened' } })
+  const newState = reduce({
+    type: '_NOT_A_REAL_ACTION_',
+    payload: {message: 'hello world', err: 'bad things happened'}
+  })
   equal(newState.notifications.length, 1)
   equal(newState.notifications[0].type, 'error')
   equal(newState.notifications[0].message, 'hello world')
@@ -306,14 +325,14 @@ test('catches any action with err and message and treats it as an error notifica
 })
 
 test('adds new info notification on NOTIFY_INFO', () => {
-  const newState = reduce(actions.notifyInfo({ message: 'hello world' }))
+  const newState = reduce(actions.notifyInfo({message: 'hello world'}))
   equal(newState.notifications.length, 1)
   equal(newState.notifications[0].type, 'info')
   equal(newState.notifications[0].message, 'hello world')
 })
 
 test('adds new error notification on NOTIFY_ERROR', () => {
-  const newState = reduce(actions.notifyError({ message: 'hello world', err: 'bad things happened' }))
+  const newState = reduce(actions.notifyError({message: 'hello world', err: 'bad things happened'}))
   equal(newState.notifications.length, 1)
   equal(newState.notifications[0].type, 'error')
   equal(newState.notifications[0].message, 'hello world')
@@ -322,7 +341,7 @@ test('adds new error notification on NOTIFY_ERROR', () => {
 
 test('clear notification on CLEAR_NOTIFICATION', () => {
   const newState = reduce(actions.clearNotification('1'), {
-    notifications: [{ id: '1', message: 'hello world', type: 'info' }]
+    notifications: [{id: '1', message: 'hello world', type: 'info'}]
   })
   equal(newState.notifications.length, 0)
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,6 +21,7 @@
 class SubmissionComment < ActiveRecord::Base
   include SendToStream
   include HtmlTextHelper
+  include Workflow
 
   AUDITABLE_ATTRIBUTES = %w[
     comment
@@ -38,17 +41,30 @@ class SubmissionComment < ActiveRecord::Base
   attr_writer :updating_user
   attr_accessor :grade_posting_in_progress
 
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :submission
   belongs_to :author, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :viewed_submission_comments, dependent: :destroy
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
+  validates_each :attempt do |record, attr, value|
+    next if value.nil?
+
+    submission_attempt = (record.submission.attempt || 0)
+    submission_attempt = 1 if submission_attempt == 0
+    if value > submission_attempt
+      record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
+    end
+  end
+  validates :workflow_state, inclusion: {in: ["active"]}, allow_nil: true
 
   before_save :infer_details
+  before_save :set_root_account_id
   before_save :set_edited_at
   after_save :update_participation
   after_save :check_for_media_object
@@ -74,6 +90,10 @@ class SubmissionComment < ActiveRecord::Base
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
 
+  workflow do
+    state :active
+  end
+
   def delete_other_comments_in_this_group
     update_other_comments_in_this_group(&:destroy)
   end
@@ -81,7 +101,7 @@ class SubmissionComment < ActiveRecord::Base
   def publish_other_comments_in_this_group
     return unless saved_change_to_draft?
     update_other_comments_in_this_group do |comment|
-      comment.update_attributes(draft: draft)
+      comment.update(draft: draft)
     end
   end
 
@@ -109,16 +129,26 @@ class SubmissionComment < ActiveRecord::Base
     !!self.provisional_grade_id
   end
 
+  def read?(current_user)
+    self.submission.read?(current_user) || self.viewed_submission_comments.where(user: current_user).exists?
+  end
+
+  def mark_read!(current_user)
+    ViewedSubmissionComment.unique_constraint_retry do
+      self.viewed_submission_comments.where(user: current_user).first_or_create!
+    end
+  end
+
   def media_comment?
     self.media_comment_id && self.media_comment_type
   end
 
   def check_for_media_object
     if self.media_comment? && self.saved_change_to_media_comment_id?
-      MediaObject.ensure_media_object(self.media_comment_id, {
-        :user => self.author,
-        :context => self.author,
-      })
+      MediaObject.ensure_media_object(self.media_comment_id, 
+        user: self.author,
+        context: self.author
+      )
     end
   end
 
@@ -149,15 +179,16 @@ class SubmissionComment < ActiveRecord::Base
     can :read_author
   end
 
+  def course_broadcast_data
+    submission.context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
     p.to do
-      course_id = /\d+/.match(submission.context_code).to_s.to_i
-      section_ended =
-        Enrollment.where({
-                           user_id: submission.user.id
-                         }).section_ended(course_id).length > 0
-      unless section_ended
+      active_participant =
+        Enrollment.where(user_id: submission.user.id, :course_id => submission.course_id).active_by_date.exists?
+      if active_participant
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end
     end
@@ -168,10 +199,11 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.assignment &&
       record.submission.assignment.context.available? &&
-      !record.submission.assignment.muted? &&
+      record.submission.posted? &&
       record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
       (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
@@ -180,6 +212,7 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
+    p.data { course_broadcast_data }
   end
 
   def can_view_comment?(user, session)
@@ -197,12 +230,21 @@ class SubmissionComment < ActiveRecord::Base
     end
 
     # Students on the receiving end of an assessment can view assessors' comments
-    return true if assessment_request.present? && assessment_request.user_id == user.id
+    if assessment_request.present?
+      return true if assessment_request.user_id == user.id
+      # Peer-review comments that belong to a group should be viewable by the
+      # rest of the group.
+      if group_comment_id.present?
+        group_user_ids = submission.group&.user_ids || []
+        return true if assessment_request.assessor_id == author_id && group_user_ids.include?(user.id)
+      end
+    end
 
-    # The student who owns the submission can't see drafts or hidden comments (or,
-    # generally, any instructor comments if the assignment is muted)
-    if submission.user_id == user.id
-      return false if draft? || hidden? || assignment.muted?
+    # The student who owns the submission can't see draft or hidden comments (or,
+    # generally, any instructor comments if the assignment is muted); the same
+    # holds for anyone observing the student
+    if submission.user_id == user.id || User.observing_students_in_course(submission.user, assignment.context).include?(user)
+      return false if draft? || hidden? || !submission.posted?
 
       # Generally the student should see only non-provisional comments--but they should
       # also see provisional comments from the final grader if grades are published
@@ -228,6 +270,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def can_read_author?(user, session)
     RequestCache.cache('user_can_read_author', self, user, session) do
+      return false if self.submission.assignment.anonymize_students?
       (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
           self.author == user ||
           self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
@@ -289,6 +332,12 @@ class SubmissionComment < ActiveRecord::Base
     self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
+
+    self.workflow_state ||= "active"
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= context.root_account_id
   end
 
   def force_reload_cached_attachments
@@ -352,14 +401,18 @@ class SubmissionComment < ActiveRecord::Base
     # id_changed? because new_record? is false in after_save callbacks
     if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
       return if submission.user_id == author_id
-      return if submission.assignment.deleted? || submission.assignment.muted?
+      return if submission.assignment.deleted? || !submission.posted?
       return if provisional_grade_id.present?
 
-      ContentParticipation.create_or_update({
-        :content => submission,
-        :user => submission.user,
-        :workflow_state => "unread",
-      })
+      self.class.connection.after_transaction_commit do
+        submission.user.clear_cache_key(:submissions)
+
+        ContentParticipation.create_or_update({
+          :content => submission,
+          :user => submission.user,
+          :workflow_state => "unread",
+        })
+      end
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,7 +38,7 @@ describe "Common Cartridge exporting" do
     content_export.save!
 
     expect {
-      content_export.export_without_send_later
+      content_export.export(synchronous: true)
     }.to change(ErrorReport, :count).by 1
 
     expect(content_export.error_messages.length).to eq 1
@@ -63,7 +65,7 @@ describe "Common Cartridge exporting" do
     end
 
     def run_export(opts = {})
-      @ce.export_without_send_later(opts)
+      @ce.export(opts, synchronous: true)
       expect(@ce.error_messages).to eq []
       @file_handle = @ce.attachment.open :need_local_file => true
       @zip_file = Zip::File.open(@file_handle.path)
@@ -72,7 +74,7 @@ describe "Common Cartridge exporting" do
     end
 
     def mig_id(obj)
-      CC::CCHelper.create_key(obj)
+      CC::CCHelper.create_key(obj, global: true)
     end
 
     def check_resource_node(obj, type, selected=true)
@@ -204,7 +206,7 @@ describe "Common Cartridge exporting" do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.attachments.first.instfs_uuid).to eq(uuid)
     end
 
@@ -224,10 +226,10 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
-      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_')
+      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_', global: true)
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
 
-      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_')
+      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_', global: true)
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
     end
 
@@ -316,12 +318,73 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"%24IMS-CC-FILEBASE%24/unfiled/first.png\">\n</div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
       check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
 
       path = @manifest_doc.at_css("resource[identifier=#{mig_id(@att)}]")['href']
+      expect(@zip_file.find_entry(path)).not_to be_nil
+    end
+
+    it "should include media objects" do
+      skip 'PHO-360 (9/17/2020)'
+
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+      @media_object = @course.media_objects.create!(
+        :media_id => "some-kaltura-id",
+        :media_type => "video"
+      )
+
+      qq = @q1.quiz_questions.create!
+      data = {
+        :correct_comments => "",
+        :question_type => "multiple_choice_question",
+        :question_bank_name => "Quiz",
+        :assessment_question_id => "9270",
+        :migration_id => "QUE_1014",
+        :incorrect_comments => "",
+        :question_name => "test fun",
+        :name => "test fun",
+        :points_possible => 1,
+        :question_text => "<p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/some-kaltura-id\"></a></p>",
+        :answers => [{
+          :migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080
+        }, {
+          :migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279
+        }]
+      }.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = { :all_quizzes => "1" }
+      @ce.save!
+
+      allow(CC::CCHelper).to receive(:media_object_info).and_return({
+        :asset => { :id => "some-kaltura-id", :size => 1234, :status => '2' },
+        :path => "media_objects/some-kaltura-id"
+      })
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      allow(CanvasKaltura::ClientV3).to receive(:startSession)
+      allow(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return("some-url")
+      mock_http_response = Struct.new(:code) do
+        def read_body(stream)
+          stream.puts("lalala")
+        end
+      end
+      allow(CanvasHttp).to receive(:get).and_yield(mock_http_response.new(200))
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
+      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"$IMS-CC-FILEBASE$/media_objects/some-kaltura-id\"></a></p></div>"
+
+      resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(@media_object)}]")
+      expect(resource_node).to_not be_nil
+      path = resource_node['href']
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
@@ -360,7 +423,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"%24IMS-CC-FILEBASE%24/unfiled/not_actually_first.png\">\n</div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
 
@@ -370,13 +433,13 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1"})
+      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1">})
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
       description = doc.at_css('description').to_s
-      expect(description).not_to include 'https://example.com%24IMS-CC-FILEBASE%24'
-      expect(description).to include 'img src="%24IMS-CC-FILEBASE%24/unfiled/first.png'
+      expect(description).not_to include 'https://example.com$IMS-CC-FILEBASE$'
+      expect(description).to include 'img src="$IMS-CC-FILEBASE$/unfiled/first.png'
     end
 
     it "should not fail when answers are missing for FIMB" do
@@ -503,7 +566,7 @@ describe "Common Cartridge exporting" do
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return('http://www.example.com/blah.flv')
       stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: "", status: 200)
-      allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
+      allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, path: 'blah.flv'})
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
       page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
@@ -512,11 +575,12 @@ describe "Common Cartridge exporting" do
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
       run_export
-      file_node = @manifest_doc.at_css("resource[identifier='id4164d7d594985594573e63f8ca15975'] file[href$='/blah.flv.tlh.subtitles']")
+      key = CC::CCHelper.create_key(track.content, global: true)
+      file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
       expect(file_node).to be_present
       expect(@zip_file.read(file_node['href'])).to eql(track.content)
       track_doc = Nokogiri::XML(@zip_file.read('course_settings/media_tracks.xml'))
-      expect(track_doc.at_css('media_tracks media track[locale=tlh][kind=subtitles][identifierref=id4164d7d594985594573e63f8ca15975]')).to be_present
+      expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
       expect(ccc_schema.validate(track_doc)).to be_empty
     end
 
@@ -537,7 +601,7 @@ describe "Common Cartridge exporting" do
 
       # validate cc1.3 assignment xml document
       assignment_xml_doc = Nokogiri::XML(@zip_file.read(assignment_xml_file))
-      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="%24IMS-CC-FILEBASE%24/unfiled/test.txt">what?</a>'
+      expect(assignment_xml_doc.at_css('text').text).to eq '<a href="$IMS-CC-FILEBASE$/unfiled/test.txt">what?</a>'
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
       expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11.0'
@@ -557,12 +621,96 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
     end
 
+    context 'LTI 1.3 Assignments' do
+      subject do
+        run_export(version: version)
+        @manifest_doc
+      end
+
+      let(:assignment) do
+        @course.assignments.new(
+          name: 'test assignment',
+          submission_types: 'external_tool',
+          points_possible: 10
+        )
+      end
+
+      let(:non_assignment_link) do
+        Lti::ResourceLink.create!(
+          context: @course,
+          context_external_tool: tool,
+          custom: custom_params
+        )
+      end
+
+      let(:custom_params) { { foo: 'bar '} }
+      let(:version) { '1.1.0' }
+      let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
+      let(:tag) { ContentTag.create!(context: assignment, content: tool, url: tool.url) }
+      let(:tool) { external_tool_model(context: @course, opts: { use_1_3: true }) }
+
+      before do
+        non_assignment_link
+        tool.update!(developer_key: developer_key)
+        assignment.external_tool_tag = tag
+        assignment.save!
+        assignment.primary_resource_link.update!(custom: { foo: 'assignment' })
+      end
+
+      shared_examples_for 'an export that includes lti resource links' do
+        it 'includes a "resource" element in the manifest for each link' do
+          expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+        end
+
+        it 'includes a "file" element pointing to the resource link document' do
+          resource_links = subject.css "resource[type='imsbasiclti_xmlv1p3']"
+
+          resource_links.each do |rl|
+            identifier = rl.get_attribute 'identifier'
+            expect(rl.css('file').first.get_attribute('href')).to eq "lti_resource_links/#{identifier}.xml"
+          end
+        end
+
+        context 'when an associated tool is not present' do
+          before { tool.destroy! }
+
+          it 'does not export the resource links' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+          end
+        end
+
+        context 'when the resource link does not include custom parameters' do
+          let(:custom_params) { nil }
+
+          it 'exports resource links that have custom params and those that do not' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to have(2).items
+          end
+        end
+
+        context 'when the resource link is not active' do
+          before do
+            Lti::ResourceLink.active.update_all(workflow_state: 'deleted')
+          end
+
+          it 'does not export the resource links' do
+            expect(subject.css "resource[type='imsbasiclti_xmlv1p3']").to be_blank
+          end
+        end
+      end
+
+      it_behaves_like 'an export that includes lti resource links'
+
+      context 'with common cartridge 1.3' do
+        let(:version) { '1.3' }
+
+        it_behaves_like 'an export that includes lti resource links'
+      end
+    end
+
     context 'similarity detection tool associations' do
       include_context "lti2_course_spec_helper"
 
       before(:each) do
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { SecureRandom.uuid }
         allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
         tool_proxy.context = @course
         tool_proxy.save!
@@ -627,8 +775,6 @@ describe "Common Cartridge exporting" do
       end
 
       before(:each) do
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { SecureRandom.uuid }
         allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
 
         assignment = @course.assignments.create! name: 'test assignment', submission_types: 'online_upload'

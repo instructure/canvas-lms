@@ -1,5 +1,5 @@
-<div {{bind-attr class=":row :pad-box :bottom-only view.classPath"}}>
-  <div class="span3">
+<div {{bind-attr class=":row-fluid :pad-box :bottom-only view.classPath"}}>
+  <div class="span4">
     <button
       class="btn btn-block previous_object"
       {{action 'selectItem' 'previous' target="view"}}
@@ -8,7 +8,7 @@
       {{view.previousLabel}}
     </button>
   </div>
-  <div class="span3">
+  <div class="span4">
     <button
       class="btn btn-block next_object"
       {{action 'selectItem' 'next' target="view"}}

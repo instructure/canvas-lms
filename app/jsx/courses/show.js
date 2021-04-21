@@ -16,71 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CourseHomeDialog from '../courses/CourseHomeDialog'
-import HomePagePromptContainer from '../courses/HomePagePromptContainer'
+import CourseHomeDialog from './CourseHomeDialog'
+import HomePagePromptContainer from './HomePagePromptContainer'
 import createStore from '../shared/helpers/createStore'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 import I18n from 'i18n!courses_show'
-import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { initializePlanner, renderToDoSidebar } from 'canvas-planner'
-import { showFlashAlert } from '../shared/FlashAlert'
+import {initializePlanner, renderToDoSidebar} from '@instructure/canvas-planner'
+import {showFlashAlert} from '../shared/FlashAlert'
 import apiUserContent from 'compiled/str/apiUserContent'
+import * as apiClient from './apiClient'
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
-  savedDefaultView: ENV.COURSE.default_view,
-})
-
-const publishCourse = () => {
-  axios.put(`/api/v1/courses/${ENV.COURSE.id}`, {
-    course: {event: 'offer'}
-  }).then(() => {
-    window.location.reload()
-  })
-}
-
-
-$('#course_status_form').submit((e) => {
-  const input = e.target.elements.namedItem('course[event]')
-  const value = input && input.value
-  if (value === 'offer') {
-    e.preventDefault()
-
-    const defaultView = defaultViewStore.getState().savedDefaultView
-    const container = document.getElementById('choose_home_page_not_modules');
-    if (!!container) {
-      axios.get(`/api/v1/courses/${ENV.COURSE.id}/modules`)
-        .then(({data: modules}) => {
-          if (defaultView === 'modules' && modules.length === 0) {
-            ReactDOM.render(
-              <HomePagePromptContainer
-                forceOpen
-                store={defaultViewStore}
-                courseId={ENV.COURSE.id}
-                wikiFrontPageTitle={ENV.COURSE.front_page_title}
-                wikiUrl={ENV.COURSE.pages_url}
-                returnFocusTo={$(".btn-publish").get(0)}
-                onSubmit={() => {
-                  if (defaultViewStore.getState().savedDefaultView !== 'modules') {
-                    publishCourse()
-                  }
-                }}
-              />,
-              container
-            )
-          } else {
-            publishCourse()
-          }
-        })
-    } else {
-      // we don't have the ability to change to change the course home page so just publish it
-      publishCourse()
-    }
-  }
+  savedDefaultView: ENV.COURSE.default_view
 })
 
 class ChooseHomePageButton extends React.Component {
@@ -89,7 +41,7 @@ class ChooseHomePageButton extends React.Component {
   }
 
   static propTypes = {
-    store: PropTypes.object.isRequired,
+    store: PropTypes.object.isRequired
   }
 
   render() {
@@ -98,22 +50,24 @@ class ChooseHomePageButton extends React.Component {
         <button
           type="button"
           className="Button button-sidebar-wide choose_home_page_link"
-          ref={(b) => this.chooseButton = b }
+          ref={b => (this.chooseButton = b)}
           onClick={this.onClick}
         >
           <i className="icon-target" aria-hidden="true" />
           &nbsp;{I18n.t('Choose Home Page')}
         </button>
-        <CourseHomeDialog
-          store={this.props.store}
-          open={this.state.dialogOpen}
-          onRequestClose={this.onClose}
-          courseId={ENV.COURSE.id}
-          wikiFrontPageTitle={ENV.COURSE.front_page_title}
-          wikiUrl={ENV.COURSE.pages_url}
-          returnFocusTo={this.chooseButton}
-          isPublishing={false}
-        />
+        {this.state.dialogOpen && (
+          <CourseHomeDialog
+            store={this.props.store}
+            open={this.state.dialogOpen}
+            onRequestClose={this.onClose}
+            courseId={ENV.COURSE.id}
+            wikiFrontPageTitle={ENV.COURSE.front_page_title}
+            wikiUrl={ENV.COURSE.pages_url}
+            returnFocusTo={this.chooseButton}
+            isPublishing={false}
+          />
+        )}
       </div>
     )
   }
@@ -127,14 +81,7 @@ class ChooseHomePageButton extends React.Component {
   }
 }
 
-const container = document.getElementById('choose_home_page')
-if (container) {
-  ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
-}
-
-
-
-const addToDoSidebar = (parent) => {
+const addToDoSidebar = parent => {
   initializePlanner({
     env: window.ENV, // missing STUDENT_PLANNER_COURSES, which is what we want
     flashError: message => showFlashAlert({message, type: 'error'}),
@@ -144,14 +91,58 @@ const addToDoSidebar = (parent) => {
     dateTimeFormatters: {
       dateString: $.dateString,
       timeString: $.timeString,
-      datetimeString: $.datetimeString,
+      datetimeString: $.datetimeString
     },
     forCourse: ENV.COURSE.id
   })
   renderToDoSidebar(parent)
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+$(() => {
+  $('#course_status_form').submit(e => {
+    const input = e.target.elements.namedItem('course[event]')
+    const value = input && input.value
+    const courseId = ENV.COURSE.id
+    if (value === 'offer') {
+      e.preventDefault()
+
+      const defaultView = defaultViewStore.getState().savedDefaultView
+      const container = document.getElementById('choose_home_page_not_modules')
+      if (container) {
+        apiClient.getModules({courseId}).then(({data: modules}) => {
+          if (defaultView === 'modules' && modules.length === 0) {
+            ReactDOM.render(
+              <HomePagePromptContainer
+                forceOpen
+                store={defaultViewStore}
+                courseId={courseId}
+                wikiFrontPageTitle={ENV.COURSE.front_page_title}
+                wikiUrl={ENV.COURSE.pages_url}
+                returnFocusTo={$('.btn-publish').get(0)}
+                onSubmit={() => {
+                  if (defaultViewStore.getState().savedDefaultView !== 'modules') {
+                    apiClient.publishCourse({courseId})
+                  }
+                }}
+              />,
+              container
+            )
+          } else {
+            apiClient.publishCourse({courseId})
+          }
+        })
+      } else {
+        // we don't have the ability to change to change the course home page so just publish it
+        apiClient.publishCourse({courseId})
+      }
+    }
+  })
+
+  const container = document.getElementById('choose_home_page')
+  if (container) {
+    ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
+  }
+
   const todo_container = document.querySelector('.todo-list')
   if (todo_container) {
     addToDoSidebar(todo_container)

@@ -16,5 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title (@context.is_a?(Account) ? t(:page_title_accounts, 'Account Groups') : t(:page_title, 'Course Groups')), @context.name %><% end %>
+<% provide :page_title do %><%= join_title (@context.is_a?(Account) ? t(:page_title_accounts, 'Account Groups') : t(:page_title, 'Course Groups')), @context.name %><% end %>
 <% js_bundle :manage_groups2 %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -24,6 +26,7 @@ module CanvasCrummy
 
     # Add a crumb to the +crumbs+ array
     def add_crumb(name, url=nil, options = {})
+      raise "call add_crumb in the controller when using streaming templates" if @streaming_template
       crumbs.push [name, url, options]
     end
 

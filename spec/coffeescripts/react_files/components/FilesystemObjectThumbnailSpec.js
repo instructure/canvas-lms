@@ -49,13 +49,16 @@ QUnit.module('Filesystem Object Thumbnail: file', {
 test('displays the thumbnail image', function() {
   equal(
     $(ReactDOM.findDOMNode(this.thumbnail)).attr('style'),
-    "background-image: url(\"sweet_thumbnail_url\");",
+    'background-image: url("sweet_thumbnail_url");',
     'set background image to correct url'
   )
 })
 
 test('adds class name from props to the span', function() {
-  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'), 'finds the custom className')
+  ok(
+    $(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'),
+    'finds the custom className'
+  )
 })
 
 QUnit.module('Filesystem Object Thumbnail: folder', {
@@ -78,11 +81,17 @@ QUnit.module('Filesystem Object Thumbnail: folder', {
 })
 
 test("adds mimeClass-Folder if it's a folder", function() {
-  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('mimeClass-folder'), 'adds mimeClass for folder')
+  ok(
+    $(ReactDOM.findDOMNode(this.thumbnail)).hasClass('mimeClass-folder'),
+    'adds mimeClass for folder'
+  )
 })
 
 test('adds on className to i tag if set in props', function() {
-  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'), 'finds the custom className')
+  ok(
+    $(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'),
+    'finds the custom className'
+  )
 })
 
 QUnit.module('Filesystem Object Thumbnail: other')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -37,17 +39,25 @@ describe Setting do
     end
 
     it 'should allow passing a cache expiration' do
-      opts = { expires_in: 1.minute }
       # cache 0 in process
-      expect(Setting.get('my_new_setting', '0', cache_options: opts)).to eq '0'
+      expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '0'
       # some other process sets the value out from under us
       Setting.create!(name: 'my_new_setting', value: '1')
       # but we still see the cached value for now
-      expect(Setting.get('my_new_setting', '0', cache_options: opts)).to eq '0'
+      expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '0'
       # until the expiration has passed
       Timecop.travel(2.minutes.from_now) do
-        expect(Setting.get('my_new_setting', '0', cache_options: opts)).to eq '1'
+        expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '1'
       end
+    end
+
+    it "doesn't need to query if all settings are already cached, even when skipping cache" do
+      Setting.reset_cache!
+      Setting.get('setting1', nil)
+      expect(Setting).to receive(:find_by).never
+      expect(Setting).to receive(:pluck).never
+      expect(MultiCache).to receive(:fetch).never
+      Setting.skip_cache { Setting.get('setting2', nil) }
     end
   end
 

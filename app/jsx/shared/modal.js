@@ -26,7 +26,8 @@ import ModalButtons from './modal-buttons'
 
 const modalOverrides = {
   overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: '2002'
   },
   content: {
     position: 'static',
@@ -88,21 +89,22 @@ export default class Modal extends React.Component {
 
   getAppElement = () =>
     // Need to wait for the dom to load before we can get the default #application dom element
-     this.props.appElement || document.getElementById('application')
-
+    this.props.appElement || document.getElementById('application')
 
   processMultipleChildren = props => {
     let content = null
     let buttons = null
 
-    React.Children.forEach(props.children, (child) => {
+    React.Children.forEach(props.children, child => {
       if (child.type === ModalContent) {
         content = child
       } else if (child.type === ModalButtons) {
         buttons = child
       } else {
         // Warning if you don't include a component of the right type
-        console.warn('Modal chilren must be wrapped in either a modal-content or modal-buttons component.')
+        console.warn(
+          'Modal chilren must be wrapped in either a modal-content or modal-buttons component.'
+        )
       }
     })
 

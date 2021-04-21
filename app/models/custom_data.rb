@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -46,6 +48,14 @@ class CustomData < ActiveRecord::Base
 
   def get_data(scope)
     hash_data_from_scope(data_frd, "d/#{scope}")
+  end
+
+  def lock_and_save
+    transaction do
+      self.lock!
+      yield
+      self.destroyed? || save
+    end
   end
 
   def set_data(scope, val)

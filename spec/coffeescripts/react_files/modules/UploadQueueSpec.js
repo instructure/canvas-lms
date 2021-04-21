@@ -17,21 +17,33 @@
  */
 
 import UploadQueue from 'compiled/react_files/modules/UploadQueue'
-import $ from 'jquery'
+import sinon from 'sinon'
 
-const mockFileOptions = (name = 'foo', type = 'bar') => ({
+const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   file: {
     size: 1,
     name,
     type
-  }
+  },
+  expandZip
 })
-const mockFileUploader = file => ({
+const mockFileUploader = (file, error) => ({
   upload() {
-    const promise = $.Deferred()
-    window.setTimeout(() => promise.resolve(), 2)
+    this.inFight = true
+    // eslint-disable-next-line no-unused-vars
+    const promise = new Promise((resolve, reject) => {
+      window.setTimeout(() => {
+        this.inFlight = false
+        resolve()
+      }, 2)
+    })
     return promise
   },
+  reset() {
+    this.error = null
+  },
+  inFlight: false,
+  error,
   file
 })
 const mockAttemptNext = function() {}
@@ -68,7 +80,7 @@ test('processes one upload at a time', function(assert) {
   equal(this.queue.length(), 2) // first item starts, remainder are waiting
   window.setTimeout(() => {
     equal(this.queue.length(), 1) // after two more ticks there is only one remaining
-    done();
+    done()
   }, 2)
   this.queue.createUploader = original
 })
@@ -94,7 +106,6 @@ test('getAllUploaders includes the current uploader', function() {
   equal(this.queue.length(), 1)
   this.queue.enqueue(mockFileOptions('zoo'))
   equal(this.queue.length(), 2)
-  equal(this.queue.length(), 2)
   const sentinel = mockFileOptions('sentinel')
   this.queue.currentUploader = sentinel
   const all = this.queue.getAllUploaders()
@@ -102,4 +113,29 @@ test('getAllUploaders includes the current uploader', function() {
   equal(all.indexOf(sentinel), 0)
   this.queue.currentUploader = undefined
   this.queue.attemptNextUpload = original
+})
+
+test('Calls onChange', function() {
+  const onChangeSpy = sinon.spy(this.queue, 'onChange')
+  const callbackSpy = sinon.spy()
+  this.queue.addChangeListener(callbackSpy)
+  const foo = mockFileOptions('foo', 'bar', true)
+  const uploader = this.queue.createUploader(foo)
+
+  uploader.onProgress()
+  ok(onChangeSpy.calledOnce)
+  ok(callbackSpy.calledWith(this.queue))
+  ok(callbackSpy.calledOnce)
+})
+
+test('can retry a specific uploader', function(assert) {
+  const done = assert.async()
+  const foo = mockFileUploader('foo', 'whoops')
+  const zoo = mockFileUploader('zoo', 'failed')
+  this.queue._queue.push(foo)
+  this.queue._queue.push(zoo)
+  return this.queue.attemptThisUpload(foo).then(() => {
+    equal(this.queue.length(), 1)
+    done()
+  })
 })

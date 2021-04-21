@@ -16,16 +16,18 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'Backbone'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!external_toolsHomeworkSubmissionLtiContainer'
 import $ from 'jquery'
 import _ from 'underscore'
 import homeworkSubmissionTool from 'jst/assignments/homework_submission_tool'
 import ExternalContentReturnView from '../views/ExternalTools/ExternalContentReturnView'
-import ExternalToolCollection from '../external_tools/ExternalToolCollection'
+import ExternalToolCollection from './ExternalToolCollection'
 import ExternalContentFileSubmissionView from '../views/assignments/ExternalContentFileSubmissionView'
 import ExternalContentUrlSubmissionView from '../views/assignments/ExternalContentUrlSubmissionView'
 import ExternalContentLtiLinkSubmissionView from '../views/assignments/ExternalContentLtiLinkSubmissionView'
 import {recordEulaAgreement} from '../../../public/javascripts/submit_assignment_helper'
+import {handleContentItem, handleDeepLinkingError} from './deepLinking'
+import processSingleContentItem from '../../jsx/deep_linking/processors/processSingleContentItem'
 import 'jquery.disableWhileLoading'
 
 export default class HomeworkSubmissionLtiContainer {
@@ -51,11 +53,38 @@ export default class HomeworkSubmissionLtiContainer {
     }
   }
 
+  handleDeepLinking = event => {
+    if (
+      event.origin !== ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN ||
+      !event.data ||
+      event.data.messageType !== 'LtiDeepLinkingResponse'
+    ) {
+      return
+    }
+    processSingleContentItem(event)
+      .then(result => {
+        handleContentItem(result, this.contentReturnView, this.removeDeepLinkingListener)
+      })
+      .catch(e => {
+        handleDeepLinkingError(e, this.contentReturnView, this.embedLtiLaunch.bind(this))
+      })
+  }
+
+  removeDeepLinkingListener = () => {
+    window.removeEventListener('message', this.handleDeepLinking)
+  }
+
+  addDeepLinkingListener = () => {
+    this.removeDeepLinkingListener()
+    window.addEventListener('message', this.handleDeepLinking)
+  }
+
   // embed the LTI iframe into the tab contents
   embedLtiLaunch(toolId) {
     const tool = this.externalToolCollection.findWhere({id: toolId.toString(10)})
     this.cleanupViewsForTool(tool)
     const returnView = this.createReturnView(tool)
+    this.addDeepLinkingListener()
     $(`#submit_from_external_tool_form_${toolId}`).prepend(returnView.el)
     returnView.render()
     return this.renderedViews[toolId.toString(10)].push(returnView)
@@ -91,22 +120,32 @@ export default class HomeworkSubmissionLtiContainer {
       displayAsModal: false
     })
 
-    returnView.on('ready', (function(_this) {
-      return function(data) {
-        var homeworkSubmissionView;
-        tool = this.model; // this will return the model from returnView
-        homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data);
-        homeworkSubmissionView.parentView = _this;
-        this.remove();
-        $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el);
-        _this.cleanupViewsForTool(tool);
-        _this.renderedViews[tool.get('id')].push(homeworkSubmissionView);
-        homeworkSubmissionView.render();
-        return $('input.turnitin_pledge').click(function(e) {
-          return recordEulaAgreement('#eula_agreement_timestamp', e.target.checked);
-        });
-      };
-    })(this));
+    this.contentReturnView = returnView
+
+    returnView.on(
+      'ready',
+      (function(_this) {
+        return function(data) {
+          // render inline submitted file view
+          let homeworkSubmissionView
+          tool = this.model // this will return the model from returnView
+          homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data)
+          homeworkSubmissionView.parentView = _this
+          this.remove()
+          $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el)
+          _this.cleanupViewsForTool(tool)
+          _this.renderedViews[tool.get('id')].push(homeworkSubmissionView)
+          homeworkSubmissionView.render()
+
+          // close dialog if launched from the More tab
+          window.external_tool_dialog.ready(data.contentItems)
+
+          return $('input.turnitin_pledge').click(e =>
+            recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
+          )
+        }
+      })(this)
+    )
 
     returnView.on('cancel', data => {})
 

@@ -17,7 +17,7 @@
  */
 
 const {compile} = require('coffee-script')
-const {transform} = require('babel-core')
+const {transform} = require('@babel/core')
 
 exports.process = coffee => {
   const amd = compile(coffee, {bare: true})

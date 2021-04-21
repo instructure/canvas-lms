@@ -14,7 +14,7 @@
         href="{{url}}"
     {{/if}}
     title="{{#t "authors_name"}}Author's name{{/t}}"
-    >{{display_name}}
+    >{{display_name}} {{#if pronouns}} (<i>{{pronouns}}</i>){{/if}}
   {{else}}
     class="author unknown"
     >{{#t "unknown_author"}}>Unknown Author{{/t}}

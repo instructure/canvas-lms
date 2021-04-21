@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -31,6 +33,39 @@ describe RubricAssessment do
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
   end
+
+  describe "active_rubric_association?" do
+    before(:once) do
+      @assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 5,
+            :comments => "comments",
+          }
+        }
+      })
+    end
+
+    it "returns false if there is no rubric association" do
+      @assessment.update!(rubric_association: nil)
+      expect(@assessment).not_to be_active_rubric_association
+    end
+
+    it "returns false if the rubric association is soft-deleted" do
+      @association.destroy
+      expect(@assessment).not_to be_active_rubric_association
+    end
+
+    it "returns true if the rubric association exists and is active" do
+      expect(@assessment).to be_active_rubric_association
+    end
+  end
+
+  it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
 
   it "should htmlify the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
@@ -156,8 +191,55 @@ describe RubricAssessment do
           }
         }
       })
-      expect(assessment.score).to eql(11.0)
-      expect(assessment.artifact.score).to eql(11.0)
+      expect(assessment.score).to be 11.0
+      expect(assessment.artifact.score).to be 11.0
+    end
+
+    it 'rounds the final score to avoid floating-point arithmetic issues' do
+      def criteria(id)
+        {
+          :description => "Some criterion",
+          :points => 10,
+          :id => id,
+          :ratings => [
+            {:description => "Good", :points => 10, :id => 'rat1', :criterion_id => id},
+            {:description => "Medium", :points => 5, :id => 'rat2', :criterion_id => id},
+            {:description => "Bad", :points => 0, :id => 'rat3', :criterion_id => id}
+          ]
+        }
+      end
+
+      rubric = rubric_model(data: %w[crit1 crit2 crit3 crit4].map { |n| criteria(n) })
+      association = rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+
+      # in an ideal world these would be stored using the DECIMAL type, but we
+      # don't live in that world
+      assessment = association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 1.2,
+            :rating_id => 'rat2'
+          },
+          :criterion_crit2 => {
+            :points => 1.2,
+            :rating_id => 'rat2'
+          },
+          :criterion_crit3 => {
+            :points => 1.2,
+            :rating_id => 'rat2'
+          },
+          :criterion_crit4 => {
+            :points => 0.4,
+            :rating_id => 'rat2'
+          }
+        }
+      })
+
+      expect(assessment.score).to eq(4.0)
     end
 
     context "outcome criterion" do
@@ -165,6 +247,24 @@ describe RubricAssessment do
         assignment_model
         outcome_with_rubric
         @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+        @course.enroll_student(@student, enrollment_state: :active)
+      end
+
+      it 'assessing a rubric with outcome criterion should increment datadog counter' do
+        expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome_result.create')
+        @outcome.update!(data: nil)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => '3'
+            }
+          }
+        })
       end
 
       it 'should use default ratings for scoring' do
@@ -198,8 +298,8 @@ describe RubricAssessment do
             }
           }
         })
-        expect(assessment.score).to eql(3.0)
-        expect(assessment.artifact.score).to eql(3.0)
+        expect(assessment.score).to be 3.0
+        expect(assessment.artifact.score).to be 3.0
       end
 
       it "should allow points to exceed max points possible " +
@@ -239,6 +339,23 @@ describe RubricAssessment do
         expect(LearningOutcomeResult.last.hide_points).to be true
       end
 
+      it "should truncate the learning outcome result title to 250 characters" do
+        @association.update!(title: 'a'*255)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "5"
+            }
+          }
+        })
+        expect(LearningOutcomeResult.last.title.length).to eq 250
+      end
+
       it "propagates hide_outcome_results value" do
         @association.update!(hide_outcome_results: true)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
@@ -254,6 +371,36 @@ describe RubricAssessment do
           }
         })
         expect(LearningOutcomeResult.last.hidden).to be true
+      end
+
+      it "restores a deleted result" do
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3"
+            }
+          }
+        })
+        result = LearningOutcomeResult.last
+        result.destroy
+
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3"
+            }
+          }
+        })
+        expect(result.reload).to be_active
       end
 
       it "does not update outcomes on a peer assessment" do
@@ -447,6 +594,53 @@ describe RubricAssessment do
     end
 
     describe '#update_artifact' do
+      describe 'grade_posting_in_progress' do
+        subject_once(:ra) do
+          RubricAssessment.new(
+            score: 2.0,
+            assessment_type: :grading,
+            rubric: rubric,
+            artifact: submission,
+            assessor: @teacher
+          )
+        end
+
+        let_once(:rubric) { rubric_model }
+        let_once(:submission) { @assignment.submissions.find_by!(user: @student) }
+
+        before do
+          submission.score = 1
+          ra.build_rubric_association(
+            use_for_grading: true,
+            association_object: @assignment
+          )
+        end
+
+        it 'is nil by default' do
+          expect(@assignment).to receive(:grade_student).with(
+            ra.submission.student,
+            score: ra.score,
+            grader: ra.assessor,
+            graded_anonymously: nil,
+            grade_posting_in_progress: nil
+          )
+          ra.save!
+        end
+
+        it 'passes grade_posting_in_progress from submission' do
+          submission.grade_posting_in_progress = true
+
+          expect(@assignment).to receive(:grade_student).with(
+            ra.submission.student,
+            score: ra.score,
+            grader: ra.assessor,
+            graded_anonymously: nil,
+            grade_posting_in_progress: submission.grade_posting_in_progress
+          )
+          ra.save!
+        end
+      end
+
       it 'should set group on submission' do
         group_category = @course.group_categories.create!(name: "Test Group Set")
         group = @course.groups.create!(name: "Group A", group_category: group_category)
@@ -475,6 +669,52 @@ describe RubricAssessment do
           }
         })
         expect(submission.reload.group).to eq group
+      end
+
+      describe "submission posting" do
+        let(:assessment_params) do
+          {
+            user: @student,
+            assessor: @teacher,
+            artifact: submission,
+            assessment: {
+              assessment_type: 'grading',
+              criterion_crit1: {
+                points: 5
+              }
+            }
+          }
+        end
+
+        let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+        let(:submission) { assignment.submission_for_student(@student) }
+        let(:rubric_association) { @rubric.associate_with(assignment, @course, purpose: "grading", use_for_grading: true) }
+
+        it "posts the submission if the assignment is automatically posted" do
+          rubric_association.assess(assessment_params)
+          expect(submission.reload).to be_posted
+        end
+
+        it "does not post the submission if the assignment is manually posted" do
+          assignment.post_policy.update!(post_manually: true)
+          rubric_association.assess(assessment_params)
+          expect(submission.reload).not_to be_posted
+        end
+
+        it "posts submissions for all members of the group if the assignment is graded by group" do
+          group_category = @course.group_categories.create!(name: "Test Group Set")
+          group = @course.groups.create!(name: "Group A", group_category: group_category)
+          group.add_user(@student)
+
+          other_student_in_group = @course.enroll_student(User.create!, enrollment_state: :active).user
+          group.add_user(other_student_in_group)
+          group.save!
+
+          assignment.update!(group_category: group_category, grade_group_students_individually: false)
+
+          rubric_association.assess(assessment_params)
+          expect(assignment.submission_for_student(other_student_in_group)).to be_posted
+        end
       end
     end
   end
@@ -518,6 +758,26 @@ describe RubricAssessment do
       RoleOverride.create!(:context => @account, :permission => 'manage_courses', :role => role, :enabled => false)
       @account.account_users.create!(user: @user, role: role)
       expect(@assessment.grants_right?(@user, :read)).to eq true
+    end
+  end
+
+  describe 'create' do
+    it 'sets the root_account_id using rubric' do
+      assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 5,
+            :comments => 'abcdefg',
+          }
+        }
+      })
+
+      expect(assessment.root_account_id).to_not be_nil
+      expect(assessment.root_account_id).to eq @rubric.root_account_id
     end
   end
 end

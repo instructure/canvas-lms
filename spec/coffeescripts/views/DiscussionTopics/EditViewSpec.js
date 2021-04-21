@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import {extend, defer} from 'lodash'
+import RCELoader from 'jsx/shared/rce/serviceRCELoader'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import Assignment from 'compiled/models/Assignment'
 import DueDateList from 'compiled/models/DueDateList'
@@ -32,6 +33,8 @@ import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import 'helpers/jquery.simulate'
+
+const currentOrigin = window.location.origin
 
 const editView = function(opts = {}, discussOpts = {}) {
   const modelClass = opts.isAnnouncement ? Announcement : DiscussionTopic
@@ -93,6 +96,10 @@ QUnit.module('EditView', {
   setup() {
     fakeENV.setup()
     this.server = sinon.fakeServer.create({respondImmediately: true})
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
+
+    RCELoader.RCE = null
+    return RCELoader.loadRCE()
   },
   teardown() {
     this.server.restore()
@@ -175,36 +182,41 @@ test('does not render #podcast_has_student_posts_container for non-course contex
 })
 
 test('routes to discussion details normally', function() {
-  const view = this.editView({}, {html_url: 'http://foo'})
-  equal(view.locationAfterSave({}), 'http://foo')
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({}), currentOrigin + '/foo')
 })
 
 test('routes to return_to', function() {
-  const view = this.editView({}, {html_url: 'http://foo'})
-  equal(view.locationAfterSave({return_to: 'http://bar'}), 'http://bar')
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
 test('does not route to return_to with javascript protocol', function() {
-  const view = this.editView({}, {html_url: 'http://foo'})
-  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), 'http://foo')
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
+})
+
+test('does not route to return_to in remote origin', function() {
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: 'http://evil.com'}), currentOrigin + '/foo')
 })
 
 test('cancels to env normally', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({}), 'http://foo')
+  equal(view.locationAfterCancel({}), currentOrigin + '/foo')
 })
 
 test('cancels to return_to', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({return_to: 'http://bar'}), 'http://bar')
+  equal(view.locationAfterCancel({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
 test('does not cancel to return_to with javascript protocol', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), 'http://foo')
+  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
 })
 
 test('shows todo checkbox', function() {
@@ -360,16 +372,40 @@ QUnit.module(
   })
 )
 
+QUnit.module('EditView - Usage Rights', {
+  setup() {
+    fakeENV.setup()
+    ENV.FEATURES.usage_rights_discussion_topics = true
+    ENV.USAGE_RIGHTS_REQUIRED = true
+    ENV.PERMISSIONS.manage_files = true
+    this.server = sinon.fakeServer.create({respondImmediately: true})
+    sandbox.fetch.mock('http://api/folders?contextType=user&contextId=1', 200)
+    sandbox.fetch.mock('path:/api/session', 200)
+  },
+  teardown() {
+    this.server.restore()
+    fakeENV.teardown()
+  },
+  editView() {
+    return editView.apply(this, arguments)
+  }
+})
+
+test('renders usage rights control', function() {
+  const view = this.editView({permissions: {CAN_ATTACH: true}})
+  equal(view.$el.find('#usage_rights_control').length, 1)
+})
+
 QUnit.module('EditView - ConditionalRelease', {
   setup() {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1},
-      jwt: 'foo'
+      assignment: {id: 1}
     }
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create({respondImmediately: true})
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -565,6 +601,7 @@ QUnit.module('EditView: Assignment External Tools', {
   setup() {
     fakeENV.setup({})
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
 
   teardown() {
@@ -578,13 +615,13 @@ QUnit.module('EditView: Assignment External Tools', {
 })
 
 test('it attaches assignment external tools component in course context', function() {
-  ENV.context_asset_string = "course_1"
+  ENV.context_asset_string = 'course_1'
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 1)
 })
 
 test('it does not attach assignment external tools component in group context', function() {
-  ENV.context_asset_string = "group_1"
+  ENV.context_asset_string = 'group_1'
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 0)
 })

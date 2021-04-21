@@ -31,7 +31,7 @@ QUnit.module('File', {
   }
 })
 
-test('uploads the file, and sets attributes from response', function(assert) {
+test('uploads the file, and sets attributes from response', assert => {
   const done = assert.async()
   const data = {
     id: 123,

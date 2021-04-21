@@ -18,6 +18,7 @@
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import template from 'jst/courses/roster/rosterTabs'
+import 'jqueryui/tabs'
 
 export default class RosterTabsView extends Backbone.View {
   static initClass() {

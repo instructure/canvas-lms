@@ -15,17 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-], (_, Backbone) ->
+import _ from 'underscore'
+import Backbone from 'Backbone'
 
-  class Account extends Backbone.Model
-    urlRoot: '/api/v1/accounts'
+export default class Account extends Backbone.Model
+  urlRoot: '/api/v1/accounts'
 
-    present: ->
-      _.clone @attributes
+  present: ->
+    _.clone @attributes
 
-    toJSON: ->
-      id: @get('id')
-      account: _.omit(@attributes, 'id')
+  toJSON: ->
+    id: @get('id')
+    account: _.omit(@attributes, 'id')

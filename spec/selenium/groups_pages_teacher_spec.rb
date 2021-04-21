@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -233,7 +235,7 @@ describe "groups" do
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
-      it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627 do
+      it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627, ignore_js_errors: true do
         skip_if_safari(:alert)
         DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                 title: 'Group Discussion', message: 'Group')
@@ -250,10 +252,15 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
+    # We have the funky indenting here because we will remove this once the granular
+    # permission stuff is released, and I don't want to complicate the git history
+    # for this file
+    RSpec.shared_examples "group_pages_teacher_granular_permissions" do
     describe "pages page" do
       it_behaves_like 'pages_page', :teacher
 
-      it "should allow teachers to create a page", :xbrowser, priority: "1", test_id: 289993 do
+      it "should allow teachers to create a page", priority: "1", test_id: 289993 do
+        skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         get pages_page
         manually_create_wiki_page('stuff','it happens')
       end
@@ -277,6 +284,11 @@ describe "groups" do
         get "/groups/#{new_group.id}/pages"
         expect(f('.index-content')).not_to contain_css('.wiki-page-link')
       end
+    end
+    end
+
+    describe 'With granular permission on' do
+      it_behaves_like "group_pages_teacher_granular_permissions"
     end
 
     #-------------------------------------------------------------------------------------------------------------------

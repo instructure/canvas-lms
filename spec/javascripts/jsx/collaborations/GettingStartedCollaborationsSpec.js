@@ -25,6 +25,7 @@ QUnit.module('GettingStartedCollaborations')
 function setEnvironment(roles, context) {
   ENV.context_asset_string = context
   ENV.current_user_roles = roles
+  ENV.CREATE_PERMISSION = true
 }
 
 test('renders the Getting Startted app div', () => {
@@ -78,7 +79,7 @@ test('renders the correct content with no collaborations data as a student', () 
   equal(expectedContent, wrapper.find('p').text())
 })
 
-test('renders the correct content with lti tools configured as a student', () => {
+test('renders the correct content with lti tools configured as a student with create permission enabled', () => {
   setEnvironment(['student'], 'course_4')
   const wrapper = mount(
     <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />
@@ -86,6 +87,23 @@ test('renders the correct content with lti tools configured as a student', () =>
   const expectedHeader = 'Getting started with Collaborations'
   const expectedContent =
     'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by clicking on the "+ Collaboration" button.'
+  const expectedLinkText = 'Learn more about collaborations'
+
+  equal(expectedHeader, wrapper.find('.ic-Action-header__Heading').text())
+  equal(expectedContent, wrapper.find('p').text())
+  equal(expectedLinkText, wrapper.find('a').text())
+})
+
+test('renders the correct content with lti tools configured as a student with create permission disabled', () => {
+  setEnvironment(['student'], 'course_4')
+  ENV.CREATE_PERMISSION = false
+
+  const wrapper = mount(
+    <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />
+  )
+  const expectedHeader = 'Getting started with Collaborations'
+  const expectedContent =
+    'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Talk to your teacher to get started.'
   const expectedLinkText = 'Learn more about collaborations'
 
   equal(expectedHeader, wrapper.find('.ic-Action-header__Heading').text())

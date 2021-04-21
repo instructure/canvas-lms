@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -89,6 +91,9 @@ module CanvasQuizStatistics::Analyzers
     #       // Number of students who picked this answer.
     #       "responses": 3,
     #
+    #       // The ids of the students who scored this value.
+    #       "user_ids": [100, 101, 102],
+    #
     #       // The names of the students who scored this value.
     #       "user_names": ["John", "Jim", "Jenny"],
     #
@@ -110,6 +115,7 @@ module CanvasQuizStatistics::Analyzers
     metric :answers do |responses|
       answers = Hash.new do |h,k|
         h[k] = {
+          user_ids: [],
           user_names: [],
           responses: 0
         }
@@ -151,6 +157,7 @@ module CanvasQuizStatistics::Analyzers
         # This will indicate correct if any point value reaches 100%
         hash[:full_credit] ||= response[:points].to_f >= @question_data[:points_possible].to_f
 
+        hash[:user_ids] << response[:user_id]
         hash[:user_names] << response[:user_name]
         hash[:responses] += 1
       end

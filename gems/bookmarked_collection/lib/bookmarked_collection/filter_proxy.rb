@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -34,6 +36,7 @@ class BookmarkedCollection::FilterProxy < BookmarkedCollection::Proxy
       # a single non-filtered item
       subpager.per_page = pager.per_page + 1
       subpager.current_bookmark = bookmark
+      subpager.next_bookmark = nil # reset the next_bookmark so we don't re-use the old one forever if the next_bookmark is not set next time
       subpager = @collection.execute_pager(subpager)
 
       break if subpager.empty?

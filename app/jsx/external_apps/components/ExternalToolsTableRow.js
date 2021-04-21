@@ -18,27 +18,34 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import PropTypes from 'prop-types'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {bool, func, number, object} from 'prop-types'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import EditExternalToolButton from '../../external_apps/components/EditExternalToolButton'
-import ManageUpdateExternalToolButton from '../../external_apps/components/ManageUpdateExternalToolButton'
-import ExternalToolPlacementButton from '../../external_apps/components/ExternalToolPlacementButton'
-import DeleteExternalToolButton from '../../external_apps/components/DeleteExternalToolButton'
-import ConfigureExternalToolButton from '../../external_apps/components/ConfigureExternalToolButton'
-import ReregisterExternalToolButton from '../../external_apps/components/ReregisterExternalToolButton'
-import classMunger from '../../external_apps/lib/classMunger'
+import EditExternalToolButton from './EditExternalToolButton'
+import ManageUpdateExternalToolButton from './ManageUpdateExternalToolButton'
+import ExternalToolPlacementButton from './ExternalToolPlacementButton'
+import DeleteExternalToolButton from './DeleteExternalToolButton'
+import DeploymentIdButton from './DeploymentIdButton'
+import ConfigureExternalToolButton from './ConfigureExternalToolButton'
+import ReregisterExternalToolButton from './ReregisterExternalToolButton'
+import store from '../lib/ExternalAppsStore'
+import classMunger from '../lib/classMunger'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import 'jquery.instructure_misc_helpers'
 
+const MAX_FAVS = 2
 export default class ExternalToolsTableRow extends React.Component {
   static propTypes = {
-    tool: PropTypes.object.isRequired,
-    canAddEdit: PropTypes.bool.isRequired,
-    setFocusAbove: PropTypes.func.isRequired
+    tool: object.isRequired,
+    canAddEdit: bool.isRequired,
+    setFocusAbove: func.isRequired,
+    favoriteCount: number.isRequired,
+    showLTIFavoriteToggles: bool
   }
 
-  onModalClose = () => {
-    this.button.focus()
+  get is13Tool() {
+    return this.props.tool.lti_version === '1.3'
   }
 
   nameClassNames = () => classMunger('external_tool', {muted: this.props.tool.enabled === false})
@@ -55,7 +62,6 @@ export default class ExternalToolsTableRow extends React.Component {
         <span className="text-muted">
           <i
             className="icon-lock"
-            ref="lockIcon"
             data-tooltip="top"
             title={I18n.t('%{app} was installed by Admin and is locked', {
               app: this.props.tool.name
@@ -96,33 +102,72 @@ export default class ExternalToolsTableRow extends React.Component {
     if (opts.passFocusUp) {
       this.props.setFocusAbove()
     } else {
+      this.focus()
+    }
+  }
+
+  focus() {
+    if (this.button) {
       this.button.focus()
     }
   }
 
-  focus () {
-    this.button.focus()
+  handleFavoriteChange = event => {
+    const checked = event.target.checked
+    this.changeFavoriteLTI(checked)
+  }
+
+  changeFavoriteLTI = checked => {
+    const success = _res => {
+      const externalTools = store.getState().externalTools
+      externalTools.find(t => t.app_id === this.props.tool.app_id).is_rce_favorite = checked
+      store.setState({externalTools})
+    }
+
+    const error = err => {
+      showFlashAlert({
+        message: I18n.t('We were unable to update the app.'),
+        err,
+        type: 'error'
+      })
+    }
+
+    store.setAsFavorite(this.props.tool, checked, success, error)
+  }
+
+  updateTool = tool => {
+    const externalTools = store.getState().externalTools
+    const toolRef = externalTools.find(t => String(t.app_id) === tool.id)
+    if (toolRef) {
+      toolRef.editor_button_settings = tool.editor_button
+      store.setState({externalTools})
+    }
+  }
+
+  validateTool = (r, placement) => {
+    if (placement === 'editor_button') {
+      if (r && !r.editor_button.enabled && this.props.tool.is_rce_favorite) {
+        this.changeFavoriteLTI(false)
+      }
+      store.fetchWithDetails(this.props.tool).then(data => {
+        this.updateTool(data)
+      })
+    }
   }
 
   renderButtons = () => {
-    if (this.props.tool.lti_version === '1.3') {
-      return <td className="links text-right" nowrap="nowrap">
-        <Text>LTI 1.3</Text>
-      </td>
-    }
-    if (this.props.tool.installed_locally && !this.props.tool.restricted_by_master_course) {
-      let configureButton= null
+    const {tool} = this.props
+    if (tool.installed_locally && !tool.restricted_by_master_course) {
+      let configureButton = null
       let updateBadge = null
 
-      if (this.props.tool.tool_configuration) {
-        configureButton = (
-          <ConfigureExternalToolButton ref="configureExternalToolButton" tool={this.props.tool} returnFocus={this.returnFocus} />
-        )
+      if (tool.tool_configuration) {
+        configureButton = <ConfigureExternalToolButton tool={tool} returnFocus={this.returnFocus} />
       }
 
-      if (this.props.tool.has_update) {
+      if (tool.has_update) {
         const badgeAriaLabel = I18n.t('An update is available for %{toolName}', {
-          toolName: this.props.tool.name
+          toolName: tool.name
         })
         updateBadge = <i className="icon-upload tool-update-badge" aria-label={badgeAriaLabel} />
       }
@@ -131,20 +176,17 @@ export default class ExternalToolsTableRow extends React.Component {
         <td className="links text-right" nowrap="nowrap">
           {updateBadge}
           <div className="al-dropdown__container">
-            <a
+            <button
               className="al-trigger btn"
-              role="button"
-              href="#"
+              type="button"
               ref={c => {
                 this.button = c
               }}
             >
               <i className="icon-settings" />
               <i className="icon-mini-arrow-down" />
-              <span className="screenreader-only">{`${this.props.tool.name} ${I18n.t(
-                'Settings'
-              )}`}</span>
-            </a>
+              <span className="screenreader-only">{`${tool.name} ${I18n.t('Settings')}`}</span>
+            </button>
             <ul
               className="al-options"
               role="menu"
@@ -153,31 +195,27 @@ export default class ExternalToolsTableRow extends React.Component {
               aria-expanded="false"
             >
               {configureButton}
-              <ManageUpdateExternalToolButton
-                tool={this.props.tool}
-                returnFocus={this.returnFocus}
-              />
+              <ManageUpdateExternalToolButton tool={tool} returnFocus={this.returnFocus} />
               <EditExternalToolButton
-                ref="editExternalToolButton"
-                tool={this.props.tool}
-                canAddEdit={this.props.canAddEdit}
+                tool={tool}
+                canAddEdit={this.props.canAddEdit && !this.is13Tool}
                 returnFocus={this.returnFocus}
               />
               <ExternalToolPlacementButton
-                ref="externalToolPlacementButton"
-                tool={this.props.tool}
-                onClose={this.onModalClose}
+                tool={tool}
                 returnFocus={this.returnFocus}
+                onSuccess={this.validateTool}
               />
               <ReregisterExternalToolButton
-                ref="reregisterExternalToolButton"
-                tool={this.props.tool}
+                tool={tool}
                 canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
+              {this.is13Tool ? (
+                <DeploymentIdButton tool={tool} returnFocus={this.returnFocus} />
+              ) : null}
               <DeleteExternalToolButton
-                ref="deleteExternalToolButton"
-                tool={this.props.tool}
+                tool={tool}
                 canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
@@ -189,10 +227,10 @@ export default class ExternalToolsTableRow extends React.Component {
       return (
         <td className="links text-right e-tool-table-data" nowrap="nowrap">
           <ExternalToolPlacementButton
-            ref="externalToolPlacementButton"
-            tool={this.props.tool}
+            tool={tool}
             type="button"
             returnFocus={this.returnFocus}
+            onSuccess={this.validateTool}
           />
         </td>
       )
@@ -200,18 +238,45 @@ export default class ExternalToolsTableRow extends React.Component {
   }
 
   render() {
+    const {tool} = this.props
+
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
         <td className="e-tool-table-data center-text">{this.locked()}</td>
         <td
           nowrap="nowrap"
           className={`${this.nameClassNames()} e-tool-table-data`}
-          title={this.props.tool.name}
+          title={tool.name}
         >
-          {this.props.tool.name} {this.disabledFlag()}
+          {tool.name} {this.disabledFlag()}
         </td>
+        {this.props.showLTIFavoriteToggles && (
+          <td>
+            {canBeRCEFavorite(tool) ? (
+              <Checkbox
+                variant="toggle"
+                label={<ScreenReaderContent>{I18n.t('Favorite')}</ScreenReaderContent>}
+                value={tool.app_id}
+                onChange={this.handleFavoriteChange}
+                checked={tool.is_rce_favorite}
+                disabled={!tool.is_rce_favorite && this.props.favoriteCount === MAX_FAVS}
+              />
+            ) : (
+              I18n.t('NA')
+            )}
+          </td>
+        )}
         {this.renderButtons()}
       </tr>
     )
   }
+}
+
+// tool.is_rce_favorite only exists on the tool if
+// it can be an RCE favorite
+// see lib/lti/app_collator.rb#external_tool_definition
+function canBeRCEFavorite(tool) {
+  return (
+    'is_rce_favorite' in tool && tool.editor_button_settings && tool.editor_button_settings.enabled
+  )
 }

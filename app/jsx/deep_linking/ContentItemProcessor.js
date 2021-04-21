@@ -17,46 +17,18 @@
  */
 
 import $ from 'jquery'
-import {send} from 'jsx/shared/rce/RceCommandShim'
 import LinkContentItem from './models/LinkContentItem'
 import ResourceLinkContentItem from './models/ResourceLinkContentItem'
 import ImageContentItem from './models/ImageContentItem'
-import I18n from 'i18n!external_content.success'
 import HtmlFragmentContentItem from './models/HtmlFragmentContentItem'
 
-export function processContentItemsForEditor(event, editor, dialog) {
-  const {content_items, msg, log, errormsg, errorlog, ltiEndpoint, messageType} = event.data
-  if (messageType !== 'LtiDeepLinkingResponse') {
-    return
-  }
-  return new ContentItemProcessor(
-    content_items,
-    {
-      msg,
-      errormsg
-    },
-    {
-      log,
-      errorlog
-    },
-    ltiEndpoint
-  )
-    .processContentItemsForEditor(editor)
-    .finally(() => {
-      // Remove "unsaved changes" warnings and close modal
-      dialog.close()
-    })
-    .catch(() => {
-      $.flashError(I18n.t('Error retrieving content'))
-    })
-}
-
 export default class ContentItemProcessor {
-  constructor(contentItems, messages, logs, ltiEndpoint) {
+  constructor(contentItems, messages, logs, ltiEndpoint, processHandler) {
     this.contentItems = contentItems
     this.messages = messages
     this.logs = logs
     this.ltiEndpoint = ltiEndpoint
+    this.processHandler = processHandler
     this.showMessages()
     this.showLogs()
   }
@@ -74,18 +46,30 @@ export default class ContentItemProcessor {
     }
   }
 
-  async processContentItemsForEditor(editor) {
-    this.contentItems.forEach(contentItem => {
-      if (Object.keys(this.typeMap).includes(contentItem.type)) {
-        const selection = editor.selection && editor.selection.getContent()
-        const contentItemModel = new this.typeMap[contentItem.type](
-          contentItem,
-          this.ltiEndpoint,
-          selection
-        )
-        send($(`#${editor.id}`), 'insert_code', contentItemModel.toHtmlString())
-      }
-    })
+  static fromEvent(event, processHandler) {
+    const {content_items, msg, log, errormsg, errorlog, ltiEndpoint, messageType} = event.data
+
+    if (messageType !== 'LtiDeepLinkingResponse') {
+      return
+    }
+
+    return new this(
+      content_items,
+      {
+        msg,
+        errormsg
+      },
+      {
+        log,
+        errorlog
+      },
+      ltiEndpoint,
+      processHandler
+    )
+  }
+
+  process() {
+    return this.processHandler(...arguments)
   }
 
   showMessages() {

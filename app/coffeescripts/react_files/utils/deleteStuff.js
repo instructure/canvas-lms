@@ -74,7 +74,7 @@ export default function deleteStuff(filesAndFolders, args) {
     })
   )
 
-  return $.when(...Array.from(promises || [])).then(function() {
+  return $.when(...Array.from(promises || [])).then(() => {
     $.flashMessage(
       I18n.t(
         {

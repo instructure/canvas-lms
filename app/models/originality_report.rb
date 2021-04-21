@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -21,6 +23,7 @@ class OriginalityReport < ActiveRecord::Base
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
+  belongs_to :root_account, class_name: "Account"
 
   has_one :lti_link, class_name: 'Lti::Link', as: :linkable, inverse_of: :linkable, dependent: :destroy
   accepts_nested_attributes_for :lti_link, allow_destroy: true
@@ -32,6 +35,12 @@ class OriginalityReport < ActiveRecord::Base
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
   before_validation :infer_workflow_state
+  after_validation :set_submission_time
+  before_save :set_root_account
+
+  def self.submission_asset_key(submission)
+    "#{submission.asset_string}_#{submission.submitted_at.utc.iso8601}"
+  end
 
   def state
     if workflow_state != 'scored'
@@ -66,7 +75,27 @@ class OriginalityReport < ActiveRecord::Base
 
   def asset_key
     return Attachment.asset_string(attachment_id) if attachment_id.present?
-    Submission.asset_string(submission_id)
+    if submission_time.present?
+      "#{Submission.asset_string(submission_id)}_#{submission_time&.utc&.iso8601}"
+    else
+      Submission.asset_string(submission_id)
+    end
+  end
+
+  def self.copy_to_group_submissions!(report_id: , user_id: )
+    report = self.find(report_id)
+    report.copy_to_group_submissions!
+  rescue ActiveRecord::RecordNotFound => e
+    user = User.where(id: user_id).first
+    if user.nil? || user.fake_student?
+      # Test students get reset frequently, which wipes out their originality
+      # reports, so if we can't find a report but the user is also
+      # gone or is known to be a fake_student, we can ignore this and not
+      # continue with the job
+      Canvas::Errors.capture(e, { report_id: report_id, user_id: user_id }, :info)
+    else
+      raise e
+    end
   end
 
   def copy_to_group_submissions!
@@ -74,6 +103,7 @@ class OriginalityReport < ActiveRecord::Base
     group_submissions = assignment.submissions.where.not(id: submission.id).where(group: submission.group)
     group_submissions.find_each do |s|
       copy_of_report = self.dup
+      copy_of_report.submission_time = nil
 
       # We don't want a single submission to have
       # multiple originality reports with the same
@@ -96,8 +126,17 @@ class OriginalityReport < ActiveRecord::Base
     submission.assignment
   end
 
+  def set_submission_time
+    self.submission_time ||= submission.reload.submitted_at
+  end
+
   def infer_workflow_state
+    self.workflow_state = 'error' if error_message.present?
     return if self.workflow_state == 'error'
     self.workflow_state = self.originality_score.present? ? 'scored' : 'pending'
+  end
+
+  def set_root_account
+    self.root_account_id ||= submission&.root_account_id
   end
 end

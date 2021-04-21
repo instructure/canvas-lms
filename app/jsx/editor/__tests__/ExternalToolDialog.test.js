@@ -19,15 +19,27 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ExternalToolDialog from '../ExternalToolDialog'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Transition from '@instructure/ui-motion/lib/components/Transition'
-import {processContentItemsForEditor} from '../../deep_linking/ContentItemProcessor'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Transition} from '@instructure/ui-motion'
 import {send} from '../../shared/rce/RceCommandShim'
 
-jest.mock('../../deep_linking/ContentItemProcessor')
+// jest.mock('../../deep_linking/ContentItemProcessor')
 jest.mock('../../shared/rce/RceCommandShim')
 
 const noop = () => {}
+
+const content_items = [
+  {
+    type: 'link',
+    title: 'title',
+    url: 'http://www.tool.com'
+  },
+  {
+    type: 'ltiResourceLink',
+    title: 'LTI Link',
+    url: 'http://www.tool.com/lti'
+  }
+]
 
 let container, submit, originalSubmit, originalScroll
 
@@ -44,6 +56,7 @@ function fakeWindow() {
   return {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
     confirm: jest.fn().mockReturnValue(true),
     height: 1000,
     $: jest.fn().mockReturnValue({bind: noop, unbind: noop})
@@ -56,7 +69,8 @@ function fakeEditor() {
     selection: {
       getContent: jest.fn()
     },
-    getContent: jest.fn()
+    getContent: jest.fn(),
+    focus: () => {}
   }
 }
 
@@ -98,7 +112,14 @@ function getInstance(_container, overrides) {
   })
 }
 
-beforeEach(async () => {
+const data = overrides => ({
+  content_items,
+  ltiEndpoint: 'https://www.instructure.com/lti',
+  messageType: 'LtiDeepLinkingResponse',
+  ...overrides
+})
+
+beforeEach(() => {
   originalSubmit = HTMLFormElement.prototype.submit
   submit = jest.fn()
   HTMLFormElement.prototype.submit = submit
@@ -106,7 +127,6 @@ beforeEach(async () => {
   window.scroll = noop
   container = document.createElement('div')
   send.mockReset()
-  processContentItemsForEditor.mockReset()
 })
 
 afterEach(() => {
@@ -182,13 +202,19 @@ describe('open', () => {
     expect(bind).toHaveBeenCalledWith('externalContentReady', instance.handleExternalContentReady)
   })
 
+  it('sets "data-lti-launch" attribute on iframe', async () => {
+    const instance = await getInstance(container)
+    instance.open({name: 'foo', id: 2})
+    expect(document.querySelector('iframe').getAttribute('data-lti-launch')).toBe('true')
+  })
+
   describe('tray', () => {
-    it('does not set height or width for iframe', async () => {
+    it('sets height and width for iframe to 100%', async () => {
       const instance = await getInstance(container)
       instance.open({name: 'foo', id: 2, use_tray: true})
       const style = document.querySelector('iframe').style
-      expect(style.height).toBe('')
-      expect(style.width).toBe('')
+      expect(style.height).toBe('100%')
+      expect(style.width).toBe('100%')
     })
   })
 })
@@ -295,6 +321,16 @@ describe('handleBeforeUnload', () => {
   })
 })
 
+describe('handleRemove', () => {
+  it('dispatches a resize event', async () => {
+    const win = fakeWindow()
+    const instance = await getInstance(container, {win})
+    instance.open({name: 'foo', id: 2})
+    instance.handleClose()
+    expect(win.dispatchEvent).toHaveBeenCalledWith(new Event('resize'))
+  })
+})
+
 describe('handleExternalContentReady', () => {
   it('inserts content items in to the editor', async () => {
     const win = fakeWindow()
@@ -369,15 +405,24 @@ describe('handleDeepLinking', () => {
     const instance = await getInstance(container)
     const ev = {origin: 'otherOrigin'}
     instance.handleDeepLinking(ev)
-    expect(processContentItemsForEditor).not.toHaveBeenCalled()
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it('ignores non-deep linking responses', async () => {
+    const instance = await getInstance(container)
+    const ev = {origin: 'deepOrigin', data: data({messageType: 'notdeeplinking'})}
+    instance.handleDeepLinking(ev)
+    expect(send).not.toHaveBeenCalled()
   })
 
   it('processes content items for correct origin', async () => {
     const editor = fakeEditor()
     const instance = await getInstance(container, {editor})
-    const ev = {origin: 'deepOrigin'}
+    const ev = {origin: 'deepOrigin', data: data()}
     instance.handleDeepLinking(ev)
-    expect(processContentItemsForEditor).toHaveBeenCalledWith(ev, editor, instance)
+    expect(send.mock.calls[0][2]).toEqual(
+      '<a href="http://www.tool.com" title="title" target="_blank">title</a>'
+    )
   })
 })
 

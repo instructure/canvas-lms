@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import GradebookHelpers from 'compiled/gradebook/GradebookHelpers'
+import GradebookHelpers from 'jsx/gradebook/GradebookHelpers'
 import GradebookConstants from 'jsx/gradebook/shared/constants'
 
 QUnit.module('GradebookHelpers#noErrorsOnPage', {
@@ -26,12 +26,12 @@ QUnit.module('GradebookHelpers#noErrorsOnPage', {
   }
 })
 
-test('noErrorsOnPage returns true when the dom has no errors', function() {
+test('noErrorsOnPage returns true when the dom has no errors', () => {
   $.find.returns([])
   ok(GradebookHelpers.noErrorsOnPage())
 })
 
-test('noErrorsOnPage returns false when the dom contains errors', function() {
+test('noErrorsOnPage returns false when the dom contains errors', () => {
   $.find.returns(['dom element with error message'])
   notOk(GradebookHelpers.noErrorsOnPage())
 })
@@ -53,7 +53,7 @@ QUnit.module('GradebookHelpers#maxLengthErrorShouldBeShown', {
 test('maxLengthErrorShouldBeShown is false when text length is exactly the max allowed length', () =>
   notOk(GradebookHelpers.maxLengthErrorShouldBeShown(GradebookConstants.MAX_NOTE_LENGTH)))
 
-test('maxLengthErrorShouldBeShown is false when there are DOM errors', function() {
+test('maxLengthErrorShouldBeShown is false when there are DOM errors', () => {
   $.find.returns(['dom element with error message'])
   notOk(GradebookHelpers.maxLengthErrorShouldBeShown(GradebookConstants.MAX_NOTE_LENGTH + 1))
 })
@@ -61,7 +61,7 @@ test('maxLengthErrorShouldBeShown is false when there are DOM errors', function(
 test(
   'maxLengthErrorShouldBeShown is true when text length is greater than' +
     'the max allowed length AND there are no DOM errors',
-  function() {
+  () => {
     $.find.returns([])
     ok(GradebookHelpers.maxLengthErrorShouldBeShown(GradebookConstants.MAX_NOTE_LENGTH + 1))
   }

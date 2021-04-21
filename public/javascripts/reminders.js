@@ -21,74 +21,84 @@ import 'jqueryui/draggable'
 import './jquery.instructure_misc_plugins' /* confirmDelete */
 
 $(document).ready(function() {
-  $("#floating_reminders").draggable();
-  $(".show_reminders_link").click(function(event) {
-    event.preventDefault();
-    $(this).blur();
-    var $floater = $("#floating_reminders");
-    var $helper = $floater.clone();
-    $helper.children().css('visibility', 'hidden');
-    var offset = $("#reminders_icon").offset();
-    var floaterTop = $("#floating_reminders").offset().top;
-    $floater.after($helper);
+  $('#floating_reminders').draggable()
+  $('.show_reminders_link').click(function(event) {
+    event.preventDefault()
+    $(this).blur()
+    const $floater = $('#floating_reminders')
+    const $helper = $floater.clone()
+    $helper.children().css('visibility', 'hidden')
+    const offset = $('#reminders_icon').offset()
+    const floaterTop = $('#floating_reminders').offset().top
+    $floater.after($helper)
     $helper.css({
       width: 20,
       height: 20,
       left: offset.left,
       top: offset.top - floaterTop,
       opacity: 0.0
-    });
-    $floater.css('visibility', 'hidden').css('left', '');
-    $helper.animate({
-      top: $floater.css('top'),
-      left: $floater.css('left'),
-      width: $floater.width(),
-      height: $floater.height(),
-      opacity: 1.0
-    }, 'slow', function() {
-      $(this).remove();
-      $floater.css('visibility', 'visible');
-      $floater.find("a:not(.hide_reminders_link):visible:first").focus();
-      $("#reminders_icon").hide();
-    });
-    var url = $floater.find(".update_session_url").attr('href');
-  });
-  $(".hide_reminders_link").click(function(event) {
-    event.preventDefault();
-    var $floater = $(this).parents("#floating_reminders");
-    var $helper = $floater.clone();
-    $floater.after($helper).css('left', -2000);
-    $helper.children().css('visibility', 'hidden');
-    var offset = $("#reminders_icon").show().offset();
-    var floaterTop = $helper.offset().top;
-    $helper.animate({
-      width: 20,
-      height: 20,
-      left: offset.left,
-      top: offset.top - floaterTop,
-      opacity: 0.0
-    }, 'slow', function() {
-      $(this).remove();
-    });
-    var url = $floater.find(".update_session_url").attr('href');
-  });
-  $(".drop_held_context_link").click(function(event) {
-    event.preventDefault();
-    var $reminder = $(this).parents(".reminder");
+    })
+    $floater.css('visibility', 'hidden').css('left', '')
+    $helper.animate(
+      {
+        top: $floater.css('top'),
+        left: $floater.css('left'),
+        width: $floater.width(),
+        height: $floater.height(),
+        opacity: 1.0
+      },
+      'slow',
+      function() {
+        $(this).remove()
+        $floater.css('visibility', 'visible')
+        $floater.find('a:not(.hide_reminders_link):visible:first').focus()
+        $('#reminders_icon').hide()
+      }
+    )
+    const url = $floater.find('.update_session_url').attr('href')
+  })
+  $('.hide_reminders_link').click(function(event) {
+    event.preventDefault()
+    const $floater = $(this).parents('#floating_reminders')
+    const $helper = $floater.clone()
+    $floater.after($helper).css('left', -2000)
+    $helper.children().css('visibility', 'hidden')
+    const offset = $('#reminders_icon')
+      .show()
+      .offset()
+    const floaterTop = $helper.offset().top
+    $helper.animate(
+      {
+        width: 20,
+        height: 20,
+        left: offset.left,
+        top: offset.top - floaterTop,
+        opacity: 0.0
+      },
+      'slow',
+      function() {
+        $(this).remove()
+      }
+    )
+    const url = $floater.find('.update_session_url').attr('href')
+  })
+  $('.drop_held_context_link').click(function(event) {
+    event.preventDefault()
+    const $reminder = $(this).parents('.reminder')
     $reminder.confirmDelete({
       url: $(this).attr('href'),
-      message: "Are you sure you want to drop this " + $reminder.find(".item_type").text() + "?",
-      success: function(data) {
+      message: 'Are you sure you want to drop this ' + $reminder.find('.item_type').text() + '?',
+      success(data) {
         $(this).fadeOut('fast', function() {
-          $(this).remove();
-          if($("#floating_reminders .reminder").length === 0) {
-            $("#floating_reminders").fadeOut('fast', function() {
-              $(this).remove();
-              $("#reminders_icon").remove();
-            });
+          $(this).remove()
+          if ($('#floating_reminders .reminder').length === 0) {
+            $('#floating_reminders').fadeOut('fast', function() {
+              $(this).remove()
+              $('#reminders_icon').remove()
+            })
           }
-        });
+        })
       }
-    });
-  });
-});
+    })
+  })
+})

@@ -16,26 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!ProfileTray'
 import React from 'react'
-import {bool, string} from 'prop-types'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
+import {arrayOf, bool, object, shape, string} from 'prop-types'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {Heading} from '@instructure/ui-heading'
+import {Badge} from '@instructure/ui-badge'
+import {Avatar} from '@instructure/ui-avatar'
+import {Spinner} from '@instructure/ui-spinner'
+import {Link} from '@instructure/ui-link'
+import {View} from '@instructure/ui-view'
+import LogoutButton from '../LogoutButton'
+import HighContrastModeToggle from './HighContrastModeToggle'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
-function readCookie(key) {
-  return (document.cookie.match(`(^|; )${encodeURIComponent(key)}=([^;]*)`) || 0)[2]
+// Trying to keep this as generalized as possible, but it's still a bit
+// gross matching on the id of the tray tabs given to us by Rails
+const idsToCounts = [{id: 'content_shares', countName: 'unreadShares'}]
+
+const a11yCount = count => (
+  <AccessibleContent alt={I18n.t('%{count} unread.', {count})}>{count}</AccessibleContent>
+)
+
+function ProfileTab({id, html_url, label, counts}) {
+  function renderCountBadge() {
+    const found = idsToCounts.filter(x => x.id === id)
+    if (found.length === 0) return null // no count defined for this label
+    const count = counts[found[0].countName]
+    if (count === 0) return null // zero count is not displayed
+    return <Badge count={count} standalone margin="0 0 xxx-small small" formatOutput={a11yCount} />
+  }
+
+  return (
+    <List.Item key={id}>
+      <View className={`profile-tab-${id}`} as="div" margin="small 0">
+        <Link isWithinText={false} href={html_url}>
+          {label}
+          {renderCountBadge()}
+        </Link>
+      </View>
+    </List.Item>
+  )
 }
 
-export default function ProfileTray({
-  userDisplayName,
-  userAvatarURL,
-  profileEnabled,
-  eportfoliosEnabled
-}) {
+ProfileTab.propTypes = {
+  id: string.isRequired,
+  label: string.isRequired,
+  html_url: string.isRequired,
+  counts: object
+}
+
+export default function ProfileTray(props) {
+  const {userDisplayName, userAvatarURL, loaded, userPronouns, tabs, counts} = props
+
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -46,39 +80,34 @@ export default function ProfileTray({
           size="x-large"
           inline={false}
           margin="auto"
+          data-fs-exclude
         />
-        <Heading level="h3" as="h2">{userDisplayName}</Heading>
-        <form action="/logout" method="post">
-          <input name="utf8" value="✓" type="hidden" />
-          <input name="_method" value="delete" type="hidden" />
-          <input name="authenticity_token" value={readCookie('_csrf_token')} type="hidden" />
-          <Button type="submit" size="small" margin="medium 0">{I18n.t('Logout')}</Button>
-        </form>
+        <div style={{wordBreak: 'break-word'}}>
+          <Heading level="h3" as="h2">
+            {userDisplayName}
+            {userPronouns && (
+              <Text size="large" fontStyle="italic">
+                &nbsp;({userPronouns})
+              </Text>
+            )}
+          </Heading>
+        </div>
+        <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
-      <hr role="presentation"/>
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
-        {[
-          profileEnabled && (
-            <ListItem key="profile">
-              <Link href="/profile">{I18n.t('Profile')}</Link>
-            </ListItem>
-          ),
-          <ListItem key="settings">
-            <Link href="/profile/settings">{I18n.t('Settings')}</Link>
-          </ListItem>,
-          <ListItem key="notifications">
-            <Link href="/profile/communication">{I18n.t('Notifications')}</Link>
-          </ListItem>,
-          <ListItem key="files">
-            <Link href="/files">{I18n.t('Files')}</Link>
-          </ListItem>,
-          eportfoliosEnabled && (
-            <ListItem key="eportfolios">
-              <Link href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</Link>
-            </ListItem>
-          )
-        ].filter(Boolean)}
+      <hr role="presentation" />
+      <List variant="unstyled" margin="none" itemSpacing="small">
+        {loaded ? (
+          tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
+        ) : (
+          <List.Item key="loading">
+            <div style={{textAlign: 'center'}}>
+              <Spinner margin="medium" renderTitle="Loading" />
+            </div>
+          </List.Item>
+        )}
       </List>
+      <hr role="presentation" />
+      <HighContrastModeToggle />
     </View>
   )
 }
@@ -86,6 +115,8 @@ export default function ProfileTray({
 ProfileTray.propTypes = {
   userDisplayName: string.isRequired,
   userAvatarURL: string.isRequired,
-  profileEnabled: bool.isRequired,
-  eportfoliosEnabled: bool.isRequired
+  loaded: bool.isRequired,
+  userPronouns: string,
+  tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired,
+  counts: object.isRequired
 }

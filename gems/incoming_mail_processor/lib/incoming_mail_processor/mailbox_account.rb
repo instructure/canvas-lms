@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -37,7 +39,7 @@ module IncomingMailProcessor
     end
 
     def escaped_address
-      CanvasStatsd::Statsd.escape(address) unless address.nil?
+      InstStatsd::Statsd.escape(address) unless address.nil?
     end
   end
 end

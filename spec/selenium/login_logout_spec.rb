@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -31,6 +33,7 @@ describe "login logout test" do
   end
 
   before do
+    Account.default.enable_canvas_authentication
     @login_error_box_css = ".error_text:last"
   end
 
@@ -40,7 +43,7 @@ describe "login logout test" do
     expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
   end
 
-  it "should show error message if wrong credentials are used", :xbrowser, priority: "2" do
+  it "should show error message if wrong credentials are used", priority: "2" do
     get "/login"
     fill_in_login_form("fake@user.com", "fakepass")
     assert_flash_error_message("Invalid username")
@@ -80,7 +83,7 @@ describe "login logout test" do
     f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)
     submit_form('#forgot_password_form')
     wait_for_ajaximations
-    assert_flash_notice_message "Password confirmation sent to #{@user.primary_pseudonym.unique_id}"
+    assert_flash_notice_message "Your password recovery instructions will be sent to #{@user.primary_pseudonym.unique_id}"
   end
 
   it "should validate back button works in forgot password page", priority: "2" do

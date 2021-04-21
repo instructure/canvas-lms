@@ -1,0 +1,2 @@
+onerror|img|src|turn-into-dialog
+<div id="XSS_TEST_UNIQUE" title="Attention!" data-turn-into-dialog="{&quot;modal&quot;:true,&quot;buttons&quot;:{&quot;xx&quot;:{&quot;onclick&quot;:&quot;alert(document.cookie);&quot;,&quot;text&quot;:&quot;XSS!&quot;}}}"></div> <a class="element_toggler" aria-controls="XSS_TEST_UNIQUE" href="#">CORE-2933</a>

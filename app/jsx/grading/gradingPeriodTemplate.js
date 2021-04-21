@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from 'timezone'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!gradingPeriodTemplate'
 import _ from 'underscore'
 import DateHelper from '../shared/helpers/dateHelper'
 import 'jquery.instructure_date_and_time'

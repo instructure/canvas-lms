@@ -34,16 +34,17 @@
   })
   should log: underscore, jquery and the colors
 */
+import jQuery from 'jquery'
 
 if (!('require' in window)) {
-  const jQuery = require('jquery')
+  const getDefaultExport = m => m.default
 
   const thingsWeStillAllowThemToRequire = {
     jquery: () => jQuery,
     // load these asynchronously so they are not downloaded unless asked for
-    i18nObj: () => import('i18nObj'),
-    underscore: () => import('underscore'),
-    'jsx/course_wizard/ListItems': () => import('./course_wizard/ListItems')
+    i18nObj: () => import('i18nObj').then(getDefaultExport),
+    underscore: () => import('underscore').then(getDefaultExport),
+    'jsx/course_wizard/ListItems': () => import('./course_wizard/ListItems').then(getDefaultExport)
   }
 
   const getModule = module => {

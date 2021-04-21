@@ -17,36 +17,39 @@
  */
 
 import $ from 'jquery'
-  var inputMethods = {
-    disableInputs: function(inputs) {
-      var $body       = $('body'),
-          $inputCover = $('<div />', { 'class': 'input_cover' });
 
-      $inputCover.on('mouseleave', function(e) { $(this).remove(); });
+const inputMethods = {
+  disableInputs(inputs) {
+    const $body = $('body'),
+      $inputCover = $('<div />', {class: 'input_cover'})
 
-      $(inputs).on('mouseenter', function(e) {
-        var $el    = $(this),
-            $cover = $inputCover.clone(true);
+    $inputCover.on('mouseleave', function(e) {
+      $(this).remove()
+    })
 
-        $cover.css({
-          height   : $el.height() + 12,
-          width    : $el.width() + 12,
-          position : 'absolute',
-          left     : $el.offset().left - 6,
-          top      : $el.offset().top - 6,
-          zIndex   : 15,
-          background: 'url(/images/blank.png) 0 0 repeat'
-        });
+    $(inputs).on('mouseenter', function(e) {
+      const $el = $(this),
+        $cover = $inputCover.clone(true)
 
-        $body.append($cover);
-      });
-    },
+      $cover.css({
+        height: $el.height() + 12,
+        width: $el.width() + 12,
+        position: 'absolute',
+        left: $el.offset().left - 6,
+        top: $el.offset().top - 6,
+        zIndex: 15,
+        background: 'url(/images/blank.png) 0 0 repeat'
+      })
 
-    setWidths: function(selector) {
-      $(selector || '.answer input[type=text]').each(function() {
-        $(this).width( $(this).val().length * 9.5 );
-      });
-    }
-  };
+      $body.append($cover)
+    })
+  },
 
-export default inputMethods;
+  setWidths(selector) {
+    $(selector || '.answer input[type=text]').each(function() {
+      $(this).width($(this).val().length * 9.5)
+    })
+  }
+}
+
+export default inputMethods

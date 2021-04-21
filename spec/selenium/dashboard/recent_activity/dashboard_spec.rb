@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -118,7 +120,7 @@ describe "dashboard" do
       get "/courses/#{@course.id}"
     end
 
-    it "displays notification on course home page feed and todolist sidebar", :xbrowser do
+    it "displays notification on course home page feed and todolist sidebar" do
       # announcement icon is displayed
       expect(todosidebar_item_list).to contain_css(".ToDoSidebarItem [name='IconAnnouncement']")
       # announcement title link is displyed

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -31,7 +33,6 @@ class PageView < ActiveRecord::Base
 
   CONTEXT_TYPES = %w{Course Account Group User UserProfile}.freeze
 
-  attr_accessor :generated_by_hand
   attr_accessor :is_update
 
   # note that currently we never query page views from the perspective of the course;
@@ -47,13 +48,13 @@ class PageView < ActiveRecord::Base
       p.http_method = request.request_method.downcase
       p.controller = request.path_parameters[:controller]
       p.action = request.path_parameters[:action]
-      p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
+      p.session_id = request.session_options[:id].to_s.dup.force_encoding(Encoding::UTF_8).presence
       p.user_agent = request.user_agent
       p.remote_ip = request.remote_ip
       p.interaction_seconds = 5
       p.created_at = Time.now
       p.updated_at = Time.now
-      p.id = RequestContextGenerator.request_id
+      p.id = RequestContext::Generator.request_id
       p.export_columns.each do |c|
         v = p.send(c)
         if !v.nil? && v.respond_to?(:force_encoding)
@@ -78,21 +79,11 @@ class PageView < ActiveRecord::Base
   end
 
   def token
-    Canvas::Security.create_jwt({
-      i: request_id,
-      u: Shard.global_id_for(user_id),
-      c: created_at.try(:utc).try(:iso8601, 2)
+    CanvasSecurity::PageViewJwt.generate({
+      request_id: request_id,
+      user_id: Shard.global_id_for(user_id),
+      created_at: created_at
     })
-  end
-
-  def self.decode_token(token)
-    data = Canvas::Security.decode_jwt(token)
-    return nil unless data
-    return {
-      request_id: data[:i],
-      user_id: data[:u],
-      created_at: data[:c]
-    }
   end
 
   def url
@@ -149,7 +140,8 @@ class PageView < ActiveRecord::Base
     cassandra? || pv4?
   end
 
-  EventStream = EventStream::Stream.new do
+  EventStream = ::EventStream::Stream.new do
+    backend_strategy :cassandra
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:page_views) }
     table :page_views
     id_column :request_id
@@ -171,7 +163,7 @@ class PageView < ActiveRecord::Base
     self.raise_on_error = Rails.env.test?
 
     on_error do |operation, record, exception|
-      Canvas::EventStreamLogger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
+      ::EventStream::Logger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
     end
   end
 
@@ -276,7 +268,7 @@ class PageView < ActiveRecord::Base
         self.id
       end
     end
-    changes_applied unless CANVAS_RAILS5_1 # no longer a callback in 5.2.2
+    changes_applied
   end
 
   def _update_record(*args)
@@ -287,7 +279,7 @@ class PageView < ActiveRecord::Base
         true
       end
     end
-    changes_applied unless CANVAS_RAILS5_1
+    changes_applied
   end
 
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }

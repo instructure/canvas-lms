@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -46,6 +48,7 @@ module BrandableCSS
     "ic-brand-global-nav-menu-item__badge-text" => lambda { I18n.t("Nav Badge Text") },
     "ic-brand-global-nav-logo-bgd" => lambda { I18n.t("Nav Logo Background") },
     "ic-brand-header-image" => lambda { I18n.t("Nav Logo") },
+    "ic-brand-mobile-global-nav-logo" => lambda { I18n.t("Responsive Global Nav Logo") },
     "ic-brand-watermark" => lambda { I18n.t("Watermark") },
     "ic-brand-watermark-opacity" => lambda { I18n.t("Watermark Opacity") },
     "ic-brand-favicon" => lambda { I18n.t("Favicon") },
@@ -80,6 +83,7 @@ module BrandableCSS
 
   HELPER_TEXTS = {
     "ic-brand-header-image" => lambda { I18n.t("Accepted formats: svg, png, jpg, gif") },
+    "ic-brand-mobile-global-nav-logo" => lambda { I18n.t("Appears at the top of the global navigation tray that opens on mobile sized screens. display height: 48px. Accepted formats: svg, png, jpg, gif") },
     "ic-brand-watermark" => lambda { I18n.t("This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg") },
     "ic-brand-watermark-opacity" => lambda { I18n.t("Specify the transparency of the watermark background image.") },
     "ic-brand-favicon" => lambda { I18n.t("You can use a single 16x16, 32x32, 48x48 ico file.") },
@@ -126,14 +130,12 @@ module BrandableCSS
 
     def check_if_we_need_to_create_a_db_migration
       path = ActiveRecord::Migrator.migrations_paths.first
-      migrations = CANVAS_RAILS5_1 ?
-        ActiveRecord::Migrator.migrations(path) :
-        ActiveRecord::MigrationContext.new(path).migrations
+      migrations = ActiveRecord::MigrationContext.new(path, ActiveRecord::SchemaMigration).migrations
       ['predeploy', 'postdeploy'].each do |pre_or_post|
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
         expected_version = (pre_or_post == 'predeploy') ? migration_version : (migration_version + 1)
-        raise BrandConfigWithOutCompileAssets if expected_version == 92630630174579589147
+        raise BrandConfigWithOutCompileAssets if expected_version == 85663486644871658581990
         raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
       end
     end
@@ -338,11 +340,21 @@ run `rake canvas:compile_assets` and then try migrations again.
     def initialize
       super <<-END
 
-You have made changes to either app/stylesheets/brandable_variables.json or one of the images it
-references so you need to rename the db migrations that makes sure when this change is deployed it
+Something has changed about the default variables or images used in the Theme Editor.
+If you are seeing this and _you_ did not make changes to either app/stylesheets/brandable_variables.json
+or one of the images it references, it probably meeans your local setup is out of date.
+
+First, make sure you run `rake db:migrate`
+and then run `./script/nuke_node.sh`
+
+If that does not resolve the issue, it probably means you _did_ update one of those json variables
+in app/stylesheets/brandable_variables.json or one of the images it references so you need to rename
+the db migrations that makes sure when this change is deployed or checked out by anyone else
 makes a new .css file for the css variables for each brand based on these new defaults.
 To do that, run this command and then restart your rails process. (for local dev, if you want the
-changes to show up in the ui, make sure you also run `rake db:migrate`).
+changes to show up in the ui, make sure you also run `rake db:migrate` afterwards).
+
+ONLY DO THIS IF YOU REALLY DID MEAN TO MAKE A CHANGE TO THE DEFAULT BRANDING STUFF:
 
 mv db/migrate/*_#{MIGRATION_NAME.underscore}_predeploy.rb \\
    db/migrate/#{BrandableCSS.migration_version}_#{MIGRATION_NAME.underscore}_predeploy.rb \\

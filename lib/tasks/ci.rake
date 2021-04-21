@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :ci do
   desc "set up test shards if they don't already exist"
   task prepare_test_shards: :environment do

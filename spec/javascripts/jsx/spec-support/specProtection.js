@@ -19,6 +19,7 @@
 import AsyncTracker from './AsyncTracker'
 import ContextTracker from './ContextTracker'
 import EventTracker from './EventTracker'
+import SafetyNet from './SafetyNet'
 import SandboxFactory from './SandboxFactory'
 
 const DEFAULT_SPEC_TIMEOUT = 5000
@@ -80,6 +81,8 @@ export const eventTracker = new EventTracker({
   unmanagedListenerStrategy: 'none'
 })
 
+export const safetyNet = new SafetyNet()
+
 contextTracker.onContextStart(() => {
   // Set a standard timeout for all specs.
   // This can be overridden within specs.
@@ -88,4 +91,5 @@ contextTracker.onContextStart(() => {
 
 if (!UNPROTECTED_SPECS) {
   contextTracker.setup()
+  safetyNet.setup()
 }

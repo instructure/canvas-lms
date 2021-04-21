@@ -19,8 +19,8 @@
 import React from 'react'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import theme from '@instructure/ui-themes/lib/canvas/base'
+import {Button} from '@instructure/ui-buttons'
+import theme from '@instructure/canvas-theme'
 
 TeacherFooter.propTypes = {
   onCancel: func.isRequired,
@@ -46,8 +46,9 @@ export default function TeacherFooter(props) {
     paddingRight: padding,
     paddingLeft: padding
   }
+
   return (
-    <div className="assignments-teacher-footer" style={style}>
+    <div className="assignments-teacher-footer" style={style} data-testid="TeacherFooter">
       <Button variant="light" margin="0 x-small 0 0" onClick={props.onCancel}>
         {I18n.t('Cancel')}
       </Button>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,8 +21,8 @@
 module CC
   module Importer
     include CC::CCHelper
-    include Canvas::Migration
-    include Canvas::Migration::XMLHelper
+    include ::Canvas::Migration
+    include ::Canvas::Migration::XMLHelper
   end
 end
 

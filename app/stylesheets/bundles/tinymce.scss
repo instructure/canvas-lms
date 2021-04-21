@@ -27,6 +27,11 @@
   box-sizing: border-box;
 }
 
+/* the new rce */
+.ic-RichContentEditor .rce-wrapper textarea {
+  min-height: auto;
+}
+
 .mce-i-a11y:before {
   content: "\e900";
   border: 1px solid $ic-font-color-dark;

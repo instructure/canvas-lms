@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -40,7 +42,7 @@ describe "/courses/index" do
     assign(:future_enrollments, [])
     assign(:visible_groups, [@group])
     render "courses/index"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#my_groups_table td:nth-child(2) span.name').text).to eq @course.name
   end
 
@@ -48,7 +50,7 @@ describe "/courses/index" do
     term = EnrollmentTerm.new(:name => "term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
     course_with_student
     @course.restrict_student_future_view = true
-    @course.update_attributes!(:enrollment_term => term)
+    @course.update!(:enrollment_term => term)
 
     group_with_user(:user => @user, :group_context => @course)
     view_context
@@ -57,7 +59,7 @@ describe "/courses/index" do
     assign(:future_enrollments, [@enrollment])
     assign(:visible_groups, [])
     render "courses/index"
-    doc = Nokogiri::HTML.parse(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#my_groups_table')).to be_nil
   end
 end

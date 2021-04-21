@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ module ContentImportsHelper
     end
   end
 
-  def mig_id(obj)
-    CC::CCHelper.create_key(obj)
+  def mig_id(obj, global: false)
+    CC::CCHelper.create_key(obj, global: global)
   end
 end

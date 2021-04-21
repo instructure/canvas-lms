@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2016 Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require 'sharding_spec_helper'
 require_dependency "lti/ims/access_token_helper"
 
 module Lti
@@ -30,12 +32,9 @@ module Lti
     before(:once) { attachment_model }
     before :each do
       course_factory(active_all: true)
-      message_handler.update_attributes(message_type: 'basic-lti-launch-request')
+      message_handler.update(message_type: 'basic-lti-launch-request')
       student_in_course active_all: true
       teacher_in_course active_all: true
-
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
 
       @tool = @course.context_external_tools.create(name: "a",
                                                     domain: "google.com",
@@ -59,7 +58,6 @@ module Lti
         create: "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report"
       }
 
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
     end
 
     describe 'service definition' do
@@ -79,7 +77,7 @@ module Lti
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:show] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
         @endpoints[:alt_show] = "/api/lti/assignments/#{@assignment.id}/files/#{@attachment.id}/originality_report"
-        @assignment.course.update_attributes(account: tool_proxy.context)
+        @assignment.course.update(account: tool_proxy.context)
       end
 
       it "requires an lti access token" do
@@ -99,7 +97,7 @@ module Lti
         @assignment.save!
 
         new_tool_proxy = tool_proxy.deep_clone
-        new_tool_proxy.update_attributes(guid: SecureRandom.uuid)
+        new_tool_proxy.update(guid: SecureRandom.uuid)
 
         token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
         other_helpers = {Authorization: "Bearer #{token}"}
@@ -120,7 +118,10 @@ module Lti
           'updated_at',
           'submission_id',
           'workflow_state',
-          'link_id'
+          'link_id',
+          'error_message',
+          'submission_time',
+          'root_account_id'
         ].freeze
 
         get @endpoints[:show], headers: request_headers
@@ -149,9 +150,8 @@ module Lti
       end
 
       it "requires the plagiarism feature flag" do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
         post @endpoints[:show]
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "verifies the specified attachment is in the course" do
@@ -191,7 +191,7 @@ module Lti
           @assignment.tool_settings_tool = message_handler
           @assignment.save!
           new_tool_proxy = tool_proxy.deep_clone
-          new_tool_proxy.update_attributes(guid: SecureRandom.uuid)
+          new_tool_proxy.update(guid: SecureRandom.uuid)
           token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
           other_helpers = {Authorization: "Bearer #{token}"}
           allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
@@ -211,7 +211,10 @@ module Lti
             'updated_at',
             'submission_id',
             'workflow_state',
-            'link_id'
+            'link_id',
+            'error_message',
+            'submission_time',
+            'root_account_id'
           ].freeze
           get @endpoints[:alt_show], headers: request_headers
           expect(response).to be_successful
@@ -237,9 +240,8 @@ module Lti
         end
 
         it "requires the plagiarism feature flag" do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
           post @endpoints[:alt_show]
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it "verifies the specified attachment is in the course" do
@@ -272,7 +274,7 @@ module Lti
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:update] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
         @endpoints[:update_alt] = "/api/lti/assignments/#{@assignment.id}/files/#{@attachment.id}/originality_report"
-        @assignment.course.update_attributes(account: account)
+        @assignment.course.update(account: account)
       end
 
       it "requires the tool proxy to be associated to the assignment" do
@@ -329,6 +331,12 @@ module Lti
         put @endpoints[:update], params: {originality_report: {originality_report_url: "http://www.test.com"}}, headers: request_headers
         expect(response).to be_successful
         expect(OriginalityReport.find(@report.id).originality_report_url).to eq "http://www.test.com"
+      end
+
+      it "updates error_message" do
+        put @endpoints[:update], params: {originality_report: {error_message: "An error occured."}}, headers: request_headers
+        expect(response).to be_successful
+        expect(OriginalityReport.find(@report.id).error_message).to eq "An error occured."
       end
 
       it "updates the associated resource_url" do
@@ -403,10 +411,9 @@ module Lti
       end
 
       it "requires the plagiarism feature flag" do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
 
         put @endpoints[:udpate], params: {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, headers: request_headers
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "verifies the report is in the same context as the assignment" do
@@ -548,9 +555,8 @@ module Lti
         end
 
         it "requires the plagiarism feature flag" do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
           put @endpoints[:udpate], params: {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, headers: request_headers
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it "verifies the report is in the same context as the assignment" do
@@ -624,7 +630,7 @@ module Lti
 
     describe "POST assignments/:assignment_id/submissions/:submission_id/originality_report (#create)" do
       before do
-        @assignment.course.update_attributes(account: account)
+        @assignment.course.update(account: account)
       end
 
       it "creates an originality report when provided required params" do
@@ -648,7 +654,10 @@ module Lti
           'updated_at',
           'submission_id',
           'workflow_state',
-          'link_id'
+          'link_id',
+          'error_message',
+          'submission_time',
+          'root_account_id'
         ].freeze
 
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
@@ -670,12 +679,12 @@ module Lti
       it "checks that the specified assignment exists" do
         invalid_attach_url = "/api/lti/assignments/#{@assignment.id + 1}/submissions/#{@submission.id}/originality_report"
         post invalid_attach_url, params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "checks that the specified file exists" do
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id + 1, originality_score: 0.4}}, headers: request_headers
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "requires the tool proxy to be associated to the assignment" do
@@ -705,8 +714,8 @@ module Lti
       end
 
       it "does not require an attachment if submission type includes online text entry" do
-        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
-        @submission.update_attributes!(body: 'some text')
+        @submission.assignment.update!(submission_types: 'online_text_entry')
+        @submission.update!(body: 'some text')
         score = 0.25
         post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
 
@@ -715,7 +724,7 @@ module Lti
       end
 
       it "does not requre an attachment if submission type does not include online text entry" do
-        @submission.update_attributes!(body: 'some text')
+        @submission.update!(body: 'some text')
         score = 0.25
         post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
         expect(response).to be_not_found
@@ -749,6 +758,19 @@ module Lti
              headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['workflow_state']).to eq 'pending'
+      end
+
+      it 'sets the error_message' do
+        post @endpoints[:create],
+             params: {
+                originality_report: {
+                  file_id: @attachment.id,
+                  workflow_state: 'error',
+                  error_message: 'error message'
+                }
+             },
+             headers: request_headers
+        expect(json_parse['error_message']).to eq 'error message'
       end
 
       it 'allows creating reports for any attachment in submission history' do
@@ -802,50 +824,180 @@ module Lti
         expect(response_body['tool_setting']['resource_url']).to eq launch_url
       end
 
-      it 'updates the originality report if it has already been created' do
-        originality_score = 50
-        post @endpoints[:create],
-             params: {
-               originality_report: {
-                 file_id: @attachment.id,
-                 workflow_state: 'pending'
-               }
-             },
-             headers: request_headers
+      context 'when the originality report already exists' do
+        let(:submission) { @submission }
+        let(:originality_score) { 50 }
+        let(:existing_report) do
+          OriginalityReport.create!(
+            attachment: @attachment,
+            workflow_state: 'pending',
+            submission: submission
+          )
+        end
 
-        post @endpoints[:create],
-             params: {
-               originality_report: {
-                 file_id: @attachment.id,
-                 originality_score: originality_score
-               }
-             },
-             headers: request_headers
+        before { existing_report }
 
-        response_body = JSON.parse(response.body)
-        expect(response_body['originality_score']).to eq 50
+        it 'updates the originality report' do
+          post @endpoints[:create],
+               params: {
+                 originality_report: {
+                   file_id: @attachment.id,
+                   originality_score: originality_score
+                 }
+               },
+               headers: request_headers
+ 
+          response_body = JSON.parse(response.body)
+          expect(response_body['originality_score']).to eq 50
+        end
+
+        context 'when the attachment matches, but the submission does not' do
+          let(:new_assignment) do
+            a = @submission.assignment.dup
+            a.lti_context_id = SecureRandom.uuid
+            a.tool_settings_tool = message_handler
+            a.save!
+            a
+          end
+          let(:new_submission) { new_assignment.submit_homework(@student, attachments: [@attachment]) }
+
+
+          it 'does not update the originality report' do
+            post "/api/lti/assignments/#{new_assignment.id}/submissions/#{new_submission.id}/originality_report",
+               params: {
+                 originality_report: {
+                   file_id: @attachment.id,
+                   workflow_state: 'pending'
+                 }
+               },
+               headers: request_headers
+
+            response_body = JSON.parse(response.body)
+            expect(response_body['workflow_state']).to eq 'pending'
+          end
+        end
       end
 
-      it 'updates the originality report if it has already been created without an attachment' do
-        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
-        originality_score = 50
-        post @endpoints[:create],
-             params: {
-               originality_report: {
-                 workflow_state: 'pending'
-               }
-             },
-             headers: request_headers
+      context 'when the assignment does not require an attachment (i.e. allows online_text_entry)' do
+        let!(:n_reports_at_beginning) { OriginalityReport.count }
 
-        post @endpoints[:create],
-             params: {
-               originality_report: {
-                 originality_score: originality_score
-               }
-             },
-             headers: request_headers
-        response_body = JSON.parse(response.body)
-        expect(response_body['originality_score']).to eq 50
+        def expect_n_new_reports(n)
+          expect(OriginalityReport.count).to eq(n_reports_at_beginning + n)
+        end
+
+        context 'when attempt is given' do
+          before do
+            @submission.assignment.update!(submission_types: 'online_text_entry')
+          end
+
+          def create_version
+            sub = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: '1st noattach')
+            new_version = sub.versions.max_by{|v| v.model.attempt}
+            expect(sub.attempt).to eq(new_version.model.attempt)
+
+            new_version
+          end
+
+          def post_score_for_version(version, score)
+            post_score_for_attempt(version.model.attempt, score)
+          end
+
+          def post_score_for_attempt(attempt, score)
+            post @endpoints[:create],
+                 params: {
+                   originality_report: {
+                     originality_score: score,
+                     attempt: attempt
+                   },
+                 },
+                 headers: request_headers
+            JSON.parse(response.body)['id']
+          end
+
+          it 'updates the originality report if one exists for the attempt' do
+            ver1 = create_version
+            report1_id = post_score_for_version(ver1, 10)
+            expect(response.code).to eq('201') # created
+            create_version
+            report2_id = post_score_for_version(ver1, 20)
+            expect(response.code).to eq('200') # ok (updated)
+
+            expect_n_new_reports(1)
+            expect(report2_id).to eq(report1_id)
+            report = OriginalityReport.find(report2_id)
+            expect(report.originality_score).to eq(20)
+            expect(report.submission_time).to eq(ver1.model.submitted_at)
+          end
+
+          it 'creates a new originality report if one does not exist for the attempt' do
+            ver1 = create_version
+            report1_id = post_score_for_version(ver1, 10)
+            expect(response.code).to eq('201') # created
+            ver2 = create_version
+            report2_id = post_score_for_version(ver2, 20)
+            expect(response.code).to eq('201') # created
+
+            expect_n_new_reports(2)
+            report1 = OriginalityReport.find(report1_id)
+            report2 = OriginalityReport.find(report2_id)
+            expect(report1.originality_score).to eq(10)
+            expect(report1.submission_time).to eq(ver1.model.submitted_at)
+            expect(report2.originality_score).to eq(20)
+            expect(report2.submission_time).to eq(ver2.model.submitted_at)
+          end
+
+          # This ensures that, if they are creating a report for an attempt other than the latest,
+          # we will connect the report to the correct attempt (we match them up by submission time
+          # when viewing reports, or updating them in #create)
+          it 'creates reports which match up (with correct the submitted_at) with the correct attempt' do
+            ver1 = create_version
+            ver2 = create_version
+            report1_id = post_score_for_version(ver1, 10)
+            expect(response.code).to eq('201') # created
+            report2_id = post_score_for_version(ver2, 20)
+            expect(response.code).to eq('201') # created
+
+            expect_n_new_reports(2)
+            report1 = OriginalityReport.find(report1_id)
+            report2 = OriginalityReport.find(report2_id)
+            expect(report1.originality_score).to eq(10)
+            expect(report1.submission_time).to eq(ver1.model.submitted_at)
+            expect(report2.originality_score).to eq(20)
+            expect(report2.submission_time).to eq(ver2.model.submitted_at)
+          end
+
+          it 'returns a 404 if the attempt does not exist' do
+            ver1 = create_version
+            post_score_for_attempt(ver1.model.attempt + 1, 10)
+            expect(response.code).to eq('404')
+            expect_n_new_reports(0)
+          end
+        end
+
+        context 'when attempt is not given' do
+          it 'updates the first originality report created without an attachment' do
+            @submission.assignment.update!(submission_types: 'online_text_entry')
+            originality_score = 50
+            post @endpoints[:create],
+                 params: {
+                   originality_report: {
+                     workflow_state: 'pending'
+                   }
+                 },
+                 headers: request_headers
+
+            post @endpoints[:create],
+                 params: {
+                   originality_report: {
+                     originality_score: originality_score
+                   }
+                 },
+                 headers: request_headers
+            response_body = JSON.parse(response.body)
+            expect_n_new_reports(1)
+            expect(response_body['originality_score']).to eq 50
+          end
+        end
       end
 
       context "optional params" do

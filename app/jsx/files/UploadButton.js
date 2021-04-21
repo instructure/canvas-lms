@@ -17,64 +17,76 @@
  */
 
 import I18n from 'i18n!upload_button'
-import React from 'react'
-import createReactClass from 'create-react-class';
-import FileRenameForm from '../files/FileRenameForm'
-import ZipFileOptionsForm from './ZipFileOptionsForm'
-import UploadButton from 'compiled/react_files/components/UploadButton'
-  UploadButton.buildPotentialModal = function () {
-    if (this.state.zipOptions.length) {
-      return (
-        <ZipFileOptionsForm
-          fileOptions= {this.state.zipOptions[0]}
-          onZipOptionsResolved= {this.onZipOptionsResolved}
-          onClose={this.onClose}
-        />
-      );
-    } else if (this.state.nameCollisions.length) {
-      return (
-        <FileRenameForm
-          fileOptions= {this.state.nameCollisions[0]}
-          onNameConflictResolved= {this.onNameConflictResolved}
-          onClose= {this.onClose}
-        />
-      );
-    }
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {bool} from 'prop-types'
+import classnames from 'classnames'
+import UploadForm, {UploadFormPropTypes} from './UploadForm'
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
+
+const UploadButton = function(props) {
+  const formRef = useRef(null)
+  const [disabled, setDisabled] = useState(UploadQueue.pendingUploads())
+  const handleQueueChange = useCallback(upload_queue => {
+    setDisabled(!!upload_queue.pendingUploads())
+  }, [])
+
+  useEffect(() => {
+    UploadQueue.addChangeListener(handleQueueChange)
+    return () => UploadQueue.removeChangeListener(handleQueueChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleUploadClick() {
+    formRef.current?.addFiles()
   }
 
-  UploadButton.hiddenPhoneClassname = function () {
-    if (this.props.showingButtons) {
-      return('hidden-phone');
-    }
+  const renameFileMessage = nameToUse => {
+    return I18n.t(
+      'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
+      {name: nameToUse}
+    )
   }
 
-  UploadButton.render = function () {
-    return (
-      <span>
-        <form
-          ref= 'form'
-          className= 'hidden'
-        >
-          <input
-            type='file'
-            ref='addFileInput'
-            onChange= {this.handleFilesInputChange}
-            multiple= {true}
-          />
-        </form>
-        <button
-          type= 'button'
-          className= 'btn btn-primary btn-upload'
-          onClick= {this.handleAddFilesClick}
-        >
-          <i className='icon-upload' aria-hidden />&nbsp;
-          <span className= {this.hiddenPhoneClassname()} >
-            { I18n.t('Upload') }
-          </span>
-        </button>
-        { this.buildPotentialModal() }
-      </span>
-    );
+  const lockFileMessage = nameToUse => {
+    return I18n.t(
+      'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
+      {name: nameToUse}
+    )
   }
 
-export default createReactClass(UploadButton);
+  return (
+    <>
+      <UploadForm
+        allowSkip={window?.ENV?.FEATURES?.files_dnd}
+        ref={formRef}
+        currentFolder={props.currentFolder}
+        contextId={props.contextId}
+        contextType={props.contextType}
+        onRenameFileMessage={renameFileMessage}
+        onLockFileMessage={lockFileMessage}
+      />
+      <button
+        type="button"
+        className="btn btn-primary btn-upload"
+        onClick={handleUploadClick}
+        disabled={disabled}
+      >
+        <i className="icon-upload" aria-hidden />
+        &nbsp;
+        <span className={classnames({'hidden-phone': props.showingButtons})}>
+          {I18n.t('Upload')}
+        </span>
+      </button>
+    </>
+  )
+}
+
+UploadButton.propTypes = {
+  ...UploadFormPropTypes,
+  showingButtons: bool
+}
+
+UploadButton.defaultProps = {
+  showingButtons: false
+}
+
+export default UploadButton

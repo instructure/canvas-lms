@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -18,30 +20,64 @@
 require_relative '../../common'
 
 module PostGradesTray
-  include SeleniumDependencies
+  extend SeleniumDependencies
 
-  def full_content
-    # content finder similar to detail tray
-    # f('#SubmissionTray__Content')
+  def self.tray
+    f('[role=dialog][aria-label="Post grades tray"]')
   end
 
-  def unposted_count_indicator
-    # Todo add locator for unposted_count_indicator
+  def self.full_content
+    fj("h3:contains('Post Grades')", tray)
   end
 
-  def unposted_count
+  def self.unposted_count_indicator
+    f('#PostAssignmentGradesTray__Layout__UnpostedSummary span[id]')
+  end
+
+  def self.unposted_count
     unposted_count_indicator.text
   end
 
-  def post_button
-    # TODO: post button locator
+  def self.post_button
+    fj("button:contains('Post')", tray)
   end
 
-  def post_type_radio_button(type)
-    # TODO: locator similar to fj(".SubmissionTray__RadioInput label:contains('#{type}')")
+  def self.post_type_radio_button(type)
+    fj("label:contains(#{type.to_s.titleize})", tray)
   end
 
-  def select_section(section_name)
-    # TODO: locator for showing sections and for section checkbox
+  def self.specific_sections_toggle
+    fj("label:contains('Specific Sections')", tray)
+  end
+
+  def self.section_checkbox(section_name:)
+    fj("label:contains(#{section_name})", tray)
+  end
+
+  def self.spinner
+    fxpath("//*[text()='Posting grades']", tray)
+  end
+
+  def self.select_sections(sections:)
+    return if sections.empty?
+    specific_sections_toggle.click
+    sections.each do |section|
+      section_checkbox(section_name: section.name).click
+    end
+  end
+
+  def self.select_section(section_name)
+    specific_sections_toggle.click
+    section_checkbox(section_name: section_name).click
+  end
+
+  def self.post_grades
+    post_button.click
+    spinner # wait for spinner to appear
+    wait_for(method: nil) { Delayed::Job.find_by(tag: "Assignment#post_submissions").present? }
+    run_jobs
+    # rubocop:disable Specs/NoWaitForNoSuchElement
+    raise "spinner still spinning after waiting" unless wait_for_no_such_element(timeout: 8) { spinner }
+    # rubocop:enable Specs/NoWaitForNoSuchElement
   end
 end

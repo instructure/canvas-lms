@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -198,6 +200,7 @@ module Importers
         allowed_attempts
         time_limit
         shuffle_answers
+        disable_timer_autosubmission
         show_correct_answers
         points_possible
         hide_results
@@ -215,7 +218,6 @@ module Importers
         lockdown_browser_monitor_data
         one_time_results
         show_correct_answers_last_attempt
-        only_visible_to_overrides
       ].each do |attr|
         attr = attr.to_sym
         if hash.key?(attr)
@@ -227,6 +229,7 @@ module Importers
 
       item.saved_by = :migration
       item.save!
+      recache_due_dates = item.assignment&.needs_update_cached_due_dates # quiz ends up getting reloaded by the end
       build_assignment = false
 
       self.import_questions(item, hash, context, migration, question_data, new_record)
@@ -237,7 +240,6 @@ module Importers
         end
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
-
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
       elsif !item.assignment && grading = hash[:grading]
         item.quiz_type = 'assignment'
@@ -245,7 +247,11 @@ module Importers
       end
 
       if hash[:assignment_overrides]
+        added_overrides = false
         hash[:assignment_overrides].each do |o|
+          next if o[:set_id].to_i == AssignmentOverride::NOOP_MASTERY_PATHS &&
+            o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
+            !context.feature_enabled?(:conditional_release)
           override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
           override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
@@ -256,8 +262,12 @@ module Importers
             override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
+          added_overrides = true
           migration.add_imported_item(override,
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
+        end
+        if hash.has_key?(:only_visible_to_overrides) && added_overrides
+          item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
 
@@ -268,13 +278,14 @@ module Importers
       end
 
       if hash[:available]
-        item.generate_quiz_data
         item.workflow_state = 'available'
         item.published_at = Time.now
       elsif item.can_unpublish? && (new_record || master_migration)
         item.workflow_state = 'unpublished'
         item.assignment.workflow_state = 'unpublished' if item.assignment
       end
+
+      item.generate_quiz_data if item.published?
 
       if hash[:assignment_group_migration_id]
         if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
@@ -295,6 +306,9 @@ module Importers
       item.notify_of_update = false
       item.save
       item.assignment.save_without_broadcasting if item.assignment && item.assignment.changed?
+      if recache_due_dates
+        migration.find_imported_migration_item(Assignment, item.assignment.migration_id)&.needs_update_cached_due_dates = true
+      end
 
       migration.add_imported_item(item)
       item.saved_by = nil
@@ -308,14 +322,15 @@ module Importers
 
         if hash[:questions]
           # either the quiz hasn't been changed downstream or we've re-locked it - delete all the questions/question_groups we're not going to (re)import in
-          importing_qgroup_mig_ids = hash[:questions].select{|q| q[:question_type] == "question_group"}.map{|qg| qg[:migration_id]}
-          item.quiz_groups.where.not(:migration_id => importing_qgroup_mig_ids).destroy_all
-
           importing_question_mig_ids = hash[:questions].map{|q| q[:questions] ?
             q[:questions].map{|qq| qq[:quiz_question_migration_id] || qq[:migration_id]} :
             q[:quiz_question_migration_id] || q[:migration_id]
           }.flatten
           item.quiz_questions.active.where.not(:migration_id => importing_question_mig_ids).update_all(:workflow_state => 'deleted')
+
+          # remove the quiz groups afterwards so any of their dependent quiz questions are deleted first and we don't run into any Restrictor errors
+          importing_qgroup_mig_ids = hash[:questions].select{|q| q[:question_type] == "question_group"}.map{|qg| qg[:migration_id]}
+          item.quiz_groups.where.not(:migration_id => importing_qgroup_mig_ids).destroy_all
         end
       end
       return unless question_data

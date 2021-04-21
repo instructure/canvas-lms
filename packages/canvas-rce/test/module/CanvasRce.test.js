@@ -16,81 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import assert from "assert";
-import proxyquire from "proxyquire";
-import Bridge from "../../src/bridge";
-import sinon from "sinon";
-import skin from "tinymce-light-skin";
-import ReactDOM from "react-dom";
+import React from 'react'
+import assert from 'assert'
+import proxyquire from 'proxyquire'
+import Bridge from '../../src/bridge'
+import sinon from 'sinon'
+import ReactDOM from 'react-dom'
 
 class fakeRCEWrapper extends React.Component {
   static displayName() {
-    return "FakeRCEWrapper";
+    return 'FakeRCEWrapper'
   }
 
   render() {
-    return null;
+    return null
   }
 }
 
-fakeRCEWrapper["@noCallThru"] = true;
+fakeRCEWrapper['@noCallThru'] = true
 
-const CanvasRce = proxyquire("../../src/rce/CanvasRce", {
-  "./RCEWrapper": fakeRCEWrapper,
-  "./tinyRCE": {
-    "@noCallThru": true,
-    DOM: { loadCSS: () => {} }
+const CanvasRce = proxyquire('../../src/rce/CanvasRce', {
+  './RCEWrapper': fakeRCEWrapper,
+  './tinyRCE': {
+    '@noCallThru': true,
+    DOM: {loadCSS: () => {}}
   },
-  "../../locales/index": { "@noCallThru": true }
-}).default;
+  '../../locales/index': {'@noCallThru': true}
+}).default
 
-describe("CanvasRce", () => {
-
-  let target;
+describe('CanvasRce', () => {
+  let target
 
   beforeEach(() => {
-    sinon.stub(skin, "useCanvas");
-    target = document.createElement("div");
-    document.body.appendChild(target);
-  });
+    target = document.createElement('div')
+    document.body.appendChild(target)
+  })
 
   const renderCanvasRce = props => {
-    const mergedProps = Object.assign(
-      {
-        rceProps: {
-          editorOptions: () => {
-            return {};
-          },
-          textareaId: "someUniqueId",
-          language: "en"
-        }
+    const mergedProps = {
+      rceProps: {
+        editorOptions: () => {
+          return {}
+        },
+        textareaId: 'someUniqueId',
+        language: 'en'
       },
-      props
-    );
-    ReactDOM.render(<CanvasRce {...mergedProps} />, target);
-  };
+      ...props
+    }
+    ReactDOM.render(<CanvasRce {...mergedProps} />, target)
+  }
 
   afterEach(() => {
-    skin.useCanvas.restore();
-    Bridge.focusEditor(null);
-  });
+    Bridge.focusEditor(null)
+  })
 
-  it("bridges newly rendered editors", done => {
-    let renderCallback = rendered => {
-      assert.equal(Bridge.activeEditor(), rendered);
-      done();
-    };
-    renderCanvasRce({ renderCallback });
-  });
-
-  it("uses the canvas variant of the tinymce light skin by default", () => {
-    renderCanvasRce();
-    sinon.assert.called(skin.useCanvas);
-  });
-
-  it("does not use the bundled skin if skin is passed in props", () => {
-    renderCanvasRce({ skin: "customSkin" });
-    sinon.assert.notCalled(skin.useCanvas);
-  });
-});
+  it('bridges newly rendered editors', done => {
+    const renderCallback = rendered => {
+      assert.equal(Bridge.activeEditor(), rendered)
+      done()
+    }
+    renderCanvasRce({renderCallback})
+  })
+})

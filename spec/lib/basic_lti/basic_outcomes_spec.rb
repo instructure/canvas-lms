@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -110,7 +112,7 @@ describe BasicLTI::BasicOutcomes do
 
   describe ".decode_source_id" do
     it 'successfully decodes a source_id' do
-      expect(described_class.decode_source_id(tool, source_id)).to eq [@course, assignment, @user]
+      expect(described_class.decode_source_id(tool, source_id)).to eq [assignment, @user]
     end
 
     it 'throws Invalid sourcedid if sourcedid is nil' do
@@ -141,6 +143,13 @@ describe BasicLTI::BasicOutcomes do
       @course.save!
       expect{described_class.decode_source_id(tool, source_id)}.
         to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is invalid')
+    end
+
+    it 'throws Invalid sourcedid if course is concluded' do
+      @course.soft_conclude!
+      @course.save!
+      expect{described_class.decode_source_id(tool, source_id)}.
+        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is concluded')
     end
 
     it "throws User is no longer in course isuser enrollment is missing" do
@@ -189,7 +198,7 @@ describe BasicLTI::BasicOutcomes do
       end
 
       it "decodes a jwt signed sourcedid" do
-        expect(described_class.decode_source_id(tool, jwt_source_id)).to eq [@course, assignment, @user]
+        expect(described_class.decode_source_id(tool, jwt_source_id)).to eq [assignment, @user]
       end
 
       it 'throws invalid JWT if token is unrecognized' do
@@ -212,7 +221,7 @@ describe BasicLTI::BasicOutcomes do
     end
   end
 
-  describe "#handle_replaceResult" do
+  describe "#handle_replace_result" do
     it "accepts a grade" do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -235,7 +244,7 @@ describe BasicLTI::BasicOutcomes do
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
-    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission " do
+    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission" do
       xml.css('resultData').remove
       assignment.points_possible = nil
       assignment.save!
@@ -410,8 +419,14 @@ describe BasicLTI::BasicOutcomes do
         )
       end
 
+      let(:submitted_at_timestamp) { 1.day.ago.iso8601(3) }
+
       it "stores the score and grade for quizzes.next assignments" do
-        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        xml.css('resultData').remove
+        xml.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result').add_child(
+          "<resultData><text>#{submitted_at_timestamp}</text>
+          <url>http://example.com/launch</url></resultData>"
+        )
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(assignment.submissions.first.grade).to eq "A-"
       end

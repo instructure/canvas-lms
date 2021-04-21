@@ -21,36 +21,25 @@ module.exports = {
     '^.+\\.(js)$': 'babel-jest',
     '^.+\\.(css)$': '<rootDir>/jest-themeable-styles'
   },
-  reporters: [ "default", ["jest-junit", {
-    suiteName: 'Canvas Planner Jest Tests',
-    outputDirectory: './coverage',
-    outputName: 'canvas-planner-junit.xml'
-  }] ],
-  snapshotSerializers: [
-    'enzyme-to-json/serializer'
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        suiteName: 'Canvas Planner Jest Tests',
+        outputDirectory: './coverage',
+        outputName: 'canvas-planner-junit.xml'
+      }
+    ]
   ],
-  setupFiles: [
-    'jest-canvas-mock',
-    './jest-env.js'
-  ],
-  testPathIgnorePatterns: [
-    "<rootDir>/node_modues",
-    "<rootDir>/lib",
-    "<rootDir>/copy-of-what-gets-published-to-npm-registry",
-  ],
-  testRegex: "/__tests__/.*\\.(test|spec)\\.js$",
-  coverageReporters: [
-    'html',
-    'text',
-    'json'
-  ],
-  collectCoverageFrom: [
-    'src/**/*.js'
-  ],
-  coveragePathIgnorePatterns: [
-    '<rootDir>/src/demo.js',
-    '<rootDir>/src/i18n/flip-message.js'
-  ],
+  snapshotSerializers: ['enzyme-to-json/serializer'],
+  setupFiles: ['jest-canvas-mock', './jest-env.js'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+  testPathIgnorePatterns: ['<rootDir>/node_modues', '<rootDir>/lib'],
+  testRegex: '/__tests__/.*\\.(test|spec)\\.js$',
+  coverageReporters: ['html', 'text', 'json'],
+  collectCoverageFrom: ['src/**/*.js'],
+  coveragePathIgnorePatterns: ['<rootDir>/src/i18n/flip-message.js'],
   coverageThreshold: {
     global: {
       branches: 85,
@@ -58,5 +47,6 @@ module.exports = {
       lines: 85,
       statements: 85
     }
-  }
-};
+  },
+  testEnvironment: 'jest-environment-jsdom-fourteen'
+}

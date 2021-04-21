@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -29,7 +31,15 @@ class BigBlueButtonConference < WebConference
     description: ->{ t('recording_setting_enabled_description', 'Enable recording for this conference') },
     type: :boolean,
     default: false,
-    visible: ->{ WebConference.config(BigBlueButtonConference.to_s)[:recording_enabled] },
+    visible: ->{ WebConference.config(class_name: BigBlueButtonConference.to_s)[:recording_enabled] },
+  }
+
+  user_setting_field :scheduled_date, {
+    name: ->{ t('Scheduled Date') },
+    description: ->{ t('Enable recording for this conference') },
+    type: :date,
+    default: false,
+    visible: false
   }
 
   def initiate_conference
@@ -45,6 +55,7 @@ class BigBlueButtonConference < WebConference
       settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
     settings[:record] &&= config[:recording_enabled]
+    settings[:domain] ||= config[:domain] # save the domain
     current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
     send_request(:create, {
       :meetingID => conference_key,
@@ -106,7 +117,10 @@ class BigBlueButtonConference < WebConference
   end
 
   def recording_formats(recording)
-    recording_formats = recording.fetch(:playback, [])
+    recording_formats = recording.fetch(:playback, []).map do |format|
+      show_to_students = !!format[:length] || format[:type] == "notes" # either is an actual recording or shared notes
+      format.merge(:show_to_students => show_to_students)
+    end
     {
       recording_id:     recording[:recordID],
       title:            recording[:name],
@@ -134,6 +148,41 @@ class BigBlueButtonConference < WebConference
     super
   end
 
+  attr_writer :loaded_recordings
+  # we can use the same API method with multiple meeting ids to load all the recordings up in one go
+  # instead of making a bunch of individual calls
+  def self.preload_recordings(conferences)
+    filtered_conferences = conferences.select{|c| c.conference_key && c.settings[:record]}
+    return unless filtered_conferences.any?
+
+    fallback_conferences, current_conferences = filtered_conferences.partition{|c| c.use_fallback_config?}
+    fetch_and_preload_recordings(fallback_conferences, use_fallback_config: true) if fallback_conferences.any?
+    fetch_and_preload_recordings(current_conferences, use_fallback_config: false) if current_conferences.any?
+  end
+
+  def self.fetch_and_preload_recordings(conferences, use_fallback_config: false)
+    # have a limit so we don't send a ridiculously long URL over
+    limit = Setting.get("big_blue_button_preloaded_recordings_limit", "50").to_i
+    conferences.each_slice(limit) do |sliced_conferences|
+      meeting_ids = sliced_conferences.map(&:conference_key).join(",")
+      response = send_request(:getRecordings,
+        {:meetingID => meeting_ids},
+        use_fallback_config: use_fallback_config)
+      result = response[:recordings] if response
+      result = [] if result.is_a?(String)
+      grouped_result = Array(result).group_by{|r| r[:meetingID]}
+      sliced_conferences.each do |c|
+        c.loaded_recordings = grouped_result[c.conference_key] || []
+      end
+    end
+  end
+
+  def use_fallback_config?
+    # use the fallback config (if possible) if it wasn't created with the current config
+    self.class.config[:use_fallback] &&
+      self.settings[:domain] != self.class.config[:domain]
+  end
+
   private
 
   def retouch?
@@ -152,7 +201,7 @@ class BigBlueButtonConference < WebConference
 
   def join_url(user, type = :user)
     generate_request :join,
-      :fullName => user.name,
+      :fullName => user.short_name,
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
@@ -167,23 +216,41 @@ class BigBlueButtonConference < WebConference
   end
 
   def fetch_recordings
-    return [] unless conference_key && settings[:record]
-    response = send_request(:getRecordings, {
-      :meetingID => conference_key,
-      })
-    result = response[:recordings] if response
-    result = [] if result.is_a?(String)
-    Array(result)
+    @loaded_recordings ||= begin
+      if conference_key && settings[:record]
+        response = send_request(:getRecordings, {
+          :meetingID => conference_key,
+          })
+        result = response[:recordings] if response
+        result = [] if result.is_a?(String)
+        Array(result)
+      else
+        []
+      end
+    end
   end
 
-  def generate_request(action, options)
+  def generate_request(*args)
+    self.class.generate_request(*args)
+  end
+
+  def self.fallback_config
+    Canvas::Plugin.find(:big_blue_button_fallback).settings&.with_indifferent_access
+  end
+
+  def self.generate_request(action, options, use_fallback_config: false)
+    config_to_use = (use_fallback_config && fallback_config.presence) || config
     query_string = options.to_query
-    query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config[:secret_dec]))
-    "https://#{config[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
+    query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config_to_use[:secret_dec]))
+    "https://#{config_to_use[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
   end
 
   def send_request(action, options)
-    url_str = generate_request(action, options)
+    self.class.send_request(action, options, use_fallback_config: use_fallback_config?)
+  end
+
+  def self.send_request(action, options, use_fallback_config: false)
+    url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
     http_response = nil
     Canvas.timeout_protection("big_blue_button") do
       logger.debug "big blue button api call: #{url_str}"
@@ -207,13 +274,13 @@ class BigBlueButtonConference < WebConference
     nil
   end
 
-  def xml_to_hash(xml_string)
+  def self.xml_to_hash(xml_string)
     doc = Nokogiri::XML(xml_string)
     # assumes the top level value will be a hash
     xml_to_value(doc.root)
   end
 
-  def xml_to_value(node)
+  def self.xml_to_value(node)
     child_elements = node.element_children
 
     # if there are no children at all, then this is an empty node

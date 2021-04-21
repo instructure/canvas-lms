@@ -26,7 +26,12 @@ const json = {
   text: 'some text',
   icon: 'https://www.test.com/icon',
   thumbnail,
-  invalidProp: 'banana'
+  invalidProp: 'banana',
+  custom: {
+    root_account_id: '$Canvas.rootAccount.id',
+    referer: 'LTI test tool example'
+  },
+  lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
 }
 
 const linkContentItem = (overrides, selection) => {
@@ -59,6 +64,14 @@ describe('constructor', () => {
     expect(linkContentItem().invalidProp).toBeUndefined()
   })
 
+  it('sets the custom when present', () => {
+    expect(linkContentItem().custom).toEqual(json.custom)
+  })
+
+  it('sets the lookup_uuid when present', () => {
+    expect(linkContentItem().lookup_uuid).toEqual(json.lookup_uuid)
+  })
+
   describe('when there is a user selection', () => {
     it('replaces "text" with the selection', () => {
       expect(linkContentItem({}, 'selection').text).toEqual('selection')
@@ -69,7 +82,7 @@ describe('constructor', () => {
 describe('toHtmlString', () => {
   it('correctly creates a link with the thumbnail', () => {
     expect(linkContentItem().toHtmlString()).toEqual(
-      '<a href="https://www.test.com" title="Title"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+      '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
     )
   })
 
@@ -77,7 +90,7 @@ describe('toHtmlString', () => {
     const overrides = {thumbnail: undefined}
     it('creates an anchor tag with the correct values', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="https://www.test.com" title="Title">some text</a>'
+        '<a href="https://www.test.com" title="Title" target="_blank">some text</a>'
       )
     })
   })
@@ -86,7 +99,21 @@ describe('toHtmlString', () => {
     const overrides = {url: 'javascript:alert("hello world!");'}
     it('sanitizes the url', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+      )
+    })
+  })
+
+  describe('when the iframe property is specified', () => {
+    const iframe = {
+      src: 'http://www.instructure.com',
+      width: 500,
+      height: 200
+    }
+
+    it('returns markup for an iframe', () => {
+      expect(linkContentItem({iframe}).toHtmlString()).toEqual(
+        '<iframe src="http://www.instructure.com" title="Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
       )
     })
   })

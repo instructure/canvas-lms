@@ -46,15 +46,17 @@
             {{convertApiUserContent description}}
           </div>
         {{else}}
-          <div style="float: right;">
-            <a href="#" class="rte_switch_views_link">
-              {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-            </a>
-            <a href="#" class="rte_switch_views_link" style="display:none;">
-              {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-            </a>
-          </div>
-          <div style="clear:both;"></div>
+          {{#unless use_rce_enhancements}}
+            <div style="float: right;">
+              <a href="#" class="rte_switch_views_link">
+                {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+              </a>
+              <a href="#" class="rte_switch_views_link" style="display:none;">
+                {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+              </a>
+            </div>
+            <div style="clear:both;"></div>
+          {{/unless}}
           <textarea id="assignment_description"
             name="description"
             aria-label="{{#t "description"}}Description{{/t}}"
@@ -128,6 +130,19 @@
 
     {{>[assignments/submission_types_form]}}
 
+    {{#if assignment_attempts}}
+      <fieldset id="allowed_attempts_fields" class="control-group">
+        <div class="form-column-left">
+          {{#t "submission_attempts"}}Submission Attempts{{/t}}
+        </div>
+        <div class="form-column-right">
+          <div class="border border-trbl border-round">
+            <div id="allowed-attempts-target" />
+          </div>
+        </div>
+      </fieldset>
+    {{/if}}
+
     <fieldset id="similarity_detection_tools">
     </fieldset>
 
@@ -196,12 +211,11 @@
         <div class="form-column-right" style="margin-top: 14px;">
           <label class="checkbox">
             {{checkbox "anonymousInstructorAnnotations" id="assignment_anonymous_instructor_annotations" name="anonymous_instructor_annotations"}}
-            {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in SpeedGrader{{/t}}
+            {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in DocViewer{{/t}}
           </label>
         </div>
       </fieldset>
     {{/if}}
-
   </div>
 
   {{#if canFreeze}}
@@ -241,8 +255,8 @@
 
 <div id="assignment_external_tools"></div>
 
-<div class="form-actions" style="padding-left: 10px;">
-  <div class="pull-left" style="min-width: 300px;">
+<div class="form-actions">
+  <div class="pull-left">
     <label class="checkbox" style="text-align:left;" for="assignment_notify_of_update">
       {{checkbox "notifyOfUpdate"
         id="assignment_notify_of_update"
@@ -250,17 +264,26 @@
       {{#t "notify_content_change"}}Notify users that this content has changed{{/t}}
     </label>
   </div>
-
-  <button type="button" class="btn cancel_button">
-    {{#t "#buttons.cancel"}}Cancel{{/t}}
-  </button>
-  {{#unless published}}
-    <button type="button" class="btn btn-default save_and_publish">
-      {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
+  <div class="assignment__action-buttons">
+    <button type="button" class="btn cancel_button">
+      {{#t "#buttons.cancel"}}Cancel{{/t}}
     </button>
-  {{/unless}}
-  <button type="submit" class="btn btn-primary">
-    {{#t "buttons.save"}}Save{{/t}}
-  </button>
-
+    {{#unless published}}
+      <button type="button" class="btn btn-default save_and_publish">
+        {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
+      </button>
+    {{/unless}}
+    {{#if showBuildButton}}
+      <button type="submit" class="btn btn-default">
+        {{#t "buttons.save"}}Save{{/t}}
+      </button>
+      <button type="button" class="btn btn-primary build_button">
+        {{#t "buttons.build"}}Build{{/t}}
+      </button>
+    {{else}}
+      <button type="submit" class="btn btn-primary">
+        {{#t "buttons.save"}}Save{{/t}}
+      </button>
+    {{/if}}
+  </div>
 </div>

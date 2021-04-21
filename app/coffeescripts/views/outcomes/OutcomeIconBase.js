@@ -27,19 +27,6 @@ import 'jqueryui/draggable'
 // and provides an API for keydown events and for selecting
 // elements.
 export default class OutcomeIconBase extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.triggerSelect = this.triggerSelect.bind(this)
-    this.select = this.select.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.tagName = 'li'
 

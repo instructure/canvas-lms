@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,9 +23,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ErrorReport do
   describe ".log_exception_from_canvas_errors" do
     it "should not fail with invalid UTF-8" do
-      message = "he"
-      message << 255.chr
-      message << "llo"
+      message = "he" +
+        255.chr +
+        "llo"
       data = { extra: { message: message } }
       expect { described_class.log_exception_from_canvas_errors('my error', data) }.
         to_not raise_error
@@ -116,6 +118,15 @@ describe ErrorReport do
     report.assign_data(id: 1)
     expect(report.id).to be_nil
     expect(report.data["id"]).to eq 1
+  end
+
+  it "should truncate absurdly long messages" do
+    report = described_class.new
+    long_message = (0...100000).map { 'a' }.join
+    report.assign_data(message: long_message)
+    expect(report.message.length).to eq long_message.length
+    report.save!
+    expect(report.message.length).to be < long_message.length
   end
 
   describe "#safe_url?" do

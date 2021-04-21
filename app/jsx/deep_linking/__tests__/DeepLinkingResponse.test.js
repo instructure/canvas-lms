@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {mount} from 'enzyme'
+import {Text} from '@instructure/ui-text'
 import {RetrievingContent} from '../DeepLinkingResponse'
 
 let wrapper = 'empty wrapper'
@@ -27,9 +27,10 @@ const env = {
   message: 'message',
   log: 'log',
   error_message: 'error message',
-  error_log: "error log",
+  error_log: 'error log',
   DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
-  lti_endpoint: 'https://www.test.com/retrieve'
+  lti_endpoint: 'https://www.test.com/retrieve',
+  close_dialog: false
 }
 let oldEnv = {}
 
@@ -45,7 +46,7 @@ afterEach(() => {
 
 it('renders an informative message', () => {
   wrapper = mount(<RetrievingContent />)
-  expect(wrapper.find(Text).html()).toContain("Retrieving Content")
+  expect(wrapper.find(Text).html()).toContain('Retrieving Content')
 })
 
 describe('post message', () => {
@@ -61,7 +62,7 @@ describe('post message', () => {
     window.postMessage = oldPostMessage
   })
 
-  const messageData = () => (postMessageDouble.mock.calls[0][0])
+  const messageData = () => postMessageDouble.mock.calls[0][0]
 
   it('sends the correct message type', () => {
     expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')

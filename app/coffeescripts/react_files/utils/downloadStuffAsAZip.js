@@ -80,11 +80,11 @@ export default function downloadStuffAsAZip(filesAndFolders, {contextType, conte
     .pipe(progressObject =>
       new Progress({url: progressObject.progress_url}).poll().progress(onProgress)
     )
-    .pipe(function(progressObject) {
+    .pipe(progressObject => {
       const contentExportId = progressObject.context_id
       return $.getJSON(`${url}/${contentExportId}`)
     })
-    .pipe(function(response) {
+    .pipe(response => {
       $(window).off('beforeunload', promptBeforeLeaving)
       if (response.workflow_state === 'exported') {
         window.location = response.attachment.url
@@ -95,7 +95,7 @@ export default function downloadStuffAsAZip(filesAndFolders, {contextType, conte
     .fail(() =>
       $.flashError(I18n.t('An error occurred trying to prepare download, please try again.'))
     )
-    .always(function() {
+    .always(() => {
       $(window).off('beforeunload', promptBeforeLeaving)
       $progressIndicator.remove()
     })

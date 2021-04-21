@@ -2,4 +2,4 @@
 set -e
 
 bundle check || bundle install
-bundle exec rake spec
+bundle exec rspec spec

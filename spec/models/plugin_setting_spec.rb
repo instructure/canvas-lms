@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -30,6 +32,19 @@ describe PluginSetting do
     expect(s.settings.keys.sort_by(&:to_s)).to eql([:bar, :foo, :foo_dec, :foo_enc, :foo_salt])
     expect(s.settings[:bar]).to eql("qwerty")
     expect(s.settings[:foo_dec]).to eql("asdf")
+  end
+
+  context "dirty_checking" do
+    it 'should consider a new object to be dirty' do
+      s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
+      expect(s.changed?).to be_truthy
+    end
+
+    it 'should consider a freshly loaded encrypted object to be clean' do
+      PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
+      settings = PluginSetting.find_by(name: "plugin_setting_test")
+      expect(settings.changed?).to_not be_truthy
+    end
   end
 
   it "should not be valid if there are decrypt errors" do
@@ -77,12 +92,12 @@ describe PluginSetting do
     end
   end
 
-  it "should cache in process" do
+  it "should cache in-process" do
     RequestCache.enable do
       enable_cache do
         name = "plugin_setting_test"
-        ps = PluginSetting.create!(:name => name, :settings => {:bar => "qwerty"})
-        expect(MultiCache).to receive(:fetch).once.and_return(s)
+        s = PluginSetting.create!(:name => name, :settings => {:bar => "qwerty"})
+        expect(MultiCache.cache).to receive(:fetch_multi).once.and_return(s)
         PluginSetting.cached_plugin_setting(name) # sets the cache
         PluginSetting.cached_plugin_setting(name) # 2nd lookup
       end

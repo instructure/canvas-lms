@@ -38,21 +38,12 @@ export default class MessageListView extends PaginatedCollectionView {
   }
 
   constructor() {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.trackSelectedMessages = this.trackSelectedMessages.bind(this)
-    this.updateMessage = this.updateMessage.bind(this)
     super(...arguments)
     this.attachEvents()
   }
 
   attachEvents() {
-    return this.collection.on('change:selected', this.trackSelectedMessages)
+    return this.collection.on('change:selected', this.trackSelectedMessages, this)
   }
 
   trackSelectedMessages(model) {

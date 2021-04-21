@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-  const initialState = {
-    inFindAppointmentMode: false,
-    selectedCourse: {}
-  };
-
+const initialState = {
+  inFindAppointmentMode: false,
+  selectedCourse: {}
+}
 
 export default initialState

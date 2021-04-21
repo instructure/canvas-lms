@@ -29,16 +29,20 @@
            title="<%= t('Find an Existing Grading Scheme') %>">
           <%= image_tag "find.png", :alt => t('find', "Find") %> <%= t('select_another_scheme','Select Another Scheme') %>
         </a>
-        <a href="#"
-           title="<%= t('edit_scheme', 'Edit Grading Scheme') %>"
-           aria-label="<%= t('edit_scheme', 'Edit Grading Scheme') %>"
-           class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && grading_standard.assessed_assignment? %>">
+        <a
+          aria-label="<%= t('Edit Grading Scheme %{title}', title: grading_standard.title) %>"
+          class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && grading_standard.assessed_assignment? %>"
+          href="#"
+          title="<%= t('Edit Grading Scheme %{title}', title: grading_standard.title) %>"
+        >
           <i class="icon-edit standalone-icon"></i>
         </a>
-        <a href="#"
-           title="<%= t('remove_scheme', 'Remove Grading Scheme') %>"
-           aria-label="<%= t('remove_scheme', 'Remove Grading Scheme') %>"
-           class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>">
+        <a
+          aria-label="<%= t('Remove Grading Scheme %{title}', title: grading_standard.title) %>"
+          class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>"
+          href="#"
+          title="<%= t('Remove Grading Scheme %{title}', title: grading_standard.title) %>"
+        >
          <i class="icon-end standalone-icon"></i>
         </a>
       </div>
@@ -69,7 +73,13 @@
       </thead>
       <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
         <td colspan="4">
-          <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
+          <a
+            aria-label="<%= t('insert above %{row}', row: grading_standard.data.first[0]) %>"
+            class="insert_grading_standard_link"
+            href="#"
+          >
+            <%= t('insert here') %>
+          </a>
         </td>
       </tr>
       <% grading_standard.data.each_with_index do |row, idx| %>
@@ -120,20 +130,29 @@
             </div>
           </td>
           <td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">
-            <a href="#" class="delete_row_link no-hover" tabindex="0" aria-label="<%= t('remove_row', 'Remove row')%>" title="<%= t('remove_row', 'Remove row')%>"><i class="icon-end standalone-icon"></i></a>
+            <a
+              aria-label="<%= t('Remove row %{row}', row: row[0])%>"
+              class="delete_row_link no-hover"
+              href="#"
+              tabindex="0"
+              title="<%= t('Remove row')%>"
+            >
+              <i class="icon-end standalone-icon"></i>
+            </a>
           </td>
         </tr>
         <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
           <td colspan="4">
-            <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
+            <a
+              aria-label="<%= t('insert below %{row}', row: row[0]) %>"
+              class="insert_grading_standard_link"
+              href="#"
+            >
+              <%= t('insert_here', 'insert here') %>
+            </a>
           </td>
         </tr>
       <% end %>
-      <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
-        <td colspan="4">
-          <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
-        </td>
-      </tr>
       <tr class="grading_standard_row blank" style="display: none;">
         <td>
           <div class="editing_box">

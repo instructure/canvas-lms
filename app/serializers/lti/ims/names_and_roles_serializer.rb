@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ module Lti::Ims
 
     def serialize_context
       {
-        id: lti_id(page[:context]),
+        id: Lti::Asset.opaque_identifier_for(unwrap(page[:context])),
         label: page[:context].context_label,
         title: page[:context].context_title,
       }.compact
@@ -46,18 +48,19 @@ module Lti::Ims
     def serialize_membership(enrollment)
       # Inbound model is either an ActiveRecord Enrollment or GroupMembership, with delegations in place
       # to make them behave more or less the same for our purposes
-      expander = variable_expander(enrollment.user)
+      expander = variable_expander(enrollment)
       member(enrollment, expander).merge!(message(enrollment, expander))
     end
 
-    def variable_expander(user)
+    def variable_expander(enrollment)
       Lti::VariableExpander.new(
         page[:context].root_account,
         Lti::Ims::Providers::MembershipsProvider.unwrap(page[:context]),
         page[:controller],
         {
-          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(user),
+          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
+          enrollment: enrollment,
           variable_whitelist: %w(
             Person.name.full
             Person.name.display
@@ -85,15 +88,17 @@ module Lti::Ims
     end
 
     def member(enrollment, expander)
+      user = enrollment.user
       {
         status: 'Active',
-        name: (enrollment.user.name if page[:tool].include_name?),
-        picture: (enrollment.user.avatar_url if page[:tool].public?),
-        given_name: (enrollment.user.first_name if page[:tool].include_name?),
-        family_name: (enrollment.user.last_name if page[:tool].include_name?),
-        email: (enrollment.user.email if page[:tool].include_email?),
+        name: (user.name if page[:tool].include_name?),
+        picture: (user.avatar_url if page[:tool].public?),
+        given_name: (user.first_name if page[:tool].include_name?),
+        family_name: (user.last_name if page[:tool].include_name?),
+        email: (user.email if page[:tool].include_email?),
         lis_person_sourcedid: (member_sourced_id(expander) if page[:tool].include_name?),
-        user_id: lti_id(enrollment.user),
+        user_id: user.past_lti_ids.first&.user_lti_id || user.lti_id,
+        lti11_legacy_user_id: Lti::Asset.opaque_identifier_for(user),
         roles: enrollment.lti_roles
       }.compact
     end
@@ -121,7 +126,7 @@ module Lti::Ims
             claim_group_whitelist: [ :public, :i18n, :custom_params ],
             extension_whitelist: [ :canvas_user_id, :canvas_user_login_id ]
           }
-        ).generate_post_payload_message
+        ).generate_post_payload_message(validate_launch: false)
       ensure
         I18n.locale = orig_locale
         Time.zone = orig_time_zone
@@ -132,10 +137,6 @@ module Lti::Ims
         except!("#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}version").
         except!("picture")
       { message: [ launch_hash ] }
-    end
-
-    def lti_id(entity)
-      Lti::Asset.opaque_identifier_for(unwrap(entity))
     end
 
     def unwrap(wrapped)

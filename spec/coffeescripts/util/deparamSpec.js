@@ -46,3 +46,22 @@ test('deparam', () => {
   deepEqual(deparam(params_str), params_obj, 'deparam( String )')
   deepEqual(deparam(params_str, true), params_obj_coerce, 'deparam( String, true )')
 })
+
+test('prototype pollution protection', () => {
+  const dangerous_input =
+    'a=1&__proto__%5Bdiv%5D%5B0%5D=1&__proto__%5Bdiv%5D%5B1%5D=%3Cimg/src/onerror%3dalert(document.domain)%3E&__proto__%5Bdiv%5D%5B2%5D=1'
+
+  const safe_result = Object.create(null)
+  safe_result.a = '1'
+  // eslint-disable-next-line no-proto
+  safe_result.__proto__ = {
+    div: ['1', '<img/src/onerror=alert(document.domain)>', '1']
+  }
+
+  const obj = {}
+  deepEqual(obj.div, undefined)
+  const result = deparam(dangerous_input)
+  deepEqual(result, safe_result, 'deparam works')
+  deepEqual(result.div, undefined, '__proto__ is just an object property')
+  deepEqual(obj.div, undefined, 'Object.prototype is not polluted')
+})

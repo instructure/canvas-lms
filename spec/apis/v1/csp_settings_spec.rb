@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -61,7 +63,7 @@ describe "CSP Settings API", type: :request do
         json = get_csp_settings(@course)
         expect(json["enabled"]).to eq true
         expect(json["inherited"]).to eq true
-        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com"])
+        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com", "*.example2.com"])
       end
 
       it "should indicate if disabled explicitly on course" do
@@ -98,9 +100,11 @@ describe "CSP Settings API", type: :request do
         json = get_csp_settings(@sub)
         expect(json["enabled"]).to eq true
         expect(json["inherited"]).to eq true
-        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com"])
-        expect(json["tools_whitelist"]).to eq(
-          {"example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}]})
+        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com", "*.example2.com"])
+        expect(json["tools_whitelist"]).to eq({
+          "example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}],
+          "*.example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}]
+        })
         expect(json["current_account_whitelist"]).to eq []
       end
 
@@ -148,7 +152,7 @@ describe "CSP Settings API", type: :request do
       end
 
       it "should explicitly disable" do
-        set_csp_setting(@course, "disabled")
+        json = set_csp_setting(@course, "disabled")
         expect(@course.reload.csp_disabled?).to eq true
       end
     end
@@ -174,7 +178,8 @@ describe "CSP Settings API", type: :request do
 
       it "should disable csp" do
         Account.default.enable_csp!
-        set_csp_setting(@sub, "disabled")
+        json = set_csp_setting(@sub, "disabled")
+        expect(json["enabled"]).to eq false
         expect(@sub.reload.csp_enabled?).to eq false
       end
 
@@ -275,6 +280,37 @@ describe "CSP Settings API", type: :request do
       json = remove_domain(@sub, domain1)
       expect(@sub.reload.csp_domains.active.pluck(:domain)).to eq [domain2]
       expect(json["current_account_whitelist"]).to eq [domain2]
+    end
+  end
+
+  describe "GET csp_log" do
+    def get_csp_log(account, expected_status)
+      api_call(:get, "/api/v1/accounts/#{account.id}/csp_log",
+               {:controller => "csp_settings", :action => "csp_log", :format => "json",
+                account_id: account.id.to_param }, {}, {}, {:expected_status => expected_status})
+    end
+
+    it "400s for a subaccount" do
+      get_csp_log(@sub, 400)
+    end
+
+    it "requires authorization" do
+      course_with_teacher(active_all: true, course: @course)
+      get_csp_log(Account.default, 401)
+    end
+
+    it "requires csp logging to be configured" do
+      allow_any_instantiation_of(Account.default).to receive(:csp_logging_config).and_return({})
+      get_csp_log(Account.default, 503)
+    end
+
+    it "just passes through the result from the external service" do
+      allow_any_instantiation_of(Account.default).to receive(:csp_logging_config).and_return(
+        { 'host' => 'http://csp_logging.docker/', 'shared_secret' => 'bob' })
+      expect(CanvasHttp).to receive(:get).with("http://csp_logging.docker/report/#{Account.default.global_id}",
+                                               { "Authorization" => "Bearer bob" }).and_return(double(body: "{}"))
+      res = get_csp_log(Account.default, 200)
+      expect(res).to eq({})
     end
   end
 end

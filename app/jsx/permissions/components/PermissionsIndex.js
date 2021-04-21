@@ -24,16 +24,15 @@ import {debounce} from 'lodash'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button} from '@instructure/ui-buttons'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
+import {IconSearchLine} from '@instructure/ui-icons'
+import {TabList} from '@instructure/ui-tabs'
+import {Select} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {Heading} from '@instructure/ui-heading'
 
 import actions from '../actions'
 import propTypes, {COURSE, ACCOUNT, ALL_ROLES_VALUE, ALL_ROLES_LABEL} from '../propTypes'
@@ -121,11 +120,11 @@ export default class PermissionsIndex extends Component {
 
   renderHeader() {
     return (
-      <div className="permissions-v2__header_contianer">
-        <Container display="block">
-          <Grid>
-            <GridRow vAlign="middle">
-              <GridCol width={3}>
+      <div className="permissions-v2__header_container">
+        <View display="block">
+          <Grid startAt="large" rowSpacing="small">
+            <Grid.Row vAlign="middle">
+              <Grid.Col width="auto">
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
@@ -137,8 +136,8 @@ export default class PermissionsIndex extends Component {
                   onChange={this.onSearchStringChange}
                   name="permission_search"
                 />
-              </GridCol>
-              <GridCol width={8}>
+              </Grid.Col>
+              <Grid.Col width={null}>
                 <Select
                   id="permissions-role-filter"
                   label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
@@ -166,8 +165,8 @@ export default class PermissionsIndex extends Component {
                       </option>
                     ))}
                 </Select>
-              </GridCol>
-              <GridCol width={2}>
+              </Grid.Col>
+              <Grid.Col width="auto">
                 <Button
                   id="add_role"
                   variant="primary"
@@ -176,10 +175,10 @@ export default class PermissionsIndex extends Component {
                 >
                   {I18n.t('Add Role')}
                 </Button>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
-        </Container>
+        </View>
       </div>
     )
   }
@@ -200,14 +199,14 @@ export default class PermissionsIndex extends Component {
           }
         />
         <TabList onChange={this.onTabChanged}>
-          <TabPanel title={I18n.t('Course Roles')}>
+          <TabList.Panel title={I18n.t('Course Roles')}>
             {this.renderHeader()}
             <ConnectedPermissionsTable />
-          </TabPanel>
-          <TabPanel title={I18n.t('Account Roles')}>
+          </TabList.Panel>
+          <TabList.Panel title={I18n.t('Account Roles')}>
             {this.renderHeader()}
             <ConnectedPermissionsTable />
-          </TabPanel>
+          </TabList.Panel>
         </TabList>
       </div>
     )

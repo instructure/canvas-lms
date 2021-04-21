@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -56,7 +58,7 @@ class AnnouncementsApiController < ApplicationController
   #   a string of the name of the resource. Possible values are:
   #   "sections", "sections_user_count"
   #   if "sections" is passed, includes the course sections that are associated
-  #   with the topic, if the topic is specific to sertain sections of the course.
+  #   with the topic, if the topic is specific to certain sections of the course.
   #   If "sections_user_count" is passed, then:
   #     (a) If sections were asked for *and* the topic is specific to certain
   #         course sections sections, includes the number of users in each
@@ -97,6 +99,12 @@ class AnnouncementsApiController < ApplicationController
     @end_date ||= @start_date + 28.days
     scope = scope.where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', @start_date, @end_date)
     scope = scope.order(Arel.sql('COALESCE(delayed_post_at, posted_at, created_at) DESC'))
+
+    # only filter by section visibility if user has no course manage rights
+    skip_section_filtering = courses.all? do |course|
+      course.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments, :manage_content)
+    end
+    scope = scope.visible_to_student_sections(@current_user) unless skip_section_filtering
 
     @topics = Api.paginate(scope, self, api_v1_announcements_url)
 

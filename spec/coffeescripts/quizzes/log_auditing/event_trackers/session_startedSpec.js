@@ -28,7 +28,7 @@ test('#constructor: it sets up the proper context', () => {
   equal(tracker.priority, K.EVT_PRIORITY_LOW)
 })
 
-QUnit.skip('capturing: it works', function() {
+QUnit.skip('capturing: it works', () => {
   const tracker = new Subject()
   const capture = sinon.stub()
   tracker.install(capture)

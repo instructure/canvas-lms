@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,18 +18,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::MediaObject
+API_MEDIA_OBJECT_JSON_OPTS = {
+  :only => %w(media_id created_at media_type).freeze,
+}.freeze
 
-  def media_object_api_json(media_object, current_user, session)
-    hash = {}
-    hash['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
-    hash['media_sources'] = media_object.media_sources
-    hash['media_tracks'] = media_object.media_tracks.map do |track|
-      api_json(track, current_user, session, :only => %w(kind created_at updated_at id locale)).tap do |json|
-        json.merge! :url => show_media_tracks_url(media_object.media_id, track.id)
+module Api::V1::MediaObject
+  def media_object_api_json(media_object, current_user, session, exclude = [])
+    api_json(media_object, current_user, session, API_MEDIA_OBJECT_JSON_OPTS).tap do |json|
+      json['title'] = media_object.guaranteed_title
+      json['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
+      json['media_sources'] = media_sources_json(media_object) unless exclude.include?('sources')
+      json['embedded_iframe_url'] = media_object_iframe_url(media_object.media_id)
+
+      unless exclude.include?('tracks')
+        json['media_tracks'] = media_object.media_tracks.map do |track|
+          api_json(track, current_user, session, :only => %w(kind created_at updated_at id locale)).tap do |json2|
+            json2[:url] = show_media_tracks_url(media_object.media_id, track.id)
+          end
+        end
       end
     end
-    hash
+  end
+
+  def media_sources_json(media_object)
+    media_object.media_sources&.map do |mo|
+      mo[:src] = mo[:url]
+      mo[:label] = "#{(mo[:bitrate].to_i / 1024).floor} kbps"
+      mo
+    end
   end
 
 end

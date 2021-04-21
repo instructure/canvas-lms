@@ -15,15 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/QTIZip'
-  './MigrationView'
-],(Backbone, template, MigrationView) ->
-  class QTIZipView extends MigrationView
-    template: template
+import template from 'jst/content_migrations/QTIZip'
+import MigrationView from './MigrationView'
 
-    @child 'chooseMigrationFile', '.chooseMigrationFile'
-    @child 'questionBank', '.selectQuestionBank'
-    @child 'overwriteAssessmentContent', '.overwriteAssessmentContent'
-    @child 'importQuizzesNext', '.importQuizzesNext'
+export default class QTIZipView extends MigrationView
+  template: template
+
+  @child 'chooseMigrationFile', '.chooseMigrationFile'
+  @child 'questionBank', '.selectQuestionBank'
+  @child 'overwriteAssessmentContent', '.overwriteAssessmentContent'
+  @child 'importQuizzesNext', '.importQuizzesNext'

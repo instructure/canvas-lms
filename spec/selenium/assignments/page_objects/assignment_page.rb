@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -23,6 +25,10 @@ class AssignmentPage
       get "/courses/#{course}/assignments/#{assignment}"
     end
 
+    def assignment_page_body
+      f('body')
+    end
+
     def submission_detail_link
       fj("a:contains('Submission Details')")
     end
@@ -45,6 +51,31 @@ class AssignmentPage
 
     def title
       f('.title')
+    end
+
+    def student_group_speedgrader_dropdown(group)
+      f('select').click
+      ff('option').find { |option| option.text == group.name }.click
+    end
+
+    def speedgrader_link
+      f('a.icon-speed-grader')
+    end
+
+    def manage_assignment_button
+      fj("button:contains('Manage')")
+    end
+
+    def send_to_menuitem
+      fj("li:contains('Send To...')")
+    end
+
+    def copy_to_menuitem
+      fj("li:contains('Copy To...')")
+    end
+
+    def allowed_attempts_count
+      fj("div.control-group:contains('Allowed Attempts')")
     end
   end
 end

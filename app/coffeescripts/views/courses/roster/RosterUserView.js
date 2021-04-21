@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!roster'
+import I18n from 'i18n!RosterUserView'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
@@ -24,6 +24,10 @@ import EditSectionsView from './EditSectionsView'
 import EditRolesView from './EditRolesView'
 import InvitationsView from './InvitationsView'
 import LinkToStudentsView from './LinkToStudentsView'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Avatar} from '@instructure/ui-avatar'
+import {nanoid} from 'nanoid'
 import '../../../jquery.kylemenu'
 import 'jquery.disableWhileLoading'
 
@@ -33,20 +37,6 @@ let linkToStudentsDialog = null
 let invitationDialog = null
 
 export default class RosterUserView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.handleMenuEvent = this.handleMenuEvent.bind(this)
-    this.focus = this.focus.bind(this)
-    this.blur = this.blur.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.tagName = 'tr'
 
@@ -66,12 +56,13 @@ export default class RosterUserView extends Backbone.View {
   }
 
   initialize(options) {
+    options.model.attributes.avatarId = `user-avatar-people-page-${nanoid()}`
     super.initialize(...arguments)
     // assumes this model only has enrollments for 1 role
     this.model.currentRole = __guard__(this.model.get('enrollments')[0], x => x.role)
 
     this.$el.attr('id', `user_${options.model.get('id')}`)
-    return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.role))
+    return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.type))
   }
 
   toJSON() {
@@ -98,11 +89,11 @@ export default class RosterUserView extends Backbone.View {
       json.enrollments = _.reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
     }
 
-    json.canRemoveUsers = _.all(this.model.get('enrollments'), e => e.can_be_removed)
+    json.canRemoveUsers = _.every(this.model.get('enrollments'), e => e.can_be_removed)
     json.canResendInvitation = !json.isInactive
 
     if (json.canRemoveUsers && !ENV.course.concluded) {
-      json.canEditRoles = !_.any(
+      json.canEditRoles = !_.some(
         this.model.get('enrollments'),
         e => e.type === 'ObserverEnrollment' && e.associated_user_id
       )
@@ -110,27 +101,30 @@ export default class RosterUserView extends Backbone.View {
 
     json.canEditSections = !json.isInactive && !_.isEmpty(this.model.sectionEditableEnrollments())
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
-    json.canViewLoginIdColumn =
-      ENV.permissions.manage_admin_users || ENV.permissions.manage_students
+    json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
-    json.canManage = _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
+
+    const candoAdminActions =
+      ENV.permissions.can_allow_course_admin_actions || ENV.permissions.manage_admin_users
+    json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )
-      ? ENV.permissions.manage_admin_users
+      ? candoAdminActions
       : this.model.hasEnrollmentType('ObserverEnrollment')
-        ? ENV.permissions.manage_admin_users || ENV.permissions.manage_students
-        : ENV.permissions.manage_students
+      ? candoAdminActions || ENV.permissions.manage_students
+      : ENV.permissions.manage_students
     json.customLinks = this.model.get('custom_links')
 
     if (json.canViewLoginIdColumn) {
       json.canViewLoginId = true
-      json.login_id = json.login_id
     }
 
     if (json.canViewSisIdColumn) {
       json.canViewSisId = true
-      return (json.sis_id = json.sis_user_id)
+      json.sis_id = json.sis_user_id
     }
+    json.hideSectionsOnCourseUsersPage = ENV.course.hideSectionsOnCourseUsersPage
+    return json
   }
 
   observerJSON(json) {
@@ -139,16 +133,16 @@ export default class RosterUserView extends Backbone.View {
       const observerEnrollments = _.filter(json.enrollments, en => en.type === 'ObserverEnrollment')
       json.enrollments = _.reject(json.enrollments, en => en.type === 'ObserverEnrollment')
 
-      json.sections = _.map(json.enrollments, en => ENV.CONTEXTS['sections'][en.course_section_id])
+      json.sections = _.map(json.enrollments, en => ENV.CONTEXTS.sections[en.course_section_id])
 
       const users = {}
       if (
         observerEnrollments.length >= 1 &&
-        _.all(observerEnrollments, enrollment => !enrollment.observed_user)
+        _.every(observerEnrollments, enrollment => !enrollment.observed_user)
       ) {
         users[''] = {name: I18n.t('nobody', 'nobody')}
       } else {
-        for (let en of Array.from(observerEnrollments)) {
+        for (const en of Array.from(observerEnrollments)) {
           if (!en.observed_user) {
             continue
           }
@@ -161,7 +155,7 @@ export default class RosterUserView extends Backbone.View {
 
       return (() => {
         const result = []
-        for (let id in users) {
+        for (const id in users) {
           user = users[id]
           const ob = {
             role: I18n.t('observing_user', 'Observing: %{user_name}', {user_name: user.name})
@@ -173,7 +167,7 @@ export default class RosterUserView extends Backbone.View {
     }
   }
 
-  resendInvitation(e) {
+  resendInvitation() {
     if (!invitationDialog) {
       invitationDialog = new InvitationsView()
     }
@@ -181,7 +175,7 @@ export default class RosterUserView extends Backbone.View {
     return invitationDialog.render().show()
   }
 
-  editSections(e) {
+  editSections() {
     if (!editSectionsDialog) {
       editSectionsDialog = new EditSectionsView()
     }
@@ -189,7 +183,7 @@ export default class RosterUserView extends Backbone.View {
     return editSectionsDialog.render().show()
   }
 
-  editRoles(e) {
+  editRoles() {
     if (!editRolesDialog) {
       editRolesDialog = new EditRolesView()
     }
@@ -197,7 +191,7 @@ export default class RosterUserView extends Backbone.View {
     return editRolesDialog.render().show()
   }
 
-  linkToStudents(e) {
+  linkToStudents() {
     if (!linkToStudentsDialog) {
       linkToStudentsDialog = new LinkToStudentsView()
     }
@@ -207,7 +201,8 @@ export default class RosterUserView extends Backbone.View {
 
   deactivateUser() {
     if (
-      !confirm(
+      // eslint-disable-next-line no-alert
+      !window.confirm(
         I18n.t(
           'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.'
         )
@@ -216,7 +211,7 @@ export default class RosterUserView extends Backbone.View {
       return
     }
     const deferreds = []
-    for (let en of Array.from(this.model.get('enrollments'))) {
+    for (const en of Array.from(this.model.get('enrollments'))) {
       if (en.enrollment_state !== 'inactive') {
         const url = `/api/v1/courses/${ENV.course.id}/enrollments/${en.id}?task=deactivate`
         en.enrollment_state = 'inactive'
@@ -240,7 +235,7 @@ export default class RosterUserView extends Backbone.View {
 
   reactivateUser() {
     const deferreds = []
-    for (let en of Array.from(this.model.get('enrollments'))) {
+    for (const en of Array.from(this.model.get('enrollments'))) {
       const url = `/api/v1/courses/${ENV.course.id}/enrollments/${en.id}/reactivate`
       en.enrollment_state = 'active'
       deferreds.push($.ajaxJSON(url, 'PUT'))
@@ -261,7 +256,8 @@ export default class RosterUserView extends Backbone.View {
   }
 
   removeFromCourse(e) {
-    if (!confirm(I18n.t('Are you sure you want to remove this user?'))) {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
       return
     }
     this.$el.hide()
@@ -305,6 +301,21 @@ export default class RosterUserView extends Backbone.View {
 
   blur() {
     return this.$el.removeClass('al-hover-container-active table-hover-row')
+  }
+
+  afterRender() {
+    ReactDOM.render(
+      <a href={`users/${this.model.id}`}>
+        <Avatar
+          name={this.model.attributes.name}
+          src={this.model.attributes.avatar_url}
+          size="small"
+          alt={this.model.attributes.name}
+        />
+        <span className="screenreader-only">{this.model.attributes.name}</span>
+      </a>,
+      this.$el.find(`#${this.model.attributes.avatarId}`)[0]
+    )
   }
 }
 RosterUserView.initClass()

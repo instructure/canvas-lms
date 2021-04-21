@@ -16,23 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from './modal'
-import ModalContent from './modal-content'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!external_toolsModalLauncher'
 import iframeAllowances from '../external_apps/lib/iframeAllowances'
+import CanvasModal from 'jsx/shared/components/CanvasModal'
 
 export default class ExternalToolModalLauncher extends React.Component {
   static propTypes = {
+    appElement: PropTypes.instanceOf(Element),
+    title: PropTypes.string.isRequired,
     tool: PropTypes.object,
     isOpen: PropTypes.bool.isRequired,
     onRequestClose: PropTypes.func.isRequired,
     contextType: PropTypes.string.isRequired,
     contextId: PropTypes.number.isRequired,
-    launchType: PropTypes.string.isRequired
+    launchType: PropTypes.string.isRequired,
+    onExternalContentReady: PropTypes.func
+  }
+
+  static defaultProps = {
+    appElement: document.getElementById('application')
   }
 
   state = {
@@ -61,7 +66,10 @@ export default class ExternalToolModalLauncher extends React.Component {
     $(window).off('externalContentCancel', this.onExternalToolCompleted)
   }
 
-  onExternalToolCompleted = () => {
+  onExternalToolCompleted = (ev, data) => {
+    if (this.props.onExternalContentReady) {
+      this.props.onExternalContentReady(data)
+    }
     this.props.onRequestClose()
   }
 
@@ -159,70 +167,61 @@ export default class ExternalToolModalLauncher extends React.Component {
   }
 
   render() {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
     const styles = this.getDimensions()
 
     styles.modalLaunchStyle = {...styles.modalLaunchStyle, ...this.state.modalLaunchStyle}
 
     return (
-      <Modal
-        className="ReactModal__Content--canvas"
-        contentLabel={I18n.t('Launch External Tool')}
-        overlayClassName="ReactModal__Overlay--canvas"
-        style={styles.modalStyle}
-        isOpen={this.props.isOpen}
-        onRequestClose={this.props.onRequestClose}
-        onAfterOpen={this.onAfterOpen}
+      <CanvasModal
+        label={I18n.t('Launch External Tool')}
+        open={this.props.isOpen}
+        onDismiss={this.props.onRequestClose}
+        onOpen={this.onAfterOpen}
         title={this.props.title}
+        appElement={this.props.appElement}
       >
-        <ModalContent style={styles.modalBodyStyle}>
-          <div
-            onFocus={this.handleAlertFocus}
-            onBlur={this.handleAlertBlur}
-            className={beforeAlertStyles}
-            tabIndex="0"
-            ref={e => {
-              this.beforeAlert = e
-            }}
-          >
-            <div className="ic-flash-info">
-              <div className="ic-flash__icon" aria-hidden="true">
-                <i className="icon-info" />
-              </div>
-              {I18n.t('The following content is partner provided')}
+        <div
+          onFocus={this.handleAlertFocus}
+          onBlur={this.handleAlertBlur}
+          className={beforeAlertStyles}
+          ref={e => {
+            this.beforeAlert = e
+          }}
+        >
+          <div className="ic-flash-info">
+            <div className="ic-flash__icon" aria-hidden="true">
+              <i className="icon-info" />
             </div>
+            {I18n.t('The following content is partner provided')}
           </div>
-          <iframe
-            src={this.getIframeSrc()}
-            style={styles.modalLaunchStyle}
-            tabIndex={0}
-            ref={e => {
-              this.iframe = e
-            }}
-          />
-          <div
-            onFocus={this.handleAlertFocus}
-            onBlur={this.handleAlertBlur}
-            className={afterAlertStyles}
-            tabIndex="0"
-            ref={e => {
-              this.afterAlert = e
-            }}
-          >
-            <div className="ic-flash-info">
-              <div className="ic-flash__icon" aria-hidden="true">
-                <i className="icon-info" />
-              </div>
-              {I18n.t('The preceding content is partner provided')}
+        </div>
+        <iframe
+          src={this.getIframeSrc()}
+          style={styles.modalLaunchStyle}
+          title={this.props.title}
+          ref={e => {
+            this.iframe = e
+          }}
+          data-lti-launch="true"
+        />
+        <div
+          onFocus={this.handleAlertFocus}
+          onBlur={this.handleAlertBlur}
+          className={afterAlertStyles}
+          ref={e => {
+            this.afterAlert = e
+          }}
+        >
+          <div className="ic-flash-info">
+            <div className="ic-flash__icon" aria-hidden="true">
+              <i className="icon-info" />
             </div>
+            {I18n.t('The preceding content is partner provided')}
           </div>
-        </ModalContent>
-      </Modal>
+        </div>
+      </CanvasModal>
     )
   }
 }

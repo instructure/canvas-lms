@@ -39,6 +39,9 @@ test('renders children', () => {
     </ModalButtons>
   )
   const component = TestUtils.renderIntoDocument(mB)
-  ok($(ReactDOM.findDOMNode(component)).find('.cool_div').length === 1, 'renders the child component')
+  ok(
+    $(ReactDOM.findDOMNode(component)).find('.cool_div').length === 1,
+    'renders the child component'
+  )
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

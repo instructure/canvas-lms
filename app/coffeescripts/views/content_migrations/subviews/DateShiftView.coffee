@@ -15,80 +15,79 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  './DaySubstitutionView'
-  '../../../models/DaySubstitution'
-  'jst/content_migrations/subviews/DateShift'
-], ($, Backbone, DaySubView, DaySubModel, template) ->
-  class DateShiftView extends Backbone.View
-    template: template
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import DaySubView from './DaySubstitutionView'
+import DaySubModel from '../../../models/DaySubstitution'
+import template from 'jst/content_migrations/subviews/DateShift'
 
-    @child 'daySubstitution', '#daySubstitution'
-    @optionProperty 'oldStartDate'
-    @optionProperty 'oldEndDate'
-    @optionProperty 'addHiddenInput'
+export default class DateShiftView extends Backbone.View
+  template: template
 
-    els:
-      ".dateAdjustContent" : "$dateAdjustContent"
-      "#dateAdjustCheckbox": "$dateAdjustCheckbox"
-      ".dateShiftContent"  : "$dateShiftContent"
-      "#dateShiftOption"   : "$dateShiftOption"
-      "#oldStartDate"      : "$oldStartDate"
-      "#oldEndDate"        : "$oldEndDate"
-      "#newStartDate"      : "$newStartDate"
-      "#newEndDate"        : "$newEndDate"
-      "#daySubstitution"   : "$daySubstitution"
+  @child 'daySubstitution', '#daySubstitution'
+  @optionProperty 'oldStartDate'
+  @optionProperty 'oldEndDate'
+  @optionProperty 'addHiddenInput'
 
-    events:
-      'click #dateAdjustCheckbox' : 'toggleContent'
-      'click #dateRemoveOption'   : 'toggleShiftContent'
-      'click #dateShiftOption'    : 'toggleShiftContent'
-      'click #addDaySubstitution' : 'createDaySubView'
+  els:
+    ".dateAdjustContent" : "$dateAdjustContent"
+    "#dateAdjustCheckbox": "$dateAdjustCheckbox"
+    ".dateShiftContent"  : "$dateShiftContent"
+    "#dateShiftOption"   : "$dateShiftOption"
+    "#oldStartDate"      : "$oldStartDate"
+    "#oldEndDate"        : "$oldEndDate"
+    "#newStartDate"      : "$newStartDate"
+    "#newEndDate"        : "$newEndDate"
+    "#daySubstitution"   : "$daySubstitution"
 
-    afterRender: ->
-      @$el.find('input[type=text]').datetime_field(addHiddenInput: @addHiddenInput)
+  events:
+    'click #dateAdjustCheckbox' : 'toggleContent'
+    'click #dateRemoveOption'   : 'toggleShiftContent'
+    'click #dateShiftOption'    : 'toggleShiftContent'
+    'click #addDaySubstitution' : 'createDaySubView'
 
-      @$newStartDate.val(@oldStartDate).trigger('change') if @oldStartDate
-      @$newEndDate.val(@oldEndDate).trigger('change') if @oldEndDate
+  afterRender: ->
+    @$el.find('input[type=text]').datetime_field(addHiddenInput: @addHiddenInput)
 
-      @collection.on 'remove', => @$el.find('#addDaySubstitution').focus()
-      @toggleContent()
+    @$newStartDate.val(@oldStartDate).trigger('change') if @oldStartDate
+    @$newEndDate.val(@oldEndDate).trigger('change') if @oldEndDate
 
-    # Toggle adjust-dates content. Shows Shift/Remove radio buttons
-    # if "Adjust dates" is checked.
+    @collection.on 'remove', => @$el.find('#addDaySubstitution').focus()
+    @toggleContent()
 
-    toggleContent: =>
-      adjustDates = @$dateAdjustCheckbox.is(':checked')
-      @toggleShiftContent() if adjustDates
-      @$dateAdjustContent.toggle(adjustDates)
+  # Toggle adjust-dates content. Shows Shift/Remove radio buttons
+  # if "Adjust dates" is checked.
 
-
-    # Toggle shift content. Shows content when the "Shift dates" radio button
-    # is selected, and hides content otherwise
-    #
-    # @expects jQuery event
-    # @returns void
-    # @api private
-
-    toggleShiftContent: =>
-      dateShift = @$dateShiftOption.is(':checked')
-      @model.daySubCollection = if dateShift then @collection else null
-      @$dateShiftContent.toggle(dateShift)
-
-    # Displays a new DaySubstitutionView by adding it to the collection.
-    # @api private
-
-    createDaySubView: (event) =>
-      event.preventDefault()
-      @collection.add new DaySubModel
-
-      # Focus on the last date substitution added
-      $lastDaySubView = @collection.last()?.view.$el
-      $lastDaySubView.find('select').first().focus()
+  toggleContent: =>
+    adjustDates = @$dateAdjustCheckbox.is(':checked')
+    @toggleShiftContent() if adjustDates
+    @$dateAdjustContent.toggle(adjustDates)
 
 
-    updateNewDates: (course) =>
-      @$oldStartDate.val(course.start_at).trigger('change')
-      @$oldEndDate.val(course.end_at).trigger('change')
+  # Toggle shift content. Shows content when the "Shift dates" radio button
+  # is selected, and hides content otherwise
+  #
+  # @expects jQuery event
+  # @returns void
+  # @api private
+
+  toggleShiftContent: =>
+    dateShift = @$dateShiftOption.is(':checked')
+    @model.daySubCollection = if dateShift then @collection else null
+    @$dateShiftContent.toggle(dateShift)
+
+  # Displays a new DaySubstitutionView by adding it to the collection.
+  # @api private
+
+  createDaySubView: (event) =>
+    event.preventDefault()
+    @collection.add new DaySubModel
+
+    # Focus on the last date substitution added
+    $lastDaySubView = @collection.last()?.view.$el
+    $lastDaySubView.find('select').first().focus()
+
+
+  updateNewDates: (course) =>
+    @$oldStartDate.val(course.start_at).trigger('change')
+    @$oldEndDate.val(course.end_at).trigger('change')

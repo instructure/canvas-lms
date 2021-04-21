@@ -27,41 +27,25 @@ import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
 import 'vendor/date'
 import fcUtil from '../util/fcUtil'
-import commonEventFactory from '../calendar/commonEventFactory'
+import commonEventFactory from './commonEventFactory'
 import ValidatedFormView from '../views/ValidatedFormView'
-import '../calendar/fcMomentHandlebarsHelpers'
+import './fcMomentHandlebarsHelpers'
 
 export default class EditPlannerNoteDetails extends ValidatedFormView {
-
   events = {
     ...EditPlannerNoteDetails.prototype.events,
     'change .context_id': 'contextChange'
   }
+
   template = editPlannerNoteTemplate
 
   constructor(selector, event, contextChangeCB, closeCB) {
     super({
       title: event.title,
-      contexts: event.possibleContexts().filter((context) =>
-        // to avoid confusion over the audience of the planner note,
-        // don't offer to create new planner notes linked to courses the user teaches
-        context && context.asset_string && (
-          context.asset_string === event.contextCode() ||
-          context.asset_string.startsWith('user_') ||
-          ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(context.asset_string) < 0
-        )
-      ),
+      contexts: event.plannerNoteContexts(),
       date: event.startDate(),
       details: htmlEscape(event.description)
     })
-
-    this.onSaveFail = this.onSaveFail.bind(this)
-    this.onSaveSuccess = this.onSaveSuccess.bind(this)
-    this.getFormData = this.getFormData.bind(this)
-    this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
-    this.contextChange = this.contextChange.bind(this)
-    this.setContext = this.setContext.bind(this)
-    this.activate = this.activate.bind(this)
 
     this.event = event
     this.contextChangeCB = contextChangeCB
@@ -115,10 +99,7 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
   }
 
   setContext(newContext) {
-    this.$el
-      .find('select.context_id')
-      .val(newContext)
-      .triggerHandler('change', false)
+    this.$el.find('select.context_id').val(newContext).triggerHandler('change', false)
   }
 
   contextChange(jsEvent, propagate) {
@@ -146,12 +127,12 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
   setupTimeAndDatePickers() {
     // select the appropriate fields
     const $date = this.$el.find('.date_field')
-    const $time = this.$el.find(".time_field.note_time")
+    const $time = this.$el.find('.time_field.note_time')
 
     // set them up as appropriate variants of datetime_field
     $date.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))
+        dateFormat: datePickerFormat(I18n.t('#date.formats.default'))
       },
       dateOnly: true
     })
@@ -176,7 +157,7 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
     }
     // check if input box was cleared for explicitly undated
     if (params.todo_date) {
-      const { time } = data
+      const {time} = data
       let due_at = params.todo_date.toString('yyyy-MM-dd')
       if (time) {
         due_at += time.toString(' HH:mm')

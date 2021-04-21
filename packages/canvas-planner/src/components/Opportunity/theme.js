@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ colors, spacing, typography }) {
+export default function generator({colors, spacing, typography}) {
   return {
     lineHeight: typography.lineHeightCondensed,
     fontSize: typography.fontSizeMedium,
@@ -35,6 +35,6 @@ export default function generator ({ colors, spacing, typography }) {
     pointsNumberFontSize: typography.fontSizeLarge,
     pointsLineHeight: typography.lineHeightFit,
     titleMargin: spacing.xSmall,
-    closeButtonIconSize: "1.75rem", // to match instui Button smallHeight
-  };
+    closeButtonIconSize: '1.75rem' // to match instui Button smallHeight
+  }
 }

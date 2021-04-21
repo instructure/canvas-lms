@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@
 #        },
 #       "latest_migration": {
 #         "description": "Details of the latest migration",
-#         "type": "BlueprintMigration"
+#         "$ref": "BlueprintMigration"
 #        }
 #     }
 #   }
@@ -279,6 +281,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     courses = Api.paginate(scope, self, api_v1_course_blueprint_associated_courses_url)
     can_read_sis = @course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
 
+    preload_teachers(courses)
     json = courses.map do |course|
       course_summary_json(course, can_read_sis: can_read_sis, include_teachers: true)
     end
@@ -311,8 +314,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     if authorized_action(@course.account, @current_user, :manage_courses)
       # note that I'm additionally requiring course management rights on the account
       # since (for now) we're only allowed to associate courses derived from it
-      ids_to_add = Array(params[:course_ids_to_add]).map(&:to_i)
-      ids_to_remove = Array(params[:course_ids_to_remove]).map(&:to_i)
+      ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
+      ids_to_remove = api_find_all(Course, Array(params[:course_ids_to_remove])).pluck(:id)
       if (ids_to_add & ids_to_remove).any?
         return render :json => {:message => "cannot add and remove a course at the same time"}, :status => :bad_request
       end
@@ -359,6 +362,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #     Whether course settings should be copied over to associated courses.
   #     Defaults to true for newly associated courses.
   #
+  # @argument publish_after_initial_sync [Optional, Boolean]
+  #     If set, newly associated courses will be automatically published after the sync completes
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
   #     -X POST \
@@ -375,7 +381,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     options = params.permit(:comment, :send_notification).to_unsafe_h
-    options[:copy_settings] = value_to_boolean(params[:copy_settings]) if params.has_key?(:copy_settings)
+    [:copy_settings, :publish_after_initial_sync].each do |bool_key|
+      options[bool_key] = value_to_boolean(params[bool_key]) if params.has_key?(bool_key)
+    end
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
     render :json => master_migration_json(migration, @current_user, session)
@@ -458,7 +466,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     max_records = Setting.get('master_courses_history_count', '150').to_i
     items = []
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
     MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
       item_scope = case klass
       when 'Attachment'
@@ -509,6 +517,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def migrations_index
     # sort id desc
     migrations = Api.paginate(@template.master_migrations.order("id DESC"), self, api_v1_course_blueprint_migrations_url)
+    ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
     render :json => migrations.map{|migration| master_migration_json(migration, @current_user, session) }
   end
 
@@ -585,6 +594,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       where(:migration_type => 'master_course_import', :child_subscription_id => @subscription).
       order('id DESC')
     migrations = Api.paginate(migrations, self, api_v1_course_blueprint_imports_url)
+    ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
     render :json => migrations.map{ |migration| master_migration_json(migration.master_migration, @current_user,
                                                                       session, :child_migration => migration,
                                                                       :subscription => @subscription) }
@@ -727,7 +737,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     # if we skipped it because it's deleted, there's no sense
     # in going on and seeing if they also edited it first
     return ['deleted'] if columns.include?("manually_deleted")
-    
+
     classes = []
     columns.each do |col|
       klass.restricted_column_settings.each do |k, v|

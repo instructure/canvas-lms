@@ -23,11 +23,7 @@ import LoadingIndicator from 'jsx/files/LoadingIndicator'
 QUnit.module('LoadingIndicator')
 
 test('display none if no props supplied', () => {
-  equal(
-    shallow(<LoadingIndicator />).prop('style').display,
-    'none',
-    'loading indicator not shown'
-  )
+  equal(shallow(<LoadingIndicator />).prop('style').display, 'none', 'loading indicator not shown')
 })
 
 test('if props supplied for loading', () => {

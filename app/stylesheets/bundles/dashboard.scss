@@ -22,6 +22,10 @@
   margin-top: -($ic-sp * 2);
 }
 
+.ic-notification + .ic-dashboard-app {
+  margin-top: 0;
+}
+
 .ic-Dashboard-header__layout {
   display: flex;
   align-items: center;
@@ -55,39 +59,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-}
-
-// Note: all the calculations in the following 20+ lines are done to give IE11
-// a sticky-like header for Planner. Once all browsers support position: sticky,
-// we can remove all this and use the CSS under @supports (position: sticky)
-
-$nav-collapsed-width: $ic-header-primary-width - 30;
-$nav-expanded-width: $ic-header-primary-width;
-$content-padding: $ic-sp * 4;
-$non-main-content-width-collapsed: $nav-collapsed-width + $content-padding;
-$non-main-content-width-expanded: $nav-expanded-width + $content-padding;
-
-// If the planner is showing, serve up a fixed-position header
-body.dashboard-is-planner {
-  .ic-dashboard-app {
-    padding-top: $ic-breadcrumbs-height;
-  }
-
-  .ic-Dashboard-header {
-    position: fixed;
-    top: 0;
-    z-index: 20;
-    #{direction(left)}: $nav-collapsed-width + ($ic-sp * 2);
-    width: calc(100% - #{$non-main-content-width-collapsed});
-    margin-top: 0;
-  }
-
-  &.primary-nav-expanded {
-    .ic-Dashboard-header {
-      #{direction(left)}: $nav-expanded-width + ($ic-sp * 2);
-      width: calc(100% - #{$non-main-content-width-expanded});
-    }
-  }
 }
 
 @supports (position: sticky) or (position: -webkit-sticky) {

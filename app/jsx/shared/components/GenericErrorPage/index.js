@@ -20,12 +20,12 @@ import I18n from 'i18n!generic_error_page'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import Container from '@instructure/ui-core/lib/components/Container'
-import Text from '@instructure/ui-core/lib/components/Text'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
 import axios from 'axios'
 import {string} from 'prop-types'
-import {Spinner} from '@instructure/ui-elements'
-import {Flex} from '@instructure/ui-layout'
+
 import ErrorTextInputForm from './ErrorTextInputForm'
 import ErrorPageHeader from './ErrorPageHeader'
 
@@ -37,7 +37,7 @@ import ErrorPageHeader from './ErrorPageHeader'
  * to our errors_controller endpoint to explain how the
  * error occured
  */
-class GenericErrorPage extends React.Component {
+export default class GenericErrorPage extends React.Component {
   static propTypes = {
     errorSubject: string,
     errorCategory: string,
@@ -84,66 +84,72 @@ class GenericErrorPage extends React.Component {
       }
     }
     this.setState({submitLoading: true, showingCommentBox: false})
-    const request = await axios.post('/error_reports', postData, {
-      headers: [{'content-type': 'application/json'}]
-    })
-    // Returns json of {logged: boolean, id: string}
-    const logObject = request.data
-    if (logObject.logged) {
-      this.setState({commentPosted: true, submitLoading: false})
-    } else {
+    try {
+      // Returns json of {logged: boolean, id: string}
+      const request = await axios.post('/error_reports', postData, {
+        headers: [{'content-type': 'application/json'}]
+      })
+      const logObject = request.data
+      if (logObject.logged) {
+        this.setState({commentPosted: true, submitLoading: false})
+      } else {
+        this.setState({commentPosted: true, commentPostError: true, submitLoading: false})
+      }
+    } catch (err) {
       this.setState({commentPosted: true, commentPostError: true, submitLoading: false})
     }
   }
 
   render() {
     return (
-      <Container margin="large auto" textAlign="center" display="block">
+      <View
+        as="div"
+        width="100%"
+        height="100%"
+        margin="large auto"
+        textAlign="center"
+        display="block"
+      >
         <ErrorPageHeader imageUrl={this.props.imageUrl} />
-        <Container margin="small" display="block">
+        <View margin="small" display="block">
           {!this.state.commentPosted && (
-            <Flex justifyItems="center" margin="small" display="block">
-              <Text margin="0">{I18n.t('If you have a moment,')}</Text>
-              <Button
-                padding="0"
-                data-test-id="generic-shared-error-page-button"
-                variant="link"
-                onClick={this.handleOpenCommentBox}
-              >
-                {I18n.t('click here to tell us what happened')}
-              </Button>
-            </Flex>
+            <>
+              <View margin="small" display="block">
+                <Text margin="0">{I18n.t('Help us improve by telling us what happened')}</Text>
+              </View>
+              <View margin="small" display="block">
+                <Button margin="0" variant="primary" onClick={this.handleOpenCommentBox}>
+                  {I18n.t('Report Issue')}
+                </Button>
+              </View>
+            </>
           )}
           {this.state.showingCommentBox && (
             <ErrorTextInputForm
+              textAreaComment={this.state.textAreaComment}
+              optionalEmail={this.state.optionalEmail}
               handleChangeCommentBox={this.handleChangeCommentBox}
               handleChangeOptionalEmail={this.handleChangeOptionalEmail}
               handleSubmitErrorReport={this.handleSubmitErrorReport}
             />
           )}
           {this.state.submitLoading && (
-            <Spinner
-              data-test-id="generic-error=page-loading-indicator"
-              title={I18n.t('Loading')}
-              margin="0 0 0 medium"
-            />
+            <Spinner renderTitle={I18n.t('Loading')} margin="0 0 0 medium" />
           )}
           {this.state.commentPosted && this.state.commentPostError && (
-            <Container display="block" data-test-id="generic-error-comments-submitted">
+            <View display="block" data-test-id="generic-error-comments-submitted">
               <Text color="error" margin="x-small">
                 {I18n.t('Comment failed to post! Please try again later.')}
               </Text>
-            </Container>
+            </View>
           )}
           {this.state.commentPosted && !this.state.commentPostError && (
-            <Container display="block" data-test-id="generic-error-comments-submitted">
+            <View display="block" data-test-id="generic-error-comments-submitted">
               <Text margin="x-small">{I18n.t('Comment submitted!')}</Text>
-            </Container>
+            </View>
           )}
-        </Container>
-      </Container>
+        </View>
+      </View>
     )
   }
 }
-
-export default React.memo(GenericErrorPage)

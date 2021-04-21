@@ -26,11 +26,29 @@ import activeAddTrayReducer from './reducers/activeAddTrayReducer'
 import activePermissionTrayReducer from './reducers/activePermissionTrayReducer'
 import setFocusReducer from './reducers/setFocusReducer'
 
-import {roleSortedInsert} from './helper/utils'
+import {groupGranularPermissionsInRole, roleSortedInsert} from './helper/utils'
 
 const allRolesSelected = function allRolesSelected(selectedRoles) {
   return selectedRoles.length !== 0 && selectedRoles[0].value === ALL_ROLES_VALUE
 }
+
+const apiBusy = handleActions(
+  {
+    [actionTypes.API_PENDING](state, action) {
+      return [...state, {id: action.payload.id, name: action.payload.name}]
+    },
+    [actionTypes.API_COMPLETE](state, action) {
+      const idx = state.findIndex(
+        elt => elt.id === action.payload.id && elt.name === action.payload.name
+      )
+      if (idx < 0) return state
+      const newState = [...state]
+      newState.splice(idx, 1)
+      return newState
+    }
+  },
+  []
+)
 
 const permissions = handleActions(
   {
@@ -96,6 +114,7 @@ const roles = handleActions(
     },
     [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
       const {role} = action.payload
+      groupGranularPermissionsInRole(role)
       return state.map(r => (r.id === role.id ? role : r))
     },
     [actionTypes.ADD_NEW_ROLE]: (state, action) => {
@@ -103,10 +122,13 @@ const roles = handleActions(
       const currentContext = displayedRole.contextType
       const displayed = true
       const roleToAdd = {...action.payload, displayed, contextType: currentContext}
+      groupGranularPermissionsInRole(roleToAdd)
       return roleSortedInsert(state, roleToAdd)
     },
-    [actionTypes.UPDATE_ROLE]: (state, action) =>
-      state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r)),
+    [actionTypes.UPDATE_ROLE]: (state, action) => {
+      groupGranularPermissionsInRole(action.payload)
+      return state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r))
+    },
     [actionTypes.DELETE_ROLE_SUCCESS]: (state, action) =>
       state.filter(role => action.payload.id !== role.id)
   },
@@ -139,5 +161,6 @@ export default combineReducers({
   contextId: (state, _action) => state || '',
   nextFocus: setFocusReducer,
   permissions,
-  roles
+  roles,
+  apiBusy
 })

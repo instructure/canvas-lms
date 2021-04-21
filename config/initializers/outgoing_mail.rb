@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -24,7 +26,7 @@ require 'net/smtp'
 config = {
   :domain => "unknowndomain.example.com",
   :delivery_method => :smtp,
-}.merge((ConfigFile.load("outgoing_mail") || {}).symbolize_keys)
+}.merge((ConfigFile.load("outgoing_mail").dup || {}).symbolize_keys)
 
 [:authentication, :delivery_method].each do |key|
   config[key] = config[key].to_sym if config.has_key?(key)

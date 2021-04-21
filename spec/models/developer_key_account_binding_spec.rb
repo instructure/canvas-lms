@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -16,46 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
-settings = {
-  'title' => 'LTI 1.3 Tool',
-  'description' => '1.3 Tool',
-  'launch_url' => 'http://lti13testtool.docker/blti_launch',
-  'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
-  'public_jwk' => {
-    "kty" => "RSA",
-    "e" => "AQAB",
-    "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
-    "kid" => "2018-09-18T21:55:18Z",
-    "alg" => "RS256",
-    "use" => "sig"
-  },
-  'extensions' =>  [
-    {
-      'platform' => 'canvas.instructure.com',
-      'privacy_level' => 'public',
-      'tool_id' => 'LTI 1.3 Test Tool',
-      'domain' => 'http://lti13testtool.docker',
-      'settings' =>  {
-        'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
-        'selection_height' => 500,
-        'selection_width' => 500,
-        'text' => 'LTI 1.3 Test Tool Extension text',
-        'course_navigation' =>  {
-          'message_type' => 'LtiResourceLinkRequest',
-          'canvas_icon_class' => 'icon-lti',
-          'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-          'text' => 'LTI 1.3 Test Tool Course Navigation',
-          'url' =>
-          'http://lti13testtool.docker/launch?placement=course_navigation',
-          'enabled' => true
-        }
-      }
-    }
-  ]
-}
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 RSpec.describe DeveloperKeyAccountBinding, type: :model do
+  include_context 'lti_1_3_spec_helper'
+
   let(:account) { account_model }
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_binding) do
@@ -71,8 +38,11 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
   describe '#lti_1_3_tools' do
     subject do
       expect(DeveloperKey.count > 1).to be true
-      described_class.lti_1_3_tools(account)
+      described_class.lti_1_3_tools(
+        described_class.active_in_account(account)
+      )
     end
+
     let(:params) { { visible: true } }
     let(:workflow_state) { described_class::ON_STATE }
 
@@ -164,7 +134,10 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
       end
     end
 
-    describe 'after_save' do
+    describe 'after update' do
+      subject { site_admin_binding.update!(update_parameters) }
+
+      let(:update_parameters) { {workflow_state: workflow_state} }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:site_admin_binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
 
@@ -178,6 +151,88 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         allow(MultiCache).to receive(:delete).and_return(true)
         expect(MultiCache).not_to receive(:delete).with(DeveloperKeyAccountBinding.site_admin_cache_key(root_account_key))
         root_account_binding.update!(workflow_state: 'on')
+      end
+
+      context 'when the starting workflow_state is on' do
+        before { site_admin_binding.update!(workflow_state: 'on') }
+
+        context 'when the new workflow state is "off"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::OFF_STATE }
+
+          it 'disables associated external tools' do
+            expect(site_admin_key).to receive(:disable_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "on"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ON_STATE }
+
+          it 'does not disable associated external tools' do
+            expect(site_admin_key).not_to receive(:disable_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "allow"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
+
+          it 'restores associated external tools' do
+            expect(site_admin_key).to receive(:restore_external_tools!)
+            subject
+          end
+        end
+      end
+
+      context 'when the starting workflow_state is off' do
+        before { site_admin_binding.update!(workflow_state: 'off') }
+
+        context 'when the new workflow state is "on"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ON_STATE }
+
+          it 'enables external tools' do
+            expect(site_admin_key).not_to receive(:disable_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "allow"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
+
+          it 'restores associated external tools' do
+            expect(site_admin_key).to receive(:restore_external_tools!)
+            subject
+          end
+        end
+      end
+    end
+
+    describe 'after save' do
+      describe 'set root account' do
+        context 'when account is root account' do
+          let(:account) { account_model }
+
+          it 'sets root account equal to account' do
+            dev_key_binding.account = account
+            dev_key_binding.save!
+            expect(dev_key_binding.root_account).to eq account
+          end
+        end
+
+        context 'when account is not root account' do
+          let(:account) {
+            a = account_model
+            a.root_account = Account.create!
+            a.save!
+            a
+          }
+
+          it 'sets root account equal to account\'s root account' do
+            dev_key_binding.account = account
+            dev_key_binding.save!
+            expect(dev_key_binding.root_account).to eq account.root_account
+          end
+        end
       end
     end
   end

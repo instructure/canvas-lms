@@ -18,10 +18,10 @@
 
 import PropTypes from 'prop-types'
 
-const { shape, string, number } = PropTypes
+const {shape, string, number} = PropTypes
 
 export default shape({
   id: number.isRequired,
   name: string.isRequired,
-  avatar_url: string,
+  avatar_url: string
 })

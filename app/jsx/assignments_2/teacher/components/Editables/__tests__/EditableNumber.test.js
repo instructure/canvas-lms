@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import EditableNumber from '../EditableNumber'
 
 describe('EditableNumber', () => {
   it('renders the value in view mode', () => {
-    const {getByText} = render(
+    const {getByText, getAllByText} = render(
       <EditableNumber
         mode="view"
         onChange={() => {}}
@@ -31,12 +31,12 @@ describe('EditableNumber', () => {
         value="17"
       />
     )
-    expect(getByText('17')).toBeInTheDocument()
+    expect(getAllByText('17')[0]).toBeInTheDocument()
     expect(getByText('Pick a number')).toBeInTheDocument()
   })
 
   it('renders the value in edit mode', () => {
-    const {container} = render(
+    const {getByDisplayValue} = render(
       <EditableNumber
         mode="edit"
         onChange={() => {}}
@@ -45,7 +45,7 @@ describe('EditableNumber', () => {
         value="17"
       />
     )
-    expect(container.querySelector('input[value="17"]')).toBeInTheDocument()
+    expect(getByDisplayValue('17')).toBeInTheDocument()
   })
 
   it('does not render edit button when readOnly', () => {
@@ -64,7 +64,7 @@ describe('EditableNumber', () => {
 
   it('exits edit mode on <Enter>', () => {
     const onChangeMode = jest.fn()
-    const {container} = render(
+    const {getByDisplayValue} = render(
       <EditableNumber
         mode="edit"
         onChange={() => {}}
@@ -73,26 +73,33 @@ describe('EditableNumber', () => {
         value="17"
       />
     )
-    const input = container.querySelector('input[value="17"]')
+    const input = getByDisplayValue('17')
     fireEvent.keyDown(input, {key: 'Enter', code: 13})
     expect(onChangeMode).toHaveBeenCalledWith('view')
   })
 
-  it('does not exit edit mode if value is invalid', () => {
+  it('reverts to the old value and exits edit mode on Escape', () => {
+    const onChange = jest.fn()
+    const onInputChange = jest.fn()
     const onChangeMode = jest.fn()
-    const {container} = render(
+    const {getByDisplayValue} = render(
       <EditableNumber
         mode="edit"
-        onChange={() => {}}
+        onChange={onChange}
         onChangeMode={onChangeMode}
-        isValid={() => false}
+        onInputChange={onInputChange}
         label="Pick a number"
         value="17"
       />
     )
-    const input = container.querySelector('input[value="17"]')
-    fireEvent.keyDown(input, {key: 'Enter', code: 13})
-    expect(onChangeMode).not.toHaveBeenCalled()
+
+    const input = getByDisplayValue('17')
+    fireEvent.change(input, {target: {value: '2'}})
+    expect(onInputChange).toHaveBeenLastCalledWith('2')
+
+    fireEvent.keyUp(input, {key: 'Escape', code: 27})
+    expect(onChange).toHaveBeenLastCalledWith('17')
+    expect(onChangeMode).toHaveBeenLastCalledWith('view')
   })
 
   // I want to test that the input grows in width as the user
@@ -100,7 +107,7 @@ describe('EditableNumber', () => {
   // where it's given a size. The container and everything w/in
   // is is 0x0.
   // it('grows with the value', () => {
-  //   const {container} = render(
+  //   const {getByDisplayValue} = render(
   //     <EditableNumber
   //       mode="edit"
   //       onChange={() => {}}
@@ -109,7 +116,7 @@ describe('EditableNumber', () => {
   //       value="17"
   //     />
   //   )
-  //   let input = container.querySelector('input[value="17"]')
+  //   let input = getByDisplayValue('17')
   //   const w0 = input.offsetWidth
   //   render(
   //     <EditableNumber
@@ -121,7 +128,7 @@ describe('EditableNumber', () => {
   //     />,
   //     {container}
   //   )
-  //   input = container.querySelector('input[value="1777"]')
+  //   input = getByDisplayValue('1777')
   //   const w1 = input.offsetWidth
 
   //   expect(w1 > w0).toBeTruthy()

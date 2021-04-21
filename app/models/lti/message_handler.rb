@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -104,6 +106,5 @@ module Lti
         { resource_type_code: resource_handler.resource_type_code }
       )
     end
-
   end
 end

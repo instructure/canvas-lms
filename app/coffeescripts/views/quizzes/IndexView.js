@@ -15,12 +15,21 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!quizzes'
+import I18n from 'i18n!quizzesIndexView'
 import $ from 'jquery'
+import 'jquery.ajaxJSON'
 import _ from 'underscore'
 import Backbone from 'Backbone'
 import template from 'jst/quizzes/IndexView'
 import '../../jquery.rails_flash_notifications'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Alert} from '@instructure/ui-alerts'
+import {Text} from '@instructure/ui-text'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import QuizEngineModal from 'jsx/quizzes/QuizEngineModal'
+import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
+import getCookie from 'jsx/shared/helpers/getCookie'
 
 export default class IndexView extends Backbone.View {
   static initClass() {
@@ -35,14 +44,17 @@ export default class IndexView extends Backbone.View {
 
     this.prototype.events = {
       'keyup #searchTerm': 'keyUpSearch',
-      'mouseup #searchTerm': 'keyUpSearch'
+      'mouseup #searchTerm': 'keyUpSearch',
+      'click .header-bar-right .menu_tool_link': 'openExternalTool',
+      'click .choose-quiz-engine': 'createNewQuiz',
+      'click .reset-quiz-engine': 'resetQuizEngine'
     }
 
     this.prototype.keyUpSearch = _.debounce(function() {
       this.filterResults()
       return this.announceCount()
     }, 200)
-    //ie10 x-close workaround
+    // ie10 x-close workaround
   }
 
   initialize() {
@@ -53,6 +65,7 @@ export default class IndexView extends Backbone.View {
       this.assignmentView.collection.length + this.openView.collection.length === 0
     this.options.hasAssignmentQuizzes = this.assignmentView.collection.length > 0
     this.options.hasOpenQuizzes = this.openView.collection.length > 0
+    this.quizIndexPlacements = ENV.quiz_index_menu_tools != null ? ENV.quiz_index_menu_tools : []
     return (this.options.hasSurveys = this.surveyView.collection.length > 0)
   }
 
@@ -90,6 +103,130 @@ export default class IndexView extends Backbone.View {
       {count: numQuizzes}
     )
     return $.screenReaderFlashMessageExclusive(msg)
+  }
+
+  toJSON() {
+    const json = super.toJSON(...arguments)
+    json.quizIndexPlacements = this.quizIndexPlacements
+    return json
+  }
+
+  createNewQuiz() {
+    const newQuizzesSelected = ENV.NEW_QUIZZES_SELECTED
+    if (newQuizzesSelected === null) {
+      this.chooseQuizEngine()
+    } else if (newQuizzesSelected === 'true') {
+      window.location.href = `${ENV.URLS.new_assignment_url}?quiz_lti`
+    } else if (newQuizzesSelected === 'false') {
+      const authenticity_token = () => getCookie('_csrf_token')
+      $.ajaxJSON(
+        ENV.URLS.new_quiz_url,
+        'POST',
+        {authenticity_token: authenticity_token()},
+        data => {
+          window.location.href = data.url
+        }
+      )
+    } else {
+      this.chooseQuizEngine()
+    }
+  }
+
+  chooseQuizEngine() {
+    this.renderQuizEngineModal(true, $('.choose-quiz-engine'))
+  }
+
+  resetQuizEngine() {
+    const newquizzes_engine = null
+    $.ajaxJSON(
+      ENV.URLS.new_quizzes_selection,
+      'PUT',
+      {
+        newquizzes_engine_selected: newquizzes_engine
+      },
+      () => {
+        window.location.reload()
+        this.renderQuizEngineSelectionSuccessNotice()
+      },
+      () => {
+        this.renderQuizEngineSelectionFailureNotice()
+      }
+    )
+  }
+
+  renderQuizEngineModal(setOpen, returnFocusTo) {
+    const handleDismiss = () => {
+      this.renderQuizEngineModal(false)
+      returnFocusTo && returnFocusTo.focus()
+    }
+
+    ReactDOM.render(
+      <QuizEngineModal onDismiss={handleDismiss} setOpen={setOpen} />,
+      $('#quiz-modal-mount-point')[0]
+    )
+  }
+
+  renderQuizEngineSelectionSuccessNotice() {
+    $('#flash_message_holder')
+      .css('width', '30rem')
+      .css('padding-left', '35rem')
+      .css('display', 'block')
+
+    ReactDOM.render(
+      <Alert variant="success" timeout={4000} transition="fade">
+        <Text>{I18n.t(`Your quiz engine choice has been reset!`)}</Text>
+      </Alert>,
+      $('#flash_message_holder')[0]
+    )
+  }
+
+  renderQuizEngineSelectionFailureNotice() {
+    $('#flash_message_holder')
+      .css('width', '30rem')
+      .css('padding-left', '35rem')
+      .css('display', 'block')
+    ReactDOM.render(
+      <Alert variant="error" timeout={4000} transition="fade">
+        <Text>{I18n.t(`There was a problem resetting your quiz engine choice`)}</Text>
+      </Alert>,
+      $('#flash_message_holder')[0]
+    )
+  }
+
+  openExternalTool(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    const tool = this.quizIndexPlacements.find(t => t.id === ev.target.dataset.toolId)
+    this.setExternalToolTray(tool, $('.al-trigger')[0])
+  }
+
+  reloadPage() {
+    window.location.reload()
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        this.reloadPage()
+      }
+    }
+
+    ReactDOM.render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="quiz_index_menu"
+        acceptedResourceTypes={['quiz']}
+        targetResourceType="quiz"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      $('#external-tool-mount-point')[0]
+    )
   }
 }
 IndexView.initClass()

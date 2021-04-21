@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -89,7 +91,7 @@ describe AssignmentsHelper do
       student_in_course(active_all: true)
       assignment_model(course: @course)
       @assignment.turnitin_enabled = true
-      @assignment.update_attributes!({
+      @assignment.update!({
         submission_types: ["online_url"]
       })
       @context = @assignment.context
@@ -105,14 +107,14 @@ describe AssignmentsHelper do
     end
 
     it "returns false if the assignment does not require submissions" do
-      @assignment.update_attributes!({
+      @assignment.update!({
         submission_types: ["none"]
       })
       expect(turnitin_active?).to be_falsey
     end
 
     it "returns false if turnitin is disabled on the account level" do
-      @context.account.update_attributes!({
+      @context.account.update!({
         turnitin_account_id: nil,
         turnitin_shared_secret: nil
       })
@@ -162,6 +164,37 @@ describe AssignmentsHelper do
   describe "#i18n_grade" do
     it "returns nil when passed a nil grade and a grading_type of pass_fail" do
       expect(i18n_grade(nil, "pass_fail")).to be nil
+    end
+  end
+
+  describe "#student_peer_review_link_for" do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create(peer_reviews: true, title: "hi") }
+    let(:reviewer) { course.enroll_student(User.create!, active_all: true).user }
+    let(:reviewee) { course.enroll_student(User.create!, active_all: true).user }
+    let(:assessment) { assignment.submission_for_student(reviewer).assigned_assessments.first }
+
+    before(:each) do
+      assignment.assign_peer_review(reviewer, reviewee)
+
+      # Avoid having to go down a rabbit hole of imports
+      allow(self).to receive(:submission_author_name_for).and_return("Nobody")
+      allow(self).to receive(:link_to).and_return("")
+    end
+
+    it "creates a URL containing the peer reviewee's user ID when peer reviewing is not anonymous" do
+      allow(self).to receive(:submission_author_name_for).and_return("Nobody")
+      expect(self).to receive(:context_url).with(course, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+
+      student_peer_review_link_for(course, assignment, assessment)
+    end
+
+    it "creates a URL containing the peer reviewee's anonymous ID when peer reviewing is anonymous" do
+      assignment.update!(anonymous_peer_reviews: true)
+
+      expect(self).to receive(:context_url).with(course, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
+
+      student_peer_review_link_for(course, assignment, assessment)
     end
   end
 end

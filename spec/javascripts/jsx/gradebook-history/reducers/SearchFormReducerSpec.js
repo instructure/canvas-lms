@@ -51,12 +51,12 @@ const defaultState = () => ({
 
 QUnit.module('SearchFormReducer')
 
-test('returns the current state by default', function() {
+test('returns the current state by default', () => {
   const currState = defaultState()
   deepEqual(reducer(currState, {}), currState)
 })
 
-test('handles FETCH_RECORDS_START for given record type', function() {
+test('handles FETCH_RECORDS_START for given record type', () => {
   const defaults = defaultState()
   const initialState = {
     ...defaults,
@@ -88,7 +88,7 @@ test('handles FETCH_RECORDS_START for given record type', function() {
   deepEqual(reducer(initialState, action), newState)
 })
 
-test('handles FETCH_RECORDS_SUCCESS on success for given record type', function() {
+test('handles FETCH_RECORDS_SUCCESS on success for given record type', () => {
   const payload = {
     recordType: 'graders',
     data: Fixtures.userArray(),
@@ -115,7 +115,7 @@ test('handles FETCH_RECORDS_SUCCESS on success for given record type', function(
   deepEqual(reducer(initialState, action), newState)
 })
 
-test('handles FETCH_RECORDS_FAILURE on failure for given record type', function() {
+test('handles FETCH_RECORDS_FAILURE on failure for given record type', () => {
   const defaults = defaultState()
   const initialState = {
     ...defaults,
@@ -147,7 +147,7 @@ test('handles FETCH_RECORDS_FAILURE on failure for given record type', function(
   deepEqual(reducer(initialState, action), newState)
 })
 
-test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', function() {
+test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', () => {
   const defaults = defaultState()
   const initialState = {
     ...defaults,
@@ -179,7 +179,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', fun
   deepEqual(reducer(initialState, action), newState)
 })
 
-test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function() {
+test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', () => {
   const defaults = defaultState()
   const payload = {
     recordType: 'graders',
@@ -218,7 +218,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function()
   deepEqual(reducer(initialState, action), newState)
 })
 
-test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function() {
+test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', () => {
   const defaults = defaultState()
   const initialState = {
     ...defaults,
@@ -250,7 +250,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function()
   deepEqual(reducer(initialState, action), newState)
 })
 
-test('handles CLEAR_RECORDS for given record type', function() {
+test('handles CLEAR_RECORDS for given record type', () => {
   const defaults = defaultState()
   const initialState = {
     ...defaults,

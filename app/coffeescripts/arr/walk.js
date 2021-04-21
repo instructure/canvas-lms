@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function walk (arr, prop, iterator) {
+export default function walk(arr, prop, iterator) {
   for (let i = 0; i < arr.length; i++) {
     const item = arr[i]
     const result = iterator(item, arr)

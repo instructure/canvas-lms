@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -78,7 +80,7 @@ module FilesCommon
     files.each do |file_name|
       file = driver.find_element(xpath: "//span[contains(text(), '#{file_name}') and @class='ef-name-col__text']")
                    .find_element(xpath: "../..")
-      driver.action.key_down(:control).click(file).key_up(:control).perform
+      driver.action.key_down(:command).click(file).key_up(:command).perform
     end
     wait_for_ajaximations
     f('.btn-move').click
@@ -104,14 +106,14 @@ module FilesCommon
     elsif permission_type == :unpublish
       driver.find_elements(:name, 'permissions')[1].click
     else
-      driver.find_elements(:name, 'permissions')[2].click
       if restricted_access_option == :available_with_link
-        driver.find_elements(:name, 'restrict_options')[0].click
+        driver.find_elements(:name, 'permissions')[2].click
       else
-        driver.find_elements(:name, 'restrict_options')[1].click
+        driver.find_elements(:name, 'permissions')[3].click
         ff('.ui-datepicker-trigger.btn')[0].click
         fln("15").click
         ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
+        wait_for_ajaximations
         ff('.ui-datepicker-trigger.btn')[1].click
         fln("25").click
         ff('.ui-datepicker-trigger.btn')[1].send_keys(:enter) # close the calendar
@@ -158,8 +160,9 @@ module FilesCommon
   def add_folder(name = 'new folder')
     click_new_folder_button
     new_folder = f("input[aria-label='Folder Name']")
+    new_folder.click # sometimes send_keys won't send all keys unless click first
     new_folder.send_keys(name)
-    new_folder.send_keys(:return)
+    f('.ef-edit-name-accept').click
     wait_for_ajaximations
   end
 
@@ -170,7 +173,7 @@ module FilesCommon
 
   def create_new_folder
     f('.btn-add-folder').click
-    f('.ef-edit-name-form').submit
+    f("input[aria-label='Folder Name']").send_keys(:return)
     wait_for_ajaximations
     all_files_folders.first
   end
@@ -180,29 +183,20 @@ module FilesCommon
     driver.find_elements(:class, 'ef-item-row')
   end
 
-  def insert_file_from_rce(insert_into = nil)
+  def insert_file_from_rce(insert_into = nil, filename = nil)
+    fj('[role=tablist] [role=presentation]:not([aria-disabled]):contains("Files")').click
+    fj('[role=tabpanel] button:contains("unfiled")').click
+    fj('[role=tabpanel] button:contains("some test file")').click
     if insert_into == :quiz
-      ff(".ui-tabs-anchor")[6].click
-    else
-      file_tab = ff(".ui-tabs-anchor")[1]
-      expect(file_tab).to be_displayed
-      ff(".ui-tabs-anchor")[1].click
-    end
-    ff(".name.text")[0].click
-    wait_for_ajaximations
-    ff(".name.text")[1].click
-    wait_for_ajaximations
-    ff(".name.text")[2].click
-    wait_for_ajaximations
-    if insert_into == :quiz
-      ff(".name.text")[3].click
-      ff(".btn-primary")[3].click
+      fj("[role=tabpanel] button:contains('#{filename}')").click
+      f(".save_quiz_button").click
     elsif insert_into == :discussion
       f("#edit_discussion_form_buttons .btn-primary").click
+    elsif insert_into == :wiki_page
+      f('.btn-primary.submit').click
     else
-      f(".btn-primary").click
+      f('.btn-primary[type=submit]').click
     end
-    wait_for_ajaximations
     expect(fln("some test file")).to be_displayed
   end
 end

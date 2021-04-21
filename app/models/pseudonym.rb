@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -15,15 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class ImpossibleCredentialsError < ArgumentError; end
 
 class Pseudonym < ActiveRecord::Base
   include Workflow
 
   has_many :session_persistence_tokens
   belongs_to :account
+  include Canvas::RootAccountCacher
   belongs_to :user
-  has_many :communication_channels, -> { order(:position) }
+  has_many :communication_channels, -> { ordered }
   has_many :sis_enrollments, class_name: 'Enrollment', inverse_of: :sis_pseudonym
+  has_many :auditor_authentication_records,
+    class_name: "Auditors::ActiveRecord::AuthenticationRecord",
+    dependent: :destroy,
+    inverse_of: :pseudonym
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   belongs_to :authentication_provider
@@ -47,23 +55,41 @@ class Pseudonym < ActiveRecord::Base
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
 
+  alias_attribute :root_account_id, :account_id
+
   alias_method :context, :account
 
   include StickySisFields
   are_sis_sticky :unique_id
 
-  validates_each :password, {:if => :require_password?}, &Canvas::PasswordPolicy.method("validate")
+  validates :unique_id, format: { with: /\A[[:print:]]+\z/ },
+            length: { within: 1..MAX_UNIQUE_ID_LENGTH },
+            uniqueness: {
+              case_sensitive: false,
+              scope: [:account_id, :workflow_state, :authentication_provider_id],
+              if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
+            }
+
+  validates :password,
+            confirmation: true,
+            if: :require_password?
+
+  validates_each :password, if: :require_password?,
+            &Canvas::PasswordPolicy.method("validate")
+  validates :password_confirmation,
+            presence: true,
+            if: :require_password?
+
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A[[:print:]]+\z/}
     config.login_field :unique_id
     config.perishable_token_valid_for = 30.minutes
-    config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
-    config.validates_uniqueness_of_login_field_options = {
-        case_sensitive: false,
-        scope: [:account_id, :workflow_state, :authentication_provider_id],
-        if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
-    }
-    config.crypto_provider = Authlogic::CryptoProviders::Sha512
+    # if changing this to a new provider, add the _new_ provider to the transition
+    # list for a full deploy first before moving it to primary, so that
+    # a) there won't be any possibility of split brain where old-still-running code
+    #   can't understand the new hash in the db from new code, and
+    # b) if we have to roll back to old code, users won't be locked out
+    config.crypto_provider = ScryptProvider.new("4000$8$1$")
+    config.transition_from_crypto_providers = [Authlogic::CryptoProviders::Sha512]
   end
 
   attr_writer :require_password
@@ -102,13 +128,9 @@ class Pseudonym < ActiveRecord::Base
     end
   end
 
-  def root_account_id
-    account.root_account_id || account.id
-  end
-
   def must_be_root_account
     if account_id_changed?
-      self.errors.add(:account_id, "must belong to a root_account") unless self.account_id == self.root_account_id
+      self.errors.add(:account_id, "must belong to a root_account") unless account.root_account?
     end
   end
 
@@ -167,6 +189,8 @@ class Pseudonym < ActiveRecord::Base
     if (!crypted_password || crypted_password == "") && !@require_password
       self.generate_temporary_password
     end
+    # treat empty or whitespaced strings as nullable
+    self.integration_id = nil if self.integration_id.blank?
     self.sis_user_id = nil if self.sis_user_id.blank?
   end
 
@@ -196,7 +220,7 @@ class Pseudonym < ActiveRecord::Base
     :email_login
   end
 
-  def works_for_account?(account, allow_implicit = false)
+  def works_for_account?(account, allow_implicit = false, ignore_types: [:implicit])
     true
   end
 
@@ -253,7 +277,7 @@ class Pseudonym < ActiveRecord::Base
   set_policy do
     # an admin can only create and update pseudonyms when they have
     # :manage_user_logins permission on the pseudonym's account, :read
-    # permission on the pseudonym's owner, and a superset of hte pseudonym's
+    # permission on the pseudonym's owner, and a superset of the pseudonym's
     # owner's rights (if any) on the pseudonym's account. some fields of the
     # pseudonym may require additional conditions to update (see below)
     given do |user|
@@ -396,25 +420,6 @@ class Pseudonym < ActiveRecord::Base
     self.password
   end
 
-  def move_to_user(user, migrate=true)
-    return unless user
-    return true if self.user_id == user.id
-    old_user = self.user
-    old_user_id = self.user_id
-    self.user = user
-    unless self.crypted_password
-      self.generate_temporary_password
-    end
-    self.save
-    if old_user_id
-      CommunicationChannel.by_path(self.unique_id).where(:user_id => old_user_id).update_all(:user_id => user)
-      User.where(:id => [old_user_id, user]).update_all(:update_at => Time.now.utc)
-    end
-    if User.find(old_user_id).pseudonyms.empty? && migrate
-      UserMerge.from(old_user).into(user)
-    end
-  end
-
   def valid_ssha?(plaintext_password)
     return false if plaintext_password.blank? || self.sis_ssha.blank?
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
@@ -425,6 +430,7 @@ class Pseudonym < ActiveRecord::Base
     digest == digested_password
   end
 
+  attr_reader :ldap_authentication_provider_used
   def ldap_bind_result(password_plaintext)
     aps = case authentication_provider
           when AuthenticationProvider::LDAP
@@ -437,7 +443,10 @@ class Pseudonym < ActiveRecord::Base
     end
     aps.each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
-      return res if res
+      if res
+        @ldap_authentication_provider_used = config
+        return res
+      end
     end
     return nil
   end
@@ -487,6 +496,12 @@ class Pseudonym < ActiveRecord::Base
   def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
+    if credentials[:unique_id].length > 255
+      # this sometimes happens by mistake, and produces noisy errors.
+      # we can handle this error explicitly when it arrives and just return
+      # a failed login instead of an error.
+      raise ImpossibleCredentialsError, "pseudonym cannot have a unique_id of length #{credentials[:unique_id].length}"
+    end
     too_many_attempts = false
     begin
       associated_shards = associated_shards(credentials[:unique_id])
@@ -512,7 +527,13 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def self.authenticate(credentials, account_ids, remote_ip = nil)
-    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+    pseudonyms = []
+    begin
+      pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+    rescue ImpossibleCredentialsError => e
+      Rails.logger.info("Impossible pseudonym credentials: #{credentials[:unique_id]}, invalidating session")
+      return :impossible_credentials
+    end
     return :too_many_attempts if pseudonyms == :too_many_attempts
     site_admin = pseudonyms.find { |p| p.account_id == Account.site_admin.id }
     # only log them in if these credentials match a single user OR if it matched site admin
@@ -523,14 +544,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def audit_login(remote_ip, valid_password)
-    return :too_many_attempts unless Canvas::Security.allow_login_attempt?(self, remote_ip)
-
-    if valid_password
-      Canvas::Security.successful_login!(self, remote_ip)
-    else
-      Canvas::Security.failed_login!(self, remote_ip)
-    end
-    nil
+    Canvas::Security::LoginRegistry.audit_login(self, remote_ip, valid_password)
   end
 
   def self.cas_ticket_key(ticket)

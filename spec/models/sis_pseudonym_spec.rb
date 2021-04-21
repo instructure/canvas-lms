@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -35,7 +37,7 @@ describe SisPseudonym do
 
   context "when there is a deleted pseudonym" do
     before do
-      u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
+      @deleted_pseudonym = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
         x.workflow_state = 'deleted'
         x.sis_user_id = "user2"
       end
@@ -48,6 +50,19 @@ describe SisPseudonym do
         x.sis_user_id = "user1"
       end
       expect(SisPseudonym.for(u, course1)).to eq(active_pseudonym)
+    end
+
+    it "should not return deleted pseudonyms from enrollments unless @include_deleted" do
+      e = course1.enroll_user(u)
+      e.sis_pseudonym_id = @deleted_pseudonym
+      e.save!
+      expect(SisPseudonym.for(u, course1)).to be_nil
+      active_pseudonym = u.pseudonyms.create!(pseud_params("user1@example.com")) do |x|
+        x.workflow_state = 'active'
+        x.sis_user_id = "user1"
+      end
+      expect(SisPseudonym.for(u, course1)).to eq(active_pseudonym)
+      expect(SisPseudonym.for(u, course1, include_deleted: true)).to eq @deleted_pseudonym
     end
 
     it "returns only active pseudonyms when loading from user collection too" do
@@ -100,6 +115,26 @@ describe SisPseudonym do
     e2.save!
     expect(SisPseudonym.for(u, e)).to eq @p
     expect(SisPseudonym.for(u, e2)).to eq @p2
+  end
+
+  it "follows ths sis_user_id if it moves between pseudonyms" do
+    pseudonym1 = u.pseudonyms.create!(pseud_params("testuser41@example.com")) do |x|
+      x.workflow_state = 'active'
+      x.sis_user_id = "user2"
+    end
+    pseudonym2 = u.pseudonyms.create!(pseud_params("testuser42@example.com")) do |x|
+      x.workflow_state = 'active'
+      x.sis_user_id = nil
+    end
+    enrollment = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active')
+    enrollment.sis_pseudonym_id = pseudonym1.id
+    enrollment.save!
+    expect(SisPseudonym.for(u, course1)).to eq(pseudonym1)
+    pseudonym1.sis_user_id = nil
+    pseudonym1.save!
+    pseudonym2.sis_user_id = "user2"
+    pseudonym2.save!
+    expect(SisPseudonym.for(u, course1)).to eq(pseudonym2)
   end
 
   it "should find the right root account for a course" do
@@ -233,6 +268,19 @@ describe SisPseudonym do
       @shard1.activate do
         expect(SisPseudonym.for(@user, Account.default)).to eq @pseudonym
       end
+    end
+
+    it "looks in other accounts" do
+      @shard1.activate do
+        @s1root = account_model
+        @user = User.create!
+        @pseudonym = @s1root.pseudonyms.create!(user: @user, unique_id: 'user') do |p|
+          p.sis_user_id = 'abc'
+        end
+        allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(Account.default, true).and_return(true)
+      end
+      expect(SisPseudonym.for(@user, Account.default, type: :implicit)).to eq @pseudonym
+      expect(SisPseudonym.for(@user, Account.default, type: :implicit, in_region: true)).to eq @pseudonym
     end
   end
 

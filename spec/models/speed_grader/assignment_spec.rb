@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -39,7 +41,7 @@ describe SpeedGrader::Assignment do
     end
 
     context "add students to the group" do
-      let(:category) { @course.group_categories.create! name: "Assignment Groups" }
+      let(:category) { @course.group_categories.create! name: "Group Set" }
       let(:assignment) do
         @course.assignments.create!(
           group_category_id: category.id,
@@ -189,6 +191,21 @@ describe SpeedGrader::Assignment do
     expect(json[:submissions].first[:submission_comments]).to be_empty
   end
 
+  it "includes submission resource_link_lookup_uuid" do
+    params = {
+      submission_type: 'basic_lti_launch',
+      url: 'http://lti13testtool.docker/launch?deep_linking=true',
+      resource_link_lookup_uuid: '41b67e00-c2ae-44b1-8c8e-e9a782f39e30'
+    }
+
+    assignment_model(course: @course)
+    @assignment.submit_homework(@user, params)
+    @assignment.save!
+
+    json = SpeedGrader::Assignment.new(@assignment, @user).json
+    expect(json[:submissions].first[:resource_link_lookup_uuid]).to eq params[:resource_link_lookup_uuid]
+  end
+
   it "returns provisional grade ids to provisional grader" do
     final_grader = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     assignment = Assignment.create!(
@@ -204,6 +221,31 @@ describe SpeedGrader::Assignment do
     expect(
       json[:submissions].first[:provisional_grades].first[:provisional_grade_id]
     ).to eq comment.provisional_grade_id.to_s
+  end
+
+  context "rubric association" do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+    end
+
+    let(:json) { SpeedGrader::Assignment.new(@assignment, @user).json }
+
+    it "does not include rubric_association when one does not exist" do
+      expect(json).not_to have_key "rubric_association"
+    end
+
+    it "does not include rubric_association when one exists but it is not active" do
+      rubric = rubric_model
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      association.destroy
+      expect(json).not_to have_key "rubric_association"
+    end
+
+    it "includes a rubric_association when one exists and is active" do
+      rubric = rubric_model
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      expect(json.dig("rubric_association", "id")).to eq association.id.to_s
+    end
   end
 
   context "students and active course sections" do
@@ -280,6 +322,28 @@ describe SpeedGrader::Assignment do
       allow(Canvadoc).to receive(:mime_types).and_return("image/png")
     end
 
+    describe "has_postable_comments" do
+      before(:each) do
+        @assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "is true when submission is unposted and hidden comments exist" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be true
+      end
+
+      it "is false when submission is unposted and only non-hidden comments exist" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @student1, comment: "good job!", hidden: false)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be false
+      end
+    end
+
     it "returns submission lateness" do
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       json[:submissions].each do |submission|
@@ -303,85 +367,66 @@ describe SpeedGrader::Assignment do
       expect(submission.fetch('grading_period_id')).to eq period.id.to_s
     end
 
-    it "creates a non-annotatable DocViewer session for Discussion attachments" do
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      assignment.anonymous_grading = true
-      topic = course.discussion_topics.create!(assignment: assignment)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      entry = topic.reply_from(user: @student, text: "entry")
-      entry.attachment = attachment
-      entry.save!
-      topic.ensure_submission(@student)
+    context 'DocViewer' do
+      let(:course) { student_in_course(active_all: true).course }
+      let(:assignment) { assignment_model(course: course) }
+      let(:attachment) do
+        attachment_model(
+          context: @student,
+          uploaded_data: stub_png_data,
+          filename: "homework.png"
+        )
+      end
+      let(:json) { SpeedGrader::Assignment.new(assignment, @teacher).json }
+      let(:sub) do
+        json[:submissions].find do |submission|
+          submission[:submission_history][0][:submission][:versioned_attachments].any?
+        end
+      end
+      let(:versioned_attachments) { sub[:submission_history][0][:submission][:versioned_attachments] }
 
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub[:versioned_attachments].first.dig(:attachment, :canvadoc_url)
-      expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
-    end
+      it "creates a non-annotatable DocViewer session for Discussion attachments" do
+        assignment.anonymous_grading = true
+        topic = course.discussion_topics.create!(assignment: assignment)
+        entry = topic.reply_from(user: @student, text: "entry")
+        entry.attachment = attachment
+        entry.save!
+        topic.ensure_submission(@student)
 
-    it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      assignment.anonymous_instructor_annotations = true
-      topic = course.discussion_topics.create!(assignment: assignment)
-      entry = topic.reply_from(user: @student, text: "entry")
-      entry.attachment = attachment
-      entry.save!
-      topic.ensure_submission(@student)
+        canvadoc_url = versioned_attachments.first.dig(:attachment, :canvadoc_url)
+        expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
+      end
 
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
+      it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
+        assignment.anonymous_instructor_annotations = true
+        topic = course.discussion_topics.create!(assignment: assignment)
+        entry = topic.reply_from(user: @student, text: "entry")
+        entry.attachment = attachment
+        entry.save!
+        topic.ensure_submission(@student)
 
-      expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
-    end
+        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
+        expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
+      end
 
-    it "passes enrollment type to DocViewer" do
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      topic = course.discussion_topics.create!(assignment: assignment)
-      entry = topic.reply_from(user: @student, text: "entry")
-      entry.attachment = attachment
-      entry.save!
-      topic.ensure_submission(@student)
+      it "passes enrollment type to DocViewer" do
+        topic = course.discussion_topics.create!(assignment: assignment)
+        entry = topic.reply_from(user: @student, text: "entry")
+        entry.attachment = attachment
+        entry.save!
+        topic.ensure_submission(@student)
 
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
+        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
+        expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
+      end
 
-      expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
-    end
+      it "passes submission id to DocViewer" do
+        submission = assignment.submit_homework(@student, attachments: [attachment])
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
 
-    it "passes submission id to DocViewer" do
-      course = student_in_course(active_all: true).course
-      assignment = assignment_model(course: course)
-      attachment = attachment_model(
-        context: @student,
-        uploaded_data: stub_png_data,
-        filename: "homework.png"
-      )
-      submission = assignment.submit_homework(@student, attachments: [attachment])
-      allow(Canvadocs).to receive(:enabled?).and_return(true)
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      sub_json = json[:submissions].first[:submission_history].first[:submission]
-      canvadoc_url = sub_json[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
-
-      expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
+        expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+      end
     end
 
     it "includes submission missing status in each submission history version" do
@@ -419,6 +464,23 @@ describe SpeedGrader::Assignment do
       end
     end
 
+    describe "submission posting" do
+      let(:submission_json) do
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        json[:submissions].detect { |submission| submission[:user_id] == @student_1.id.to_s }
+      end
+
+      it "includes the submission's posted-at date in the posted_at field" do
+        posted_at_time = 1.day.ago
+        @assignment.submission_for_student(@student_1).update!(posted_at: posted_at_time)
+        expect(submission_json["posted_at"]).to eq posted_at_time
+      end
+
+      it "includes nil for the posted_at field if the submission is not posted" do
+        expect(submission_json["posted_at"]).to be nil
+      end
+    end
+
     describe 'attachment JSON' do
       let(:viewed_at_time) { Time.zone.now }
 
@@ -434,6 +496,11 @@ describe SpeedGrader::Assignment do
         assignment.submit_homework(student, attachments: [attachment])
       end
 
+      it 'includes redo_request field' do
+        json = SpeedGrader::Assignment.new(assignment, teacher).json
+        expect(json.dig('submissions', 0)).to have_key :redo_request
+      end
+
       it 'includes the viewed_at field if the assignment is not anonymized' do
         json = SpeedGrader::Assignment.new(assignment, teacher).json
         submission_json = json.dig(:submissions, 0, :submission_history, 0, :submission)
@@ -443,7 +510,7 @@ describe SpeedGrader::Assignment do
 
       context 'for an anonymized assignment' do
         before(:each) do
-          assignment.update!(anonymous_grading: true, muted: true)
+          allow(assignment).to receive(:anonymize_students?).and_return(true)
         end
 
         it 'includes the viewed_at field if the user is an admin' do
@@ -493,22 +560,22 @@ describe SpeedGrader::Assignment do
       @course.enroll_student(@student2, enrollment_state: 'active')
       assignment_model(course: @course)
       @teacher.preferences[:gradebook_settings] = {}
-      @teacher.preferences[:gradebook_settings][@course.id] = {
+      @teacher.preferences[:gradebook_settings][@course.global_id] = {
         'show_concluded_enrollments' => 'false'
       }
     end
 
     it 'does not include concluded students when user preference is to not include' do
       Enrollment.find_by(user: @student1).conclude
-      @course.update_attributes!(conclude_at: 1.day.ago, start_at: 2.days.ago)
+      @course.update!(conclude_at: 1.day.ago, start_at: 2.days.ago)
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       expect(json[:context][:students].count).to be 1
     end
 
     it 'includes concluded when user preference is to include' do
-      @teacher.preferences[:gradebook_settings][@course.id]['show_concluded_enrollments'] = 'true'
+      @teacher.preferences[:gradebook_settings][@course.global_id]['show_concluded_enrollments'] = 'true'
       Enrollment.find_by(user: @student1).conclude
-      @course.update_attributes!(conclude_at: 1.day.ago, start_at: 2.days.ago)
+      @course.update!(conclude_at: 1.day.ago, start_at: 2.days.ago)
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       expect(json[:context][:students].count).to be 2
     end
@@ -516,156 +583,316 @@ describe SpeedGrader::Assignment do
 
   context "group assignments" do
     before :once do
-      course_with_teacher(active_all: true)
-      @gc = @course.group_categories.create! name: "Assignment Groups"
-      @groups = [1, 2].map { |i| @gc.groups.create! name: "Group #{i}", context: @course }
+      @teacher = course_with_teacher(active_all: true).user
+      @group_category = @course.group_categories.create!(name: 'Group Set')
+      @first_group = @group_category.groups.create!(name: 'Group 1', context: @course)
+      @second_group = @group_category.groups.create!(name: 'Group 2', context: @course)
+      @groups = [@first_group, @second_group]
       students = create_users_in_course(@course, 6, return_type: :record)
-      students.each_with_index { |s, i| @groups[i % @groups.size].add_user(s) }
-      @assignment = @course.assignments.create!(
-        group_category_id: @gc.id,
-        grade_group_students_individually: false,
-        submission_types: %w(text_entry)
-      )
-    end
-
-    it "is not in group mode for non-group assignments" do
-      assignment_model(course: @course)
-      @assignment.submit_homework(@user, {submission_type: 'online_text_entry', body: 'blah'})
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      expect(json["GROUP_GRADING_MODE"]).not_to be_truthy
-    end
-
-    it "sorts student view students last" do
-      test_student = @course.student_view_student
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
-    end
-
-    it 'returns "groups" instead of students' do
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      @groups.each do |group|
-        j = json["context"]["students"].find { |g| g["name"] == group.name }
-        expect(group.users.map { |u| u.id.to_s }).to include j["id"]
+      students.each_with_index do |student, index|
+        @groups.fetch(index % @groups.size).add_user(student)
       end
-      expect(json["GROUP_GRADING_MODE"]).to be_truthy
     end
 
-    it 'chooses the student with turnitin data to represent' do
-      turnitin_submissions = @groups.map do |group|
-        rep = group.users.sample
-        turnitin_submission = @assignment.grade_student(rep, grade: 10, grader: @teacher)[0]
-        turnitin_submission.update_attribute :turnitin_data, {blah: 1}
-        turnitin_submission
+    context 'given an assignment' do
+      before(:once) do
+        @assignment = @course.assignments.create!
       end
 
-      @assignment.update_attribute :turnitin_enabled, true
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+      it "is not in group mode for non-group assignments" do
+        @assignment.submit_homework(@student, {submission_type: 'online_text_entry', body: 'blah'})
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json["GROUP_GRADING_MODE"]).to be false
+      end
 
-      expect(json["submissions"].map do |s|
-        s["id"]
-      end.sort).to eq turnitin_submissions.map { |t| t.id.to_s }.sort
+      context 'when a course has new gradeook and filter by student group enabled' do
+        before(:once) do
+          @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+          @course.update!(filter_speed_grader_by_student_group: true)
+        end
+
+        context 'when no group filter is present' do
+          it 'returns all students' do
+            @teacher.preferences.deep_merge!(gradebook_settings: {
+              @course.id => {'filter_rows_by' => {'student_group_id' => nil}}
+            })
+            json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+            json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+            students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            StringifyIds.recursively_stringify_ids(students)
+            expect(json_students).to match_array(students)
+          end
+        end
+
+        context 'when the first group filter is present' do
+          let(:group) { @first_group }
+
+          before(:once) do
+            @teacher.preferences.deep_merge!(gradebook_settings: {
+              @course.global_id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+            })
+          end
+
+          it 'returns only students that belong to the first group' do
+            json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+            json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+            group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            StringifyIds.recursively_stringify_ids(group_students)
+            expect(json_students).to match_array(group_students)
+          end
+
+          context 'when a student is removed from a group' do
+            let(:first_student) { group.users.first }
+
+            before { group.group_memberships.find_by!(user: first_student).destroy! }
+
+            it 'that student is no longer included' do
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              group_students = group.users.where.not(id: first_student).
+                as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+          end
+
+          context 'when the second group filter is present' do
+            let(:group) { @second_group }
+
+            it 'returns only students that belong to the second group' do
+              @teacher.preferences.deep_merge!(gradebook_settings: {
+                @course.global_id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+              })
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+          end
+
+          context "when the group the user is filtering by has been deleted" do
+            let(:group) { @second_group }
+
+            it "returns all students rather than attempting to filter by the deleted group" do
+              @teacher.preferences.deep_merge!(gradebook_settings: {
+                @course.global_id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+              })
+              group.destroy!
+
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              course_students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(course_students)
+              expect(json_students).to match_array(course_students)
+            end
+          end
+        end
+      end
     end
 
-    it 'prefers people with submissions' do
-      g1, = @groups
-      @assignment.grade_student(g1.users.first, score: 10, grader: @teacher)
-      g1rep = g1.users.sample
-      s = @assignment.submission_for_student(g1rep)
-      s.update_attribute :submission_type, 'online_upload'
-      expect(@assignment.representatives(@teacher)).to include g1rep
+    context 'given a group assignment' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          group_category_id: @group_category.id,
+          grade_group_students_individually: false,
+          submission_types: %w(text_entry)
+        )
+      end
+
+      it "sorts student view students last" do
+        test_student = @course.student_view_student
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
+      end
+
+      it 'returns "groups" instead of students' do
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        @groups.each do |group|
+          j = json["context"]["students"].find { |g| g["name"] == group.name }
+          expect(group.users.map { |u| u.id.to_s }).to include j["id"]
+        end
+        expect(json["GROUP_GRADING_MODE"]).to be_truthy
+      end
+
+      it 'chooses the student with turnitin data to represent' do
+        @assignment.update!(turnitin_enabled: true)
+        submissions = @groups.map do |group|
+          rep = group.users.sample
+          @assignment.grade_student(rep, grade: 10, grader: @teacher).first.tap do |submission|
+            submission.update!(turnitin_data: {blah: 1})
+          end
+        end
+
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        json_submission_ids = json["submissions"].map {|s| s.fetch('id')}
+        submission_ids = submissions.map { |t| t.id.to_s }
+        expect(json_submission_ids).to match_array(submission_ids)
+      end
+
+      it 'prefers people with submissions' do
+        @assignment.grade_student(@first_group.users.first, score: 10, grader: @teacher)
+        first_group_representative = @first_group.users.sample
+        submission = @assignment.submission_for_student(first_group_representative)
+        submission.update!(submission_type: 'online_upload')
+        expect(@assignment.representatives(user: @teacher)).to include first_group_representative
+      end
+
+      it "prefers people who aren't excused when submission exists" do
+        first_group_representative, *everyone_else = @first_group.users.to_a.shuffle
+        @assignment.submit_homework(first_group_representative, {
+          submission_type: 'online_text_entry',
+          body: 'hi'
+        })
+        everyone_else.each do |user|
+          @assignment.grade_student(user, excuse: true, grader: @teacher)
+        end
+        expect(@assignment.representatives(user: @teacher)).to include first_group_representative
+      end
+
+      it "includes users who aren't in a group" do
+        student_in_course active_all: true
+        expect(@assignment.representatives(user: @teacher)).to include @student
+      end
+
+      it "includes groups" do
+        student_in_course active_all: true
+        group = @group_category.groups.create!(context: @course)
+        group.add_user(@student)
+        expect(@assignment.representatives(user: @teacher).map(&:name)).to include group.name
+      end
+
+      it "doesn't include deleted groups" do
+        student_in_course active_all: true
+        group = @group_category.groups.create!(context: @course)
+        group.add_user(@student)
+        group.destroy!
+        expect(@assignment.representatives(user: @teacher).map(&:name)).not_to include group.name
+      end
+
+      it 'prefers active users over other workflow states' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.first.deactivate
+        enrollments.second.conclude
+
+        reps = @assignment.representatives(user: @teacher, includes: %i[inactive completed])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to eql(enrollments.third.user)
+      end
+
+      it 'prefers inactive users when no active users are present' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.first.conclude
+        enrollments.second.deactivate
+        enrollments.third.conclude
+
+        reps = @assignment.representatives(user: @teacher, includes: %i[inactive completed])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to eql(enrollments.second.user)
+      end
+
+      it 'includes concluded students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:conclude)
+
+        reps = @assignment.representatives(user: @teacher, includes: [:completed])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(enrollments.find_by(user: user)).to be_present
+      end
+
+      it 'does not include concluded students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:conclude)
+
+        reps = @assignment.representatives(user: @teacher, includes: [])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to be_nil
+      end
+
+      it 'includes inactive students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:deactivate)
+
+        reps = @assignment.representatives(user: @teacher, includes: [:inactive])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(enrollments.find_by(user: user)).to be_present
+      end
+
+      it 'does not include inactive students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:deactivate)
+
+        reps = @assignment.representatives(user: @teacher, includes: [])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to be_nil
+      end
+    end
+  end
+
+  describe "filtering students by section" do
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course.enroll_teacher(User.create, enrollment_state: :active).user }
+
+    let_once(:section1) { course.course_sections.create!(name: "first") }
+
+    let_once(:section2) { course.course_sections.create!(name: "second") }
+
+    let_once(:section1_student) { User.create! }
+    let_once(:section2_student) { User.create! }
+    let_once(:default_section_student) { User.create! }
+    let_once(:sectionless_student) { User.create! }
+
+    let_once(:assignment) { course.assignments.create! }
+
+    let(:json) { SpeedGrader::Assignment.new(assignment, teacher).json }
+    let(:returned_student_ids) { json.dig(:context, :students).pluck(:id) }
+    let(:all_course_student_ids) { course.students.pluck(:id).map(&:to_s) }
+
+    before(:once) do
+      course.enroll_student(section1_student, enrollment_state: :active, section: section1)
+      course.enroll_student(section2_student, enrollment_state: :active, section: section2)
+      course.enroll_student(default_section_student, enrollment_state: :active)
     end
 
-    it "prefers people who aren't excused when submission exists" do
-      g1, = @groups
-      g1rep, *others = g1.users.to_a.shuffle
-      @assignment.submit_homework(g1rep, {
-        submission_type: 'online_text_entry',
-        body: 'hi'
+    before(:each) do
+      user_session(teacher)
+    end
+
+    it "only returns students from the selected section if the user has selected one" do
+      teacher.preferences.deep_merge!(gradebook_settings: {
+        course.global_id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
       })
-      others.each do |u|
-        @assignment.grade_student(u, excuse: true, grader: @teacher)
+      expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
+    end
+
+    it "returns all eligible students if the user has not selected a section" do
+      expect(returned_student_ids).to match_array(all_course_student_ids)
+    end
+
+    it "returns all eligible students if the selected section is set to nil" do
+      teacher.preferences.deep_merge!(gradebook_settings: {
+        course.global_id => {'filter_rows_by' => {'section_id' => nil}}
+      })
+      expect(returned_student_ids).to match_array(all_course_student_ids)
+    end
+
+    context "when the user is filtering by both section and group" do
+      let_once(:group) do
+        category = course.group_categories.create!(name: "Group Set")
+        category.create_groups(2)
+
+        group = category.groups.first
+        group.add_user(section1_student)
+        group.add_user(section2_student)
+        group
       end
-      expect(@assignment.representatives(@teacher)).to include g1rep
-    end
 
-    it "includes users who aren't in a group" do
-      student_in_course active_all: true
-      expect(@assignment.representatives(@teacher).last).to eq @student
-    end
-
-    it "doesn't include deleted groups" do
-      student_in_course active_all: true
-      deleted_group = @gc.groups.create! name: "DELETE ME", context: @course
-      deleted_group.add_user(@student)
-      rep_names = @assignment.representatives(@teacher).map(&:name)
-      expect(rep_names).to include "DELETE ME"
-
-      deleted_group.destroy!
-      rep_names = @assignment.representatives(@teacher).map(&:name)
-      expect(rep_names).not_to include "DELETE ME"
-    end
-
-    it 'prefers active users over other workflow states' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments[0].deactivate
-      enrollments[1].conclude
-
-      reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[2].user_id)
-    end
-
-    it 'prefers inactive users when no active users are present' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments[0].conclude
-      enrollments[1].deactivate
-      enrollments[2].conclude
-
-      reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[1].user_id)
-    end
-
-    it 'includes concluded students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:conclude)
-
-      reps = @assignment.representatives(@teacher, includes: [:completed])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[0].user_id)
-    end
-
-    it 'does not include concluded students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:conclude)
-
-      reps = @assignment.representatives(@teacher, includes: [])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user).to be_nil
-    end
-
-    it 'includes inactive students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:deactivate)
-
-      reps = @assignment.representatives(@teacher, includes: [:inactive])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[0].user_id)
-    end
-
-    it 'does not include inactive students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:deactivate)
-
-      reps = @assignment.representatives(@teacher, includes: [])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user).to be_nil
+      it "restricts by both section and group when section_id and group_id are both specified" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.global_id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
+        })
+        expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
+      end
     end
   end
 
@@ -832,27 +1059,6 @@ describe SpeedGrader::Assignment do
         json_submission4 = json_submission.last.fetch('submission')
         expect(json_submission4['score']).to eq(@assignment.points_possible*0.48)
         expect(json_submission4['url']).to eq(urls[3])
-      end
-
-      context "when quizzes_next_submission_history FF is turned off" do
-        before do
-          allow(@assignment.root_account).
-            to receive(:feature_enabled?).
-            with(:quizzes_next_submission_history).and_return(false)
-        end
-
-        it "doesn't use BasicLTI::QuizzesNextVersionedSubmission object" do
-          expect(BasicLTI::QuizzesNextVersionedSubmission).not_to receive(:new)
-          json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-          submission_history = json.fetch(:submissions).first.fetch(:submission_history)
-          expect(submission_history.count).to be url_grades.count
-          expect(submission_history.map{|x| x.values.first['score']}).to eq(
-            url_grades.map{|x| @assignment.points_possible*x[:grade]}.reverse
-          )
-          expect(submission_history.map{|x| x.values.first['external_tool_url']}).to eq(
-            url_grades.map{|x| x[:url]}.reverse
-          )
-        end
       end
     end
   end
@@ -1305,7 +1511,7 @@ describe SpeedGrader::Assignment do
 
     it "returns students in accord with user gradebook preferences if assignment is not muted" do
       @teacher.preferences[:gradebook_settings] = {}
-      @teacher.preferences[:gradebook_settings][@course.id] = {
+      @teacher.preferences[:gradebook_settings][@course.global_id] = {
         'show_concluded_enrollments' => 'true',
         'show_inactive_enrollments' => 'true'
       }
@@ -1357,17 +1563,17 @@ describe SpeedGrader::Assignment do
 
     it "includes 'has_originality_report' in the json for group assignments" do
       user_two = test_student.dup
-      user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+      user_two.update!(lti_context_id: SecureRandom.uuid)
       assignment.course.enroll_student(user_two)
 
       group = group_model(context: assignment.course)
-      group.update_attributes!(users: [user_two, test_student])
+      group.update!(users: [user_two, test_student])
 
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
       assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
 
       assignment.submissions.each do |s|
-        s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        s.update!(group: group, turnitin_data: {blah: 1})
       end
 
       report = OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
@@ -1421,7 +1627,10 @@ describe SpeedGrader::Assignment do
       OriginalityReport.create!(originality_score: '1', submission: submission)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       keys = json['submissions'].first['submission_history'].first['submission']['turnitin_data'].keys
-      expect(keys).to include submission.asset_string, attachment.asset_string
+      expect(keys).to include(
+        OriginalityReport.submission_asset_key(submission),
+        attachment.asset_string
+      )
     end
 
     it 'does not override "turnitin_data"' do
@@ -1449,7 +1658,7 @@ describe SpeedGrader::Assignment do
     let_once(:concluded_student) { User.create }
 
     let(:gradebook_settings) do
-      { test_course.id =>
+      { test_course.global_id =>
         {
           'show_inactive_enrollments' => 'false',
           'show_concluded_enrollments' => 'false'
@@ -1469,7 +1678,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "returns active and inactive students and enrollments when inactive enromments is true" do
-      gradebook_settings[test_course.id]['show_inactive_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_inactive_enrollments'] = 'true'
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
@@ -1478,7 +1687,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "returns active and concluded students and enrollments when concluded is true" do
-      gradebook_settings[test_course.id]['show_concluded_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_concluded_enrollments'] = 'true'
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
@@ -1487,8 +1696,8 @@ describe SpeedGrader::Assignment do
     end
 
     it "returns active, inactive, and concluded students and enrollments when both settings are true" do
-      gradebook_settings[test_course.id]['show_inactive_enrollments'] = 'true'
-      gradebook_settings[test_course.id]['show_concluded_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_inactive_enrollments'] = 'true'
+      gradebook_settings[test_course.global_id]['show_concluded_enrollments'] = 'true'
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
@@ -2738,6 +2947,21 @@ describe SpeedGrader::Assignment do
       it 'sets anonymize_graders to false in the response' do
         expect(json['anonymize_graders']).to be false
       end
+    end
+  end
+
+  describe "post policies" do
+    let_once(:assignment) { @course.assignments.create!(title: "hi") }
+    let(:json) { SpeedGrader::Assignment.new(assignment, @teacher).json }
+
+    it "sets post_manually to true in the response if the assignment is manually-posted" do
+      assignment.ensure_post_policy(post_manually: true)
+      expect(json['post_manually']).to be true
+    end
+
+    it "sets post_manually to false in the response if the assignment is not manually-posted" do
+      assignment.ensure_post_policy(post_manually: false)
+      expect(json['post_manually']).to be false
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -25,8 +27,29 @@ module Api::V1::Outcome
   # context id and type, and description.
   def outcomes_json(outcomes, user, session, opts = {})
     outcome_ids = outcomes.map(&:id)
-    opts[:assessed_outcomes] = LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+    opts[:assessed_outcomes] = LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     outcomes.map { |o| outcome_json(o, user, session, opts) }
+  end
+
+  def mastery_scale_opts(context)
+    return {} unless (context.is_a?(Course) || context.is_a?(Account)) && mastery_scales_flag_enabled(context)
+
+    @mastery_scale_opts ||= {}
+    @mastery_scale_opts[context.asset_string] ||= begin
+      method = context.resolved_outcome_calculation_method
+      mastery_scale = context.resolved_outcome_proficiency
+      {
+        calculation_method: method&.calculation_method,
+        calculation_int: method&.calculation_int,
+        points_possible: mastery_scale&.points_possible,
+        mastery_points: mastery_scale&.mastery_points,
+        ratings: mastery_scale&.ratings_hash
+      }
+    end
+  end
+
+  def mastery_scales_flag_enabled(context)
+    context&.root_account&.feature_enabled?(:account_level_mastery_scales) || @domain_root_account&.feature_enabled?(:account_level_mastery_scales)
   end
 
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
@@ -47,17 +70,20 @@ module Api::V1::Outcome
       hash['has_updateable_rubrics'] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
-
-        # existing outcomes that have a nil calculation method should be handled as highest
-        hash['calculation_method'] = outcome.calculation_method || 'highest'
-
-        if ["decaying_average", "n_mastery"].include? outcome.calculation_method
-          hash['calculation_int'] = outcome.calculation_int
+        context = opts[:context]
+        mastery_scale_opts = mastery_scale_opts(context)
+        if mastery_scale_opts.any?
+          hash.merge!(mastery_scale_opts)
+        elsif !mastery_scales_flag_enabled(context)
+          hash['points_possible'] = outcome.rubric_criterion[:points_possible]
+          hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
+          hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
+          # existing outcomes that have a nil calculation method should be handled as highest
+          hash['calculation_method'] = outcome.calculation_method || 'highest'
+          if ["decaying_average", "n_mastery"].include? outcome.calculation_method
+            hash['calculation_int'] = outcome.calculation_int
+          end
         end
-
-        hash['points_possible'] = outcome.rubric_criterion[:points_possible]
-        hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
-        hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
         hash['ratings']&.each_with_index do |rating, i|
           rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
         end if opts[:rating_percents]
@@ -102,7 +128,7 @@ module Api::V1::Outcome
     #
     # Assumption:  All of the outcome links have the same context.
     #
-    opts[:assessed_outcomes] = LearningOutcomeResult.distinct.where(
+    opts[:assessed_outcomes] = LearningOutcomeResult.active.distinct.where(
       context_type: outcome_links.first.context_type,
       context_id: outcome_links.map(&:context_id),
       learning_outcome_id: outcome_links.map(&:content_id)
@@ -131,7 +157,7 @@ module Api::V1::Outcome
         outcome_link.learning_outcome_content,
         user,
         session,
-        opts.slice(:outcome_style, :assessed_outcomes)
+        opts.slice(:outcome_style, :assessed_outcomes, :context)
       )
 
       unless outcome_link.deleted?

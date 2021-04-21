@@ -17,24 +17,24 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import {render, shallow} from 'enzyme'
 import UnassessedAssignment from '../UnassessedAssignment'
 
 it('properly renders the UnassessedAssignment component', () => {
-  const props = { assignment: {id: 1, title: 'example', url: 'www.example.com' }}
-  const wrapper = shallow(<UnassessedAssignment {...props}/>)
-  expect(wrapper).toMatchSnapshot()
+  const props = {assignment: {id: 1, title: 'example', url: 'www.example.com'}}
+  const wrapper = shallow(<UnassessedAssignment {...props} />)
+  expect(wrapper.html()).toMatch(/example \(not yet assessed\)/i)
 })
 
 it('properly renders with a quiz icon when submission type is online quiz', () => {
   const props = {
     assignment: {
       id: 1,
-      title: 'example', url:
-      'www.example.com',
+      title: 'example',
+      url: 'www.example.com',
       submission_types: ['online_quiz']
     }
   }
-  const wrapper = shallow(<UnassessedAssignment {...props}/>)
-  expect(wrapper.find('IconQuiz')).toHaveLength(1)
+  const wrapper = render(<UnassessedAssignment {...props} />)
+  expect(wrapper.find('svg[name="IconQuiz"]')).toHaveLength(1)
 })

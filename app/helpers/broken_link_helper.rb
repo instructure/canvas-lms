@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -19,10 +21,12 @@ module BrokenLinkHelper
   def send_broken_content!
     # call when processing a 4xx error.
     # this will examine the referrer to see if we got here because of a bad link
-    return false unless request.referer
-    record = Context.find_asset_by_url(request.referer)
+    from_url = request.referer
+    return false unless from_url
+    record = Context.find_asset_by_url(from_url)
+    record ||= Context.get_front_wiki_page_for_course_from_url(from_url)
     return false unless record
-    body = Nokogiri::HTML(Context.asset_body(record))
+    body = Nokogiri::HTML5(Context.asset_body(record))
     anchor = body.css("a[href$='#{request.fullpath}']").text
     return false if anchor.blank?
 
@@ -32,8 +36,8 @@ module BrokenLinkHelper
     notification = BroadcastPolicy.notification_finder.by_name('Content Link Error')
     error_type = error_type(record.context, request.url)
     data = {location: request.referer, url: request.url, anchor: anchor, error_type: error_type}
-    DelayedNotification.send_later_if_production_enqueue_args(:process, { priority: Delayed::LOW_PRIORITY },
-      record, notification, recipient_keys, data)
+    DelayedNotification.delay_if_production(priority: Delayed::LOW_PRIORITY).
+      process(record, notification, recipient_keys, data)
     true
   rescue
     false
@@ -43,10 +47,14 @@ module BrokenLinkHelper
     course_id = url.match(/\/courses\/(\d+)/)&.[](1)&.to_i
     return :course_mismatch if course_id && course_id != course.id
     link_obj = Context.find_asset_by_url(url)
-    return :missing_item unless link_obj
+    return response_code_type unless link_obj
     course_validator = CourseLinkValidator.new(course)
-    course_validator.check_object_status(url, object: link_obj)
+    course_validator.check_object_status(url, object: link_obj) || response_code_type
   rescue => e
     :missing_item
+  end
+
+  def response_code_type
+    (response.status == 401 || response.status == 403) ? :inaccessible : :missing_item
   end
 end

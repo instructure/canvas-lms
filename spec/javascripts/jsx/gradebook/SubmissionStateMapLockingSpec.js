@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from 'timezone'
 import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
 
 const student = {
@@ -48,61 +47,36 @@ function createAndSetupMap(assignment, opts = {}) {
 // time this is being written a significant amount of work is needed
 // to be able to require javascript files that live in the spec directory
 
-QUnit.module('SubmissionStateMap')
+QUnit.module('SubmissionStateMap without grading periods')
 
-test('submission is unlocked if not anonymous', function() {
-  const assignment = {id: '1', muted: true}
-  const map = createAndSetupMap(assignment)
-  const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
-  strictEqual(state.locked, false)
-})
-
-test('submission is unlocked if not muted', function() {
-  const assignment = {id: '1', anonymous_grading: true}
-  const map = createAndSetupMap(assignment)
-  const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
-  strictEqual(state.locked, false)
-})
-
-test('submission is locked if anonymize_students is true', function() {
-  const assignment = {id: '1', anonymize_students: true}
-  const map = createAndSetupMap(assignment)
+test('submission in an unpublished assignment is locked', () => {
+  const assignment = {id: '1', published: false, effectiveDueDates: {}}
+  const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, true)
 })
 
-test('submission is unlocked if not moderated', function() {
-  const assignment = {id: '1', moderated_grading: false, grades_published: false}
-  const map = createAndSetupMap(assignment)
+test('submission in a published assignment is not locked', () => {
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
+  const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, false)
 })
 
-test('submission is unlocked if grades are published', function() {
-  const assignment = {id: '1', moderated_grading: false, grades_published: true}
-  const map = createAndSetupMap(assignment)
-  const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
-  strictEqual(state.locked, false)
-})
-
-test('submission is locked if moderated and not published', function() {
-  const assignment = {id: '1', moderated_grading: true, grades_published: false}
-  const map = createAndSetupMap(assignment)
-  const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
-  strictEqual(state.locked, true)
-})
-
-QUnit.module('SubmissionStateMap with no grading periods')
-
-test('submission is locked for a student without assignment visibility', function() {
-  const assignment = {id: '1', effectiveDueDates: {}, only_visible_to_overrides: true}
+test('submission is locked for a student without assignment visibility', () => {
+  const assignment = {
+    id: '1',
+    published: true,
+    effectiveDueDates: {},
+    only_visible_to_overrides: true
+  }
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   equal(state.locked, true)
 })
 
-test('submission is unlocked for an assigned student', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+test('submission is unlocked for an assigned student', () => {
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: null,
     grading_period_id: null,
@@ -123,14 +97,19 @@ QUnit.module('SubmissionStateMap with grading periods and all grading periods se
 })
 
 test('submission is locked for a student without assignment visibility', function() {
-  const assignment = {id: '1', effectiveDueDates: {}, only_visible_to_overrides: true}
+  const assignment = {
+    id: '1',
+    published: true,
+    effectiveDueDates: {},
+    only_visible_to_overrides: true
+  }
   const map = createAndSetupMap(assignment, this.mapOptions)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   equal(state.locked, true)
 })
 
 test('submission is locked for an assigned student with assignment due in a closed grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_IN_CLOSED_PERIOD,
     grading_period_id: '1',
@@ -143,7 +122,7 @@ test('submission is locked for an assigned student with assignment due in a clos
 })
 
 test('user is admin: submission is unlocked for an assigned student with assignment due in a closed grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_IN_CLOSED_PERIOD,
     grading_period_id: '1',
@@ -157,7 +136,7 @@ test('user is admin: submission is unlocked for an assigned student with assignm
 })
 
 test('submission is unlocked for an assigned student with assignment due outside of a closed grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_NOT_IN_CLOSED_PERIOD,
     grading_period_id: '1',
@@ -179,7 +158,7 @@ QUnit.module('SubmissionStateMap with grading periods and a non-closed grading p
 })
 
 test('submission is locked for an assigned student with assignment due outside of the selected grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
     grading_period_id: '2',
@@ -192,7 +171,7 @@ test('submission is locked for an assigned student with assignment due outside o
 })
 
 test('submission is unlocked for an assigned student with assignment due in the selected grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_IN_SELECTED_PERIOD,
     grading_period_id: this.SELECTED_PERIOD_ID,
@@ -214,7 +193,7 @@ QUnit.module('SubmissionStateMap with grading periods and a closed grading perio
 })
 
 test('submission is locked for an assigned student with assignment due outside of the selected grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_NOT_IN_SELECTED_PERIOD,
     grading_period_id: '2',
@@ -227,7 +206,7 @@ test('submission is locked for an assigned student with assignment due outside o
 })
 
 test('submission is locked for an assigned student with assignment due in the selected grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_IN_SELECTED_PERIOD,
     grading_period_id: this.SELECTED_PERIOD_ID,
@@ -240,7 +219,7 @@ test('submission is locked for an assigned student with assignment due in the se
 })
 
 test('user is admin: submission is unlocked for an assigned student with assignment due in the selected grading period', function() {
-  const assignment = {id: '1', effectiveDueDates: {}}
+  const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: this.DATE_IN_SELECTED_PERIOD,
     grading_period_id: this.SELECTED_PERIOD_ID,

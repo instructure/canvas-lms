@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -41,6 +43,19 @@ describe "discussion_topics" do
     expect(response).to be_successful
   end
 
+  it "should show a course name for group subtopics" do
+    course_with_student_logged_in(:active_all => true)
+    @course.update_attribute(:short_name, "some name")
+    group_assignment_discussion(course: @course)
+    @group.users << @user
+
+    get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
+    expect(response).to be_successful
+    doc = Nokogiri::HTML5(response.body)
+    link_text = doc.at_css("span.discussion-subtitle a").text
+    expect(link_text).to eq @course.short_name
+  end
+
   it "should not allow concluded students to update topic" do
     student_enrollment = course_with_student(:course => @course, :active_all => true)
     @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @user)
@@ -68,7 +83,7 @@ describe "discussion_topics" do
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('.admin-links .icon-speed-grader')).not_to be_nil
   end
 
@@ -80,7 +95,7 @@ describe "discussion_topics" do
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('.admin-links .icon-peer-review')).not_to be_nil
   end
 end

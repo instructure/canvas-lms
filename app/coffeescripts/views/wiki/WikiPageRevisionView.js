@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
 import Backbone from 'Backbone'
 import template from 'jst/wiki/WikiPageRevision'
 
@@ -55,13 +54,14 @@ export default class WikiPageRevisionView extends Backbone.View {
 
   toJSON() {
     const latest = this.model.collection != null ? this.model.collection.latest : undefined
-    const json = _.extend({}, super.toJSON(...arguments), {
+    const json = {
+      ...super.toJSON(...arguments),
       IS: {
         LATEST: !!this.model.get('latest'),
         SELECTED: !!this.model.get('selected'),
         LOADED: !!this.model.get('title') && !!this.model.get('body')
       }
-    })
+    }
     json.IS.SAME_AS_LATEST =
       json.IS.LOADED &&
       this.model.get('title') === (latest != null ? latest.get('title') : undefined) &&

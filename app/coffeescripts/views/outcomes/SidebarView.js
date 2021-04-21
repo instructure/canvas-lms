@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!outcomesSidebarView'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
@@ -28,25 +28,6 @@ import FindDirectoryView from './FindDirectoryView'
 let findDialog
 
 export default class SidebarView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.resetSidebar = this.resetSidebar.bind(this)
-    this.addAndSelect = this.addAndSelect.bind(this)
-    this.selectDir = this.selectDir.bind(this)
-    this.refreshSelection = this.refreshSelection.bind(this)
-    this.clearOutcomeSelection = this.clearOutcomeSelection.bind(this)
-    this.goBack = this.goBack.bind(this)
-    this.renderDir = this.renderDir.bind(this)
-    this.findDialog = this.findDialog.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.directoryWidth = 200
     this.prototype.entryHeight = 30
@@ -114,7 +95,7 @@ export default class SidebarView extends Backbone.View {
   addDir(dir) {
     if (dir.outcomeGroup) this.cachedDirectories[dir.outcomeGroup.id] = dir
     dir.off('select')
-    dir.on('select', this.selectDir)
+    dir.on('select', this.selectDir, this)
     dir.sidebar = this
     dir.clearSelection()
     this.directories.push(dir)
@@ -148,7 +129,7 @@ export default class SidebarView extends Backbone.View {
   // Select the directory view and optionally select an Outcome or Group.
   selectDir(dir, selectedModel) {
     // If root selection is an outcome, don't have a dir. Get root most dir to clear selection.
-    const useDir = dir ? dir : this.directories[0]
+    const useDir = dir || this.directories[0]
     if (useDir && !selectedModel) useDir.clearSelection()
 
     // remove all directories after the selected dir from @directories and the view
@@ -190,11 +171,11 @@ export default class SidebarView extends Backbone.View {
 
   selectedGroup() {
     let g = null
-    this._findLastDir((d) => {
-        if (d.selectedModel instanceof OutcomeGroup) {
-          return g = d.selectedModel;
-        }
-      });
+    this._findLastDir(d => {
+      if (d.selectedModel instanceof OutcomeGroup) {
+        return (g = d.selectedModel)
+      }
+    })
     return g || this.rootOutcomeGroup
   }
 
@@ -237,7 +218,7 @@ export default class SidebarView extends Backbone.View {
 
   render() {
     this.$el.empty()
-    _.each(this.directories, this.renderDir)
+    _.each(this.directories, dir => this.renderDir(dir))
     return this
   }
 

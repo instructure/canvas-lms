@@ -17,13 +17,13 @@
 %>
 
 <%
-  content_for :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
-  @active_tab = "statistics"
+  provide :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
+  set_active_tab "statistics"
   css_bundle :statistics
   js_bundle :account_statistics
 %>
 <% @customLinks = account_custom_links; if @customLinks %>
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <% @customLinks.each do |link| %>
       <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
     <% end %>

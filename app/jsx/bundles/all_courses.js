@@ -18,26 +18,36 @@
 
 import I18n from 'i18n!catalog'
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import 'jqueryui/dialog'
 
-function fetchCourses () {
+const startupHost = window.location.host
+
+function fetchCourses() {
+  // Defense-in-depth... it's hard to see how this could happen given
+  // the places in which this function is given control, but let's just
+  // make absolutely sure that we never load off-application HTML into
+  // the #catalog_content div.
+  if (window.location.host !== startupHost) return
   $('#catalog_content').load(window.location.href)
 }
 
-function handleNav (e) {
+function handleNav(e) {
   let url
-  if (!history.pushState) { return }
+  if (!window.history.pushState) {
+    return
+  }
   if (this.href) {
     url = this.href
   } else {
     url = `${this.action}?${$(this).serialize()}`
   }
-  history.pushState(null, '', url)
+  window.history.pushState(null, '', url)
   fetchCourses()
   e.preventDefault()
 }
 
-function handleCourseClick (e) {
+function handleCourseClick(e) {
   const link = $(e.target).closest('.course_enrollment_link')[0]
   if (!link) {
     const $course = $(e.target).closest('.course_summary')
@@ -61,8 +71,10 @@ function handleCourseClick (e) {
   e.preventDefault()
 }
 
-$('#course_filter').submit(handleNav)
-$('#catalog_content').on('click', '#previous-link', handleNav)
-$('#catalog_content').on('click', '#next-link', handleNav)
-$('#catalog_content').on('click', '#course_summaries', handleCourseClick)
-window.addEventListener('popstate', fetchCourses)
+ready(() => {
+  $('#course_filter').submit(handleNav)
+  $('#catalog_content').on('click', '#previous-link', handleNav)
+  $('#catalog_content').on('click', '#next-link', handleNav)
+  $('#catalog_content').on('click', '#course_summaries', handleCourseClick)
+  window.addEventListener('popstate', fetchCourses)
+})

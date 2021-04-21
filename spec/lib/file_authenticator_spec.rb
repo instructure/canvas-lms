@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -141,6 +143,14 @@ describe FileAuthenticator do
         expect(InstFS).to receive(:authenticated_thumbnail_url).
           with(@attachment, include(geometry: geometry))
         @authenticator.thumbnail_url(@attachment, size: geometry)
+      end
+
+      it "should pass along the original_url" do
+        original_url = "http://example.com/preview/1234"
+        allow(@attachment).to receive(:thumbnailable?).and_return(true)
+        expect(InstFS).to receive(:authenticated_thumbnail_url).
+          with(@attachment, include(original_url: original_url))
+        @authenticator.thumbnail_url(@attachment, original_url: original_url)
       end
 
       it "should construct a url specific to the authenticator params" do

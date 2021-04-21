@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {bool, func, string} from 'prop-types'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!gradebook'
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-text'
+import I18n from 'i18n!SpeedGraderSettingsMenu'
 
 // We're foregoing the use of InstUI buttons or instructure-icons icons here to be consistent
 // with the look/styling of this button's siblings. When those siblings have been updated to
@@ -61,32 +61,34 @@ export default function SpeedGraderSettingsMenu(props) {
       placement="bottom end"
       trigger={menuTrigger}
     >
-      <MenuItem name="options" onSelect={props.openOptionsModal} value="options">
+      <Menu.Item name="options" onSelect={props.openOptionsModal} value="options">
         <Text>{I18n.t('Options')}</Text>
-      </MenuItem>
+      </Menu.Item>
 
       {props.showModerationMenuItem && (
-        <MenuItem
+        <Menu.Item
           name="moderationPage"
           onSelect={handleModerationPageSelect}
           value="moderationPage"
         >
           <Text>{I18n.t('Moderation Page')}</Text>
-        </MenuItem>
+        </Menu.Item>
       )}
 
-      <MenuItem
-        name="keyboardShortcuts"
-        onSelect={props.openKeyboardShortcutsModal}
-        value="keyboardShortcuts"
-      >
-        <Text>{I18n.t('Keyboard Shortcuts')}</Text>
-      </MenuItem>
+      {props.showKeyboardShortcutsMenuItem && (
+        <Menu.Item
+          name="keyboardShortcuts"
+          onSelect={props.openKeyboardShortcutsModal}
+          value="keyboardShortcuts"
+        >
+          <Text>{I18n.t('Keyboard Shortcuts')}</Text>
+        </Menu.Item>
+      )}
 
       {props.showHelpMenuItem && (
-        <MenuItem name="help" onSelect={handleHelpSelect} value="help">
+        <Menu.Item name="help" onSelect={handleHelpSelect} value="help">
           <Text>{I18n.t('Help')}</Text>
-        </MenuItem>
+        </Menu.Item>
       )}
     </Menu>
   )
@@ -101,7 +103,8 @@ SpeedGraderSettingsMenu.propTypes = {
   openOptionsModal: func.isRequired,
   openKeyboardShortcutsModal: func.isRequired,
   showHelpMenuItem: bool.isRequired,
-  showModerationMenuItem: bool.isRequired
+  showModerationMenuItem: bool.isRequired,
+  showKeyboardShortcutsMenuItem: bool.isRequired
 }
 
 SpeedGraderSettingsMenu.defaultProps = {
@@ -109,6 +112,6 @@ SpeedGraderSettingsMenu.defaultProps = {
   onMenuShow() {}
 }
 
-SpeedGraderSettingsMenu.setURL = function(url) {
+SpeedGraderSettingsMenu.setURL = function (url) {
   window.location.href = url
 }

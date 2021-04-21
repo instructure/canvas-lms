@@ -15,19 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!assignments_2_thing'
+import I18n from 'i18n!a2LatePolicyToolTipContent'
 import PropTypes from 'prop-types'
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 import AccessibleTipContent from './AccessibleTipContent'
 
-function LatePolicyToolTipContent(props) {
-  const {gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
+export default function LatePolicyToolTipContent(props) {
+  // TODO - At this point we really should just pass in the whole assignment and
+  //        submission into this component and let it grab the data itself.
+  const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
-    <React.Fragment>
+    <>
       <AccessibleTipContent
+        attempt={attempt}
         grade={grade}
         gradingType={gradingType}
         originalGrade={originalGrade}
@@ -36,16 +39,16 @@ function LatePolicyToolTipContent(props) {
       />
       <Flex
         aria-hidden="true"
-        data-test-id="late-policy-tip-content"
+        data-testid="late-policy-tip-content"
         margin="x-small"
         direction="column"
       >
-        <FlexItem>
+        <Flex.Item>
           <Flex>
-            <FlexItem margin="0 small 0 0">
-              <Text size="small">{I18n.t('Attempt 1')}</Text>
-            </FlexItem>
-            <FlexItem grow textAlign="end">
+            <Flex.Item margin="0 small 0 0">
+              <Text size="small">{I18n.t('Attempt %{attempt}', {attempt})}</Text>
+            </Flex.Item>
+            <Flex.Item grow textAlign="end">
               <Text size="small">
                 {GradeFormatHelper.formatGrade(originalGrade, {
                   gradingType,
@@ -53,25 +56,25 @@ function LatePolicyToolTipContent(props) {
                   formatType: 'points_out_of_fraction'
                 })}
               </Text>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Flex>
-            <FlexItem margin="0 small 0 0">
+            <Flex.Item margin="0 small 0 0">
               <Text size="small">{I18n.t('Late Penalty')}</Text>
-            </FlexItem>
-            <FlexItem grow textAlign="end">
+            </Flex.Item>
+            <Flex.Item grow textAlign="end">
               <Text size="small">-{props.pointsDeducted}</Text>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Flex>
-            <FlexItem margin="0 small 0 0">
+            <Flex.Item margin="0 small 0 0">
               <Text size="small">{I18n.t('Grade')}</Text>
-            </FlexItem>
-            <FlexItem grow textAlign="end">
+            </Flex.Item>
+            <Flex.Item grow textAlign="end">
               <Text size="small">
                 {GradeFormatHelper.formatGrade(grade, {
                   gradingType,
@@ -79,20 +82,19 @@ function LatePolicyToolTipContent(props) {
                   formatType: 'points_out_of_fraction'
                 })}
               </Text>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
-    </React.Fragment>
+    </>
   )
 }
 
 LatePolicyToolTipContent.propTypes = {
+  attempt: PropTypes.number.isRequired,
   grade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   pointsDeducted: PropTypes.number.isRequired,
   pointsPossible: PropTypes.number.isRequired
 }
-
-export default React.memo(LatePolicyToolTipContent)

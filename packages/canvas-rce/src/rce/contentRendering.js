@@ -16,65 +16,124 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import formatMessage from "../format-message";
+import React from 'react'
+import {renderToStaticMarkup} from 'react-dom/server'
+import {cleanUrl} from './contentInsertionUtils'
+import formatMessage from '../format-message'
+import {
+  VIDEO_SIZE_DEFAULT,
+  AUDIO_PLAYER_SIZE
+} from './plugins/instructure_record/VideoOptionsTray/TrayController'
+import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
+import {prepEmbedSrc, prepLinkedSrc} from '../common/fileUrl'
 
-export function renderLink(link) {
-  const href = link.href || link.url;
-  const title =
-    link.title ||
-    formatMessage({
-      default: "Link",
-      description:
-        "Fallback title attribute on an unnamed link inserted from the sidebar."
-    });
-  const previewAlt = link["data-preview-alt"];
-  const contents = link.contents || title;
+export function renderLink(data, contents) {
+  const linkAttrs = {...data}
+  linkAttrs.href = prepLinkedSrc(linkAttrs.href || linkAttrs.url)
+  delete linkAttrs.url
+  if (linkAttrs.href) {
+    linkAttrs.href = cleanUrl(linkAttrs.href)
+  }
+  linkAttrs.title = linkAttrs.title || formatMessage('Link')
+  const children = contents || linkAttrs.text || linkAttrs.title
+  delete linkAttrs.selectionDetails
+  delete linkAttrs.text
+  linkAttrs.className = linkAttrs.class
+  delete linkAttrs.class
 
-  return renderToStaticMarkup(
-    <a
-      href={href}
-      title={title}
-      data-preview-alt={previewAlt}
-      className={link["class"]}
-      id={link["id"]}
-    >
-      {contents}
-    </a>
-  );
+  // renderToStaticMarkup isn't happy with bool attributes
+  Object.keys(linkAttrs).forEach(attr => {
+    if (typeof linkAttrs[attr] === 'boolean') linkAttrs[attr] = linkAttrs[attr].toString()
+  })
+
+  return renderToStaticMarkup(<a {...linkAttrs}>{children}</a>)
+}
+
+export function renderDoc(doc) {
+  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${doc.display_name ||
+    doc.filename}</a>`
 }
 
 export function renderLinkedImage(linkElem, image) {
-  const linkHref = linkElem.getAttribute("href");
+  const linkHref = linkElem.getAttribute('href')
+  image.href = prepEmbedSrc(image.href)
 
   return renderToStaticMarkup(
     <a href={linkHref} data-mce-href={linkHref}>
-      {constructJSXImageElement(image, { doNotLink: true })}
+      {constructJSXImageElement(image, {doNotLink: true})}
     </a>
-  );
+  )
 }
 
 export function constructJSXImageElement(image, opts = {}) {
-  const href = image.href || image.url;
-  let ret = <img alt={image.title || image.display_name} src={href} />;
-  if (image.alt_text) {
-    if (image.alt_text.decorativeSelected) {
-      ret = <img alt="" data-decorative="true" src={href} />;
-    } else {
-      ret = <img alt={image.alt_text.altText} src={href} />;
-    }
+  const {
+    href,
+    url,
+    title,
+    display_name,
+    alt_text,
+    isDecorativeImage,
+    link,
+    ...otherAttributes
+  } = image
+  const src = href || url
+  const altText = alt_text || title || display_name || ''
+  if (isDecorativeImage) {
+    otherAttributes.role = 'presentation'
   }
-  if (image.link && !opts.doNotLink) {
-    ret = (
-      <a href={image.link} target="_blank">
+
+  const ret = (
+    <img alt={altText} src={src} width={image.width} height={image.height} {...otherAttributes} />
+  )
+  if (link && !opts.doNotLink) {
+    return (
+      <a href={link} target="_blank" rel="noopener noreferrer">
         {ret}
       </a>
-    );
+    )
   }
-  return ret;
+  return ret
 }
 
-export function renderImage(image) {
-  return renderToStaticMarkup(constructJSXImageElement(image));
+export function renderImage(image, opts) {
+  image.href = prepEmbedSrc(image.href)
+  return renderToStaticMarkup(constructJSXImageElement(image, opts))
+}
+
+export function renderVideo(video) {
+  const src = mediaPlayerURLFromFile(video)
+  return `
+  <iframe
+      allow="fullscreen"
+      allowfullscreen
+      data-media-id="${video.media_id || video.id || video.file_id}"
+      data-media-type="video"
+      src="${src}"
+      style="width:${VIDEO_SIZE_DEFAULT.width};height:${
+    VIDEO_SIZE_DEFAULT.height
+  };display:inline-block;"
+      title="${formatMessage('Video player for {title}', {
+        title: video.title || video.name || video.text
+      })}"></iframe>
+  `
+    .trim()
+    .replace(/\s+/g, ' ')
+}
+
+export function renderAudio(audio) {
+  const src = mediaPlayerURLFromFile(audio)
+  return `
+  <iframe
+      data-media-id="${audio.media_id || audio.id || audio.file_id}"
+      data-media-type="audio"
+      src="${src}"
+      style="width:${AUDIO_PLAYER_SIZE.width};height:${
+    AUDIO_PLAYER_SIZE.height
+  };display:inline-block;"
+      title="${formatMessage('Audio player for {title}', {
+        title: audio.title || audio.name || audio.text
+      })}"></iframe>
+  `
+    .trim()
+    .replace(/\s+/g, ' ')
 }

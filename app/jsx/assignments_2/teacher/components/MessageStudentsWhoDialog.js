@@ -25,7 +25,7 @@ import {sendMesssageStudentsWho} from '../api'
 import {
   hasSubmitted,
   hasSubmission
-} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
+} from '../../../gradebook/shared/helpers/messageStudentsWhoHelper'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 

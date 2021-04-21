@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,6 +20,22 @@
 require 'lti_advantage'
 
 module Lti::Messages
+
+  # Base class for all LTI Message "factory" classes.
+  #
+  # This class, and it's child classes, are responsible
+  # for constructing and ID token suitable for LTI 1.3
+  # authentication responses (LTI launches).
+  #
+  # These class have counterparts for simply modeling the
+  # data  at "gems/lti-advantage/lib/lti_advantage/messages".
+  #
+  # For details on the data included in the ID token please refer
+  # to http://www.imsglobal.org/spec/lti/v1p3/.
+  #
+  # For implementation details on LTI Advantage launches in
+  # Canvas, please see the inline documentation of
+  # app/models/lti/lti_advantage_adapter.rb.
   class JwtMessage
     EXTENSION_PREFIX = 'https://www.instructure.com/'.freeze
 
@@ -36,7 +54,7 @@ module Lti::Messages
       { id_token: LtiAdvantage::Messages::JwtMessage.create_jws(body, Lti::KeyStorage.present_key) }
     end
 
-    def generate_post_payload_message
+    def generate_post_payload_message(validate_launch: true)
       raise 'Class can only be used once.' if @used
       @used = true
 
@@ -52,8 +70,10 @@ module Lti::Messages
       add_roles_claims! if include_claims?(:roles)
       add_custom_params_claims! if include_claims?(:custom_params)
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
+      add_lti11_legacy_user_id!
 
       @expander.expand_variables!(@message.extensions)
+      @message.validate! if validate_launch
       @message
     end
 
@@ -65,14 +85,20 @@ module Lti::Messages
 
     def add_security_claims!
       @message.aud = @tool.developer_key.global_id.to_s
+      @message.azp = @tool.developer_key.global_id.to_s
       @message.deployment_id = @tool.deployment_id
       @message.exp = Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
-      @message.sub = @user.lti_id
-      @message.lti11_legacy_user_id = Lti::Asset.opaque_identifier_for(@user)
-      @message.target_link_uri = @tool.extension_setting(@opts[:resource_type], :target_link_uri) || @tool.url
+      @message.sub = @user&.lookup_lti_id(@context) || User.public_lti_id
+      @message.target_link_uri = target_link_uri
+    end
+
+    def target_link_uri
+      @opts[:target_link_uri] ||
+      @tool.extension_setting(@opts[:resource_type], :target_link_uri) ||
+      @tool.url
     end
 
     def add_context_claims!
@@ -112,29 +138,32 @@ module Lti::Messages
     end
 
     def add_include_name_claims!
-      @message.name = @user.name
-      @message.given_name = @user.first_name
-      @message.family_name = @user.last_name
+      @message.name = @user&.name
+      @message.given_name = @user&.first_name
+      @message.family_name = @user&.last_name
       @message.lis.person_sourcedid = expand_variable('$Person.sourcedId')
       @message.lis.course_offering_sourcedid = expand_variable('$CourseSection.sourcedId')
     end
 
     def add_include_email_claims!
-      @message.email = @user.email
+      @message.email = @user&.email
     end
 
     def add_public_claims!
-      @message.picture = @user.avatar_url
+      @message.picture = @user&.avatar_url
     end
 
     def add_mentorship_claims!
       @message.role_scope_mentor = current_observee_list if current_observee_list.present?
     end
 
+    def add_lti11_legacy_user_id!
+      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || User.public_lti_id
+    end
+
     def include_names_and_roles_service_claims?
       include_claims?(:names_and_roles_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        @tool.lti_1_3_enabled? &&
         @tool.developer_key&.scopes&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
     end
 
@@ -150,21 +179,26 @@ module Lti::Messages
 
     def current_observee_list
       return nil unless @context.is_a?(Course)
+      return nil if @user.blank?
+
       @_current_observee_list ||= begin
         @user.observer_enrollments.current.
           where(course_id: @context.id).
           preload(:associated_user).
-          map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+          map { |e| e.try(:associated_user).try(:lti_id) }.compact
       end
     end
 
     def custom_parameters
-      custom_params_hash = @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
+      @expander.expand_variables!(unexpanded_custom_parameters)
+    end
+
+    def unexpanded_custom_parameters
+      @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
         key = k.dup
         key.slice! 'custom_'
         key
       end
-      @expander.expand_variables!(custom_params_hash)
     end
 
     def include_claims?(claim_group)

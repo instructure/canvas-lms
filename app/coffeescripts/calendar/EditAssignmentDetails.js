@@ -20,7 +20,7 @@ import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import moment from 'moment'
 import natcompare from '../util/natcompare'
-import commonEventFactory from '../calendar/commonEventFactory'
+import commonEventFactory from './commonEventFactory'
 import ValidatedFormView from '../views/ValidatedFormView'
 import SisValidationHelper from '../util/SisValidationHelper'
 import editAssignmentTemplate from 'jst/calendar/editAssignment'
@@ -33,30 +33,9 @@ import withinMomentDates from 'jsx/shared/helpers/momentDateHelper'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
-import '../calendar/fcMomentHandlebarsHelpers'
+import './fcMomentHandlebarsHelpers'
 
 export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.setContext = this.setContext.bind(this)
-    this.activate = this.activate.bind(this)
-    this.moreOptions = this.moreOptions.bind(this)
-    this.setContext = this.setContext.bind(this)
-    this.contextChange = this.contextChange.bind(this)
-    this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
-    this.submitAssignment = this.submitAssignment.bind(this)
-    this.getFormData = this.getFormData.bind(this)
-    this.onSaveSuccess = this.onSaveSuccess.bind(this)
-    this.onSaveFail = this.onSaveFail.bind(this)
-    super(...args)
-  }
-
   initialize(selector, event, contextChangeCB, closeCB) {
     this.event = event
     this.contextChangeCB = contextChangeCB

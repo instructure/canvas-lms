@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 
 class GradebookUserIds
   def initialize(course, user)
-    settings = (user.preferences.dig(:gradebook_settings, course.id) || {}).with_indifferent_access
+    settings = (user.get_preference(:gradebook_settings, course.global_id) || {}).with_indifferent_access
     @course = course
     @user = user
     @include_inactive = settings[:show_inactive_enrollments] == "true"
@@ -26,12 +28,13 @@ class GradebookUserIds
     @sort_by = settings[:sort_rows_by_setting_key] || "name"
     @selected_grading_period_id = settings.dig(:filter_columns_by, :grading_period_id)
     @selected_section_id = settings.dig(:filter_rows_by, :section_id)
+    @selected_student_group_id = settings.dig(:filter_rows_by, :student_group_id)
     @direction = settings[:sort_rows_by_direction] || "ascending"
   end
 
   def user_ids
     if @column == "student"
-      sort_by_student_name
+      sort_by_student_field
     elsif @column =~ /assignment_\d+$/
       assignment_id = @column[/\d+$/]
       send("sort_by_assignment_#{@sort_by}", assignment_id)
@@ -47,12 +50,42 @@ class GradebookUserIds
 
   private
 
+  def sort_by_student_field
+    if ["name", "sortable_name"].include?(@sort_by) || !pseudonym_sort_field
+      sort_by_student_name
+    else
+      sort_by_pseudonym_field
+    end
+  end
+
   def sort_by_student_name
     students.
       order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).
       uniq
+  end
+
+  def sort_by_pseudonym_field
+    sort_column = Pseudonym.best_unicode_collation_key("pseudonyms.#{pseudonym_sort_field}")
+
+     students.joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=users.id AND
+                    pseudonyms.workflow_state <> 'deleted'").
+       order(Arel.sql("#{sort_column} #{sort_direction} NULLS LAST")).
+       order(Arel.sql("pseudonyms.id IS NULL")).
+       order(Arel.sql("users.id #{sort_direction}")).
+       pluck(:id).
+       uniq
+  end
+
+  def pseudonym_sort_field
+    # The sort keys integration_id and sis_user_id map to columns in Pseudonym,
+    # while login_id needs to be changed to unique_id
+    {
+      "login_id" => "unique_id",
+      "sis_user_id" => "sis_user_id",
+      "integration_id" => "integration_id"
+    }.with_indifferent_access[@sort_by]
   end
 
   def sort_by_assignment_grade(assignment_id)
@@ -141,7 +174,19 @@ class GradebookUserIds
   end
 
   def students
-    User.left_joins(:enrollments).merge(student_enrollments_scope)
+    # Because of AR internals (https://github.com/rails/rails/issues/32598),
+    # we avoid using Arel left_joins here so that sort_by_scores will have
+    # Enrollment defined.
+    students = User.
+      joins("LEFT JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id").
+      merge(student_enrollments_scope)
+
+    if student_group_id.present?
+      students.joins(group_memberships: :group).
+        where(group_memberships: {group: student_group_id, workflow_state: :accepted})
+    else
+      students
+    end
   end
 
   def sort_by_scores(type = :total_grade, id = nil)
@@ -153,25 +198,10 @@ class GradebookUserIds
       "scores.course_score IS TRUE"
     end
 
-    # In this query we need to jump through enrollments to go see if
-    # there are scores for the user. Because of some AR internal
-    # stuff, if we did students.joins("LEFT JOIN scores ON
-    # enrollments.id=scores.enrollment_id AND ...") as you'd expect,
-    # it plops the new join before the enrollments join and the
-    # database gets angry because it doesn't know what what this
-    # "enrollments" we're querying against is. Because of this, we
-    # have to WET up the method and hand do the enrollment join
-    # here. Without doing the score conditions in the join, we lose
-    # data, so it has to be this way... For example, we might lose
-    # concluded enrollments who don't have a Score.
-    #
-    # That is a super long way of saying, make sure this stays in sync
-    # with what happens in the students method above in regards to
-    # enrollments and enrollments scoping.
-    User.joins("LEFT JOIN #{Enrollment.quoted_table_name} on users.id=enrollments.user_id
-                LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
+    # Without doing the score conditions in the join, we lose data. For
+    # example, we might lose concluded enrollments who don't have a Score.
+    students.joins("LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
                 scores.workflow_state='active' AND #{score_scope}").
-      merge(student_enrollments_scope).
       order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
       order(Arel.sql("scores.unposted_current_score #{sort_direction} NULLS LAST")).
       order_by_sortable_name(direction: @direction.to_sym).
@@ -194,7 +224,12 @@ class GradebookUserIds
   end
 
   def section_id
-    return nil if @selected_section_id.nil? || @selected_section_id == "null" || @section_section_id == "0"
+    return nil if @selected_section_id.nil? || @selected_section_id == "null" || @selected_section_id == "0"
     @selected_section_id
+  end
+
+  def student_group_id
+    return nil if @selected_student_group_id.nil? || ["0", "null"].include?(@selected_student_group_id)
+    Group.active.exists?(id: @selected_student_group_id) ? @selected_student_group_id : nil
   end
 end

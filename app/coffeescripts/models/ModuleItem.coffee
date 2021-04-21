@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-], (Backbone) ->
+import Backbone from 'Backbone'
 
-  class ModuleItem extends Backbone.Model
+export default class ModuleItem extends Backbone.Model

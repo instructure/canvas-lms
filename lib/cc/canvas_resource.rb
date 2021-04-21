@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -164,6 +166,7 @@ JOKE
           atts.uniq.each do |att|
             c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''
           end
+          c.tag!(:overridden_course_visibility, @course.overridden_course_visibility)
         end
         if @course.grading_standard
           if @course.grading_standard.context_type == "Account"
@@ -174,6 +177,10 @@ JOKE
           end
         end
         c.root_account_uuid(@course.root_account.uuid) if @course.root_account
+
+        if @course.default_post_policy.present?
+          c.default_post_policy { |policy| policy.post_manually(@course.default_post_policy.post_manually?) }
+        end
       end
       course_file.close if course_file
       rel_path

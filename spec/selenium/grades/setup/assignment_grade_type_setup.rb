@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -15,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradezilla_common'
+require_relative '../../helpers/gradebook_common'
 
 module AssignmentGradeTypeSetup
-  include GradezillaCommon
+  include GradebookCommon
 
   def assignments_with_grades_setup(grading_type, grade)
     init_course_with_students 1

@@ -75,7 +75,7 @@
                     <span>{{title}}</span>
                     &nbsp;&nbsp;&nbsp;
                     {{#each playback_formats}}
-                      {{#if length}}
+                      {{#if show_to_students}}
                         <a href="{{url}}" target="_blank" class="ig-title"
                           style="line-height: inherit;" data-id="{{../recording_id}}" data-format="presentation">
                           {{#t "type"}}{{type}}{{/t}}

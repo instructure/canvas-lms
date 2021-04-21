@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -23,18 +25,19 @@ describe Lti::Ims::AuthenticationController do
 
   let(:developer_key) {
     key = DeveloperKey.create!(
-      redirect_uris: ['https://redirect.tool.com'],
-      account: context
+      redirect_uris: redirect_uris,
+      account: context.root_account
     )
     enable_developer_key_account_binding!(key)
     key
   }
+  let(:redirect_uris) { ['https://redirect.tool.com'] }
   let(:user) { user_model }
   let(:redirect_domain) { 'redirect.instructure.com' }
   let(:verifier) { SecureRandom.hex 64 }
   let(:client_id) { developer_key.global_id }
   let(:context) { account_model }
-  let(:login_hint) { Lti::Asset.opaque_identifier_for(user) }
+  let(:login_hint) { Lti::Asset.opaque_identifier_for(user, context: context) }
   let(:nonce) { SecureRandom.uuid }
   let(:prompt) { 'none' }
   let(:redirect_uri) { 'https://redirect.tool.com?foo=bar' }
@@ -130,7 +133,7 @@ describe Lti::Ims::AuthenticationController do
             },
             (1.year.from_now)
           )
-          jws.first(-1)
+          jws[0...-1]
         end
 
         it_behaves_like 'lti_message_hint error'
@@ -155,7 +158,7 @@ describe Lti::Ims::AuthenticationController do
         assigns[:oidc_error]
       end
 
-      it { is_expected.to be_success }
+      it { is_expected.to be_successful }
 
       it 'has a descriptive error message' do
         expect(error_object[:error_description]).to eq expected_message
@@ -175,10 +178,18 @@ describe Lti::Ims::AuthenticationController do
 
       subject do
         get :authorize, params: params
-        JSON::JWT.decode(assigns.dig(:id_token, :id_token), :skip_verification)
       end
 
-      let(:account) { context }
+      let(:id_token) do
+        token = assigns.dig(:id_token, :id_token)
+        if token.present?
+          JSON::JWT.decode(token, :skip_verification)
+        else
+          token
+        end
+      end
+
+      let(:account) { context.root_account }
       let(:lti_launch) do
         {
           "aud" => developer_key.global_id,
@@ -200,16 +211,68 @@ describe Lti::Ims::AuthenticationController do
       end
 
       it 'correctly sets the nonce of the launch' do
-        expect(subject['nonce']).to eq nonce
+        subject
+        expect(id_token['nonce']).to eq nonce
       end
 
       it 'generates an id token' do
-        expect(subject.except('nonce')).to eq lti_launch.except('nonce')
+        subject
+        expect(id_token.except('nonce')).to eq lti_launch.except('nonce')
       end
 
       it 'sends the state' do
         subject
         expect(assigns.dig(:id_token, :state)).to eq state
+      end
+
+      context 'when there are additional query params on the redirect_uri' do
+        let(:redirect_uris) { ['https://redirect.tool.com?must_be_present=true'] }
+        let(:redirect_uri) { 'https://redirect.tool.com?must_be_present=true&foo=bar' }
+
+        before do
+          developer_key.update!(redirect_uris: redirect_uris)
+        end
+
+        it 'launches succesfully' do
+          subject
+          expect(id_token['nonce']).to eq nonce
+        end
+      end
+
+      context "when cached launch has expired" do
+        before do
+          fetch_and_delete_launch(context, verifier)
+        end
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "The launch has either expired or already been consumed" }
+          let(:expected_error) { "launch_no_longer_valid" }
+        end
+      end
+
+      context 'when there there is no current user' do
+        before { remove_user_session }
+
+        it_behaves_like 'non redirect_uri errors' do
+          subject { get :authorize, params: params }
+
+          let(:expected_message) { "Must have an active user session" }
+          let(:expected_error) { "login_required" }
+        end
+
+        context 'and the context is public' do
+          let(:context) do
+            course = course_model
+            course.update!(is_public: true)
+            course.offer
+            course
+          end
+
+          it 'generates an id token' do
+            subject
+            expect(id_token.except('nonce')).to eq lti_launch.except('nonce')
+          end
+        end
       end
     end
 
@@ -247,7 +310,7 @@ describe Lti::Ims::AuthenticationController do
         let(:login_hint) { 'not_the_correct_lti_id' }
 
         it_behaves_like 'non redirect_uri errors' do
-          let(:expected_message) { "The user is not logged in" }
+          let(:expected_message) { "Must have an active user session" }
           let(:expected_error) { "login_required" }
         end
       end
@@ -260,10 +323,29 @@ describe Lti::Ims::AuthenticationController do
           let(:expected_error) { "unauthorized_client" }
         end
       end
+
+      context 'when key has no bindings to the context' do
+        before do
+          developer_key.developer_key_account_bindings.destroy_all
+        end
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "Client not authorized in requested context" }
+          let(:expected_error) { "unauthorized_client" }
+        end
+      end
     end
 
     context 'when the developer key redirect uri does not match' do
       before { developer_key.update!(redirect_uris: ['https://www.not-matching.com']) }
+
+      it_behaves_like 'redirect_uri errors' do
+        let(:expected_message) { 'Invalid redirect_uri' }
+      end
+    end
+
+    context 'when the developer key reidrect uri contains a query string' do
+      let(:redirect_uris) { ['https://redirect.tool.com?must_be_present=true'] }
 
       it_behaves_like 'redirect_uri errors' do
         let(:expected_message) { 'Invalid redirect_uri' }

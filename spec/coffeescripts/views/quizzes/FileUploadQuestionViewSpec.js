@@ -32,6 +32,10 @@ QUnit.module('FileUploadQuestionView', {
       {preflightUrl: 'url.com'}
     )
     this.view = new FileUploadQuestion({model: this.model})
+    $('<input value="C:\\fakepath\\file.upload.zip" class="file-upload hidden" />').appendTo(
+      this.view.$el
+    )
+    $('<input type="hidden" id="fileupload_in_progress" value="false"/>').appendTo(this.view.$el)
     this.view.$el.appendTo('#fixtures')
     this.view.render()
   },
@@ -42,11 +46,25 @@ QUnit.module('FileUploadQuestionView', {
   }
 })
 
+test('#checkForFileChange set file upload status to in_progress', function() {
+  $('#fileupload_in_progress').val(false)
+  const spy = sinon.stub(this.model, 'save')
+  ok($('#fileupload_in_progress').val(), 'false')
+  this.view.$fileUpload.val('C:\\fakepath\\file.upload.zip')
+  this.view.checkForFileChange($.Event('keydown', {keyCode: 64}))
+  ok($('#fileupload_in_progress').val(), 'true')
+  spy.reset()
+  spy.restore()
+})
+
 test('#processAttachment fires "attachmentManipulationComplete" event', function() {
+  $('#fileupload_in_progress').val(true)
   const spy = sinon.spy(this.view, 'trigger')
   notOk(spy.called, 'precondition')
+  ok($('#fileupload_in_progress').val(), 'true')
   this.view.processAttachment()
   ok(spy.calledWith('attachmentManipulationComplete'))
+  ok($('#fileupload_in_progress').val(), 'false')
   this.view.trigger.restore()
 })
 
@@ -56,4 +74,10 @@ test('#deleteAttachment fires "attachmentManipulationComplete" event', function(
   this.view.deleteAttachment($.Event('keydown', {keyCode: 64}))
   ok(spy.calledWith('attachmentManipulationComplete'))
   this.view.trigger.restore()
+})
+
+test('#deleteAttachment clears file input', function() {
+  equal(this.view.$fileUpload.val(), 'C:\\fakepath\\file.upload.zip')
+  this.view.deleteAttachment($.Event('keydown', {keyCode: 64}))
+  equal(this.view.$fileUpload.val(), '')
 })

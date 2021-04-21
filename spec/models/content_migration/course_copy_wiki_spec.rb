@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -81,6 +83,7 @@ describe ContentMigration do
     end
 
     it "should keep assignment relationship" do
+      @copy_to.enable_feature!(:conditional_release)
       vanilla_page_from = @copy_from.wiki_pages.create!(title: "Everyone Sees This Page")
       title = "conditional page"
       wiki_page_assignment_model(course: @copy_from, title: title)

@@ -1,6 +1,6 @@
 <div class="row-fluid group-header">
   <div class="{{#if leader}}span5{{else}}span8{{/if}} ellipsis">
-    <a href="#" class="toggle-group group-heading" aria-label="{{#t "show_group_details"}}Show details for group {{name}}{{/t}}" title="{{name}}" aria-expanded="false">
+    <a role="button" href="#" class="toggle-group group-heading" aria-label="{{#t "show_group_details"}}Show details for group {{name}}{{/t}}" title="{{name}}" aria-expanded="false">
       <i class="group-collapsed-item icon-mini-arrow-right"></i>
       <i class="group-expanded-item icon-mini-arrow-down"></i>
       <span class="group-name">{{name}}</span>
@@ -23,7 +23,7 @@
   </div>
   <div class="span2 group-actions">
     {{#if canAssignUsers}}
-      <a href="#" class="add-user action-darkgray" data-tooltip aria-label="{{#t "add_user_to_group"}}Assign user to group{{/t}}" title="{{#t "add_user_to_group"}}Assign user to group{{/t}}"><i class="icon-add"></i></a>
+      <a role="button" href="#" class="add-user action-darkgray" data-tooltip aria-label="{{#t "add_user_to_group"}}Assign user to group{{/t}}" title="{{#t "add_user_to_group"}}Assign user to group{{/t}}"><i class="icon-add"></i></a>
     {{/if}}
     <div class="inline-block">
       <a id='group-{{id}}-actions' class="al-trigger action-darkgray" href="#" role="button">
@@ -33,8 +33,8 @@
       <ul class="al-options">
         <li><a href="/groups/{{id}}" class="icon-group visit-group">{{#t "visit_group_homepage"}}Visit Group Homepage{{/t}}</a></li>
         {{#if canEdit}}
-          <li><a href="#" data-focus-returns-to='group-{{id}}-actions' class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
-          <li><a href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
+          <li><a role="button" href="#" data-focus-returns-to='group-{{id}}-actions' class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
+          <li><a role="button" href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
         {{/if}}
       </ul>
     </div>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,6 +24,10 @@ module Canvas::LiveEventsCallbacks
     case obj
     when Course
       Canvas::LiveEvents.course_created(obj)
+    when Conversation
+      Canvas::LiveEvents.conversation_created(obj)
+    when ConversationMessage
+      Canvas::LiveEvents.conversation_message_created(obj)
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic
@@ -42,8 +48,12 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_created(obj)
     when AssignmentGroup
       Canvas::LiveEvents.assignment_group_created(obj)
+    when AssignmentOverride
+      Canvas::LiveEvents.assignment_override_created(obj)
     when Submission
-      Canvas::LiveEvents.submission_created(obj)
+      Canvas::LiveEvents.submission_created(obj) if obj.just_submitted?
+    when SubmissionComment
+      Canvas::LiveEvents.submission_comment_created(obj)
     when UserAccountAssociation
       Canvas::LiveEvents.user_account_association_created(obj)
     when Attachment
@@ -59,7 +69,24 @@ module Canvas::LiveEventsCallbacks
     when ContextModule
       Canvas::LiveEvents.module_created(obj)
     when ContentTag
-      Canvas::LiveEvents.module_item_created(obj) if obj.tag_type == "context_module"
+      case obj.tag_type
+      when 'context_module'
+        Canvas::LiveEvents.module_item_created(obj)
+      when 'learning_outcome_association'
+        Canvas::LiveEvents.learning_outcome_link_created(obj)
+      end
+    when LearningOutcomeResult
+      Canvas::LiveEvents.learning_outcome_result_created(obj)
+    when LearningOutcome
+      Canvas::LiveEvents.learning_outcome_created(obj)
+    when LearningOutcomeGroup
+      Canvas::LiveEvents.learning_outcome_group_created(obj)
+    when SisBatch
+      Canvas::LiveEvents.sis_batch_created(obj)
+    when OutcomeProficiency
+      Canvas::LiveEvents.outcome_proficiency_created(obj)
+    when OutcomeCalculationMethod
+      Canvas::LiveEvents.outcome_calculation_method_created(obj)
     end
   end
 
@@ -103,6 +130,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_updated(obj)
     when AssignmentGroup
       Canvas::LiveEvents.assignment_group_updated(obj)
+    when AssignmentOverride
+      Canvas::LiveEvents.assignment_override_updated(obj)
     when Attachment
       if attachment_eligible?(obj)
         if changes["display_name"]
@@ -125,11 +154,33 @@ module Canvas::LiveEventsCallbacks
     when ContextModule
       Canvas::LiveEvents.module_updated(obj)
     when ContextModuleProgression
-      if changes["completed_at"] && CourseProgress.new(obj.context_module.course, obj.user, read_only: true).completed?
-        Canvas::LiveEvents.course_completed(obj)
+      if changes["completed_at"]
+        CourseProgress.delay_if_production(
+          singleton: "course_progress_#{obj.global_id}",
+          run_at: Setting.get('course_progress_live_event_delay_seconds', '120').to_i.seconds.from_now
+        ).dispatch_live_event(obj)
       end
     when ContentTag
-      Canvas::LiveEvents.module_item_updated(obj) if obj.tag_type == "context_module"
+      case obj.tag_type
+      when 'context_module'
+        Canvas::LiveEvents.module_item_updated(obj)
+      when 'learning_outcome_association'
+        Canvas::LiveEvents.learning_outcome_link_updated(obj)
+      end
+    when LearningOutcomeResult
+      Canvas::LiveEvents.learning_outcome_result_updated(obj)
+    when LearningOutcome
+      Canvas::LiveEvents.learning_outcome_updated(obj)
+    when LearningOutcomeGroup
+      Canvas::LiveEvents.learning_outcome_group_updated(obj)
+    when SisBatch
+      if changes[:workflow_state].present?
+        Canvas::LiveEvents.sis_batch_updated(obj)
+      end
+    when OutcomeProficiency
+      Canvas::LiveEvents.outcome_proficiency_updated(obj)
+    when OutcomeCalculationMethod
+      Canvas::LiveEvents.outcome_calculation_method_updated(obj)
     end
   end
 

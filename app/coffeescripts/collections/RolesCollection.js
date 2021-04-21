@@ -17,7 +17,6 @@
 
 import Backbone from 'Backbone'
 
-import _ from 'underscore'
 import Role from '../models/Role'
 
 export default class RolesCollection extends Backbone.Collection {
@@ -32,7 +31,7 @@ export default class RolesCollection extends Backbone.Collection {
   // @api backbone override
   comparator(role) {
     const base_role_type = role.get('base_role_type')
-    const index = _.indexOf(this.sortOrder, base_role_type)
+    const index = RolesCollection.prototype.sortOrder.indexOf(base_role_type)
     const role_name = role.get('role')
 
     let position_string = `${index}_${base_role_type}_${role_name}`

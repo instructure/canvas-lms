@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,20 +24,28 @@ module Lti
     class DeepLinkingController < ApplicationController
       protect_from_forgery except: [:deep_linking_response], with: :exception
 
-      include Concerns::DeepLinkingServices
+      include Lti::Ims::Concerns::DeepLinkingServices
+      include Lti::Ims::Concerns::DeepLinkingModules
 
       before_action :require_context
       before_action :validate_jwt
+      before_action :add_module_items # renders if unauthorized
 
       def deep_linking_response
+        # Adding one module item creates the resource link
+        # in ContextModule#add_item, adding multiple creates links in
+        # add_module_items before action
+        create_lti_resource_links unless adding_module_item?
+
         # Set content items and messaging values in JS env
         js_env({
-          content_items: deep_linking_jwt["#{CLAIM_PREFIX}content_items"],
+          content_items: content_items,
           message: messaging_value('msg'),
           log: messaging_value('log'),
           error_message: messaging_value('errormsg'),
           error_log: messaging_value('errorlog'),
-          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools])
+          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools]),
+          reload_page: multiple_module_items?
         }.compact)
 
         render layout: 'bare'

@@ -16,103 +16,128 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import Link from '@instructure/ui-elements/lib/components/Link';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import List from '@instructure/ui-elements/lib/components/List';
-import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
+import React from 'react'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 
-import AssignmentIcon from   '@instructure/ui-icons/lib/Line/IconAssignment';
-import QuizIcon from         '@instructure/ui-icons/lib/Line/IconQuiz';
-import AnnouncementIcon from '@instructure/ui-icons/lib/Line/IconAnnouncement';
-import DiscussionIcon from   '@instructure/ui-icons/lib/Line/IconDiscussion';
-import NoteIcon from         '@instructure/ui-icons/lib/Line/IconNote';
-import CalendarIcon from     '@instructure/ui-icons/lib/Line/IconCalendarMonth';
-import PageIcon from         '@instructure/ui-icons/lib/Line/IconDocument';
-import PeerReviewIcon from '@instructure/ui-icons/lib/Line/IconPeerReview';
+import {
+  IconAssignmentLine,
+  IconQuizLine,
+  IconAnnouncementLine,
+  IconDiscussionLine,
+  IconNoteLine,
+  IconCalendarMonthLine,
+  IconDocumentLine,
+  IconPeerReviewLine
+} from '@instructure/ui-icons'
 
-import { dateTimeString } from '../../utilities/dateUtils';
-import formatMessage from '../../format-message';
-import { func, shape, object, arrayOf, number, string } from 'prop-types';
+import {func, shape, object, arrayOf, number, string} from 'prop-types'
+import {dateTimeString} from '../../utilities/dateUtils'
+import formatMessage from '../../format-message'
 
-const getIconComponent = (itemType) => {
+const getIconComponent = itemType => {
   switch (itemType) {
     case 'Assignment':
-      return <AssignmentIcon label={formatMessage('Assignment')} className="ToDoSidebarItem__Icon" />;
+      return (
+        <IconAssignmentLine label={formatMessage('Assignment')} className="ToDoSidebarItem__Icon" />
+      )
     case 'Quiz':
-      return <QuizIcon label={formatMessage('Quiz')} className="ToDoSidebarItem__Icon" />;
+      return <IconQuizLine label={formatMessage('Quiz')} className="ToDoSidebarItem__Icon" />
     case 'Discussion':
-      return <DiscussionIcon label={formatMessage('Discussion')} className="ToDoSidebarItem__Icon" />;
+      return (
+        <IconDiscussionLine label={formatMessage('Discussion')} className="ToDoSidebarItem__Icon" />
+      )
     case 'Announcement':
-      return <AnnouncementIcon label={formatMessage('Announcement')} className="ToDoSidebarItem__Icon" />;
+      return (
+        <IconAnnouncementLine
+          label={formatMessage('Announcement')}
+          className="ToDoSidebarItem__Icon"
+        />
+      )
     case 'Calendar Event':
-      return <CalendarIcon label={formatMessage('Calendar Event')} className="ToDoSidebarItem__Icon" />;
+      return (
+        <IconCalendarMonthLine
+          label={formatMessage('Calendar Event')}
+          className="ToDoSidebarItem__Icon"
+        />
+      )
     case 'Page':
-      return <PageIcon label={formatMessage('Page')} className="ToDoSidebarItem__Icon" />;
+      return <IconDocumentLine label={formatMessage('Page')} className="ToDoSidebarItem__Icon" />
     case 'Peer Review':
-      return <PeerReviewIcon label={formatMessage('Peer Review')} className="ToDoSidebarItem__Icon" />;
+      return (
+        <IconPeerReviewLine
+          label={formatMessage('Peer Review')}
+          className="ToDoSidebarItem__Icon"
+        />
+      )
     default:
-      return <NoteIcon label={formatMessage('To Do')} className="ToDoSidebarItem__Icon" />;
+      return <IconNoteLine label={formatMessage('To Do')} className="ToDoSidebarItem__Icon" />
   }
-};
+}
 
 const getContextShortName = (courses, courseId) => {
-  const course = courses.find(x => x.id === courseId);
-  return course ? course.shortName : '';
-};
+  const course = courses.find(x => x.id === courseId)
+  return course ? course.shortName : ''
+}
 
 export default class ToDoItem extends React.Component {
-  focus () {
-    const focusable = this.linkRef || this.buttonRef;
-    if (focusable) focusable.focus();
+  focus() {
+    const focusable = this.linkRef || this.buttonRef
+    if (focusable) focusable.focus()
   }
 
   handleClick = () => {
-    this.props.handleDismissClick(this.props.item);
+    this.props.handleDismissClick(this.props.item)
   }
 
   getInformationRow = (dueAt, points) => {
-    const toDisplay = [];
+    const toDisplay = []
     if (points) {
       toDisplay.push(
-        <ListItem key="points">
-          {formatMessage('{numPoints} points', { numPoints: points })}
-        </ListItem>
-      );
+        <List.Item key="points">
+          {formatMessage('{numPoints} points', {numPoints: points})}
+        </List.Item>
+      )
     }
 
-    toDisplay.push(
-      <ListItem key="date">
-        {dateTimeString(dueAt, this.props.timeZone)}
-      </ListItem>
-    );
-    return toDisplay;
+    toDisplay.push(<List.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</List.Item>)
+    return toDisplay
   }
 
-  itemTitle () {
+  itemTitle() {
     if (this.props.item.type === 'Peer Review') {
-      return formatMessage('Peer Review for {itemTitle}', {itemTitle: this.props.item.title});
-    } 
-    return this.props.item.title;
+      return formatMessage('Peer Review for {itemTitle}', {itemTitle: this.props.item.title})
+    }
+    return this.props.item.title
   }
 
-  render () {
-    const title = <Text size="small" lineHeight="fit">{this.itemTitle()}</Text>;
+  render() {
+    const title = (
+      <Text size="small" lineHeight="fit">
+        {this.itemTitle()}
+      </Text>
+    )
     const titleComponent = this.props.item.html_url ? (
-      <Link linkRef={(elt) => {this.linkRef = elt;}} href={this.props.item.html_url}>{title}</Link>
+      <Button
+        variant="link"
+        theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+        buttonRef={elt => {
+          this.linkRef = elt
+        }}
+        href={this.props.item.html_url}
+      >
+        {title}
+      </Button>
     ) : (
       <Text>{title}</Text>
-    );
+    )
 
     return (
       <div className="ToDoSidebarItem">
         {getIconComponent(this.props.item.type)}
         <div className="ToDoSidebarItem__Info">
-          <div className="ToDoSidebarItem__Title">
-            {titleComponent}
-          </div>
+          <div className="ToDoSidebarItem__Title">{titleComponent}</div>
           <Text color="secondary" size="small" weight="bold" lineHeight="fit">
             {getContextShortName(this.props.courses, this.props.item.course_id)}
           </Text>
@@ -125,13 +150,15 @@ export default class ToDoItem extends React.Component {
             variant="icon"
             size="small"
             onClick={this.handleClick}
-            buttonRef={(elt) => {this.buttonRef = elt;}}
+            buttonRef={elt => {
+              this.buttonRef = elt
+            }}
           >
             {formatMessage('Dismiss {itemTitle}', {itemTitle: this.props.item.title})}
           </CloseButton>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -142,10 +169,10 @@ ToDoItem.propTypes = {
     type: string,
     course_id: string,
     date: object, // moment
-    points: number,
+    points: number
   }),
   courses: arrayOf(object).isRequired,
   handleDismissClick: func.isRequired,
   timeZone: string,
-  locale: string,
-};
+  locale: string
+}

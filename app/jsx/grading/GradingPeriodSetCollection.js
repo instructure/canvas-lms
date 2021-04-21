@@ -20,8 +20,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
 import $ from 'jquery'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import I18n from 'i18n!grading_periods'
+import {Button} from '@instructure/ui-buttons'
+import I18n from 'i18n!GradingPeriodSetCollection'
 import GradingPeriodSet from './GradingPeriodSet'
 import SearchGradingPeriodsField from './SearchGradingPeriodsField'
 import SearchHelpers from '../shared/helpers/searchHelpers'
@@ -35,7 +35,7 @@ import 'jquery.instructure_misc_plugins'
 
 const presentEnrollmentTerms = function(enrollmentTerms) {
   return _.map(enrollmentTerms, term => {
-    const newTerm = _.extend({}, term)
+    const newTerm = {...term}
 
     if (newTerm.name) {
       newTerm.displayName = newTerm.name
@@ -57,7 +57,7 @@ const getEditGradingPeriodSetRef = function(set) {
 
 const {bool, string, shape} = PropTypes
 
-class GradingPeriodSetCollection extends React.Component {
+export default class GradingPeriodSetCollection extends React.Component {
   static propTypes = {
     readOnly: bool.isRequired,
 
@@ -85,7 +85,7 @@ class GradingPeriodSetCollection extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.editSet.id && prevState.editSet.id !== this.state.editSet.id) {
       const set = {id: prevState.editSet.id}
-      this.refs[this.getShowGradingPeriodSetRef(set)].refs.editButton.focus()
+      this.refs[this.getShowGradingPeriodSetRef(set)]._refs.editButton.focus()
     }
   }
 
@@ -105,8 +105,8 @@ class GradingPeriodSetCollection extends React.Component {
 
   associateTermsWithSet = (setID, termIDs) =>
     _.map(this.state.enrollmentTerms, term => {
-      if (_.contains(termIDs, term.id)) {
-        const newTerm = _.extend({}, term)
+      if (_.includes(termIDs, term.id)) {
+        const newTerm = {...term}
         newTerm.gradingPeriodGroupId = setID
         return newTerm
       } else {
@@ -150,14 +150,14 @@ class GradingPeriodSetCollection extends React.Component {
 
   onSetUpdated = updatedSet => {
     const sets = _.map(this.state.sets, set =>
-      set.id === updatedSet.id ? _.extend({}, set, updatedSet) : set
+      set.id === updatedSet.id ? {...set, ...updatedSet} : set
     )
 
     const terms = _.map(this.state.enrollmentTerms, term => {
-      if (_.contains(updatedSet.enrollmentTermIDs, term.id)) {
-        return _.extend({}, term, {gradingPeriodGroupId: updatedSet.id})
+      if (_.includes(updatedSet.enrollmentTermIDs, term.id)) {
+        return {...term, gradingPeriodGroupId: updatedSet.id}
       } else if (term.gradingPeriodGroupId === updatedSet.id) {
-        return _.extend({}, term, {gradingPeriodGroupId: null})
+        return {...term, gradingPeriodGroupId: null}
       } else {
         return term
       }
@@ -174,7 +174,7 @@ class GradingPeriodSetCollection extends React.Component {
   }
 
   searchTextMatchesTitles = titles =>
-    _.any(titles, title => SearchHelpers.substringMatchRegex(this.state.searchText).test(title))
+    _.some(titles, title => SearchHelpers.substringMatchRegex(this.state.searchText).test(title))
 
   filterSetsBySearchText = (sets, searchText) => {
     if (searchText === '') return sets
@@ -237,7 +237,7 @@ class GradingPeriodSetCollection extends React.Component {
   }
 
   toggleSetBody = setId => {
-    if (_.contains(this.state.expandedSetIDs, setId)) {
+    if (_.includes(this.state.expandedSetIDs, setId)) {
       this.setState({expandedSetIDs: _.without(this.state.expandedSetIDs, setId)})
     } else {
       this.setState({expandedSetIDs: this.state.expandedSetIDs.concat([setId])})
@@ -255,7 +255,7 @@ class GradingPeriodSetCollection extends React.Component {
     } else {
       const setRef = this.getShowGradingPeriodSetRef(this.state.sets[index - 1])
       const setToFocus = this.refs[setRef]
-      return setToFocus.refs.editButton
+      return setToFocus._refs.editButton
     }
   }
 
@@ -268,7 +268,7 @@ class GradingPeriodSetCollection extends React.Component {
   updateSetPeriods = (setID, gradingPeriods) => {
     const newSets = _.map(this.state.sets, set => {
       if (set.id === setID) {
-        return _.extend({}, set, {gradingPeriods})
+        return {...set, gradingPeriods}
       }
 
       return set
@@ -291,7 +291,7 @@ class GradingPeriodSetCollection extends React.Component {
     const setIDs = _.pluck(this.state.sets, 'id')
     return _.filter(this.state.enrollmentTerms, term => {
       const setID = term.gradingPeriodGroupId
-      return setID && _.contains(setIDs, setID)
+      return setID && _.includes(setIDs, setID)
     })
   }
 
@@ -317,7 +317,7 @@ class GradingPeriodSetCollection extends React.Component {
     }
 
     const saveCallback = set => {
-      const editSet = _.extend({}, this.state.editSet, {saving: true})
+      const editSet = {...this.state.editSet, saving: true}
       this.setState({editSet})
       SetsApi.update(set)
         .then(updated => {
@@ -342,7 +342,7 @@ class GradingPeriodSetCollection extends React.Component {
     )
   }
 
-  renderSets = () => {
+  renderSets() {
     const urls = {
       batchUpdateURL: this.props.urls.gradingPeriodsUpdateURL,
       gradingPeriodSetsURL: this.props.urls.gradingPeriodSetsURL,
@@ -364,7 +364,7 @@ class GradingPeriodSetCollection extends React.Component {
             readOnly={this.props.readOnly}
             permissions={set.permissions}
             terms={this.state.enrollmentTerms}
-            expanded={_.contains(this.state.expandedSetIDs, set.id)}
+            expanded={_.includes(this.state.expandedSetIDs, set.id)}
             onEdit={this.editGradingPeriodSet}
             onDelete={this.removeGradingPeriodSet}
             onPeriodsChange={this.updateSetPeriods}
@@ -385,7 +385,6 @@ class GradingPeriodSetCollection extends React.Component {
           closeForm={this.closeNewSetForm}
           urls={this.props.urls}
           enrollmentTerms={this.termsNotBelongingToActiveSets()}
-          readOnly={this.props.readOnly}
           addGradingPeriodSet={this.addGradingPeriodSet}
         />
       )
@@ -424,9 +423,8 @@ class GradingPeriodSetCollection extends React.Component {
             </div>
 
             <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
+            <div className="ic-Form-action-box__Actions">{this.renderAddSetFormButton()}</div>
           </div>
-
-          <div className="ic-Form-action-box__Actions">{this.renderAddSetFormButton()}</div>
         </div>
 
         {this.renderNewGradingPeriodSetForm()}
@@ -435,5 +433,3 @@ class GradingPeriodSetCollection extends React.Component {
     )
   }
 }
-
-export default GradingPeriodSetCollection

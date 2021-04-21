@@ -26,10 +26,10 @@ import TeacherViewContext from '../TeacherViewContext'
 import AvailabilityDates from '../../../shared/AvailabilityDates'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
-import Responsive from '@instructure/ui-layout/lib/components/Responsive'
+import {Responsive} from '@instructure/ui-responsive'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
 export default class OverrideSummary extends React.Component {
   static contextType = TeacherViewContext
@@ -42,33 +42,57 @@ export default class OverrideSummary extends React.Component {
     return <Text weight="bold">{override.title}</Text>
   }
 
-  renderAttemptsAllowed(override) {
+  renderAttemptsAllowedAndSubmissionTypes(override) {
     const allowed = override.allowedAttempts
     const attempts = Number.isInteger(allowed) ? allowed : 1
-    return <Text>{I18n.t({one: '1 Attempt', other: '%{count} Attempts'}, {count: attempts})}</Text>
-  }
-
-  renderSubmissionTypesAndDueDate(override) {
     return (
       <Text>
+        <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
+        <div style={{display: 'inline-block', padding: '0 .5em'}}>|</div>
         <OverrideSubmissionTypes variant="summary" override={override} />
-        <Text> | </Text>
-        <FriendlyDatetime
-          prefix={I18n.t('Due: ')}
-          dateTime={override.dueAt}
-          format={I18n.t('#date.formats.full')}
-        />
       </Text>
     )
   }
 
-  renderAvailability(override) {
+  renderDueDate(override) {
     return (
-      <Text>
-        {I18n.t('Available ')}
-        <AvailabilityDates assignment={override} formatStyle="short" />
+      <Text color="secondary">
+        {override.dueAt ? (
+          <FriendlyDatetime
+            prefix={I18n.t('Due: ')}
+            dateTime={override.dueAt}
+            format={I18n.t('#date.formats.full')}
+          />
+        ) : (
+          I18n.t('No Due Date')
+        )}
       </Text>
     )
+  }
+
+  // it's unfortunate but when both unlock and lock dates exist
+  // AvailabilityDates only prefixes with "Available" if the formatStyle="long"
+  // If I chnage it there, it will alter the Student view
+  renderAvailability(override) {
+    // both dates exist, manually add Available prefix
+    if (override.unlockAt && override.lockAt) {
+      return (
+        <Text color="secondary">
+          {I18n.t('Available ')}
+          <AvailabilityDates assignment={override} formatStyle="short" />
+        </Text>
+      )
+    }
+    // only one date exists, AvailabilityDates will include the Available prefix
+    if (override.unlockAt || override.lockAt) {
+      return (
+        <Text color="secondary">
+          <AvailabilityDates assignment={override} formatStyle="short" />
+        </Text>
+      )
+    }
+    // no dates exist, so the assignment is simply Available
+    return <Text>{I18n.t('Available')}</Text>
   }
 
   render() {
@@ -90,7 +114,7 @@ export default class OverrideSummary extends React.Component {
                   <OverrideAssignTo override={override} variant="summary" />
                 </View>
                 <View display="block">
-                  <OverrideAttempts override={override} variant="summary" />
+                  {this.renderAttemptsAllowedAndSubmissionTypes(override)}
                 </View>
               </View>
             )
@@ -98,7 +122,7 @@ export default class OverrideSummary extends React.Component {
             const rightColumn = (
               <View display="block">
                 <View display="block" margin="0 0 xxx-small">
-                  {this.renderSubmissionTypesAndDueDate(override)}
+                  {this.renderDueDate(override)}
                 </View>
                 <View display="block">{this.renderAvailability(override)}</View>
               </View>
@@ -108,10 +132,10 @@ export default class OverrideSummary extends React.Component {
               <View as="div" data-testid="OverrideSummary">
                 {largerScreen ? (
                   <Flex justifyItems="space-between">
-                    <FlexItem grow shrink>
+                    <Flex.Item grow shrink>
                       {leftColumn}
-                    </FlexItem>
-                    <FlexItem textAlign="end">{rightColumn}</FlexItem>
+                    </Flex.Item>
+                    <Flex.Item textAlign="end">{rightColumn}</Flex.Item>
                   </Flex>
                 ) : (
                   <View display="block">

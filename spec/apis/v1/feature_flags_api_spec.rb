@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 Instructure, Inc.
 #
@@ -15,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require_relative '../../sharding_spec_helper'
+require 'apis/api_spec_helper'
+require 'sharding_spec_helper'
 
 describe "Feature Flags API", type: :request do
   let_once(:t_site_admin) { Account.site_admin }
@@ -25,6 +27,8 @@ describe "Feature Flags API", type: :request do
   let_once(:t_sub_account) { account_model parent_account: t_root_account }
   let_once(:t_course) { course_with_teacher(user: t_teacher, account: t_sub_account, active_all: true).course }
   let_once(:t_root_admin) { account_admin_user account: t_root_account }
+
+  let(:live_event_feature) { Feature.new(feature: 'compact_live_event_payloads', applies_to: 'RootAccount', state: 'allowed') }
 
   before do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
@@ -35,7 +39,8 @@ describe "Feature Flags API", type: :request do
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
       'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
-      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden')
+      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
+      'compact_live_event_payloads' => live_event_feature
     })
   end
 
@@ -50,7 +55,7 @@ describe "Feature Flags API", type: :request do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'on'
       json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
          { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
-      expect(json.sort_by { |f| f['feature'] }).to eql(
+      expect(json).to match_array(
          [{"feature"=>"account_feature",
            "display_name"=>"Account Feature FRD",
            "description"=>"FRD!!",
@@ -60,11 +65,11 @@ describe "Feature Flags API", type: :request do
            "feature_flag"=>
                {"feature"=>"account_feature",
                 "state"=>"on",
+                "parent_state" => "on",
                 "locked"=>true,
-                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
+                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}, "allowed_on"=>{"locked"=>false}}}},
           {"feature"=>"course_feature",
            "applies_to"=>"Course",
-           "development"=>true,
            "release_notes_url"=>"http://example.com",
            "display_name"=>"not localized",
            "description"=>"srsly",
@@ -74,8 +79,21 @@ describe "Feature Flags API", type: :request do
                 "locking_account_id"=>nil,
                 "feature"=>"course_feature",
                 "state"=>"on",
+                "parent_state" => "allowed",
                 "locked"=>false,
-                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
+                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}, "allowed_on"=>{"locked"=>false}}}},
+          {"applies_to"=>"RootAccount",
+            "feature"=>"compact_live_event_payloads",
+            "feature_flag"=>
+              {"context_id"=>t_root_account.id,
+              "context_type"=>"Account",
+              "feature"=>"compact_live_event_payloads",
+              "locked"=>false,
+              "locking_account_id"=>nil,
+              "state"=>"off",
+              "parent_state" => "off",
+              "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}, "allowed_on"=>{"locked"=>true}}},
+            "root_opt_in"=>true},
           {"feature"=>"root_account_feature",
            "applies_to"=>"RootAccount",
            "root_opt_in"=>true,
@@ -85,8 +103,9 @@ describe "Feature Flags API", type: :request do
                 "locking_account_id"=>nil,
                 "feature"=>"root_account_feature",
                 "state"=>"off",
+                "parent_state" => "off",
                 "locked"=>false,
-                "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}}}},
+                "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}, "allowed_on"=>{"locked"=>true}}}},
           {"feature"=>"root_opt_in_feature",
            "applies_to"=>"Course",
            "root_opt_in"=>true,
@@ -95,9 +114,10 @@ describe "Feature Flags API", type: :request do
                 "context_type"=>"Account",
                 "feature"=>"root_opt_in_feature",
                 "state"=>"off",
+                "parent_state" => "off",
                 "locking_account_id"=>nil,
                 "locked"=>false,
-                "transitions"=>{"allowed"=>{"locked"=>false}, "on"=>{"locked"=>false}}}}])
+                "transitions"=>{"allowed"=>{"locked"=>false}, "on"=>{"locked"=>false}, "allowed_on"=>{"locked"=>false}}}}])
     end
 
     it "should paginate" do
@@ -106,8 +126,8 @@ describe "Feature Flags API", type: :request do
       expect(json.size).to eql 3
       json += api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features?per_page=3&page=2",
                        { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param, per_page: '3', page: '2' })
-      expect(json.size).to eql 4
-      expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature root_account_feature root_opt_in_feature)
+      expect(json.size).to eql 5
+      expect(json.map { |f| f['feature'] }.sort).to match_array %w(account_feature course_feature root_account_feature root_opt_in_feature compact_live_event_payloads)
     end
 
     it "should return only relevant features" do
@@ -127,14 +147,14 @@ describe "Feature Flags API", type: :request do
       it "should show hidden features on site admin" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.id.to_s })
-        expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature)
+        expect(json.map { |f| f['feature'] }).to match_array %w(account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature compact_live_event_payloads)
         expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
 
       it "should show hidden features on root accounts to a site admin user" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
            { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
-        expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature)
+        expect(json.map { |f| f['feature'] }).to match_array %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads)
         expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
 
@@ -142,8 +162,8 @@ describe "Feature Flags API", type: :request do
         t_root_account.allow_feature! :hidden_feature
         json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
-        expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature)
-        expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to be_nil
+                        expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to be_nil
+                        expect(json.map { |f| f['feature'] }).to match_array %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads)
       end
 
       it "should show 'hidden' tag to site admin on the feature flag that un-hides a hidden feature" do
@@ -216,15 +236,30 @@ describe "Feature Flags API", type: :request do
                {}, {}, { expected_status: 404 })
     end
 
+    it "should skip cache for admins" do
+      original = t_root_account.method(:lookup_feature_flag)
+      @checked = false
+      allow_any_instantiation_of(t_root_account).to receive(:lookup_feature_flag) do |feature, opts|
+        if feature.to_s == "root_account_feature"
+          @checked = true
+          expect(opts[:skip_cache]).to eq true
+        end
+        original.call(feature, *opts)
+      end
+      api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/flags/root_account_feature",
+        { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_root_account.to_param, feature: 'root_account_feature' })
+      expect(@checked).to eq true # should actually check the expectation
+    end
+
     it "should return the correct format" do
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      expect(json).to eql({"feature"=>"user_feature", "state"=>"allowed", "locked"=>false, "transitions"=>{"on"=>{"locked"=>false}, "off"=>{"locked"=>false}}})
+      expect(json).to eql({"feature"=>"user_feature", "state"=>"allowed", "parent_state" => "allowed", "locked"=>false, "transitions"=>{"on"=>{"locked"=>false}, "off"=>{"locked"=>false}}})
 
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on'
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                       { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      expect(json).to eql({"feature"=>"user_feature", "state"=>"on", "context_type"=>"User", "context_id"=>t_teacher.id, "locked"=>false, "locking_account_id"=>nil,
+      expect(json).to eql({"feature"=>"user_feature", "state"=>"on", "parent_state" => "allowed", "context_type"=>"User", "context_id"=>t_teacher.id, "locked"=>false, "locking_account_id"=>nil,
                        "transitions"=>{"off"=>{"locked"=>false}}})
     end
 
@@ -307,7 +342,7 @@ describe "Feature Flags API", type: :request do
       api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/root_opt_in_feature?state=allowed",
                { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'root_opt_in_feature', state: 'allowed' })
       flag = t_root_account.feature_flag('root_opt_in_feature')
-      expect(flag).to be_allowed
+      expect(flag.state).to eq("allowed")
       expect(flag).not_to be_new_record
     end
 
@@ -326,6 +361,8 @@ describe "Feature Flags API", type: :request do
         MultiCache.fetch(cache_key) { nil }
         api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature?state=off",
                          { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature', state: 'off' })
+        assert_status(200)
+        expect(flag.reload.state).to eq('off')
       end
     end
 
@@ -357,7 +394,18 @@ describe "Feature Flags API", type: :request do
                                               enabled: true,
                                               applies_to_self: false,
                                               applies_to_descendants: true)
+          t_site_admin.role_overrides.create!(permission: 'view_feature_flags',
+                                              role: role,
+                                              enabled: true,
+                                              applies_to_self: true,
+                                              applies_to_descendants: true)
           @site_admin_member = site_admin_user(role: role)
+        end
+
+        it "should view a hidden feature" do
+          json = api_call_as_user(@site_admin_member, :get, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
+                           { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_site_admin.id.to_s, feature: 'hidden_feature' })
+          expect(json['state']).to eq 'hidden'
         end
 
         it "should not create a site admin feature flag" do
@@ -371,6 +419,13 @@ describe "Feature Flags API", type: :request do
           api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
                            { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' })
           expect(t_root_account.feature_flags.where(feature: 'hidden_feature').count).to eql 1
+        end
+
+        it "can unhide a hidden feature in a subaccount" do
+          api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_sub_account.id}/features/flags/hidden_feature?state=on",
+                   { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_sub_account.to_param, feature: 'hidden_feature', state: 'on' },
+                   {}, {}, { expected_status: 200 })
+          expect(t_sub_account.feature_flags.where(feature: 'hidden_feature').take).to be_enabled
         end
       end
 
@@ -421,7 +476,8 @@ describe "Feature Flags API", type: :request do
     it "should delete a feature flag" do
       t_root_account.feature_flags.create! feature: 'course_feature'
       api_call_as_user(t_root_admin, :delete, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature",
-               { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature' })
+               { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature' },
+               {}, {}, { expected_status: 200 })
       expect(t_root_account.feature_flags.where(feature: 'course_feature')).to be_empty
     end
 
@@ -433,6 +489,17 @@ describe "Feature Flags API", type: :request do
     end
   end
 
+  describe "environment" do
+    it "lists cached_js_env_account_features" do
+      expect_any_instance_of(ApplicationController).to receive(:cached_js_env_account_features).
+        and_return({telepathic_navigation: true})
+      json = api_call(:get, "/api/v1/features/environment",
+               { controller: 'feature_flags', action: 'environment', format: 'json' }, {}, {},
+               { expected_status: 200 })
+      expect(json).to eq({'telepathic_navigation' => true})
+    end
+  end
+
   describe "custom_transition_proc" do
     before do
       allow(Feature).to receive(:definitions).and_return({
@@ -441,7 +508,8 @@ describe "Feature Flags API", type: :request do
                   transitions['off'] = { 'locked'=>true, 'message'=>"don't ever turn this off" } if from_state == 'on'
                   transitions['on'] = { 'locked'=>false, 'message'=>"this is permanent?!" } if transitions.has_key?('on')
                 end
-          )
+          ),
+          'compact_live_event_payloads' => live_event_feature
       })
     end
 
@@ -454,6 +522,7 @@ describe "Feature Flags API", type: :request do
            "feature_flag"=>
                {"feature"=>"custom_feature",
                 "state"=>"allowed",
+                "parent_state" => "allowed",
                 "locked"=>false,
                 "transitions"=>{"on"=>{"locked"=>false,"message"=>"this is permanent?!"},"off"=>{"locked"=>false}}}}])
     end
@@ -467,7 +536,7 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
            { controller: 'feature_flags', action: 'show', format: 'json', course_id: t_course.id, feature: 'custom_feature' })
         expect(json).to eql({"context_id"=>t_course.id,"context_type"=>"Course","feature"=>"custom_feature",
-                         "locking_account_id"=>nil,"state"=>"on", "locked"=>false,
+                         "locking_account_id"=>nil,"state"=>"on", "locked"=>false, "parent_state" => "allowed",
                          "transitions"=>{"off"=>{"locked"=>true,"message"=>"don't ever turn this off"}}})
       end
 
@@ -488,7 +557,8 @@ describe "Feature Flags API", type: :request do
                 after_state_change_proc: ->(user, context, from_state, to_state) do
                   t_state_changes << [user.id, context.id, from_state, to_state]
                 end
-          )
+          ),
+          'compact_live_event_payloads' => live_event_feature
       })
     end
 
@@ -507,6 +577,15 @@ describe "Feature Flags API", type: :request do
            { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
       }.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'off', 'on']
+    end
+
+    it 'should fire when deleting a feature flag override (because of a hidden feature or otherwise)' do
+      t_course.enable_feature! 'custom_feature'
+      expect {
+        api_call_as_user(t_root_admin, :delete, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
+           { controller: 'feature_flags', action: 'delete', format: 'json', course_id: t_course.to_param, feature: 'custom_feature' })
+      }.to change(t_state_changes, :size).by(1)
+      expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'on', 'allowed']
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -50,12 +52,14 @@ module BasicLTI
 
     def validate!
       raise Errors::InvalidSourceId, 'Course is invalid' unless course
+      raise Errors::InvalidSourceId, 'Course is concluded' if course.concluded?
       raise Errors::InvalidSourceId, 'User is no longer in course' unless user
       raise Errors::InvalidSourceId, 'Assignment is invalid' unless assignment
 
       tag = assignment.external_tool_tag
-      raise Errors::InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag && tool.
-          matches_url?(tag.url, false) && tool.workflow_state != 'deleted'
+      raise Errors::InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag &&
+        (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
+        tool.workflow_state != 'deleted'
     end
 
     def self.load!(sourcedid_string)

@@ -24,8 +24,8 @@ import $ from 'jquery'
 import ConditionalRelease from 'jsx/shared/conditional_release/ConditionalRelease'
 
 let editor = null
-window.conditional_release_module = {
-  ConditionalReleaseEditor: env => {
+class ConditionalReleaseEditor {
+  constructor(env) {
     editor = {
       attach: sinon.stub(),
       updateAssignment: sinon.stub(),
@@ -37,13 +37,14 @@ window.conditional_release_module = {
     return editor
   }
 }
+window.conditional_release_module = {ConditionalReleaseEditor}
 
 let component = null
 const createComponent = submitCallback => {
   component = TestUtils.renderIntoDocument(
     <ConditionalRelease.Editor env={assignmentEnv} type="foo" />
   )
-  component.createEditor()
+  component.createNativeEditor()
 }
 
 const makePromise = () => {
@@ -54,9 +55,9 @@ const makePromise = () => {
 }
 
 let ajax = null
-const assignmentEnv = {assignment: {id: 1}, editor_url: 'editorurl', jwt: 'foo'}
-const noAssignmentEnv = {edit_rule_url: 'about:blank', jwt: 'foo'}
-const assignmentNoIdEnv = {assignment: {foo: 'bar'}, edit_rule_url: 'about:blank', jwt: 'foo'}
+const assignmentEnv = {assignment: {id: 1}, course_id: 1}
+const noAssignmentEnv = {edit_rule_url: 'about:blank'}
+const assignmentNoIdEnv = {assignment: {foo: 'bar'}, course_id: 1}
 
 QUnit.module('Conditional Release component', {
   setup: () => {
@@ -75,11 +76,6 @@ QUnit.module('Conditional Release component', {
     editor = null
     ajax.restore()
   }
-})
-
-test('it loads a cyoe editor on mount', () => {
-  ok(ajax.calledOnce)
-  ok(ajax.calledWithMatch({url: 'editorurl'}))
 })
 
 test('it creates a cyoe editor', () => {

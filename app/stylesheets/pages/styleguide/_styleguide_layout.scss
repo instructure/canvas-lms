@@ -78,98 +78,10 @@ body.Sg-only {
   line-height: 1.5;
   background: $sg-background;
 }
-.Sg-header {
-  background: $sg-background-global-nav;
-  position: fixed;
-  width: 100%;
-  z-index: 999;
-}
-.Sg-header__Alert {
-  background: darken($ic-color-dark, 5%);
-  padding: 16px;
-}
-.Sg-header__Navigation {
-  @include sg-header-logo;
-  @extend %sg-flex;
-  @extend %sg-flex-1;
-  @extend %sg-flex-align-content-center;
-  @extend %sg-flex-justify-content-center;
-}
-.Sg-header__Navigation-item {
-  color: $sg-header-navigation-item;
-  @include fontSize($ic-font-size--medium);
-  padding: 13px 15px;
-  text-transform: capitalize;
-  text-decoration: none;
-  @extend %sg-flex-align-self;
-  &:hover {
-    text-decoration: none;
-    color: $sg-header-navigation-item--hover;
-    background: $sg-background-sub-nav;
-  }
-  &:focus {
-    text-decoration: none;
-    color: $sg-header-navigation-item;
-  }
-}
-.Sg-header__Navigation-item.active {
-  background: $sg-background-sub-nav;
-  color: $sg-header-navigation-item--active;
-}
-.Sg-header__Subnavigation {
-  background: $sg-background-sub-nav;
-  @extend %sg-flex;
-  @extend %sg-flex-1;
-  @extend %sg-flex-align-content-center;
-  @extend %sg-flex-justify-content-center;
-}
-.Sg-header__Subnavigation-item {
-  &,
-  &:active,
-  &:visited,
-  &:focus {
-    @include fontSize(13px);
-    padding: 8px 10px;
-    font-weight: bold;
-    color: $sg-header-subnavigation-item;
-    text-decoration: none;
-  }
-  &:hover {
-    color: $sg-header-subnavigation-item--hover;
-    text-decoration: none;
-  }
-}
-.Sg-Main {
-  /// Account for fixed header
-  padding-top: 121px;
-}
 // Hologram class
 .Sg-Content,
 // Dresscode class
 .Sg-Article {
-  > h1 {
-    background: var(--ic-brand-primary);
-    color: $sg-content-title-font-color;
-    @include fontSize(48px);
-    font-weight: 100;
-    text-align: center;
-    padding: 40px 0;
-    margin: 0;
-  }
-  > h2 {
-    padding: 3px 0;
-    margin: 25px 0;
-    text-transform: capitalize;
-    @include fontSize(20px);
-    text-align: center;
-    border-top: 1px solid $sg-title-border;
-    border-bottom: 1px solid $sg-title-border;
-  }
-  > p {
-    @include fontSize($ic-font-size--medium);
-    text-align: center;
-    margin: 0;
-  }
   > ul, > dl, > ol {
     margin: 10px 20px;
     li {
@@ -187,10 +99,13 @@ body.Sg-only {
     }
   }
  .sg-src-file-path {
-    text-align: center;
-    padding: 5px 0;
-    background: var(--ic-brand-primary);
-    border-top:1px solid $sg-src-file-path-border-color;
-    color: $sg-src-file-path-font-color;
+    font-weight: bold;
+    margin-bottom: $ic-sp * 1.5;
   }
+}
+
+.Sg-Component-Heading {
+  font-size: 3rem;
+  font-weight: 300;
+  margin: 2.5rem 0 0;
 }

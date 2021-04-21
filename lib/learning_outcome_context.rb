@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -67,7 +69,7 @@ module LearningOutcomeContext
 
     def has_outcomes?
       Rails.cache.fetch(['has_outcomes', self].cache_key) do
-        linked_learning_outcomes.count > 0
+        linked_learning_outcomes.exists?
       end
     end
 

@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t('titles.registered_services', 'Registered Services') %>
+<% provide :page_title, t('titles.registered_services', 'Registered Services') %>
 <% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
-  @active_tab="people"
+  set_active_tab "people"
   add_crumb(t('#crumbs.registered_services', 'Registered Services'), context_url(@context, :context_user_services_url)) %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div class="rs-margin-bottom">
     <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><i class="icon-arrow-left"></i> <%= t('links.back_to_roster', %{Back to Roster}) %></a>
   </div>
@@ -37,7 +37,7 @@
     </ul>
   </div>
 <% end %>
-<% content_for :stylesheets do %>
+
 <style>
 .service_types {
   font-size: 1.2em;
@@ -78,13 +78,13 @@
   padding-<%= direction('right') %>: 5px;
 }
 </style>
-<% end %>
+
 <h1><%= t('headings.registered_services', %{Registered Services}) %></h1>
 <a href="<%= settings_profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
 <p>
   <%= t 'help.user_services', %{If other members choose, they can let you see which outside services they've linked to their Canvas account.  This can make it easier to coordinate group projects and also link up outside of class.} %>
 </p>
-<% if @current_user && @current_user.user_services.empty? %>
+<% if @current_user && @current_user.user_services.select{|s| feature_and_service_enabled?(s.service)}.empty? %>
   <p>
     <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like Twitter.} %>
   </p>

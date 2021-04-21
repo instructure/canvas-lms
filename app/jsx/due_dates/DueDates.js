@@ -20,16 +20,15 @@ import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import DueDateRow from '../due_dates/DueDateRow'
-import DueDateAddRowButton from '../due_dates/DueDateAddRowButton'
-import OverrideStudentStore from '../due_dates/OverrideStudentStore'
-import StudentGroupStore from '../due_dates/StudentGroupStore'
-import TokenActions from '../due_dates/TokenActions'
+import DueDateRow from './DueDateRow'
+import DueDateAddRowButton from './DueDateAddRowButton'
+import OverrideStudentStore from './OverrideStudentStore'
+import StudentGroupStore from './StudentGroupStore'
+import TokenActions from './TokenActions'
 import Override from 'compiled/models/AssignmentOverride'
 import AssignmentOverrideHelper from '../gradebook/AssignmentOverrideHelper'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!due_datesDueDates'
 import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
-import tz from 'timezone'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default class DueDates extends React.Component {
@@ -66,7 +65,6 @@ export default class DueDates extends React.Component {
     noops: {[Override.conditionalRelease.noop_id]: Override.conditionalRelease},
     rows: {},
     addedRowCount: 0,
-    defaultSectionId: null,
     currentlySearching: false,
     allStudentsFetched: false,
     selectedGroupSetId: null
@@ -115,7 +113,7 @@ export default class DueDates extends React.Component {
   }
 
   // always keep React Overrides in sync with Backbone Collection
-  componentWillUpdate(nextProps, nextState) {
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
     const updatedOverrides = this.getAllOverrides(nextState.rows)
     this.props.syncWithBackbone(updatedOverrides)
   }
@@ -139,14 +137,14 @@ export default class DueDates extends React.Component {
 
   formattedSectionHash = unformattedSections => {
     const formattedSections = _.map(unformattedSections, this.formatSection)
-    return _.indexBy(formattedSections, 'id')
+    return _.keyBy(formattedSections, 'id')
   }
 
   formatSection = section => _.extend(section.attributes, {course_section_id: section.id})
 
   formattedGroupHash = unformattedGroups => {
     const formattedGroups = _.map(unformattedGroups, this.formatGroup)
-    return _.indexBy(formattedGroups, 'id')
+    return _.keyBy(formattedGroups, 'id')
   }
 
   formatGroup = group => _.extend(group, {group_id: group.id})
@@ -185,8 +183,8 @@ export default class DueDates extends React.Component {
     const allGroups = this.state.groups
     const setId = this.state.selectedGroupSetId
     return _.chain(allGroups)
-      .filter((value, key) => value.group_category_id === setId)
-      .indexBy('id')
+      .filter(value => value.group_category_id === setId)
+      .keyBy('id')
       .value()
   }
 
@@ -215,10 +213,7 @@ export default class DueDates extends React.Component {
       .groupBy(key => (key.length > 11 ? 'datedKeys' : 'numberedKeys'))
       .value()
 
-    return _.chain([datedKeys, numberedKeys])
-      .flatten()
-      .compact()
-      .value()
+    return _.chain([datedKeys, numberedKeys]).flatten().compact().value()
   }
 
   rowRef = rowKey => `due_date_row-${rowKey}`
@@ -230,7 +225,7 @@ export default class DueDates extends React.Component {
   addRow = () => {
     const newRowCount = this.state.addedRowCount + 1
     this.replaceRow(newRowCount, [], {})
-    this.setState({addedRowCount: newRowCount}, function() {
+    this.setState({addedRowCount: newRowCount}, function () {
       this.focusRow(newRowCount)
     })
   }
@@ -240,7 +235,7 @@ export default class DueDates extends React.Component {
 
     const previousIndex = _.indexOf(this.sortedRowKeys(), rowToRemoveKey)
     const newRows = _.omit(this.state.rows, rowToRemoveKey)
-    this.setState({rows: newRows}, function() {
+    this.setState({rows: newRows}, function () {
       const ks = this.sortedRowKeys()
       const previousRowKey = ks[previousIndex] || ks[ks.length - 1]
       this.focusRow(previousRowKey)
@@ -250,9 +245,7 @@ export default class DueDates extends React.Component {
   canRemoveRow = () => this.sortedRowKeys().length > 1
 
   focusRow = rowKey => {
-    ReactDOM.findDOMNode(this.refs[this.rowRef(rowKey)])
-      .querySelector('input')
-      .focus()
+    ReactDOM.findDOMNode(this.refs[this.rowRef(rowKey)]).querySelector('input').focus()
   }
 
   // --------------------------
@@ -379,7 +372,7 @@ export default class DueDates extends React.Component {
       object: this.state.noops,
       keysToOmit: this.chosenNoops()
     })
-    if (this.props.hasGradingPeriods && !_.contains(ENV.current_user_roles, 'admin')) {
+    if (this.props.hasGradingPeriods && !_.includes(ENV.current_user_roles, 'admin')) {
       ;({
         validStudents,
         validGroups,
@@ -449,14 +442,10 @@ export default class DueDates extends React.Component {
 
   chosenNoops = () => this.chosenIds('noop_id')
 
-  valuesWithOmission = args =>
-    _.chain(args.object)
-      .omit(args.keysToOmit)
-      .values()
-      .value()
+  valuesWithOmission = args => _.chain(args.object).omit(args.keysToOmit).values().value()
 
   disableInputs = row => {
-    const rowIsNewOrUserIsAdmin = !row.persisted || _.contains(ENV.current_user_roles, 'admin')
+    const rowIsNewOrUserIsAdmin = !row.persisted || _.includes(ENV.current_user_roles, 'admin')
     if (!this.props.hasGradingPeriods || rowIsNewOrUserIsAdmin) {
       return false
     }

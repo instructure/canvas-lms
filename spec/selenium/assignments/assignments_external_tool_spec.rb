@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -22,8 +24,8 @@ describe "external tool assignments" do
 
   before (:each) do
     course_with_teacher_logged_in
-    @t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
-    @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
+    @t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
+    @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
   it "should allow creating through index", priority: "2", test_id: 209971  do
@@ -121,5 +123,84 @@ describe "external tool assignments" do
 
     get "/courses/#{@course.id}/assignments/#{a.id}"
     expect(f('.module-sequence-footer-button--next')).to be_displayed
+  end
+
+  context "submission type selection placement" do
+    before :each do
+      [@t1, @t2].each do |tool|
+        tool.submission_type_selection = {:text => "link to #{tool.name} or whatever"}
+        tool.save!
+      end
+      Account.default.enable_feature!(:submission_type_tool_placement)
+    end
+
+    it "should be able to select the tool directly from the submission type drop-down" do
+      get "/courses/#{@course.id}/assignments/new"
+
+      click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
+      button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+      expect(button).to be_displayed
+      expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
+
+      click_option("#assignment_submission_type", @t2.name)
+      expect(button.text).to include("link to #{@t2.name} or whatever") # the launch button uses the placement text
+
+      f("#assignment_name").send_keys("some title")
+      f(".btn-primary[type=\"submit\"]").click
+      wait_for_ajaximations
+      assmt = @course.assignments.last
+      expect(assmt.submission_types).to eq "external_tool"
+      expect(assmt.external_tool_tag.content).to eq @t2
+      expect(assmt.external_tool_tag.url).to eq @t2.url
+    end
+
+    it "should show the tool as selected when editing a saved configured assignment" do
+      assmt = @course.assignments.create!(:title => "blah", :submission_types => "external_tool",
+        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url})
+      get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
+      selected = first_selected_option(f("#assignment_submission_type"))
+      expect(selected.text.strip).to eq @t1.name
+      button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+      expect(button).to be_displayed
+      expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
+    end
+
+    it "should display external data for mastery connect" do
+      ext_data = {
+        key: "https://canvas.instructure.com/lti/mastery_connect_assessment",
+        points: 10,
+        objectives: "6.R.P.A.1, 6.R.P.A.2",
+        trackerName: "My Tracker Name",
+        studentCount: 15,
+        trackerAlignment: "6th grade Math"
+      }
+      a = assignment_model(
+        :course => @course,
+        :title => "test1",
+        :submission_types => 'external_tool',
+        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url, :external_data => ext_data.to_json}
+      )
+
+      get "/courses/#{@course.id}/assignments/#{a.id}/edit"
+
+      expect(f('#mc_external_data_assessment').text).to eq(a.name)
+      expect(f('#mc_external_data_points').text).to eq("#{ext_data[:points]} Points")
+      expect(f('#mc_external_data_objectives').text).to eq(ext_data[:objectives])
+      expect(f('#mc_external_data_tracker').text).to eq(ext_data[:trackerName])
+      expect(f('#mc_external_data_tracker_alignment').text).to eq(ext_data[:trackerAlignment])
+      expect(f('#mc_external_data_students').text).to eq("#{ext_data[:studentCount]} Students")
+    end
+
+    it "should be bring up modal when submission type link is clicked" do
+      get "/courses/#{@course.id}/assignments/new"
+      click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
+      f("#assignment_submission_type_selection_tool_launch_container .btn-primary").click
+      expect(fxpath("//span[@aria-label = 'Launch External Tool']//h2").text).to include("link to #{@t1.name} or whatever")
+
+      close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"
+      close_button = fxpath(close_button_selector)
+      close_button.click
+      expect(element_exists?(close_button_selector,true)).to eq(false)
+    end
   end
 end

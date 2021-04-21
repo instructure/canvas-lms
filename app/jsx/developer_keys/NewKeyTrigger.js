@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
+import {View} from '@instructure/ui-view'
+
+import {Flex} from '@instructure/ui-flex'
+import {Menu} from '@instructure/ui-menu'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconPlusLine} from '@instructure/ui-icons'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
@@ -37,32 +38,25 @@ export default class DeveloperKeyModalTrigger extends React.Component {
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen('lti'))
   }
 
-  isLti13Enabled = ENV.LTI_1_3_ENABLED
-
   developerKeyMenuItem(title, onClick) {
     return (
-      <MenuItem onClick={onClick} type="button">
+      <Menu.Item onClick={onClick} type="button">
         <Flex>
-          <FlexItem padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+          <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
             <IconPlusLine />
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <ScreenReaderContent>{I18n.t('Create an')}</ScreenReaderContent>
             {title}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </MenuItem>
+      </Menu.Item>
     )
   }
 
   triggerButton() {
     return (
-      <Button
-        variant="primary"
-        onClick={this.isLti13Enabled ? () => {} : this.showCreateDeveloperKey}
-        buttonRef={this.props.setAddKeyButtonRef}
-        icon={IconPlusLine}
-      >
+      <Button variant="primary" buttonRef={this.props.setAddKeyButtonRef} icon={IconPlusLine}>
         <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
         {I18n.t('Developer Key')}
       </Button>
@@ -70,15 +64,12 @@ export default class DeveloperKeyModalTrigger extends React.Component {
   }
 
   developerKeyTrigger() {
-    if (this.isLti13Enabled) {
-      return (
-        <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect>
-          {this.developerKeyMenuItem(I18n.t('API Key'), this.showCreateDeveloperKey)}
-          {this.developerKeyMenuItem(I18n.t('LTI Key'), this.showCreateLtiKey)}
-        </Menu>
-      )
-    }
-    return this.triggerButton()
+    return (
+      <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect>
+        {this.developerKeyMenuItem(I18n.t('API Key'), this.showCreateDeveloperKey)}
+        {this.developerKeyMenuItem(I18n.t('LTI Key'), this.showCreateLtiKey)}
+      </Menu>
+    )
   }
 
   render() {

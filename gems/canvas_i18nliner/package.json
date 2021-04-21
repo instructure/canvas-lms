@@ -5,17 +5,18 @@
   "main": "./js/main",
   "version": "0.0.1",
   "dependencies": {
+    "@instructure/i18nliner-handlebars": "^1.0.0",
     "ember-template-compiler": "1.8.0",
     "glob": "^7.0.3",
     "handlebars": "1.3.0",
-    "i18nliner": "^0.2.6",
-    "i18nliner-handlebars": "^0.2.2",
+    "i18nliner": "instructure/i18nliner-js#babel7",
     "minimist": "^1.1.0",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "coffee-script": "^1.12.4",
-    "jasmine": "^2.5.3"
+    "jasmine": "^2.5.3",
+    "jasmine-pretty-html-reporter": "^0.2.5"
   },
   "peerDependencies": {},
   "scripts": {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -17,30 +19,41 @@
 
 module Lti
   class Asset
-    def self.opaque_identifier_for(asset)
+    def self.opaque_identifier_for(asset, context: nil)
+      return if asset.blank?
+
       shard = asset.shard
       shard.activate do
         lti_context_id = context_id_for(asset, shard)
-        set_asset_context_id(asset, lti_context_id)
+        set_asset_context_id(asset, lti_context_id, context: context)
       end
     end
 
-    def self.set_asset_context_id(asset, context_id)
-      lti_context_id = context_id
+    def self.set_asset_context_id(asset, lti_context_id, context: nil)
       if asset.respond_to?('lti_context_id')
         global_context_id = global_context_id_for(asset)
         if asset.new_record?
           asset.lti_context_id = global_context_id
+        elsif asset.lti_context_id?
+          lti_context_id = (old_id = old_id_for_user_in_context(asset, context)) ? old_id : asset.lti_context_id
         else
-          asset.reload unless asset.lti_context_id?
+          GuardRail.activate(:primary) {asset.reload}
           unless asset.lti_context_id
             asset.lti_context_id = global_context_id
-            asset.save!
+            GuardRail.activate(:primary) {asset.save!}
           end
           lti_context_id = asset.lti_context_id
         end
       end
       lti_context_id
+    end
+
+    def self.old_id_for_user_in_context(asset, context)
+      if asset.is_a?(User) && context
+        context.shard.activate do
+          asset.past_lti_ids.where(context: context).take&.user_lti_context_id
+        end
+      end
     end
 
     def self.context_id_for(asset, shard = nil)

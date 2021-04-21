@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
 import Backbone from 'Backbone'
 import OutcomeResultCollection from '../../collections/OutcomeResultCollection'
 import DialogBaseView from '../DialogBaseView'
@@ -58,7 +57,9 @@ export default class OutcomeDetailView extends DialogBaseView {
       outcome: this.model
     })
 
-    this.allAlignments.on('fetched:last', () => this.alignmentsForView.reset(this.allAlignments.toArray()));
+    this.allAlignments.on('fetched:last', () =>
+      this.alignmentsForView.reset(this.allAlignments.toArray())
+    )
 
     return this.allAlignments.fetch()
   }
@@ -73,7 +74,7 @@ export default class OutcomeDetailView extends DialogBaseView {
 
   toJSON() {
     const json = super.toJSON(...arguments)
-    return _.extend(json, {progress: this.progress})
+    return {...json, progress: this.progress}
   }
 }
 OutcomeDetailView.initClass()

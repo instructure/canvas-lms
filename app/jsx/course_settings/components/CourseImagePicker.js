@@ -19,86 +19,105 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!course_images'
-import _ from 'underscore'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import UploadArea from './UploadArea'
+import {Spinner} from '@instructure/ui-spinner'
+import {Tabs} from '@instructure/ui-tabs'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Billboard} from '@instructure/ui-billboard'
+import {Text} from '@instructure/ui-text'
 import FlickrSearch from '../../shared/FlickrSearch'
+import ImageSearch from '../../shared/ImageSearch'
+import {getIconByType} from '../../shared/helpers/mimeClassIconHelper'
+
+const dropIcon = getIconByType('image')
 
 export default class CourseImagePicker extends React.Component {
   static propTypes = {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     handleFileUpload: PropTypes.func,
-    handleFlickrUrlUpload: PropTypes.func,
+    handleImageSearchUrlUpload: PropTypes.func,
     uploadingImage: PropTypes.bool
   }
 
   static defaultProps = {
     handleFileUpload: () => {},
-    handleFlickrUrlUpload: () => {},
+    handleImageSearchUrlUpload: () => {},
     uploadingImage: false
   }
 
   state = {
-    draggingFile: false
+    selectedIndex: 0,
+    fileDropMessages: null
   }
 
-  onDrop = e => {
-    this.setState({draggingFile: false})
-    this.props.handleFileUpload(e, this.props.courseId)
-    e.preventDefault()
-    e.stopPropagation()
+  handleTabChange = (event, {index}) => {
+    this.setState({
+      selectedIndex: index
+    })
   }
 
-  onDragLeave = () => {
-    this.setState({draggingFile: false})
+  handleDropAccepted = files => {
+    this.setState({fileDropMessages: null})
+    this.props.handleFileUpload(
+      {
+        dataTransfer: {files},
+        preventDefault: () => {},
+        stopPropagagtion: () => {}
+      },
+      this.props.courseId
+    )
   }
 
-  onDragEnter = e => {
-    if (this.shouldAcceptDrop(e.dataTransfer)) {
-      this.setState({draggingFile: true})
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  }
-
-  shouldAcceptDrop = dataTransfer => {
-    if (dataTransfer) {
-      return _.indexOf(dataTransfer.types, 'Files') >= 0
-    }
+  handleDropRejected = () => {
+    this.setState({
+      fileDropMessages: [{text: I18n.t('File must be an image'), type: 'error'}]
+    })
   }
 
   render() {
+    const selectedIndex = this.state.selectedIndex
     return (
-      <div
-        className="CourseImagePicker"
-        onDrop={this.onDrop}
-        onDragLeave={this.onDragLeave}
-        onDragOver={this.onDragEnter}
-        onDragEnter={this.onDragEnter}
-      >
-        {this.props.uploadingImage && (
-          <div className="CourseImagePicker__Overlay">
-            <Spinner title="Loading" />
-          </div>
-        )}
-        {this.state.draggingFile && (
-          <div className="DraggingOverlay CourseImagePicker__Overlay">
-            <div className="DraggingOverlay__Content">
-              <div className="DraggingOverlay__Icon">
-                <i className="icon-upload" />
-              </div>
-              <div className="DraggingOverlay__Instructions">{I18n.t('Drop Image')}</div>
+      <Tabs margin="large auto" maxWidth="60%" onRequestTabChange={this.handleTabChange}>
+        <Tabs.Panel renderTitle={I18n.t('Computer')} isSelected={selectedIndex === 0}>
+          {this.props.uploadingImage ? (
+            <div className="CourseImagePicker__Overlay">
+              <Spinner renderTitle="Loading" />
             </div>
-          </div>
+          ) : (
+            <FileDrop
+              accept="image/*"
+              renderLabel={
+                <Billboard
+                  heading={I18n.t('Upload Image')}
+                  hero={dropIcon}
+                  message={
+                    <Text size="small">
+                      {I18n.t('Drag and drop, or click to browse your computer')}
+                    </Text>
+                  }
+                />
+              }
+              messages={this.state.fileDropMessages}
+              onDropAccepted={this.handleDropAccepted}
+              onDropRejected={this.handleDropRejected}
+            />
+          )}
+        </Tabs.Panel>
+        {ENV.use_unsplash_image_search ? (
+          <Tabs.Panel renderTitle={I18n.t('Unsplash')} isSelected={selectedIndex === 1}>
+            <ImageSearch
+              selectImage={(imageUrl, confirmationId) =>
+                this.props.handleImageSearchUrlUpload(imageUrl, confirmationId)
+              }
+            />
+          </Tabs.Panel>
+        ) : (
+          <Tabs.Panel renderTitle={I18n.t('Flickr')} isSelected={selectedIndex === 1}>
+            <FlickrSearch
+              selectImage={imageUrl => this.props.handleImageSearchUrlUpload(imageUrl)}
+            />
+          </Tabs.Panel>
         )}
-        <div className="CourseImagePicker__Content">
-          <UploadArea
-            courseId={this.props.courseId}
-            handleFileUpload={this.props.handleFileUpload}
-          />
-          <FlickrSearch selectImage={flickrUrl => this.props.handleFlickrUrlUpload(flickrUrl)} />
-        </div>
-      </div>
+      </Tabs>
     )
   }
 }

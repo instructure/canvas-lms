@@ -21,16 +21,25 @@ import {shallow} from 'enzyme'
 
 import {ROLES} from '../../__tests__/examples'
 import PermissionTray from '../PermissionTray'
+import {ENABLED_FOR_ALL} from '../../propTypes'
+
+const permission = {
+  enabled: ENABLED_FOR_ALL,
+  locked: false,
+  readonly: false,
+  explicit: true
+}
 
 function makeDefaultProps() {
   return {
     assignedRoles: ROLES.filter(r => r.id === '1'),
     label: 'Student',
     permissionName: 'add_section',
-    permission: 'the best permission',
+    permission,
     tab: 'account',
     open: true,
-    hideTray: () => {},
+    hideTray: Function.prototype,
+    modifyPermissions: Function.prototype,
     unassignedRoles: ROLES.filter(r => r.id === '2')
   }
 }
@@ -72,7 +81,6 @@ it('renders unassigned roles if any are present', () => {
 
 it('renders details toggles for permissions if any are present', () => {
   const props = makeDefaultProps()
-  props.permissionName = 'manage_account_settings'
   const tree = shallow(<PermissionTray {...props} />)
   const node = tree.find('DetailsToggle')
   expect(node.exists()).toBeTruthy()

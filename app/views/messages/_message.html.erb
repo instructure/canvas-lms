@@ -36,12 +36,10 @@
         <div id="meta-data-<%= message.id %>">
             <table class="ic-Table ic-Table--condensed grid">
                 <tbody>
-                <% unless Rails.env.production? %>
                 <tr>
-                    <td class="td-label"><div>ID</div></td>
+                    <td class="td-label"><div><%= t('id') %></div></td>
                     <td><%= message.id %></td>
                 </tr>
-                <% end %>
                 <tr>
                     <td class="td-label"><div><%= t('titles.subject', 'Subject') %></div></td>
                     <td><%= message.subject %></td>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ module Api::V1::SisAssignment
   end
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data include_in_final_grade).freeze,
+    only: %i(id created_at due_at unlock_at lock_at points_possible sis_assignment_id integration_id integration_data include_in_final_grade).freeze,
     methods: %i(name submission_types_array).freeze
   }.freeze
 
@@ -102,9 +104,9 @@ module Api::V1::SisAssignment
 
     assignment_override_students_json = override.assignment_override_students.map do |student_override|
       json = api_json(student_override, nil, nil, API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS)
-      if student_override.association(:user).loaded? && student_override.user.association(:pseudonym).loaded?
-        pseudonym = student_override.user.pseudonym
-        json[:sis_user_id] = (pseudonym ? pseudonym.sis_user_id : nil)
+      if student_override.association(:user).loaded?
+        pseudonym = SisPseudonym.for(student_override.user, override.assignment.context)
+        json[:sis_user_id] = pseudonym&.sis_user_id
       end
 
       json

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -25,6 +27,29 @@ describe "CanvasHttp" do
 
   include WebMock::API
 
+  around :each do |block|
+    fake_logger = Class.new do
+      attr_reader :messages
+      def initialize()
+        @messages = []
+        super
+      end
+
+      def info(message)
+        @messages << { level: "info", message: message }
+      end
+
+      def warn(message)
+        @messages << { level: "warn", message: message }
+      end
+    end
+    logger = fake_logger.new
+    real_logger = CanvasHttp.logger
+    CanvasHttp.logger = -> { logger }
+    block.call
+    CanvasHttp.logger = real_logger
+  end
+
   describe ".post" do
     before :each do
       WebMock::RequestRegistry.instance.reset!
@@ -36,6 +61,12 @@ describe "CanvasHttp" do
       stub_request(:post, url).with(body: "abc").
         to_return(status: 200)
       expect(CanvasHttp.post(url, body: body).code).to eq "200"
+      logs = CanvasHttp.logger.messages
+      expect(logs.size).to eq(3)
+      expect(logs[0][:message] =~ /CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post/).to be_truthy
+      expect(logs[0][:message] =~ /| elapsed: \d/).to be_truthy
+      expect(logs[1][:message] =~ /CANVAS_HTTP INITIATE REQUEST | url: www.example.com/).to be_truthy
+      expect(logs[2][:message] =~ /CANVAS_HTTP RESOLVE RESPONSE | url: www.example.com/).to be_truthy
     end
 
     it "allows you to set a content_type" do
@@ -63,6 +94,36 @@ describe "CanvasHttp" do
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 
       assert_requested(stubbed)
+    end
+
+    it "escapes filename for multipart" do
+      url = "www.example.com/a"
+      file_contents = "file contents"
+      form_data = { "dangling\"quote.txt" => StringIO.new(file_contents) }
+
+      stubbed = stub_request(:post, url).with do |req|
+        expect(req.headers['Content-Type']).to match(%r{\Amultipart/form-data})
+        expect(req.body.lines[1]).to match('Content-Disposition: form-data; name="dangling%22quote.txt"; filename="dangling%22quote.txt"')
+        expect(req.body.lines[2]).to match('Content-Transfer-Encoding: binary')
+        expect(req.body.lines[3]).to match('Content-Type: text/plain')
+        expect(req.body.lines[5]).to match('file contents')
+      end.to_return(:status => 200)
+
+      CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
+
+      assert_requested(stubbed)
+    end
+
+    it "tracks the cost in seconds" do
+      url = "www.example.com/a"
+      stub_request(:get, url).to_return(status: 200)
+      CanvasHttp.reset_cost!
+      expect(CanvasHttp.cost).to eq(0)
+      start_time = Time.now
+      expect(CanvasHttp.get(url).code).to eq "200"
+      end_time = Time.now
+      expect(CanvasHttp.cost > 0).to be_truthy
+      expect(CanvasHttp.cost <= (end_time - start_time)).to be_truthy
     end
   end
 
@@ -150,19 +211,32 @@ describe "CanvasHttp" do
   end
 
   describe '#insecure_host?' do
+    around(:each) do |example|
+      old_filters = CanvasHttp.blocked_ip_filters
+      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
+      example.call
+    ensure
+      CanvasHttp.blocked_ip_filters = old_filters
+    end
+
     it "should check for insecure hosts" do
-      begin
-        old_filters = CanvasHttp.blocked_ip_filters
-        CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
-        expect(CanvasHttp.insecure_host?('www.example.com')).to eq false
-        expect(CanvasHttp.insecure_host?('localhost')).to eq true
-        expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
-        expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
-        expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
-        expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
-      ensure
-        CanvasHttp.blocked_ip_filters = old_filters
-      end
+      expect(CanvasHttp.insecure_host?('example.com')).to eq false
+      expect(CanvasHttp.insecure_host?('localhost')).to eq true
+      expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
+      expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
+      expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
+      expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
+    end
+
+    it "raises an error when URL is not resolveable" do
+      bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
+      expect{ CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
+    end
+
+    it "won't continue to process a host with no valid IPs" do
+      bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
+      expect(Resolv).to receive(:getaddresses).with(bad_url).and_return(["not.an.ip.address"])
+      expect{ CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
   end
 
@@ -191,6 +265,44 @@ describe "CanvasHttp" do
       http = CanvasHttp.connection_for_uri(URI.parse("https://example.com"))
       expect(http.address).to eq("example.com")
       expect(http.use_ssl?).to eq(true)
+    end
+  end
+
+  describe ".validate_url" do
+    it "accepts a valid url" do
+      value, _ = CanvasHttp.validate_url('http://example.com')
+      expect(value).to eq 'http://example.com'
+    end
+
+    it "rejects a bad url" do
+      expect { CanvasHttp.validate_url('this is not a url') }.to raise_error(URI::InvalidURIError)
+    end
+
+    it "infers host and scheme" do
+      value, _ = CanvasHttp.validate_url('/whatever', host: 'example.org', scheme: 'https')
+      expect(value).to eq 'https://example.org/whatever'
+    end
+
+    it "enforces allowed schemes" do
+      expect { CanvasHttp.validate_url('ftp://example.com', allowed_schemes: ['ftp']) }.not_to raise_error
+      expect { CanvasHttp.validate_url('ftp://example.com') }.to raise_error(ArgumentError)
+    end
+
+    it "checks for unsafe hosts" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
+      expect { CanvasHttp.validate_url('http://127.0.0.1') }.not_to raise_error
+      expect { CanvasHttp.validate_url('http://127.0.0.1', check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+    end
+
+    it "normalizes unicode names" do
+      value, _ = CanvasHttp.validate_url('http://example.com/whät')
+      expect(value).to eq 'http://example.com/wh%C3%A4t'
+    end
+
+    it "does not bypass other checks when normalizing unicode names" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
+      expect { CanvasHttp.validate_url('http://127.0.0.1/嘊', check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+      expect { CanvasHttp.validate_url('http://example.com/whät', allowed_schemes: ['https']) }.to raise_error(ArgumentError)
     end
   end
 end

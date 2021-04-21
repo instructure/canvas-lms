@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -51,7 +53,10 @@ module SpecTimeLimit
 
     # find an appropriate timeout for this spec
     def timeout_for(example)
-      if ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
+      if example.metadata[:custom_timeout]
+        raise "Custom timeouts cannot exceed #{ABSOLUTE_TIMEOUT} seconds!" if example.metadata[:custom_timeout].to_i > ABSOLUTE_TIMEOUT
+        [:target, example.metadata[:custom_timeout].to_i]
+      elsif ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
       elsif example.file_path.match? /\.\/spec\/selenium\/.*rcs/ # files in ./spec/selenium/**/rcs
         [:target, SIDEBAR_LOADING_TIMEOUT]
@@ -91,7 +96,7 @@ module SpecTimeLimit
       #
       # furthermore, these are exempt from rerun thresholds so your build
       # will likely still pass if it was a total fluke.
-      ((stats[stat_key] * 2) + 5).ceil
+      ((stats[stat_key] * 3) + 5).ceil
     end
 
     def stats

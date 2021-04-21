@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -16,10 +18,46 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AssignmentConfigurationToolLookup < ActiveRecord::Base
+  SUBSCRIPTION_MANAGEMENT_STRAND = 'plagiarism-platform-subscription-management'
+
+  validates :context_type, presence: true
+
   belongs_to :tool, polymorphic: [:context_external_tool, message_handler: 'Lti::MessageHandler']
   belongs_to :assignment
-  after_create :create_subscription
   # Do not add before_destroy or after_destroy, these records are "delete_all"ed
+
+  class << self
+    def by_message_handler(message_handler, assignments)
+      product_family = message_handler.tool_proxy.product_family
+      AssignmentConfigurationToolLookup.where(
+        assignment: Array(assignments),
+        tool_product_code: product_family.product_code,
+        tool_vendor_code: product_family.vendor_code,
+        tool_resource_type_code: message_handler.resource_handler.resource_type_code,
+        context_type: message_handler.tool_proxy.context_type # Course or Account
+      )
+    end
+
+    # TODO: this method is not used. remove.
+    def by_tool_proxy(tool_proxy)
+      by_tool_proxy_scope(tool_proxy).preload(:assignment).map(&:assignment)
+    end
+
+    def by_tool_proxy_scope(tool_proxy)
+      message_handler = tool_proxy.resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
+        mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
+      end
+      where(
+        tool_product_code: tool_proxy.product_family.product_code,
+        tool_vendor_code: tool_proxy.product_family.vendor_code,
+        tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
+        # this method is only used in
+        # app/controllers/lti/users_api_controller.rb#user_in_context to limit
+        # access. So we don't include context_type here, in case that breaks
+        # tools from working (if some course-level ACTLs as "Account")
+      )
+    end
+  end
 
   def lti_tool
     @_lti_tool ||= begin
@@ -36,12 +74,6 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     end
   end
 
-  def destroy_subscription
-    return unless lti_tool.instance_of? Lti::MessageHandler
-    tool_proxy = lti_tool.resource_handler.tool_proxy
-    Lti::AssignmentSubscriptionsHelper.new(tool_proxy).destroy_subscription(subscription_id)
-  end
-
   def resource_codes
     if tool_type == 'Lti::MessageHandler' && tool_id.blank?
       return {
@@ -53,35 +85,5 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
       return lti_tool.resource_codes
     end
     {}
-  end
-
-  def self.by_message_handler(message_handler, assignment)
-    product_family = message_handler.resource_handler.tool_proxy.product_family
-    AssignmentConfigurationToolLookup.where(
-      assignment: assignment,
-      tool_product_code: product_family.product_code,
-      tool_vendor_code: product_family.vendor_code,
-      tool_resource_type_code: message_handler.resource_handler.resource_type_code
-    )
-  end
-
-  def self.by_tool_proxy(tool_proxy)
-    message_handler = tool_proxy.resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
-      mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
-    end
-    where(
-      tool_product_code: tool_proxy.product_family.product_code,
-      tool_vendor_code: tool_proxy.product_family.vendor_code,
-      tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
-    ).preload(:assignment).map(&:assignment)
-  end
-
-  private
-
-  def create_subscription
-    return unless lti_tool.instance_of? Lti::MessageHandler
-    tool_proxy = lti_tool.resource_handler.tool_proxy
-    subscription_helper = Lti::AssignmentSubscriptionsHelper.new(tool_proxy, assignment)
-    self.update_attributes(subscription_id: subscription_helper.create_subscription)
   end
 end

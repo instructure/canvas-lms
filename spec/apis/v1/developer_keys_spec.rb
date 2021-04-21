@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -17,8 +19,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti_1_3_spec_helper')
 
 describe DeveloperKeysController, type: :request do
+  include_context 'lti_1_3_spec_helper'
   let(:sa_id) { Account.site_admin.id }
 
   describe "GET 'index'" do
@@ -74,8 +78,28 @@ describe DeveloperKeysController, type: :request do
       d.update! visible: true
       get "/api/v1/accounts/#{a.id}/developer_keys", params: { inherited: true }
       expect(json_parse.first.keys).to match_array(
-        %w[name created_at icon_url workflow_state id developer_key_account_binding]
+        %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key]
       )
+    end
+
+    it 'should only include tool_configuration if inherited is not set' do
+      a = Account.create!
+      allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
+      user_session(account_admin_user(account: a))
+      d = DeveloperKey.create!(account: a)
+      d.update! visible: true
+      get "/api/v1/accounts/#{a.id}/developer_keys"
+      expect(json_parse.first.keys).to include 'tool_configuration'
+    end
+
+    it 'should include "allow_includes"' do
+      a = Account.create!
+      allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
+      user_session(account_admin_user(account: a))
+      d = DeveloperKey.create!(account: a)
+      d.update! visible: true
+      get "/api/v1/accounts/#{a.id}/developer_keys"
+      expect(json_parse.first.keys).to include 'allow_includes'
     end
 
     it 'does not include `test_cluster_only` by default' do

@@ -17,28 +17,27 @@
  */
 
 import React from 'react'
-import { render, shallow } from 'enzyme'
-import { Set } from 'immutable'
+import {render, fireEvent, within} from '@testing-library/react'
+import {Set} from 'immutable'
 import OutcomeGroup from '../OutcomeGroup'
 
 const outcome = (id, title) => ({
   id,
   title,
-  assignments: [],
+  assignments: [
+    {html_url: 'http://foo', id: 'assignment_2', name: 'My alignment', submission_types: 'none'}
+  ],
   mastered: false,
   mastery_points: 3,
   points_possible: 5,
   calculation_method: 'highest',
-  ratings: [
-    { description: 'My first rating' },
-    { description: 'My second rating' }
-  ],
+  ratings: [{description: 'My first rating'}, {description: 'My second rating'}],
   results: [
     {
       id: 1,
       percent: 0.1,
       assignment: {
-        id: 2,
+        id: 'assignment_2',
         name: 'My alignment',
         html_url: 'http://foo',
         submission_types: ''
@@ -47,68 +46,26 @@ const outcome = (id, title) => ({
   ]
 })
 
-const defaultProps = (props = {}) => (
-  Object.assign({
-    outcomeGroup: {
-      id: 10,
-      title: 'My group'
-    },
-    outcomes: [
-      {
-        id: 1,
-        expansionId: 100,
-        mastered: false,
-        mastery_points: 3,
-        points_possible: 5,
-        calculation_method: 'highest',
-        ratings: [
-          { description: 'My first rating' },
-          { description: 'My second rating' }
-        ],
-        results: [
-          {
-            id: 1,
-            score: 1,
-            percent: 0.1,
-            assignment: {
-              id: 1,
-              html_url: 'http://foo',
-              name: 'My assignment',
-              submission_types: 'online_quiz'
-            }
-          }
-        ],
-        title: 'My outcome'
-      }
-    ],
-    expanded: false,
-    expandedOutcomes: Set(),
-    onExpansionChange: () => {}
-  }, props)
-)
-
-it('renders the OutcomeGroup component', () => {
-  const wrapper = shallow(<OutcomeGroup {...defaultProps()}/>)
-  expect(wrapper).toMatchSnapshot()
+const defaultProps = (props = {}) => ({
+  outcomeGroup: {
+    id: 10,
+    title: 'My group'
+  },
+  outcomes: [outcome(1, 'My outcome')],
+  expanded: false,
+  expandedOutcomes: Set(),
+  onExpansionChange: () => {},
+  ...props
 })
 
-describe('header', () => {
-  it('includes the outcome group name', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()}/>)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('My group')
-  })
+it('renders the OutcomeGroup component', () => {
+  const {getByText} = render(<OutcomeGroup {...defaultProps()} />)
+  expect(getByText('My group')).not.toBeNull()
 })
 
 it('includes the individual outcomes', () => {
-  const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
-  expect(wrapper.find('Outcome')).toHaveLength(1)
-})
-
-it('renders correctly expanded', () => {
-  const wrapper = shallow(<OutcomeGroup {...defaultProps()} expanded />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText} = render(<OutcomeGroup {...defaultProps()} expanded />)
+  expect(getByText('My outcome')).not.toBeNull()
 })
 
 it('renders outcomes in alphabetical order by title', () => {
@@ -120,21 +77,22 @@ it('renders outcomes in alphabetical order by title', () => {
       outcome(4, 'Aerosmith')
     ]
   })
-  const wrapper = shallow(<OutcomeGroup {...props} />)
-  const outcomes = wrapper.find('Outcome')
+  const {getAllByRole} = render(<OutcomeGroup {...props} expanded />)
+  const outcomes = getAllByRole('listitem')
   expect(outcomes).toHaveLength(4)
-  expect(outcomes.get(0).props.outcome.title).toEqual('Aardvark')
-  expect(outcomes.get(1).props.outcome.title).toEqual('abba')
-  expect(outcomes.get(2).props.outcome.title).toEqual('Aerosmith')
-  expect(outcomes.get(3).props.outcome.title).toEqual('ZZ Top')
+  expect(within(outcomes[0]).getByText('Aardvark')).not.toBeNull()
+  expect(within(outcomes[1]).getByText('abba')).not.toBeNull()
+  expect(within(outcomes[2]).getByText('Aerosmith')).not.toBeNull()
+  expect(within(outcomes[3]).getByText('ZZ Top')).not.toBeNull()
 })
 
 describe('handleToggle()', () => {
   it('calls the correct onExpansionChange callback', () => {
     const props = defaultProps()
     props.onExpansionChange = jest.fn()
-    const wrapper = shallow(<OutcomeGroup {...props} />)
-    wrapper.instance().handleToggle(null, true)
-    expect(props.onExpansionChange).toBeCalledWith('group', 10, true)
+    const {getByRole} = render(<OutcomeGroup {...props} />)
+    const button = getByRole('button')
+    fireEvent.click(button)
+    expect(props.onExpansionChange).toHaveBeenCalledWith('group', 10, true)
   })
 })

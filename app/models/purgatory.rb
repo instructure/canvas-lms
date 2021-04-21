@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -20,4 +22,23 @@ class Purgatory < ActiveRecord::Base
   belongs_to :deleted_by_user, class_name: 'User'
 
   scope :active, -> { where(workflow_state: 'active') }
+
+  def self.days_until_expiration
+    Setting.get("purgatory_days_until_expiration", "30").to_i
+  end
+
+  def self.expire_old_purgatories
+    Purgatory.active.where("updated_at < ?", self.days_until_expiration.days.ago).find_in_batches do |batch|
+      batch.each do |p|
+        if p.new_instfs_uuid
+          begin
+            InstFS.delete_file(p.new_instfs_uuid)
+          rescue # still expire the record anyway even if we fail removing from instfs
+            ::Rails.logger.warn("error deleting purgatory from instfs: #{$!.inspect}")
+          end
+        end
+      end
+      Purgatory.where(:id => batch).update_all(:workflow_state => "expired")
+    end
+  end
 end

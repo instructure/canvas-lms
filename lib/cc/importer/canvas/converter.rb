@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,6 +28,7 @@ module CC::Importer::Canvas
     include WebcontentConverter
     include QuizConverter
     include MediaTrackConverter
+    include LtiResourceLinkConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -67,6 +70,8 @@ module CC::Importer::Canvas
       set_progress(70)
       @course[:media_tracks] = convert_media_tracks(settings_doc(MEDIA_TRACKS))
       set_progress(71)
+      @course[:lti_resource_links] = convert_lti_resource_links
+      set_progress(72)
       convert_quizzes if Qti.qti_enabled?
       set_progress(80)
 
@@ -96,7 +101,7 @@ module CC::Importer::Canvas
           data = JSON.parse(json)
           external_content[service_key] = data
         rescue JSON::ParserError => e
-          Canvas::Errors.capture_exception(:external_content_migration, e)
+          Canvas::Errors.capture_exception(:external_content_migration, e, :info)
         end
       end
       @course[:external_content] = external_content

@@ -20,7 +20,6 @@ import React from 'react'
 import * as enzyme from 'enzyme'
 import ExpandableLockOptions from 'jsx/blueprint_courses/components/ExpandableLockOptions'
 
-
 QUnit.module('ExpandableLockOptions component')
 
 const defaultProps = () => ({
@@ -31,8 +30,8 @@ const defaultProps = () => ({
     content: false,
     points: false,
     due_dates: false,
-    availability_dates: false,
-  },
+    availability_dates: false
+  }
 })
 
 test('renders the ToggleMenuTab component', () => {
@@ -43,7 +42,7 @@ test('renders the ToggleMenuTab component', () => {
 
 test('renders the closed toggle Icon', () => {
   const tree = enzyme.shallow(<ExpandableLockOptions {...defaultProps()} />)
-  const icon = tree.find('.bcs_tab_indicator-icon IconArrowOpenEnd')
+  const icon = tree.find('.bcs_tab_indicator-icon IconArrowOpenEndSolid')
   equal(icon.length, 1)
 })
 
@@ -51,11 +50,11 @@ test('renders the opened toggle Icon', () => {
   const props = defaultProps()
   props.isOpen = true
   const tree = enzyme.shallow(<ExpandableLockOptions {...props} />)
-  const icon = tree.find('.bcs_tab_indicator-icon IconArrowOpenDown')
+  const icon = tree.find('.bcs_tab_indicator-icon IconArrowOpenDownSolid')
   equal(icon.length, 1)
 })
 
-test('opens the submenu when toggle is clicked', (assert) => {
+test('opens the submenu when toggle is clicked', assert => {
   const done = assert.async()
   const tree = enzyme.mount(<ExpandableLockOptions {...defaultProps()} />)
   const toggle = tree.find('.bcs_tab-icon')

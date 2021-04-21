@@ -19,21 +19,17 @@
 import I18n from 'i18n!theme_editor'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {Modal} from '@instructure/ui-modal'
+import {Heading} from '@instructure/ui-heading'
 import ProgressBar from '../shared/ProgressBar'
 
 const messageToName = message =>
-  message.includes('Syncing for') ? message.replace('Syncing for ', '') : I18n.t('Unknown Account')
+  message.includes('Syncing for') ? message.replace('Syncing for ', '') : message
 
 function SubAccountProgressBar({message, completion}) {
   return (
     <li className="Theme-editor-progress-list-item">
-      <div className="Theme-editor-progress-list-item__title">
-        {I18n.t('%{account_name}', {
-          account_name: messageToName(message)
-        })}
-      </div>
+      <div className="Theme-editor-progress-list-item__title">{messageToName(message)}</div>
       <div className="Theme-editor-progress-list-item__bar">
         <ProgressBar
           progress={completion}
@@ -55,14 +51,14 @@ export default function ThemeEditorModal(props) {
 
   return (
     <Modal open={modalIsOpen} size={props.showProgressModal ? 'small' : 'medium'}>
-      <ModalHeader>
+      <Modal.Header>
         <Heading>
           {props.showProgressModal
             ? I18n.t('Generating preview...')
             : I18n.t('Applying new styles to subaccounts')}{' '}
         </Heading>
-      </ModalHeader>
-      <ModalBody>
+      </Modal.Header>
+      <Modal.Body>
         {props.showProgressModal ? (
           <ProgressBar
             progress={props.progress}
@@ -82,7 +78,7 @@ export default function ThemeEditorModal(props) {
             </ul>
           </div>
         )}
-      </ModalBody>
+      </Modal.Body>
     </Modal>
   )
 }

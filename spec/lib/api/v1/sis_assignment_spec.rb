@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -192,7 +194,7 @@ describe Api::V1::SisAssignment do
     context "mastery paths overrides" do
       it "uses a mastery paths due date as the course due date" do
         due_at = Time.zone.parse('2017-02-08 22:11:10')
-        assignment_1.update_attributes(due_at: nil)
+        assignment_1.update(due_at: nil)
         create_mastery_paths_override_for_assignment(assignment_1, due_at: due_at)
         assignments = Assignment.where(id: assignment_1.id).
           preload(:active_assignment_overrides)
@@ -204,7 +206,7 @@ describe Api::V1::SisAssignment do
 
       it "prefers the assignment due_at over an override" do
         assignment_due_at = Time.zone.parse('2017-03-08 22:11:10')
-        assignment_1.update_attributes(due_at: assignment_due_at)
+        assignment_1.update(due_at: assignment_due_at)
 
         override_due_at = Time.zone.parse('2017-02-08 22:11:10')
         create_mastery_paths_override_for_assignment(assignment_1, due_at: override_due_at)
@@ -224,7 +226,7 @@ describe Api::V1::SisAssignment do
       before do
         @student1 = student_in_course(course: course, workflow_state: 'active').user
         @student2 = student_in_course(course: course, workflow_state: 'active').user
-        managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2')
+        managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2', account: Account.default)
 
         due_at = Time.zone.parse('2017-02-08 22:11:10')
         @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at: due_at)
@@ -265,15 +267,6 @@ describe Api::V1::SisAssignment do
       it "does not list student sis_ids when users are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id).
           preload(active_assignment_overrides: [:assignment_override_students])
-
-        user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
-
-        expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
-      end
-
-      it "does not list student sis_ids when pseudonyms are not preloaded" do
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(active_assignment_overrides: [assignment_override_students: [:user]])
 
         user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
 

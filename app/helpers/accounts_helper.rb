@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -51,6 +53,7 @@ module AccountsHelper
     [
       [I18n.t('Card View'), 'cards'],
       [I18n.t('Recent Activity'), 'activity'],
-    ].tap { |opts| opts << [I18n.t('List View'), 'planner'] if account.root_account.feature_enabled?(:student_planner)}
+      [I18n.t('List View'), 'planner']
+    ]
   end
 end

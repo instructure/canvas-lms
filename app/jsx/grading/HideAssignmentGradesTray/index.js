@@ -17,13 +17,32 @@
  */
 
 import React, {PureComponent} from 'react'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
-import View from '@instructure/ui-layout/lib/components/View'
+import {CloseButton} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Heading} from '@instructure/ui-heading'
+import {Tray} from '@instructure/ui-tray'
+
 import I18n from 'i18n!hide_assignment_grades_tray'
+
+import Layout from './Layout'
+import {
+  hideAssignmentGrades,
+  hideAssignmentGradesForSections,
+  resolveHideAssignmentGradesStatus
+} from './Api'
+import {isHideable} from '../helpers/SubmissionHelper'
+import {showFlashAlert} from '../../shared/FlashAlert'
+
+function initialShowState() {
+  return {
+    hideBySections: false,
+    hidingGrades: false,
+    open: true,
+    selectedSectionIds: []
+  }
+}
 
 export default class HideAssignmentGradesTray extends PureComponent {
   constructor(props) {
@@ -31,9 +50,17 @@ export default class HideAssignmentGradesTray extends PureComponent {
 
     this.dismiss = this.dismiss.bind(this)
     this.show = this.show.bind(this)
+    this.hideBySectionsChanged = this.hideBySectionsChanged.bind(this)
+    this.onHideClick = this.onHideClick.bind(this)
+    this.sectionSelectionChanged = this.sectionSelectionChanged.bind(this)
 
     this.state = {
-      open: false
+      hideBySections: false,
+      hidingGrades: false,
+      onExited() {},
+      open: false,
+      selectedSectionIds: [],
+      submissions: []
     }
   }
 
@@ -44,8 +71,76 @@ export default class HideAssignmentGradesTray extends PureComponent {
   show(context) {
     this.setState({
       ...context,
-      open: true
+      ...initialShowState()
     })
+  }
+
+  hideBySectionsChanged(hideBySections) {
+    this.setState({hideBySections, selectedSectionIds: []})
+  }
+
+  async onHideClick() {
+    const {assignment, containerName, selectedSectionIds} = this.state
+    let hideRequest
+    let successMessage
+
+    if (this.state.hideBySections) {
+      if (selectedSectionIds.length === 0) {
+        showFlashAlert({
+          message: I18n.t('At least one section must be selected to hide grades by section.'),
+          type: 'error'
+        })
+
+        return
+      }
+
+      hideRequest = hideAssignmentGradesForSections(assignment.id, selectedSectionIds)
+      successMessage = I18n.t(
+        'Success! Grades have been hidden for the selected sections of %{assignmentName}.',
+        {assignmentName: assignment.name}
+      )
+    } else {
+      hideRequest = hideAssignmentGrades(assignment.id)
+      successMessage = I18n.t('Success! Grades have been hidden for %{assignmentName}.', {
+        assignmentName: assignment.name
+      })
+    }
+
+    this.setState({hidingGrades: true})
+
+    try {
+      const progress = await hideRequest
+      const hiddenSubmissionInfo = await resolveHideAssignmentGradesStatus(progress)
+      this.dismiss()
+      this.state.onHidden(hiddenSubmissionInfo)
+
+      if (!assignment.anonymousGrading || containerName !== 'SPEED_GRADER') {
+        showFlashAlert({
+          message: successMessage,
+          type: 'success'
+        })
+      }
+    } catch (_error) {
+      showFlashAlert({
+        message: I18n.t('There was a problem hiding assignment grades.'),
+        type: 'error'
+      })
+      this.setState({hidingGrades: false})
+    }
+  }
+
+  sectionSelectionChanged(selected, sectionId) {
+    const {selectedSectionIds} = this.state
+
+    if (selected) {
+      this.setState({selectedSectionIds: [...selectedSectionIds, sectionId]})
+    } else {
+      this.setState({
+        selectedSectionIds: selectedSectionIds.filter(
+          selectedSection => selectedSection !== sectionId
+        )
+      })
+    }
   }
 
   render() {
@@ -53,28 +148,45 @@ export default class HideAssignmentGradesTray extends PureComponent {
       return null
     }
 
-    const {assignment, onExited} = this.state
+    const {assignment, containerName, onExited, sections, submissions} = this.state
+
+    const unhiddenCount = submissions.filter(submission => isHideable(submission)).length
 
     return (
       <Tray
         label={I18n.t('Hide grades tray')}
+        onDismiss={this.dismiss}
         onExited={onExited}
         open={this.state.open}
         placement="end"
       >
         <View as="div" padding="small">
-          <Flex as="div" alignItems="start" margin="0 0 medium 0">
-            <FlexItem>
+          <Flex as="div" alignItems="start" margin="0 0 small 0">
+            <Flex.Item>
               <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem margin="0 0 0 small" shrink>
+            <Flex.Item margin="0 0 0 small" shrink>
               <Heading as="h2" level="h3">
                 <TruncateText maxLines={3}>{assignment.name}</TruncateText>
               </Heading>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </View>
+
+        <Layout
+          assignment={assignment}
+          containerName={containerName}
+          dismiss={this.dismiss}
+          hideBySections={this.state.hideBySections}
+          hideBySectionsChanged={this.hideBySectionsChanged}
+          hidingGrades={this.state.hidingGrades}
+          onHideClick={this.onHideClick}
+          sections={sections}
+          sectionSelectionChanged={this.sectionSelectionChanged}
+          selectedSectionIds={this.state.selectedSectionIds}
+          unhiddenCount={unhiddenCount}
+        />
       </Tray>
     )
   }

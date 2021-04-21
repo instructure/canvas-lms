@@ -16,28 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react';
-import { string, func } from 'prop-types';
-import Badge from '@instructure/ui-elements/lib/components/Badge';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import React, {Component} from 'react'
+import {string, func} from 'prop-types'
+import {Badge} from '@instructure/ui-badge'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class Indicator extends Component {
   static propTypes = {
     title: string.isRequired,
     variant: string.isRequired,
-    indicatorRef: func,
+    indicatorRef: func
   }
 
   static defaultProps = {
     indicatorRef: () => {}
   }
 
-  render () {
-    return <div ref={this.props.indicatorRef}>
-      <Badge standalone type="notification" variant={this.props.variant} />
-      <ScreenReaderContent>
-        {this.props.title}
-      </ScreenReaderContent>
-    </div>;
+  render() {
+    return (
+      <div ref={this.props.indicatorRef}>
+        <Badge standalone type="notification" variant={this.props.variant} />
+        <ScreenReaderContent>{this.props.title}</ScreenReaderContent>
+      </div>
+    )
   }
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddUniqueNameIndexes < ActiveRecord::Migration[4.2]
   tag :postdeploy
 

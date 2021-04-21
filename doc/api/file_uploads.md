@@ -26,7 +26,9 @@ There are three steps to uploading a file directly via POST:
 The first step is to POST to the relevant API endpoint, depending on where
 you want to create the file. For example, to <a href="courses.html">add a file to a course</a>, you'd
 POST to `/api/v1/courses/:course_id/files`. Or to <a href="submissions.html">upload a file as part of a student homework submission</a>, as the student you'd POST to
-`/api/v1/courses/:course_id/assignments/:assignment_id/submissions/self/files`.
+`/api/v1/courses/:course_id/assignments/:assignment_id/submissions/self/files` or `/api/v1/courses/:course_id/assignments/:assignment_id/submissions/comments/self/files` for submission comments.
+
+Note* The endpoint you choose to post files to will change the permissions set on the file. i.e. only files posted to the submissions comments endpoint can be attached to a submissions comment.
 
 Arguments:
 
@@ -121,18 +123,11 @@ If Step 2 is successful, the response will be either a 3XX redirect or
 
 In the case of a 3XX redirect, the application needs to perform a GET to
 this location in order to complete the upload, otherwise the new file
-may not be marked as available. This request is back against Canvas
-again, and needs to be authenticated using the normal API access token
-authentication.
-
-<p class="note deprecated">
-[DEPRECATED] While a POST would be truer to REST semantics, and was
-previously called for by this documentation, a GET is recommended at
-this point for forwards compatibility with the 201 Created response
-described below. POST requests are currently supported for backwards
-compatibility at all endpoints that may appear in the Location header,
-but are deprecated effective 2019-04-21 (notice given 2018-10-06).
-</p>
+may not be marked as available. (Note: While a POST would be truer to
+REST semantics, a GET is required for forwards compatibility with the
+201 Created response described below.) This request is back against
+Canvas again, and needs to be authenticated using the normal API access
+token authentication.
 
 In the case of a 201 Created, the upload has been complete and the
 Canvas JSON representation of the file can be retrieved with a GET from
@@ -168,11 +163,13 @@ public HTTP or HTTPS URL from which to retrieve the file.
 ### Step 1a: Posting the file URL to Canvas
 
 The first step is the same as with the "Uploading via POST" flow above,
-with the addition of one new parameter:
+with the addition of a few new parameters:
 
 <dl>
   <dt>url</dt>
   <dd>The full URL to the file to be uploaded. This URL must be publicly accessible.</dd>
+  <dt>submit_assignment</dt>
+  <dd>A boolean to indicate whether or not to automatically submit the assignment the file is associated with if it is associated with an assignment. Defaults to true.</dd>
 </dl>
 
 Example Request:

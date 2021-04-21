@@ -1,6 +1,6 @@
 <div id="assignment_group_{{id}}" data-id="{{id}}" class="assignment_group">
 
-  <div class="ig-header" style="position:relative;">
+  <div class="ig-header">
     {{#if ENV.PERMISSIONS.manage}}
       <span class="sortable-handle">
         <i class="icon-drag-handle" aria-hidden="true"></i>
@@ -8,18 +8,16 @@
     {{/if}}
     {{#if course_home}}
       <h3 class="ig-header-title">
-        <a
+        <button
         class="element_toggler accessible-toggler"
         aria-controls="assignment_group_{{id}}_assignments"
         aria-expanded="true"
         aria-label="{{name}} {{toggleMessage}}"
         tabindex="0"
-        href="#"
-        role="button"
         >
           <i class="icon-mini-arrow-down"></i>
           {{name}}
-        </a>
+        </button>
         {{#if hasIntegrationData}}
           <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from {{postToSISName}}{{/t}}'></i>
           <span class="screenreader-only">{{#t}}Imported from {{postToSISName}}{{/t}}</span>
@@ -27,18 +25,16 @@
       </h3>
     {{else}}
       <h2 class="ig-header-title">
-        <a
+        <button
         class="element_toggler accessible-toggler"
         aria-controls="assignment_group_{{id}}_assignments"
         aria-expanded="true"
         aria-label="{{name}} {{toggleMessage}}"
         tabindex="0"
-        href="#"
-        role="button"
         >
           <i class="icon-mini-arrow-down" aria-hidden="true"></i>
           {{name}}
-        </a>
+        </button>
         {{#if hasIntegrationData}}
           <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from {{postToSISName}}{{/t}}'></i>
           <span class="screenreader-only">{{#t}}Imported from {{postToSISName}}{{/t}}</span>
@@ -73,7 +69,7 @@
       {{#if ENV.PERMISSIONS.manage}}
         <a
           href="#"
-          class="btn add_assignment"
+          class="add_assignment Button--icon-action"
           title='{{#t}}Add Assignment to {{name}}{{/t}}'
         >
           {{! icon is separate from <a> tag because it is the only visible content in the button }}
@@ -82,10 +78,10 @@
         </a>
 
         <div class="inline-block">
-          <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0" role="button">
+          <button id="ag_{{id}}_manage_link" class="al-trigger Button--icon-action" tabindex="0">
             <span class="screenreader-only">{{#t}}Manage {{name}}{{/t}}</span>
             <i class="icon-more" aria-hidden="true"></i>
-          </a>
+          </button>
           <ul class="al-options">
             <li>
               <a
@@ -127,6 +123,7 @@
               >{{#t}}Move Group…{{/t}}</a>
             </li>
             {{/if}}
+            {{>ExternalTools/external_tools_menu assignmentGroupMenuPlacements}}
           </ul>
         </div>
       {{/if}}

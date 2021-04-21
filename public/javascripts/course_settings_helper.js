@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function tabIdFromElement (el) {
-    var tabIdStr = el.id;
-    if (tabIdStr) {
-      var tabId = tabIdStr.replace(/^nav_edit_tab_id_/, '');
-      if (tabId.length > 0) {
-        if(!tabId.match(/context|lti\/message_handler_/)) {
-          tabId = parseInt(tabId, 10);
-        }
-        return tabId;
+export function tabIdFromElement(el) {
+  const tabIdStr = el.id
+  if (tabIdStr) {
+    let tabId = tabIdStr.replace(/^nav_edit_tab_id_/, '')
+    if (tabId.length > 0) {
+      if (!tabId.match(/context|lti\/message_handler_/)) {
+        tabId = parseInt(tabId, 10)
       }
+      return tabId
     }
-    return null;
   }
+  return null
+}

@@ -176,6 +176,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   position: relative;
   margin: 10px;
   flex: 3;
+  width: 100%;
   // long file names cause this container, of all things, to expand unreasonably even after they get elided. Work
   // around that for the moment with this.
   display: flex;
@@ -237,8 +238,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   .btn-link {
     border-width: 0;
     padding-#{direction(right)}: 15px;
-    &.restricted { color: $ic-color-alert; }
-    &.hiddenState { color: $ic-color-alert; }
+    &.restricted { color: $ic-font-color-dark; }
+    &.hiddenState { color: $ic-font-color-dark; }
   }
 }
 

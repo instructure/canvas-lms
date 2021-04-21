@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -30,7 +32,7 @@ module LtiAdvantage::Models
 
     TYPED_ATTRIBUTES = {
       accept_types: Array,
-      accept_media_types: Array,
+      accept_media_types: String,
       accept_presentation_document_targets: Array
     }.freeze
 

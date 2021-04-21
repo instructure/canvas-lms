@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,14 +22,13 @@ require 'atom'
 
 class Wiki < ActiveRecord::Base
   has_many :wiki_pages, :dependent => :destroy
+  has_one :course
+  has_one :group
+  belongs_to :root_account, :class_name => 'Account'
 
   before_save :set_has_no_front_page_default
   after_update :set_downstream_change_for_master_courses
-
   after_save :update_contexts
-
-  has_one :course
-  has_one :group
 
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
@@ -151,32 +152,48 @@ class Wiki < ActiveRecord::Base
     can :view_unpublished_items
 
     given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits}
-    can :read and can :create_page and can :update_page and can :update_page_content
+    can :read and can :create_page and can :update_page
 
-    given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
-    can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content and can :view_unpublished_items
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_wiki_create)
+    end
+    can :read and can :create_page and can :view_unpublished_items
 
-    given {|user, session| self.context.grants_right?(user, session, :manage_wiki) && !self.context.is_a?(Group)}
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_wiki_delete)
+    end
+    can :read and can :delete_page and can :view_unpublished_items
+
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_wiki_update)
+    end
+    can :read and can :update and can :update_page and can :view_unpublished_items
+
     # Pages created by a user without this permission will be automatically published
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_wiki_update) && !self.context.is_a?(Group)
+    end
     can :publish_page
   end
 
   def self.wiki_for_context(context)
-    context.transaction do
-      # otherwise we lose dirty changes
-      context.save! if context.changed?
-      context.lock!
-      return context.wiki if context.wiki_id
-      # TODO i18n
-      t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
-      t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
+    GuardRail.activate(:primary) do
+      context.transaction do
+        # otherwise we lose dirty changes
+        context.save! if context.changed?
+        context.lock!
+        return context.wiki if context.wiki_id
+        # TODO i18n
+        t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
+        t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 
-      self.extend TextHelper
-      name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
+        self.extend TextHelper
+        name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
 
-      context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
-      context.save!
-      wiki
+        context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki", :root_account_id => context.root_account_id)
+        context.save!
+        wiki
+      end
     end
   end
 
@@ -200,7 +217,9 @@ class Wiki < ActiveRecord::Base
     if (match = param.match(/\Apage_id:(\d+)\z/))
       return self.wiki_pages.where(id: match[1].to_i).first
     end
-    scope = include_deleted ? self.wiki_pages : self.wiki_pages.not_deleted
+    scope = include_deleted ?
+      self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END")) :
+      self.wiki_pages.not_deleted
     scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
   end
 
@@ -208,4 +227,5 @@ class Wiki < ActiveRecord::Base
     # was a shim for draft state, can be removed
     'pages'
   end
+
 end

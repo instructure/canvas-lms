@@ -15,53 +15,51 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!assignments'
-  'Backbone'
-  'jquery'
-  'jst/assignments/AssignmentGroupCreateDialog'
-  'jquery.toJSON'
-  'jquery.instructure_forms'
-  'jquery.disableWhileLoading'
-  '../../jquery.rails_flash_notifications'
-  '../../jquery/fixDialogButtons'
-], (I18n, {View}, $, template) ->
+import I18n from 'i18n!AssignmentGroupCreateDialog'
+import {View} from 'Backbone'
+import $ from 'jquery'
+import template from 'jst/assignments/AssignmentGroupCreateDialog'
+import 'jquery.toJSON'
+import 'jquery.instructure_forms'
+import 'jquery.disableWhileLoading'
+import '../../jquery.rails_flash_notifications'
+import '../../jquery/fixDialogButtons'
 
-  class AssignmentGroupCreateDialog extends View
+export default class AssignmentGroupCreateDialog extends View
 
-    events:
-      submit: 'createAssignmentGroup'
-      'click .cancel-button': 'cancel'
+  events:
+    submit: 'createAssignmentGroup'
+    'click .cancel-button': 'cancel'
 
-    tagName: 'div'
+  tagName: 'div'
 
-    render: =>
-      @$el.html template()
-      @$el.dialog(
-        title: I18n.t('titles.add_assignment_group', "Add Assignment Group"),
-        width: 'auto',
-        modal: true
-      ).fixDialogButtons()
-      @$el.closest('.ui-dialog').find('.ui-dialog-titlebar-close').click =>  @cancel()
-      this
+  render: =>
+    @$el.html template()
+    @$el.dialog(
+      title: I18n.t('titles.add_assignment_group', "Add Assignment Group"),
+      width: 'auto',
+      modal: true
+    ).fixDialogButtons()
+    @$el.closest('.ui-dialog').find('.ui-dialog-titlebar-close').click =>  @cancel()
+    this
 
-    createAssignmentGroup: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
-      disablingDfd = new $.Deferred()
-      @$el.disableWhileLoading disablingDfd
-      $.ajaxJSON "/courses/#{ENV.CONTEXT_ID}/assignment_groups",
-        'POST',
-        @$el.find('form').toJSON(),
-        (data) =>
-          disablingDfd.resolve()
-          @closeDialog()
-          @trigger 'assignmentGroup:created', data.assignment_group
+  createAssignmentGroup: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
+    disablingDfd = new $.Deferred()
+    @$el.disableWhileLoading disablingDfd
+    $.ajaxJSON "/courses/#{ENV.CONTEXT_ID}/assignment_groups",
+      'POST',
+      @$el.find('form').toJSON(),
+      (data) =>
+        disablingDfd.resolve()
+        @closeDialog()
+        @trigger 'assignmentGroup:created', data.assignment_group
 
-    cancel: =>
-      @trigger 'assignmentGroup:canceled'
-      @closeDialog()
+  cancel: =>
+    @trigger 'assignmentGroup:canceled'
+    @closeDialog()
 
-    closeDialog: =>
-      @$el.dialog 'close'
-      @trigger 'close'
+  closeDialog: =>
+    @$el.dialog 'close'
+    @trigger 'close'

@@ -10,12 +10,13 @@ development:
     # service
     canvas:
       # environment
-      address-book:
-        app-host: "http://address-book.docker"
-        secret: "opensesame"
       canvas:
         encryption-secret: "astringthatisactually32byteslong"
         signing-secret: "astringthatisactually32byteslong"
+      datadog-rum:
+        application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81"
+        client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r"
+        sample_rate_percentage: 0.0 # Between 0.0 and 100.0; 0.0 disables the feature.
       live-events:
         aws_endpoint: http://kinesis.canvaslms.docker
         kinesis_stream_name: live-events
@@ -28,6 +29,11 @@ development:
         use_for_mml: 'false'
       rich-content-service:
         app-host: "rce.docker"
+      common_cartridge_viewer:
+        base_url: "http://localhost:3300"
+      fullstory:
+        sampling_rate: '0.0' # randomly inject this fraction of the time
+        app_key: 'xyzzy'
     # another service
     inst-fs:
       app-host: "http://api.instfs.docker"
@@ -41,37 +47,52 @@ development:
 
   private:
     canvas:
+      auditors.yml: |
+        write_paths:
+          - active_record
+        read_path: active_record
+      # datadog_apm.yml: |
+      #   sample_rate: 0.0
+      #   host_sample_rate: 0.0
+      # immersive_reader.yml: |
+      #   ir_tenant_id: ""
+      #   ir_client_id: ""
+      #   ir_client_secret: ""
+      #   ir_subdomain: "canvasir"
       # use a unique subdomain per attachment, so that browsers will enforce security
       # permissions (such as microphone/camera access) per-file. You must have wildcard
       # DNS set up for this to work.
-      attachment_specific_file_domain: true
-      ha_cache.yml: |
-        cache_store: ha_store
-        servers:
-         - redis://localhost/2
-        # keep stale data for up to 1 week in the cache
-        race_condition_ttl: 604800
-        # how long it might take to recompute a cache value
-        # before the lock times out and another process is
-        # allowed to write it
-        lock_timeout: 5
-        # how long before a cache entry is considered stale
-        expires_in: 300
-        # when deleting from the cache, trigger a consul event
-        # you can use the example script/consume_consul_events
-        # to delete from local nodes, but may need to tweak
-        # slightly if your config doesn't match
-        consul_event: "canvas/dev/invalidate_ha_cache"
-        # if configured, trigger the event in multiple Consul
-        # datacenters, rather than just the local one
-        # if you use this you SHOULD still list the local
-        # dc; it won't be added for you
-        consul_datacenters:
-        - dc1
-        - dc2
-      clone_url_strand.yml: |
-        lti1.instructure.com: lti1
-        lti2.instructure.com: lti2
+      # attachment_specific_file_domain: true
+      # ha_cache.yml: |
+      #   cache_store: ha_store
+      #   servers:
+      #    - redis://localhost/2
+      #   # keep stale data for up to 1 week in the cache
+      #   race_condition_ttl: 604800
+      #   # how long it might take to recompute a cache value
+      #   # before the lock times out and another process is
+      #   # allowed to write it
+      #   lock_timeout: 5
+      #   # how long before a cache entry is considered stale
+      #   expires_in: 300
+      #   # when deleting from the cache, trigger a consul event
+      #   # you can use the example script/consume_consul_events
+      #   # to delete from local nodes, but may need to tweak
+      #   # slightly if your config doesn't match
+      #   consul_event: "canvas/dev/invalidate_ha_cache"
+      #   # if configured, trigger the event in multiple Consul
+      #   # datacenters, rather than just the local one
+      #   # if you use this you SHOULD still list the local
+      #   # dc; it won't be added for you
+      #   consul_datacenters:
+      #   - dc1
+      #   - dc2
+      # clone_url_strand.yml: |
+      #   lti1.instructure.com: lti1
+      #   lti2.instructure.com: lti2
+      # csp_logging.yml: |
+      #   host: https://csplogging.inscloudgate.net/
+      #   shared_secret: s00p3r_s3cr3t
   store:
     canvas:
       lti-keys:

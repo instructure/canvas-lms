@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 require 'nokogiri'
+require 'nokogumbo'
 
 module CC
 module CCHelper
@@ -46,6 +49,7 @@ module CCHelper
   WEB_LINK = "imswl_xmlv1p1"
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
+  BASIC_LTI_1_DOT_3 = 'imsbasiclti_xmlv1p3'
   BLTI_NAMESPACE = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
 
   # Common Cartridge 1.2
@@ -95,6 +99,7 @@ module CCHelper
   MEDIA_TRACKS = 'media_tracks.xml'
   ASSIGNMENT_XML = 'assignment.xml'
   EXTERNAL_CONTENT_FOLDER = 'external_content'
+  RESOURCE_LINK_FOLDER = 'lti_resource_links'
 
   def ims_date(date=nil,default=Time.now)
     CCHelper.ims_date(date, default)
@@ -104,13 +109,16 @@ module CCHelper
     CCHelper.ims_datetime(date, default)
   end
 
-  def self.create_key(object, prepend="")
+  def self.create_key(object, prepend="", global: false)
     if object.is_a? ActiveRecord::Base
-      key = object.asset_string
+      key = global ? object.global_asset_string : object.asset_string
+    elsif global && (md = object.to_s.match(/^(.*)_(\d+)$/))
+      key = "#{md[1]}_#{Shard.global_id_for(md[2])}" # globalize asset strings
     else
       key = object.to_s
     end
-    "i" + Digest::MD5.hexdigest(prepend + key)
+    # make it obvious if we're using new identifiers now
+    (global ? "g" : "i") + Digest::MD5.hexdigest(prepend + key)
   end
 
   def self.ims_date(date=nil,default=Time.now)
@@ -146,20 +154,24 @@ module CCHelper
     [title, body]
   end
 
+  SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/
+  WEB_CONTENT_REFERENCE_REGEX = Regexp.union(Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
+    Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN))))
+
   def self.map_linked_objects(content)
     linked_objects = []
-    html = Nokogiri::HTML.fragment(content)
+    html = Nokogiri::HTML5.fragment(content)
     html.css('a, img').each do |atag|
       source = atag['href'] || atag['src']
-      next unless source =~ /%24[^%]*%24/
-      if source.include?(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN))
-        attachment_key = source.sub(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), '')
+      next unless source =~ SPECIAL_REFERENCE_REGEX
+      if source =~ WEB_CONTENT_REFERENCE_REGEX
+        attachment_key = source.sub(WEB_CONTENT_REFERENCE_REGEX, '')
         attachment_key = attachment_key.split('?').first
         attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
         linked_objects.push({local_path: attachment_key, type: 'Attachment'})
       else
         type, object_key = source.split('/').last 2
-        if type =~ /%24[^%]*%24/
+        if type =~ SPECIAL_REFERENCE_REGEX
           type = object_key
           object_key = nil
         end
@@ -213,15 +225,20 @@ module CCHelper
             obj = match.obj_class.where(id: match.obj_id).first
           end
           next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
-          folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-          folder = folder.split("/").map{|part| URI.escape(part)}.join("/")
 
           @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
-          # for files, turn it into a relative link by path, rather than by file id
-          # we retain the file query string parameters
-          path = "#{folder}/#{URI.escape(obj.display_name)}"
-          path = HtmlTextHelper.escape_html(path)
-          "#{path}#{CCHelper.file_query_string(match.rest)}"
+
+          if @for_course_copy
+            "#{COURSE_TOKEN}/file_ref/#{@key_generator.create_key(obj)}#{match.rest}"
+          else
+            # for files in exports, turn it into a relative link by path, rather than by file id
+            # we retain the file query string parameters
+            folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+            folder = folder.split("/").map{|part| URI.escape(part)}.join("/")
+            path = "#{folder}/#{URI.escape(obj.display_name)}"
+            path = HtmlTextHelper.escape_html(path)
+            "#{path}#{CCHelper.file_query_string(match.rest)}"
+          end
         end
       end
       wiki_handler = Proc.new do |match|
@@ -233,7 +250,8 @@ module CCHelper
                  @course.wiki_pages.where(id: url_or_title.to_i).first
         end
         if page
-          "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{match.query}"
+          query = translate_module_item_query(match.query)
+          "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{query}"
         else
           "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}#{match.query}"
         end
@@ -275,7 +293,7 @@ module CCHelper
       return query unless query&.include?("module_item_id=")
       original_param = query.sub("?", "").split("&").detect{|p| p.include?("module_item_id=")}
       tag_id = original_param.split("=").last
-      new_param = "module_item_id=#{@key_generator.create_key("content_tag_#{tag_id}")}"
+      new_param = "module_item_id=#{@key_generator.create_key(ContentTag.new(:id => tag_id))}"
       query.sub(original_param, new_param)
     end
 
@@ -299,16 +317,28 @@ module CCHelper
       # keep track of found media comments, and translate them into links into the files tree
       # if imported back into canvas, they'll get uploaded to the media server
       # and translated back into media comments
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      doc = Nokogiri::HTML5.fragment(html)
       doc.css('a.instructure_inline_media_comment').each do |anchor|
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
         obj = MediaObject.by_media_id(media_id).first
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          anchor['href'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
+          anchor['href'] = File.join(WEB_CONTENT_TOKEN, info[:path])
+        end
+      end
+
+      # process new RCE media iframes too
+      doc.css('iframe[data-media-id]').each do |iframe|
+        media_id = iframe['data-media-id']
+        obj = MediaObject.by_media_id(media_id).take
+        if obj && migration_id = @key_generator.create_key(obj)
+          @used_media_objects << obj
+          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
+          @media_object_infos[obj.id] = info
+          iframe['src'] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
       end
 
@@ -336,7 +366,7 @@ module CCHelper
     end
   end
 
-  def self.media_object_info(obj, client = nil, flavor = nil)
+  def self.media_object_info(obj, course: nil, client: nil, flavor: nil)
     unless client
       client = CanvasKaltura::ClientV3.new
       client.startSession(CanvasKaltura::SessionType::ADMIN)
@@ -348,10 +378,17 @@ module CCHelper
     else
       asset = client.flavorAssetGetOriginalAsset(obj.media_id)
     end
-    # we use the media_id as the export filename, since it is guaranteed to
-    # be unique
-    filename = "#{obj.media_id}.#{asset[:fileExt]}" if asset
-    { :asset => asset, :filename => filename }
+    attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by_id(obj.attachment_id)
+    path = if attachment
+      # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
+      attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, '')
+    else
+      # otherwise export to a file named after the media id
+      filename = obj.media_id
+      filename += ".#{asset[:fileExt]}" if asset
+      File.join(MEDIA_OBJECTS_FOLDER, filename)
+    end
+    { :asset => asset, :path => path }
   end
 
   # sub_path is the last part of a file url: /courses/1/files/1(/download)

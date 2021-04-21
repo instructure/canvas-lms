@@ -20,7 +20,7 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingStandard from './gradingStandard'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!external_toolsgradingStandardCollection'
 import _ from 'underscore'
 import 'jquery.instructure_misc_plugins'
 
@@ -33,25 +33,15 @@ class GradingStandardCollection extends React.Component {
 
   gotStandards = standards => {
     let formattedStandards = $.extend(true, [], standards)
-    formattedStandards = _.map(
-      formattedStandards,
-      function(standard) {
-        standard.grading_standard.data = this.formatStandardData(standard.grading_standard.data)
-        return standard
-      },
-      this
-    )
+    formattedStandards = _.map(formattedStandards, standard => {
+      standard.grading_standard.data = this.formatStandardData(standard.grading_standard.data)
+      return standard
+    })
     this.setState({standards: formattedStandards})
   }
 
   formatStandardData = standardData =>
-    _.map(
-      standardData,
-      function(dataRow) {
-        return [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)]
-      },
-      this
-    )
+    _.map(standardData, dataRow => [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)])
 
   addGradingStandard = () => {
     const newStandard = {
@@ -133,35 +123,27 @@ class GradingStandardCollection extends React.Component {
 
   dataFormattedForCreate = standard => {
     const formattedData = {grading_standard: standard}
-    _.each(
-      standard.data,
-      function(dataRow, i) {
-        const name = dataRow[0]
-        const value = dataRow[1]
-        formattedData.grading_standard.data[i] = [
-          name.trim(),
-          this.roundToTwoDecimalPlaces(value) / 100
-        ]
-      },
-      this
-    )
+    _.each(standard.data, (dataRow, i) => {
+      const name = dataRow[0]
+      const value = dataRow[1]
+      formattedData.grading_standard.data[i] = [
+        name.trim(),
+        this.roundToTwoDecimalPlaces(value) / 100
+      ]
+    })
     return formattedData
   }
 
   dataFormattedForUpdate = standard => {
     const formattedData = {grading_standard: {title: standard.title, standard_data: {}}}
-    _.each(
-      standard.data,
-      function(dataRow, i) {
-        const name = dataRow[0]
-        const value = dataRow[1]
-        formattedData.grading_standard.standard_data[`scheme_${i}`] = {
-          name: name.trim(),
-          value: this.roundToTwoDecimalPlaces(value)
-        }
-      },
-      this
-    )
+    _.each(standard.data, (dataRow, i) => {
+      const name = dataRow[0]
+      const value = dataRow[1]
+      formattedData.grading_standard.standard_data[`scheme_${i}`] = {
+        name: name.trim(),
+        value: this.roundToTwoDecimalPlaces(value)
+      }
+    })
     return formattedData
   }
 

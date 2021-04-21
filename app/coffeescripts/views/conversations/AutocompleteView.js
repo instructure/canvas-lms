@@ -34,21 +34,6 @@ import '../../jquery/scrollIntoView'
 const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1)
 
 export default class AutocompleteView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this._addToModelCache = this._addToModelCache.bind(this)
-    this._getModel = this._getModel.bind(this)
-    this._onSearchResultLoad = this._onSearchResultLoad.bind(this)
-    this._addToken = this._addToken.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     // Public: Limit selection to one result.
     this.optionProperty('single')
@@ -396,7 +381,7 @@ export default class AutocompleteView extends Backbone.View {
   _onSearchResultLoad() {
     _.extend(this.permissions, this._getPermissions())
     if (!this.excludeAll && !!this._canSendToAll()) this._addEveryoneResult(this.resultCollection)
-    this.resultCollection.each(this._addToModelCache)
+    this.resultCollection.each(this._addToModelCache.bind(this))
     const hasResults = this.resultCollection.length
     const isFinished = !this.nextRequest
     this._addBackResult(this.resultCollection)
@@ -522,7 +507,7 @@ export default class AutocompleteView extends Backbone.View {
       this.resultCollection.url = url
       this.cache[url] = this.resultCollection
       this._attachCollection()
-      this.currentRequest = this.resultCollection.fetch().done(this._onSearchResultLoad)
+      this.currentRequest = this.resultCollection.fetch().done(this._onSearchResultLoad.bind(this))
       return this.toggleResultList(true)
     }
   }
@@ -802,7 +787,7 @@ export default class AutocompleteView extends Backbone.View {
   //
   // Returns an array of models.
   tokenModels() {
-    return _.map(this.tokens, this._getModel)
+    return _.map(this.tokens, this._getModel.bind(this))
   }
 
   // Public: Set the current course context.

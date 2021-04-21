@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -39,7 +41,12 @@ class DelayedNotification < ActiveRecord::Base
     state :errored
   end
 
-  def self.process(asset, notification, recipient_keys, data)
+  
+  def self.process(asset, notification, recipient_keys, data = {}, **kwargs)
+    # RUBY 2.7 this can go away (**{} will work at the caller)
+    raise ArgumentError, "Only send one hash" if !data&.empty? && !kwargs.empty?
+    data = kwargs if data&.empty? && !kwargs.empty?
+
     DelayedNotification.new(
       asset: asset,
       notification: notification,
@@ -49,9 +56,12 @@ class DelayedNotification < ActiveRecord::Base
   end
 
   def process
-    tos = self.to_list
-    if self.asset && !tos.empty?
-      res = self.notification.create_message(self.asset, tos, data: self.data)
+    res = []
+    if asset
+      iterate_to_list do |to_list_slice|
+        slice_res = notification.create_message(self.asset, to_list_slice, data: self.data)
+        res.concat(slice_res) if Rails.env.test?
+      end
     end
     self.do_process unless self.new_record?
     res
@@ -63,8 +73,7 @@ class DelayedNotification < ActiveRecord::Base
     []
   end
 
-  def to_list
-    return @to_list if @to_list
+  def iterate_to_list
     lookups = {}
     (recipient_keys || []).each do |key|
       pieces = key.split('_')
@@ -73,13 +82,16 @@ class DelayedNotification < ActiveRecord::Base
       lookups[klass] ||= []
       lookups[klass] << id
     end
-    res = []
+
     lookups.each do |klass, ids|
       includes = []
-      includes = [:user] if klass == CommunicationChannel
-      res += klass.where(:id => ids).preload(includes).to_a rescue []
+      includes = [ :notification_policies, :notification_policy_overrides, { user: :pseudonyms } ] if klass == CommunicationChannel
+      includes = [ :pseudonyms, { communication_channels: [:notification_policies, :notification_policy_overrides] } ] if klass == User
+
+      ids.each_slice(100) do |slice|
+        yield klass.where(:id => slice).preload(includes).to_a
+      end
     end
-    @to_list = res.uniq
   end
 
   scope :to_be_processed, lambda { |limit|

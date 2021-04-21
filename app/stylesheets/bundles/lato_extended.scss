@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// New fonts added here also need to be added to app/stylesheets/bundles/lato.scss
+// Either lato.scss or lato_extended.scss is loaded depending on the value of the 'disable_lato_extended' setting
+
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+
+@font-face {
+  font-family: 'Lato Extended';
+  font-style: normal;
+  font-weight: 300;
+  src: url(/fonts/lato/extended/Lato-Light.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lato Extended';
+  font-style: italic;
+  font-weight: 400;
+  src: url(/fonts/lato/extended/Lato-Italic.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lato Extended';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/lato/extended/Lato-Regular.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lato Extended';
+  font-style: normal;
+  font-weight: 700;
+  src: url(/fonts/lato/extended/Lato-Bold.woff2) format('woff2');
+  font-display: swap;
+}

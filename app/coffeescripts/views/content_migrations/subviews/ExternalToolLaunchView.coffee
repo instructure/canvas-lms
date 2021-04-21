@@ -15,31 +15,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/subviews/ExternalToolLaunch'
-  'jquery'
-], (Backbone, template, $) ->
-  class ExternalToolLaunchView extends Backbone.View
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/subviews/ExternalToolLaunch'
+import $ from 'jquery'
 
-    events:
-      "click #externalToolLaunch": "launchExternalTool"
+export default class ExternalToolLaunchView extends Backbone.View
+  template: template
 
-    els:
-      '.file_name': '$fileName'
+  events:
+    "click #externalToolLaunch": "launchExternalTool"
 
-    @optionProperty 'contentReturnView'
+  els:
+    '.file_name': '$fileName'
 
-    initialize: (options) ->
-      super(options)
-      @contentReturnView.on 'ready', @setUrl
+  @optionProperty 'contentReturnView'
 
-    launchExternalTool: (event) ->
-      event.preventDefault()
-      @contentReturnView.render()
+  initialize: (options) ->
+    super(options)
+    @contentReturnView.on 'ready', @setUrl
 
-    setUrl: (data) =>
-      item = data.contentItems[0]
-      @$fileName.text(item.text)
-      @model.set('settings', {file_url: item.url})
+  launchExternalTool: (event) ->
+    event.preventDefault()
+    @contentReturnView.render()
+
+  setUrl: (data) =>
+    item = data.contentItems[0]
+    @$fileName.text(item.text)
+    @model.set('settings', {file_url: item.url})

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
+import GRADEBOOK_TRANSLATIONS from 'jsx/gradebook/GradebookTranslations'
 
 const MULTIPLIER = 1.5
 

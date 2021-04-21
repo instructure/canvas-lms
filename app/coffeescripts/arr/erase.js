@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 // erase `victim` from `array`
-export default function erase (array, victim) {
+export default function erase(array, victim) {
   for (let index = 0; index < array.length; index++) {
     const suspect = array[index]
     if (suspect === victim) {

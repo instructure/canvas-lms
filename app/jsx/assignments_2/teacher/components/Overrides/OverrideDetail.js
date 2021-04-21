@@ -22,17 +22,23 @@ import OverrideAttempts from './OverrideAttempts'
 import OverrideSubmissionTypes from './OverrideSubmissionTypes'
 import OverrideDates from './OverrideDates'
 import {OverrideShape} from '../../assignmentData'
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-view'
 
 export default class OverrideDetail extends React.Component {
   static propTypes = {
     override: OverrideShape.isRequired,
     onChangeOverride: func.isRequired,
+    onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     readOnly: bool
   }
 
   static defaultProps = {
-    readOnly: true
+    readOnly: false
+  }
+
+  handleChangeDate = (which, value) => {
+    this.props.onChangeOverride(which, value)
   }
 
   renderAssignedTo() {
@@ -45,6 +51,10 @@ export default class OverrideDetail extends React.Component {
         dueAt={this.props.override.dueAt}
         unlockAt={this.props.override.unlockAt}
         lockAt={this.props.override.lockAt}
+        onChange={this.handleChangeDate}
+        onValidate={this.props.onValidate}
+        invalidMessage={this.props.invalidMessage}
+        readOnly={this.props.readOnly}
       />
     )
   }
@@ -66,8 +76,8 @@ export default class OverrideDetail extends React.Component {
     return (
       <OverrideAttempts
         variant="detail"
-        override={this.props.override}
-        onChangeOverride={this.props.onChangeOverride}
+        allowedAttempts={this.props.override.allowedAttempts}
+        onChange={this.props.onChangeOverride}
         readOnly={this.props.readOnly}
       />
     )

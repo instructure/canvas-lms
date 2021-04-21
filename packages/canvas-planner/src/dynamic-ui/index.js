@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './animatable';
-export * from './middleware';
-export * from './manager';
-export * from './notifier';
-export * from './provider';
-export * from './util';
+export * from './animatable'
+export * from './middleware'
+export * from './manager'
+export * from './notifier'
+export * from './provider'
+export * from './util'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,18 +27,26 @@ describe Api::V1::Course do
   end
 
   describe "#course_settings_json" do
-  	it "should return course settings hash" do
-  		course_factory
-  		grading_standard = grading_standard_for(@course)
-  		@course.grading_standard = grading_standard
-  		@course.save
-  		course_settings = course_settings_json(@course)
-  		expect(course_settings[:allow_student_discussion_topics]).to eq true
-  		expect(course_settings[:allow_student_forum_attachments]).to eq false
-  		expect(course_settings[:allow_student_discussion_editing]).to eq true
-  		expect(course_settings[:grading_standard_enabled]).to eq true
-  		expect(course_settings[:grading_standard_id]).to eq grading_standard.id
-  	end
+    before :once do
+      @course = Course.create!
+    end
+
+    it "should return course settings hash" do
+      grading_standard = grading_standard_for(@course)
+      @course.grading_standard = grading_standard
+      @course.save
+      course_settings = course_settings_json(@course)
+      expect(course_settings[:allow_student_discussion_topics]).to eq true
+      expect(course_settings[:allow_student_forum_attachments]).to eq true
+      expect(course_settings[:allow_student_discussion_editing]).to eq true
+      expect(course_settings[:grading_standard_enabled]).to eq true
+      expect(course_settings[:grading_standard_id]).to eq grading_standard.id
+    end
+
+    it "includes filter_speed_grader_by_student_group in the settings hash" do
+      course_settings = course_settings_json(@course)
+      expect(course_settings).to have_key :filter_speed_grader_by_student_group
+    end
   end
 
   describe "#course_json" do

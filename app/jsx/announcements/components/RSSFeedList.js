@@ -22,13 +22,12 @@ import {func, arrayOf, bool} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconXLine from '@instructure/ui-icons/lib/Line/IconX'
+import {Button} from '@instructure/ui-buttons'
+import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
+import {IconXLine} from '@instructure/ui-icons'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -90,18 +89,22 @@ export default class RSSFeedList extends React.Component {
             hAlign="space-around"
             rowSpacing="small"
           >
-            <GridRow>
-              <GridCol>
-                <Link margin="0 small" href={url}>
-                  <Text size="small" margin="0 small 0">
-                    {display_name}
-                  </Text>
-                </Link>
+            <Grid.Row>
+              <Grid.Col>
+                <Button
+                  variant="link"
+                  margin="0 small"
+                  size="small"
+                  href={url}
+                  theme={{smallPadding: '0', smallHeight: '1rem'}}
+                >
+                  {display_name}
+                </Button>
                 <Text size="small" margin="0 small" color="secondary">
                   {this.renderPostAddedText(external_feed_entries_count)}
                 </Text>
-              </GridCol>
-              <GridCol width="auto">
+              </Grid.Col>
+              <Grid.Col width="auto">
                 <Button
                   id={`feed-row-${index}`}
                   className="external-rss-feed__delete-button"
@@ -113,8 +116,8 @@ export default class RSSFeedList extends React.Component {
                 >
                   <IconXLine title={I18n.t('Delete %{feedName}', {feedName: display_name})} />
                 </Button>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
       </div>
@@ -125,7 +128,7 @@ export default class RSSFeedList extends React.Component {
     if (!this.props.hasLoadedFeed) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner size="small" title={I18n.t('Adding RSS Feed')} />
+          <Spinner size="small" renderTitle={I18n.t('Adding RSS Feed')} />
         </div>
       )
     } else {
@@ -139,17 +142,13 @@ export default class RSSFeedList extends React.Component {
   }
 }
 
-const connectState = state =>
-  Object.assign({
-    feeds: state.externalRssFeed.feeds,
-    hasLoadedFeed: state.externalRssFeed.hasLoadedFeed
-  })
+const connectState = state => ({
+  feeds: state.externalRssFeed.feeds,
+  hasLoadedFeed: state.externalRssFeed.hasLoadedFeed
+})
 const connectActions = dispatch =>
   bindActionCreators(
     Object.assign(select(actions, ['getExternalFeeds', 'deleteExternalFeed'])),
     dispatch
   )
-export const ConnectedRSSFeedList = connect(
-  connectState,
-  connectActions
-)(RSSFeedList)
+export const ConnectedRSSFeedList = connect(connectState, connectActions)(RSSFeedList)

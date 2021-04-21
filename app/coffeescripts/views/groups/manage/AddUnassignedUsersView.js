@@ -16,25 +16,23 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {View} from 'Backbone'
-import _ from 'underscore'
 import CollectionView from '../../CollectionView'
 import template from 'jst/groups/manage/addUnassignedUsers'
 import itemTemplate from 'jst/groups/manage/addUnassignedUser'
 
 export default class AddUnassignedUsersView extends CollectionView {
   initialize(options) {
-    return super.initialize(
-      _.extend({}, options, {
-        itemView: View.extend({tagName: 'li'}),
-        itemViewOptions: {
-          template: itemTemplate
-        }
-      })
-    )
+    return super.initialize({
+      ...options,
+      itemView: View.extend({tagName: 'li'}),
+      itemViewOptions: {
+        template: itemTemplate
+      }
+    })
   }
 
   attach() {
-    this.collection.on('add remove change reset', this.render)
+    this.collection.on('add remove change reset', this.render, this)
     this.collection.on('setParam deleteParam', this.checkParam, this)
   }
 

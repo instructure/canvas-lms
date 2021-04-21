@@ -22,6 +22,7 @@ import ContentView from 'compiled/views/outcomes/ContentView'
 import fakeENV from 'helpers/fakeENV'
 import instructionsTemplate from 'jst/outcomes/mainInstructions'
 import assertions from 'helpers/assertions'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 
 QUnit.module('CollectionView', {
   setup() {
@@ -49,7 +50,7 @@ test('should be accessible', function(assert) {
 
 test('collectionView replaces text with warning and link on renderNoOutcomeWarning event', function() {
   ok(this.contentView.$el.text().match(/original_text/))
-  $.publish('renderNoOutcomeWarning')
+  publish('renderNoOutcomeWarning')
   ok(this.contentView.$el.text().match(/You have no outcomes/))
   ok(!this.contentView.$el.text().match(/original_text/))
   ok(

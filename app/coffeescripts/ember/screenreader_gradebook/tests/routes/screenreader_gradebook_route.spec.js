@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import * as FinalGradeOverrideApi from 'jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import ScreenreaderGradebookRoute from '../../routes/screenreader_gradebook_route'
 
 QUnit.module('ScreenreaderGradebookRoute', suiteHooks => {

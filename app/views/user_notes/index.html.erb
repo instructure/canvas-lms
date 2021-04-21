@@ -22,10 +22,10 @@
    js_bundle :user_notes
    css_bundle :user_notes
 %>
-<% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
+<% provide :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 
 <% if can_do(@user, @current_user, :create_user_notes) %>
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <a id="new_user_note_button" class="new btn button-sidebar-wide icon-add" href="#"><%= t 'links.create_new_entry', "Create a New Entry" %></a>
   <% end %>
 <% end %>

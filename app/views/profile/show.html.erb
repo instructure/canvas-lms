@@ -15,12 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-<%
-  js_env ga_page_title: "User Profile"
-%>
-<% content_for :page_title, @user_data[:short_name] %>
+<% provide :page_title, "User Profile" %>
 
 <div class="ic-Profile-layout">
+  <h1 class="screenreader-only"><%= t("User Profile") %></h1>
   <div class="ic-Profile-layout__Primary">
     <%= render 'shared/profile' %>
   </div>

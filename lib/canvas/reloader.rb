@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,8 +27,6 @@ module Canvas::Reloader
     def reload!
       Rails.logger.info("Canvas::Reloader fired")
       @pending_reload = false
-      Setting.reset_cache!
-      RequestThrottle.reload!
       to_reload.each do |block|
         begin
           block.call

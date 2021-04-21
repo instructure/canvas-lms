@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -17,23 +19,29 @@
 
 class SisPseudonym
   # type: :exact, :trusted, or :implicit
-  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false)
+  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
-    self.new(user, context, type, require_sis, include_deleted).pseudonym
+    raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
+    raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
+    self.new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region).pseudonym
   end
 
   attr_reader :user, :context, :type, :require_sis, :include_deleted
 
-  def initialize(user, context, type, require_sis, include_deleted)
+  def initialize(user, context, type, require_sis, include_deleted, root_account, in_region: false)
     @user = user
     @context = context
     @type = type
     @require_sis = require_sis
     @include_deleted = include_deleted
+    @root_account = root_account
+    @in_region = in_region
   end
 
   def pseudonym
     result = @context.sis_pseudonym if @context.class <= Enrollment
+    result ||= find_on_enrollment_for_context
+    result = nil if exclude_deleted?(result)
     result ||= find_in_home_account
     result ||= find_in_other_accounts
     if result
@@ -43,6 +51,25 @@ class SisPseudonym
   end
 
   private
+
+  def exclude_deleted?(result)
+    result&.workflow_state == 'deleted' && !@include_deleted
+  end
+
+  def find_on_enrollment_for_context
+    if @context.is_a?(Course) || @context.is_a?(CourseSection)
+      pseudonym = @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      # if the sis user id isn't here, this pointer might
+      # no longer be good.  Let the fallback logic work
+      # through "find_in_home_account".  It may still return this one,
+      # but if the sis_user_id got moved to another pseudonym
+      # it will grab that one instead.
+      return nil if pseudonym&.sis_user_id.nil?
+      return nil if pseudonym&.workflow_state == 'deleted' && !@include_deleted
+      pseudonym
+    end
+  end
+
   def find_in_other_accounts
     return nil if type == :exact
     if include_deleted
@@ -55,15 +82,29 @@ class SisPseudonym
       end
     end
 
-    shards = user.associated_shards
-    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
-    if type == :trusted
-      # only search the shards with trusted accounts
-      shards &= trusted_account_ids.keys
+
+    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted
+
+    # try the user's home shard first if it's fast
+    # the default shard has a replica in every region, so is always fast
+    user_shard_is_in_region = user.shard.in_current_region? || user.shard.default?
+    if user_shard_is_in_region
+      if type != :trusted || (account_ids = trusted_account_ids[user.shard])
+        user.shard.activate do
+          result = find_in_trusted_accounts(account_ids)
+          return result if result
+        end
+      end
     end
+
+    shards = @in_region ? user.in_region_associated_shards : user.associated_shards
+    # only search the shards with trusted accounts
+    shards &= trusted_account_ids.keys if type == :trusted
+
     return nil if shards.empty?
 
     Shard.with_each_shard(shards.sort) do
+      next if Shard.current == user.shard && user_shard_is_in_region
       account_ids = trusted_account_ids[Shard.current] if type == :trusted
       result = find_in_trusted_accounts(account_ids)
       return result if result

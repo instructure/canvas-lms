@@ -20,13 +20,9 @@
   css_bundle :otp_login
   js_bundle :otp_login
   @headers = false
-  @body_classes << "full-width modal body--login-confirmation"
-  content_for :page_title, t(:page_title, "Multi-factor Authentication")
+  add_body_class "full-width modal body--login-confirmation"
+  provide :page_title, t(:page_title, "Multi-factor Authentication")
 %>
-
-<% content_for :meta_tags do %>
-  <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=yes,width=device-width">
-<% end %>
 
 <div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
@@ -77,7 +73,7 @@ profile page and print out a set of back-up codes, in case your normal multi-fac
             <% end %>
           </div>
           <div class="col-xs-4">
-            <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("Canvas") %>
+            <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("#{@domain_root_account.name} Canvas- #{@current_pseudonym.unique_id}") %>
             <% qr_code = Barby::QrCode.new(provisioning_uri) %>
             <div class="otp-qr-code">
               <img src="data:image/png;base64,<%= Base64.encode64(qr_code.to_png(:xdim => 4)).strip %>">

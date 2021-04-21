@@ -16,39 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, Children} from 'react';
-import {shape, func, element} from 'prop-types';
+import {Component, Children} from 'react'
+import {shape, func, element} from 'prop-types'
 
 const uiManagerShape = shape({
   handleAction: func.isRequired,
   registerAnimatable: func.isRequired,
   deregisterAnimatable: func.isRequired,
   preTriggerUpdates: func.isRequired,
-  triggerUpdates: func.isRequired,
-});
+  triggerUpdates: func.isRequired
+})
 
 export class DynamicUiProvider extends Component {
   static propTypes = {
     manager: uiManagerShape.isRequired,
-    children: element.isRequired,
+    children: element.isRequired
   }
 
   static childContextTypes = {
-    dynamicUiManager: uiManagerShape,
+    dynamicUiManager: uiManagerShape
   }
 
-  constructor (props, context) {
-    super(props, context);
-    this.manager = props.manager;
+  constructor(props, context) {
+    super(props, context)
+    this.manager = props.manager
   }
 
-  getChildContext () {
+  getChildContext() {
     return {
-      dynamicUiManager: this.manager,
-    };
+      dynamicUiManager: this.manager
+    }
   }
 
-  render () {
-    return Children.only(this.props.children);
+  render() {
+    return Children.only(this.props.children)
   }
 }

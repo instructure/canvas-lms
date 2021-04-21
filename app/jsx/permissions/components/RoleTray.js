@@ -22,21 +22,18 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-layout/lib/components/View'
-import Dialog from '@instructure/ui-a11y/lib/components/Dialog'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import IconArrowStart from '@instructure/ui-icons/lib/Solid/IconArrowStart'
-import IconEdit from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconX from '@instructure/ui-icons/lib/Solid/IconX'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Dialog} from '@instructure/ui-dialog'
+import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import {IconArrowStartSolid, IconEditLine, IconTrashLine, IconXSolid} from '@instructure/ui-icons'
+import {TextInput} from '@instructure/ui-text-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {Tray} from '@instructure/ui-tray'
 
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import actions from '../actions'
@@ -88,7 +85,7 @@ export default class RoleTray extends Component {
   // We need this so that if there is an alert displayed inside this tray
   // (such as the delete confirmation alert) it will disapear if we click
   // on a different role then we are currently operating on.
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.id !== nextProps.id) {
       this.clearState()
     }
@@ -244,9 +241,9 @@ export default class RoleTray extends Component {
     <div style={{zIndex: 10, position: 'absolute'}}>
       <Dialog open shouldContainFocus>
         <Alert variant="warning" margin="small">
-          <Container as="block">
+          <View as="block">
             {children}
-            <Container as="block" margin="small 0 0 0">
+            <View as="block" margin="small 0 0 0">
               <Button onClick={onCancel} margin="none xx-small none none">
                 <ScreenReaderContent>{children}</ScreenReaderContent>
                 {I18n.t('Cancel')}
@@ -254,8 +251,8 @@ export default class RoleTray extends Component {
               <Button onClick={onOk} id="confirm-delete-role" variant="primary">
                 {I18n.t('Ok')}
               </Button>
-            </Container>
-          </Container>
+            </View>
+          </View>
         </Alert>
       </Dialog>
     </div>
@@ -298,9 +295,9 @@ export default class RoleTray extends Component {
       buttonRef={c => (this.closeButton = c)}
     >
       {this.state.editTrayVisable ? (
-        <IconArrowStart title={I18n.t('Back')} />
+        <IconArrowStartSolid title={I18n.t('Back')} />
       ) : (
-        <IconX title={I18n.t('Close')} />
+        <IconXSolid title={I18n.t('Close')} />
       )}
     </Button>
   )
@@ -352,7 +349,7 @@ export default class RoleTray extends Component {
       buttonRef={c => (this.editButton = c)}
     >
       <Text color="brand">
-        <IconEdit title={I18n.t('Edit')} />
+        <IconEditLine title={I18n.t('Edit')} />
       </Text>
     </Button>
   )
@@ -366,7 +363,7 @@ export default class RoleTray extends Component {
       buttonRef={c => (this.deleteButton = c)}
     >
       <Text color="brand">
-        <IconTrash title={I18n.t('Delete')} />
+        <IconTrashLine title={I18n.t('Delete')} />
       </Text>
     </Button>
   )
@@ -374,8 +371,8 @@ export default class RoleTray extends Component {
   renderTrayHeader = () => (
     <div>
       <Flex alignItems="start" justifyItems="space-between">
-        <FlexItem>
-          <Container as="div">
+        <Flex.Item>
+          <View as="div">
             <div style={{maxWidth: '225px'}}>
               <Heading id="general_tray_header" level="h3" as="h2">
                 {this.props.label}
@@ -386,17 +383,17 @@ export default class RoleTray extends Component {
                 {I18n.t('Based on: %{basedOn}', {basedOn: this.props.basedOn})}
               </Text>
             )}
-          </Container>
-        </FlexItem>
-        <FlexItem>
+          </View>
+        </Flex.Item>
+        <Flex.Item>
           {this.props.editable && this.renderEditButton()}
           {this.props.deletable && this.renderDeleteButton()}
-        </FlexItem>
+        </Flex.Item>
       </Flex>
 
-      <Container as="div" margin="small 0 medium 0">
+      <View as="div" margin="small 0 medium 0">
         <Flex direction="column">
-          <FlexItem>
+          <Flex.Item>
             <Text className="role-tray-last-changed">
               <span>
                 <FriendlyDatetime
@@ -405,27 +402,27 @@ export default class RoleTray extends Component {
                 />
               </span>
             </Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </Container>
+      </View>
     </div>
   )
 
   renderBaseRoleSelector = () => (
-    <Container as="div" margin="medium 0 large 0">
-      <Select
-        label={I18n.t('Base Type')}
-        defaultOption={this.props.basedOn}
+    <View as="div" margin="medium 0 large 0">
+      <SimpleSelect
+        renderLabel={I18n.t('Base Type')}
+        defaultValue={this.props.basedOn}
         onChange={(_event, option) => this.showEditBaseRoleAlert(option.value)}
         inputRef={c => (this.editRoleInput = c)}
       >
         {this.props.baseRoleLabels.map(label => (
-          <option key={label} value={label}>
+          <SimpleSelect.Option id={label} key={label} value={label}>
             {label}
-          </option>
+          </SimpleSelect.Option>
         ))}
-      </Select>
-    </Container>
+      </SimpleSelect>
+    </View>
   )
 
   renderEditHeader = () => (
@@ -434,7 +431,7 @@ export default class RoleTray extends Component {
         {I18n.t('Edit %{label}', {label: this.props.label})}
       </Heading>
 
-      <Container as="div" margin="medium 0 large 0">
+      <View as="div" margin="medium 0 large 0">
         <TextInput
           label={I18n.t('Role Name')}
           name="edit_name_box"
@@ -443,7 +440,7 @@ export default class RoleTray extends Component {
           onBlur={this.updateRole}
           onChange={this.onChangeRoleLabel}
         />
-      </Container>
+      </View>
 
       {/*
        * this is not currently possible due to limitations in the api. once we
@@ -470,10 +467,10 @@ export default class RoleTray extends Component {
         {this.state.deleteAlertVisable && this.renderDeleteAlert()}
         {this.state.editBaseRoleAlertVisable && this.renderEditBaseRoleAlert()}
         {this.renderCloseButton()}
-        <Container as="div" padding="small small x-large small">
+        <View as="div" padding="small small x-large small">
           {this.state.editTrayVisable ? this.renderEditHeader() : this.renderTrayHeader()}
           {this.renderPermissions()}
-        </Container>
+        </View>
       </Tray>
     )
   }
@@ -548,7 +545,4 @@ const mapDispatchToProps = {
   deleteRole: actions.deleteRole
 }
 
-export const ConnectedRoleTray = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RoleTray)
+export const ConnectedRoleTray = connect(mapStateToProps, mapDispatchToProps)(RoleTray)

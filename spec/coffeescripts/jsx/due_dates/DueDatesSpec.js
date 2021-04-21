@@ -295,11 +295,43 @@ QUnit.module('DueDates with grading periods', {
       })
     ]
     const sections = [
-      { attributes: { id: "0", name: "Everyone" } },
-      { attributes: { id: "19", name: "Section 1", start_at: null, end_at: null, override_course_and_term_dates: null } },
-      { attributes: { id: "4", name: "Section 2", start_at: null, end_at: null, override_course_and_term_dates: null } },
-      { attributes: { id: "7", name: "Section 3", start_at: null, end_at: null, override_course_and_term_dates: null } },
-      { attributes: { id: "8", name: "Section 4", start_at: null, end_at: null, override_course_and_term_dates: null } },
+      {attributes: {id: '0', name: 'Everyone'}},
+      {
+        attributes: {
+          id: '19',
+          name: 'Section 1',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      },
+      {
+        attributes: {
+          id: '4',
+          name: 'Section 2',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      },
+      {
+        attributes: {
+          id: '7',
+          name: 'Section 3',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      },
+      {
+        attributes: {
+          id: '8',
+          name: 'Section 4',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
+        }
+      }
     ]
     const gradingPeriods = [
       {

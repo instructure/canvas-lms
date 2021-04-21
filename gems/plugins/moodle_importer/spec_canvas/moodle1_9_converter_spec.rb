@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -85,11 +87,11 @@ describe Moodle::Converter do
 
       dt = @course.discussion_topics.first
       expect(dt.title).to eq "General Forum"
-      expect(dt.message).to eq "<p>General Forum Introduction</p>"
+      expect(dt.message).to eq "General Forum Introduction"
 
       dt = @course.discussion_topics.last
       expect(dt.title).to eq "News forum"
-      expect(dt.message).to eq "<p>General news and announcements</p>"
+      expect(dt.message).to eq "General news and announcements"
     end
   end
 
@@ -99,13 +101,13 @@ describe Moodle::Converter do
 
       assignment = @course.assignments.where(title: 'Create a Rails site').first
       expect(assignment).not_to be_nil
-      expect(assignment.description).to eq "<p>Use `rails new` to create your first Rails site</p>"
+      expect(assignment.description).to eq "Use `rails new` to create your first Rails site"
     end
 
     it "should convert Moodle Workshop to peer reviewed assignment" do
       assignment = @course.assignments.where(title: 'My Workshop').first
       expect(assignment).not_to be_nil
-      expect(assignment.description).to eq "<p>My Workshop Description</p>"
+      expect(assignment.description).to eq "My Workshop Description"
       expect(assignment.peer_reviews).to be_truthy
       expect(assignment.automatic_peer_reviews).to be_truthy
       #assignment.anonymous_peer_reviews.should be_false
@@ -122,7 +124,7 @@ describe Moodle::Converter do
       page = wiki.wiki_pages.where(title: 'My Wiki').first
       expect(page).not_to be_nil
       expect(page.url).to eq 'my-wiki-my-wiki'
-      html = Nokogiri::HTML(page.body)
+      html = Nokogiri::HTML5(page.body)
       href = html.search('a').first.attributes['href'].value
       expect(href).to eq "/courses/#{@course.id}/#{@course.wiki.path}/my-wiki-link"
 
@@ -163,7 +165,7 @@ describe Moodle::Converter do
       # add warnings because these question types seem to be ambiguously structured in moodle
       warnings = @cm.migration_issues.select{|w|
         w.description == "Possible answers will need to be regenerated for Formula question" &&
-            w.fix_issue_html_url.include?("question_#{question.assessment_question_id}")
+            w.fix_issue_html_url.include?("question_#{question.assessment_question_id}_question_text")
       }
       expect(warnings.count).to eq 1
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -145,8 +147,8 @@ describe Csp do
       enable_cache do
         domain = "example.com"
         expect(Csp::Domain).to receive(:domains_for_account).with(@root.global_id).and_return([domain]).once
-        expect(@sub.csp_whitelisted_domains).to eq [domain]
-        expect(Account.find(@sub.id).csp_whitelisted_domains).to eq [domain]
+        expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to eq [domain]
+        expect(Account.find(@sub.id).csp_whitelisted_domains(include_files: false, include_tools: false)).to eq [domain]
       end
     end
 
@@ -155,18 +157,22 @@ describe Csp do
         domain1 = "blah.example.com"
         domain2 = "bloo.example.com"
 
-        @root = Account.create!
         @root.enable_csp!
         @root.add_domain!(domain1)
         @sub = @root.sub_accounts.create!
-        expect(@sub.csp_whitelisted_domains).to eq [domain1]
+        expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to eq [domain1]
 
         @root.add_domain!(domain2)
-        expect(@sub.csp_whitelisted_domains).to match_array([domain1, domain2])
+        expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to match_array([domain1, domain2])
 
         @root.remove_domain!(domain1)
-        expect(@sub.csp_whitelisted_domains).to match_array([domain2])
+        expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to match_array([domain2])
       end
+    end
+
+    it "should include the global whitelist Setting" do
+      allow(Setting).to receive(:get).with('csp.global_whitelist', '').and_return('some-domain.com,another.net, a-third.io')
+      expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to match_array(['some-domain.com', 'another.net', 'a-third.io'])
     end
   end
 
@@ -179,30 +185,54 @@ describe Csp do
     end
 
     it "should get all tool domains in the chain" do
-      root_tool = create_tool(@root, :domain => "example1.com")
-      sub1_tool = create_tool(@sub1, :domain => "example2.com")
-      sub2_tool = create_tool(@sub2, :url => "https://example3.com/launchnstuff")
+      create_tool(@root, :domain => "example1.com")
+      create_tool(@sub1, :domain => "example2.com")
+      create_tool(@sub2, :url => "https://example3.com/launchnstuff")
 
-      expect(@sub1.cached_tool_domains).to match_array(["example1.com", "example2.com"])
-      expect(@sub2.cached_tool_domains).to match_array(["example1.com", "example2.com", "example3.com"])
+      expect(@sub1.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com"])
+      expect(@sub2.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
     end
 
     it "should cache the tool domains" do
       enable_cache do
         expect(@sub2).to receive(:get_account_tool_domains).and_return(["example.com"]).once
-        @sub2.csp_whitelisted_domains
-        Account.find(@sub2.id).csp_whitelisted_domains
+        @sub2.csp_whitelisted_domains(include_files: false, include_tools: true)
+        Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)
       end
     end
 
     it "should invalidate the tool domain cache" do
       enable_cache do
-        expect(@sub2.csp_whitelisted_domains).to eq []
+        expect(@sub2.csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
         root_tool = create_tool(@root, :domain => "example1.com")
-        expect(Account.find(@sub2.id).csp_whitelisted_domains).to eq ["example1.com"]
+        expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array ["example1.com", "*.example1.com"]
+        expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array ["example1.com", "*.example1.com"]
         root_tool.update_attribute(:domain, "example2.com")
-        expect(Account.find(@sub2.id).csp_whitelisted_domains).to eq ["example2.com"]
+        expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array ["example2.com", "*.example2.com"]
+        expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array ["example2.com", "*.example2.com"]
+        root_tool.update_attribute(:workflow_state, "deleted")
+        expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
+        expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
       end
+    end
+
+    it "groups tools by domain" do
+      root_tool = create_tool(@root, domain: 'example1.com')
+      sub1_tool = create_tool(@sub1, domain: 'example2.com')
+      sub2_tool = create_tool(@sub2, domain: 'example2.com')
+
+      expect(@sub1.csp_tools_grouped_by_domain).to eq({
+        'example1.com' => [root_tool],
+        '*.example1.com' => [root_tool],
+        'example2.com' => [sub1_tool],
+        '*.example2.com' => [sub1_tool]
+      })
+      expect(@sub2.csp_tools_grouped_by_domain).to eq({
+        'example1.com' => [root_tool],
+        '*.example1.com' => [root_tool],
+        'example2.com' => [sub1_tool, sub2_tool],
+        '*.example2.com' => [sub1_tool, sub2_tool]
+      })
     end
   end
 
@@ -216,7 +246,8 @@ describe Csp do
 
     it "should cache course-level tools" do
       enable_cache do
-        expect(Csp::Domain).to receive(:domains_for_tools).and_return([]).once
+        tool = create_tool(@course, domain: 'example.com')
+        expect(Csp::Domain).to receive(:domains_for_tool).with(tool).once.and_return(['example.com'])
         @course.cached_tool_domains
         Course.find(@course.id).cached_tool_domains
       end
@@ -225,12 +256,12 @@ describe Csp do
     it "should invalidate the cache for course-level tools" do
       enable_cache do
         create_tool(@course, :url => "https://course.example.com/blah")
-        expect(@course.csp_whitelisted_domains).to match_array(["course.example.com"])
+        expect(@course.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["course.example.com", "*.course.example.com"])
 
         Timecop.freeze(1.minute.from_now) do
           create_tool(@course, :url => "https://example2.com/whee/woo")
         end
-        expect(@course.reload.csp_whitelisted_domains).to match_array(["course.example.com", "example2.com"])
+        expect(@course.reload.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["course.example.com", "*.course.example.com", "example2.com", "*.example2.com"])
       end
     end
 
@@ -238,7 +269,7 @@ describe Csp do
       @root.add_domain!("example1.com")
       create_tool(@sub, :domain => "example2.com")
       create_tool(@course, :domain => "example3.com")
-      expect(@course.csp_whitelisted_domains).to match_array(["example1.com", "example2.com", "example3.com"])
+      expect(@course.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
     end
   end
 end

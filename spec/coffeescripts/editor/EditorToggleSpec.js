@@ -85,7 +85,7 @@ test('@options.rceOptions can extend the default RichContentEditor opts', () => 
   equal(opts.otherStuff, rceOptions.otherStuff)
 })
 
-test("createDone does not throw error when editButton doesn't exist", function() {
+test("createDone does not throw error when editButton doesn't exist", () => {
   sandbox.stub($.fn, 'click').callsArg(0)
   EditorToggle.prototype.createDone.call({
     options: {doneText: ''},
@@ -102,7 +102,7 @@ test('createTextArea returns element with unique id', () => {
   notEqual(ta1.attr('id'), ta2.attr('id'))
 })
 
-test('replaceTextArea', function() {
+test('replaceTextArea', () => {
   sandbox.stub(RichContentEditor, 'destroyRCE')
   sandbox.stub($.fn, 'insertBefore')
   sandbox.stub($.fn, 'remove')
@@ -136,53 +136,4 @@ test('getContent leaves plain text alone', () => {
   containerDiv.text('this is plain text')
   const et = new EditorToggle(containerDiv)
   equal(et.getContent(), 'this is plain text')
-})
-
-test('edit', function() {
-  const fresh = {}
-  const content = 'content'
-  const textArea = $('<textarea/>')
-  const et = {
-    el: $('<div/>'),
-    textAreaContainer: $('<div/>'),
-    textArea,
-    done: $('<div/>'),
-    getContent() {
-      return content
-    },
-    getRceOptions() {},
-    trigger() {},
-    options: {}
-  }
-  sandbox.stub(RichContentEditor, 'loadNewEditor')
-  sandbox.stub(RichContentEditor, 'freshNode').returns(fresh)
-  sandbox.stub($.fn, 'val')
-  sandbox.stub($.fn, 'insertBefore')
-  sandbox.stub($.fn, 'detach')
-
-  EditorToggle.prototype.edit.call(et)
-
-  ok($.fn.val.calledOn(textArea), 'set value of textarea')
-  ok($.fn.val.calledWith(content), 'with correct content')
-
-  ok($.fn.insertBefore.calledOn(et.textAreaContainer), 'inserts container')
-  ok($.fn.insertBefore.calledWith(et.el), 'before el')
-  ok($.fn.detach.calledOn(et.el), 'removes el')
-
-  ok(RichContentEditor.loadNewEditor.calledWith(textArea), 'loads rce')
-
-  ok(RichContentEditor.freshNode.calledWith(textArea), 'gets fresh node')
-  equal(et.textArea, fresh, 'sets @textArea to fresh node')
-})
-
-test('shows keyboard shortcuts and toggle link in the appropriate tab order', () => {
-  const fresh = {}
-  sandbox.stub(RichContentEditor, 'loadNewEditor')
-  sandbox.stub(RichContentEditor, 'freshNode').returns(fresh)
-
-  const et = new EditorToggle(containerDiv)
-  et.edit()
-  const focusableItems = $(':focusable').toArray()
-  ok(focusableItems[0].className, 'tinymce-keyboard-shortcuts-toggle')
-  ok(focusableItems[1].className, 'switch-views__link switch-views__link__html')
 })

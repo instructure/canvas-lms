@@ -18,7 +18,7 @@
 
 import {arrayOf, shape, string} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!FinalGraderSelectMenu'
 
 export default class FinalGraderSelectMenu extends React.Component {
   static propTypes = {
@@ -33,11 +33,10 @@ export default class FinalGraderSelectMenu extends React.Component {
 
   constructor(props) {
     super(props)
-    this.handleSelectFinalGrader = this.handleSelectFinalGrader.bind(this)
     this.state = {selectedValue: this.props.finalGraderID || ''}
   }
 
-  handleSelectFinalGrader({target: {value: selectedValue}}) {
+  handleSelectFinalGrader = ({target: {value: selectedValue}}) => {
     this.setState({selectedValue})
   }
 

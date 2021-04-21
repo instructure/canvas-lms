@@ -15,37 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!assignments_2'
-import React from 'react'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
-
+import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
+import {Flex} from '@instructure/ui-flex'
+import I18n from 'i18n!assignments_2'
 import lockedSVG from '../SVG/Locked.svg'
-import {StudentAssignmentShape} from '../assignmentData'
+import React from 'react'
+import {Text} from '@instructure/ui-text'
 
-function LockedAssignment(props) {
-  const {assignment} = props
+export default function LockedAssignment({assignment}) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-      <FlexItem>
+      <Flex.Item>
         <img alt={I18n.t('Assignment Locked')} src={lockedSVG} />
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text size="x-large">{I18n.t('Availability Dates')}</Text>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text size="large">
           <AvailabilityDates assignment={assignment} formatStyle="short" />
         </Text>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }
 
 LockedAssignment.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: Assignment.shape
 }
-
-export default React.memo(LockedAssignment)

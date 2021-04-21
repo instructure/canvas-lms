@@ -71,6 +71,7 @@ class MyForm extends ValidatedFormView {
     this.model.url = '/fail'
     return this.render()
   }
+
   template() {
     return `
       <input type="text" name="first_name" value="123">
@@ -97,7 +98,7 @@ form.showErrors json
 */
 
 test('displays errors when validation fails and remove them on click', 4, function() {
-  this.form.on('fail', function(errors) {
+  this.form.on('fail', errors => {
     ok(errors.first_name.$errorBox.is(':visible'))
     ok(errors.last_name.$errorBox.is(':visible'))
 
@@ -129,7 +130,7 @@ test('triggers success, submit events', 3, function() {
   this.form.model.url = '/success'
   this.form.on('submit', () => ok(true, 'submit handler called'))
 
-  this.form.on('success', function(resp) {
+  this.form.on('success', resp => {
     ok(true, 'success handler called')
     equal('ok', resp, 'passes response in')
   })
@@ -140,7 +141,7 @@ test('triggers success, submit events', 3, function() {
 test('triggers fail, submit events', 6, function() {
   this.form.model.url = '/fail'
   this.form.on('submit', () => ok(true, 'submit handler called'))
-  this.form.on('fail', function(errors, xhr, status, statusText) {
+  this.form.on('fail', (errors, xhr, status, statusText) => {
     ok(true, 'fail handler called')
     equal(errors.first_name[0].type, 'required', 'passes errors in')
     ok(xhr, 'passes xhr in')
@@ -218,7 +219,7 @@ test('validate always calls hideErrors', 2, function() {
   this.form.validate()
   ok(this.form.hideErrors.called, 'hideErrors called with no errors')
 
-  this.form.hideErrors.reset()
+  this.form.hideErrors.resetHistory()
   this.form.validateFormData.returns({
     errors: [
       {
@@ -239,7 +240,7 @@ test('validate always calls showErrors', 2, function() {
   this.form.validate()
   ok(this.form.showErrors.called, 'showErrors called with no errors')
 
-  this.form.showErrors.reset()
+  this.form.showErrors.resetHistory()
   this.form.validateFormData.returns({
     errors: [
       {
@@ -250,4 +251,30 @@ test('validate always calls showErrors', 2, function() {
   })
   this.form.validate()
   ok(this.form.showErrors.called, 'showErrors called with errors')
+})
+
+test('RCE Present: Calls the sendFunc to determine if it is ready', function() {
+  const origVal = window.ENV.use_rce_enhancements
+  window.ENV.use_rce_enhancements = true
+  const fakeSendFunc = sinon.stub().returns(true)
+  const textArea = $('<textarea data-rich_text="true"></textarea>')
+  this.form.$el.append(textArea)
+  this.form.submit(null, fakeSendFunc)
+  // Kinda funky, but comparing jQuery objects directlyy doesn't work.
+  ok(fakeSendFunc.args[0][0][0] === textArea[0], 'the rce argument is the proper text area')
+  ok(fakeSendFunc.args[0][1] === 'checkReadyToGetCode', 'command argument is checkReadyToGetCode')
+  ok(fakeSendFunc.args[0][2] === window.confirm, 'promptFunc is window.confirm by default')
+  window.ENV.use_rce_enhancements = origVal
+})
+
+test('RCE Present: Ends execution if sendFunc returns false', function() {
+  const origVal = window.ENV.use_rce_enhancements
+  window.ENV.use_rce_enhancements = true
+  sandbox.spy(this.form, 'validateFormData')
+  const fakeSendFunc = sinon.stub().returns(false)
+  const textArea = $('<textarea data-rich_text="true"></textarea>')
+  this.form.$el.append(textArea)
+  this.form.submit(null, fakeSendFunc)
+  ok(!this.form.validateFormData.called, 'validateFormData was not called')
+  window.ENV.use_rce_enhancements = origVal
 })

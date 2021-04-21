@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -43,7 +45,11 @@ module AssignmentsHelper
       "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
       submission_author_name_for(assessment)
     ]
-    href = context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+    href = if assignment.anonymous_peer_reviews?
+      context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
+    else
+      context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+    end
     link_to text, href, options
   end
 
@@ -63,15 +69,14 @@ module AssignmentsHelper
 
   def assignment_submission_button(assignment, user, user_submission)
     if assignment.expects_submission? && can_do(assignment, user, :submit)
-      submit_text = user_submission.try(:has_submission?) ? I18n.t("Re-submit Assignment") : I18n.t("Submit Assignment")
+      submit_text = user_submission.try(:has_submission?) ? I18n.t("New Attempt") : I18n.t("Start Assignment")
       late = user_submission.try(:late?) ? "late" : ""
-      link_to(
-        submit_text,
-        '#',
-        :role => "button",
-        :class => "Button Button--primary submit_assignment_link #{late}",
-        :disabled => user_submission && user_submission.attempts_left == 0,
-      )
+      options = {
+        type: 'button',
+        class: "Button Button--primary submit_assignment_link #{late}",
+        disabled: user_submission && user_submission.attempts_left == 0
+      }
+      content_tag('button', submit_text, options)
     end
   end
 

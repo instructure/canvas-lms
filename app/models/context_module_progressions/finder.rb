@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -30,13 +32,19 @@ module ContextModuleProgressions
         if existing_progressions.include?(mod.id)
           progression = existing_progressions[mod.id]
         else
-          ContextModuleProgression.unique_constraint_retry do |retry_count|
-            progression = mod.context_module_progressions.where(user_id: user).first if retry_count > 0
-            progression ||= mod.context_module_progressions.create!(user: user)
-          end
+          progression = create_module_progression(mod, user)
         end
         progression.context_module = mod
         progression
+      end
+    end
+
+    def self.create_module_progression(mod, user)
+      GuardRail.activate(:primary) do
+        ContextModuleProgression.unique_constraint_retry do |retry_count|
+          progression = mod.context_module_progressions.where(user_id: user).first if retry_count > 0
+          progression ||= mod.context_module_progressions.create!(user: user)
+        end
       end
     end
   end

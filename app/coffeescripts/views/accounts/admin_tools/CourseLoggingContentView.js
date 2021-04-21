@@ -27,58 +27,51 @@ import template from 'jst/accounts/admin_tools/courseLoggingContent'
 import courseLoggingResultsTemplate from 'jst/accounts/admin_tools/courseLoggingResults'
 import detailsTemplate from 'jst/accounts/admin_tools/courseLoggingDetails'
 import 'jqueryui/dialog'
+import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
-export default class CourseLoggingContentView extends Backbone.View {
-  static initClass() {
-    this.mixin(ValidatedMixin)
+_inherits(CourseLoggingContentView, Backbone.View)
 
-    this.child('resultsView', '#courseLoggingSearchResults')
-    this.child('dateRangeSearch', '#courseDateRangeSearch')
-    this.child('courseSearch', '#courseCourseSearch')
-    this.prototype.fieldSelectors = {course_id: '#course_id-autocompleteField'}
-
-    this.prototype.els = {'#courseLoggingForm': '$form'}
-
-    this.prototype.template = template
-    this.prototype.detailsTemplate = detailsTemplate
-
-    this.prototype.events = {
-      'submit #courseLoggingForm': 'onSubmit',
-      'click #courseLoggingSearchResults .courseLoggingDetails > a': 'showDetails'
+export default function CourseLoggingContentView(options) {
+  this.fetch = this.fetch.bind(this)
+  this.onFail = this.onFail.bind(this)
+  this.options = options
+  this.collection = new CourseLoggingCollection()
+  Backbone.View.apply(this, arguments)
+  this.dateRangeSearch = new DateRangeSearchView({
+    name: 'courseLogging'
+  })
+  this.courseSearch = new AutocompleteView({
+    collection: new Backbone.Collection(null, {resourceName: 'courses'}),
+    labelProperty: $.proxy(this.autoCompleteItemLabel, this),
+    fieldName: 'course_id',
+    placeholder: 'Course ID',
+    sourceParameters: {
+      'state[]': 'all'
     }
-  }
+  })
+  this.resultsView = new PaginatedCollectionView({
+    template: courseLoggingResultsTemplate,
+    itemView: CourseLoggingItemView,
+    collection: this.collection
+  })
+}
+CourseLoggingContentView.mixin(ValidatedMixin)
+CourseLoggingContentView.child('resultsView', '#courseLoggingSearchResults')
+CourseLoggingContentView.child('dateRangeSearch', '#courseDateRangeSearch')
+CourseLoggingContentView.child('courseSearch', '#courseCourseSearch')
 
-  constructor(options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.fetch = this.fetch.bind(this)
-    this.onFail = this.onFail.bind(this)
-    this.options = options
-    this.collection = new CourseLoggingCollection()
-    super(...arguments)
-    this.dateRangeSearch = new DateRangeSearchView({
-      name: 'courseLogging'
-    })
-    this.courseSearch = new AutocompleteView({
-      collection: new Backbone.Collection(null, {resourceName: 'courses'}),
-      labelProperty: $.proxy(this.autoCompleteItemLabel, this),
-      fieldName: 'course_id',
-      placeholder: 'Course ID',
-      sourceParameters: {
-        'state[]': 'all'
-      }
-    })
-    this.resultsView = new PaginatedCollectionView({
-      template: courseLoggingResultsTemplate,
-      itemView: CourseLoggingItemView,
-      collection: this.collection
-    })
-  }
+Object.assign(CourseLoggingContentView.prototype, {
+  fieldSelectors: {course_id: '#course_id-autocompleteField'},
+
+  els: {'#courseLoggingForm': '$form'},
+
+  template,
+  detailsTemplate,
+
+  events: {
+    'submit #courseLoggingForm': 'onSubmit',
+    'click #courseLoggingSearchResults .courseLoggingDetails > a': 'showDetails'
+  },
 
   onSubmit(event) {
     event.preventDefault()
@@ -86,7 +79,7 @@ export default class CourseLoggingContentView extends Backbone.View {
     if (this.validate(json)) {
       return this.updateCollection(json)
     }
-  }
+  },
 
   showDetails(event) {
     event.preventDefault()
@@ -113,7 +106,7 @@ export default class CourseLoggingContentView extends Backbone.View {
       resizable: true
     }
     return this.dialog.dialog(config)
-  }
+  },
 
   updateCollection(json) {
     // Update the params (which fetches the collection)
@@ -132,7 +125,7 @@ export default class CourseLoggingContentView extends Backbone.View {
     if (json.course_id) params.id = json.course_id
 
     return this.collection.setParams(params)
-  }
+  },
 
   validate(json) {
     if (!json) json = this.$form.toJSON()
@@ -151,15 +144,15 @@ export default class CourseLoggingContentView extends Backbone.View {
 
     this.showErrors(errors)
     return $.isEmptyObject(errors)
-  }
+  },
 
   attach() {
     return this.collection.on('setParams', this.fetch)
-  }
+  },
 
   fetch() {
     return this.collection.fetch({error: this.onFail})
-  }
+  },
 
   onFail(collection, xhr) {
     // Received a 404, empty the collection and don't let the paginated
@@ -178,12 +171,11 @@ export default class CourseLoggingContentView extends Backbone.View {
       ]
       if (!$.isEmptyObject(errors)) return this.showErrors(errors)
     }
-  }
+  },
 
   autoCompleteItemLabel(model) {
     const name = model.get('name')
     const code = model.get('course_code')
     return `${model.id} - ${name} - ${code}`
   }
-}
-CourseLoggingContentView.initClass()
+})

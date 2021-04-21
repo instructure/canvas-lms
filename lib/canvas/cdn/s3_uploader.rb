@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -16,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'parallel'
+require 'brotli'
 
 module Canvas
   module Cdn
@@ -39,11 +42,34 @@ module Canvas
       end
 
       def upload!
+        return if (local_files - previous_manifest).empty? # nothing to change
         opts = {in_threads: 16, progress: 'uploading to S3'}
         if block_given?
           opts[:finish] = -> (_, i, _) { yield (100.0 * i / local_files.count) }
         end
         Parallel.each(local_files, opts) { |file| upload_file(file) }
+        # success - we can push the manifest
+        push_manifest
+      end
+
+      # tl;dr store a list of assets for a given tag on the bucket itself
+      # so we don't have to make 10,000 s3 get calls every time to make sure they're all still there
+      def manifest_path
+        tag = ENV['MANIFEST_TAG']
+        tag && "manifests/#{tag}.json"
+      end
+
+      def previous_manifest
+        return [] unless manifest_path
+        @manifest ||= begin
+          s3_obj = bucket.object(manifest_path)
+          s3_obj.exists? ? JSON.parse(s3_obj.get.body.read) : []
+        end
+      end
+
+      def push_manifest
+        return unless manifest_path
+        bucket.object(manifest_path).put(body: JSON.dump(local_files))
       end
 
       def fingerprinted?(path)
@@ -53,7 +79,9 @@ module Canvas
       def mime_for(path)
         ext = path.extname[1..-1]
         # Mime::Type.lookup_by_extension doesn't have some types (like svg), so fall back to others
-        Mime::Type.lookup_by_extension(ext) || Rack::Mime.mime_type(".#{ext}") || MIME::Types.type_for(ext).first
+        content_type = Mime::Type.lookup_by_extension(ext) || Rack::Mime.mime_type(".#{ext}") || MIME::Types.type_for(ext).first
+        content_type = 'text/css; charset=utf-8' if content_type == 'text/css'
+        content_type
       end
 
       def options_for(path)
@@ -68,34 +96,47 @@ module Canvas
       end
 
       def upload_file(remote_path)
+        return if previous_manifest.include?(remote_path)
+
         local_path = Pathname.new("#{Rails.public_path}/#{remote_path}")
         return if (local_path.extname == '.gz') || local_path.directory?
-        s3_object = mutex.synchronize { bucket.object(remote_path) }
-        return log("skipping already existing #{remote_path}") if s3_object.exists?
         options = options_for(local_path)
-        s3_object.put(options.merge(body: handle_compression(local_path, options)))
+        {'br' => 'br/', 'gzip' => ''}.each do |compression_type, path_prefix|
+          remote_path_with_prefix = path_prefix + remote_path
+          s3_object = mutex.synchronize { bucket.object(remote_path_with_prefix) }
+          if s3_object.exists?
+            log("skipping already existing #{compression_type} file #{remote_path_with_prefix}")
+          else
+            s3_object.put(options.merge(body: handle_compression(local_path, options, compression_type)))
+          end
+        end
       end
 
       def log(msg)
-        Rails.logger.debug "#{self.class} - #{msg}"
+        full_msg = "#{self.class} - #{msg}"
+        Rails.logger ? Rails.logger.debug(full_msg) : puts(full_msg)
       end
 
-      def handle_compression(file, options)
-        if file.size > 150 # gzipping small files is not worth it
-          gzipped = ActiveSupport::Gzip.compress(file.read, Zlib::BEST_COMPRESSION)
-          compression = 100 - (100.0 * gzipped.size / file.size).round
-          # if we couldn't compress more than 5%, the gzip decoding cost to the
-          # client makes it is not worth serving gzipped
+      def handle_compression(file, options, compression_algorithm='gzip')
+        contents = file.binread
+        if file.size > 150 # compressing small files is not worth it
+          compressed = if compression_algorithm == 'br'
+            Brotli.deflate(contents, quality: 11)
+          elsif compression_algorithm == 'gzip'
+            ActiveSupport::Gzip.compress(contents, Zlib::BEST_COMPRESSION)
+          end
+          compression = 100 - (100.0 * compressed.size / file.size).round
+          # if we couldn't compress more than 5%, the gzip/brotli decoding cost to the
+          # client makes it not worth serving compressed
           if compression > 5
-            options[:content_encoding] = 'gzip'
-            log "uploading gzipped #{file}. was: #{file.size} now: #{gzipped.size} saved: #{compression}%"
-            return gzipped
+            options[:content_encoding] = compression_algorithm
+            log "uploading #{compression_algorithm}'ed #{file}. was: #{file.size} now: #{compressed.size} saved: #{compression}%"
+            return compressed
           end
         end
-        log "uploading ungzipped #{file}"
-        file.read
+        log "uploading un-#{compression_algorithm}'ed #{file}"
+        contents
       end
-
     end
   end
 end

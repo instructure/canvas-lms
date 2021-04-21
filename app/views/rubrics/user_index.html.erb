@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t(:page_title, "Rubrics") %>
+<% provide :page_title, t(:page_title, "Rubrics") %>
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link">
     <i class="icon-add"></i>
     <%= t('buttons.add_rubric', 'Add Rubric') %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 Instructure, Inc.
 #
@@ -31,6 +33,7 @@ describe "Rubrics API", type: :request do
     @rubric = Rubric.new(:context => context)
     @rubric.data = [rubric_data_hash(opts)]
     @rubric.save!
+    @rubric.update_with_association(nil, {}, context, {association_object: context})
   end
 
   def rubric_association_params_for_assignment(assign)
@@ -209,13 +212,39 @@ describe "Rubrics API", type: :request do
         assert_status(401)
       end
 
+      it "returns unauthorized status if teacher is not in the course" do
+        teacher_in_other_course = @teacher
+        course_with_teacher(active_all: true)
+        create_rubric(@course)
+        @user = teacher_in_other_course
+        raw_rubric_call(@course)
+        assert_status(401)
+      end
+
+      it "returns not found status if rubric belongs to a course other than the one requested for" do
+        # Enroll the same teacher in 2 courses.
+        course1 = course_with_teacher(active_all: true).course
+        course2 = course_with_teacher(active_all: true, user: @teacher).course
+        create_rubric(course1)
+        # @rubric has an association with course1; now request it but scoped to
+        # course2.
+        raw_rubric_call(course2)
+        assert_status(404)
+      end
+
+      it "always return rubrics for admins" do
+        course_with_teacher(active_all: true)
+        create_rubric(@course)
+        @user = account_admin_user
+        raw_rubric_call(@course)
+        assert_status(200)
+      end
 
       context "include parameter" do
         before :once do
           course_with_student(user: @user, active_all: true)
           course_with_teacher active_all: true
           create_rubric(@course)
-          RubricAssociation.generate(@teacher, @rubric, @course, association_object: @course)
           RubricAssociation.generate(@teacher, @rubric, @course, association_object: @account)
           ['grading', 'peer_review'].each.with_index do |type, index|
             create_rubric_assessment({type: type, comments: "comment #{index}"})
@@ -277,7 +306,7 @@ describe "Rubrics API", type: :request do
         it "returns an error if passed an invalid argument" do
           raw_rubric_call(@course, {include: "cheez"})
 
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "invalid include value requested. Must be one of the following:"
         end
@@ -285,13 +314,13 @@ describe "Rubrics API", type: :request do
         it "returns an error if passed mutually-exclusive include options" do
           raw_rubric_call(@course, {include: ["assessments", "peer_assessments"]})
 
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple assessment includes."
 
           raw_rubric_call(@course, {include: ["associations", "assignment_associations"]})
 
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple association includes."
         end
@@ -310,7 +339,7 @@ describe "Rubrics API", type: :request do
           it "returns an error if passed an invalid argument" do
             raw_rubric_call(@course, {include: "assessments", style: "BigMcLargeHuge"})
 
-            expect(response).not_to be_success
+            expect(response).not_to be_successful
             json = JSON.parse response.body
             expect(json["errors"]["style"].first["message"]).to eq "invalid style requested. Must be one of the following: full, comments_only"
           end
@@ -318,7 +347,7 @@ describe "Rubrics API", type: :request do
           it "returns an error if passed a style parameter without assessments" do
             raw_rubric_call(@course, {style: "full"})
 
-            expect(response).not_to be_success
+            expect(response).not_to be_successful
             json = JSON.parse response.body
             expect(json["errors"]["style"].first["message"]).to eq "invalid parameters. Style parameter passed without requesting assessments"
           end
@@ -500,15 +529,6 @@ describe "Rubrics API", type: :request do
           expect(response["assessments"].length).to eq 2
         end
 
-        it "returns only rubric assessments a user has permission to read" do
-          course_with_teacher active_all: true
-          assignment = assignment_model(context: @course)
-          ra_params = rubric_association_params_for_assignment(assignment)
-          RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
-          response = rubric_api_call(@course, {include: "assessments"})
-          expect(response["assessments"].length).to eq 0
-        end
-
         it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
           response = rubric_api_call(@account, {include: "graded_assessments"}, 'account')
           expect(response["assessments"][0]["assessment_type"]).to eq "grading"
@@ -524,7 +544,7 @@ describe "Rubrics API", type: :request do
         it "returns an error if passed an invalid argument" do
           raw_rubric_call(@account, {include: "cheez"}, 'account')
 
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "invalid include value requested. Must be one of the following:"
         end
@@ -532,13 +552,13 @@ describe "Rubrics API", type: :request do
         it "returns an error if passed mutually-exclusive include options" do
           raw_rubric_call(@account, {include: ["assessments", "peer_assessments"]}, 'account')
 
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple assessment includes."
 
           raw_rubric_call(@account, {include: ["associations", "assignment_associations"]}, 'account')
 
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple association includes."
         end
@@ -561,7 +581,7 @@ describe "Rubrics API", type: :request do
           it "returns an error if passed an invalid argument" do
             raw_rubric_call(@account, {include: "assessments", style: "BigMcLargeHuge"}, 'account')
 
-            expect(response).not_to be_success
+            expect(response).not_to be_successful
             json = JSON.parse response.body
             expect(json["errors"]["style"].first["message"]).to eq "invalid style requested. Must be one of the following: full, comments_only"
           end
@@ -569,7 +589,7 @@ describe "Rubrics API", type: :request do
           it "returns an error if passed a style parameter without assessments" do
             raw_rubric_call(@account, {style: "full"}, 'account')
 
-            expect(response).not_to be_success
+            expect(response).not_to be_successful
             json = JSON.parse response.body
             expect(json["errors"]["style"].first["message"]).to eq "invalid parameters. Style parameter passed without requesting assessments"
           end

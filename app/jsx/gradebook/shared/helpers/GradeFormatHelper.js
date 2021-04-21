@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!sharedGradeFormatHelper'
 import round from 'compiled/util/round'
 import numberHelper from '../../../shared/helpers/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
-import {scoreToGrade} from '../../../gradebook/GradingSchemeHelper'
+import {scoreToGrade} from '../../GradingSchemeHelper'
 
 const POINTS = 'points'
 const PERCENT = 'percent'
@@ -97,7 +97,7 @@ function excused() {
 }
 
 function formatPointsGrade(score) {
-  return I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
+  return I18n.n(round(score, 2), {precision: 2, strip_insignificant_zeros: true})
 }
 
 function formatPercentageGrade(score, options) {

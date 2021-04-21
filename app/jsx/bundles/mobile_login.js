@@ -18,17 +18,19 @@
 
 import I18n from 'i18n!pseudonyms_mobile_login'
 import signupDialog from 'compiled/registration/signupDialog'
+import ready from '@instructure/ready'
 
-const eventToBindTo = ('ontouchstart' in window) ? 'touchstart' : 'click'
-document.addEventListener('DOMContentLoaded', () => {
+const eventToBindTo = 'click'
+
+ready(() => {
   setupForgotPassword()
   setupParentSignup()
 })
 
-function setupParentSignup () {
+function setupParentSignup() {
   const element = document.querySelector('#coenrollment_link a')
   if (element) {
-    element.addEventListener(eventToBindTo, (e) => {
+    element.addEventListener(eventToBindTo, e => {
       e.preventDefault()
       const template = element.getAttribute('data-template')
       const path = element.getAttribute('data-path')
@@ -37,64 +39,71 @@ function setupParentSignup () {
   }
 }
 
-function setupForgotPassword () {
+function setupForgotPassword() {
   const $front_back_container = document.querySelector('#f1_container')
   const $flip_to_back = document.querySelector('.flip-to-back')
+  const $forgot_password_form = document.querySelector('#forgot_password_form')
+  const uniqueIdInput = document.querySelector('#pseudonym_session_unique_id_forgot')
 
   if ($flip_to_back) {
-    $flip_to_back.addEventListener(eventToBindTo, (event) => {
+    $flip_to_back.addEventListener(eventToBindTo, event => {
       event.preventDefault()
       addClass($front_back_container, 'flipped')
+      setFocus(uniqueIdInput)
     })
   }
 
-  document.querySelector('.flip-to-front').addEventListener(eventToBindTo, (event) => {
+  document.querySelector('.flip-to-front').addEventListener(eventToBindTo, event => {
     event.preventDefault()
     removeClass($front_back_container, 'flipped')
   })
 
-  const $forgot_password_form = document.querySelector('#forgot_password_form')
-  $forgot_password_form.addEventListener('submit', (event) => {
+  $forgot_password_form.addEventListener('submit', event => {
     const $button = $forgot_password_form.querySelector('.request-password-button')
-    const originalText = $button.textContent
-    const uniqueId = $forgot_password_form.querySelector('input[name="pseudonym_session[unique_id_forgot]"]').value.trim()
-    if (!uniqueId) return false
+    const uniqueIdValue = uniqueIdInput.value.trim()
+
+    if (!uniqueIdValue) return false
     $button.disabled = true
     $button.textContent = $button.getAttribute('data-text-while-loading')
     event.preventDefault()
     ajax({
-      type: "POST",
-      url: "/forgot_password",
-      data: `authenticity_token=${encodeURIComponent($forgot_password_form.querySelector('input[name=authenticity_token]').value)}
-            &pseudonym_session%5Bunique_id_forgot%5D=${encodeURIComponent(uniqueId)}`,
-      success () {
-        alert(ENV.RESET_SENT)
+      type: 'POST',
+      url: '/forgot_password',
+      data: `authenticity_token=${encodeURIComponent(
+        $forgot_password_form.querySelector('input[name=authenticity_token]').value
+      )}
+            &pseudonym_session%5Bunique_id_forgot%5D=${encodeURIComponent(uniqueIdValue)}`,
+      success() {
+        $button.disabled = false
+        $button.textContent = $button.getAttribute('data-text-when-loaded')
       },
-      error () {
-        alert(ENV.RESET_ERROR)
-      },
-      complete () {
-        $button.textContent = originalText
+      error() {
+        $button.textContent = $button.getAttribute('data-text-on-error')
       }
     })
   })
 }
 
-function addClass(element, name){
+function setFocus(element) {
+  element.focus()
+}
+
+function addClass(element, name) {
   removeClass(element, name)
   element.className += ` ${name}`
 }
 
-function removeClass(element, name){
+function removeClass(element, name) {
   const regex = new RegExp(`(^|\\s)${name}(\\s|$)`)
   element.className = element.className.replace(regex, '')
 }
 
-function ajax(options){
+function ajax(options) {
   const xhr = new window.XMLHttpRequest()
   options.headers = options.headers || {}
   options.headers['X-Requested-With'] = 'XMLHttpRequest'
-  if (options.data && !options.contentType) options.contentType = 'application/x-www-form-urlencoded'
+  if (options.data && !options.contentType)
+    options.contentType = 'application/x-www-form-urlencoded'
   if (options.contentType) options.headers['Content-Type'] = options.contentType
 
   xhr.onreadystatechange = () => {

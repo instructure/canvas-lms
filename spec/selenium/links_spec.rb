@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -107,10 +109,12 @@ describe "links", priority: "2" do
     end
 
     context "right side links" do
-
-      it "should navigate user to conversations page after inbox link is clicked" do
-        expect_new_page_load { fj('#global_nav_conversations_link').click}
-        expect(f("i.icon-email")).to be_displayed
+      context 'when react_inbox feature flag is off' do
+        it "should navigate user to conversations page after inbox link is clicked" do
+          Account.default.set_feature_flag! :react_inbox, 'off'
+          expect_new_page_load { fj('#global_nav_conversations_link').click}
+          expect(f("i.icon-email")).to be_displayed
+        end
       end
 
       it "should navigate user to user settings page after settings link is clicked" do
@@ -132,6 +136,13 @@ describe "links", priority: "2" do
       it "should navigate user to the calendar page after calender link is clicked" do
         expect_new_page_load { fln('Calendar').click }
         expect(f('.calendar_header')).to be_displayed
+      end
+
+      it "should navigate to main content from skip_to_link" do
+        driver.action.send_keys(:tab).perform
+        expect(check_element_has_focus(f('a#skip_navigation_link'))).to eq(true)
+        driver.action.send_keys(:enter).perform
+        expect(driver.switch_to.active_element.attribute("id")).to eq("content")
       end
     end
   end

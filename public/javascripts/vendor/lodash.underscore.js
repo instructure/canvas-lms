@@ -1900,6 +1900,7 @@
         length = props.length,
         result = {};
 
+    if (object == null) return result;
     while (++index < length) {
       var key = props[index];
       if (key in object) {
@@ -5070,6 +5071,12 @@
   lodash.foldr = reduceRight;
   lodash.include = contains;
   lodash.inject = reduce;
+
+  // INSTRUCTURE: In lodash 4, these are the preferred names for these methods but the aliases don't
+  // exist yet in this version of lodash. so we added them here so we can transition to a newer lodash
+  lodash.includes = contains;
+  lodash.keyBy = indexBy;
+
 
   /*--------------------------------------------------------------------------*/
 

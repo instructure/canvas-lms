@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { SET_ROOT } from "../actions/files";
+import {SET_ROOT} from '../actions/files'
 
 export default function rootFolderIdReducer(state = null, action) {
   switch (action.type) {
     case SET_ROOT:
-      return action.id;
+      return action.id
     default:
-      return state;
+      return state
   }
 }

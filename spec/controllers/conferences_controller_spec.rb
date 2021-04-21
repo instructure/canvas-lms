@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../apis/api_spec_helper'
 
 describe ConferencesController do
+  include ExternalToolsSpecHelper
+
   before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')
@@ -97,6 +101,58 @@ describe ConferencesController do
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:new_conferences]).to be_empty
     end
+
+    it "should preload recordings for BBB conferences" do
+      PluginSetting.create!(name: 'big_blue_button',
+        :settings => {
+          :domain => "bbb.totallyanexampleplzdontcallthis.com",
+          :secret_dec => "secret",
+        })
+      allow(BigBlueButtonConference).to receive(:send_request).and_return('')
+
+      user_session(@teacher)
+      @bbb = BigBlueButtonConference.create!(:title => "my conference", :user => @teacher, :context => @course)
+      @other = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
+
+      expect(BigBlueButtonConference).to receive(:preload_recordings).with([@bbb])
+      get 'index', params: {:course_id => @course.id}
+      expect(response).to be_successful
+    end
+
+    context "sets render_alternatives variable" do
+      it "should set to false by default" do
+        user_session(@teacher)
+        get 'index', params: { course_id: @course.id }
+        expect(assigns[:js_env][:render_alternatives]).to be_falsey
+      end
+
+      it "should set to true if plugins are set to replace_with_alternatives" do
+        user_session(@teacher)
+        @plugin.update_attribute(:settings, @plugin.settings.merge(replace_with_alternatives: true))
+        get 'index', params: { course_id: @course.id }
+        expect(assigns[:js_env][:render_alternatives]).to be_truthy
+      end
+
+      context "should set to true if course setting show_conference_alternatives is set" do
+        before do
+          @course.update! settings: @course.settings.merge(show_conference_alternatives: true)
+        end
+
+        it "when context is a group" do
+          user_session(@student)
+          @group = @course.groups.create!(:name => "some group")
+          @group.add_user(@student)
+          get 'index', params: { group_id: @group.id }
+          expect(assigns[:js_env][:render_alternatives]).to be_truthy
+        end
+
+        it "when context is a course" do
+          user_session(@teacher)
+          get 'index', params: { course_id: @course.id }
+          expect(assigns[:js_env][:render_alternatives]).to be_truthy
+        end
+      end
+    end
   end
 
   describe "POST 'create'" do
@@ -164,6 +220,22 @@ describe ConferencesController do
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       post 'update', params: {:course_id => @course.id, :id => @conference, :web_conference => {:title => "Something else"}}, :format => 'json'
       expect(response).to be_successful
+    end
+
+    it "should return user ids" do
+      user_session(@teacher)
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher)
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: {
+          title: "Something else",
+        },
+      }
+      post :update, params: params, format: :json
+      body = JSON.parse(response.body)
+      expect(body["user_ids"]).to include(@teacher.id)
+      expect(body["user_ids"]).to include(@student.id)
     end
   end
 
@@ -238,6 +310,55 @@ describe ConferencesController do
           expect(page_view.url).to match %r{^http://test\.host/courses/\d+/conferences/\d+/join}
           expect(page_view.participated).to be_truthy
         end
+      end
+    end
+  end
+
+  context 'LTI conferences' do
+    before(:once) do
+      Account.site_admin.enable_feature! :conference_selection_lti_placement
+    end
+
+    let_once(:course) { course_model }
+
+    let_once(:tool) do
+      new_valid_tool(course).tap do |t|
+        t.name = 'course tool'
+        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.save!
+      end
+    end
+
+    let_once(:account_tool) do
+      new_valid_tool(course.account).tap do |t|
+        t.name = 'account_tool'
+        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.save!
+      end
+    end
+
+    context '#index' do
+      it 'lists include LTI conference types' do
+        user_session(@teacher)
+        get 'index', params: { course_id: @course.id }
+        conference_types = assigns[:js_env][:conference_type_details]
+        expect(conference_types.pluck(:name)).to include(tool.name)
+        expect(conference_types.pluck(:name)).to include(account_tool.name)
+      end
+    end
+
+    context '#create' do
+      it 'can create LTI conferences' do
+        user_session(@teacher)
+        post 'create', params: {
+          course_id: @course.id,
+          web_conference: {
+            title: "My Conference",
+            conference_type: 'LtiConference',
+            lti_settings: { tool_id: tool.id }
+          }
+        }, format: 'json'
+        expect(response).to be_successful
       end
     end
   end

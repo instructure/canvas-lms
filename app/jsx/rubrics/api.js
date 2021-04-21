@@ -16,12 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+  TODO: Duplicated and modified within jsx/outcomes/MasteryScale for use there
+        Remove when feature flag account_level_mastery_scales is enabled
+*/
+
 import axios from 'axios'
 
-export const fetchProficiency = (accountId) => (
+export const fetchProficiency = accountId =>
   axios.get(`/api/v1/accounts/${accountId}/outcome_proficiency`)
-)
 
-export const saveProficiency = (accountId, config) => (
+export const saveProficiency = (accountId, config) =>
   axios.post(`/api/v1/accounts/${accountId}/outcome_proficiency`, config)
-)

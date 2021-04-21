@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -77,11 +79,7 @@ module GradebookSetup
   end
 
   def update_course_preferences(user, preferences)
-    user.update preferences: {
-      gradebook_settings: {
-        @course.id => preferences
-      }
-    }
+    user.set_preference(:gradebook_settings, @course.global_id, preferences)
   end
 
   def display_concluded_enrollments
@@ -104,8 +102,12 @@ module GradebookSetup
     set_filter_visibility(user, 'modules', true)
   end
 
+  def show_student_groups_filter(user)
+    set_filter_visibility(user, 'studentGroups', true)
+  end
+
   def set_filter_visibility(user, filter, visible)
-    filters = user.preferences.dig(:gradebook_settings, @course.id, :selected_view_options_filters) || []
+    filters = user.get_preference(:gradebook_settings, @course.global_id)&.dig(:selected_view_options_filters) || []
     if visible && !filters.include?(filter)
       filters << filter
     elsif !visible && filters.include?(filter)

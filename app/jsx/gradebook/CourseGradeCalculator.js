@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import round from 'compiled/util/round'
-import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
+import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {
   bigSum,
   sum,
@@ -159,7 +159,7 @@ function calculateWithGradingPeriods(
     return effectiveDueDates[assignmentId].grading_period_id
   })
 
-  const gradingPeriodsById = _.indexBy(gradingPeriods, 'id')
+  const gradingPeriodsById = _.keyBy(gradingPeriods, 'id')
   const gradingPeriodGradesByPeriodId = {}
   const periodBasedAssignmentGroupGrades = []
 
@@ -173,7 +173,8 @@ function calculateWithGradingPeriods(
 
       groupGrades[assignmentGroup.id] = AssignmentGroupGradeCalculator.calculate(
         submissions,
-        assignmentGroup
+        assignmentGroup,
+        options.ignoreUnpostedAnonymous
       )
       periodBasedAssignmentGroupGrades.push(groupGrades[assignmentGroup.id])
     }
@@ -201,11 +202,15 @@ function calculateWithGradingPeriods(
   }
 
   const allAssignmentGroupGrades = _.map(assignmentGroups, assignmentGroup =>
-    AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+    AssignmentGroupGradeCalculator.calculate(
+      submissions,
+      assignmentGroup,
+      options.ignoreUnpostedAnonymous
+    )
   )
 
   return {
-    assignmentGroups: _.indexBy(allAssignmentGroupGrades, grade => grade.assignmentGroupId),
+    assignmentGroups: _.keyBy(allAssignmentGroupGrades, grade => grade.assignmentGroupId),
     gradingPeriods: gradingPeriodGradesByPeriodId,
     current: combineAssignmentGroupGrades(allAssignmentGroupGrades, false, options),
     final: combineAssignmentGroupGrades(allAssignmentGroupGrades, true, options),
@@ -215,11 +220,15 @@ function calculateWithGradingPeriods(
 
 function calculateWithoutGradingPeriods(submissions, assignmentGroups, options) {
   const assignmentGroupGrades = _.map(assignmentGroups, assignmentGroup =>
-    AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+    AssignmentGroupGradeCalculator.calculate(
+      submissions,
+      assignmentGroup,
+      options.ignoreUnpostedAnonymous
+    )
   )
 
   return {
-    assignmentGroups: _.indexBy(assignmentGroupGrades, grade => grade.assignmentGroupId),
+    assignmentGroups: _.keyBy(assignmentGroupGrades, grade => grade.assignmentGroupId),
     current: combineAssignmentGroupGrades(assignmentGroupGrades, false, options),
     final: combineAssignmentGroupGrades(assignmentGroupGrades, true, options),
     scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
@@ -250,6 +259,7 @@ function calculateWithoutGradingPeriods(submissions, assignmentGroups, options) 
 // * id: Canvas id
 // * points_possible: non-negative number
 // * submission_types: [array of strings]
+// * anonymize_students: boolean
 //
 // The weighting scheme is one of [`percent`, `points`]
 //
@@ -328,12 +338,14 @@ function calculate(
   submissions,
   assignmentGroups,
   weightingScheme,
+  ignoreUnpostedAnonymous,
   gradingPeriodSet,
   effectiveDueDates
 ) {
   const options = {
     weightGradingPeriods: gradingPeriodSet && !!gradingPeriodSet.weighted,
-    weightAssignmentGroups: weightingScheme === 'percent'
+    weightAssignmentGroups: weightingScheme === 'percent',
+    ignoreUnpostedAnonymous
   }
 
   if (gradingPeriodSet && effectiveDueDates) {

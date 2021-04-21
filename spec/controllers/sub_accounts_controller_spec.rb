@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe SubAccountsController do
   describe "POST 'create'" do
@@ -41,7 +43,7 @@ describe SubAccountsController do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
-      
+
       sub_account = root_account.sub_accounts.create(:name => 'sub account')
 
       post 'create', params: {:account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }}
@@ -196,6 +198,27 @@ describe SubAccountsController do
       delete 'destroy', params: {account_id: @root_account, id: @sub_account}
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
+    end
+  end
+
+  describe "GET 'show'" do
+    before :once do
+      @root_account = Account.create(name: 'new account')
+      account_admin_user(active_all: true, account: @root_account)
+      @sub_account = @root_account.sub_accounts.create!
+    end
+
+    before :each do
+      user_session @user
+    end
+
+    it 'should get sub-accounts in alphabetical order' do
+      names = ["script", "bank", "cow", "program", "means"]
+      names.each {|name| Account.create!(name: name, parent_account: @sub_account)}
+      get 'show', params: {account_id: @root_account, id: @sub_account}
+      expect(response.status).to eq 200
+      json = JSON.parse(response.body)
+      expect(json["account"]["sub_accounts"].map{|sub| sub["account"]["name"]}).to eq names.sort
     end
   end
 end

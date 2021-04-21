@@ -20,9 +20,10 @@ const RichContentEditor = {
   preloadRemoteModule() {},
   loadNewEditor() {},
   destroyRCE() {},
+  initSidebar() {},
   callOnRCE(textarea, opName) {
-    if (opName === 'get_code')
-    return textarea.innerHTML
-  }
+    if (opName === 'get_code') return textarea.innerHTML
+  },
+  closeRCE() {}
 }
 export default RichContentEditor

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -56,7 +58,8 @@ module Importers
         type = 'context_modules' if type == 'modules'
         type = 'pages' if type == 'wiki'
         if type == 'pages'
-          link[:new_value] = "#{context_path}/pages/#{migration_id}#{link[:query]}"
+          query = resolve_module_item_query(context, link[:query])
+          link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == 'attachments'
           if att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"
@@ -77,7 +80,7 @@ module Importers
         # see LinkParser for details
 
         rel_path = link[:rel_path]
-        node = Nokogiri::HTML::DocumentFragment.parse(link[:old_value]).children.first
+        node = Nokogiri::HTML5.fragment(link[:old_value]).children.first
         new_url = resolve_media_comment_data(node, rel_path)
         new_url ||= resolve_relative_file_url(rel_path)
 
@@ -85,8 +88,12 @@ module Importers
           new_url ||= missing_relative_file_url(rel_path)
           link[:missing_url] = new_url
         end
-        node['href'] = new_url
-        link[:new_value] = node.to_xml
+        if node.name == 'iframe'
+          node['src'] = new_url
+        else
+          node['href'] = new_url
+        end
+        link[:new_value] = node.to_s
       when :file
         rel_path = link[:rel_path]
         new_url = resolve_relative_file_url(rel_path)
@@ -95,6 +102,13 @@ module Importers
           link[:missing_url] = new_url
         end
         link[:new_value] = new_url
+      when :file_ref
+        file_id = context.attachments.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
+        if file_id
+          rest = link[:rest].presence || '/preview'
+          link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"
+          link[:new_value] = "/media_objects_iframe?mediahref=#{link[:new_value]}" if link[:in_media_iframe]
+        end
       else
         raise "unrecognized link_type in unresolved link"
       end
@@ -179,17 +193,30 @@ module Importers
       new_url
     end
 
+    def media_iframe_url(media_id, media_type = nil)
+      url = "/media_objects_iframe/#{media_id}"
+      url += "?type=#{media_type}" if media_type.present?
+      url
+    end
+
     def resolve_media_comment_data(node, rel_path)
-      if file = find_file_in_context(rel_path)
+      if file = find_file_in_context(rel_path[/^[^?]+/]) # strip query string for this search
         media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
         if media_id && media_id != 'maybe'
-          node['id'] = "media_comment_#{media_id}"
-          return "/media_objects/#{media_id}"
+          if node.name == 'iframe'
+            node['data-media-id'] = media_id
+            return media_iframe_url(media_id, node['data-media-type'])
+          else
+            node['id'] = "media_comment_#{media_id}"
+            return "/media_objects/#{media_id}"
+          end
         end
       end
 
       if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
         return "/media_objects/#{$1}"
+      elsif node['data-media-id'].present?
+        return media_iframe_url(node['data-media-id'], node['data-media-type'])
       else
         node.delete('class')
         node.delete('id')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ describe "dashboard" do
       term.save!
       c1 = @course
       c1.name = 'a_soft_concluded_course'
-      c1.update_attributes!(:enrollment_term => term)
+      c1.update!(:enrollment_term => term)
       c1.reload
 
       get "/courses"
@@ -159,7 +161,7 @@ describe "dashboard" do
 
           Timecop.freeze(3.minutes.from_now) do
             @assignment.update_attribute(:grades_published_at, Time.now.utc)
-            @teacher.touch # would be done by the publishing endpoint
+            @teacher.clear_cache_key(:todo_list) # would be done by the publishing endpoint
 
             get "/"
             expect(f('.to-do-list')).to_not include_text("Moderate #{@assignment.title}")

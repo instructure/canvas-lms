@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -47,7 +49,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       allow(@migration).to receive(:cache_key).and_return('1')
       allow(@migration).to receive(:close)
       allow(@migration).to receive(:read).and_return(@overview.to_json)
-      @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com")
+      allow(@migration).to receive(:context).and_return(course_model)
+      @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com", global_identifiers: true)
     end
 
     it "should list top-level items" do
@@ -56,7 +59,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
                                              {:type=>"assignments", :property=>"copy[all_assignments]", :title=>"Assignments", :count=>2, :sub_items_url=>"https://example.com?type=assignments"},
                                              {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1, :sub_items_url=>"https://example.com?type=quizzes"},
-                                             {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
+                                             {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
                                              {:type=>"context_external_tools", :property=>"copy[all_context_external_tools]", :title=>"External Tools", :count=>1, :sub_items_url=>"https://example.com?type=context_external_tools"},
                                              {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1, :sub_items_url=>"https://example.com?type=tool_profiles"},
                                              {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>1},
@@ -70,6 +73,49 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(@formatter.get_content_list('context_external_tools').length).to eq 1
       expect(@formatter.get_content_list('learning_outcomes').length).to eq 1
       expect(@formatter.get_content_list('attachments').length).to eq 1
+    end
+
+    context 'selectable_outcomes_in_course_copy enabled' do
+      before(:example) do
+        @migration.context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      after(:example) do
+        @migration.context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      context 'with learning_outcome_groups course data' do
+        before do
+          @overview['learning_outcome_groups'] = [{
+            'title' => 'my group',
+            'migration_id' => 'g1',
+            'child_groups' => []
+          }]
+          @overview['outcomes'].first['parent_migration_id'] = 'g1'
+          allow(@migration).to receive(:read).and_return(@overview.to_json)
+        end
+
+        it 'should arrange an outcome hiearchy' do
+          expect(@formatter.get_content_list('learning_outcomes')).to eq [
+            {
+              type: 'learning_outcome_groups',
+              property: 'copy[learning_outcome_groups][id_g1]',
+              title: 'my group',
+              migration_id: 'g1',
+              sub_items: [{
+                type: 'learning_outcomes',
+                property: 'copy[learning_outcomes][id_a1]',
+                title: 'a1',
+                migration_id: 'a1'
+              }]
+            }
+          ]
+        end
+      end
+
+      it 'should return standard outcomes without learning_outcome_groups course data' do
+        expect(@formatter.get_content_list('learning_outcomes').length).to eq 1
+      end
     end
 
     it "should group assignments into assignment groups" do
@@ -175,7 +221,18 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
   context "course copy" do
     include_context "lti2_course_spec_helper"
-    let(:formatter) { Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration) }
+    let(:formatter) { Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com", global_identifiers: true) }
+    let(:top_level_items) do
+      [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+       {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
+       {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1, :sub_items_url=>"https://example.com?type=context_modules"},
+       {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1, :sub_items_url=>"https://example.com?type=tool_profiles"},
+       {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1, :sub_items_url=>"https://example.com?type=discussion_topics"},
+       {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
+       {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1, :sub_items_url=>"https://example.com?type=announcements"},
+       {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>4},
+       {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1, :sub_items_url=>"https://example.com?type=attachments"}]
+    end
 
     before do
       course_model
@@ -191,21 +248,14 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @migration = double()
       allow(@migration).to receive(:migration_type).and_return('course_copy_importer')
       allow(@migration).to receive(:source_course).and_return(@course)
-      @course_outcome = outcome_model
-      @account_outcome = outcome_model(:outcome_context => @course.account)
-    end
-
-    it "should list top-level items" do
-      #groups should not show up even though there are some
-      expect(formatter.get_content_list).to match_array [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
-                                             {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
-                                             {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
-                                             {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1},
-                                             {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
-                                             {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1},
-                                             {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1},
-                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>2},
-                                             {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1}]
+      export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      allow(@migration).to receive(:content_export).and_return(export)
+      @course_outcome = outcome_model(title: 'zebra')
+      @account_outcome = outcome_model(outcome_context: @course.account, title: 'alpaca')
+      @out_group1 = outcome_group_model(title: 'striker')
+      @outcome1_in_group = outcome_model(outcome_group: @out_group1, title: 'speakeasy')
+      @outcome2_in_group = outcome_model(outcome_group: @out_group1, title: 'moonshine')
+      @out_group2 = outcome_group_model(title: 'beta')
     end
 
     it "should list individual types" do
@@ -214,7 +264,60 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(formatter.get_content_list('attachments').length).to eq 1
       expect(formatter.get_content_list('discussion_topics').length).to eq 1
       expect(formatter.get_content_list('announcements').length).to eq 1
-      expect(formatter.get_content_list('learning_outcomes').length).to eq 2
+    end
+
+    context 'with selectable_outcomes_in_course_copy disabled' do
+      before do
+        @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      it "should list top-level items" do
+        # groups should not show up even though there are some
+        expect(formatter.get_content_list).to match_array top_level_items
+      end
+
+      it "should list learning outcomes" do
+        outcomes = formatter.get_content_list('learning_outcomes')
+        expect(outcomes.map {|o| o[:title]}).to match_array(
+          [
+            'alpaca',
+            'moonshine',
+            'speakeasy',
+            'zebra'
+          ]
+        )
+      end
+    end
+
+    context 'with selectable_outcomes_in_course_copy enabled' do
+      before do
+        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+      end
+
+      it "should list top-level items" do
+        # groups should not show up even though there are some
+        copy = top_level_items.clone
+        copy.find {|item| item[:type] == 'learning_outcomes' }[:sub_items_url] = "https://example.com?type=learning_outcomes"
+        expect(formatter.get_content_list).to match_array copy
+      end
+
+      it "should list individual types in expected order" do
+        outcomes = formatter.get_content_list('learning_outcomes')
+        expect(outcomes.map {|o| o[:title]}).to eq [
+          'beta',
+          'striker',
+          'alpaca',
+          'zebra'
+        ]
+      end
+
+      it "should list outcomes in outcome group" do
+        outcomes = formatter.get_content_list("learning_outcome_groups_#{@out_group1.id}")
+        expect(outcomes.map {|o| o[:title]}).to eq [
+          'moonshine',
+          'speakeasy'
+        ]
+      end
     end
 
     it "should link resources for quizzes and submittables" do
@@ -243,6 +346,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @topic.destroy
         @course_outcome.destroy
         @account_outcome.destroy
+        @outcome1_in_group.destroy
+        @outcome2_in_group.destroy
+        @out_group1.destroy
+        @out_group2.destroy
         tool_proxy.destroy
 
         @course.require_assignment_group
@@ -297,6 +404,5 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(res[3][:title]).to eq 'course files/a/b/c'
       expect(res[3][:sub_items][0][:title]).to eq 'a4.html'
     end
-
   end
 end

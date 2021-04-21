@@ -17,15 +17,15 @@
  */
 import sinon from 'sinon'
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import CommentButton from '../CommentButton'
 
 describe('The CommentButton component', () => {
   const props = {
-    onClick: sinon.spy(),
+    onClick: sinon.spy()
   }
 
-  const component = (mods) => shallow(<CommentButton {...{ ...props, ...mods }} />)
+  const component = mods => shallow(<CommentButton {...{...props, ...mods}} />)
 
   it('renders the root component as expected', () => {
     expect(component()).toMatchSnapshot()
@@ -33,7 +33,7 @@ describe('The CommentButton component', () => {
 
   it('passes through onClick', () => {
     const onClick = sinon.spy()
-    const el = component({ onClick })
+    const el = component({onClick})
     el.find('Button[variant="icon"]').prop('onClick')()
     expect(onClick.calledOnce).toEqual(true)
   })

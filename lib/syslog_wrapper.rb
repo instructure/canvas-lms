@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,6 +24,8 @@ require 'syslog'
 class SyslogWrapper
 
   attr_accessor :level, :datetime_format
+
+  def formatter; nil; end
 
   @@silencer = true
   def self.silencer; @@silencer; end

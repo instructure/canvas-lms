@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -55,7 +57,7 @@ describe "discussions" do
 
       before(:each) do
         user_session(student)
-        enable_all_rcs @course.account
+        Account.default.enable_feature!(:rce_enhancements)
         stub_rcs_config
       end
 

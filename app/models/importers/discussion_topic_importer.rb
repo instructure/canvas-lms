@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -131,7 +133,12 @@ module Importers
       if options[:external_feed_migration_id].present?
         item.external_feed = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
       end
-      item.assignment = fetch_assignment
+      skip_assignment = migration.for_master_course_import? &&
+        migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("assignment_id") &&
+        !item.editing_restricted?(:settings)
+      unless skip_assignment
+        item.assignment = fetch_assignment
+      end
 
       if options[:attachment_ids].present?
         item.message += Attachment.attachment_list_from_migration(context, options[:attachment_ids])
@@ -140,6 +147,18 @@ module Importers
       if options[:has_group_category]
         item.group_category ||= context.group_categories.active.where(:name => options[:group_category]).first
         item.group_category ||= context.group_categories.active.where(:name => I18n.t("Project Groups")).first_or_create
+      elsif migration.for_master_course_import? && !item.is_announcement
+        if item.for_group_discussion? && !item.can_group?
+          # when this is false you can't actually unset the category in the UI so we'll keep it consistent here
+          # this is just some silliness so the attempted change gets ignored and also logged as a sync exception
+          tag = migration.master_course_subscription.content_tag_for(item)
+          unless tag.downstream_changes.include?("group_category_id")
+            tag.downstream_changes << "group_category_id"
+            tag.save
+          end
+        end
+
+        item.group_category = nil
       end
 
       item.save_without_broadcasting!

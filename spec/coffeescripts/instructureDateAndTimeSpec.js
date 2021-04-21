@@ -26,9 +26,8 @@ import 'jquery.instructure_date_and_time'
 
 QUnit.module('fudgeDateForProfileTimezone', {
   setup() {
-    let expectedTimestamp
     this.snapshot = tz.snapshot()
-    this.original = new Date((expectedTimestamp = Date.UTC(2013, 8, 1)))
+    this.original = new Date(Date.UTC(2013, 8, 1))
   },
   teardown() {
     tz.restore(this.snapshot)
@@ -75,9 +74,8 @@ test('should be sensitive to profile time zone', function() {
 
 QUnit.module('unfudgeDateForProfileTimezone', {
   setup() {
-    let expectedTimestamp
     this.snapshot = tz.snapshot()
-    this.original = new Date((expectedTimestamp = Date.UTC(2013, 8, 1)))
+    this.original = new Date(Date.UTC(2013, 8, 1))
   },
   teardown() {
     tz.restore(this.snapshot)
@@ -273,37 +271,37 @@ test('should accept localized strings and return them fudged', () => {
 })
 
 QUnit.module('$.datepicker time picker', {
-  setup () {
+  setup() {
     this.container = document.createElement('div')
     this.field = document.createElement('input')
     this.container.appendChild(this.field)
     document.body.appendChild(this.container)
-    $(this.field).datepicker({ timePicker: true })
+    $(this.field).datepicker({timePicker: true})
     $(this.field).focus()
     this.$hour = $('.ui-datepicker-time-hour')
     this.$ampm = $('.ui-datepicker-time-ampm')
   },
-  teardown () {
+  teardown() {
     document.body.removeChild(this.container)
   }
 })
 
-test('sets ampm select to am if empty and hour is changed to 0', function () {
+test('sets ampm select to am if empty and hour is changed to 0', function() {
   this.$hour.val('0').trigger('change')
   equal(this.$ampm.val(), 'am')
 })
 
-test('sets ampm select to am if empty and hour is changed to 00', function () {
+test('sets ampm select to am if empty and hour is changed to 00', function() {
   this.$hour.val('00').trigger('change')
   equal(this.$ampm.val(), 'am')
 })
 
-test('sets ampm select to pm if empty and hour is changed to > 0', function () {
+test('sets ampm select to pm if empty and hour is changed to > 0', function() {
   this.$hour.val('1').trigger('change')
   equal(this.$ampm.val(), 'pm')
 })
 
-test('sets hour to 12 if ampm exists and hour is changed to 0', function () {
+test('sets hour to 12 if ampm exists and hour is changed to 0', function() {
   this.$hour.val('0').trigger('change')
   equal(this.$hour.val(), '12')
 })

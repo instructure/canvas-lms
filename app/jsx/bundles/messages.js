@@ -25,7 +25,7 @@ import 'jqueryui/tabs'
 
 $('.tabs').tabs()
 
-function showDialog (e) {
+function showDialog(e) {
   e.preventDefault()
   const $message = $(e.target).parents('li.message:first')
   const modal = new MessageModal($message, $message.data())
@@ -34,14 +34,12 @@ function showDialog (e) {
 
 // Manage state on a new message modal.
 class MessageModal {
-
   // Create a new MessageModal.
   //
   // $message - A wrapped li.message object.
   // {secureId, messageId} - An object containing secureId and messageId
   //   keys corresponding to the given message object.
-  constructor ($message, {secureId, messageId}) {
-    this.sendMessage = this.sendMessage.bind(this)
+  constructor($message, {secureId, messageId}) {
     this.tpl = sendForm({
       location: window.location.href,
       secureId,
@@ -57,30 +55,39 @@ class MessageModal {
   // Internal: Manage event handlers on the new dialog.
   //
   // Returns nothing.
-  attachEvents () {
+  attachEvents() {
     this.$el.on('submit', this.sendMessage)
   }
 
   // Public: Open the modal.
   //
   // Returns nothing.
-  open () { this.$el.dialog('open').fixDialogButtons() }
+  open() {
+    this.$el.dialog('open').fixDialogButtons()
+  }
 
   // Public: Close the modal.
   //
   // Returns nothing.
-  close () { this.$el.dialog('close') }
+  close() {
+    this.$el.dialog('close')
+  }
 
   // Internal: Serialize the message form and send the request.
   //
   // e - Event object.
   //
   // Returns nothing.
-  sendMessage (e) {
+  sendMessage = e => {
     e.preventDefault()
     this.close()
     $.post(this.$el.attr('action'), this.$el.serialize()).fail(() =>
-      $.flashError(I18n.t('messages.failure', 'There was an error sending your email. Please reload the page and try again.'))
+      $.flashError(
+        I18n.t(
+          'messages.failure',
+          'There was an error sending your email. Please reload the page and try again.'
+        )
+      )
     )
     $.flashMessage(I18n.t('messages.success', 'Your email is being delivered.'))
   }

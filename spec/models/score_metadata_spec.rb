@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@
 require 'spec_helper'
 
 describe ScoreMetadata do
-  it { is_expected.to belong_to(:score)}
+  it { is_expected.to belong_to(:score).required }
   it { is_expected.to validate_presence_of(:score) }
   it { is_expected.to validate_presence_of(:calculation_details) }
   it { is_expected.to validate_uniqueness_of(:score_id) }

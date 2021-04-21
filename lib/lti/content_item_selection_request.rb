@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 Instructure, Inc.
 #
@@ -59,7 +61,7 @@ module Lti
         oauth_callback: 'about:blank'
       }
 
-      params[:user_id] = Lti::Asset.opaque_identifier_for(user) if user
+      params[:user_id] = Lti::Asset.opaque_identifier_for(user, context: context) if user
       params
     end
 
@@ -127,21 +129,34 @@ module Lti
       end
     end
 
+    INDEX_MENU_TOOL_TYPES = %w{
+      assignment_index_menu
+      assignment_group_menu
+      discussion_topic_index_menu
+      file_index_menu
+      module_index_menu
+      module_group_menu
+      quiz_index_menu
+      wiki_index_menu
+    }.freeze
+
     def placement_params(placement, assignment: nil)
       case placement
       when 'migration_selection'
         migration_selection_params
       when 'editor_button'
         editor_button_params
-      when 'resource_selection', 'link_selection', 'assignment_selection'
+      when 'resource_selection', 'link_selection', 'assignment_selection', 'submission_type_selection'
         lti_launch_selection_params
       when 'collaboration'
         collaboration_params
       when 'homework_submission'
         homework_submission_params(assignment)
+      when *INDEX_MENU_TOOL_TYPES
+        {}
       else
         # TODO: we _could_, if configured, have any other placements return to the content migration page...
-        raise "Content-Item not supported at this placement"
+        raise ::Lti::Errors::UnsupportedPlacement, "Content-Item not supported at this placement"
       end
     end
 
@@ -169,6 +184,7 @@ module Lti
         accept_media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).join(','),
         accept_presentation_document_targets: %w(embed frame iframe window).join(','),
         accept_unsigned: true,
+        accept_multiple: true,
         auto_create: false
       }
     end

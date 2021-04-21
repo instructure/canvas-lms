@@ -20,11 +20,17 @@
   folders = @context.active_folders.by_position.select([:id, :name, :parent_folder_id]).to_a
   root_folders = folders.select{|f| f.parent_folder_id == nil}
 
-  content_for :page_title, join_title(t(:page_title, "Import Content"), @context.name)
+  provide :page_title, join_title(t(:page_title, "Import Content"), @context.name)
   js_bundle :content_migration
   js_env :FOLDER_OPTIONS => folders_as_options(root_folders, :all_folders => folders)
   css_bundle :content_migrations
 %>
 
 <form id="migrationConverterContainer" class="form-horizontal"></form>
+<div id="migration_upload_progress_container" style="width: 100%; display: none;">
+  <div style="display: flex;">
+    <span><%= t("Uploading...") %>&ensp;</span>
+    <span id="migration_upload_progress_bar" style="flex-grow: 1;"></span>
+  </div>
+</div>
 <div id="progress" class="span10"></div>

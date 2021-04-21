@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::ModuleItemType do
   let_once(:course) { course_with_teacher(active_all: true); @course }
@@ -31,7 +33,7 @@ describe Types::ModuleItemType do
   end
 
   context "permissions" do
-    let_once(:student) { student_in_course(course: course) }
+    let_once(:student) { student_in_course(course: course).user }
 
     it "requires read permission on context module" do
       module1.workflow_state = "unpublished"
@@ -41,7 +43,7 @@ describe Types::ModuleItemType do
     end
 
     it "requires read permission on context" do
-      other_course_student = student_in_course(course: course_factory)
+      other_course_student = student_in_course(course: course_factory).user
       resolver = GraphQLTypeTester.new(module_item1, current_user: other_course_student)
       expect(resolver.resolve("_id")).to be_nil
     end
@@ -144,6 +146,14 @@ describe Types::ModuleItemType do
         url: 'https://google.com'
       )
       verify_module_item_works(module_item)
+    end
+
+    it "works for sub headings" do
+      module_item = module1.add_item({type: 'SubHeader', title: "WHOA!"}, nil, position: 1)
+      expect(
+        GraphQLTypeTester.new(module_item, current_user: @teacher).
+           resolve("content { ... on SubHeader { title } }")
+      ).to eq module_item.title
     end
   end
 end

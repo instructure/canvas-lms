@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -791,6 +793,27 @@ describe "Modules API", type: :request do
       expect(json['completed_at']).to be_nil
 
       @external_url_tag.context_module_action(@user, :read)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      :controller => "context_modules_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :id => "#{@module1.id}")
+      expect(json['state']).to eq 'completed'
+      expect(json['completed_at']).not_to be_nil
+    end
+
+    it "should consider scores that are close enough as complete" do
+      teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
+      @module1.completion_requirements = {
+        @assignment_tag.id => { :type => 'min_score', :min_score => 1 },
+      }
+      @module1.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      :controller => "context_modules_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :id => "#{@module1.id}")
+      expect(json['state']).to eq 'unlocked'
+
+      @assignment.grade_student(@user, score: 0.3 + 0.3 + 0.3 + 0.1, grader: teacher)
+
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module1.id}")

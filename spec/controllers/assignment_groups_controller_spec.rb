@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -44,6 +46,7 @@ describe AssignmentGroupsController do
         student_override = assignment_with_override.assignment_overrides.new.tap do |override|
           override.title = 'feb override'
           override.due_at = Time.zone.local(2015, 2, 15)
+          override.due_at_overridden = true
         end
         student_override.save!
         student_override.assignment_override_students.create!(user: student)
@@ -52,6 +55,7 @@ describe AssignmentGroupsController do
       let(:student) do
         dora = User.create!(name: "Dora")
         course_with_student(course: course, user: dora, active_enrollment: true)
+        course_with_student(course: course, user: User.create!, active_enrollment: true)
         dora
       end
 
@@ -209,6 +213,57 @@ describe AssignmentGroupsController do
       end
     end
 
+    describe 'filtering assignments by ID' do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @first_assignment = @course.assignments.create!(name: "Assignment 1")
+        @second_assignment = @course.assignments.create!(name: "Assignment 2")
+      end
+
+      it 'optionally filters assignments by ID' do
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id]
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id]
+      end
+
+      it 'optionally filters assignments by ID when passed assignment_ids as a comma separated string' do
+        new_assignment = @course.assignments.create!(name: "Assignment 3")
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id, new_assignment.id].join(",")
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id, new_assignment.id]
+      end
+
+      it 'does not return assignments outside the scope of the original result set' do
+        new_course = Course.create!
+        new_assignment = new_course.assignments.create!(name: "New Assignment")
+
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id, new_assignment.id]
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id]
+      end
+    end
+
     context 'given a course with a teacher and a student' do
       before :once do
         course_with_teacher(active_all: true)
@@ -273,18 +328,128 @@ describe AssignmentGroupsController do
         expect(json[0]['assignments'][0]['submission']['id']).to eq @submission.id
       end
 
-      it 'only makes the call to get effective due dates once when assignments are included' do
-        @course.assignments.create!
-        double = EffectiveDueDates.for_course(@course)
-        expect(EffectiveDueDates).to receive(:for_course).once.and_return(double)
-        api_call_as_user(@teacher, :get,
-          "/api/v1/courses/#{@course.id}/assignment_groups", {
-          controller: 'assignment_groups',
-          action: 'index',
-          format: 'json',
-          course_id: @course.id,
-          include: ['assignments']
-        })
+      context "submission in_closed_grading_period" do
+        before(:once) do
+          @gp_group = @course.account.grading_period_groups.create!
+          @course.enrollment_term.update!(grading_period_group: @gp_group)
+        end
+
+        it "any_assignment_in_closed_grading_period is false if no assignments exist, but a closed grading period does" do
+          @gp_group.grading_periods.create!(
+            start_date: 4.days.ago,
+            end_date: 2.days.ago,
+            close_date: 1.day.ago,
+            title: "closed gp"
+          )
+          @course.assignments.destroy_all
+          json = api_call_as_user(@student, :get,
+            "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=submission", {
+            controller: 'assignment_groups',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id,
+            include: ['assignments', 'submission']
+          })
+          expect(json.first.fetch("any_assignment_in_closed_grading_period")).to be false
+        end
+
+        it "returns in_closed_grading_period when 'assignments' are included in params" do
+          @course.assignments.create!
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups", {
+            controller: 'assignment_groups',
+              action: 'index',
+              format: 'json',
+              course_id: @course.id,
+              include: ['assignments']
+          })
+          assignment_json = json.first.fetch("assignments").first
+          expect(assignment_json).to have_key "in_closed_grading_period"
+        end
+
+        it "in_closed_grading_period is true when any submission is in a closed grading period" do
+          @gp_group.grading_periods.create!(
+            start_date: 4.days.ago,
+            end_date: 2.days.ago,
+            close_date: 1.day.ago,
+            title: "closed gp"
+          )
+          closed_gp_assignment = @course.assignments.create!(due_at: 2.days.ago)
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups", {
+            controller: 'assignment_groups',
+              action: 'index',
+              format: 'json',
+              course_id: @course.id,
+              include: ['assignments']
+          })
+          assignments_json = json.first.fetch("assignments")
+          assignment_json = assignments_json.find { |a| a.fetch("id") == closed_gp_assignment.id }
+          expect(assignment_json.fetch("in_closed_grading_period")).to be true
+        end
+
+        it "in_closed_grading_period is false when all submissions are in open grading periods" do
+          @gp_group.grading_periods.create!(
+            start_date: 4.days.ago,
+            end_date: 1.day.from_now,
+            close_date: 2.days.from_now,
+            title: "open gp"
+          )
+          open_gp_assignment = @course.assignments.create!(due_at: 2.days.ago)
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups", {
+            controller: 'assignment_groups',
+              action: 'index',
+              format: 'json',
+              course_id: @course.id,
+              include: ['assignments']
+          })
+          assignments_json = json.first.fetch("assignments")
+          assignment_json = assignments_json.find { |a| a.fetch("id") == open_gp_assignment.id }
+          expect(assignment_json.fetch("in_closed_grading_period")).to be false
+        end
+
+        it "submissions with no due date and last period is open do not cause in_closed_grading_period to be true" do
+          @gp_group.grading_periods.create!(
+            start_date: 4.days.ago,
+            end_date: 1.day.from_now,
+            close_date: 2.days.from_now,
+            title: "open gp"
+          )
+          assignment = @course.assignments.create!
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups", {
+            controller: 'assignment_groups',
+              action: 'index',
+              format: 'json',
+              course_id: @course.id,
+              include: ['assignments']
+          })
+          assignments_json = json.first.fetch("assignments")
+          assignment_json = assignments_json.find { |a| a.fetch("id") == assignment.id }
+          expect(assignment_json.fetch("in_closed_grading_period")).to be false
+        end
+
+        it "submissions with no due date and last period is closed cause in_closed_grading_period to be true" do
+          @gp_group.grading_periods.create!(
+            start_date: 4.days.ago,
+            end_date: 2.days.ago,
+            close_date: 1.day.ago,
+            title: "closed gp"
+          )
+          assignment = @course.assignments.create!
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups", {
+            controller: 'assignment_groups',
+              action: 'index',
+              format: 'json',
+              course_id: @course.id,
+              include: ['assignments']
+          })
+          assignments_json = json.first.fetch("assignments")
+          assignment_json = assignments_json.find { |a| a.fetch("id") == assignment.id }
+          expect(assignment_json.fetch("in_closed_grading_period")).to be true
+        end
       end
     end
   end
@@ -390,7 +555,7 @@ describe AssignmentGroupsController do
         Factories::GradingPeriodHelper.new.create_for_group(group, {
           start_date: 2.days.ago, end_date: 2.days.from_now, close_date: 3.days.from_now
         })
-        @assignment1.update_attributes(due_at: 1.week.ago)
+        @assignment1.update(due_at: 1.week.ago)
       end
 
       it 'does not allow assignments in closed grading periods to be moved into different assignment groups' do

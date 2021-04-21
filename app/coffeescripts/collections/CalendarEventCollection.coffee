@@ -16,11 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'underscore'
-  '../collections/PaginatedCollection'
-], (_, PaginatedCollection) ->
+import _ from 'underscore'
+import PaginatedCollection from '../collections/PaginatedCollection'
 
-  class CalendarEventCollection extends PaginatedCollection
-
-    url: '/api/v1/calendar_events'
+export default class CalendarEventCollection extends PaginatedCollection
+  url: '/api/v1/calendar_events'

@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!announcements_v2'
-import React, {Component} from 'react'
-import {string, func, bool, number} from 'prop-types'
+import {bindActionCreators} from 'redux'
+import {bool, func, number, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
-import {bindActionCreators} from 'redux'
+import I18n from 'i18n!announcements_v2'
+import React, {Component} from 'react'
+import {Button} from '@instructure/ui-buttons'
+import {FormField} from '@instructure/ui-form-field'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {
+  IconLockLine,
+  IconPlusLine,
+  IconSearchLine,
+  IconTrashLine,
+  IconUnlockLine
+} from '@instructure/ui-icons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextInput} from '@instructure/ui-text-input'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Select from '@instructure/ui-core/lib/components/Select'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
-
-import select from '../../shared/select'
-import propTypes from '../propTypes'
 import actions from '../actions'
 import ExternalFeedsTray from './ExternalFeedsTray'
+import propTypes from '../propTypes'
+import select from '../../shared/select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 
 // Delay the search so as not to overzealously read out the number
@@ -111,99 +111,104 @@ export default class IndexHeader extends Component {
     return (
       <View>
         <View margin="0 0 medium" display="block">
-          <Grid>
-            <GridRow hAlign="space-between">
-              <GridCol width={2}>
-                <Select
+          <Flex wrapItems wrap="wrap" justifyItems="end">
+            <Flex.Item grow>
+              <FormField
+                id="announcement-filter"
+                label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
+              >
+                <select
+                  id="announcement-filter"
                   name="filter-dropdown"
                   onChange={e => this.props.searchAnnouncements({filter: e.target.value})}
-                  size="medium"
-                  label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
+                  style={{
+                    margin: '0',
+                    width: '100%'
+                  }}
                 >
                   {Object.keys(filters).map(filter => (
                     <option key={filter} value={filter}>
                       {filters[filter]}
                     </option>
                   ))}
-                </Select>
-              </GridCol>
-              <GridCol width={4}>
-                <TextInput
-                  label={
-                    <ScreenReaderContent>
-                      {I18n.t('Search announcements by title')}
-                    </ScreenReaderContent>
-                  }
-                  placeholder={I18n.t('Search')}
-                  icon={() => <IconSearchLine />}
-                  ref={this.searchInputRef}
-                  onChange={this.onSearch}
-                  name="announcements_search"
-                />
-              </GridCol>
-              <GridCol width={6} textAlign="end">
-                {this.props.permissions.manage_content &&
-                  !this.props.announcementsLocked &&
-                  (this.props.isToggleLocking ? (
-                    <Button
-                      disabled={this.props.isBusy || this.props.selectedCount === 0}
-                      size="medium"
-                      margin="0 small 0 0"
-                      id="lock_announcements"
-                      onClick={this.props.toggleSelectedAnnouncementsLock}
-                    >
-                      <IconLock />
-                      <ScreenReaderContent>
-                        {I18n.t('Lock Selected Announcements')}
-                      </ScreenReaderContent>
-                    </Button>
-                  ) : (
-                    <Button
-                      disabled={this.props.isBusy || this.props.selectedCount === 0}
-                      size="medium"
-                      margin="0 small 0 0"
-                      id="lock_announcements"
-                      onClick={this.props.toggleSelectedAnnouncementsLock}
-                    >
-                      <IconUnlock />
-                      <ScreenReaderContent>
-                        {I18n.t('Unlock Selected Announcements')}
-                      </ScreenReaderContent>
-                    </Button>
-                  ))}
-                {this.props.permissions.manage_content && (
+                </select>
+              </FormField>
+            </Flex.Item>
+
+            <Flex.Item grow margin="0 0 0 small">
+              <TextInput
+                label={
+                  <ScreenReaderContent>
+                    {I18n.t('Search announcements by title')}
+                  </ScreenReaderContent>
+                }
+                placeholder={I18n.t('Search')}
+                icon={() => <IconSearchLine />}
+                ref={this.searchInputRef}
+                onChange={this.onSearch}
+                name="announcements_search"
+              />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 small">
+              {this.props.permissions.manage_content &&
+                !this.props.announcementsLocked &&
+                (this.props.isToggleLocking ? (
                   <Button
                     disabled={this.props.isBusy || this.props.selectedCount === 0}
                     size="medium"
                     margin="0 small 0 0"
-                    id="delete_announcements"
-                    onClick={this.onDelete}
-                    ref={c => {
-                      this.deleteBtn = c
-                    }}
+                    id="lock_announcements"
+                    onClick={this.props.toggleSelectedAnnouncementsLock}
                   >
-                    <IconTrash />
+                    <IconLockLine />
                     <ScreenReaderContent>
-                      {I18n.t('Delete Selected Announcements')}
+                      {I18n.t('Lock Selected Announcements')}
                     </ScreenReaderContent>
                   </Button>
-                )}
-                {this.props.permissions.create && (
+                ) : (
                   <Button
-                    href={`/${this.props.contextType}s/${
-                      this.props.contextId
-                    }/discussion_topics/new?is_announcement=true`}
-                    variant="primary"
-                    id="add_announcement"
+                    disabled={this.props.isBusy || this.props.selectedCount === 0}
+                    size="medium"
+                    margin="0 small 0 0"
+                    id="lock_announcements"
+                    onClick={this.props.toggleSelectedAnnouncementsLock}
                   >
-                    <IconPlus />
-                    <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
-                    <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+                    <IconUnlockLine />
+                    <ScreenReaderContent>
+                      {I18n.t('Unlock Selected Announcements')}
+                    </ScreenReaderContent>
                   </Button>
-                )}
-              </GridCol>
-            </GridRow>
-          </Grid>
+                ))}
+              {this.props.permissions.manage_content && (
+                <Button
+                  disabled={this.props.isBusy || this.props.selectedCount === 0}
+                  size="medium"
+                  margin="0 small 0 0"
+                  id="delete_announcements"
+                  onClick={this.onDelete}
+                  ref={c => {
+                    this.deleteBtn = c
+                  }}
+                >
+                  <IconTrashLine />
+                  <ScreenReaderContent>
+                    {I18n.t('Delete Selected Announcements')}
+                  </ScreenReaderContent>
+                </Button>
+              )}
+              {this.props.permissions.create && (
+                <Button
+                  href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
+                  variant="primary"
+                  id="add_announcement"
+                >
+                  <IconPlusLine />
+                  <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
+                  <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+                </Button>
+              )}
+            </Flex.Item>
+          </Flex>
         </View>
         <ExternalFeedsTray
           atomFeedUrl={this.props.atomFeedUrl}
@@ -214,22 +219,22 @@ export default class IndexHeader extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {
-      isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
-      selectedCount: state.selectedAnnouncements.length,
-      isToggleLocking: state.isToggleLocking
-    },
-    select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl', 'announcementsLocked'])
-  )
+const connectState = state => ({
+  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
+  selectedCount: state.selectedAnnouncements.length,
+  isToggleLocking: state.isToggleLocking,
+  ...select(state, [
+    'contextType',
+    'contextId',
+    'permissions',
+    'atomFeedUrl',
+    'announcementsLocked'
+  ])
+})
 const selectedActions = [
   'searchAnnouncements',
   'toggleSelectedAnnouncementsLock',
   'deleteSelectedAnnouncements'
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(
-  connectState,
-  connectActions
-)(IndexHeader)
+export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

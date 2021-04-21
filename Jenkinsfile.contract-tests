@@ -1,0 +1,134 @@
+#!/usr/bin/env groovy
+
+/*
+ * Copyright (C) 2019 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+
+def cleanupFn(status) {
+  try {
+    junit "tmp/spec_results/**/*.xml"
+
+    if(status == 'SUCCESS' && configuration.isChangeMerged()) {
+      sh 'build/new-jenkins/pact/contracts-publish-api.sh'
+    }
+  } finally {
+    sh 'rm -vrf tmp/spec_results'
+    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+  }
+}
+
+def runAndCopyResults(database_name, consumer_name, script_name='build/new-jenkins/pact/contracts-verify-api.sh') {
+  withEnv([
+    "DATABASE_NAME=${database_name}",
+    "PACT_API_CONSUMER=${consumer_name}",
+  ]) {
+    try {
+      sh script_name
+    } finally {
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+    }
+  }
+}
+
+pipeline {
+  agent none
+  options {
+    ansiColor('xterm')
+    timeout(time: 15)
+    timestamps()
+  }
+
+  environment {
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-contract-tests.yml'
+    DOCKER_PROCESSES = '7'
+    POSTGRES_PASSWORD = 'sekret'
+    PACT_BROKER = credentials('PACT_BROKER')
+    PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
+    PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}"
+  }
+
+  stages {
+    stage('Environment') {
+      steps {
+        script {
+          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
+            stage ('Pre-Cleanup') {
+              cleanAndSetup()
+            }
+
+            stage('Start Docker Images') {
+              timeout(time: 3) {
+                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+                checkoutRepo("canvas-lms", refspecToCheckout, 1)
+
+                credentials.withStarlordCredentials { ->
+                  sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+                }
+                sh 'build/new-jenkins/pact/docker-compose-pact-setup.sh'
+              }
+            }
+
+            stage('Provider Verification for API and Live Event Consumers') {
+              def stages = [:]
+
+              stages['Android'] = {
+                timeout(time: 5) {
+                  runAndCopyResults('pact_test1', 'android')
+                }
+              }
+
+              stages['Canvas iOS'] = {
+                timeout(time: 5) {
+                  runAndCopyResults('pact_test2', 'canvas-ios')
+                }
+              }
+
+              stages['Quiz LTI'] = {
+                timeout(time: 10) {
+                  runAndCopyResults('pact_test3', 'Quiz LTI')
+                }
+              }
+
+              stages['Sistemic'] = {
+                timeout(time: 5) {
+                  runAndCopyResults('pact_test4', 'Sistemic')
+                }
+              }
+
+              stages['Live Events'] = {
+                timeout(time: 5) {
+                  runAndCopyResults('live_events', '', 'build/new-jenkins/pact/contracts-verify-live-events.sh')
+                }
+              }
+
+              stages['Outcomes'] = {
+                timeout(time: 5) {
+                  runAndCopyResults('pact_test6', '', 'build/new-jenkins/pact/contracts-generate-api.sh')
+                }
+              }
+
+              parallel(stages)
+            }
+          }
+        }
+      }
+    }
+  }
+}

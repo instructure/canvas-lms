@@ -48,7 +48,7 @@ QUnit.module('SaveThemeButton Component', {
   }
 })
 
-test('save', function(assert) {
+test('save', assert => {
   const done = assert.async()
   let component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
   const updatedBrandConfig = {}
@@ -80,7 +80,7 @@ test('save', function(assert) {
   })
 })
 
-test('modal visibility', function() {
+test('modal visibility', () => {
   const wrapper = shallow(<SaveThemeButton {...props} />)
 
   let modal = wrapper.find('CanvasInstUIModal')

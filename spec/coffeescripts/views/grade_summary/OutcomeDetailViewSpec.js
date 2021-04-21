@@ -38,9 +38,7 @@ QUnit.module('OutcomeDetailViewSpec', {
       points_possible: 5
     })
     this.outcome.group = new Group({title: 'Outcome Group Title'})
-    this.url = `/api/v1/courses/${this.course_id}/outcome_results?user_ids[]=${
-      this.user_id
-    }&outcome_ids[]=${this.outcome.id}&include[]=alignments&per_page=100`
+    this.url = `/api/v1/courses/${this.course_id}/outcome_results?user_ids[]=${this.user_id}&outcome_ids[]=${this.outcome.id}&include[]=alignments&per_page=100`
     this.outcomeDetailView = new OutcomeDetailView({
       course_id: this.course_id,
       user_id: this.user_id

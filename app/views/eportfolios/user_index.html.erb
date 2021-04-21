@@ -19,16 +19,18 @@
 <%
    js_bundle :eportfolio
 %>
-<% content_for :page_title do %>
+<% provide :page_title do %>
   <%= t(:page_title, "My ePortfolios") %>
 <% end %>
 
 <h1 class="screenreader-only"><%= t('headers.eportfolios', "ePortfolios") %></h1>
-<% content_for :right_side do %>
-  <a href="#" class="add_eportfolio_link btn button-sidebar-wide">
-    <i class="icon-add"></i>
-    <%= t('links.create', "Create an ePortfolio") %>
-  </a>
+<% provide :right_side do %>
+  <% if Eportfolio.new.grants_right?(@current_user, :create) %>
+    <a href="#" class="add_eportfolio_link btn button-sidebar-wide">
+      <i class="icon-add"></i>
+      <%= t('links.create', "Create an ePortfolio") %>
+    </a>
+  <% end %>
 <% end %>
 
 <% if @portfolios.empty? %>

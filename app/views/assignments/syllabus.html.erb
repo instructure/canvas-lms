@@ -16,14 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t :page_title, "Syllabus for %{course}", :course => @context.name %><% end %>
-<% content_for :right_side do %>
+<% provide :page_title do %><%= t :page_title, "Syllabus for %{course}", :course => @context.name %><% end %>
+<% provide :right_side do %>
   <%= render :partial => 'assignments/syllabus_right_side' %>
 <% end %>
 
 <%
-  js_env :SYLLABUS_PER_PAGE => Setting.get('syllabus_per_page', Setting.get('api_max_per_page', '50'))
-  js_bundle :syllabus
+  if @context.syllabus_course_summary?
+    js_env :SYLLABUS_PER_PAGE => Setting.get('syllabus_per_page', Setting.get('api_max_per_page', '50'))
+    js_bundle :syllabus
+  else
+    js_bundle :static_syllabus
+  end
   css_bundle :tinymce
 %>
 <%= render :partial => 'assignments/syllabus_content' %>

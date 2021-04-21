@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/ar.json";
-import "../rce/languages/ar_SA";
-formatMessage.addLocale({ ar: locale });
+import formatMessage from '../format-message'
+import locale from '@instructure/translations/lib/canvas-rce/ar.json'
+import '../rce/languages/ar_SA'
+
+formatMessage.addLocale({ar: locale})

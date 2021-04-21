@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import {bool, string, shape} from 'prop-types'
 import GradingStandardCollection from './gradingStandardCollection'
 import GradingPeriodSetCollection from './GradingPeriodSetCollection'
 import $ from 'jquery'
-import I18n from 'i18n!grading_periods'
-
-const {bool, string, shape} = PropTypes
+import I18n from 'i18n!AccountTabContainer'
+import 'jqueryui/tabs'
 
 class AccountTabContainer extends React.Component {
   static propTypes = {

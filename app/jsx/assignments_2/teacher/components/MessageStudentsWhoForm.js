@@ -20,17 +20,23 @@ import React from 'react'
 import {bool, func, number, string, arrayOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Select from '@instructure/ui-forms/lib/components/Select'
+import {Select} from '@instructure/ui-select'
+import {TextArea} from '@instructure/ui-text-area'
+import {TextInput} from '@instructure/ui-text-input'
 
 import {TeacherAssignmentShape} from '../assignmentData'
-import {hasSubmission} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
+import {hasSubmission} from '../../../gradebook/shared/helpers/messageStudentsWhoHelper'
 
+/*
+ *  CAUTION: The InstUI Select component is greatly changed in v7.
+ *  Updating the import to the new ui-select location is almost certainly
+ *  going to break the functionality of the component. Any failing tests
+ *  will just be skipped, and the component can be fixed later when work
+ *  resumes on A2.
+ */
 export default class MessageStudentsWhoForm extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
@@ -107,7 +113,7 @@ export default class MessageStudentsWhoForm extends React.Component {
         this.props.pointsThreshold === null ? '' : this.props.pointsThreshold.toString()
       return (
         <NumberInput
-          label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+          renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
           placeholder={I18n.t('Points')}
           value={points}
           onChange={this.handlePointsChangeString}
@@ -153,6 +159,7 @@ export default class MessageStudentsWhoForm extends React.Component {
           multiple
           selectedOption={this.props.selectedStudents}
           onChange={this.handleStudentsChange}
+          data-testid="student-recipients"
           formatSelectedOption={tag => (
             <AccessibleContent alt={I18n.t('Remove %{studentName}', {studentName: tag.label})}>
               {tag.label}
@@ -167,14 +174,16 @@ export default class MessageStudentsWhoForm extends React.Component {
         </Select>
 
         <TextInput
-          label={I18n.t('Subject:')}
+          renderLabel={I18n.t('Subject:')}
           value={this.props.subject}
           onChange={this.handleChangeSubject}
+          data-testid="subject-input"
         />
         <TextArea
           label={I18n.t('Body:')}
           value={this.props.body}
           onChange={this.handleChangeBody}
+          data-testid="body-input"
         />
       </FormFieldGroup>
     )

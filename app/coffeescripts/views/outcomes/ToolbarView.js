@@ -23,25 +23,6 @@ import OutcomeGroup from '../../models/OutcomeGroup'
 
 // Manage the toolbar buttons.
 export default class ToolbarView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.goBack = this.goBack.bind(this)
-    this.addOutcome = this.addOutcome.bind(this)
-    this.addGroup = this.addGroup.bind(this)
-    this.findDialog = this.findDialog.bind(this)
-    this.importOutcomes = this.importOutcomes.bind(this)
-    this.disable = this.disable.bind(this)
-    this.enable = this.enable.bind(this)
-    this.resetBackButton = this.resetBackButton.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.events = {
       'click .go_back': 'goBack',

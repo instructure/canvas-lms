@@ -16,55 +16,55 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
-import React, { Component } from "react";
-import Folder from "./Folder";
-import { css } from "aphrodite";
-import styles from "./styles";
+import React, {Component} from 'react'
+import Folder from './Folder'
+import {css} from 'aphrodite'
+import styles from './styles'
 
-const DOWN_KEY = 40;
-const UP_KEY = 38;
-const J_KEY = 74;
-const K_KEY = 75;
+const DOWN_KEY = 40
+const UP_KEY = 38
+const J_KEY = 74
+const K_KEY = 75
 
 export default class FileTree extends Component {
   handleKeyDown = event => {
     switch (event.keyCode) {
       case DOWN_KEY:
       case J_KEY:
-        this.moveFocus(1);
-        break;
+        this.moveFocus(1)
+        break
       case UP_KEY:
       case K_KEY:
-        this.moveFocus(-1);
-        break;
+        this.moveFocus(-1)
+        break
       default:
-        return;
+        return
     }
-    event.stopPropagation();
-  };
+    event.stopPropagation()
+  }
 
   navigableNodes() {
-    return Array.from(this.containerNode.querySelectorAll("button"));
+    return Array.from(this.containerNode.querySelectorAll('button'))
   }
 
   moveFocus(delta) {
-    const nodes = this.navigableNodes();
-    const active = nodes.indexOf(window.document.activeElement);
-    let next = active + delta;
+    const nodes = this.navigableNodes()
+    const active = nodes.indexOf(window.document.activeElement)
+    let next = active + delta
     if (next < 0) {
-      next = 0;
+      next = 0
     } else if (next >= nodes.length) {
-      next = nodes.length - 1;
+      next = nodes.length - 1
     }
-    nodes[next].focus();
+    nodes[next].focus()
   }
 
   render() {
     const inlineStyles = {
       maxHeight: this.props.maxHeight
-    };
+    }
     return (
       <div
         className={css(styles.container)}
@@ -74,11 +74,11 @@ export default class FileTree extends Component {
       >
         <Folder {...this.props} />
       </div>
-    );
+    )
   }
 }
 
 FileTree.propTypes = {
   ...Folder.propTypes,
   maxHeight: PropTypes.string
-};
+}

@@ -15,12 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+/* TODO: Remove when feature flag account_level_mastery_scales is enabled */
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!rubrics'
-import TabList, { TabPanel } from '@instructure/ui-tabs/lib/components/TabList'
+import I18n from 'i18n!RubricManagement'
+import {TabList} from '@instructure/ui-tabs'
 import ProficiencyTable from 'jsx/rubrics/ProficiencyTable'
 import RubricPanel from 'jsx/rubrics/RubricPanel'
 
@@ -29,22 +32,24 @@ export default class RubricManagement extends React.Component {
     accountId: PropTypes.string.isRequired
   }
 
-  focusTab = _.memoize((ix) => () => {
+  focusTab = _.memoize(ix => () => {
     ReactDOM.findDOMNode(this.tabList._tabs[ix]).focus()
   })
 
   render() {
     return (
-      <TabList ref={tabList => { this.tabList = tabList }} defaultSelectedIndex={0}>
-        <TabPanel title={I18n.t('Account Rubrics')}>
+      <TabList
+        ref={tabList => {
+          this.tabList = tabList
+        }}
+        defaultSelectedIndex={0}
+      >
+        <TabList.Panel title={I18n.t('Account Rubrics')}>
           <RubricPanel />
-        </TabPanel>
-        <TabPanel title={I18n.t('Learning Mastery')}>
-          <ProficiencyTable
-            focusTab={this.focusTab(1)}
-            accountId={this.props.accountId}
-          />
-        </TabPanel>
+        </TabList.Panel>
+        <TabList.Panel title={I18n.t('Learning Mastery')}>
+          <ProficiencyTable focusTab={this.focusTab(1)} accountId={this.props.accountId} />
+        </TabList.Panel>
       </TabList>
     )
   }

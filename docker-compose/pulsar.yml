@@ -1,0 +1,7 @@
+version: "2"
+services:
+  postgres:
+    environment:
+      REPLICATION_USER: impulse
+      REPLICATION_PASSWORD: impulse
+      REPLICATION_DB: canvas

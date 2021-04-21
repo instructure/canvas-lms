@@ -34,7 +34,8 @@ QUnit.module('FileRenameForm', {
       }
     }
     this.renderForm = props => {
-      this.form = ReactDOM.render(<FileRenameForm {...defaultProps} {...props} />,
+      this.form = ReactDOM.render(
+        <FileRenameForm {...defaultProps} {...props} />,
         $('<div>').appendTo('#fixtures')[0]
       )
     }
@@ -89,6 +90,21 @@ test('calls passed in props method to resolve conflict', function() {
   Simulate.click(this.form.refs.commitChangeBtn)
 })
 
+test('onNameConflictResolved preserves expandZip option when skipping', function() {
+  expect(1)
+  this.renderForm({
+    fileOptions: {
+      file: {name: 'file_name.md'},
+      expandZip: 'true'
+    },
+    onNameConflictResolved(options) {
+      equal(options.expandZip, 'true')
+    },
+    allowSkip: true
+  })
+  Simulate.click(this.form.refs.skipBtn)
+})
+
 test('onNameConflictResolved preserves expandZip option when renaming', function() {
   expect(2)
   this.renderForm({
@@ -117,4 +133,52 @@ test('onNameConflictResolved preserves expandZip option when replacing', functio
     }
   })
   Simulate.click(this.form.refs.replaceBtn)
+})
+
+test('renders default rename file message', function() {
+  this.renderForm()
+  equal(
+    this.form.refs.bodyContent.textContent,
+    'An item named "options_name.txt" already exists in this location. Do you want to replace the existing file?'
+  )
+})
+
+test('override rename file message', function() {
+  this.renderForm({
+    onRenameFileMessage: nameToUse => `rename ${nameToUse} please`
+  })
+  equal(this.form.refs.bodyContent.textContent, 'rename options_name.txt please')
+})
+
+test('renders default lock file message', function() {
+  this.renderForm({
+    fileOptions: {
+      file: {
+        id: 999,
+        name: 'original_name.txt'
+      },
+      name: 'options_name.txt',
+      cannotOverwrite: true
+    }
+  })
+  ok(
+    this.form.refs.bodyContent.textContent.match(
+      /A locked item named "options_name.txt" already exists in this location. Please enter a new name./
+    )
+  )
+})
+
+test('override lock file message', function() {
+  this.renderForm({
+    fileOptions: {
+      file: {
+        id: 999,
+        name: 'original_name.txt'
+      },
+      name: 'options_name.txt',
+      cannotOverwrite: true
+    },
+    onLockFileMessage: nameToUse => `rename locked file ${nameToUse} please`
+  })
+  ok(this.form.refs.bodyContent.textContent.match(/rename locked file options_name.txt please/))
 })

@@ -19,10 +19,9 @@
 import $ from 'jquery'
 import submissionDetailsDialog from 'jst/SubmissionDetailsDialog'
 import I18n from 'i18n!submission_details_dialog'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import GradebookHelpers from './gradebook/GradebookHelpers'
-import {extractDataForTurnitin} from './gradebook/Turnitin'
+import originalityReportSubmissionKey from 'jsx/gradebook/shared/helpers/originalityReportSubmissionKey'
+import {extractDataForTurnitin} from 'jsx/gradebook/Turnitin'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import 'jst/_submission_detail' // a partial needed by the SubmissionDetailsDialog template
 import 'jst/_turnitinScore' // a partial needed by the submission_detail partial
@@ -116,9 +115,7 @@ export default class SubmissionDetailsDialog {
         )
       })
 
-    const url = `${
-      this.url
-    }&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
+    const url = `${this.url}&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
     const deferred = $.ajaxJSON(url, 'GET', {}, this.update)
     this.dialog.find('.submission_details_comments').disableWhileLoading(deferred)
   }
@@ -152,9 +149,18 @@ export default class SubmissionDetailsDialog {
         })
       submission.turnitin = extractDataForTurnitin(
         submission,
-        `submission_${submission.id}`,
+        originalityReportSubmissionKey(submission),
         this.options.context_url
       )
+
+      if (Object.keys(submission.turnitin).length === 0) {
+        submission.turnitin = extractDataForTurnitin(
+          submission,
+          `submission_${submission.id}`,
+          this.options.context_url
+        )
+      }
+
       submission.attachments &&
         submission.attachments.forEach(attachment => {
           attachment.turnitin = extractDataForTurnitin(

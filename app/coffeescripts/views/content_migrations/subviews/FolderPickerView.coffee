@@ -15,47 +15,46 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/subviews/FolderPicker'
-  'i18n!content_migrations'
-], (Backbone, template, I18n) ->
-  class FolderPickerView extends Backbone.View
-    template: template
-    @optionProperty 'folderOptions'
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/subviews/FolderPicker'
+import I18n from 'i18n!content_migrations'
 
-    els:
-      ".migrationUploadTo" : "$migrationUploadTo"
+export default class FolderPickerView extends Backbone.View
+  template: template
+  @optionProperty 'folderOptions'
 
-    events:
-      "change .migrationUploadTo" : "setAttributes"
+  els:
+    ".migrationUploadTo" : "$migrationUploadTo"
 
-    setAttributes: (event) ->
-      @model.set('settings', folder_id: @$migrationUploadTo.val() if @$migrationUploadTo.val())
+  events:
+    "change .migrationUploadTo" : "setAttributes"
 
-    toJSON: (json) ->
-      json = super
-      json.folderOptions = @folderOptions || ENV.FOLDER_OPTIONS
-      json
+  setAttributes: (event) ->
+    @model.set('settings', folder_id: @$migrationUploadTo.val() if @$migrationUploadTo.val())
 
-    # Validates this form element. This validates method is a convention used
-    # for all sub views.
-    # ie:
-    #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
-    # -----------------------------------------------------------------------
-    # @expects void
-    # @returns void | object (error)
-    # @api private
+  toJSON: (json) ->
+    json = super
+    json.folderOptions = @folderOptions || ENV.FOLDER_OPTIONS
+    json
 
-    validations: ->
-      errors = {}
-      settings = @model.get('settings')
+  # Validates this form element. This validates method is a convention used
+  # for all sub views.
+  # ie:
+  #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
+  # -----------------------------------------------------------------------
+  # @expects void
+  # @returns void | object (error)
+  # @api private
 
-      unless settings?.folder_id
-        errors.migrationUploadTo = [
-          type: "required"
-          message: I18n.t("You must select a folder to upload your migration to")
-        ]
+  validations: ->
+    errors = {}
+    settings = @model.get('settings')
 
-      errors
+    unless settings?.folder_id
+      errors.migrationUploadTo = [
+        type: "required"
+        message: I18n.t("You must select a folder to upload your migration to")
+      ]
+
+    errors
 

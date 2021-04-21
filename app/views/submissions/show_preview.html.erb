@@ -16,13 +16,36 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%
+  presenter = Submission::ShowPresenter.new(
+    submission: @submission,
+    current_user: @current_user,
+    assessment_request: @assessment_request,
+    current_host: request.host
+  )
+
+  # Calls to doc_preview_attributes will result in this hash getting some
+  # attributes deleted; dup this hash before passing it to any methods.
+  preview_url_opts = {
+    anonymous_instructor_annotations: @anonymous_instructor_annotations,
+    enable_annotations: true,
+    enrollment_type: @enrollment_type,
+    moderated_grading_allow_list: @moderated_grading_allow_list,
+    submission_id: @submission.id
+  }
+
+  if @submission.submission_type == "annotated_document"
+    annotation_context = @submission.annotation_context(attempt: @submission.attempt)
+    preview_url_opts[:annotation_context] = annotation_context.launch_id
+  end
+%>
+
 <% css_bundle :submission %>
 
-<%
-  js_env ga_page_title: "Submission Preview"
-%>
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
-<% content_for :page_title do %><%= join_title @assignment.title, submission_author_name_for(@assessment_request) %><% end %>
+<% show_updated_plagiarism_icons = @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator) %>
+
+<% provide :page_title do %><%= join_title @assignment.title, t("Submission Preview") %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>
@@ -116,6 +139,12 @@
       <option aria-label="<%= t("Assignment %{assignment} submission Paper View", :assignment=> @assignment.title) %>" value="paper"><%= t('Paper View') %></option>
       <option aria-label="<%= t("Assignment %{assignment} submission Plain Text View", :assignment=> @assignment.title) %>" value="plain_text"><%= t('Plain Text View') %></option>
     </select>
+    <%=
+      render partial: 'submissions/originality_score', locals: {
+        attachment: nil,
+        show_updated_icons: show_updated_plagiarism_icons
+      }
+    %>
   </div>
   <div id="submission_preview" class="paper user_content">
     <%= user_content(@submission.body) %>
@@ -160,39 +189,12 @@
         </div>
 
         <div class="file-upload-submission-turnitin">
-          <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && @submission.turnitin_data[:provider] == :vericite && (vericite_score = @submission.vericite_data(true)[attachment.asset_string]) && vericite_score[:similarity_score] %>
-
-            <span class="turnitin_score_container">
-              <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
-              <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>"target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
-                <%= vericite_score[:similarity_score] %>%
-                <span class="tooltip_wrap right">
-                  <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
-                </span>
-              </a>
-            </span>
-          <% elsif can_do(@submission, @current_user, :view_turnitin_report) &&
-            (turnitin_score = @submission.originality_data[attachment.asset_string]) &&
-            (@submission.originality_data[:provider] == nil || @submission.originality_reports.present?) &&
-            (turnitin_score[:similarity_score] || turnitin_score[:state] == 'pending') %>
-            <span class="turnitin_score_container">
-              <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
-              <% if !@submission.has_originality_report? %>
-                <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>"
-                   title="Similarity score -- more information"
-                   target="_blank"
-                   class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score">
-                  <%= turnitin_score[:similarity_score] %>%</a>
-              <% else %>
-                <a href="<%= polymorphic_url([@context, @assignment, @submission, :originality_report], asset_string: attachment.asset_string) %>"
-                   target="_blank"
-                   title="<%= "Similarity score -- #{turnitin_score[:state]}" %>"
-                   class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score">
-                  <%= turnitin_score[:similarity_score].present? ? "#{turnitin_score[:similarity_score]}%" : ' ' %>
-                </a>
-              <% end %>
-            </span>
-          <% end %>
+          <%=
+            render partial: 'submissions/originality_score', locals: {
+              attachment: attachment,
+              show_updated_icons: show_updated_plagiarism_icons
+            }
+          %>
         </div>
 
         <div class="file-upload-submission-attachment">
@@ -214,16 +216,7 @@
               data-attachment_id="<%= attachment.id %>"
               data-submission_id="<%= @submission.id %>"
               data-dialog-title="<%= attachment.display_name %>"
-              <%=
-                doc_preview_attributes(
-                  attachment,
-                  anonymous_instructor_annotations: @anonymous_instructor_annotations,
-                  enable_annotations: true,
-                  enrollment_type: @enrollment_type,
-                  moderated_grading_whitelist: @moderated_grading_whitelist,
-                  submission_id: @submission.id
-                )
-              %>
+              <%= doc_preview_attributes(attachment, preview_url_opts.dup) %>
             >
               <%= button_text %>
             </a>
@@ -236,10 +229,8 @@
   <% end %>
 
   <% js_bundle 'legacy/submissions_show_preview_upload' %>
-<% elsif @submission.submission_type == "online_quiz" %>
-  <% content_for :stylesheets do %>
-    <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
-  <% end %>
+<% elsif @submission.submission_type == "online_quiz" and  @assignment&.quiz&.id %>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <div style="text-align: center;">
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>
   </div>
@@ -253,7 +244,17 @@
 
   <% js_bundle 'legacy/submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
-  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless', url: @submission.external_tool_url) %>"/>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
+<% elsif @submission.submission_type == "annotated_document" %>
+  <div class="ef-file-preview-stretch">
+    <iframe
+      allowfullscreen
+      title="<%= t "Annotated Document submission" %>"
+      src="<%= annotation_context.attachment.canvadoc_url(@current_user, preview_url_opts.dup) %>"
+      class="ef-file-preview-frame annotated-document-submission"
+      style="width: 100%;">
+    </iframe>
+  </div>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

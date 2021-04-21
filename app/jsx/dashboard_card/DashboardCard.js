@@ -16,13 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
+import axios from 'axios'
+
 import DashboardCardAction from './DashboardCardAction'
 import CourseActivitySummaryStore from './CourseActivitySummaryStore'
 import DashboardCardMenu from './DashboardCardMenu'
+import PublishButton from './PublishButton'
+import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
+import {showFlashError} from '../shared/FlashAlert'
+import instFSOptimizedImageUrl from '../shared/helpers/instFSOptimizedImageUrl'
+
+export function DashboardCardHeaderHero({image, backgroundColor, hideColorOverlays, onClick}) {
+  if (image) {
+    return (
+      <div
+        className="ic-DashboardCard__header_image"
+        style={{backgroundImage: `url(${instFSOptimizedImageUrl(image, {x: 262, y: 146})})`}}
+      >
+        <div
+          className="ic-DashboardCard__header_hero"
+          style={{backgroundColor, opacity: hideColorOverlays ? 0 : 0.6}}
+          onClick={onClick}
+          aria-hidden="true"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="ic-DashboardCard__header_hero"
+      style={{backgroundColor}}
+      onClick={onClick}
+      aria-hidden="true"
+    />
+  )
+}
 
 export default class DashboardCard extends Component {
   // ===============
@@ -43,11 +75,20 @@ export default class DashboardCard extends Component {
     handleColorChange: PropTypes.func,
     hideColorOverlays: PropTypes.bool,
     isDragging: PropTypes.bool,
+    isFavorited: PropTypes.bool,
     connectDragSource: PropTypes.func,
     connectDropTarget: PropTypes.func,
     moveCard: PropTypes.func,
+    onConfirmUnfavorite: PropTypes.func,
     totalCards: PropTypes.number,
-    position: PropTypes.oneOfType([PropTypes.number, PropTypes.func])
+    position: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
+    enrollmentType: PropTypes.string,
+    observee: PropTypes.string,
+    published: PropTypes.bool,
+    canChangeCourseState: PropTypes.bool,
+    defaultView: PropTypes.string,
+    pagesUrl: PropTypes.string,
+    frontPageTitle: PropTypes.string
   }
 
   static defaultProps = {
@@ -62,16 +103,20 @@ export default class DashboardCard extends Component {
     connectDropTarget: c => c,
     moveCard: () => {},
     totalCards: 0,
-    position: 0
+    position: 0,
+    published: false,
+    canChangeCourseState: false
   }
 
   constructor(props) {
     super()
 
-    this.state = _.extend(
-      {nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id)},
-      CourseActivitySummaryStore.getStateForCourse(props.id)
-    )
+    this.state = {
+      nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id),
+      ...CourseActivitySummaryStore.getStateForCourse(props.id)
+    }
+
+    this.removeCourseFromFavorites = this.removeCourseFromFavorites.bind(this)
   }
 
   // ===============
@@ -142,6 +187,16 @@ export default class DashboardCard extends Component {
     }
   }
 
+  handleUnfavorite = () => {
+    const modalProps = {
+      courseId: this.props.id,
+      courseName: this.props.originalName,
+      onConfirm: this.removeCourseFromFavorites,
+      onClose: this.handleClose,
+      onEntered: this.handleEntered
+    }
+    showConfirmUnfavorite(modalProps)
+  }
   // ===============
   //    HELPERS
   // ===============
@@ -163,8 +218,7 @@ export default class DashboardCard extends Component {
     }[icon]
 
     const itemStream = stream || []
-    const streamItem = _.find(
-      itemStream,
+    const streamItem = itemStream.find(
       item =>
         // only return 'Message' type if category is 'Due Date' (for assignments)
         item.type === activityType &&
@@ -185,6 +239,20 @@ export default class DashboardCard extends Component {
       canMoveToBeginning: !isFirstCard,
       canMoveToEnd: !isLastCard
     }
+  }
+
+  removeCourseFromFavorites() {
+    const url = `/api/v1/users/self/favorites/courses/${this.props.id}`
+    axios
+      .delete(url)
+      .then(response => {
+        if (response.status === 200) {
+          this.props.onConfirmUnfavorite(this.props.id)
+        }
+      })
+      .catch(() =>
+        showFlashError(I18n.t('We were unable to remove this course from your favorites.'))
+      )
   }
 
   // ===============
@@ -210,32 +278,6 @@ export default class DashboardCard extends Component {
     })
   }
 
-  renderHeaderHero() {
-    const {image, backgroundColor, hideColorOverlays} = this.props
-
-    if (image) {
-      return (
-        <div className="ic-DashboardCard__header_image" style={{backgroundImage: `url(${image})`}}>
-          <div
-            className="ic-DashboardCard__header_hero"
-            style={{backgroundColor, opacity: hideColorOverlays ? 0 : 0.6}}
-            onClick={this.headerClick}
-            aria-hidden="true"
-          />
-        </div>
-      )
-    }
-
-    return (
-      <div
-        className="ic-DashboardCard__header_hero"
-        style={{backgroundColor}}
-        onClick={this.headerClick}
-        aria-hidden="true"
-      />
-    )
-  }
-
   renderHeaderButton() {
     const {backgroundColor, hideColorOverlays} = this.props
 
@@ -259,6 +301,8 @@ export default class DashboardCard extends Component {
           currentColor={this.props.backgroundColor}
           nicknameInfo={this.state.nicknameInfo}
           assetString={this.props.assetString}
+          onUnfavorite={this.handleUnfavorite}
+          isFavorited={this.props.isFavorited}
           {...reorderingProps}
           trigger={
             <button
@@ -299,17 +343,22 @@ export default class DashboardCard extends Component {
                   course: this.state.nicknameInfo.nickname
                 })}
           </span>
-          {this.renderHeaderHero()}
+          <DashboardCardHeaderHero
+            image={this.props.image}
+            backgroundColor={this.props.backgroundColor}
+            hideColorOverlays={this.props.hideColorOverlays}
+            onClick={this.headerClick}
+          />
           <a href={this.props.href} className="ic-DashboardCard__link">
             <div className="ic-DashboardCard__header_content">
-              <h2
+              <h3
                 className="ic-DashboardCard__header-title ellipsis"
                 title={this.props.originalName}
               >
                 <span style={{color: this.props.backgroundColor}}>
                   {this.state.nicknameInfo.nickname}
                 </span>
-              </h2>
+              </h3>
               <div
                 className="ic-DashboardCard__header-subtitle ellipsis"
                 title={this.props.courseCode}
@@ -319,8 +368,24 @@ export default class DashboardCard extends Component {
               <div className="ic-DashboardCard__header-term ellipsis" title={this.props.term}>
                 {this.props.term ? this.props.term : null}
               </div>
+              {this.props.enrollmentType === 'ObserverEnrollment' && this.props.observee && (
+                <div className="ic-DashboardCard__header-term ellipsis" title={this.props.observee}>
+                  {I18n.t('Observing: %{observee}', {observee: this.props.observee})}
+                </div>
+              )}
             </div>
           </a>
+          {window.ENV?.FEATURES?.unpublished_courses &&
+            !this.props.published &&
+            this.props.canChangeCourseState && (
+              <PublishButton
+                courseNickname={this.state.nicknameInfo.nickname}
+                defaultView={this.props.defaultView}
+                pagesUrl={this.props.pagesUrl}
+                frontPageTitle={this.props.frontPageTitle}
+                courseId={this.props.id}
+              />
+            )}
           {this.renderHeaderButton()}
         </div>
         <nav

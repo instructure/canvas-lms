@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -44,9 +46,31 @@ describe RubricsController do
         expect(assigns[:js_env][:PERMISSIONS][:manage_outcomes]).to eq true
       end
 
+      it "should include manage_rubrics permission" do
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
+      end
+
       it "should return non_scoring_rubrics if enabled" do
         get 'index', params: {:course_id => @course.id}
         expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to eq true
+      end
+    end
+
+    describe "after a course has concluded" do
+      before do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.complete!
+      end
+
+      it "can access rubrics" do
+        get 'index', params: {:course_id => @course.id}
+        expect(response).to be_successful
+      end
+
+      it "should not allow the teacher to manage_rubrics" do
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
       end
     end
   end
@@ -242,6 +266,7 @@ describe RubricsController do
       expect(assigns[:association]).to be_nil
       expect(response).to be_successful
     end
+
     it "should update the rubric even if it doesn't belong to the context, just an association" do
       course_model
       @course2 = @course
@@ -261,7 +286,7 @@ describe RubricsController do
 
     # this happens after a importing content into a new course, before a new
     # association is set up
-    it "should create a new rubrice (and not update the existing rubric) if it doesn't belong to the context or to an association" do
+    it "should create a new rubric (and not update the existing rubric) if it doesn't belong to the context or to an association" do
       course_model
       @course2 = @course
       course_with_teacher_logged_in(:active_all => true)
@@ -275,6 +300,19 @@ describe RubricsController do
       expect(assigns[:rubric]).not_to eql(@rubric)
       expect(assigns[:rubric].title).to eql("new title")
     end
+
+    it "should create a new rubric (and not update the existing rubric) if it doesn't belongs to the same context" do
+      course_model
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_association_model(:user => @user, :context => @course)
+      @rubric.context = @course.root_account
+      @rubric.save
+      put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
+      expect(assigns[:rubric]).not_to be_nil
+      expect(assigns[:rubric]).not_to eql(@rubric)
+      expect(assigns[:rubric].title).to eql("new title")
+    end
+
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -288,6 +326,23 @@ describe RubricsController do
       expect(assigns[:rubric].title).to eql("new title")
       expect(response).to be_successful
     end
+
+    it "should mark the blueprint associated assignment as having it's rubric changed if moved to a new rubric" do
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
+
+      @rubric_association_object.update(:migration_id => "#{MasterCourses::MIGRATION_ID_PREFIX}_blah")
+      mc_course = Course.create!
+      @template = MasterCourses::MasterTemplate.set_as_master_course(mc_course)
+      sub = @template.add_child_course!(@course)
+      child_tag = sub.content_tag_for(@rubric_association_object) # create a fake content tag
+
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association_object => @course)
+      put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
+      expect(response).to be_successful
+      expect(child_tag.reload.downstream_changes).to include("rubric")
+    end
+
     it "should not update the rubric and not create a new one if the parameters don't change the rubric" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -577,6 +632,7 @@ describe RubricsController do
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric.id}
       assert_unauthorized
     end
+
     it "should delete the rubric" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -584,6 +640,17 @@ describe RubricsController do
       expect(response).to be_successful
       expect(assigns[:rubric]).to be_deleted
     end
+
+    # This should probably be fixed, but I want to document how this currently behaves.
+    it "returns a 500 if the rubric cannot be found" do
+      course_with_teacher_logged_in(active_all: true)
+      association = rubric_association_model(user: @user, context: @course)
+      association.destroy
+      delete 'destroy', params: { course_id: @course.id, id: @rubric.id }
+
+      expect(response.status).to eq 500
+    end
+
     it "should delete the rubric if the rubric is only associated with a course" do
       course_with_teacher_logged_in :active_all => true
       Account.site_admin.account_users.create!(user: @user)
@@ -599,6 +666,7 @@ describe RubricsController do
       @rubric.reload
       expect(@rubric.deleted?).to be_truthy
     end
+
     it "should delete the rubric association even if the rubric doesn't belong to a course" do
       course_with_teacher_logged_in :active_all => true
       Account.site_admin.account_users.create!(user: @user)
@@ -666,12 +734,36 @@ describe RubricsController do
       end
     end
 
-    it "works" do
-      r = Rubric.create! user: @teacher, context: Account.default
-      ra = RubricAssociation.create! rubric: r, context: @course,
-        purpose: :bookmark, association_object: @course
-      get 'show', params: {id: r.id, course_id: @course.id}
-      expect(response).to be_successful
+    describe "with a valid rubric" do
+      before do
+        @r = Rubric.create! user: @teacher, context: Account.default
+        RubricAssociation.create! rubric: @r, context: @course,
+          purpose: :bookmark, association_object: @course
+      end
+
+      it "works" do
+        get 'show', params: {id: @r.id, course_id: @course.id}
+        expect(response).to be_successful
+      end
+
+      it "should allow the teacher to manage_rubrics" do
+        get 'show', params: {id: @r.id, course_id: @course.id}
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
+      end
+
+      describe "after a course has concluded" do
+        before { @course.complete! }
+
+        it "can access the rubric" do
+          get 'show', params: {id: @r.id, course_id: @course.id}
+          expect(response).to be_successful
+        end
+
+        it "should not allow the teacher to manage_rubrics" do
+          get 'show', params: {id: @r.id, course_id: @course.id}
+          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
+        end
+      end
     end
   end
 end

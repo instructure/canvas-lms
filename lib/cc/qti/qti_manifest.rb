@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -16,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CC
-module QTI
-  class QTIManifest
+module Qti
+  class QtiManifest
     include CC::CCHelper
 
     attr_accessor :exporter
-    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :qti_export?, :course, :user, :create_key, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :for_course_copy, :qti_export?, :course, :user, :create_key, :to => :exporter
     delegate :referenced_files, :to => :@html_exporter
 
     def initialize(exporter)
@@ -71,7 +73,7 @@ module QTI
 
         manifest_node.resources do |resources|
           begin
-            g = QTI::QTIGenerator.new(self, resources, @html_exporter)
+            g = Qti::QtiGenerator.new(self, resources, @html_exporter)
             g.generate_qti_only
           rescue
             add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)
@@ -95,6 +97,11 @@ module QTI
             end
           end
 
+          begin
+            Resource.new(self, manifest_node, resources).add_media_objects(@html_exporter)
+          rescue
+            add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
+          end
         end
       end #manifest
 

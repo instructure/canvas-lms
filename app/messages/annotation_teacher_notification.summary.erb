@@ -1,0 +1,11 @@
+<% presenter = Messages::SubmissionCommentForTeacher::AnnotationPresenter.new(self, data: data) %>
+
+<% define_content :link do %>
+  <%= presenter.link %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= presenter.subject %>
+<% end %>
+
+<%= presenter.body %>

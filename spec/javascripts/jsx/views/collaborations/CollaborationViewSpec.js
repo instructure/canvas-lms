@@ -27,7 +27,7 @@ let iframe
 let info
 
 QUnit.module('CollaborationsView screenreader only content', {
-  setup () {
+  setup() {
     fixtures = $('#fixtures')
     fixtures.append(`
       <div class="container" data-id="15">
@@ -51,14 +51,14 @@ QUnit.module('CollaborationsView screenreader only content', {
         </div>
       </div>
     `)
-    view = new CollaborationView({ el: fixtures.find('.container') })
+    view = new CollaborationView({el: fixtures.find('.container')})
     view.render()
     el = view.$el
     iframe = el.find('iframe')
     fakeENV.setup({LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media']})
   },
 
-  teardown () {
+  teardown() {
     fakeENV.teardown()
     fixtures.empty()
   }
@@ -95,7 +95,12 @@ test('hides ending info alert and removes class from iframe', () => {
 })
 
 test("doesn't show infos or add border to iframe by default", () => {
-  equal(el.find('.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only').length, 2)
+  equal(
+    el.find(
+      '.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only'
+    ).length,
+    2
+  )
   notOk(iframe.hasClass('info_alert_outline'))
 })
 

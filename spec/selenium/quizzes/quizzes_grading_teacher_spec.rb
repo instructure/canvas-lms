@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -78,7 +80,7 @@ describe 'Grading quizzes' do
 
       context 'after deleting an answer to a quiz question' do
         it 'doesn\'t offer regrade options', priority: "1", test_id: 140626 do
-          make_full_screen
+
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
           dismiss_flash_messages # can interfere w/ our hovering
           click_questions_tab

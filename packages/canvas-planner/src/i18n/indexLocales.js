@@ -15,48 +15,69 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {flipAll} from './flip-message';
-import ar from '../../config/locales/ar.json';
-import bg from '../../config/locales/bg.json';
-import cs from '../../config/locales/cs.json';
-import da from '../../config/locales/da.json';
-import de from '../../config/locales/de.json';
-import el from '../../config/locales/el.json';
-import enAU from '../../config/locales/en_AU.json';
-import enGB from '../../config/locales/en_GB.json';
-import en from '../../config/locales/en.json';
-import es from '../../config/locales/es.json';
-import faIR from '../../config/locales/fa_IR.json';
-import frCA from '../../config/locales/fr_CA.json';
-import fr from '../../config/locales/fr.json';
-import he from '../../config/locales/he.json';
-import ht from '../../config/locales/ht.json';
-import hu from '../../config/locales/hu.json';
-import hy from '../../config/locales/hy.json';
-import it from '../../config/locales/it.json';
-import ja from '../../config/locales/ja.json';
-import ko from '../../config/locales/ko.json';
-import mi from '../../config/locales/mi.json';
-import nl from '../../config/locales/nl.json';
-import nn from '../../config/locales/nn.json';
-import nb from '../../config/locales/no.json';
-import pl from '../../config/locales/pl.json';
-import ptBR from '../../config/locales/pt_BR.json';
-import pt from '../../config/locales/pt.json';
-import ro from '../../config/locales/ro.json';
-import ru from '../../config/locales/ru.json';
-import sq from '../../config/locales/sq.json';
-import sr from '../../config/locales/sr.json';
-import sv from '../../config/locales/sv.json';
-import tr from '../../config/locales/tr.json';
-import ukUA from '../../config/locales/uk_UA.json';
-import vi from '../../config/locales/vi.json';
-import zhHans from '../../config/locales/zh.json';
-import zhHant from '../../config/locales/zh_HK.json';
+import ar from '@instructure/translations/lib/canvas-planner/ar.json'
+import da from '@instructure/translations/lib/canvas-planner/da.json'
+import de from '@instructure/translations/lib/canvas-planner/de.json'
+import el from '@instructure/translations/lib/canvas-planner/el.json'
+import enAU from '@instructure/translations/lib/canvas-planner/en_AU.json'
+import enGB from '@instructure/translations/lib/canvas-planner/en_GB.json'
+import en from '@instructure/translations/lib/canvas-planner/en.json'
+import es from '@instructure/translations/lib/canvas-planner/es.json'
+import faIR from '@instructure/translations/lib/canvas-planner/fa_IR.json'
+import frCA from '@instructure/translations/lib/canvas-planner/fr_CA.json'
+import fr from '@instructure/translations/lib/canvas-planner/fr.json'
+import he from '@instructure/translations/lib/canvas-planner/he.json'
+import ht from '@instructure/translations/lib/canvas-planner/ht.json'
+import hu from '@instructure/translations/lib/canvas-planner/hu.json'
+import hy from '@instructure/translations/lib/canvas-planner/hy.json'
+import it from '@instructure/translations/lib/canvas-planner/it.json'
+import ja from '@instructure/translations/lib/canvas-planner/ja.json'
+import ko from '@instructure/translations/lib/canvas-planner/ko.json'
+import mi from '@instructure/translations/lib/canvas-planner/mi.json'
+import nl from '@instructure/translations/lib/canvas-planner/nl.json'
+import nn from '@instructure/translations/lib/canvas-planner/nn.json'
+import pl from '@instructure/translations/lib/canvas-planner/pl.json'
+import ptBR from '@instructure/translations/lib/canvas-planner/pt_BR.json'
+import pt from '@instructure/translations/lib/canvas-planner/pt.json'
+import ru from '@instructure/translations/lib/canvas-planner/ru.json'
+import sv from '@instructure/translations/lib/canvas-planner/sv.json'
+import tr from '@instructure/translations/lib/canvas-planner/tr.json'
+import ukUA from '@instructure/translations/lib/canvas-planner/uk_UA.json'
+import zhHans from '@instructure/translations/lib/canvas-planner/zh.json'
+import zhHant from '@instructure/translations/lib/canvas-planner/zh_HK.json'
+import {flipAll} from './flip-message'
 
 export default {
-  enflip: flipAll(en), ar, bg, cs, da, de, el, 'en-AU': enAU, 'en-GB': enGB, en,
-  es, 'fa-IR': faIR, 'fr-CA': frCA, fr, he, ht, hu, hy, it, ja, ko, mi, nl, nn,
-  nb, pl, 'pt-BR': ptBR, pt, ro, ru, sq, sr, sv, tr, 'uk-UA': ukUA, vi,
-  'zh-Hans': zhHans, 'zh-Hant': zhHant,
-};
+  enflip: flipAll(en),
+  ar,
+  da,
+  de,
+  el,
+  'en-au': enAU,
+  'en-gb': enGB,
+  en,
+  es,
+  fa: faIR,
+  'fa-ir': faIR,
+  'fr-ca': frCA,
+  fr,
+  he,
+  ht,
+  hu,
+  hy,
+  it,
+  ja,
+  ko,
+  mi,
+  nl,
+  nn,
+  pl,
+  'pt-br': ptBR,
+  pt,
+  ru,
+  sv,
+  tr,
+  'uk-ua': ukUA,
+  'zh-cn': zhHans,
+  'zh-tw': zhHant
+}

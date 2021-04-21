@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,7 +24,6 @@ describe 'simply_versioned' do
     class Woozel < ActiveRecord::Base
       simply_versioned :explicit => true
     end
-    Woozel.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
 
     Woozel.connection.create_table :woozels, :force => true do |t|
       t.string :name
@@ -31,8 +32,7 @@ describe 'simply_versioned' do
 
   after :all do
     Woozel.connection.drop_table :woozels
-    Woozel.remove_connection
-    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(Woozel)
+    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('Woozel')
     Object.send(:remove_const, :Woozel)
     GC.start
   end

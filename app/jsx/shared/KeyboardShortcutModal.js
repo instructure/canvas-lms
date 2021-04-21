@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shape, string, arrayOf} from 'prop-types'
-import Modal, {ModalBody} from '../shared/components/InstuiModal'
+import Modal from './components/InstuiModal'
 import I18n from 'i18n!keyboardShortcutModal'
 
 export default class KeyboardShortcutModal extends React.Component {
@@ -52,8 +52,7 @@ export default class KeyboardShortcutModal extends React.Component {
   }
 
   handleKeydown = e => {
-    // 188 is comma and 191 is forward slash
-    const keyComboPressed = e.which === 188 || (e.which === 191 && e.shiftKey)
+    const keyComboPressed = e.which === 119 && e.altKey
     if (keyComboPressed && e.target.nodeName !== 'INPUT' && e.target.nodeName !== 'TEXTAREA') {
       e.preventDefault()
       this.setState({isOpen: !this.state.isOpen})
@@ -63,11 +62,12 @@ export default class KeyboardShortcutModal extends React.Component {
   render() {
     return (
       <Modal
+        data-canvas-component
         open={this.state.isOpen}
         label={I18n.t('Keyboard Shortcuts')}
         onDismiss={this.closeModal}
       >
-        <ModalBody>
+        <Modal.Body>
           <div className="keyboard_navigation">
             <span className="screenreader-only">
               {I18n.t(
@@ -87,7 +87,7 @@ export default class KeyboardShortcutModal extends React.Component {
               {I18n.t('Press the esc key to close this modal')}
             </span>
           </div>
-        </ModalBody>
+        </Modal.Body>
       </Modal>
     )
   }

@@ -15,32 +15,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-  'i18n!discussions'
-], (_, Backbone, I18n) ->
+import Backbone from 'Backbone'
+import I18n from 'i18n!discussions'
 
-  UNKNOWN_AUTHOR =
-    avatar_image_url: null
-    display_name: I18n.t 'unknown_author', 'Unknown Author'
-    id: null
+UNKNOWN_AUTHOR =
+  avatar_image_url: null
+  display_name: I18n.t 'unknown_author', 'Unknown Author'
+  id: null
 
-  ##
-  # Model representing an entry in discussion topic
-  class DiscussionEntry extends Backbone.Model
+##
+# Model representing an entry in discussion topic
+export default class DiscussionEntry extends Backbone.Model
 
-    author: ->
-      @findParticipant @get('user_id')
+  author: ->
+    @findParticipant @get('user_id')
 
-    editor: ->
-      @findParticipant @get('editor_id')
+  editor: ->
+    @findParticipant @get('editor_id')
 
-    findParticipant: (user_id) ->
-      if user_id && user = @collection?.participants.get user_id
-        user.toJSON()
-      else if user_id is ENV.current_user?.id
-        ENV.current_user
-      else
-        UNKNOWN_AUTHOR
+  findParticipant: (user_id) ->
+    if user_id && user = @collection?.participants.get user_id
+      user.toJSON()
+    else if user_id is ENV.current_user?.id
+      ENV.current_user
+    else
+      UNKNOWN_AUTHOR
 

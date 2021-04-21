@@ -1,0 +1,26 @@
+---
+default_recaptcha_registration_enable:
+  state: hidden
+  display_name: Enable Recaptcha by default for self-registration
+  description: Requires Recaptcha for self-registration by default
+  applies_to: SiteAdmin
+granular_permissions_manage_users:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Granular permissions for Add/Remove roles from Course
+  description: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
+granular_permissions_course_files:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Granular permissions for managing course files
+  description: Add granularity to permissions around managing course files
+release_notes_ui:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Advertise release notes via the UI
+  description: Enables siteadmin users to configure release notes to display to users
+course_templates:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Templates
+  description: Enables the Course Templates feature globally

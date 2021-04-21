@@ -27,10 +27,10 @@
   })
   @show_left_side = false
   @show_embedded_chat = false
-  @body_classes << 'ic-no-flex-layout full-width'
+  add_body_class 'ic-no-flex-layout full-width'
   @can_edit_anything = !@context.completed?
 %>
-<% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
+<% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
 <div id="speed_grader_timeout_alert"></div>
 <h4 id="speed_grader_loading">
   <%= t(:loading, "loading...") %>
@@ -45,14 +45,8 @@
           <i class="icon-gradebook" aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
         </a>
-        <button type="button" data-muted="<%= @assignment.muted? %>" id="mute_link"
-          class="Button Button--icon-action gradebookActions__Button<%= @disable_unmute_assignment ? " disabled" : "" %>" title="<%= t('Mute/Unmute Assignment') %>">
-          <i class=<%= @assignment.muted? ? "icon-muted" : "icon-unmuted"  %> aria-hidden="true"></i>
-          <span class="screenreader-only" aria-hidden="true">
-            <%= @assignment.muted? ? t("Unmute Assignment") : t("Mute Assignment") %>
-          </span>
-        </button>
 
+        <span id="speed_grader_post_grades_menu_mount_point"></span>
         <span id="speed_grader_settings_mount_point"></span>
       </div>
       <div class="assignmentDetails">
@@ -130,6 +124,12 @@
           <%= t :comment_submitted, "Your comment has been submitted." %>
         </div>
       </div>
+      <div id="reassignment_complete" class="alert alert-success speedgrader_alert">
+        <button aria-label="<%= t 'Close' %>" class="dismiss_alert close">×</button>
+        <div id="reassignment_complete_message">
+          <%= t "The assignment has been reassigned." %>
+        </div>
+      </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
           <h3>
@@ -171,10 +171,15 @@
                   download_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}")
                   preview_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}", inline: 1)
                 %>
-                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>" download></a>
                 <span class="turnitin_score_container"></span>
                 <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
                 <span id="react_pill_container"></span>
+                <a class="submission-file-delete icon-trash" href="/api/v1/files/{{attachmentId}}?replace=1" style="display:none;">
+                  <span class="screenreader-only"><%= t("Delete this file") %></span>
+                </a>
+                <a class="submission-file-download icon-download" href="<%= download_url %>" download>
+                  <span class="screenreader-only"><%= t("Download this file") %></span>
+                </a>
               </div>
             </div>
             <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>
@@ -189,8 +194,7 @@
         </div>
 
         <div class="content_box">
-          <% if @assignment.rubric_association %>
-          <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
+          <% if @assignment.active_rubric_association? %>
           <div id="rubric_full" style="display: none;">
             <div id="rubric_full_resizer">
               <div id="rubric_full_resizer_handle"></div>
@@ -215,24 +219,21 @@
           </div>
           <% end %>
 
-          <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+          <% if  @assignment.active_rubric_association? || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
           <div id="grading">
             <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
             <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
               <div id="grade_container">
-                <%= render partial: "grading_box_extended",
-                  locals: {assignment: @assignment}
-                %>
+                <%= render partial: "grading_box_extended", locals: {assignment: @assignment} %>
                 <span class="turnitin_score_container"></span>
                 <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
-                <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
                 <div class="turnitin_info_container"></div>
               </div>
 
               <div id="grading_details_mount_point"></div>
             <% end %>
 
-            <% if @assignment.rubric_association %>
+            <% if @assignment.active_rubric_association? %>
               <div id="rubric_summary_holder">
                 <div id="rubric_assessments_list_and_edit_button_holder">
                   <span id="rubric_assessments_list">
@@ -252,7 +253,13 @@
         </div>
 
         <div class="content_box">
-          <h2><%= t("Assignment Comments") %></h2>
+          <h2>
+            <% if @assignment.a2_enabled? %>
+              <%= t('Comments for this Attempt') %>
+            <% else %>
+              <%= t("Assignment Comments") %>
+            <% end %>
+          </h2>
           <div id="discussion">
             <div id="comments">
               <div class="comment" id="comment_blank" style="display: none;">
@@ -351,6 +358,12 @@
                 </div>
               </div>
             </form>
+
+            <% if @can_reassign_submissions %>
+              <div id="reassign_assignment_wrapper">
+                <button id="reassign_assignment" disabled class="Button"><%= t("Reassign Assignment") %></button>
+              </div>
+            <% end %>
           <% end %>
 
           <div id="speed_grader_submission_comments_download_mount_point"></div>
@@ -412,8 +425,7 @@
     <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
   </div>
 </form>
-<%= render :partial => "shared/mute_dialog" %>
-<%= render :partial => "shared/unmute_dialog" %>
+
 <ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">
   <li role="presentation" class="ui-selectmenu-item">
     <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">
@@ -426,12 +438,16 @@
 </ul>
 
 <div id="speed_grader_assessment_audit_tray_mount_point"></div>
+<div id="hide-assignment-grades-tray"></div>
+<div id="post-assignment-grades-tray"></div>
 
 <span id="aria_name_alert" class="screenreader-only" aria-live="polite"></span>
-<% keyboard_navigation([
-  {:key => t('keycodes.next_student', 'j'), :description => t('keycode_descriptions.next_student', 'Next Student')},
-  {:key => t('keycodes.previous_student', 'k'), :description => t('keycode_descriptions.previous_student', 'Previous Student')},
-  {:key => t('keycodes.leave_comment', 'c'), :description => t('keycode_descriptions.leave_comment', 'Leave Comment')},
-  {:key => t('keycodes.change_grade', 'g'), :description => t('keycode_descriptions.change_grade', 'Change Grade')},
-  {:key => t('keycodes.use_rubric', 'r'), :description => t('keycode_descriptions.use_rubric', 'Use Rubric')}
-]) %>
+<% unless @current_user.try(:prefers_no_keyboard_shortcuts?) %>
+  <% keyboard_navigation([
+    {:key => t('keycodes.next_student', 'j'), :description => t('keycode_descriptions.next_student', 'Next Student')},
+    {:key => t('keycodes.previous_student', 'k'), :description => t('keycode_descriptions.previous_student', 'Previous Student')},
+    {:key => t('keycodes.leave_comment', 'c'), :description => t('keycode_descriptions.leave_comment', 'Leave Comment')},
+    {:key => t('keycodes.change_grade', 'g'), :description => t('keycode_descriptions.change_grade', 'Change Grade')},
+    {:key => t('keycodes.use_rubric', 'r'), :description => t('keycode_descriptions.use_rubric', 'Use Rubric')}
+  ]) %>
+<% end %>

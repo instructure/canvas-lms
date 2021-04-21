@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import _ from 'underscore'
 import React from 'react'
 import StudentContextTray from './StudentContextTray'
 import {createClient, ApolloProvider, Query, gql} from '../canvas-apollo'
@@ -62,16 +60,20 @@ const SCC_QUERY = gql`
     user: legacyNode(type: User, _id: $studentId) {
       ... on User {
         _id
+        pronouns
         short_name: shortName
         avatar_url: avatarUrl
         enrollments(courseId: $courseId) {
           last_activity_at: lastActivityAt
+          state
           section {
             name
           }
           grades {
             current_grade: currentGrade
             current_score: currentScore
+            override_grade: overrideGrade
+            override_score: overrideScore
           }
         }
         analytics: summaryAnalytics(courseId: $courseId) {

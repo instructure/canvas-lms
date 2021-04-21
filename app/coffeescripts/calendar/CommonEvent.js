@@ -50,11 +50,7 @@ Object.assign(CommonEvent.prototype, {
   },
 
   isAppointmentGroupFilledEvent() {
-    return (
-      this.object &&
-      this.object.child_events &&
-      this.object.child_events.length > 0
-    )
+    return this.object && this.object.child_events && this.object.child_events.length > 0
   },
 
   isAppointmentGroupEvent() {
@@ -102,6 +98,24 @@ Object.assign(CommonEvent.prototype, {
 
   possibleContexts() {
     return this.allPossibleContexts || [this.contextInfo]
+  },
+
+  plannerNoteContexts() {
+    const managedContexts = ENV.CALENDAR?.MANAGE_CONTEXTS || []
+    return this.possibleContexts().filter(context => {
+      // to avoid confusion over the audience of the planner note,
+      // don't offer to create new planner notes linked to courses the user teaches
+      // excludes groups as they are not supported for planner notes
+      const assetString = context?.asset_string
+      // No groups because planner notes don't support groups
+      if (!assetString || assetString.startsWith('group_')) return false
+
+      return (
+        assetString === this.contextCode() ||
+        assetString.startsWith('user_') ||
+        !managedContexts.includes(assetString)
+      )
+    })
   },
 
   addClass(newClass) {
@@ -154,7 +168,7 @@ Object.assign(CommonEvent.prototype, {
     return this.start && this.start < fcUtil.now()
   },
 
-  copyDataFromObject(data) {
+  copyDataFromObject(_data) {
     this.originalStart = this.start && fcUtil.clone(this.start)
     this.midnightFudged = false // clear out cached value because now we have new data
     if (this.isDueAtMidnight()) {
@@ -207,10 +221,7 @@ Object.assign(CommonEvent.prototype, {
 
   assignmentType() {
     if (!this.assignment) return
-    if (
-      this.assignment.submission_types &&
-      this.assignment.submission_types.length
-    ) {
+    if (this.assignment.submission_types && this.assignment.submission_types.length) {
       const type = this.assignment.submission_types[0]
       if (type === 'online_quiz') return 'quiz'
       if (type === 'discussion_topic') return 'discussion'
@@ -219,7 +230,7 @@ Object.assign(CommonEvent.prototype, {
   },
 
   plannerObjectType() {
-    switch(this.object.plannable_type) {
+    switch (this.object.plannable_type) {
       case 'discussion_topic':
         return 'discussion'
       case 'wiki_page':
@@ -237,7 +248,7 @@ Object.assign(CommonEvent.prototype, {
       return type
     } else if (this.eventType === 'planner_note') {
       return 'note-light'
-    } else if (ENV.CALENDAR.BETTER_SCHEDULER) {
+    } else if (ENV.CALENDAR.SHOW_SCHEDULER) {
       if (
         this.isAppointmentGroupEvent() &&
         (this.isAppointmentGroupFilledEvent() || this.appointmentGroupEventStatus === 'Reserved')

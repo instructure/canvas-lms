@@ -21,7 +21,8 @@ import React from 'react'
 class PaginatedUserCheckList extends React.Component {
   static defaultProps = {
     permanentUsers: [],
-    checked: []
+    checked: [],
+    labelId: null
   }
 
   _isChecked = id => this.props.checked.includes(id)
@@ -50,7 +51,7 @@ class PaginatedUserCheckList extends React.Component {
     ))
 
     return (
-      <ul className="unstyled_list">
+      <ul className="unstyled_list" aria-labelledby={this.props.labelId}>
         {permanentListItems}
         {listItems}
       </ul>

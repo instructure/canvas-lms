@@ -39,7 +39,7 @@ import $ from 'jquery'
 let instanceID = 0
 
 class FloatingSticky {
-  constructor (el, container, options = {}) {
+  constructor(el, container, options = {}) {
     this.instanceID = `floatingSticky${instanceID++}`
 
     this.$window = $(window)
@@ -53,12 +53,12 @@ class FloatingSticky {
     this.reposition()
   }
 
-  remove () {
+  remove() {
     this.$window.off(this.instanceID)
     return this.$el.data('floatingSticky', null)
   }
 
-  reposition () {
+  reposition() {
     let newTop
     let windowTop = this.$window.scrollTop()
     const windowHeight = this.$window.height()
@@ -97,13 +97,13 @@ class FloatingSticky {
     }
 
     return this.$el.css({
-      top: newTop,
+      top: newTop
     })
   }
 }
 
-$.fn.floatingSticky = function (container, options = {}) {
-  return this.map(function () {
+$.fn.floatingSticky = function(container, options = {}) {
+  return this.map(function() {
     return $(this).data('floatingSticky') || new FloatingSticky(this, container, options)
   })
 }

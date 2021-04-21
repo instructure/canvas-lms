@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -54,7 +56,7 @@ RSpec.shared_context 'lti_advantage_shared_examples' do
     assignment_model(
       course: course,
       submission_types: 'external_tool',
-      external_tool_tag_attributes: { content: tool }
+      external_tool_tag_attributes: { content: tool, url: tool.url }
     )
   end
   let_once(:user) { user_model(email: 'banana@test.com') }
@@ -130,11 +132,6 @@ RSpec.shared_context 'lti_advantage_shared_examples' do
     it 'adds private claims' do
       allow(I18n).to receive(:locale).and_return('en')
       expect(jws['locale']).to eq 'en'
-    end
-
-    it 'adds lti11_legacy_user_id' do
-      expected_val = Lti::Asset.opaque_identifier_for(user)
-      expect(jws['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']).to eq expected_val
     end
 
     it 'adds security claims' do

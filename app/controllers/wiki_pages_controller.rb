@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,7 +28,7 @@ class WikiPagesController < ApplicationController
   before_action :set_pandapub_read_token
   before_action :set_js_rights
   before_action :set_js_wiki_data
-  before_action :rich_content_service_config, only: [:edit, :index]
+  before_action :rce_js_env, only: [:edit, :index]
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
@@ -64,6 +66,8 @@ class WikiPagesController < ApplicationController
     if @page && !@page.new_record?
       wiki_pages_js_env(@context)
       @padless = true
+      js_bundle :wiki_page_show
+      css_bundle :wiki_page
       render template: 'wiki_pages/show'
     else
       redirect_to polymorphic_url([@context, :wiki_pages])
@@ -71,42 +75,48 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
-      log_asset_access([ "pages", @context ], "pages", "other")
-      js_env((ConditionalRelease::Service.env_for(@context)))
-      wiki_pages_js_env(@context)
-      set_tutorial_js_env
-      @padless = true
+    GuardRail.activate(:secondary) do
+      if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+        log_asset_access([ "pages", @context ], "pages", "other")
+        js_env((ConditionalRelease::Service.env_for(@context)))
+        wiki_pages_js_env(@context)
+        set_tutorial_js_env
+        @padless = true
+      end
     end
   end
 
   def show
-    if @page.new_record?
-      if @page.grants_any_right?(@current_user, session, :update, :update_content)
-        flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
-        encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
-        redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
-      else
-        wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
-        if wiki_page && wiki_page.deleted?
-          flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+    GuardRail.activate(:secondary) do
+      if @page.new_record?
+        if @page.grants_any_right?(@current_user, session, :update, :update_content)
+          flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
+          encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
+          redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
-          flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+          wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
+          if wiki_page && wiki_page.deleted?
+            flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+          else
+            flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+          end
+          redirect_to polymorphic_url([@context, :wiki_pages])
         end
-        redirect_to polymorphic_url([@context, :wiki_pages])
+        return
       end
-      return
-    end
 
-    if authorized_action(@page, @current_user, :read)
-      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
-        add_crumb(@page.title)
-        log_asset_access(@page, 'wiki', @wiki)
-        wiki_pages_js_env(@context)
-        set_master_course_js_env_data(@page, @context)
-        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
-        @padless = true
+      if authorized_action(@page, @current_user, :read)
+        if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+          add_crumb(@page.title)
+          log_asset_access(@page, 'wiki', @wiki)
+          wiki_pages_js_env(@context)
+          set_master_course_js_env_data(@page, @context)
+          @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
+          @padless = true
+        end
       end
+      js_bundle :wiki_page_show
+      css_bundle :wiki_page
     end
   end
 
@@ -154,15 +164,14 @@ class WikiPagesController < ApplicationController
   end
 
   private
-  def rich_content_service_config
-    rce_js_env(:sidebar)
-  end
-
   def wiki_pages_js_env(context)
+    wiki_index_menu_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:wiki_index_menu) : []
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
+      :wiki_index_menu_tools => wiki_index_menu_tools,
       :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
-      :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner)
+      :CAN_SET_TODO_DATE => context.grants_right?(@current_user, session, :manage_content),
+      :IMMERSIVE_READER_ENABLED => context.account&.feature_enabled?(:immersive_reader_wiki_pages),
     }
     js_env(@wiki_pages_env)
     @wiki_pages_env

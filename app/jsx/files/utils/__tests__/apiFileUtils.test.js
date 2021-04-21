@@ -18,7 +18,7 @@
 
 import moxios from 'moxios'
 import sinon from 'sinon'
-import { uploadFile } from 'jsx/files/utils/apiFileUtils'
+import {uploadFile} from 'jsx/files/utils/apiFileUtils'
 
 describe('apiFileUtils', () => {
   beforeEach(() => {
@@ -30,19 +30,19 @@ describe('apiFileUtils', () => {
   })
 
   describe('uploadFile', () => {
-    it('runs the onSuccess method after upload', (done) => {
+    it('runs the onSuccess method after upload', done => {
       const onSuccess = sinon.spy()
       const onFail = sinon.spy()
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         response: {
-          upload_url: "http://new_url",
+          upload_url: 'http://new_url',
           upload_params: {
-            Filename: "file",
-            key: "folder/filename",
-            "content-type": "image/png"
+            Filename: 'file',
+            key: 'folder/filename',
+            'content-type': 'image/png'
           },
-          file_param: "attachment[uploaded_data]"
+          file_param: 'attachment[uploaded_data]'
         }
       })
       moxios.stubRequest('http://new_url', {
@@ -61,19 +61,19 @@ describe('apiFileUtils', () => {
       })
     })
 
-    it('runs the onFailure method on upload failure', (done) => {
+    it('runs the onFailure method on upload failure', done => {
       const onSuccess = sinon.spy()
       const onFail = sinon.spy()
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         response: {
-          upload_url: "http://new_url",
+          upload_url: 'http://new_url',
           upload_params: {
-            Filename: "file",
-            key: "folder/filename",
-            "content-type": "image/png"
+            Filename: 'file',
+            key: 'folder/filename',
+            'content-type': 'image/png'
           },
-          file_param: "attachment[uploaded_data]"
+          file_param: 'attachment[uploaded_data]'
         }
       })
       moxios.stubRequest('http://new_url', {
@@ -93,7 +93,7 @@ describe('apiFileUtils', () => {
   })
 
   describe('onFileUploadInfoReceived', () => {
-    it('runs the onFailure on file prep failure', (done) => {
+    it('runs the onFailure on file prep failure', done => {
       const onSuccess = sinon.spy()
       const onFail = sinon.spy()
       moxios.stubRequest('/api/v1/folders/1/files', {

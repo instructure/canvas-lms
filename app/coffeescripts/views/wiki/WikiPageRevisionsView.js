@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import _ from 'underscore'
 import CollectionView from '../CollectionView'
 import WikiPageRevisionView from './WikiPageRevisionView'
 import template from 'jst/wiki/WikiPageRevisions'
 import '../../jquery/floatingSticky'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 
 export default class WikiPageRevisionsView extends CollectionView {
   static initClass() {
@@ -62,7 +62,7 @@ export default class WikiPageRevisionsView extends CollectionView {
 
   afterRender() {
     super.afterRender(...arguments)
-    $.publish('userContent/change')
+    publish('userContent/change')
     this.trigger('render')
 
     return (this.floatingSticky = this.$aside.floatingSticky('#main', {top: '#content'}))

@@ -15,30 +15,20 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!groups'
 import $ from 'jquery'
 import {View} from 'Backbone'
 import MessageStudentsDialog from '../../MessageStudentsDialog'
 import RandomlyAssignMembersView from './RandomlyAssignMembersView'
-import GroupCreateView from './GroupCreateView'
 import GroupCategoryEditView from './GroupCategoryEditView'
-import GroupCategoryCloneView from './GroupCategoryCloneView'
-import Group from '../../../models/Group'
 import template from 'jst/groups/manage/groupCategoryDetail'
+import GroupModal from 'jsx/groups/components/GroupModal'
+import GroupCategoryCloneModal from 'jsx/groups/components/GroupCategoryCloneModal'
+import GroupImportModal from 'jsx/groups/components/GroupImportModal'
 
 export default class GroupCategoryDetailView extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.deleteCategory = this.deleteCategory.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.template = template
 
@@ -49,6 +39,7 @@ export default class GroupCategoryDetailView extends View {
       'click .edit-category': 'editCategory',
       'click .delete-category': 'deleteCategory',
       'click .add-group': 'addGroup',
+      'click .import-groups': 'importGroups',
       'click .clone-category': 'cloneCategory'
     }
 
@@ -69,8 +60,8 @@ export default class GroupCategoryDetailView extends View {
   }
 
   attach() {
-    this.collection.on('add remove reset', this.render)
-    return this.model.on('change', this.render)
+    this.collection.on('add remove reset', this.render, this)
+    return this.model.on('change', this.render, this)
   }
 
   afterRender() {
@@ -78,6 +69,12 @@ export default class GroupCategoryDetailView extends View {
     this.randomlyAssignUsersView.setTrigger(this.$randomlyAssignMembersLink)
     // reassign the trigger for the createView modal if instantiated
     return this.createView != null ? this.createView.setTrigger(this.$addGroupButton) : undefined
+  }
+
+  refreshCollection() {
+    // fetch a new paginated set of models for this collection from the server
+    // helpul when bypassing Backbone lifecycle events
+    this.collection.fetch()
   }
 
   toJSON() {
@@ -90,6 +87,7 @@ export default class GroupCategoryDetailView extends View {
 
   deleteCategory(e) {
     e.preventDefault()
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group set?'))) {
       this.$groupCategoryActions.focus()
       return
@@ -106,20 +104,43 @@ export default class GroupCategoryDetailView extends View {
     })
   }
 
-  addGroup(e) {
-    e.preventDefault()
-    if (this.createView == null) {
-      this.createView = new GroupCreateView({
-        groupCategory: this.model,
-        trigger: this.$addGroupButton
-      })
-    }
-    const newGroup = new Group({group_category_id: this.model.id}, {newAndEmpty: true})
-    newGroup.once('sync', () => {
-      return this.collection.add(newGroup)
-    })
-    this.createView.model = newGroup
-    return this.createView.open()
+  addGroup(e, open = true) {
+    if (e) e.preventDefault()
+    ReactDOM.render(
+      <GroupModal
+        groupCategory={{id: this.model.get('id')}}
+        group={{
+          role: this.model.get('role'),
+          group_limit: this.model.get('group_limit')
+        }}
+        label={I18n.t('Add Group')}
+        open={open}
+        requestMethod="POST"
+        onSave={() => this.refreshCollection()}
+        onDismiss={() => {
+          this.addGroup(null, false)
+          this.$addGroupButton.focus()
+        }}
+      />,
+      document.getElementById('group-mount-point')
+    )
+  }
+
+  setProgress(progress) {
+    this.model.progressModel.set(progress)
+  }
+
+  importGroups(e) {
+    if (e) e.preventDefault()
+    const parent = document.getElementById('group-import-modal-mount-point')
+    ReactDOM.render(
+      <GroupImportModal
+        setProgress={this.setProgress.bind(this)}
+        groupCategoryId={this.model.id}
+        parent={parent}
+      />,
+      parent
+    )
   }
 
   editCategory() {
@@ -132,20 +153,24 @@ export default class GroupCategoryDetailView extends View {
     return this.editCategoryView.open()
   }
 
-  cloneCategory(e) {
-    e.preventDefault()
-    this.cloneCategoryView = new GroupCategoryCloneView({
-      model: this.model,
-      openedFromCaution: false
-    })
-    this.cloneCategoryView.open()
-    return this.cloneCategoryView.on('close', () => {
-      if (this.cloneCategoryView.cloneSuccess) {
-        return window.location.reload()
-      } else {
-        return $(`#group-category-${this.model.id}-actions`).focus()
-      }
-    })
+  cloneCategory(e, open = true) {
+    if (e) e.preventDefault()
+    ReactDOM.render(
+      <GroupCategoryCloneModal
+        // implicitly rendered with openedFromCaution: false
+        groupCategory={{
+          id: this.model.get('id'),
+          name: this.model.get('name')
+        }}
+        label={I18n.t('Clone Group Set')}
+        open={open}
+        onDismiss={() => {
+          this.cloneCategory(null, false)
+          $(`#group-category-${this.model.id}-actions`).focus()
+        }}
+      />,
+      document.getElementById('group-category-clone-mount-point')
+    )
   }
 
   messageAllUnassigned(e) {

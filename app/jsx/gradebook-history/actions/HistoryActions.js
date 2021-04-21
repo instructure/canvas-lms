@@ -62,6 +62,7 @@ function formatHistoryItems(data) {
 
     return {
       assignment,
+      courseOverrideGrade: !!item.course_override_grade,
       date: item.created_at,
       displayAsPoints: assignment ? assignment.gradingType === 'points' : false,
       gradedAnonymously: item.graded_anonymously,

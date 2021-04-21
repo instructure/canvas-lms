@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -167,6 +169,13 @@ describe "grades" do
       user_session(@student_1)
     end
 
+    it "should not send PII to google analytics" do
+      Setting.set('google_analytics_key', 'testing123')
+      StudentGradesPage.visit_as_student(@course)
+      analytics_snippet_script = ff('script').find {|s| s.attribute('innerHTML').include? "ga('create', \"testing123\", 'auto');"}
+      expect(analytics_snippet_script.attribute('innerHTML')).to include("ga('set', 'title', \"Grades for Student\");")
+    end
+
     it "should display tooltip on focus", priority: "1", test_id: 229659 do
       StudentGradesPage.visit_as_student(@course)
 
@@ -315,8 +324,7 @@ describe "grades" do
     it "should not display rubric on muted assignment", priority: "1", test_id: 229662 do
       StudentGradesPage.visit_as_student(@course)
 
-      @first_assignment.muted = true
-      @first_assignment.save!
+      @first_assignment.mute!
       StudentGradesPage.visit_as_student(@course)
 
       expect(f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link")).not_to be_displayed
@@ -332,8 +340,9 @@ describe "grades" do
         submission_types: 'online_text_entry',
         assignment_group: @group,
         grading_type: 'letter_grade',
-        muted: 'true'
+        muted: true
       })
+      @another_assignment.ensure_post_policy(post_manually: true)
       @another_submission = @another_assignment.submit_homework(@student_1, body: 'student second submission')
       @another_assignment.grade_student(@student_1, grade: 81, grader: @teacher)
       @another_submission.save!
@@ -347,7 +356,7 @@ describe "grades" do
         @first_assignment.grade_student(@s, grade: 4, grader: @teacher)
       end
 
-      AssignmentScoreStatisticsGenerator.update_score_statistics(@course.id)
+      ScoreStatisticsGenerator.update_score_statistics(@course.id)
 
       StudentGradesPage.visit_as_student(@course)
       f('.toggle_score_details_link').click
@@ -372,7 +381,7 @@ describe "grades" do
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
       end
       # but then prevent them at the course levels
-      @course.update_attributes(hide_distribution_graphs: true)
+      @course.update(hide_distribution_graphs: true)
 
       StudentGradesPage.visit_as_student(@course)
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
@@ -473,21 +482,21 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
       click_option("#student_select_menu", "Student 2")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 2"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 2"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
       click_option("#student_select_menu", "Student 1")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end

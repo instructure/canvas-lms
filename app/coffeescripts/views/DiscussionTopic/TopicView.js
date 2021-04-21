@@ -17,6 +17,8 @@
 
 import I18n from 'i18n!discussions'
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import Backbone from 'Backbone'
 import DiscussionTopic from '../../models/DiscussionTopic'
 import EntryView from '../DiscussionTopic/EntryView'
@@ -27,22 +29,10 @@ import assignmentRubricDialog from '../../widget/assignmentRubricDialog'
 import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
 import htmlEscape from 'str/htmlEscape'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 export default class TopicView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.hideIfFiltering = this.hideIfFiltering.bind(this)
-    this.subscriptionStatusChanged = this.subscriptionStatusChanged.bind(this)
-    this.handleKeyDown = this.handleKeyDown.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.events = {
       // #
@@ -56,7 +46,9 @@ export default class TopicView extends Backbone.View {
       'click .topic-subscribe-button': 'subscribeTopic',
       'click .topic-unsubscribe-button': 'unsubscribeTopic',
       'click .mark_all_as_read': 'markAllAsRead',
-      'click .mark_all_as_unread': 'markAllAsUnread'
+      'click .mark_all_as_unread': 'markAllAsUnread',
+      'click .direct-share-send-to-menu-item': 'openSendTo',
+      'click .direct-share-copy-to-menu-item': 'openCopyTo'
     }
 
     this.prototype.els = {
@@ -85,7 +77,7 @@ export default class TopicView extends Backbone.View {
     this.model.cid = 'main'
     this.model.set('canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH)
     this.filterModel = this.options.filterModel
-    this.filterModel.on('change', this.hideIfFiltering)
+    this.filterModel.on('change', this.hideIfFiltering, this)
     this.topic = new DiscussionTopic({id: ENV.DISCUSSION.TOPIC.ID})
     // get rid of the /view on /api/vl/courses/x/discusison_topics/x/view
     this.topic.url = ENV.DISCUSSION.ROOT_URL.replace(/\/view/m, '')
@@ -94,7 +86,7 @@ export default class TopicView extends Backbone.View {
 
     // catch when non-root replies are added so we can twiddle the subscribed button
     EntryView.on('addReply', () => this.setSubscribed(true))
-    $(window).on('keydown', this.handleKeyDown)
+    $(window).on('keydown', e => this.handleKeyDown(e))
   }
 
   hideIfFiltering() {
@@ -205,17 +197,17 @@ export default class TopicView extends Backbone.View {
     }
     if (this.reply == null) {
       this.reply = new Reply(this, {topLevel: true, focus: true})
-      this.reply.on(
-        'edit',
-        () => (this.$addRootReply != null ? this.$addRootReply.hide() : undefined)
+      this.reply.on('edit', () =>
+        this.$addRootReply != null ? this.$addRootReply.hide() : undefined
       )
-      this.reply.on(
-        'hide',
-        () => (this.$addRootReply != null ? this.$addRootReply.show() : undefined)
+      this.reply.on('hide', () =>
+        this.$addRootReply != null ? this.$addRootReply.show() : undefined
       )
       this.reply.on('save', entry => {
-        ENV.DISCUSSION.CAN_SUBSCRIBE = true
-        this.topic.set('subscription_hold', false)
+        if (!ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT) {
+          ENV.DISCUSSION.CAN_SUBSCRIBE = true
+          this.topic.set('subscription_hold', false)
+        }
         this.setSubscribed(true)
         return this.trigger('addReply', entry)
       })
@@ -249,6 +241,7 @@ export default class TopicView extends Backbone.View {
       modelData.root = true
       modelData.title = ENV.DISCUSSION.TOPIC.TITLE
       modelData.isForMainDiscussion = true
+      modelData.use_rce_enhancements = ENV.use_rce_enhancements
       const html = replyTemplate(modelData)
       this.$('#discussion_topic').append(html)
     }
@@ -281,9 +274,41 @@ export default class TopicView extends Backbone.View {
     return this.$announcementCog.focus()
   }
 
+  openSendTo(event, open = true) {
+    if (event) event.preventDefault()
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentShare={{content_type: 'discussion_topic', content_id: this.topic.id}}
+        onDismiss={() => {
+          this.openSendTo(null, false)
+          this.$announcementCog.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  openCopyTo(event, open = true) {
+    if (event) event.preventDefault()
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{discussion_topics: [this.topic.id]}}
+        onDismiss={() => {
+          this.openCopyTo(null, false)
+          this.$announcementCog.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
   handleKeyDown(e) {
     const nodeName = e.target.nodeName.toLowerCase()
-    if (nodeName === 'input' || nodeName === 'textarea') return
+    if (nodeName === 'input' || nodeName === 'textarea' || window.ENV.disable_keyboard_shortcuts) return
     if (e.which !== 78) return // n
     this.addRootReply(e)
     e.preventDefault()

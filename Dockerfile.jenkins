@@ -1,0 +1,69 @@
+# GENERATED FILE, DO NOT MODIFY!
+# To update this file please edit the relevant template and run the generation
+# task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
+
+ARG RUBY=2.6-p6.0.4
+
+FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
+LABEL maintainer="Instructure"
+
+ARG POSTGRES_CLIENT=12
+ENV APP_HOME /usr/src/app/
+ENV RAILS_ENV production
+ENV NGINX_MAX_UPLOAD_SIZE 10g
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ARG CANVAS_RAILS6_0=1
+ENV CANVAS_RAILS6_0=${CANVAS_RAILS6_0}
+
+ENV YARN_VERSION 1.19.1-1
+ENV BUNDLER_VERSION 2.2.11
+ENV GEM_HOME /home/docker/.gem/$RUBY
+ENV PATH $GEM_HOME/bin:$PATH
+ENV BUNDLE_APP_CONFIG /home/docker/.bundle
+
+WORKDIR $APP_HOME
+
+USER root
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
+  && printf 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*' > /etc/dpkg/dpkg.cfg.d/01_nodoc \
+  && echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+  && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+  && apt-get update -qq \
+  && apt-get install -qqy --no-install-recommends \
+       nodejs \
+       yarn="$YARN_VERSION" \
+       libxmlsec1-dev \
+       python-lxml \
+       libicu-dev \
+       parallel \
+       postgresql-client-$POSTGRES_CLIENT \
+       unzip \
+       pbzip2 \
+       fontforge \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
+RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
+  && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
+  && gem install bundler --no-document -v $BUNDLER_VERSION \
+  && find $GEM_HOME ! -user docker | xargs chown docker:docker
+RUN npm install -g npm@latest && npm cache clean --force
+
+USER docker
+
+COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
+
+RUN set -eux; \
+  \
+  # set up bundle config options \
+  bundle config --global build.nokogiri --use-system-libraries \
+  && bundle config --global build.ffi --enable-system-libffi \
+  && mkdir -p \
+    /home/docker/.bundle \
+  # TODO: --without development \
+  && bundle install --jobs $(nproc) \
+  && rm -rf $GEM_HOME/cache

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -47,6 +49,10 @@ class DiscussionTopicPresenter
       assignment.context.grants_right?(user, :manage_assignments))
   end
 
+  def can_direct_share?
+    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :read_as_admin)
+  end
+
   # Public: Determine if the given user has permissions to view peer reviews.
   #
   # user - The user whose permissions we're testing.
@@ -62,7 +68,7 @@ class DiscussionTopicPresenter
   end
 
   def peer_reviews_for(user)
-    reviews = user.assigned_submission_assessments.for_assignment(assignment.id).to_a
+    reviews = user.assigned_submission_assessments.shard(assignment.shard).for_assignment(assignment.id).to_a
     if reviews.any?
       valid_student_ids = assignment.context.participating_students.where(:id => reviews.map(&:user_id)).pluck(:id).to_set
       reviews = reviews.select{|r| valid_student_ids.include?(r.user_id)}
@@ -74,7 +80,7 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def has_attached_rubric?
-    !!assignment.rubric_association.try(:rubric)
+    !!assignment.rubric
   end
 
   # Public: Determine if the given user can manage rubrics.
@@ -130,7 +136,7 @@ class DiscussionTopicPresenter
       if student_enrollment
         attrs[:"data-student_id"] = student_enrollment.user_id
         attrs[:"data-course_id"] = student_enrollment.course_id
-        attrs[:class] << " student_context_card_trigger"
+        attrs[:class] = "author student_context_card_trigger"
       end
     end
 

@@ -290,7 +290,7 @@ test('toJSON includes group weight', function() {
 
 test('shouldBeExpanded returns cache state', function() {
   const view = createView(this.model)
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }
@@ -306,7 +306,7 @@ test('shouldBeExpanded returns cache state', function() {
 
 test('toggleCache correctly toggles cache state', function() {
   const view = createView(this.model)
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }
@@ -320,7 +320,7 @@ test('toggleCache correctly toggles cache state', function() {
 
 test('currentlyExpanded returns expanded state', function() {
   const view = createView(this.model)
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }
@@ -330,7 +330,7 @@ test('currentlyExpanded returns expanded state', function() {
 test('toggleCollapse toggles expansion', function() {
   const view = createView(this.model)
   const $toggle_el = view.$el.find('.element_toggler')
-  //make sure the cache starts at true
+  // make sure the cache starts at true
   if (!view.shouldBeExpanded()) {
     view.toggleCache()
   }

@@ -24,18 +24,20 @@ import FindDialog from 'compiled/views/outcomes/FindDialog'
 import OutcomeGroup from 'compiled/models/OutcomeGroup'
 import browserTemplate from 'jst/outcomes/browser'
 import instructionsTemplate from 'jst/outcomes/mainInstructions'
-import ReactDOM from 'react-dom'
 import {showImportOutcomesModal} from '../outcomes/ImportOutcomesModal'
 import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '../outcomes/OutcomesImporter'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
 const $el = $('#outcomes')
-$el.html(browserTemplate({
-  canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
-  canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}))
+$el.html(
+  browserTemplate({
+    canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
+    canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
+    canImportOutcomes: ENV.PERMISSIONS.import_outcomes,
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  })
+)
 
 export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
 
@@ -66,32 +68,37 @@ const resetOutcomeViews = () => {
 }
 
 // toolbar events
-toolbar.on('goBack', sidebar.goBack)
-toolbar.on('add', sidebar.addAndSelect)
-toolbar.on('add', content.add)
+toolbar.on('goBack', sidebar.goBack.bind(sidebar))
+toolbar.on('add', sidebar.addAndSelect.bind(sidebar))
+toolbar.on('add', content.add.bind(content))
 toolbar.on('find', () => sidebar.findDialog(FindDialog))
 toolbar.on('import', () => showImportOutcomesModal({toolbar}))
-toolbar.on('start_sync', (file) => showOutcomesImporter({
-  file,
-  disableOutcomeViews,
-  resetOutcomeViews,
-  mount: content.$el[0],
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}))
+toolbar.on('start_sync', file =>
+  showOutcomesImporter({
+    file,
+    disableOutcomeViews,
+    resetOutcomeViews,
+    mount: content.$el[0],
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  })
+)
 
-showOutcomesImporterIfInProgress({
-  disableOutcomeViews,
-  resetOutcomeViews,
-  mount: content.$el[0],
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}, ENV.current_user.id)
+showOutcomesImporterIfInProgress(
+  {
+    disableOutcomeViews,
+    resetOutcomeViews,
+    mount: content.$el[0],
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  },
+  ENV.current_user.id
+)
 
 // sidebar events
 sidebar.on('select', model => content.show(model))
-sidebar.on('select', toolbar.resetBackButton)
+sidebar.on('select', toolbar.resetBackButton.bind(toolbar))
 
 // content events
-content.on('addSuccess', sidebar.refreshSelection)
+content.on('addSuccess', sidebar.refreshSelection.bind(sidebar))
 content.on('deleteSuccess', () => {
   const view = sidebar.$el.find('.outcome-group.selected:last').data('view')
   const model = view && view.model

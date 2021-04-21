@@ -35,6 +35,13 @@ import 'jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.templateData'
 import 'jquery.instructure_date_and_time'
+import renderConferenceAlternatives from '../conferences/renderAlternatives'
+
+if (ENV.can_create_conferences) {
+  if (ENV.render_alternatives) {
+    renderConferenceAlternatives()
+  }
+}
 
 const ConferencesRouter = Backbone.Router.extend({
   routes: {
@@ -46,7 +53,7 @@ const ConferencesRouter = Backbone.Router.extend({
   currentConferences: null,
   concludedConferences: null,
 
-  initialize () {
+  initialize() {
     this.close = this.close.bind(this)
     // populate the conference list with inital set of data
     this.editView = new EditConferenceView()
@@ -58,13 +65,13 @@ const ConferencesRouter = Backbone.Router.extend({
         $(`#new-conference-list div[data-id=${this.editConferenceId}] .al-trigger`).focus()
       }
     })
-    let view = this.currentView = new CollectionView({
+    let view = (this.currentView = new CollectionView({
       el: $('#new-conference-list'),
       itemView: ConferenceView,
       collection: this.currentConferences,
       emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences'),
       listClassName: 'ig-list'
-    })
+    }))
     view.render()
 
     this.concludedConferences = new ConferenceCollection(ENV.concluded_conferences)
@@ -88,11 +95,11 @@ const ConferencesRouter = Backbone.Router.extend({
     $('.new-conference-btn').on('click', () => this.create())
   },
 
-  index () {
+  index() {
     this.editView.close()
   },
 
-  create () {
+  create() {
     const conference = new Conference(_.clone(ENV.default_conference))
     conference.once('startSync', () => this.currentConferences.unshift(conference))
     if (conference.get('permissions').create) {
@@ -100,8 +107,9 @@ const ConferencesRouter = Backbone.Router.extend({
     }
   },
 
-  edit (conference) {
-    conference = this.currentConferences.get(conference) || this.concludedConferences.get(conference)
+  edit(conference) {
+    conference =
+      this.currentConferences.get(conference) || this.concludedConferences.get(conference)
     if (!conference) return
 
     if (conference.get('permissions').update) {
@@ -113,7 +121,7 @@ const ConferencesRouter = Backbone.Router.extend({
     $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
   },
 
-  close (conference) {
+  close(conference) {
     this.currentConferences.remove(conference)
     this.concludedConferences.unshift(conference)
   }

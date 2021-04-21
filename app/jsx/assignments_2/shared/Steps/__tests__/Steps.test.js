@@ -35,29 +35,29 @@ afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-it('should render', async () => {
+it('should render', () => {
   ReactDOM.render(<Steps />, document.getElementById('fixtures'))
   const element = $('[data-test-id="assignment-2-step-index"]')
   expect(element).toHaveLength(1)
 })
 
-it('should not render collapsed class when not collapsed', async () => {
+it('should not render collapsed class when not collapsed', () => {
   ReactDOM.render(<Steps isCollapsed={false} />, document.getElementById('fixtures'))
   const element = $('[data-test-id="steps-container-collapsed"]')
   expect(element).toHaveLength(0)
 })
 
-it('should render collapsed class when collapsed', async () => {
+it('should render collapsed class when collapsed', () => {
   ReactDOM.render(<Steps isCollapsed />, document.getElementById('fixtures'))
   const element = $('[data-test-id="steps-container-collapsed"]')
   expect(element).toHaveLength(1)
 })
 
-it('should render with StepItems', async () => {
+it('should render with StepItems', () => {
   ReactDOM.render(
     <Steps label="Settings">
-      <StepItem label={status => `Phase one ${status}`} status="complete" />
-      <StepItem label={status => `Phase two ${status}`} status="in-progress" />
+      <StepItem label="Phase one" status="complete" />
+      <StepItem label="Phase two" status="in-progress" />
       <StepItem label="Phase three" />
     </Steps>,
     document.getElementById('fixtures')
@@ -66,11 +66,11 @@ it('should render with StepItems', async () => {
   expect(element).toHaveLength(3)
 })
 
-it('should render aria-current for the item that is in progress', async () => {
+it('should render aria-current for the item that is in progress', () => {
   ReactDOM.render(
     <Steps label="Settings">
-      <StepItem label={status => `Phase one ${status}`} status="complete" />
-      <StepItem label={status => `Phase two ${status}`} status="in-progress" />
+      <StepItem label="Phase one" status="complete" />
+      <StepItem label="Phase two" status="in-progress" />
       <StepItem label="Phase three" />
     </Steps>,
     document.getElementById('fixtures')

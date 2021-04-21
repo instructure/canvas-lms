@@ -18,27 +18,22 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from '@instructure/ui-overlays/lib/components/Modal'
-import ModalHeader from '@instructure/ui-overlays/lib/components/Modal/ModalHeader'
-import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Flex from '@instructure/ui-layout/lib/components/Flex'
+import CanvasModal from 'jsx/shared/components/CanvasModal'
 
 export default function ExternalToolDialogModal(props) {
-  const {open, label, onOpen, onClose, onCloseButton, closeLabel, name, children} = props
+  const {open, label, onOpen, onClose, onCloseButton, name, children} = props
   return (
-    <Modal open={open} label={label} onOpen={onOpen} onClose={onClose}>
-      <ModalHeader>
-        <CloseButton placement="end" offset="medium" variant="icon" onClick={onCloseButton}>
-          {closeLabel}
-        </CloseButton>
-        <Heading>{name}</Heading>
-      </ModalHeader>
-      <ModalBody padding="0">
-        <Flex direction="column">{children}</Flex>
-      </ModalBody>
-    </Modal>
+    <CanvasModal
+      padding="0"
+      open={open}
+      label={label}
+      title={name}
+      onOpen={onOpen}
+      onClose={onClose}
+      onDismiss={onCloseButton}
+    >
+      {children}
+    </CanvasModal>
   )
 }
 
@@ -48,7 +43,6 @@ ExternalToolDialogModal.propTypes = {
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
   onCloseButton: PropTypes.func,
-  closeLabel: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   children: PropTypes.node
 }

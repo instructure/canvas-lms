@@ -20,7 +20,9 @@ import React from 'react'
 import {bool, func, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import EditableRichText from './Editables/EditableRichText'
-import View from '@instructure/ui-layout/lib/components/View'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 
 const descriptionPlaceholder = I18n.t('Description')
 
@@ -32,7 +34,7 @@ export default class AssignmentDescription extends React.Component {
   }
 
   static defaultPropTypes = {
-    readOnly: true
+    readOnly: false
   }
 
   constructor(props) {
@@ -53,16 +55,25 @@ export default class AssignmentDescription extends React.Component {
 
   render() {
     return (
-      <View as="div" margin="small 0" data-testid="AssignmentDescription">
-        <EditableRichText
-          mode={this.state.mode}
-          value={this.props.text || ''}
-          placeholder={descriptionPlaceholder}
-          onChange={this.handleChange}
-          onChangeMode={this.handleChangeMode}
-          label={I18n.t('Description')}
-          readOnly={this.props.readOnly}
-        />
+      <View as="div" margin="0 0 small" data-testid="AssignmentDescription">
+        <ToggleDetails
+          defaultExpanded
+          summary={
+            <>
+              <Text>{I18n.t('Description')}</Text>
+            </>
+          }
+        >
+          <EditableRichText
+            mode={this.state.mode}
+            value={this.props.text || ''}
+            placeholder={descriptionPlaceholder}
+            onChange={this.handleChange}
+            onChangeMode={this.handleChangeMode}
+            label={I18n.t('Description')}
+            readOnly={this.props.readOnly}
+          />
+        </ToggleDetails>
       </View>
     )
   }

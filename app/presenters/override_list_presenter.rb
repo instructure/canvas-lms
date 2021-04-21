@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -84,7 +86,7 @@ class OverrideListPresenter
   # Returns an array of due date hashes.
   def visible_due_dates
     return [] unless assignment
-
+    
     assignment.dates_hash_visible_to(user).each do |due_date|
       due_date[:raw] = due_date.dup
       due_date[:lock_at] = lock_at due_date

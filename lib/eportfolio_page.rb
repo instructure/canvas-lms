@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -51,5 +53,10 @@ module EportfolioPage
       js_env :folder_id => Folder.unfiled_folder(@current_user).id,
              :context_code => @current_user.asset_string
     end
+
+    js_env({ SKIP_ENHANCING_USER_CONTENT: true })
+    js_bundle :eportfolio, 'legacy/eportfolios_wizard_box'
+    css_bundle :tinymce
+    @no_left_side_list_view = true
   end
 end

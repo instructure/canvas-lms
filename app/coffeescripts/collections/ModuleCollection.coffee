@@ -15,14 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../collections/PaginatedCollection'
-  '../models/Module'
-], (PaginatedCollection, Module) ->
+import PaginatedCollection from './PaginatedCollection'
+import Module from '../models/Module'
 
-  class ModuleCollection extends PaginatedCollection
-    model: Module
+export default class ModuleCollection extends PaginatedCollection
+  model: Module
 
-    @optionProperty 'course_id'
+  @optionProperty 'course_id'
 
-    url: -> "/api/v1/courses/#{@course_id}/modules"
+  url: -> "/api/v1/courses/#{@course_id}/modules"

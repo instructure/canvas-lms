@@ -15,26 +15,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'i18n!content_migrations'
-  'jst/content_migrations/subviews/ImportQuizzesNextView'
-  'jquery'
-], (Backbone, I18n, template, $) ->
-  class ImportQuizzesNextView extends Backbone.View
-    template: template
-    @optionProperty 'quizzesNextEnabled'
-    @optionProperty 'questionBank'
+import Backbone from 'Backbone'
+import I18n from 'i18n!content_migrations'
+import template from 'jst/content_migrations/subviews/ImportQuizzesNextView'
+import $ from 'jquery'
 
-    events:
-      "change #importQuizzesNext" : "setAttribute"
+export default class ImportQuizzesNextView extends Backbone.View
+  template: template
+  @optionProperty 'quizzesNextEnabled'
+  @optionProperty 'migrationDefault'
+  @optionProperty 'questionBank'
 
-    setAttribute: =>
-      settings = @model.get('settings') || {}
-      checked = @$el.find('#importQuizzesNext').is(':checked')
-      settings.import_quizzes_next = checked
+  events:
+    "change #importQuizzesNext" : "setAttribute"
+
+  afterRender: ->
+    @setAttribute()
+
+  setAttribute: =>
+    settings = @model.get('settings') || {}
+    checked = @$el.find('#importQuizzesNext').is(':checked')
+    settings.import_quizzes_next = checked
+    @updateQuestionBank(checked)
+    @model.set('settings', settings)
+
+  updateQuestionBank: (checked) ->
+    if @questionBank?
       @questionBank.setEnabled(!checked,
-        I18n.t('This option is not compatible with Quizzes.Next'))
-      @model.set('settings', settings)
+        I18n.t('This option is not compatible with New Quizzes'))
 
-    toJSON: -> @options
+  toJSON: -> @options

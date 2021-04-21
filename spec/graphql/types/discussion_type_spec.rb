@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::DiscussionType do
   let_once(:discussion) { group_discussion_assignment }
@@ -26,6 +28,32 @@ describe Types::DiscussionType do
 
   it "works" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
+  end
+
+  it "queries the attribute" do
+    expect(discussion_type.resolve("title")).to eq discussion.title
+    expect(discussion_type.resolve("podcastHasStudentPosts")).to eq discussion.podcast_has_student_posts
+    expect(discussion_type.resolve("discussionType")).to eq discussion.discussion_type
+    expect(discussion_type.resolve("position")).to eq discussion.position
+    expect(discussion_type.resolve("allowRating")).to eq discussion.allow_rating
+    expect(discussion_type.resolve("onlyGradersCanRate")).to eq discussion.only_graders_can_rate
+    expect(discussion_type.resolve("sortByRating")).to eq discussion.sort_by_rating
+    expect(discussion_type.resolve("isSectionSpecific")).to eq discussion.is_section_specific
+
+    expect(discussion_type.resolve("rootTopic { _id }")).to eq discussion.root_topic_id
+    
+    expect(discussion_type.resolve("assignment { _id }")).to eq discussion.assignment_id.to_s
+    expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
+    expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
+  end
+
+  it 'allows querying root discussion entries' do
+    de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
+
+    result = discussion_type.resolve('rootDiscussionEntriesConnection { nodes { message } }')
+    expect(result.count).to be 1
+    expect(result[0]).to eq de.message
   end
 
   it "has modules" do

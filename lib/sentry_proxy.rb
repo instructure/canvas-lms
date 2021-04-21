@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,11 +20,11 @@
 require 'raven/base'
 
 class SentryProxy
-  def self.capture(exception, data)
+  def self.capture(exception, data, level=:error)
     if exception.is_a?(String) || exception.is_a?(Symbol)
-      Raven.capture_message(exception.to_s, data)
+      Raven.capture_message(exception.to_s, data) if reportable?(exception.to_s, level)
     else
-      Raven.capture_exception(exception, data) if reportable?(exception)
+      Raven.capture_exception(exception, data) if reportable?(exception, level)
     end
   end
 
@@ -32,7 +34,7 @@ class SentryProxy
   #  configure the sentry client in an initializer).  This allows plugins and extensions
   # to register their own errors that they don't want to get reported to sentry
   def self.register_ignorable_error(error_class)
-    @ignorable_errors = (self.ignorable_errors << error_class).uniq
+    @ignorable_errors = (self.ignorable_errors << error_class.to_s).uniq
   end
 
   def self.ignorable_errors
@@ -43,8 +45,16 @@ class SentryProxy
     @ignorable_errors = []
   end
 
-  def self.reportable?(exception)
-    !ignorable_errors.include?(exception.class)
+  def self.reportable?(exception, error_level)
+    # :info and :warn levels specifically introduced
+    # to avoid sentry noise for inactionable errors.
+    return false unless error_level == :error
+
+    if exception.is_a?(String)
+      !ignorable_errors.include?(exception.to_s)
+    else
+      !ignorable_errors.include?(exception.class.to_s)
+    end
   end
 
 end

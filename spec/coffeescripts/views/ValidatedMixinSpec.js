@@ -17,14 +17,12 @@
  */
 
 import $ from 'jquery'
-import tinymce from 'compiled/editor/stocktiny'
 import ValidatedMixin from 'compiled/views/ValidatedMixin'
 
 let textarea = null
 
 QUnit.module('ValidatedMixin', {
   setup() {
-    tinymce.remove()
     textarea = $("<textarea id='a42' name='message' data-rich_text='true'></textarea>")
     $('#fixtures').append(textarea)
     ValidatedMixin.$ = $
@@ -35,15 +33,15 @@ QUnit.module('ValidatedMixin', {
   }
 })
 
-test('it can find tinymce instances as fields', (assert) => {
-
+test('it can find tinymce instances as fields', assert => {
   const done = assert.async()
-  tinymce.init({
-    selector: '#fixtures textarea#a42',
-    }).then(() => {
+  tinymce
+    .init({
+      selector: '#fixtures textarea#a42'
+    })
+    .then(() => {
       const element = ValidatedMixin.findField('message')
       equal(element.length, 1)
       done()
     })
-
 })

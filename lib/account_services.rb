@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -38,12 +40,6 @@ module AccountServices
             :name => I18n.t("Skype"),
             :description => "",
             :expose_to_ui => :service
-        },
-        :linked_in => {
-            :name => I18n.t("LinkedIn"),
-            :description => "",
-            :expose_to_ui => :service,
-            :expose_to_ui_proc => proc { !!LinkedIn::Connection.config }
         },
         :twitter => {
             :name => I18n.t("Twitter"),

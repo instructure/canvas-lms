@@ -17,36 +17,54 @@
  */
 
 import React from 'react'
-import createReactClass from 'create-react-class';
+import {func} from 'prop-types'
 import classnames from 'classnames'
-import CurrentUploads from 'compiled/react_files/components/CurrentUploads'
-import UploadProgress from '../files/UploadProgress'
+import UploadProgress from './UploadProgress'
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
 
-    CurrentUploads.renderUploadProgress = function () {
-      if (this.state.currentUploads.length) {
-        var progessComponents = this.state.currentUploads.map((uploader) => {
-          return <UploadProgress uploader={uploader} key={uploader.getFileName()} />
-        });
-        return (
-          <div className='current_uploads__uploaders'>
-            {progessComponents}
-          </div>
-        );
-      } else {
-        return null;
-      }
-    };
+class CurrentUploads extends React.Component {
+  state = {currentUploads: []}
 
-    CurrentUploads.render = function () {
-      var classes = classnames({
-        'current_uploads': this.state.currentUploads.length
-      });
+  static propTypes = {
+    onUploadChange: func
+  }
 
-      return (
-        <div className={classes}>
-          {this.renderUploadProgress()}
-        </div>
-      );
-    };
+  static defaultProps = {
+    onUploadChange: () => {}
+  }
 
-export default createReactClass(CurrentUploads);
+  handleUploadQueueChange = upload_queue => {
+    this.setState({currentUploads: upload_queue.getAllUploaders()}, () => {
+      this.props.onUploadChange(this.state.currentUploads.length)
+    })
+  }
+
+  componentDidMount() {
+    UploadQueue.addChangeListener(this.handleUploadQueueChange)
+  }
+
+  componentWillUnmount() {
+    UploadQueue.removeChangeListener(this.handleUploadQueueChange)
+  }
+
+  renderUploadProgress = function() {
+    if (this.state.currentUploads.length) {
+      const progessComponents = this.state.currentUploads.map(uploader => {
+        return <UploadProgress uploader={uploader} key={uploader.getFileName()} />
+      })
+      return <div className="current_uploads__uploaders">{progessComponents}</div>
+    } else {
+      return null
+    }
+  }
+
+  render() {
+    const classes = classnames({
+      current_uploads: this.state.currentUploads.length
+    })
+
+    return <div className={classes}>{this.renderUploadProgress()}</div>
+  }
+}
+
+export default CurrentUploads

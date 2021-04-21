@@ -18,43 +18,51 @@
 
 import React from 'react'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Text} from '@instructure/ui-text'
+import {Table} from '@instructure/ui-table'
+import {View} from '@instructure/ui-view'
 
-import { IconLock, IconUnlock } from './BlueprintLocks'
+import {IconLock, IconUnlock} from './BlueprintLocks'
 import propTypes from '../propTypes'
 import {itemTypeLabels, changeTypeLabels} from '../labels'
 
-const UnsyncedChange = (props) => {
+const UnsyncedChange = props => {
   const {asset_type, asset_name, change_type, locked} = props.change
   const changeLabel = changeTypeLabels[change_type] || change_type
   const typeLabel = itemTypeLabels[asset_type] || asset_type
 
   return (
-    <tr className="bcs__unsynced-item">
-      <td>
+    <Table.Row data-testid="bcs__unsynced-item">
+      <Table.Cell>
         <div className="bcs__unsynced-item__name">
           <Text size="large" color="secondary">
             {locked ? <IconLock /> : <IconUnlock />}
           </Text>
           <View padding="0 0 0 small">
-            <Text size="small" weight="bold">{asset_name}</Text>
+            <Text size="small" weight="bold">
+              {asset_name}
+            </Text>
           </View>
         </div>
-      </td>
-      <td>
-        <Text size="small" weight="bold">{changeLabel}</Text>
-      </td>
-      <td>
-        <Text size="small" weight="bold">{typeLabel}</Text>
-      </td>
-    </tr>
+      </Table.Cell>
+      <Table.Cell>
+        <Text size="small" weight="bold">
+          {changeLabel}
+        </Text>
+      </Table.Cell>
+      <Table.Cell>
+        <Text size="small" weight="bold">
+          {typeLabel}
+        </Text>
+      </Table.Cell>
+    </Table.Row>
   )
 }
-
 
 UnsyncedChange.propTypes = {
   change: propTypes.unsyncedChange.isRequired
 }
+
+UnsyncedChange.displayName = 'Row'
 
 export default UnsyncedChange

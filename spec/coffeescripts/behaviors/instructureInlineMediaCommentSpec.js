@@ -19,24 +19,20 @@
 import $ from 'jquery'
 import inlineMediaComment from 'compiled/behaviors/instructure_inline_media_comment'
 
-let oldTrackEvent = null
-
 QUnit.module('inlineMediaComment', {
   setup() {
-    oldTrackEvent = $.trackEvent
     this.fixtures = document.getElementById('fixtures')
-    this.fixtures.innerHTML = "<a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a>"
+    this.fixtures.innerHTML =
+      "<a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a>"
     window.INST.kalturaSettings = 'settings set'
   },
   teardown() {
-    $.trackEvent = oldTrackEvent
     this.fixtures.innerHTML = ''
     window.INST.kalturaSettings = null
   }
 })
 
 test('anchor tag with proper class triggers media load when clicked', function() {
-  $.trackEvent = () => null
   const $link = $(this.fixtures).find('a')
   $link.click()
   ok(
@@ -71,7 +67,6 @@ test('getMediaCommentId can pull from an inner element in an html block', () => 
 })
 
 test('video in td has minimum size of 300', function() {
-  $.trackEvent = () => null
   this.fixtures.innerHTML =
     "<table><tbody><tr><td><a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a></td></tr></tbody></table>"
   const $link = $(this.fixtures).find('a')

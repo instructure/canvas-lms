@@ -21,65 +21,70 @@
 
 import $ from 'jquery'
 import './vendor/jquery.scrollTo'
-import './jquery.instructure_jquery_patches'
 
 $.fn.scrollToVisible = function(obj) {
-  var options = {};
-  var $obj = $(obj);
+  const options = {}
+  const $obj = $(obj)
 
-  if ($obj.length === 0) { return; }
-  var innerOffset   = $obj.offset(),
-      width         = $obj.outerWidth(),
-      height        = $obj.outerHeight(),
-      top           = innerOffset.top,
-      bottom        = top + height,
-      left          = innerOffset.left,
-      right         = left + width,
-      currentTop    = (this.selector == "html,body" ? $.windowScrollTop() : this.scrollTop()),
-      currentLeft   = this.scrollLeft(),
-      currentHeight = this.outerHeight(),
-      currentWidth  = this.outerWidth();
+  if ($obj.length === 0) {
+    return
+  }
+  let innerOffset = $obj.offset(),
+    width = $obj.outerWidth(),
+    height = $obj.outerHeight(),
+    top = innerOffset.top,
+    bottom = top + height,
+    left = innerOffset.left,
+    right = left + width,
+    currentTop = this.selector == 'html,body' ? $.windowScrollTop() : this.scrollTop(),
+    currentLeft = this.scrollLeft(),
+    currentHeight = this.outerHeight(),
+    currentWidth = this.outerWidth()
 
-  if (this.selector != "html,body") {
-    var outerOffset = $("body").offset();
+  if (this.selector != 'html,body') {
+    let outerOffset = $('body').offset()
     this.each(function() {
       try {
-        outerOffset = $(this).offset();
-        return false;
-      } catch(e) {}
-    });
-    top    -= outerOffset.top;
-    bottom -= outerOffset.top;
-    left   -= outerOffset.left;
-    right  -= outerOffset.left;
+        outerOffset = $(this).offset()
+        return false
+      } catch (e) {}
+    })
+    top -= outerOffset.top
+    bottom -= outerOffset.top
+    left -= outerOffset.left
+    right -= outerOffset.left
   }
 
-  if (this[0].tagName == "HTML" || this[0].tagName == "BODY") {
-    currentHeight = $(window).height();
-    if($("#wizard_box:visible").length > 0) {
-      currentHeight -= $("#wizard_box:visible").height();
+  if (this[0].tagName == 'HTML' || this[0].tagName == 'BODY') {
+    currentHeight = $(window).height()
+    if ($('#wizard_box:visible').length > 0) {
+      currentHeight -= $('#wizard_box:visible').height()
     }
-    currentWidth = $(window).width();
-    top -= currentTop;
-    left -= currentLeft;
-    bottom -= currentTop;
-    right -= currentLeft;
+    currentWidth = $(window).width()
+    top -= currentTop
+    left -= currentLeft
+    bottom -= currentTop
+    right -= currentLeft
   }
   if (top < 0 || (currentHeight < height && bottom > currentHeight)) {
-    options.scrollTop = top + currentTop;
+    options.scrollTop = top + currentTop
   } else if (bottom > currentHeight) {
-    options.scrollTop = bottom + currentTop - currentHeight + 20;
+    options.scrollTop = bottom + currentTop - currentHeight + 20
   }
   if (left < 0) {
-    options.scrollLeft = left + currentLeft;
+    options.scrollLeft = left + currentLeft
   } else if (right > currentWidth) {
-    options.scrollLeft = right + currentLeft - currentWidth + 20;
+    options.scrollLeft = right + currentLeft - currentWidth + 20
   }
-  if (options.scrollTop == 1) { options.scrollTop = 0; }
-  if (options.scrollLeft == 1) { options.scrollLeft = 0; }
-  
-  this.scrollTop(options.scrollTop);
-  this.scrollLeft(options.scrollLeft);
-  
-  return this;
-};
+  if (options.scrollTop == 1) {
+    options.scrollTop = 0
+  }
+  if (options.scrollLeft == 1) {
+    options.scrollLeft = 0
+  }
+
+  this.scrollTop(options.scrollTop)
+  this.scrollLeft(options.scrollLeft)
+
+  return this
+}

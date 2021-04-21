@@ -1,0 +1,49 @@
+{
+  "name": "learning_outcome_result_created",
+  "definition": "The event is emitted anytime a submission is assessed against an outcome. The following setup should be enabled in Canvas in order for the event to be triggered:\n1. Administrator has set up learning outcomes at the account/sub-account level\n2. Instructor has added outcome to assignment rubric\n3. Student submitted a rubric based assignment\n4. Instructor graded a rubric based assignment at the outcome level => there is a result associated with assignment outcome",
+  "trigger": "Triggered when a submission is rated against an outcome.",
+  "schema": {
+    "assessed_at": "The date when the outcome was last assessed.",
+    "attempt": "The submission attempt number.",
+    "created_at": "Time when the result was created.",
+    "learning_outcome_id": "The local Canvas ID of the learning outcome.",
+    "mastery": "True if student achieved mastery.",
+    "original_mastery": "True if student achieved mastery on the first attempt.",
+    "original_possible": "Possible points on the first attempt.",
+    "original_score": "Score on the first attempt.",
+    "percent": "Percent of maximum points possible for an outcome, scaled to reflect any custom mastery levels that differ from the learning outcome.",
+    "possible": "Total number of points possible.",
+    "score": "The student's score.",
+    "title": "Title of the learning outcome."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "learning_outcome_result_created",
+          "event_time": "2019-08-09T21:35:05Z",
+          "job_id": "1020020528469291",
+          "job_tag": "Quizzes::SubmissionGrader#update_outcomes",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "assessed_at": "2019-08-09T21:35:05Z",
+          "attempt": 1,
+          "created_at": "2019-08-09T21:35:05Z",
+          "learning_outcome_id": "1",
+          "mastery": true,
+          "original_mastery": false,
+          "original_possible": 5,
+          "original_score": 5,
+          "percent": 1,
+          "possible": 5,
+          "score": 5,
+          "title": "oxana Student 2, Test Outcome"
+        }
+      }
+    }
+  ]
+}

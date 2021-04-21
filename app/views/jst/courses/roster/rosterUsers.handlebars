@@ -11,7 +11,9 @@
         {{#if canViewSisIdColumn}}
         <th scope="col">{{#t}}SIS ID{{/t}}</th>
         {{/if}}
+        {{#unless hideSectionsOnCourseUsersPage}}
         <th scope="col">{{#t "section"}}Section{{/t}}</th>
+        {{/unless}}
         <th scope="col">{{#t "role"}}Role{{/t}}</th>
         {{#if ENV.permissions.read_reports}}
         <th scope="col">{{#t "last_activity"}}Last Activity{{/t}}</th>

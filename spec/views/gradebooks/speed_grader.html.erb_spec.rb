@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -24,7 +26,9 @@ describe "/gradebooks/speed_grader" do
   include GroupsCommon
 
   let(:locals) do
-    { anonymize_students: false }
+    {
+      anonymize_students: false
+    }
   end
 
   before(:once) do
@@ -71,6 +75,16 @@ describe "/gradebooks/speed_grader" do
     expect(rendered).to include '<span id="speed_grader_settings_mount_point"></span>'
   end
 
+  it "includes a mount point for hide assignment grades tray" do
+    render template: 'gradebooks/speed_grader', locals: locals
+    expect(rendered).to include '<div id="hide-assignment-grades-tray"></div>'
+  end
+
+  it "includes a mount point for post assignment grades tray" do
+    render template: 'gradebooks/speed_grader', locals: locals
+    expect(rendered).to include '<div id="post-assignment-grades-tray"></div>'
+  end
+
   it "includes a link back to the gradebook (gradebook by default)" do
     render template: 'gradebooks/speed_grader', locals: locals
     expect(rendered).to include "a href=\"http://test.host/courses/#{@course.id}/gradebook\""
@@ -110,25 +124,12 @@ describe "/gradebooks/speed_grader" do
     end
   end
 
-  describe 'mute button' do
-    it 'is rendered' do
+  describe 'reassignment wrapper' do
+    it 'is rendered when @can_comment_on_submission and @can_reassign_submissions are true' do
+      assign(:can_comment_on_submission, true)
+      assign(:can_reassign_submissions, true)
       render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.at_css('#mute_link')).to be_present
-    end
-
-    it 'is enabled if user can mute assignment' do
-      assign(:disable_unmute_assignment, false)
-      render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.at_css('#mute_link.disabled')).not_to be_present
-    end
-
-    it 'is disabled if user cannot mute assignment' do
-      assign(:disable_unmute_assignment, true)
-      render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.at_css('#mute_link.disabled')).to be_present
+      expect(rendered).to include "<div id=\"reassign_assignment_wrapper\""
     end
   end
 
@@ -139,7 +140,7 @@ describe "/gradebooks/speed_grader" do
 
     it 'shows radio buttons if individually graded' do
       render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 2
       expect(html.css('#submission_group_comment').size).to be 1
     end
@@ -148,10 +149,10 @@ describe "/gradebooks/speed_grader" do
       @assignment.grade_group_students_individually = false
       @assignment.save!
       render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 0
       checkbox = html.css('#submission_group_comment')
-      expect(checkbox.attr('checked').value).to eq 'checked'
+      expect(checkbox.attr('checked')).not_to be_nil
       expect(checkbox.attr('style').value).to include('display:none')
     end
   end
@@ -159,7 +160,7 @@ describe "/gradebooks/speed_grader" do
   context 'grading box' do
     let(:html) do
       render template: 'gradebooks/speed_grader', locals: locals
-      Nokogiri::HTML.fragment(response.body)
+      Nokogiri::HTML5.fragment(response.body)
     end
 
     it 'renders the possible points for a points-based assignment' do
@@ -186,7 +187,7 @@ describe "/gradebooks/speed_grader" do
   context "hide student names checkbox" do
     let(:html) do
       render template: "gradebooks/speed_grader", locals: locals
-      Nokogiri::HTML.fragment(response.body)
+      Nokogiri::HTML5.fragment(response.body)
     end
 
     before(:once) do

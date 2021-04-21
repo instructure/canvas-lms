@@ -22,13 +22,11 @@ import axios from 'axios'
 QUnit.module('Developer key actions')
 
 function thenStub() {
-  return(
-    {
-      then: () => {
-        return {catch: () => {}}
-      }
+  return {
+    then: () => {
+      return {catch: () => {}}
     }
-  )
+  }
 }
 
 test('listInheritedDeveloperKeysStart returns proper action', () => {
@@ -98,4 +96,3 @@ test('listDeveloperKeyScopes makes a request to the scopes endpoint', () => {
   ok(getStub.calledWith('/api/v1/accounts/1/scopes?group_by=resource_name'))
   axios.get.restore()
 })
-

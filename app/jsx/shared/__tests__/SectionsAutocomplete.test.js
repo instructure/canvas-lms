@@ -23,12 +23,12 @@ import SectionsAutocomplete from '../SectionsAutocomplete'
 describe('Sections Autocomplete', () => {
   const defaultProps = () => ({
     sections: [{id: '1', name: 'awesome section'}],
-    flashMessage: () => {},
+    flashMessage: () => {}
   })
 
   it('renders SectionsAutocomplete', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
-    const renderedAutocomplete = wrapper.find('Select')
+    const renderedAutocomplete = wrapper.find('CanvasMultiSelect')
     expect(renderedAutocomplete).toHaveLength(1)
   })
 
@@ -41,7 +41,7 @@ describe('Sections Autocomplete', () => {
 
   it('removes the all sections option when individual one is added', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
-    wrapper.instance().onAutocompleteChange(null, [{id: '1', value: 'awesome section'}])
+    wrapper.instance().onAutocompleteChange(['1'])
     expect(wrapper.instance().state.selectedSectionsValue).toEqual(['1'])
   })
 
@@ -75,7 +75,7 @@ describe('Sections Autocomplete', () => {
 
   it('shows an error message when removing all sections', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
-    wrapper.instance().onAutocompleteChange(null, [])
+    wrapper.instance().onAutocompleteChange([])
     expect(wrapper.instance().state.messages).toEqual([
       {text: 'A section is required', type: 'error'}
     ])
@@ -83,13 +83,8 @@ describe('Sections Autocomplete', () => {
 
   it('removes the all sections except the all option when all section is added', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
-    wrapper.instance().onAutocompleteChange(null, [{id: '1', value: 'awesome section'}])
-    wrapper
-      .instance()
-      .onAutocompleteChange(null, [
-        {id: '1', value: 'awesome section'},
-        {id: 'all', value: 'All Sections'}
-      ])
+    wrapper.instance().onAutocompleteChange(['1'])
+    wrapper.instance().onAutocompleteChange(['1', 'all'])
     expect(wrapper.instance().state.selectedSectionsValue).toEqual(['all'])
   })
 
@@ -103,13 +98,8 @@ describe('Sections Autocomplete', () => {
     }
 
     const wrapper = shallow(<SectionsAutocomplete {...props} />)
-    wrapper.instance().onAutocompleteChange(null, [{id: '1', value: 'awesome section'}])
-    wrapper
-      .instance()
-      .onAutocompleteChange(null, [
-        {id: '3', value: 'other thing'},
-        {id: '1', value: 'awesome section'}
-      ])
+    wrapper.instance().onAutocompleteChange(['1'])
+    wrapper.instance().onAutocompleteChange(['3', '1'])
     expect(wrapper.instance().state.selectedSectionsValue).toEqual(['3', '1'])
   })
 
@@ -118,16 +108,16 @@ describe('Sections Autocomplete', () => {
     const props = {...defaultProps(), flashMessage}
     const wrapper = shallow(<SectionsAutocomplete {...props} />)
 
-    wrapper.instance().onAutocompleteChange(null, [])
+    wrapper.instance().onAutocompleteChange([])
     expect(flashMessage).toHaveBeenCalledWith('All Sections removed')
 
-    wrapper.instance().onAutocompleteChange(null, props.sections)
+    wrapper.instance().onAutocompleteChange(props.sections.map(s => s.id))
     expect(flashMessage).toHaveBeenCalledWith('awesome section added')
 
-    wrapper.instance().onAutocompleteChange(null, [])
+    wrapper.instance().onAutocompleteChange([])
     expect(flashMessage).toHaveBeenCalledWith('awesome section removed')
 
-    wrapper.instance().onAutocompleteChange(null, [{id: 'all', value: 'All Sections'}])
+    wrapper.instance().onAutocompleteChange(['all'])
     expect(flashMessage).toHaveBeenCalledWith('All Sections added')
   })
 })

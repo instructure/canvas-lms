@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -15,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-require 'action_controller_test_process'
 
 module Canvas::Migration::Worker
 
@@ -79,7 +79,7 @@ module Canvas::Migration::Worker
 
     att
   end
-  
+
   def self.clear_exported_data(folder)
     begin
       config = ConfigFile.load('external_migration')

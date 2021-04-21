@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::FileType do
   let_once(:course) { course_with_teacher(active_all: true); @course }
@@ -38,9 +40,9 @@ describe Types::FileType do
   end
 
   it 'requires read permission' do
-    other_course_student = student_in_course(course: course_factory)
+    other_course_student = student_in_course(course: course_factory).user
     resolver = GraphQLTypeTester.new(file, current_user: other_course_student)
-    expect(resolver.resolve('displayName')).to be_nil
+    expect(resolver.resolve("_id")).to be_nil
   end
 
   it 'requires the file to not be deleted' do
@@ -60,5 +62,88 @@ describe Types::FileType do
     expect(
       file_type.resolve('url', request: ActionDispatch::TestRequest.create, current_user: @student)
     ).to be_nil
+  end
+
+  it 'has a thumbnail url' do
+    f = attachment_with_context(course, uploaded_data: stub_png_data, content_type: 'image/png')
+    f_type = GraphQLTypeTester.new(f, current_user: @teacher)
+    expect(
+        f_type.resolve('thumbnailUrl', request: ActionDispatch::TestRequest.create, current_user: @student).start_with?("http://localhost/images/thumbnails/show")
+    ).to be true
+  end
+
+  describe "url" do
+    let(:file) { attachment_with_context(course, uploaded_data: stub_png_data, content_type: 'image/png') }
+    let(:type_tester) { GraphQLTypeTester.new(file, current_user: @student) }
+
+    it "returns an https URL if the request was issued over SSL" do
+      request = ActionDispatch::TestRequest.create({"HTTPS" => "on"})
+      expect(type_tester.resolve("url", request: request, current_user: @student)).to start_with("https:")
+    end
+
+    it "returns an http URL if the request was not issued over SSL" do
+      request = ActionDispatch::TestRequest.create
+      expect(type_tester.resolve("url", request: request, current_user: @student)).to start_with("http:")
+    end
+  end
+
+  context 'submission preview url' do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+      @student_file = attachment_with_context(@student, content_type: "application/pdf")
+      @submission = @assignment.submit_homework(
+        @student,
+        body: 'Attempt 1',
+        submitted_at: 2.hours.ago,
+        submission_type: "online_upload",
+        attachments: [@student_file]
+      )
+      AttachmentAssociation.create!(attachment: @student_file, context: @submission, context_type: "Submission")
+      @resolver = GraphQLTypeTester.new(@student_file, current_user: @student)
+    end
+
+    it 'returns nil if the the file is locked' do
+      file.update!(locked: true)
+      expect(
+        file_type.resolve(
+          'submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")',
+          request: ActionDispatch::TestRequest.create,
+          current_user: @student
+        )
+      ).to be_nil
+    end
+
+    it 'returns nil if the file is not a canvadocable type' do
+      allow(Canvadocs).to receive(:enabled?).and_return true
+      @student_file.update!(content_type: 'application/loser')
+      expect(
+        @resolver.resolve('submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")')
+      ).to be_nil
+    end
+
+    it 'returns nil if canvadocs is not enabled' do
+      allow(Canvadocs).to receive(:enabled?).and_return false
+      expect(
+        @resolver.resolve('submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")')
+      ).to be_nil
+    end
+
+    it 'returns nil if the given submission id is not associated with the attachment' do
+      other_assignment = assignment_model(course: @course)
+      other_submission = other_assignment.submit_homework(
+        @student,
+        body: 'Attempt 1',
+        submitted_at: 2.hours.ago,
+      )
+      resp = @resolver.resolve('submissionPreviewUrl(submissionId: "' + other_submission.id.to_s + '")')
+      expect(resp).to be_nil
+    end
+
+    it 'returns the submission preview url' do
+      allow(Canvadocs).to receive(:enabled?).and_return true
+      resp = @resolver.resolve('submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")')
+      expect(resp).not_to be_nil
+      expect(resp.start_with?('/api/v1/canvadoc_session')).to be true
+    end
   end
 end

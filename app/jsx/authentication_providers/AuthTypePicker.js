@@ -16,71 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!authentication_providers'
-import Select from '@instructure/ui-core/lib/components/Select'
+import {FormField} from '@instructure/ui-form-field'
 
-  class AuthTypePicker extends React.Component {
+export default function AuthTypePicker({onChange, authTypes}) {
+  const [selectedAuthType, setSelectedAuthType] = useState('default')
 
-    static propTypes = {
-      authTypes: PropTypes.arrayOf(PropTypes.shape({
-        value: PropTypes.string,
-        name: PropTypes.string
-      })).isRequired,
-      onChange: PropTypes.func
-    };
-
-    static defaultProps = {
-      authTypes: [],
-      onChange () {}
-    };
-
-    constructor (props) {
-      super(props);
-      this.state = {
-        authType: 'default'
-      };
-    }
-
-    handleChange = (event) => {
-      const authType = event.target.value;
-      this.setState({ authType });
-      this.props.onChange(authType);
-    }
-
-    renderAuthTypeOptions () {
-      return this.props.authTypes.map(authType => (
-        <option
-          key={authType.value}
-          value={authType.value}
+  return (
+    <div>
+      <FormField label={I18n.t('Add an identity provider to this account:')} id="add_auth_select">
+        <select
+          id="add_auth_select"
+          onChange={event => {
+            const authType = event.target.value
+            setSelectedAuthType(authType)
+            onChange(authType)
+          }}
+          value={selectedAuthType}
+          style={{width: '100%'}}
         >
-          {authType.name}
-        </option>
-      ));
-    }
+          {authTypes.map(authType => (
+            <option key={authType.value} value={authType.value}>
+              {authType.name}
+            </option>
+          ))}
+        </select>
+      </FormField>
+    </div>
+  )
+}
 
-    render () {
-      const label = (
-        <span className="add" style={{ display: 'block' }}>
-          {I18n.t('Add an identity provider to this account:')}
-        </span>
-      )
+AuthTypePicker.propTypes = {
+  authTypes: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      name: PropTypes.string
+    })
+  ).isRequired,
+  onChange: PropTypes.func
+}
 
-      return (
-        <div>
-          <Select
-            label={label}
-            id="add_auth_select"
-            onChange={this.handleChange}
-            value={this.state.authType}
-          >
-            {this.renderAuthTypeOptions()}
-          </Select>
-        </div>
-      );
-    }
-
-  }
-
-export default AuthTypePicker
+AuthTypePicker.defaultProps = {
+  authTypes: [],
+  onChange() {}
+}

@@ -29,7 +29,15 @@ QUnit.module('UsageRightsSelectBox', {
 
 test('shows alert message if nothing is chosen and component is setup for a message', () => {
   const wrapper = shallow(<UsageRightsSelectBox showMessage />)
-  ok(wrapper.find('.alert').text().includes("If you do not select usage rights now, this file will be unpublished after it's uploaded."), 'message is being shown')
+  ok(
+    wrapper
+      .find('.alert')
+      .text()
+      .includes(
+        "If you do not select usage rights now, this file will be unpublished after it's uploaded."
+      ),
+    'message is being shown'
+  )
 })
 
 test('fetches license options when component mounts', () => {
@@ -52,8 +60,13 @@ test('fetches license options when component mounts', () => {
 test('inserts copyright into textbox when passed in', () => {
   const copyright = 'all dogs go to taco bell'
   const wrapper = shallow(<UsageRightsSelectBox copyright={copyright} />)
-  equal(wrapper.find('#copyrightHolder').find('input').prop('defaultValue'), copyright)
-
+  equal(
+    wrapper
+      .find('#copyrightHolder')
+      .find('input')
+      .prop('defaultValue'),
+    copyright
+  )
 })
 
 test('shows creative commons options when set up', () => {
@@ -75,10 +88,6 @@ test('shows creative commons options when set up', () => {
     ])
   ])
 
-  equal(
-    wrapper.instance().creativeCommons.value,
-    'cc_some_option',
-    'shows creative commons option'
-  )
+  equal(wrapper.instance().creativeCommons.value, 'cc_some_option', 'shows creative commons option')
   server.restore()
 })

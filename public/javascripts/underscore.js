@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-////
+// //
 // if you want underscore in your code. require 'underscore' (this file)
-const  _ = require('vendor/lodash.underscore')
+const _ = require('vendor/lodash.underscore')
 
 // grab the global '_' variable, make it not global and return it
-module.exports = _.noConflict();
+module.exports = _.noConflict()

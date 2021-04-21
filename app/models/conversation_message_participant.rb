@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,14 +19,19 @@
 #
 
 class ConversationMessageParticipant < ActiveRecord::Base
+  self.ignored_columns = %i[root_account_id]
+
   include SimpleTags
   include Workflow
+  include ConversationHelper
 
   belongs_to :conversation_message
   belongs_to :user
   # deprecated
   belongs_to :conversation_participant
   delegate :author, :author_id, :generated, :body, :to => :conversation_message
+
+  before_create :set_root_account_ids
 
   scope :active, -> { where("(conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)") }
   scope :deleted, -> { where(workflow_state: 'deleted') }
@@ -37,6 +44,10 @@ class ConversationMessageParticipant < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
+  end
+
+  def conversation
+    conversation_message.conversation
   end
 
   def self.query_deleted(user_id, options={})

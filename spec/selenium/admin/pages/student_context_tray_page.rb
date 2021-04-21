@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -30,7 +32,7 @@ module StudentContextTray
     end
 
     def student_name_link
-      f(".StudentContextTray-Header__NameLink a")
+      f(".StudentContextTray-Header__Name a")
     end
 
     def todo_tray_course_selector
@@ -42,16 +44,24 @@ module StudentContextTray
     end
 
     def todo_tray_dropdown_select_course(course_name)
-      fj("li[role=option]:contains('#{course_name}')")
+      fj("li[role=none] span[role=option]:contains('#{course_name}')")
+    end
+
+    def student_tray_quick_links
+      f('.StudentContextTray-QuickLinks')
     end
 
     #------------------------ Actions & Methods ---------------------------
     def wait_for_student_tray
       wait_for(method: nil, timeout: 1) { student_name_link.displayed? }
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 5) { ff(".StudentContextTray__Spinner").empty? }
     end
 
     def todo_tray_select_course_from_dropdown(course_name='Optional: Add Course')
       todo_tray_course_selector.click
       todo_tray_dropdown_select_course(course_name).click
     end
+
+
 end

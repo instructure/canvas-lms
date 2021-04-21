@@ -18,6 +18,9 @@
 
 <% default_term ||= @root_account.default_enrollment_term %>
 <% terms = terms.not_default %>
+<% active_terms = RequestCache.cache('active_terms', @root_account) { terms.started.not_ended.by_name.to_a } %>
+<% future_terms = RequestCache.cache('future_terms', @root_account) { terms.not_started.by_name.to_a } %>
+<% past_terms = RequestCache.cache('past_terms', @root_account) { terms.ended.by_name.to_a } %>
 <% selected_id ||= nil %>
 <% exclude_all_option ||= false %>
 <% name ||= 'enrollment_term_id' %>
@@ -29,23 +32,23 @@
   <% if default_term %>
     <option value="<%= default_term.id %>" <%= 'selected' if default_term.id == selected_id %>><%= default_term.name %></option>
   <% end %>
-  <% if terms.started.not_ended.any? %>
+  <% if active_terms.any? %>
     <optgroup label="<%= t("Active Terms") %>">
-      <% terms.started.not_ended.by_name.each do |term| %>
+      <% active_terms.each do |term| %>
         <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
       <% end %>
     </optgroup>
   <% end %>
-  <% if terms.not_started.any? %>
+  <% if future_terms.any? %>
     <optgroup label="<%= t("Future Terms") %>">
-      <% terms.not_started.by_name.each do |term| %>
+      <% future_terms.each do |term| %>
         <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
       <% end %>
     </optgroup>
   <% end %>
-  <% if terms.ended.any? %>
+  <% if past_terms.any? %>
     <optgroup label="<%= t("Past Terms") %>">
-      <% terms.ended.by_name.each do |term| %>
+      <% past_terms.each do |term| %>
         <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
       <% end %>
     </optgroup>

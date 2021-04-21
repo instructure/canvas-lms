@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -19,12 +21,7 @@ class FixupGroupOriginalityReports < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def change
-    DataFixup::FixupGroupOriginalityReports.send_later_if_production_enqueue_args(
-      :run,
-      {
-        priority: Delayed::LOWER_PRIORITY,
-        n_strand: "DataFixup::FixupGroupOriginalityReports:#{Shard.current.database_server.id}"
-      }
-    )
+    DataFixup::FixupGroupOriginalityReports.delay_if_production(priority: Delayed::LOWER_PRIORITY,
+      n_strand: "DataFixup::FixupGroupOriginalityReports:#{Shard.current.database_server.id}").run
   end
 end

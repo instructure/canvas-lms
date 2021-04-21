@@ -21,9 +21,7 @@
 </span>
 <% if with_login_text %>
   <span class="ic-Login__sso-button__title ic-Login__sso-button__title--<%= auth_type %>">
-    <%= t do %>
-      Login with <span class="ic-Login__sso-button__title-caps"><%= auth_type %></span>
-    <% end %>
+    <%= with_login_text %>
   </span>
 <% end %>
 <% if sr_message.present? %>

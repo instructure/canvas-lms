@@ -25,7 +25,7 @@ QUnit.module('SyncHistoryItem component')
 
 const defaultProps = () => ({
   heading: null,
-  migration: getSampleData().history[0],
+  migration: getSampleData().history[0]
 })
 
 test('renders the SyncHistoryItem component', () => {
@@ -57,4 +57,11 @@ test('renders changes using the appropriate prop component', () => {
   const tree = enzyme.mount(<SyncHistoryItem {...props} />)
   const node = tree.find('.bcs__history-item .test-change')
   equal(node.length, props.migration.changes.length)
+})
+
+test('includes the name of the person who started the sync', () => {
+  const tree = enzyme.mount(<SyncHistoryItem {...defaultProps()} />)
+  const node = tree.find('.bcs__history-item__title')
+  const text = node.text()
+  notEqual(text.indexOf('changes pushed by Bob Jones'), -1)
 })

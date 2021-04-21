@@ -24,13 +24,10 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
   let $container
   let $menuContent
   let props
-  let qunitTimeout
   let resolveOpen
   let wrapper
 
   hooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // protect against unresolved async mistakes
     props = {
       assignmentID: '71',
       courseID: '8',
@@ -57,7 +54,6 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     window.open.restore()
     SpeedGraderSettingsMenu.setURL.restore()
     $container.remove()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   function mountComponent() {
@@ -93,14 +89,24 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     })
   })
 
-  test('includes a "Keyboard Shortcuts" menu item', () => {
+  test('includes a "Keyboard Shortcuts" menu item when keyboard shortcuts are enabled', () => {
+    props.showKeyboardShortcutsMenuItem = true
     mountComponent()
     return clickToOpenMenu().then(() => {
       ok(getMenuItem('Keyboard Shortcuts'))
     })
   })
 
+  test('does not include a "Keyboard Shortcuts" menu item when keyboard shortcuts are disabled', () => {
+    props.showKeyboardShortcutsMenuItem = false
+    mountComponent()
+    return clickToOpenMenu().then(() => {
+      notOk(getMenuItem('Keyboard Shortcuts'))
+    })
+  })
+
   test('calls the openKeyboardShortcutsModal prop when "Keyboard Shortcuts" is clicked', () => {
+    props.showKeyboardShortcutsMenuItem = true
     props.openKeyboardShortcutsModal = sinon.stub()
     mountComponent()
     return clickToOpenMenu().then(() => {

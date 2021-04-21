@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -270,8 +272,10 @@ module QuizzesCommon
 
   def click_questions_tab
     wait_for_ajaximations
-    dismiss_flash_messages_if_present
-    f("a[href='#questions_tab']").click
+    tab = f("a[href='#questions_tab']")
+    keep_trying_until do
+      tab.click; true
+    end
   end
 
   # Locate an anchor using its text() node value. The anchor is expected to
@@ -391,13 +395,6 @@ module QuizzesCommon
       f('#quiz_access_code').send_keys(access_code)
       wait_for_new_page_load { fj('.btn', '#main').click }
     end or raise "unable to start quiz"
-
-    wait_for_quiz_to_begin
-  end
-
-  # uses sleep() because the display is updated on a timer, not an ajax callback
-  def wait_for_quiz_to_begin
-    sleep 1
   end
 
   def submit_quiz
@@ -412,7 +409,6 @@ module QuizzesCommon
     open_quiz_show_page
 
     expect_new_page_load { f('#preview_quiz_button').click }
-    wait_for_quiz_to_begin
 
     complete_and_submit_quiz(submit)
   end
@@ -524,8 +520,7 @@ module QuizzesCommon
   end
 
   def save_settings
-    f('.save_quiz_button').click
-    wait_for_ajaximations
+    wait_for_new_page_load { f('.save_quiz_button').click }
   end
 
   def edit_quiz

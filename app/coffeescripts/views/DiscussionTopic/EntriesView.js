@@ -24,23 +24,6 @@ import '../../jquery/scrollIntoView'
 import 'underscore.flattenObjects'
 
 export default class EntriesView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.showDeleted = this.showDeleted.bind(this)
-    this.hideIfFiltering = this.hideIfFiltering.bind(this)
-    this.addEntry = this.addEntry.bind(this)
-    this.goToEntry = this.goToEntry.bind(this)
-    this.render = this.render.bind(this)
-    this.handleKeyDown = this.handleKeyDown.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.defaults = {
       initialPage: 0,
@@ -56,8 +39,8 @@ export default class EntriesView extends Backbone.View {
 
   initialize() {
     super.initialize(...arguments)
-    this.collection.on('add', this.addEntry)
-    return this.model.on('change', this.hideIfFiltering)
+    this.collection.on('add', this.addEntry, this)
+    return this.model.on('change', this.hideIfFiltering, this)
   }
 
   showDeleted(show) {
@@ -226,7 +209,7 @@ export default class EntriesView extends Backbone.View {
   handleKeyDown(e) {
     let reverse
     const nodeName = e.target.nodeName.toLowerCase()
-    if (nodeName === 'input' || nodeName === 'textarea') return
+    if (nodeName === 'input' || nodeName === 'textarea' || ENV.disable_keyboard_shortcuts) return
     if (e.which !== 74 && e.which !== 75) return // j, k
     const entry = $(e.target).closest('.entry')
     this.traverse(entry, (reverse = e.which === 75))

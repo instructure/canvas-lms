@@ -26,20 +26,6 @@ import 'vendor/bootstrap/bootstrap-dropdown'
 import 'vendor/bootstrap-select/bootstrap-select'
 
 export default class CourseSelectionView extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.render = this.render.bind(this)
-    this.loadAll = this.loadAll.bind(this)
-    this.truncate_course = this.truncate_course.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.events = {change: 'onChange'}
 
@@ -54,14 +40,31 @@ export default class CourseSelectionView extends View {
     this.$el
       .selectpicker({useSubmenus: true})
       .next()
-      .on('mouseover', this.loadAll)
+      .on('mouseover', () => this.loadAll())
       .find('.dropdown-toggle')
-      .on('focus', this.loadAll)
-    this.options.courses.favorites.on('reset', this.render)
-    this.options.courses.all.on('reset', this.render)
-    this.options.courses.all.on('add', this.render)
-    this.options.courses.groups.on('reset', this.render)
-    this.options.courses.groups.on('add', this.render)
+      .on('focus', () => this.loadAll())
+    const dropdown = this.$el.data('selectpicker')?.$newElement
+    if (dropdown) {
+      dropdown.on('focusout', () => {
+        setTimeout(() => {
+          // fully close dropdown once focus has left the dropdown tree
+          if (
+            !dropdown[0].contains(document.activeElement) &&
+            // selenium tests fail when executing JS scripts as the web
+            // driver moves focus to the body. so let's just exclude it
+            // from the things we care to check :P
+            document.activeElement !== document.body
+          ) {
+            dropdown.removeClass('open')
+          }
+        }, 0)
+      })
+    }
+    this.options.courses.favorites.on('reset', () => this.render())
+    this.options.courses.all.on('reset', () => this.render())
+    this.listenTo(this.options.courses.all, 'add', _.debounce(_.bind(this.render), 200))
+    this.options.courses.groups.on('reset', () => this.render())
+    this.listenTo(this.options.courses.groups, 'add', _.debounce(_.bind(this.render), 200))
     this.$picker = this.$el.next()
     return this.render()
   }
@@ -90,8 +93,11 @@ export default class CourseSelectionView extends View {
       defaultOption: this.options.defaultOption,
       favorites: this.options.courses.favorites.toJSON(),
       more,
-      concluded,
       groups: group_json
+    }
+
+    if (!this.options.excludeConcluded) {
+      data.concluded = concluded
     }
 
     this.truncate_course_name_data(data)
@@ -121,11 +127,12 @@ export default class CourseSelectionView extends View {
   }
 
   loadAll() {
-    const {all} = this.options.courses
+    const {all, groups} = this.options.courses
     if (all._loading) return
     all.fetch()
     all._loading = true
-    this.options.courses.groups.fetchAll()
+
+    groups.fetchAll()
     return this.$picker.find('> .dropdown-menu').append(
       $('<div />')
         .attr('class', 'paginatedLoadingIndicator')
@@ -196,7 +203,7 @@ export default class CourseSelectionView extends View {
   }
 
   truncate_course_names(courses) {
-    return _.each(courses, this.truncate_course)
+    return _.each(courses, c => this.truncate_course(c))
   }
 
   truncate_course(course) {

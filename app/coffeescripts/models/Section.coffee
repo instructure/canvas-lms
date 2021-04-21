@@ -16,15 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define ['Backbone', 'i18n!overrides'], ({Model}, I18n ) ->
+import {Model} from 'Backbone'
+import I18n from 'i18n!modelsSection'
 
-  class Section extends Model
-    @defaultDueDateSection: ->
-      new Section
-        id: Section.defaultDueDateSectionID
-        name: I18n.t 'overrides.everyone', 'Everyone'
+export default class Section extends Model
+  @defaultDueDateSection: ->
+    new Section
+      id: Section.defaultDueDateSectionID
+      name: I18n.t 'overrides.everyone', 'Everyone'
 
-    @defaultDueDateSectionID: '0'
+  @defaultDueDateSectionID: '0'
 
-    isDefaultDueDateSection: =>
-      @id is Section.defaultDueDateSectionID
+  isDefaultDueDateSection: =>
+    @id is Section.defaultDueDateSectionID

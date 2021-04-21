@@ -32,7 +32,11 @@ QUnit.module('EventDataSource: getEvents', {
 
     // create the data source with a couple of recognized contexts. we'll use
     // those same context codes in querying
-    this.source = new EventDataSource([{asset_string: 'course_1'}, {asset_string: 'course_2'}, {asset_string: 'group_1'}])
+    this.source = new EventDataSource([
+      {asset_string: 'course_1'},
+      {asset_string: 'course_2'},
+      {asset_string: 'group_1'}
+    ])
     this.contexts = ['course_1', 'course_2']
 
     // a container for stubbing queries, along with helpers to populate
@@ -272,7 +276,10 @@ test('pagination: calls data callback with each page of data if set', function()
 })
 
 test('indexParams filters appointment_group_ids from params', function() {
-  const p = this.source.indexParams({blah: 'blah', context_codes: ['course_1', 'appointment_group_2', 'group_3', 'appointment_group_1337']})
+  const p = this.source.indexParams({
+    blah: 'blah',
+    context_codes: ['course_1', 'appointment_group_2', 'group_3', 'appointment_group_1337']
+  })
   equal(p.blah, 'blah')
   deepEqual(p.context_codes, ['course_1', 'group_3'])
   equal(p.appointment_group_ids, '2,1337')
@@ -297,7 +304,7 @@ test('transforms course planner item', function() {
 test('transforms group planner item', function() {
   const date = fcUtil.unwrap(this.date2).toISOString()
   this.server.addPlannerItem('group', 1, 'assignment', 4, 'bleh', date)
-  this.source.getEvents(this.date1, this.date4, ["group_1"], events => {
+  this.source.getEvents(this.date1, this.date4, ['group_1'], events => {
     equal(events.length, 1)
     const event = events[0].calendarEvent
     equal(event.context_code, 'group_1')

@@ -20,7 +20,7 @@ import _ from 'underscore'
 import rgb2hex from './util/rgb2hex'
 
 export default {
-  persistContextColors (colorsByContext, userId) {
+  persistContextColors(colorsByContext, userId) {
     _.each(colorsByContext, (color, contextCode) => {
       const hexcode = color.match(/rgb/) ? rgb2hex(color) : color
 

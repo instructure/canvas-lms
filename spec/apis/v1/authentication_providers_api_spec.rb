@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -164,12 +166,27 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "should error if empty post params sent" do
-      json = call_create({}, 422)
-      expect(json['errors'].first).to eq({
-        'field' => 'auth_type',
-        'message' => "invalid auth_type, must be one of #{AuthenticationProvider.valid_auth_types.join(',')}",
-        'error_code' => 'inclusion'
-      })
+      json = call_create({}, 400)
+      expect(json['errors'].first).to eq(
+        {
+          'message' =>
+            "invalid or missing auth_type '', must be one of #{
+              AuthenticationProvider.valid_auth_types.join(',')
+            }"
+        }
+      )
+    end
+
+    it 'should return bad request for invalid auth type' do
+      json = call_create({ auth_type: 'invalid' }, 400)
+      expect(json['errors'].first).to eq(
+        {
+          'message' =>
+            "invalid or missing auth_type 'invalid', must be one of #{
+              AuthenticationProvider.valid_auth_types.join(',')
+            }"
+        }
+      )
     end
 
     it "should return unauthorized error" do
@@ -187,6 +204,36 @@ describe "AuthenticationProviders API", type: :request do
     it "should not allow creation of duplicate singleton providers" do
       call_create({ auth_type: 'facebook' })
       call_create({ auth_type: 'facebook' }, 422)
+    end
+  end
+
+  describe "/update" do
+    before :once do
+      @aac = @account.authentication_providers.create!(@saml_hash)
+    end
+
+    it "should allow updating without auth type" do
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
+                      {controller: 'authentication_providers',
+                       action: 'update',
+                       account_id: @account.id.to_s,
+                       id: @aac.to_param,
+                       format: 'json'},
+                      { authentication_provider: { log_in_url: 'http://example.com/updated_cool_log_in' } })
+      expect(json['log_in_url']).to eq 'http://example.com/updated_cool_log_in'
+    end
+
+    it "should error when changing the type" do
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
+                      {controller: 'authentication_providers',
+                       action: 'update',
+                       account_id: @account.id.to_s,
+                       id: @aac.to_param,
+                       format: 'json'},
+                      { authentication_provider: { log_in_url: 'http://example.com/updated_cool_log_in', auth_type: 'facebook' } },
+                      {},
+                      expected_status: 400)
+      expect(json['message']).to eq 'Can not change type of authorization config, please delete and create new config.'
     end
   end
 
@@ -247,6 +294,12 @@ describe "AuthenticationProviders API", type: :request do
     it "should return unauthorized error" do
       course_with_student(:course => @course)
       call_show(0, 401)
+    end
+
+    it "should allow seeing the canvas auth type for any authenticated user" do
+      @account.authentication_providers.create!(auth_type: 'canvas')
+      course_with_student(:course => @course)
+      call_show('canvas')
     end
   end
 

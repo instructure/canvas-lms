@@ -65,17 +65,18 @@ export default class LDBLoginPopup extends Backbone.View {
       }
     }
   }
+
   initialize(options) {
     // @property {window} whnd The popup window handle.
     // @private
-    let whnd = undefined
+    let whnd
 
     // @property {CSSStyleSheet[]} styleSheets
     // @private
     //
     // The set of stylesheets to inject into the dialog, parsed from the current
     // page's available stylesheets.
-    let styleSheets = undefined
+    let styleSheets
 
     // @property {jQuery} $delegate
     // @private
@@ -92,7 +93,7 @@ export default class LDBLoginPopup extends Backbone.View {
     // instead of binding to 'click', 'mousedown', or 'keydown' handlers on all
     // of window, document, and document.body to ensure that everything gets
     // captured.
-    let $inputSink = undefined
+    let $inputSink
 
     _.extend(this.options, options)
 
@@ -104,14 +105,14 @@ export default class LDBLoginPopup extends Backbone.View {
     // @public
     //
     // Install an event handler.
-    this.on = _.bind($delegate.on, $delegate)
-    this.one = _.bind($delegate.one, $delegate)
+    this.on = $delegate.on.bind($delegate)
+    this.one = $delegate.one.bind($delegate)
 
     // @method off
     // @public
     //
     // Remove a previously registered event handler.
-    this.off = _.bind($delegate.off, $delegate)
+    this.off = $delegate.off.bind($delegate)
 
     // When the popup is closed manually by clicking the X in the titlebar
     // in LDB, it will not honor nor trigger the `onbeforeunload` event, so
@@ -179,14 +180,14 @@ export default class LDBLoginPopup extends Backbone.View {
 
       const authenticate = this.authenticate(credentials)
 
-      authenticate.then(function(rc) {
+      authenticate.then(rc => {
         $delegate.triggerHandler('login_success')
         whnd.close()
         reset()
         return rc
       })
 
-      authenticate.fail(function(xhrError) {
+      authenticate.fail(xhrError => {
         $delegate.triggerHandler('login_failure', xhrError)
         return xhrError
       })
@@ -202,7 +203,7 @@ export default class LDBLoginPopup extends Backbone.View {
       const $head = $(whnd.document.head)
 
       // Inject the stylesheets.
-      _(styleSheets).each(function(href) {
+      _(styleSheets).each(href => {
         $head.append(`<link rel="stylesheet" href="${htmlEscape(href)}" />`)
       })
 
@@ -258,7 +259,7 @@ export default class LDBLoginPopup extends Backbone.View {
       })
 
     if (this.options.sticky) {
-      let relaunch = undefined
+      let relaunch
 
       this.on('login_failure.sticky', () => (relaunch = true))
 

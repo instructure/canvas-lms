@@ -20,7 +20,7 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!gradinggradingPeriodCollection'
 import _ from 'underscore'
 import {camelize} from 'convert_case'
 import 'jquery.instructure_misc_plugins'
@@ -114,7 +114,7 @@ class GradingPeriodCollection extends React.Component {
     const target = this.getPeriodById(targetPeriod.id)
     const otherPeriods = _.reject(this.state.periods, p => p.id === target.id)
     if (_.isEmpty(otherPeriods)) return false
-    return _.any(
+    return _.some(
       otherPeriods,
       period =>
         // http://c2.com/cgi/wiki?TestIfDateRangesOverlap
@@ -210,7 +210,7 @@ class GradingPeriodCollection extends React.Component {
     if (
       periodsAreLoaded(this.state) &&
       !this.state.readOnly &&
-      _.all(this.state.periods, period => period.permissions.update)
+      _.every(this.state.periods, period => period.permissions.update)
     ) {
       return (
         <div className="form-actions">

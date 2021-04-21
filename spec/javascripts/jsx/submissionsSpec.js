@@ -90,6 +90,25 @@ test('comment_change submits the grading_comment but not grade', () => {
   equal($.ajaxJSON.getCall(0).args[2]['submission[group_comment]'], '1')
 })
 
+test('comment_change submits the user_id of the submission if present', () => {
+  $('.grading_comment').val('Hello again.')
+  $('.save_comment_button').click()
+
+  const [, , callParams] = $.ajaxJSON.getCall(0).args
+  strictEqual(callParams['submission[user_id]'], 1)
+})
+
+test('comment_change submits the anonymous_id of the submission if the user_id is not present', () => {
+  delete ENV.SUBMISSION.user_id
+  ENV.SUBMISSION.anonymous_id = 'zxcvb'
+
+  $('.grading_comment').val('Hello again.')
+  $('.save_comment_button').click()
+
+  const [, , callParams] = $.ajaxJSON.getCall(0).args
+  strictEqual(callParams['submission[anonymous_id]'], 'zxcvb')
+})
+
 test('comment_change does not submit if no comment', () => {
   $('.grading_comment').val('')
   $('.save_comment_button').click()
@@ -115,7 +134,7 @@ test('clicking a media comment passes the opening element to the window', () => 
   sinon.stub($.fn, 'mediaComment')
 
   commentLink.click()
-  const [,,,openingElement] = $.fn.mediaComment.firstCall.args
+  const [, , , openingElement] = $.fn.mediaComment.firstCall.args
   strictEqual(openingElement, commentLink.get(0))
 
   $.fn.mediaComment.restore()

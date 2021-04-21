@@ -16,18 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'underscore'
-  'Backbone'
-], ({extend, map}, {Collection, Model}) ->
+import {extend, map} from 'underscore'
+import {Collection, Model} from 'Backbone'
 
-  class CollaboratorCollection extends Collection
-    model: Model
+export default class CollaboratorCollection extends Collection
+  model: Model
 
-    comparator: (model) ->
-      # sort groups and users together.
-      model.get('sortable_name') or model.get('name')
+  comparator: (model) ->
+    # sort groups and users together.
+    model.get('sortable_name') or model.get('name')
 
-    parse: (response) ->
-      map(response, (model) -> extend(model, id: "#{model.type}_#{model.collaborator_id}"))
+  parse: (response) ->
+    map(response, (model) -> extend(model, id: "#{model.type}_#{model.collaborator_id}"))
 

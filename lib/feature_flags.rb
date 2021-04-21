@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -27,10 +29,10 @@ module FeatureFlags
     false
   end
 
-  def feature_allowed?(feature, exclude_enabled: false)
+  def feature_allowed?(feature)
     flag = lookup_feature_flag(feature)
     return false unless flag
-    exclude_enabled ? flag.allowed? : flag.enabled? || flag.allowed?
+    flag.enabled? || flag.can_override?
   end
 
   def set_feature_flag!(feature, state)
@@ -44,15 +46,15 @@ module FeatureFlags
   end
 
   def allow_feature!(feature)
-    set_feature_flag!(feature, 'allowed')
+    set_feature_flag!(feature, Feature::STATE_DEFAULT_OFF)
   end
 
   def enable_feature!(feature)
-    set_feature_flag!(feature, 'on')
+    set_feature_flag!(feature, Feature::STATE_ON)
   end
 
   def disable_feature!(feature)
-    set_feature_flag!(feature, 'off')
+    set_feature_flag!(feature, Feature::STATE_OFF)
   end
 
   def reset_feature!(feature)
@@ -69,12 +71,22 @@ module FeatureFlags
 
   # return the feature flag for the given feature that is defined on this object, if any.
   # (helper method.  use lookup_feature_flag to test policy.)
-  def feature_flag(feature)
-    RequestCache.cache("feature_flag", self, feature) do
-      self.shard.activate do
-        result = feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
-          self.feature_flags.where(feature: feature.to_s).first
+  def feature_flag(feature, skip_cache: false)
+    return nil unless self.id
+
+    self.shard.activate do
+      if self.feature_flags.loaded?
+        self.feature_flags.detect{|ff| ff.feature == feature.to_s}
+      elsif skip_cache
+        self.feature_flags.where(feature: feature.to_s).first
+      else
+        result = RequestCache.cache("feature_flag", self, feature) do
+          feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
+            # keep have the context association unloaded in case we can't marshal it
+            FeatureFlag.where(feature: feature.to_s).polymorphic_where(:context => self).first
+          end
         end
+        result.context = self if result
         result
       end
     end
@@ -84,10 +96,12 @@ module FeatureFlags
   # starting with site admin
   def feature_flag_account_ids
     return [Account.site_admin.global_id] if is_a?(User)
+    return [] if self.is_a?(Account) && self.site_admin?
 
+    cache = self.is_a?(Account) && root_account? ? MultiCache.cache : Rails.cache
     RequestCache.cache('feature_flag_account_ids', self) do
       shard.activate do
-        Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
+        cache.fetch(['feature_flag_account_ids', self].cache_key) do
           chain = account_chain(include_site_admin: true)
           chain.shift if is_a?(Account)
           chain.reverse.map(&:global_id)
@@ -98,14 +112,14 @@ module FeatureFlags
 
   # find the feature flag setting that applies to this object
   # it may be defined on the object or inherited
-  def lookup_feature_flag(feature, override_hidden = false)
+  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, hide_inherited_enabled: false, inherited_only: false)
     feature = feature.to_s
     feature_def = Feature.definitions[feature]
     raise "no such feature - #{feature}" unless feature_def
     return nil unless feature_def.applies_to_object(self)
 
     return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
-    return feature_def unless feature_def.allowed? || feature_def.hidden?
+    return return_flag(feature_def, hide_inherited_enabled) unless feature_def.can_override? || feature_def.hidden?
 
     is_root_account = self.is_a?(Account) && self.root_account?
     is_site_admin = self.is_a?(Account) && self.site_admin?
@@ -114,7 +128,7 @@ module FeatureFlags
     retval = feature_def.clone_for_cache unless feature_def.hidden? && !is_site_admin && !override_hidden
 
     @feature_flag_cache ||= {}
-    return @feature_flag_cache[feature] if @feature_flag_cache.key?(feature)
+    return return_flag(@feature_flag_cache[feature], hide_inherited_enabled) if @feature_flag_cache.key?(feature) && !inherited_only
 
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
@@ -125,27 +139,48 @@ module FeatureFlags
       account.readonly!
       account
     end
-    (accounts + [self]).each do |context|
-      flag = context.feature_flag(feature)
+
+    all_contexts = (accounts + [self]).uniq
+    all_contexts -= [self] if inherited_only
+    all_contexts.each_with_index do |context, idx|
+      flag = context.feature_flag(feature, skip_cache: context == self && skip_cache)
       next unless flag
       retval = flag
-      break unless flag.allowed?
+      break unless flag.can_override?
     end
 
     # if this feature requires root account opt-in, reject a default or site admin flag
     # if the context is beneath a root account
-    if retval && (retval.allowed? || retval.hidden?) && feature_def.root_opt_in && !is_site_admin &&
+    if retval && (retval.state == Feature::STATE_DEFAULT_OFF || retval.hidden?) && feature_def.root_opt_in && !is_site_admin &&
         (retval.default? || retval.context_type == 'Account' && retval.context_id == Account.site_admin.id)
       if is_root_account
-        # create a virtual feature flag in "off" state
+        # create a virtual feature flag in corresponding default state state
         retval = self.feature_flags.temp_record feature: feature, state: 'off' unless retval.hidden?
       else
         # the feature doesn't exist beneath the root account until the root account opts in
-        return @feature_flag_cache[feature] = nil
+        if inherited_only
+          return nil
+        else
+          return @feature_flag_cache[feature] = nil
+        end
       end
     end
 
-    @feature_flag_cache[feature] = retval
+    @feature_flag_cache[feature] = retval unless inherited_only
+    return_flag(retval, hide_inherited_enabled)
+  end
+
+  def return_flag(retval, hide_inherited_enabled)
+    return nil unless retval
+
+    unless hide_inherited_enabled && retval.enabled? && !retval.can_override? && (
+      # Hide feature flag configs if they belong to a different context
+      (!retval.default? && (retval.context_type != self.class.name || retval.context_id != self.id)) ||
+      # Hide flags that are forced on in config as well
+      retval.default?
+    )
+      retval
+    end
   end
 end
 

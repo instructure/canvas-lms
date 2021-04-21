@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t :page_title, "Canvas Plugins" %><% end %>
+<% provide :page_title do %><%= t :page_title, "Canvas Plugins" %><% end %>
 
 <%
   add_crumb t('#crumbs.plugins', "Plugins")

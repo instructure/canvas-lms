@@ -15,30 +15,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/accounts/user'
-], (Backbone, template) ->
+import Backbone from 'Backbone'
+import template from 'jst/accounts/user'
 
-  class UserView extends Backbone.View
+export default class UserView extends Backbone.View
 
-    tagName: 'tr'
+  tagName: 'tr'
 
-    className: 'rosterUser al-hover-container'
+  className: 'rosterUser al-hover-container'
 
-    template: template
+  template: template
 
-    events:
-      'click': 'click'
+  events:
+    'click': 'click'
 
-    attach: ->
-      @model.collection.on 'selectedModelChange', @changeSelection
+  attach: ->
+    @model.collection.on 'selectedModelChange', @changeSelection
 
-    click: (e) =>
-      e.preventDefault()
-      @model.collection.trigger('selectedModelChange', @model)
+  click: (e) =>
+    e.preventDefault()
+    @model.collection.trigger('selectedModelChange', @model)
 
-    changeSelection: (u) =>
-      if u == @model
-        setTimeout((() => @$el.addClass('selected')), 0)
+  changeSelection: (u) =>
+    if u == @model
+      setTimeout((() => @$el.addClass('selected')), 0)
 

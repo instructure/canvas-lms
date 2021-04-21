@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -204,5 +206,9 @@ YAML
 
   it "dumps and loads singletons" do
     expect(YAML.load(YAML.dump(Mime::NullType.instance))).to eq Mime::NullType.instance
+  end
+
+  it "restores default value on sets on load" do
+    expect(YAML.unsafe_load(YAML.dump(Set.new)).include?("test")).to eq false
   end
 end

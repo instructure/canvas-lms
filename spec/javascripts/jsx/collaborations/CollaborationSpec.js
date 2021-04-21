@@ -124,9 +124,7 @@ test('has an edit button that links to the proper url', () => {
   const editIcon = TestUtils.findRenderedDOMComponentWithClass(component, 'icon-edit')
   ok(
     ReactDOM.findDOMNode(editIcon).href.includes(
-      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${
-        props.collaboration.id
-      }&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`
+      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${props.collaboration.id}&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`
     )
   )
 })

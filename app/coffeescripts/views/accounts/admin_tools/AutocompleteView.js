@@ -19,40 +19,34 @@ import Backbone from 'Backbone'
 import $ from 'jquery'
 import template from 'jst/accounts/admin_tools/autocomplete'
 import 'jqueryui/autocomplete'
+import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
-export default class AutocompleteView extends Backbone.View {
-  static initClass() {
-    this.prototype.template = template
+_inherits(AutocompleteView, Backbone.View)
 
-    this.prototype.els = {
-      '[data-name=autocomplete_search_term]': '$searchTerm',
-      '[data-name=autocomplete_search_value]': '$searchValue'
-    }
-  }
+export default function AutocompleteView(options) {
+  this.options = options
+  this.collection = this.options.collection
+  Backbone.View.apply(this, arguments)
 
-  constructor(options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.options = options
-    this.collection = this.options.collection
-    super(...arguments)
+  if (!this.options.minLength) this.options.minLength = 3
+  if (!this.options.labelProperty) this.options.labelProperty = 'name'
+  if (!this.options.valueProperty) this.options.valueProperty = 'id'
+  if (!this.options.fieldName) this.options.fieldName = this.options.valueProperty
+  if (!this.options.placeholder) this.options.placeholder = this.options.fieldName
+  if (!this.options.sourceParameters) this.options.sourceParameters = {}
+}
 
-    if (!this.options.minLength) this.options.minLength = 3
-    if (!this.options.labelProperty) this.options.labelProperty = 'name'
-    if (!this.options.valueProperty) this.options.valueProperty = 'id'
-    if (!this.options.fieldName) this.options.fieldName = this.options.valueProperty
-    if (!this.options.placeholder) this.options.placeholder = this.options.fieldName
-    if (!this.options.sourceParameters) this.options.sourceParameters = {}
-  }
+Object.assign(AutocompleteView.prototype, {
+  template,
+
+  els: {
+    '[data-name=autocomplete_search_term]': '$searchTerm',
+    '[data-name=autocomplete_search_value]': '$searchValue'
+  },
 
   toJSON() {
     return this.options
-  }
+  },
 
   afterRender() {
     return this.$searchTerm.autocomplete({
@@ -61,7 +55,7 @@ export default class AutocompleteView extends Backbone.View {
       source: $.proxy(this.autocompleteSource, this),
       change: $.proxy(this.autocompleteSelect, this)
     })
-  }
+  },
 
   autocompleteSource(request, response) {
     this.$searchTerm.addClass('loading')
@@ -81,7 +75,7 @@ export default class AutocompleteView extends Backbone.View {
     }
 
     return this.collection.fetch(params).success($.proxy(success, this))
-  }
+  },
 
   autocompleteSelect(event, ui) {
     if (ui.item && ui.item.value) {
@@ -90,5 +84,4 @@ export default class AutocompleteView extends Backbone.View {
       return this.$searchValue.val(null)
     }
   }
-}
-AutocompleteView.initClass()
+})

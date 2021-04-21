@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!roster'
+import I18n from 'i18n!RosterDialogMixin'
 import _ from 'underscore'
 import 'jquery.disableWhileLoading'
 
@@ -30,9 +30,9 @@ const RosterDialogMixin = {
     let enrollments = this.model.get('enrollments')
     enrollments = enrollments.concat(addEnrollments)
     const removeIds = _.pluck(removeEnrollments, 'id')
-    enrollments = _.reject(enrollments, en => _.include(removeIds, en.id))
+    enrollments = _.reject(enrollments, en => _.includes(removeIds, en.id))
     const sectionIds = _.pluck(enrollments, 'course_section_id')
-    const sections = _.select(ENV.SECTIONS, s => _.include(sectionIds, s.id))
+    const sections = _.filter(ENV.SECTIONS, s => _.includes(sectionIds, s.id))
     return this.model.set({enrollments, sections})
   }
 }

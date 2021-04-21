@@ -33,7 +33,7 @@ const defaultProps = () => ({
   removedAssociations: [],
   onRemoveAssociations: () => {},
   isLoadingAssociations: false,
-  focusManager,
+  focusManager
 })
 
 test('renders the AssociationsTable component', () => {
@@ -45,18 +45,32 @@ test('renders the AssociationsTable component', () => {
 test('displays correct table data', () => {
   const props = defaultProps()
   const tree = enzyme.mount(<AssociationsTable {...props} />)
-  const rows = tree.find('.bca-associations__course-row')
+  const rows = tree.find('tr[data-testid="associations-course-row"]')
 
   equal(rows.length, props.existingAssociations.length)
-  equal(rows.at(0).find('td').at(0).text(), props.existingAssociations[0].name)
-  equal(rows.at(1).find('td').at(0).text(), props.existingAssociations[1].name)
+  equal(
+    rows
+      .at(0)
+      .find('td')
+      .at(0)
+      .text(),
+    props.existingAssociations[0].name
+  )
+  equal(
+    rows
+      .at(1)
+      .find('td')
+      .at(0)
+      .text(),
+    props.existingAssociations[1].name
+  )
 })
 
 test('calls onRemoveAssociations when association remove button is clicked', () => {
   const props = defaultProps()
   props.onRemoveAssociations = sinon.spy()
   const tree = enzyme.mount(<AssociationsTable {...props} />)
-  const button = tree.find('.bca-associations__course-row form')
+  const button = tree.find('tr[data-testid="associations-course-row"] form')
   button.at(0).simulate('submit')
 
   equal(props.onRemoveAssociations.callCount, 1)

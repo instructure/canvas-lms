@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,14 +30,14 @@ describe "/quizzes/quizzes/show" do
     expect(response).not_to be_nil
   end
 
-  it "should render a notice instead of grades if muted" do
+  it "should render a notice instead of grades when grades have not been posted" do
     course_with_student(:active_all => true)
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
     quiz.save!
     quiz.reload
-    quiz.assignment.mute!
-    quiz.assignment.grade_student(@student, grade: 5, grader: @teacher)
+    quiz.assignment.ensure_post_policy(post_manually: true)
+    quiz.assignment.grade_student(@student, grade: 5, grader: @teacher).first
     submission = quiz.quiz_submissions.create
     submission.score = 5
     submission.user = @student
@@ -98,7 +100,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     render "quizzes/quizzes/show"
 
-    doc = Nokogiri::HTML(response)
+    doc = Nokogiri::HTML5(response)
     doc.css(".control-group .controls .value").each do |node|
         expect(node.content).not_to include("#{points}") if node.parent.parent.content.include? "Points"
     end
@@ -111,6 +113,36 @@ describe "/quizzes/quizzes/show" do
     render 'quizzes/quizzes/show'
     expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
     expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
+  end
+
+  it 'should not render direct share menu options for students' do
+    course_with_student(active_all: true)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML5(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
+  end
+
+  it 'should render direct share menu options for user with :read_as_admin, even without manage permission' do
+    @account = Account.default
+    @role = custom_teacher_role('No Manage')
+    @account.role_overrides.create!(permission: :manage_assignments, role: @role, enabled: false)
+    course_with_teacher(active_all: true, role: @role)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML5(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
+  end
+
+  it 'renders direct share menu items when enabled with permission' do
+    course_with_teacher(active_all: true)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML5(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
   end
 
   it 'should render student partial for students' do
@@ -130,7 +162,7 @@ describe "/quizzes/quizzes/show" do
     quiz.workflow_state = 'available'
     quiz.save!
     quiz.reload
-    quiz.assignment.mute!
+    quiz.assignment.ensure_post_policy(post_manually: true)
     quiz.assignment.grade_student(@student, grade: 5, grader: @teacher)
     submission = quiz.quiz_submissions.create
     submission.score = 5
@@ -147,4 +179,3 @@ describe "/quizzes/quizzes/show" do
     expect(response).to include 'preview of the draft version'
   end
 end
-

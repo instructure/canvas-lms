@@ -18,21 +18,48 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const PeopleTray = () => (
   <TutorialTrayContent
     heading={I18n.t('People')}
-    subheading={I18n.t('Add Students, TAs, and Observers to your course')}
-    image="/images/tutorial-tray-images/people.svg"
-  >
-    <Text as="p">
+    subheading={I18n.t('Know your users')}
+    image="/images/tutorial-tray-images/Panda_People.svg"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
       {
-        I18n.t('Manage enrollment status, create groups, and add users from this page.')
+        label: I18n.t('How do I use the People page in a course as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667'
+      },
+      {
+        label: I18n.t('How do I add users to a course?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119'
+      },
+      {
+        label: I18n.t('How do I view a context card for a student in a course?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608'
+      },
+      {
+        label: I18n.t('How do I view user details for an enrollment in a course?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216'
       }
-    </Text>
+    ]}
+  >
+    {I18n.t(
+      `What's a class without people to take and lead it? The People page
+      shows the list of users in your course. Depending on your permissions,
+      you may be able to add students, teacher assistants, and observers to
+      your course. You can also create student groups to house group assignments,
+      discussions, and files.`
+    )}
   </TutorialTrayContent>
-);
+)
 
 export default PeopleTray

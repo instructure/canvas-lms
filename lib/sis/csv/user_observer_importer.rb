@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ module SIS
       end
 
       def self.identifying_fields
-        %w[observer_id].freeze
+        %w[observer_id student_id].freeze
       end
 
       # possible columns:

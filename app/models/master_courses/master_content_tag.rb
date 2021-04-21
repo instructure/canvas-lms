@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -18,6 +20,11 @@
 class MasterCourses::MasterContentTag < ActiveRecord::Base
   # i want to get off content tag's wild ride
 
+  # stores restriction data on the blueprint side
+  # i.e. which objects are locked and what parts
+  # and makes for easy restriction lookup from the associated course side via matching migration_id columns
+  # NOTE: this fact means that locking/unlocking an object takes immediate effect (and is independent of syncs)
+
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :content, polymorphic: [:assessment_question_bank,
                                      :assignment,
@@ -32,18 +39,24 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :wiki_page,
                                      quiz: 'Quizzes::Quiz'
   ]
+  belongs_to :root_account, :class_name => 'Account'
   validates_with MasterCourses::TagValidator
 
   serialize :restrictions, Hash
   validate :require_valid_restrictions
 
   before_create :set_migration_id
+  before_create :set_root_account_id
 
   before_save :mark_touch_content_if_restrictions_tightened
   after_save :touch_content_if_restrictions_tightened
 
   def set_migration_id
     self.migration_id = self.master_template.migration_id_for(self.content)
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.master_template.root_account_id
   end
 
   def require_valid_restrictions

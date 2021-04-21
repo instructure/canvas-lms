@@ -16,70 +16,74 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DynamicUiManager} from '../../manager';
+import {DynamicUiManager} from '../../manager'
 
-export function mockRegistryEntry (ids, name, date) {
+export function mockRegistryEntry(ids, name, date) {
   return {
     componentIds: ids,
-    component: mockComponent(name, date),
-  };
+    component: mockComponent(name, date)
+  }
 }
 
-export function mockApp () {
+export function mockApp() {
   return {
-    fixedElementForItemScrolling: jest.fn(),
-  };
+    fixedElementForItemScrolling: jest.fn()
+  }
 }
 
-export function mockDocument () {
+export function mockDocument() {
   return {
     activeElement: 'active-element',
     querySelector: jest.fn(),
-    body: {},
-  };
+    body: {}
+  }
 }
 
 export function mockComponent(name, date) {
   return {
     getFocusable: jest.fn(() => `${name}-focusable`),
     getScrollable: jest.fn(() => `${name}-scrollable`),
-    props: {date},
-  };
+    props: {date}
+  }
 }
 
-export function mockRegistry () {
+export function mockRegistry() {
   return {
     getComponent: jest.fn(),
     getLastComponent: jest.fn(),
     getAllNewActivityIndicatorsSorted: jest.fn(),
-    getAllItemsSorted: jest.fn(),
-  };
+    getAllItemsSorted: jest.fn()
+  }
 }
 
-export function mockAnimator () {
+export function mockAnimator() {
   return {
     getWindow: jest.fn(() => window),
     focusElement: jest.fn(),
     elementPositionMemo: jest.fn(),
     maintainViewportPositionFromMemo: jest.fn(),
-    scrollTo: jest.fn(((scrollable, offset, callback) => {callback && callback()})),
-    forceScrollTo: jest.fn(((scrollable, offset, callback) => {callback && callback()})),
+    scrollTo: jest.fn((scrollable, offset, callback) => {
+      callback && callback()
+    }),
+    forceScrollTo: jest.fn((scrollable, offset, callback) => {
+      callback && callback()
+    }),
     scrollToTop: jest.fn(),
     isAboveScreen: jest.fn(),
     isBelowScreen: jest.fn(),
     isOnScreen: jest.fn(),
-    isOffScreen: jest.fn(),
-  };
+    isOffScreen: jest.fn()
+  }
 }
 
-export function mockStore () {
+export function mockStore() {
   return {
     getState: jest.fn(),
-    dispatch: jest.fn(),
-  };
+    dispatch: jest.fn()
+  }
 }
 
-export function mockManager () {
+export function mockManager() {
   return {
     registry: mockRegistry(),
     animator: mockAnimator(),
@@ -87,19 +91,33 @@ export function mockManager () {
     app: mockApp(),
     document: mockDocument(),
 
-    getRegistry () { return this.registry; },
-    getAnimator () { return this.animator; },
-    getStore () { return this.store; },
-    getApp () { return this.app; },
-    getDocument () { return this.document; },
-    getStickyOffset () { return 34; },
-    totalOffset () { return 42; },
-  };
+    getRegistry() {
+      return this.registry
+    },
+    getAnimator() {
+      return this.animator
+    },
+    getStore() {
+      return this.store
+    },
+    getApp() {
+      return this.app
+    },
+    getDocument() {
+      return this.document
+    },
+    getStickyOffset() {
+      return 34
+    },
+    totalOffset() {
+      return 42
+    }
+  }
 }
 
-export function createAnimation (AnimationClass) {
-  const manager = mockManager();
-  const expectedActions = DynamicUiManager.expectedActionsFor(AnimationClass);
-  const animation = new AnimationClass(expectedActions, manager);
-  return {animation, manager, ...manager};
+export function createAnimation(AnimationClass) {
+  const manager = mockManager()
+  const expectedActions = DynamicUiManager.expectedActionsFor(AnimationClass)
+  const animation = new AnimationClass(expectedActions, manager)
+  return {animation, manager, ...manager}
 }

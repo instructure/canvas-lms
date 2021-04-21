@@ -31,6 +31,7 @@
 }
 
 .ToDoSidebarItem__Info {
+  min-width: 0;
   flex: 1;
   padding: direction-sides(0 $ic-sp / 2 0 $ic-sp * 0.75);
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ module Quizzes::LogAuditing
     EVENT_TYPE = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
     RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/
     SQL_FIND_PREDECESSORS = (
-      <<-SQL
+      <<~SQL
             created_at >= :started_at
         AND created_at <= :created_at
         AND quiz_submission_id = :quiz_submission_id

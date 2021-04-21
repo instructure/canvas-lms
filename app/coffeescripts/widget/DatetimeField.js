@@ -26,10 +26,41 @@ import moment from 'moment'
 import 'jquery.instructure_date_and_time'
 import '../jquery.rails_flash_notifications'
 
+const datepickerDefaults = {
+  constrainInput: false,
+  dateFormat: datePickerFormat(I18n.lookup('date.formats.medium')),
+  showOn: 'button',
+  buttonText: '<i class="icon-calendar-month"></i>',
+  buttonImageOnly: false,
+  disableButton: false,
+
+  // localization values understood by $.datepicker
+  isRTL: isRTL(),
+  get prevText() {
+    return I18n.t('prevText', 'Prev')
+  }, // title text for previous month icon
+  get nextText() {
+    return I18n.t('nextText', 'Next')
+  }, // title text for next month icon
+  monthNames: I18n.lookup('date.month_names').slice(1), // names of months
+  monthNamesShort: I18n.lookup('date.abbr_month_names').slice(1), // abbreviated names of months
+  dayNames: I18n.lookup('date.day_names'), // title text for column headings
+  dayNamesShort: I18n.lookup('date.abbr_day_names'), // title text for column headings
+  dayNamesMin: I18n.lookup('date.datepicker.column_headings'), // column headings for days (Sunday = 0)
+  get firstDay() {
+    return I18n.t('first_day_index', '0')
+  }, // first day of the week (Sun = 0)
+  get showMonthAfterYear() {
+    return I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y'
+  } // "month year" or "year month"
+}
+
 // adds datepicker and suggest functionality to the specified $field
 export default class DatetimeField {
-  constructor ($field, options = {}) {
-    ['alertScreenreader', 'setFromValue', 'setDatetime', 'setTime', 'setDate'].forEach(m => this[m] = this[m].bind(this))
+  constructor($field, options = {}) {
+    ;['alertScreenreader', 'setFromValue', 'setDatetime', 'setTime', 'setDate'].forEach(
+      m => (this[m] = this[m].bind(this))
+    )
     let $wrapper
     this.$field = $field
     this.$field.data({instance: this})
@@ -54,7 +85,7 @@ export default class DatetimeField {
     this.setFromValue()
   }
 
-  processTimeOptions (options) {
+  processTimeOptions(options) {
     // default undefineds to false
     let {timeOnly, dateOnly} = options
     const {alwaysShowTime} = options
@@ -74,16 +105,21 @@ export default class DatetimeField {
     this.alwaysShowTime = this.allowTime && (timeOnly || alwaysShowTime)
   }
 
-  addDatePicker (options) {
+  addDatePicker(options) {
     this.$field.wrap('<div class="input-append" />')
     const $wrapper = this.$field.parent('.input-append')
     if (!this.isReadonly()) {
-      const datepickerOptions = $.extend({}, this.datepickerDefaults(), {
-        timePicker: this.allowTime,
-        beforeShow: () => this.$field.trigger('detachTooltip'),
-        onClose: () => this.$field.trigger('reattachTooltip'),
-        firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek(),
-      }, options.datepicker)
+      const datepickerOptions = $.extend(
+        {},
+        this.datepickerDefaults(),
+        {
+          timePicker: this.allowTime,
+          beforeShow: () => this.$field.trigger('detachTooltip'),
+          onClose: () => this.$field.trigger('reattachTooltip'),
+          firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek()
+        },
+        options.datepicker
+      )
       this.$field.datepicker(datepickerOptions)
 
       // TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
@@ -95,7 +131,7 @@ export default class DatetimeField {
     return $wrapper
   }
 
-  addSuggests ($sibling, options = {}) {
+  addSuggests($sibling, options = {}) {
     if (this.isReadonly()) return
     this.courseTimezone = options.courseTimezone || ENV.CONTEXT_TIMEZONE
     this.$suggest = $('<div class="datetime_suggest" />').insertAfter($sibling)
@@ -104,7 +140,7 @@ export default class DatetimeField {
     }
   }
 
-  addHiddenInput () {
+  addHiddenInput() {
     this.$hiddenInput = $('<input type="hidden">').insertAfter(this.$field)
     this.$hiddenInput.attr('name', this.$field.attr('name'))
     this.$hiddenInput.val(this.$field.val())
@@ -113,7 +149,7 @@ export default class DatetimeField {
   }
 
   // public API
-  setDate (date) {
+  setDate(date) {
     if (!this.showDate) {
       this.implicitDate = date
       return this.setFromValue()
@@ -122,21 +158,21 @@ export default class DatetimeField {
     }
   }
 
-  setTime (date) {
+  setTime(date) {
     return this.setFormattedDatetime(date, 'time.formats.tiny')
   }
 
-  setDatetime (date) {
+  setDatetime(date) {
     return this.setFormattedDatetime(date, 'date.formats.full')
   }
 
   // private API
-  setFromValue () {
+  setFromValue() {
     this.parseValue()
     this.update()
   }
 
-  normalizeValue (value) {
+  normalizeValue(value) {
     if (value == null) return value
 
     // trim leading/trailing whitespace
@@ -166,7 +202,7 @@ export default class DatetimeField {
     }
   }
 
-  parseValue () {
+  parseValue() {
     const value = this.normalizeValue(this.$field.val())
     this.datetime = tz.parse(value)
     if (this.datetime && !this.showDate && this.implicitDate) {
@@ -178,7 +214,7 @@ export default class DatetimeField {
     this.invalid = !this.blank && this.datetime === null
   }
 
-  setFormattedDatetime (datetime, format) {
+  setFormattedDatetime(datetime, format) {
     if (datetime) {
       this.blank = false
       this.datetime = datetime
@@ -195,14 +231,14 @@ export default class DatetimeField {
     this.update()
   }
 
-  update (updates) {
+  update(updates) {
     this.updateData()
     this.updateSuggest()
     this.updateAria()
   }
 
-  updateData () {
-    const iso8601 = this.datetime && this.datetime.toISOString() || ''
+  updateData() {
+    const iso8601 = (this.datetime && this.datetime.toISOString()) || ''
     this.$field.data({
       'unfudged-date': this.datetime,
       date: this.fudged,
@@ -222,24 +258,24 @@ export default class DatetimeField {
       this.$field.data({
         'time-hour': null,
         'time-minute': null,
-        'time-ampm': null,
+        'time-ampm': null
       })
     } else if (tz.useMeridian()) {
       this.$field.data({
         'time-hour': tz.format(this.datetime, '%-l'),
         'time-minute': tz.format(this.datetime, '%M'),
-        'time-ampm': tz.format(this.datetime, '%P'),
+        'time-ampm': tz.format(this.datetime, '%P')
       })
     } else {
       this.$field.data({
         'time-hour': tz.format(this.datetime, '%-k'),
         'time-minute': tz.format(this.datetime, '%M'),
-        'time-ampm': null,
+        'time-ampm': null
       })
     }
   }
 
-  updateSuggest () {
+  updateSuggest() {
     if (this.isReadonly()) return
 
     let localText = this.formatSuggest()
@@ -256,7 +292,7 @@ export default class DatetimeField {
     this.$suggest.toggleClass('invalid_datetime', this.invalid).text(localText)
   }
 
-  alertScreenreader () {
+  alertScreenreader() {
     // only alert if the value in the field changed (e.g. don't alert on arrow
     // keys). not debouncing around alertScreenreader itself, because if so,
     // the retrieval of val() here gets delayed and can do weird stuff while
@@ -268,11 +304,11 @@ export default class DatetimeField {
     }
   }
 
-  updateAria () {
+  updateAria() {
     this.$field.attr('aria-invalid', !!this.invalid)
   }
 
-  formatSuggest () {
+  formatSuggest() {
     if (this.blank) {
       return ''
     } else if (this.invalid) {
@@ -282,7 +318,7 @@ export default class DatetimeField {
     }
   }
 
-  formatSuggestCourse () {
+  formatSuggestCourse() {
     if (this.blank) {
       return ''
     } else if (this.invalid) {
@@ -294,7 +330,7 @@ export default class DatetimeField {
     }
   }
 
-  formatString () {
+  formatString() {
     if (this.showDate && this.showTime) {
       return I18n.t('#date.formats.full_with_weekday')
     } else if (this.showDate) {
@@ -304,35 +340,23 @@ export default class DatetimeField {
     }
   }
 
-  isReadonly () {
+  isReadonly() {
     return !!this.$field.attr('readonly')
   }
 
-  datepickerDefaults () {
-    return {
-      constrainInput: false,
-      dateFormat: datePickerFormat(I18n.lookup('date.formats.medium')),
-      showOn: 'button',
-      buttonText: '<i class="icon-calendar-month"></i>',
-      buttonImageOnly: false,
-      disableButton: false,
+  datepickerDefaults() {
+    return datepickerDefaults
+  }
 
-      // localization values understood by $.datepicker
-      isRTL: isRTL(),
-      prevText: I18n.t('prevText', 'Prev'), // title text for previous month icon
-      nextText: I18n.t('nextText', 'Next'), // title text for next month icon
-      monthNames: I18n.lookup('date.month_names').slice(1), // names of months
-      monthNamesShort: I18n.lookup('date.abbr_month_names').slice(1), // abbreviated names of months
-      dayNames: I18n.lookup('date.day_names'), // title text for column headings
-      dayNamesShort: I18n.lookup('date.abbr_day_names'), // title text for column headings
-      dayNamesMin: I18n.lookup('date.datepicker.column_headings'), // column headings for days (Sunday = 0)
-      firstDay: I18n.t('first_day_index', '0'), // first day of the week (Sun = 0)
-      showMonthAfterYear: I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y' // "month year" or "year month"
-    }
+  get parseError() {
+    return I18n.t('errors.not_a_date', "That's not a date!")
+  }
+
+  get courseLabel() {
+    return `${I18n.t('#helpers.course', 'Course')}: `
+  }
+
+  get localLabel() {
+    return `${I18n.t('#helpers.local', 'Local')}: `
   }
 }
-
-
-DatetimeField.prototype.parseError = I18n.t('errors.not_a_date', "That's not a date!")
-DatetimeField.prototype.courseLabel = `${I18n.t('#helpers.course', 'Course')}: `
-DatetimeField.prototype.localLabel = `${I18n.t('#helpers.local', 'Local')}: `

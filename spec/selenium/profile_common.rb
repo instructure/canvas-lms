@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ shared_examples 'profile_settings_page' do |context|
   it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
     enable_avatars(false)
     get "/profile/settings"
-    driver.mouse.move_to f('.avatar.profile_pic_link.none')
+    driver.action.move_to(f('.avatar.profile_pic_link.none')).perform
     wait_for_ajaximations
 
     # We want to make sure the tooltip is displayed,
@@ -47,7 +49,7 @@ shared_examples 'profile_user_about_page' do |context|
     enable_avatars(false)
     get "/about/#{@user.id}"
 
-    driver.mouse.move_to f('.avatar.profile-link')
+    driver.action.move_to(f('.avatar.profile-link')).perform
     wait_for_ajaximations
 
     # We are checking the title in this tooltip like we do in the one above,
@@ -60,6 +62,7 @@ shared_examples 'user settings page change pic window' do |context|
   include SharedExamplesCommon
 
   it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+    skip('ADMIN-2680')
     enable_avatars(true)
     get '/profile/settings'
 

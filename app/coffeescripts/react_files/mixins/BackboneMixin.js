@@ -40,7 +40,7 @@ function subscribe(component, modelOrCollection, customChangeOptions) {
   if (!modelOrCollection) return
   const behavior =
     modelOrCollection instanceof Backbone.Collection ? collectionBehavior : modelBehavior
-  const triggerUpdate = behavior.updateScheduler(function() {
+  const triggerUpdate = behavior.updateScheduler(() => {
     if (component.isMounted()) {
       return (component.onModelChange || component.forceUpdate).call(component)
     }

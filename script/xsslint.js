@@ -22,7 +22,7 @@ const globby = require('gglobby')
 const fs = require('fs')
 const CoffeeScript = require('coffee-script')
 const glob = require('glob')
-const babylon = require('babylon')
+const babylon = require('@babel/parser')
 
 XSSLint.configure({
   'xssable.receiver.whitelist': ['formData'],
@@ -137,7 +137,13 @@ allPaths.forEach(({paths, glob, defaultIgnores = ['**/__tests__/**/*.js'], trans
       let source = fs.readFileSync(file).toString()
       if (transform) source = transform(source)
       source = babylon.parse(source, {
-        plugins: ['jsx', 'classProperties', 'objectRestSpread', 'dynamicImport'],
+        plugins: [
+          'jsx',
+          'classProperties',
+          'objectRestSpread',
+          'dynamicImport',
+          'optionalChaining'
+        ],
         sourceType: 'module'
       })
       const warnings = XSSLint.run({source})

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -46,16 +48,15 @@ describe LatePolicyApplicator do
     end
 
     it 'kicks off a singleton background job with an identifier based on the course id' do
-      queueing_args = [
-        :process,
+      queueing_args = {
         singleton: "late_policy_applicator:calculator:Course:#{@course.global_id}"
-      ]
+      }
 
       applicator_double = instance_double('LatePolicyApplicator')
       allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
 
-      expect(applicator_double).to receive(:send_later_if_production_enqueue_args).
-        with(*queueing_args)
+      expect(applicator_double).to receive(:delay_if_production).with(**queueing_args).and_return(applicator_double)
+      expect(applicator_double).to receive(:process)
 
       LatePolicyApplicator.for_course(@course)
     end
@@ -110,16 +111,15 @@ describe LatePolicyApplicator do
     end
 
     it 'kicks off a singleton background job with an identifier based on the assignment id' do
-      queueing_args = [
-        :process,
+      queueing_args = {
         singleton: "late_policy_applicator:calculator:Assignment:#{@published_assignment.global_id}"
-      ]
+      }
 
       applicator_double = instance_double('LatePolicyApplicator')
       allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
 
-      expect(applicator_double).to receive(:send_later_if_production_enqueue_args).
-        with(*queueing_args)
+      expect(applicator_double).to receive(:delay_if_production).with(**queueing_args).and_return(applicator_double)
+      expect(applicator_double).to receive(:process)
 
       LatePolicyApplicator.for_assignment(@published_assignment)
     end
@@ -349,6 +349,7 @@ describe LatePolicyApplicator do
         override.assignment_override_students.create!(user: @students[0])
 
         # turn on the late policy without calling callbacks
+        @late_policy = late_policy_factory(course: @course, deduct: 50.0, every: :day, missing: 95.0)
         @course.update_attribute(:late_policy, @late_policy)
 
         late_policy_applicator = LatePolicyApplicator.new(@course, [assignment_to_override])

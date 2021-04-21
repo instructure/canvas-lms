@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -84,12 +86,24 @@ module CC
           ext_node.lticm(:property, tool.domain, 'name' => 'domain') unless tool.domain.blank?
 
           [:selection_width, :selection_height].each do |key|
-            ext_node.lticm(:property, tool.settings[key], 'name' => key) unless tool.settings[key].blank?
+            ext_node.lticm(:property, tool.settings[key], 'name' => key) if tool.settings[key].present?
+          end
+
+          if tool.developer_key_id.present?
+            ext_node.lticm :property, tool.developer_key.global_id, 'name' => 'client_id'
           end
 
           if for_course_copy
             ext_node.lticm :property, tool.consumer_key, 'name' => 'consumer_key'
             ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
+          end
+
+          if (cm_settings = tool.settings[:content_migration]&.with_indifferent_access)
+            ext_node.lticm(:options, 'name' => 'content_migration') do |cm_node|
+              [:export_start_url, :import_start_url, :export_format, :import_format].each do |key|
+                cm_node.lticm(:property, cm_settings[key], 'name' => key.to_s) if cm_settings[key].present?
+              end
+            end
           end
 
           extension_exclusions = [

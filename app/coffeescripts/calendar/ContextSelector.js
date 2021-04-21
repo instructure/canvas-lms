@@ -22,6 +22,7 @@ import I18n from 'i18n!context_sector'
 import contextSelectorTemplate from 'jst/calendar/contextSelector'
 import contextSelectorItemTemplate from 'jst/calendar/contextSelectorItem'
 import preventDefault from '../fn/preventDefault'
+import {publish, subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 class ContextSelectorItem {
   constructor(context) {
@@ -90,7 +91,7 @@ class ContextSelectorItem {
         break
     }
 
-    $.publish('/contextSelector/changed')
+    publish('/contextSelector/changed')
   }
 
   sectionChange = () => {
@@ -147,7 +148,7 @@ export default class ContextSelector {
 
     const $contextsList = this.$menu.find('.ag-contexts')
 
-    $.subscribe('/contextSelector/changed', () =>
+    subscribe('/contextSelector/changed', () =>
       contextsChangedCB(this.selectedContexts(), this.selectedSections())
     )
 

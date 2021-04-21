@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@
 # See Context::CONTEXT_TYPES below.
 module Context
 
-  CONTEXT_TYPES = [:Account, :Course, :User, :Group].freeze
+  CONTEXT_TYPES = [:Account, :Course, :CourseSection, :User, :Group].freeze
 
   ASSET_TYPES = {
       Announcement: :Announcement,
@@ -65,7 +67,7 @@ module Context
       user = entry.user || feed.user
       # If already existed and has been updated
       if entry.entry_changed? && entry.asset
-        entry.asset.update_attributes(
+        entry.asset.update(
           :title => entry.title,
           :message => entry.message
         )
@@ -77,13 +79,13 @@ module Context
         announcement.external_feed_id = feed.id
         announcement.user = user
         announcement.save
-        entry.update_attributes(:asset => announcement)
+        entry.update(:asset => announcement)
       end
     end
   end
 
   def self.sorted_rubrics(user, context)
-    associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
+    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
@@ -100,7 +102,7 @@ module Context
           context_codes << context.asset_string if context
         end
       end
-      associations += RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
+      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
     end
 
     associations = associations.select(&:rubric).uniq{|a| [a.rubric_id, a.context.asset_string] }
@@ -122,7 +124,8 @@ module Context
     possible_types = {
       files: -> { self.respond_to?(:attachments) && self.attachments.active.exists? },
       modules: -> { self.respond_to?(:context_modules) && self.context_modules.active.exists? },
-      quizzes: -> { self.respond_to?(:quizzes) && self.quizzes.active.exists? },
+      quizzes: -> { (self.respond_to?(:quizzes) && self.quizzes.active.exists?) ||
+        (self.respond_to?(:assignments) && self.assignments.active.quiz_lti.exists?) },
       assignments: -> { self.respond_to?(:assignments) && self.assignments.active.exists? },
       pages: -> { self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists? },
       conferences: -> { self.respond_to?(:web_conferences) && self.web_conferences.active.exists? },
@@ -238,6 +241,18 @@ module Context
     nil
   end
 
+  def self.get_front_wiki_page_for_course_from_url(url)
+    params = Rails.application.routes.recognize_path(url)
+    if params[:controller] == "courses" && params[:action] == "show"
+      course = Course.find(params[:id])
+      if course.default_view == "wiki"
+        course.wiki.front_page
+      end
+    end
+  rescue
+    nil
+  end
+
   def self.find_asset_by_url(url)
     object = nil
     params = Rails.application.routes.recognize_path(url)
@@ -245,6 +260,10 @@ module Context
     group = Group.find(params[:group_id]) if params[:group_id]
     user = User.find(params[:user_id]) if params[:user_id]
     context = course || group || user
+
+    media_obj = MediaObject.where(:media_id => params[:media_object_id]).first if params[:media_object_id]
+    context = media_obj.context if media_obj
+
     return nil unless context
     case params[:controller]
     when 'files'
@@ -256,6 +275,24 @@ module Context
       object ||= context.attachments.find_by_id(file_id) # attachments.find_by_id uses the replacement hackery
     when 'wiki_pages'
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
+      if !object && params[:id].to_s.include?("+") # maybe it really is a "+"
+        object = context.wiki.find_page(CGI.unescape(params[:id].to_s.gsub("+", "%2B")), include_deleted: true)
+      end
+    when 'external_tools'
+      if params[:action] == "retrieve"
+        tool_url = CGI.parse(URI.parse(url).query)["url"].first rescue nil
+        object = ContextExternalTool.find_external_tool(tool_url, context) if tool_url
+      elsif params[:id]
+        object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
+      end
+    when 'context_modules'
+      if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
+        object = context.context_module_tags.find_by(id: params[:id])
+      else
+        object = context.context_modules.find_by(id: params[:id])
+      end
+    when 'media_objects'
+      object = media_obj
     else
       object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
     end
@@ -289,6 +326,19 @@ module Context
     end
   end
 
+  def self.get_account_or_parent_account_global_id(context)
+    case context
+    when Account
+      context.root_account? ? context.global_id : context.global_parent_account_id
+    when Course
+      context.global_account_id
+    when CourseSection
+      get_account_or_parent_account_global_id(context.course)
+    when Group
+      get_account_or_parent_account_global_id(context.context)
+    end
+  end
+
   def is_a_context?
     true
   end
@@ -317,5 +367,9 @@ module Context
          .order("updated_at DESC")
          .limit(1)
          .pluck(:updated_at)&.first
+  end
+
+  def resolved_root_account_id
+    self.root_account_id if self.respond_to? :root_account_id
   end
 end

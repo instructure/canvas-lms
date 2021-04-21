@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -35,6 +37,7 @@ class LoadAccount
     Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
     ::Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
     ::LoadAccount.clear_shard_cache
+    Account.current_domain_root_account = nil
   end
 
   def self.clear_shard_cache
@@ -52,5 +55,6 @@ class LoadAccount
 
   def configure_for_root_account(domain_root_account)
     Attachment.current_root_account = domain_root_account
+    Account.current_domain_root_account = domain_root_account
   end
 end

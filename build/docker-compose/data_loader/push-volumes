@@ -5,7 +5,7 @@ publish_vars_path=$2
 echo "pushing to $archive_path"
 for dir in /volumes/*_data; do
   (
-    tar czPf - "$dir"/ | \
+    tar vczPf - "$dir"/ | \
       aws s3 cp --only-show-errors --region "$DOCKER_CACHE_S3_REGION" - "$archive_path/`basename "$dir"`"
   ) &
 done

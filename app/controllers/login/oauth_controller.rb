@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -29,7 +31,7 @@ class Login::OauthController < Login::OauthBaseController
       }
       opts = {}
       opts[oauth_callback: callback_uri] unless request_token.callback_confirmed?
-      redirect_to delegated_auth_redirect_uri(request_token.authorize_url(opts))
+      redirect_to request_token.authorize_url(opts)
     end
   end
 

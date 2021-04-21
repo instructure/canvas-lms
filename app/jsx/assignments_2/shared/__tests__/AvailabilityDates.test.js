@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AvailabilityDates from '../AvailabilityDates'
-import {mockAssignment} from '../../student/test-utils'
+import {mockAssignment} from '../../student/mocks'
 import $ from 'jquery'
 
 beforeAll(() => {
@@ -35,8 +35,8 @@ afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-it('renders nothing if lockAt and unlockAt are null', () => {
-  const assignment = mockAssignment({lockAt: null, unlockAt: null})
+it('renders nothing if lockAt and unlockAt are null', async () => {
+  const assignment = await mockAssignment()
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
     document.getElementById('fixtures')
@@ -45,8 +45,8 @@ it('renders nothing if lockAt and unlockAt are null', () => {
   expect(element.text()).toEqual('')
 })
 
-it('renders correctly if lockAt is set and and unlockAt is null', () => {
-  const assignment = mockAssignment({lockAt: '2016-07-11T23:00:00-00:00', unlockAt: null})
+it('renders correctly if lockAt is set and and unlockAt is null', async () => {
+  const assignment = await mockAssignment({Assignment: {lockAt: '2016-07-11T23:00:00-00:00'}})
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
     document.getElementById('fixtures')
@@ -55,12 +55,12 @@ it('renders correctly if lockAt is set and and unlockAt is null', () => {
 
   // Rendered twice cause one of them is a screenreader only
   const expected =
-    'Available until Jul 11, 2016 11:00pmAvailable until Jul 11, 2016 11:00pm2016-7-11'
+    'Available until Jul 11, 2016 11:00pmAvailable until Jul 11, 2016 11:00pm7/11/2016'
   expect(element.text()).toEqual(expected)
 })
 
-it('renders correctly if unlockAt is set and and lockAt is null', () => {
-  const assignment = mockAssignment({unlockAt: '2016-07-11T23:00:00-00:00', lockAt: null})
+it('renders correctly if unlockAt is set and and lockAt is null', async () => {
+  const assignment = await mockAssignment({Assignment: {unlockAt: '2016-07-11T23:00:00-00:00'}})
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
     document.getElementById('fixtures')
@@ -69,14 +69,13 @@ it('renders correctly if unlockAt is set and and lockAt is null', () => {
 
   // Rendered twice cause one of them is a screenreader only
   const expected =
-    'Available after Jul 11, 2016 11:00pmAvailable after Jul 11, 2016 11:00pm2016-7-11'
+    'Available after Jul 11, 2016 11:00pmAvailable after Jul 11, 2016 11:00pm7/11/2016'
   expect(element.text()).toEqual(expected)
 })
 
-it('renders correctly if unlockAt and lockAt are set', () => {
-  const assignment = mockAssignment({
-    unlockAt: '2016-07-11T23:00:00-00:00',
-    lockAt: '2016-07-15T23:00:00-00:00'
+it('renders correctly if unlockAt and lockAt are set', async () => {
+  const assignment = await mockAssignment({
+    Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'}
   })
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
@@ -86,14 +85,13 @@ it('renders correctly if unlockAt and lockAt are set', () => {
 
   // Rendered twice cause one of them is a screenreader only
   const expected =
-    'Available Jul 11, 2016 11:00pmAvailable Jul 11, 2016 11:00pm2016-7-11 until Jul 15, 2016 11:00pm until Jul 15, 2016 11:00pm2016-7-15'
+    'Available: Jul 11, 2016 11:00pmAvailable: Jul 11, 2016 11:00pm7/11/2016 until Jul 15, 2016 11:00pm until Jul 15, 2016 11:00pm7/15/2016'
   expect(element.text()).toEqual(expected)
 })
 
-it('renders correctly if unlockAt and lockAt are set and rendered in short mode', () => {
-  const assignment = mockAssignment({
-    unlockAt: '2016-07-11T23:00:00-00:00',
-    lockAt: '2016-07-15T23:00:00-00:00'
+it('renders correctly if unlockAt and lockAt are set and rendered in short mode', async () => {
+  const assignment = await mockAssignment({
+    Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'}
   })
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} formatStyle="short" />,
@@ -102,6 +100,6 @@ it('renders correctly if unlockAt and lockAt are set and rendered in short mode'
   const element = $('#fixtures')
 
   // Rendered twice cause one of them is a screenreader only
-  const expected = 'Jul 11Jul 112016-7-11 to Jul 15, 2016 11:00pm to Jul 15, 2016 11:00pm2016-7-15'
+  const expected = 'Jul 11Jul 117/11/2016 to Jul 15 to Jul 157/15/2016'
   expect(element.text()).toEqual(expected)
 })

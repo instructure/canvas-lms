@@ -1,0 +1,2 @@
+onerror|img|src|data-popup-within
+<a class="al-trigger" role="button" href="#" data-popup-within="<img src=x onerror=prompt(document.cookie); />">CORE-2937</a> <div id="wrapper"></div>

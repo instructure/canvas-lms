@@ -22,9 +22,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
 import FocusStore from 'compiled/react_files/modules/FocusStore'
-import openMoveDialog from '../files/utils/openMoveDialog'
+import openMoveDialog from './utils/openMoveDialog'
 import deleteStuff from 'compiled/react_files/utils/deleteStuff'
-import UploadButton from '../files/UploadButton'
+import UploadButton from './UploadButton'
 import classnames from 'classnames'
 import preventDefault from 'compiled/fn/preventDefault'
 import Folder from 'compiled/models/Folder'
@@ -34,13 +34,20 @@ import downloadStuffAsAZip from 'compiled/react_files/utils/downloadStuffAsAZip'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import RestrictedDialogForm from './RestrictedDialogForm'
 import 'compiled/jquery.rails_flash_notifications'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import {ltiState} from '../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class Toolbar extends React.Component {
   static propTypes = {
     currentFolder: customPropTypes.folder, // not required as we don't have it on the first render
     contextType: customPropTypes.contextType.isRequired,
     contextId: customPropTypes.contextId.isRequired,
-    showingSearchResults: PropTypes.bool
+    showingSearchResults: PropTypes.bool,
+    usageRightsRequiredForContext: PropTypes.bool,
+    userCanAddFilesForContext: PropTypes.bool,
+    userCanEditFilesForContext: PropTypes.bool,
+    userCanDeleteFilesForContext: PropTypes.bool,
+    userCanRestrictFilesForContext: PropTypes.bool
   }
 
   componentWillMount() {
@@ -128,6 +135,75 @@ export default class Toolbar extends React.Component {
     page(`/search?search_term=${searchTerm}`)
   }
 
+  renderTrayToolsMenu = () => {
+    if (this.props.indexExternalToolsForContext?.length > 0) {
+      return (
+        <div className="inline-block">
+          <a
+            className="al-trigger btn"
+            id="file_menu_link"
+            role="button"
+            tabIndex="0"
+            title={I18n.t('Files Menu')}
+            aria-label={I18n.t('Files Menu')}
+          >
+            <i className="icon-more" aria-hidden="true" />
+            <span className="screenreader-only">{I18n.t('Files Menu')}</span>
+          </a>
+          <ul className="al-options" role="menu">
+            {this.props.indexExternalToolsForContext.map(tool => (
+              <li key={tool.id} role="menuitem">
+                <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
+                  {this.iconForTrayTool(tool)}
+                  {tool.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div id="external-tool-mount-point" />
+        </div>
+      )
+    }
+  }
+
+  iconForTrayTool(tool) {
+    if (tool.canvas_icon_class) {
+      return <i className={tool.canvas_icon_class} />
+    } else if (tool.icon_url) {
+      return <img className="icon" alt="" src={tool.icon_url} />
+    }
+  }
+
+  onLaunchTrayTool = tool => e => {
+    if (e != null) {
+      e.preventDefault()
+    }
+    this.setExternalToolTray(tool, document.getElementById('file_menu_link'))
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        window.location.reload()
+      }
+    }
+    ReactDOM.render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="file_index_menu"
+        acceptedResourceTypes={['audio', 'document', 'image', 'video']}
+        targetResourceType="document" // maybe this isn't what we want but it's my best guess
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      document.getElementById('external-tool-mount-point')
+    )
+  }
+
   renderUploadAddFolderButtons(canManage) {
     if (this.props.showingSearchResults) {
       return null
@@ -144,20 +220,23 @@ export default class Toolbar extends React.Component {
             className="btn btn-add-folder"
             aria-label={I18n.t('Add Folder')}
           >
-            <i className="icon-plus" />&nbsp;
+            <i className="icon-plus" />
+            &nbsp;
             <span className={phoneHiddenSet}>{I18n.t('Folder')}</span>
           </button>
 
           <UploadButton
             currentFolder={this.props.currentFolder}
-            showingButtons={this.showingButtons}
+            showingButtons={!!this.showingButtons}
             contextId={this.props.contextId}
             contextType={this.props.contextType}
           />
+          {this.renderTrayToolsMenu()}
         </div>
       )
     }
   }
+
   renderDeleteButton(canManage) {
     if (canManage) {
       return (
@@ -178,8 +257,9 @@ export default class Toolbar extends React.Component {
       )
     }
   }
-  renderManageUsageRightsButton() {
-    if (this.props.userCanManageFilesForContext && this.props.usageRightsRequiredForContext) {
+
+  renderManageUsageRightsButton(canManage) {
+    if (canManage) {
       return (
         <button
           ref="usageRightsBtn"
@@ -196,6 +276,7 @@ export default class Toolbar extends React.Component {
       )
     }
   }
+
   renderCopyCourseButton(canManage) {
     if (canManage) {
       return (
@@ -266,7 +347,7 @@ export default class Toolbar extends React.Component {
     }
   }
 
-  renderRestrictedAccessButtons(canManage) {
+  renderManageAccessPermissionsButton(canManage) {
     if (canManage) {
       return (
         <button
@@ -294,10 +375,16 @@ export default class Toolbar extends React.Component {
     const restrictedByMasterCourse = this.props.selectedItems.some(
       item => item.get('restricted_by_master_course') && item.get('is_master_course_child_content')
     )
-    const canManage =
-      this.props.userCanManageFilesForContext &&
-      !submissionsFolderSelected &&
-      !restrictedByMasterCourse
+    const {
+      userCanRestrictFilesForContext,
+      userCanAddFilesForContext,
+      userCanEditFilesForContext,
+      userCanDeleteFilesForContext
+    } = this.props
+
+    const canManage = permission => {
+      return permission && !submissionsFolderSelected && !restrictedByMasterCourse
+    }
 
     this.showingButtons = this.props.selectedItems.length
 
@@ -344,7 +431,7 @@ export default class Toolbar extends React.Component {
             <a
               ref="previewLink"
               href="#"
-              onClick={!selectedItemIsFolder ? preventDefault(() => this.openPreview()) : (() => {})}
+              onClick={!selectedItemIsFolder ? preventDefault(() => this.openPreview()) : () => {}}
               className={viewBtnClasses}
               title={label}
               role="button"
@@ -356,13 +443,13 @@ export default class Toolbar extends React.Component {
               <i className="icon-eye" />
             </a>
 
-            {this.renderRestrictedAccessButtons(
-              canManage && this.props.userCanRestrictFilesForContext
-            )}
+            {this.renderManageAccessPermissionsButton(canManage(userCanRestrictFilesForContext))}
             {this.renderDownloadButton()}
-            {this.renderCopyCourseButton(canManage)}
-            {this.renderManageUsageRightsButton(canManage)}
-            {this.renderDeleteButton(canManage)}
+            {this.renderCopyCourseButton(canManage(userCanEditFilesForContext))}
+            {this.renderManageUsageRightsButton(
+              canManage(userCanEditFilesForContext && this.props.usageRightsRequiredForContext)
+            )}
+            {this.renderDeleteButton(canManage(userCanDeleteFilesForContext))}
           </div>
           <span className="ef-selected-count hidden-tablet hidden-phone">
             {I18n.t(
@@ -370,7 +457,7 @@ export default class Toolbar extends React.Component {
               {count: this.props.selectedItems.length}
             )}
           </span>
-          {this.renderUploadAddFolderButtons(canManage)}
+          {this.renderUploadAddFolderButtons(canManage(userCanAddFilesForContext))}
         </div>
       </header>
     )

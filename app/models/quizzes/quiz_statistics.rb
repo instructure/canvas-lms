@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -37,6 +39,8 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
     self.includes_all_versions ||= false
     self.includes_sis_ids ||= false
   end
+
+  delegate :context, to: :quiz
 
   # Test a given quiz if it's within the sanity limits for generating stats.
   # You should not generate stats for this quiz if this returns true.
@@ -149,5 +153,11 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
         (!includes_sis_ids || quiz.context.grants_any_right?(user, session, :read_sis, :manage_sis))
     end
     can :read
+
+    given do |user, session|
+      quiz.grants_right?(user, session, :read_statistics) &&
+        context.grants_right?(user, session, :manage_files)
+    end
+    can :manage_files
   end
 end

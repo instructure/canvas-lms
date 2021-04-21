@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -55,6 +57,7 @@ module DeveloperKeysRewriteCommon
   def expand_scope_group_by_filter(scope_group, context_id)
     get "/accounts/#{context_id}/developer_keys"
     find_button("Developer Key").click
+    find_button("API Key").click
     click_enforce_scopes
     filter_scopes_by_name(scope_group)
     fj("[data-automation='toggle-scope-group'] span:contains('#{scope_group}')").click

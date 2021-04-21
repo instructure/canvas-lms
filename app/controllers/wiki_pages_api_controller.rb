@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -165,7 +167,7 @@ class WikiPagesApiController < ApplicationController
   # Duplicate a wiki page
   #
   # @example_request
-  #     curl -X DELETE -H 'Authorization: Bearer <token>' \
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages/14/duplicate
   #
   # @returns Page
@@ -241,6 +243,7 @@ class WikiPagesApiController < ApplicationController
   # @returns [Page]
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+      log_api_asset_access([ "pages", @context ], "pages", "other")
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
@@ -274,7 +277,7 @@ class WikiPagesApiController < ApplicationController
 
       wiki_pages = Api.paginate(scope, self, pages_route)
 
-      if @context.wiki.grants_right?(@current_user, :manage)
+      if @context.wiki.grants_right?(@current_user, :update)
         mc_status = setup_master_course_restrictions(wiki_pages, @context)
       end
       render :json => wiki_pages_json(wiki_pages, @current_user, session, :master_course_status => mc_status)
@@ -325,7 +328,7 @@ class WikiPagesApiController < ApplicationController
     if authorized_action(@page, @current_user, :create)
       update_params = get_update_params(Set[:title, :body])
       assign_todo_date
-      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
+      if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render :json => wiki_page_json(@page, @current_user, session)
@@ -390,14 +393,16 @@ class WikiPagesApiController < ApplicationController
     perform_update = false
     if @page.new_record?
       perform_update = true if authorized_action(@page, @current_user, [:create])
+      allowed_fields = Set[:title, :body]
     elsif authorized_action(@page, @current_user, [:update, :update_content])
       perform_update = true
+      allowed_fields = Set[]
     end
 
     if perform_update
       assign_todo_date
-      update_params = get_update_params
-      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
+      update_params = get_update_params(allowed_fields)
+      if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
@@ -467,20 +472,41 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns PageRevision
   def show_revision
-    if params.has_key?(:revision_id)
-      permission = :read_revisions
-      revision = @page.versions.where(number: params[:revision_id].to_i).first!
-    else
-      permission = :read
-      revision = @page.versions.current
-    end
-    if authorized_action(@page, @current_user, permission)
-      include_content = if params.has_key?(:summary)
-                          !value_to_boolean(params[:summary])
-                        else
-                          true
-                        end
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+    GuardRail.activate(:secondary) do
+      if params.has_key?(:revision_id)
+        permission = :read_revisions
+        revision = @page.versions.where(number: params[:revision_id].to_i).first!
+      else
+        permission = :read
+        revision = @page.versions.current
+      end
+      if authorized_action(@page, @current_user, permission)
+        include_content = if params.has_key?(:summary)
+                            !value_to_boolean(params[:summary])
+                          else
+                            true
+                          end
+        output_json = nil
+        begin
+          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+        rescue Psych::SyntaxError => e
+          # TODO: This should be temporary.  For a long time
+          # course exports/imports would corrupt the yaml in the first version
+          # of an imported wiki page by trying to replace placeholders right
+          # in the yaml.  When that happens, we can't parse it anymore because
+          # the html is insufficiently escaped.  This is a fix until it seems
+          # like none of these are happening anymore
+          GuardRail.activate(:primary) do
+            Canvas::Errors.capture_exception(:content_imports, e, :info)
+            # this is a badly escaped media comment
+            clean_version_yaml = WikiPage.reinterpret_version_yaml(revision.yaml)
+            revision.yaml = clean_version_yaml
+            revision.save
+          end
+          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+        end
+        render :json => output_json
+      end
     end
   end
 
@@ -521,25 +547,25 @@ class WikiPagesApiController < ApplicationController
   end
 
   def get_wiki_page
-    @wiki = @context.wiki
+    GuardRail.activate(%w{update update_front_page}.include?(params[:action]) ? :primary : :secondary) do
+      @wiki = @context.wiki
 
-    # attempt to find an existing page
-    url = params[:url]
-    if is_front_page_action?
-      @page = @wiki.front_page
-    else
-      @page = @wiki.find_page(url)
+      # attempt to find an existing page
+      @url = params[:url]
+      if is_front_page_action?
+        @page = @wiki.front_page
+      else
+        @page = @wiki.find_page(@url)
+      end
     end
 
     # create a new page if the page was not found
     unless @page
-      @page = @wiki.build_wiki_page(@current_user, :url => url)
+      @page = @wiki.build_wiki_page(@current_user, :url => @url)
       if is_front_page_action?
         @page.workflow_state = 'active'
         @set_front_page = true
         @set_as_front_page = true
-      else
-        @page.workflow_state = @wiki.grants_right?(@current_user, session, :manage) ? 'unpublished' : 'active'
       end
     end
   end
@@ -589,7 +615,7 @@ class WikiPagesApiController < ApplicationController
 
     # check user permissions
     rejected_fields = Set[]
-    if @wiki.grants_right?(@current_user, session, :manage)
+    if @wiki.grants_right?(@current_user, session, :update)
       allowed_fields.clear
     else
       if workflow_state && workflow_state != @page.workflow_state
@@ -656,7 +682,7 @@ class WikiPagesApiController < ApplicationController
 
   def assign_todo_date
     return if params.dig(:wiki_page, :student_todo_at).nil? && params.dig(:wiki_page, :student_planner_checkbox).nil?
-    if @context.root_account.feature_enabled?(:student_planner) && @page.context.grants_any_right?(@current_user, session, :manage)
+    if @page.context.grants_any_right?(@current_user, session, :manage_content)
       @page.todo_date = params.dig(:wiki_page, :student_todo_at) if params.dig(:wiki_page, :student_todo_at)
       # Only clear out if the checkbox is explicitly specified in the request
       if params[:wiki_page].key?("student_planner_checkbox") &&

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -42,6 +44,7 @@ module Types
     end
 
     field :media_type, MediaType, null: true
+
     def media_type
       object.media_type if VALID_MEDIA_TYPES.include?(object.media_type)
     end
@@ -49,5 +52,6 @@ module Types
     field :title, String, null: true
 
     field :media_sources, [Types::MediaSourceType], null: true
+    field :media_tracks, [Types::MediaTrackType], null: true
   end
 end

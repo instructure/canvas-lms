@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {bool, func, node, number} from 'prop-types'
-import IconArrowOpenUpSolid from '@instructure/ui-icons/lib/Solid/IconArrowOpenUp'
+import {IconArrowOpenUpSolid} from '@instructure/ui-icons'
 
 export default function ThemeEditorVariableGroup(props) {
   function handleToggle(event, expanded) {

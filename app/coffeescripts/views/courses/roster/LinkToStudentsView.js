@@ -24,19 +24,6 @@ import linkToStudentsViewTemplate from 'jst/courses/roster/LinkToStudentsView'
 import 'jquery.disableWhileLoading'
 
 export default class LinkToStudentsView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.onNewToken = this.onNewToken.bind(this)
-    this.update = this.update.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.mixin(RosterDialogMixin)
 
@@ -56,7 +43,7 @@ export default class LinkToStudentsView extends DialogBaseView {
       contexts: ENV.CONTEXTS,
       placeholder: I18n.t('link_students_placeholder', 'Enter a student name'),
       change: tokens => (this.students = tokens),
-      onNewToken: this.onNewToken,
+      onNewToken: this.onNewToken.bind(this),
       selector: {
         baseData: {
           type: 'user',
@@ -77,7 +64,7 @@ export default class LinkToStudentsView extends DialogBaseView {
     input.$fakeInput.css('width', '100%')
 
     for (const e of this.model.allEnrollmentsByType('ObserverEnrollment')) {
-      if (e.observed_user && _.any(e.observed_user.enrollments)) {
+      if (e.observed_user && _.some(e.observed_user.enrollments)) {
         input.addToken({
           value: e.observed_user.id,
           text: e.observed_user.name,
@@ -161,7 +148,7 @@ export default class LinkToStudentsView extends DialogBaseView {
 
     // delete old links
     const enrollmentsToRemove = _.filter(enrollments, en =>
-      _.include(removeLinks, en.associated_user_id)
+      _.includes(removeLinks, en.associated_user_id)
     )
     for (const en of enrollmentsToRemove) {
       const url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`

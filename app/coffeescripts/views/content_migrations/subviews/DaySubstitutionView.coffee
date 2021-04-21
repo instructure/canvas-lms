@@ -15,77 +15,76 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'jquery'
-  'Backbone'
-  'i18nObj'
-  'jst/content_migrations/subviews/DaySubstitution'
-], (_, $, Backbone, I18n, template) -> 
-  class DaySubstitutionView extends Backbone.View
-    template: template
+import _ from 'underscore'
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import I18n from 'i18nObj'
+import template from 'jst/content_migrations/subviews/DaySubstitution'
 
-    els: 
-      ".currentDay" : "$currentDay"
-      ".subDay"     : "$subDay"
+export default class DaySubstitutionView extends Backbone.View
+  template: template
 
-    events: 
-      'click a'             : 'removeView'
-      'change .currentDay'  : 'changeCurrentDay'
-      'change .subDay'      : 'updateModelData'
+  els:
+    ".currentDay" : "$currentDay"
+    ".subDay"     : "$subDay"
 
-    # When a new view is created, make sure the model is updated
-    # with it's initial attributes/values
+  events:
+    'click a'             : 'removeView'
+    'change .currentDay'  : 'changeCurrentDay'
+    'change .subDay'      : 'updateModelData'
 
-    afterRender: -> @updateModelData()
+  # When a new view is created, make sure the model is updated
+  # with it's initial attributes/values
 
-    # Ensure that after you update the current day you change focus
-    # to the next select box. In this case the next select box is
-    # @$subDay
+  afterRender: -> @updateModelData()
 
-    changeCurrentDay: -> 
-      @updateModelData()
-      #@$subDay.focus()
+  # Ensure that after you update the current day you change focus
+  # to the next select box. In this case the next select box is
+  # @$subDay
 
-    # Clear the model and add new value and key
-    # for the day representation.
-    #
-    # @api private
+  changeCurrentDay: ->
+    @updateModelData()
+    #@$subDay.focus()
 
-    updateModelData: -> 
-      sub_data = {}
-      sub_data[@$currentDay.val()] = @$subDay.val()
-      @updateName()
+  # Clear the model and add new value and key
+  # for the day representation.
+  #
+  # @api private
 
-      @model.clear()
-      @model.set sub_data
+  updateModelData: ->
+    sub_data = {}
+    sub_data[@$currentDay.val()] = @$subDay.val()
+    @updateName()
 
-    updateName: ->
-      @$subDay.attr 'name', "date_shift_options[day_substitutions][#{@$currentDay.val()}]"
-      
-    # Remove the model from both the view and 
-    # the collection it belongs to.
-    #
-    # @api private
+    @model.clear()
+    @model.set sub_data
 
-    removeView: (event) -> 
-      event.preventDefault()
-      @model.collection.remove @model
+  updateName: ->
+    @$subDay.attr 'name', "date_shift_options[day_substitutions][#{@$currentDay.val()}]"
 
-    # Add weekdays to the handlebars template
-    # 
-    # @api backbone override
+  # Remove the model from both the view and
+  # the collection it belongs to.
+  #
+  # @api private
 
-    toJSON: -> 
-      json = super
-      json.weekdays = @weekdays()
-      json
+  removeView: (event) ->
+    event.preventDefault()
+    @model.collection.remove @model
 
-    # Return an array of objects with weekdays
-    # ie: 
-    #   [{index: 0, name: 'Sunday'}, {index: 1, name: 'Monday'}]
-    # @api private
+  # Add weekdays to the handlebars template
+  #
+  # @api backbone override
 
-    weekdays: -> 
-      dayArray = I18n.lookup('date.day_names')
-      _.map dayArray, (day) => {index: _.indexOf(dayArray, day), name: day}
+  toJSON: ->
+    json = super
+    json.weekdays = @weekdays()
+    json
+
+  # Return an array of objects with weekdays
+  # ie:
+  #   [{index: 0, name: 'Sunday'}, {index: 1, name: 'Monday'}]
+  # @api private
+
+  weekdays: ->
+    dayArray = I18n.lookup('date.day_names')
+    _.map dayArray, (day) => {index: _.indexOf(dayArray, day), name: day}

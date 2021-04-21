@@ -29,20 +29,20 @@ import Ember from 'ember'
 import _ from 'underscore'
 import tz from 'timezone'
 import AssignmentDetailsDialog from '../../../AssignmentDetailsDialog'
-import AssignmentMuter from '../../../AssignmentMuter'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import {updateWithSubmissions, scopeToUser} from 'jsx/gradebook/EffectiveDueDates'
-import outcomeGrid from '../../../gradebook/OutcomeGradebookGrid'
-import ic_submission_download_dialog from '../../shared/components/ic_submission_download_dialog_component'
-import htmlEscape from 'str/htmlEscape'
+import outcomeGrid from 'jsx/gradebook/OutcomeGradebookGrid'
 import CalculationMethodContent from '../../../models/grade_summary/CalculationMethodContent'
 import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
 import GradeOverrideEntry from '../../../../jsx/grading/GradeEntry/GradeOverrideEntry'
 import GradingPeriodsApi from '../../../api/gradingPeriodsApi'
 import GradingPeriodSetsApi from '../../../api/gradingPeriodSetsApi'
-import GradebookSelector from 'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
-import {updateFinalGradeOverride} from '../../../../jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import GradebookSelector from 'jsx/gradebook/individual-gradebook/components/GradebookSelector'
+import {updateFinalGradeOverride} from '../../../../jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import 'jquery.instructure_date_and_time'
+import 'vendor/jquery.ba-tinypubsub'
+
+import '../../shared/components/ic_submission_download_dialog_component'
 
 const {get, set, setProperties} = Ember
 
@@ -50,8 +50,6 @@ const {get, set, setProperties} = Ember
 // http://emberjs.com/api/classes/Ember.Controller.html
 // http://emberjs.com/api/classes/Ember.ArrayController.html
 // http://emberjs.com/api/classes/Ember.ObjectController.html
-
-const gradingPeriodIsClosed = gradingPeriod => new Date(gradingPeriod.close_date) < new Date()
 
 function studentsUniqByEnrollments(...args) {
   let hiddenNameCounter = 1
@@ -114,8 +112,8 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     if (
       currentProgress &&
-      (currentProgress.progress.workflow_state !== 'completed' &&
-        currentProgress.progress.workflow_state !== 'failed')
+      currentProgress.progress.workflow_state !== 'completed' &&
+      currentProgress.progress.workflow_state !== 'failed'
     ) {
       const attachmentProgress = {
         progress_id: currentProgress.progress.id,
@@ -140,16 +138,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   submissionsUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.submissions_url'),
 
   has_grading_periods: get(window, 'ENV.GRADEBOOK_OPTIONS.grading_period_set') != null,
-
-  gradingPeriods: (function() {
-    const periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
-    const deserializedPeriods = GradingPeriodsApi.deserializePeriods(periods)
-    const optionForAllPeriods = {
-      id: '0',
-      title: I18n.t('all_grading_periods', 'All Grading Periods')
-    }
-    return _.compact([optionForAllPeriods].concat(deserializedPeriods))
-  })(),
 
   getGradingPeriodSet() {
     const grading_period_set = get(window, 'ENV.GRADEBOOK_OPTIONS.grading_period_set')
@@ -223,15 +211,13 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   hideOutcomes: (() => !get(window, 'ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled')).property(),
 
-  gradezilla: (() => get(window, 'ENV.GRADEBOOK_OPTIONS.gradezilla')).property(),
-
   showDownloadSubmissionsButton: function() {
     const hasSubmittedSubmissions = this.get('selectedAssignment.has_submitted_submissions')
-    const whitelist = ['online_upload', 'online_text_entry', 'online_url']
+    const allowList = ['online_upload', 'online_text_entry', 'online_url']
     const submissionTypes = this.get('selectedAssignment.submission_types')
-    const submissionTypesOnWhitelist = _.intersection(submissionTypes, whitelist)
+    const submissionTypesOnAllowlist = _.intersection(submissionTypes, allowList)
 
-    return hasSubmittedSubmissions && _.any(submissionTypesOnWhitelist)
+    return hasSubmittedSubmissions && _.some(submissionTypesOnAllowlist)
   }.property('selectedAssignment'),
 
   hideStudentNames: false,
@@ -260,27 +246,26 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   finalGradeOverrideEnabled: (() => ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled).property(),
 
-  showFinalGradeOverride: function() {
-    if (!ENV.GRADEBOOK_OPTIONS.settings || !this.get('finalGradeOverrideEnabled')) {
+  allowFinalGradeOverride: function() {
+    if (!ENV.GRADEBOOK_OPTIONS.course_settings) {
       return false
     }
-    return ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides === 'true'
+
+    return ENV.GRADEBOOK_OPTIONS.course_settings.allow_final_grade_override
   }
     .property()
     .volatile(),
 
-  updateShowFinalGradeOverride: function() {
+  updateAllowFinalGradeOverride: function() {
     ajax.request({
       dataType: 'json',
       type: 'put',
-      url: ENV.GRADEBOOK_OPTIONS.settings_update_url,
+      url: `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/settings`,
       data: {
-        gradebook_settings: {
-          show_final_grade_overrides: this.get('showFinalGradeOverride')
-        }
+        allow_final_grade_override: this.get('allowFinalGradeOverride')
       }
     })
-  }.observes('showFinalGradeOverride'),
+  }.observes('allowFinalGradeOverride'),
 
   selectedStudentFinalGradeOverrideChanged: function() {
     const student = this.get('selectedStudent')
@@ -342,9 +327,10 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       $('#gradebook-export').prop('disabled', true)
       $('#last-exported-gradebook').hide()
 
-      return $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url, 'GET').then(
-        attachment_progress => this.pollGradebookCsvProgress(attachment_progress)
-      )
+      return $.ajaxJSON(
+        ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
+        'GET'
+      ).then(attachment_progress => this.pollGradebookCsvProgress(attachment_progress))
     },
 
     gradeUpdated(submissions) {
@@ -466,7 +452,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.observes('hideStudentNames'),
 
   setupSubmissionCallback: function() {
-    Ember.$.subscribe('submissions_updated', _.bind(this.updateSubmissionsFromExternal, this))
+    Ember.$.subscribe('submissions_updated', this.updateSubmissionsFromExternal.bind(this))
   }.on('init'),
 
   setupAssignmentWeightingScheme: function() {
@@ -474,9 +460,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.on('init'),
 
   renderGradebookMenu: function() {
-    if (!this.get('gradezilla')) {
-      return
-    }
     const mountPoint = document.querySelector('[data-component="GradebookSelector"]')
     if (!mountPoint) {
       return
@@ -554,6 +537,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       submissions,
       assignmentGroups,
       weightingScheme,
+      ENV?.GRADEBOOK_OPTIONS?.grade_calc_ignore_unposted_anonymous_enabled,
       hasGradingPeriods ? gradingPeriodSet : undefined,
       hasGradingPeriods ? scopeToUser(effectiveDueDates, student.id) : undefined
     )
@@ -631,7 +615,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       grades = grades[finalOrCurrent]
 
       let percent = round((grades.score / grades.possible) * 100, 2)
-      if (isNaN(percent)) {
+      if (Number.isNaN(Number(percent))) {
         percent = 0
       }
       return setProperties(student, {
@@ -663,7 +647,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   subtotal_by_period: false,
 
   fetchAssignmentGroups: function() {
-    const params = {exclude_response_fields: ['in_closed_grading_period']}
+    const params = {exclude_response_fields: ['in_closed_grading_period', 'rubric']}
     const gpId = this.get('selectedGradingPeriod.id')
     if (this.get('has_grading_periods') && gpId !== '0') {
       params.grading_period_id = gpId
@@ -757,7 +741,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     this.updateEffectiveDueDatesFromSubmissions(submissions)
     const assignmentIds = _.uniq(_.pluck(submissions, 'assignment_id'))
-    const assignmentMap = _.indexBy(this.get('assignmentsFromGroups.content'), 'id')
+    const assignmentMap = _.keyBy(this.get('assignmentsFromGroups.content'), 'id')
     assignmentIds.forEach(assignmentId => {
       const assignment = assignmentMap[assignmentId]
       if (assignment) {
@@ -852,7 +836,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.observes('showNotesColumn'),
 
   bindNotesSuccess: function() {
-    return (this.boundNotesSuccess = _.bind(this.onNotesUpdateSuccess, this))
+    return (this.boundNotesSuccess = this.onNotesUpdateSuccess.bind(this))
   }.on('init'),
 
   onNotesUpdateSuccess(col) {
@@ -988,15 +972,13 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const assignments = this.get('assignmentsFromGroups')
     const assignmentsByID = this.groupById(assignments)
     const studentsByID = this.groupById(this.get('students'))
-    const submissions = this.get('submissions')
+    const submissions = this.get('submissions') || []
     submissions.forEach(function(submission) {
       const student = studentsByID[submission.user_id]
       if (student) {
         submission.submissions.forEach(function(s) {
           const assignment = assignmentsByID[s.assignment_id]
-          if (!this.differentiatedAssignmentVisibleToStudent(assignment, s.user_id)) {
-            set(s, 'hidden', true)
-          }
+          set(s, 'hidden', !this.differentiatedAssignmentVisibleToStudent(assignment, s.user_id))
           return this.updateSubmission(s, student)
         }, this)
         // fill in hidden ones
@@ -1017,7 +999,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
         this.calculateStudentGrade(student)
       }
     }, this)
-  }.observes('submissions.@each'),
+  }.observes('submissions.@each', 'assignmentsFromGroups.isLoaded'),
 
   updateSubmission(submission, student) {
     submission.submitted_at = tz.parse(submission.submitted_at)
@@ -1026,7 +1008,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   updateEffectiveDueDatesOnAssignment(assignment) {
     assignment.effectiveDueDates = this.get('effectiveDueDates.content')[assignment.id] || {}
-    return (assignment.inClosedGradingPeriod = _.any(
+    return (assignment.inClosedGradingPeriod = _.some(
       assignment.effectiveDueDates,
       date => date.in_closed_grading_period
     ))
@@ -1068,7 +1050,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     if (!assignment.only_visible_to_overrides) {
       return true
     }
-    return _.include(assignment.assignment_visibility, student_id)
+    return _.includes(assignment.assignment_visibility, student_id)
   },
 
   studentsThatCanSeeAssignment(assignment) {
@@ -1083,7 +1065,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   },
 
   checkForNoPointsWarning(ag) {
-    const pointsPossible = _.inject(ag.assignments, (sum, a) => sum + (a.points_possible || 0), 0)
+    const pointsPossible = _.reduce(ag.assignments, (sum, a) => sum + (a.points_possible || 0), 0)
     return pointsPossible === 0
   },
 
@@ -1104,8 +1086,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.property('invalidAssignmentGroups', 'weightingScheme'),
 
   invalidGroupNames: function() {
-    let names
-    return (names = this.get('invalidAssignmentGroups').map(group => group.name))
+    return this.get('invalidAssignmentGroups').map(group => group.name)
   }
     .property('invalidAssignmentGroups')
     .readOnly(),
@@ -1185,7 +1166,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const map = new SubmissionStateMap({
       hasGradingPeriods: !!this.has_grading_periods,
       selectedGradingPeriodID: this.get('selectedGradingPeriod.id') || '0',
-      isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, 'admin')
+      isAdmin: ENV.current_user_roles && _.includes(ENV.current_user_roles, 'admin')
     })
     map.setup(this.get('students').toArray(), this.get('assignmentsFromGroups.content').toArray())
     this.set('submissionStateMap', map)
@@ -1195,16 +1176,42 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     'submissions.content.length'
   ),
 
-  includeUngradedAssignments: (() =>
-    userSettings.contextGet('include_ungraded_assignments') || false)
+  includeUngradedAssignments: function() {
+    const localValue = userSettings.contextGet('include_ungraded_assignments') || false
+    if (!this.saveViewUngradedAsZeroToServer()) {
+      return localValue
+    }
+
+    // Prefer the setting we got from the server, but fall back to the value in
+    // userSettings if there is no server value
+    const savedValue = get(window, 'ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero')
+    return savedValue != null ? savedValue === 'true' : localValue
+  }
     .property()
     .volatile(),
 
   showAttendance: (() => userSettings.contextGet('show_attendance')).property().volatile(),
 
   updateIncludeUngradedAssignmentsSetting: function() {
+    if (this.saveViewUngradedAsZeroToServer()) {
+      ajax.request({
+        dataType: 'json',
+        type: 'put',
+        url: `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`,
+        data: {
+          gradebook_settings: {
+            view_ungraded_as_zero: this.get('includeUngradedAssignments') ? 'true' : 'false'
+          }
+        }
+      })
+    }
+
     userSettings.contextSet('include_ungraded_assignments', this.get('includeUngradedAssignments'))
   }.observes('includeUngradedAssignments'),
+
+  saveViewUngradedAsZeroToServer() {
+    return !!get(window, 'ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server')
+  },
 
   assignmentGroupsHash() {
     const ags = {}
@@ -1283,7 +1290,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     // Calculate whether the current user is able to grade assignments given their role and the
     // result of the calculations above
-    if (ENV.current_user_roles != null && _.contains(ENV.current_user_roles, 'admin')) {
+    if (ENV.current_user_roles != null && _.includes(ENV.current_user_roles, 'admin')) {
       this.set('disableAssignmentGrading', false)
     } else {
       this.set('disableAssignmentGrading', assignment.inClosedGradingPeriod)
@@ -1323,7 +1330,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     return this.get('selectedSubmission.hidden') || false
   }.property('selectedStudent', 'selectedAssignment'),
 
-  hideComments: function() {
+  anonymizeStudents: function() {
     return this.get('selectedAssignment.anonymize_students')
   }.property('selectedAssignment'),
 
@@ -1384,7 +1391,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.property('selectedAssignment', 'students.@each.total_grade'),
 
   outcomeDetails: function() {
-    let details
     if (this.get('selectedOutcome') == null) {
       return null
     }
@@ -1393,12 +1399,12 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       this.get('selectedOutcome').id
     )
     const scores = _.filter(_.pluck(rollups, 'score'), _.isNumber)
-    return (details = {
+    return {
       average: outcomeGrid.Math.mean(scores),
       max: outcomeGrid.Math.max(scores),
       min: outcomeGrid.Math.min(scores),
       cnt: outcomeGrid.Math.cnt(scores)
-    })
+    }
   }.property('selectedOutcome', 'outcome_rollups'),
 
   calculationDetails: function() {
@@ -1471,10 +1477,8 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   displayName: function() {
     if (this.get('hideStudentNames')) {
       return 'hiddenName'
-    } else if (ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled) {
-      return 'sortable_name'
     } else {
-      return 'name'
+      return 'sortable_name'
     }
   }.property('hideStudentNames'),
 

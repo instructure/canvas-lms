@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
 import Backbone from 'Backbone'
 import ProgressBarView from './ProgressBarView'
 import template from 'jst/grade_summary/alignment'
@@ -34,7 +33,7 @@ export default class AlignmentView extends Backbone.View {
 
   toJSON() {
     const json = super.toJSON(...arguments)
-    return _.extend(json, {progress: this.progress})
+    return {...json, progress: this.progress}
   }
 }
 AlignmentView.initClass()

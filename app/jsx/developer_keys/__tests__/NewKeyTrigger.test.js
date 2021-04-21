@@ -31,13 +31,13 @@ const actions = {
 
 let wrapper = 'empty wrapper'
 
-const menuContentsNode = () => wrapper.find('Portal').instance().DOMNode
+const menuContentsNode = () =>
+  wrapper
+    .find('Portal')
+    .at(0)
+    .instance().DOMNode
 
 beforeEach(() => {
-  window.ENV = {
-    LTI_1_3_ENABLED: true
-  }
-
   wrapper = mount(
     <DeveloperKeyModalTrigger store={store} actions={actions} setAddKeyButtonRef={() => {}} />
   )
@@ -59,13 +59,13 @@ it('it opens the API key modal when API key button is clicked', () => {
   menuContentsNode()
     .querySelector('li button')
     .click()
-  expect(actions.developerKeysModalOpen).toBeCalled()
+  expect(actions.developerKeysModalOpen).toHaveBeenCalled()
 })
 
 it('it opens the LTI key modal when LTI key button is clicked', () => {
   menuContentsNode()
     .querySelectorAll('li button')[1]
     .click()
-  expect(actions.ltiKeysSetLtiKey).toBeCalled()
-  expect(actions.developerKeysModalOpen).toBeCalled()
+  expect(actions.ltiKeysSetLtiKey).toHaveBeenCalled()
+  expect(actions.developerKeysModalOpen).toHaveBeenCalled()
 })

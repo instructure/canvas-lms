@@ -20,7 +20,6 @@ import K from './log_auditing/constants'
 import EventManager from './log_auditing/event_manager'
 import EventBuffer from './log_auditing/event_buffer'
 import './log_auditing/event_tracker'
-import hasLocalStorage from '../util/hasLocalStorage'
 import debugConsole from '../util/debugConsole'
 import page_focused from './log_auditing/event_trackers/page_focused'
 import page_blurred from './log_auditing/event_trackers/page_blurred'
@@ -38,12 +37,17 @@ const eventManager = new EventManager()
 // Register all event trackers
 trackers.forEach(factory => eventManager.registerTracker(factory))
 
-// Configure the EventBuffer to use localStorage if it's available:
-if (hasLocalStorage) {
-  debugConsole.debug('QuizLogAuditing: will be using localStorage.')
-  EventBuffer.setStorageAdapter(K.EVT_STORAGE_LOCAL_STORAGE)
-}
+// Configure the EventBuffer to use localStorage:
+debugConsole.debug('QuizLogAuditing: will be using localStorage.')
+EventBuffer.setStorageAdapter(K.EVT_STORAGE_LOCAL_STORAGE)
 
 eventManager.options.deliveryUrl = ENV.QUIZ_SUBMISSION_EVENTS_URL
+eventManager.options.errorHandler = function(resp) {
+  // Something has been malaligned and we now need ruby to figure out where we should be
+  console.log(resp)
+  if (resp.status === 401 || resp.statusText === 'Unauthorized') {
+    window.location.reload()
+  }
+}
 
 export default eventManager

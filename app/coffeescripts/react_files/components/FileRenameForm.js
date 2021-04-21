@@ -26,7 +26,10 @@ export default {
 
   propType: {
     fileOptions: PropTypes.object,
-    onNameConflictResolved: PropTypes.func.isRequired
+    onNameConflictResolved: PropTypes.func.isRequired,
+    allowSkip: PropTypes.bool,
+    onRenameFileMessage: PropTypes.func,
+    onLockFileMessage: PropTypes.func
   },
 
   getInitialState() {
@@ -46,6 +49,16 @@ export default {
 
   handleBackClick() {
     this.setState({isEditing: false})
+  },
+
+  handleSkipClick() {
+    if (this.props.closeOnResolve) this.refs.canvasModal.closeModal()
+    return this.props.onNameConflictResolved({
+      file: this.state.fileOptions.file,
+      dup: 'skip',
+      name: this.state.fileOptions.name,
+      expandZip: this.state.fileOptions.expandZip
+    })
   },
 
   // pass back expandZip to preserve options that was possibly already made

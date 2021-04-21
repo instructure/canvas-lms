@@ -19,27 +19,19 @@
 import Backbone from 'Backbone'
 
 export default class Submission extends Backbone.Model {
-  constructor(...args) {
-    super(...args)
-    this.isGraded = this.isGraded.bind(this)
-    this.hasSubmission = this.hasSubmission.bind(this)
-    this.withoutGradedSubmission = this.withoutGradedSubmission.bind(this)
-    this.present = this.present.bind(this)
-  }
-
-  isGraded() {
+  isGraded = () => {
     return this.get('grade') != null
   }
 
-  hasSubmission() {
+  hasSubmission = () => {
     return !!this.get('submission_type')
   }
 
-  withoutGradedSubmission() {
+  withoutGradedSubmission = () => {
     return !this.hasSubmission() && !this.isGraded()
   }
 
-  present() {
+  present = () => {
     const json = this.toJSON()
     json.submitted_or_graded = !this.withoutGradedSubmission()
     return json

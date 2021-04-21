@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradebook_uploads'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from './str/htmlEscape'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
-import {waitForProcessing} from 'jsx/gradezilla/uploads/wait_for_processing'
+import {waitForProcessing} from 'jsx/gradebook/uploads/wait_for_processing'
 import ProcessGradebookUpload from 'jsx/gradebook/uploads/process_gradebook_upload'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import './vendor/slickgrid' /* global Slick */
@@ -29,11 +29,26 @@ import './jquery.instructure_forms' /* errorBox */
 import './jquery.instructure_misc_helpers' /* /\.detect/ */
 import './jquery.templateData' /* fillTemplateData */
 
+function shouldHighlightScoreChange(oldValue, newValue) {
+  // Even if canvas is operating in a locale that does commas as
+  // the decimal separator, the text that represents the score
+  // is sent period separated.
+  const originalGrade = Number.parseFloat(oldValue)
+  const updatedGrade = Number.parseFloat(newValue)
+  const updateWillRemoveGrade = !Number.isNaN(originalGrade) && Number.isNaN(updatedGrade)
+
+  return originalGrade > updatedGrade || updateWillRemoveGrade
+}
+
 const GradebookUploader = {
   createGeneralFormatter(attribute) {
     return function(row, cell, value) {
-      return value ? value[attribute] : ''
+      return value ? htmlEscape(value[attribute]) : ''
     }
+  },
+
+  createGrid($container, {data, columns, options}) {
+    return new Slick.Grid($container, data, columns, options)
   },
 
   createNumberFormatter(attribute) {
@@ -169,18 +184,25 @@ const GradebookUploader = {
       gridData.columns.push(newCustomColumn)
     })
 
+    if (uploadedGradebook.override_scores != null) {
+      const overrideScores = uploadedGradebook.override_scores
+      if (overrideScores.includes_course_scores) {
+        this.addOverrideScoreChangeColumn(labelData, gridData)
+      }
+
+      overrideScores.grading_periods.forEach(gradingPeriod => {
+        this.addOverrideScoreChangeColumn(labelData, gridData, gradingPeriod)
+      })
+    }
+
     $.each(uploadedGradebook.students, function(index) {
       const row = {
         student: this,
         id: this.id
       }
       $.each(this.submissions, function() {
-        const originalGrade = Number.parseInt(this.original_grade, 10)
-        const updatedGrade = Number.parseInt(this.grade, 10)
-        const updateWillRemoveGrade = !Number.isNaN(originalGrade) && Number.isNaN(updatedGrade)
-
         if (
-          (originalGrade > updatedGrade || updateWillRemoveGrade) &&
+          shouldHighlightScoreChange(this.original_grade, this.grade) &&
           (this.grade || '').toUpperCase() !== 'EX'
         ) {
           rowsToHighlight.push({rowIndex: index, id: this.assignment_id})
@@ -197,6 +219,19 @@ const GradebookUploader = {
         row[`custom_col_${this.column_id}`] = this
         row[`custom_col_${this.column_id}_conflicting`] = this
       })
+
+      const currentStudent = this
+      currentStudent.override_scores?.forEach(overrideScore => {
+        const id = overrideScore.grading_period_id || 'course'
+        const columnId = `override_score_${id}`
+
+        if (shouldHighlightScoreChange(overrideScore.current_score, overrideScore.new_score)) {
+          rowsToHighlight.push({rowIndex: index, id: columnId})
+        }
+        row[columnId] = overrideScore
+        row[`${columnId}_conflicting`] = overrideScore
+      })
+
       gridData.data.push(row)
       row.active = true
     })
@@ -223,13 +258,8 @@ const GradebookUploader = {
         })
         .triggerHandler('resize')
 
-      gradebookGrid = new Slick.Grid(
-        $gradebook_grid,
-        gridData.data,
-        gridData.columns,
-        gridData.options
-      )
-      new Slick.Grid($gradebook_grid_header, labelData.data, labelData.columns, labelData.options)
+      gradebookGrid = GradebookUploader.createGrid($gradebook_grid, gridData)
+      GradebookUploader.createGrid($gradebook_grid_header, labelData)
 
       const gradeReviewRow = {}
 
@@ -382,18 +412,18 @@ const GradebookUploader = {
                   break
                 default:
                   // merge
-                  const obj = _.detect(uploadedGradebook[`${thing}s`], thng => id == thng.id)
+                  const obj = _.find(uploadedGradebook[`${thing}s`], thng => id == thng.id)
                   obj.id = obj.previous_id = val
                   if (thing === 'assignment') {
                     // find the original grade for this assignment for each student
                     $.each(uploadedGradebook.students, function() {
                       const student = this
-                      const submission = _.detect(
+                      const submission = _.find(
                         student.submissions,
                         thng => thng.assignment_id == id
                       )
                       submission.assignment_id = val
-                      const original_submission = _.detect(
+                      const original_submission = _.find(
                         uploadedGradebook.original_submissions,
                         sub => sub.user_id == student.id && sub.assignment_id == val
                       )
@@ -406,7 +436,7 @@ const GradebookUploader = {
                     // find the original grade for each assignment for this student
                     $.each(obj.submissions, function() {
                       const submission = this
-                      const original_submission = _.detect(
+                      const original_submission = _.find(
                         uploadedGradebook.original_submissions,
                         sub =>
                           sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
@@ -425,7 +455,7 @@ const GradebookUploader = {
           $.each(uploadedGradebook.assignments, index => {
             if (
               uploadedGradebook.assignments[index].previous_id &&
-              _.all(uploadedGradebook.students, student => {
+              _.every(uploadedGradebook.students, student => {
                 const submission = student.submissions[index]
 
                 return (
@@ -455,6 +485,46 @@ const GradebookUploader = {
         GradebookUploader.init(uploadedGradebook)
       }
     })
+  },
+
+  addOverrideScoreChangeColumn(labelData, gridData, gradingPeriod = null) {
+    // A null grading period means these changes are for override grades for the course
+    const id = gradingPeriod?.id || 'course'
+    const title = gradingPeriod?.title
+      ? I18n.t('Override Score (%{gradingPeriod})', {gradingPeriod: gradingPeriod.title})
+      : I18n.t('Override Score')
+
+    const newOverrideScoreColumn = {
+      id: `override_score_${id}`,
+      type: 'assignment',
+      name: htmlEscape(I18n.t('To')),
+      field: `override_score_${id}`,
+      width: 125,
+      editor: Slick.Editors.UploadGradeCellEditor,
+      editorFormatter: 'override_score',
+      editorParser: 'override_score',
+      formatter: GradebookUploader.createNumberFormatter('new_score'),
+      active: true,
+      cssClass: 'new-grade'
+    }
+
+    const conflictingOverrideScoreColumn = {
+      id: `override_score_${id}_conflicting`,
+      width: 125,
+      formatter: GradebookUploader.createNumberFormatter('current_score'),
+      field: `override_score_${id}_conflicting`,
+      name: htmlEscape(I18n.t('From')),
+      cssClass: 'conflicting-grade'
+    }
+    gridData.columns.push(conflictingOverrideScoreColumn, newOverrideScoreColumn)
+
+    const overrideScoreHeaderColumn = {
+      id: `override_score_${id}`,
+      width: 250,
+      name: htmlEscape(title),
+      headerCssClass: 'assignment'
+    }
+    labelData.columns.push(overrideScoreHeaderColumn)
   }
 }
 

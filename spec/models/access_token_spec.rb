@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -154,7 +156,7 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.usable?).to eq false
+      expect(@at.reload.usable?).to eq false
     end
 
     it "Shouldn't be usable if dev key isn't active, even if we request with a refresh token" do
@@ -164,7 +166,7 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.usable?(:crypted_refresh_token)).to eq false
+      expect(@at.reload.usable?(:crypted_refresh_token)).to eq false
     end
   end
 
@@ -480,14 +482,69 @@ describe AccessToken do
   end
 
   describe "#dev_key_account_id" do
-
     it "returns the developer_key account_id" do
       account = Account.create!
       dev_key = DeveloperKey.create!(account: account)
       at = AccessToken.create!(developer_key: dev_key)
       expect(at.dev_key_account_id).to eq account.id
     end
-
   end
 
+  context 'broadcast policy' do
+    before(:once) do
+      Notification.create!(name: 'Manually Created Access Token Created')
+      user_model
+    end
+
+    it 'should send a notification when a new manually created access token is created' do
+      access_token = AccessToken.create!(user: @user)
+      expect(access_token.messages_sent).to include('Manually Created Access Token Created')
+    end
+
+    it 'should send a notification when a manually created access token is regenerated' do
+      AccessToken.create!(user: @user)
+      access_token = AccessToken.last
+      access_token.regenerate_access_token
+      expect(access_token.messages_sent).to include('Manually Created Access Token Created')
+    end
+
+    it 'should not send a notification when a manually created access token is touched' do
+      AccessToken.create!(user: @user)
+      access_token = AccessToken.last
+      access_token.touch
+      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+    end
+
+    it 'should not send a notification when a new non-manually created access token is created' do
+      developer_key = DeveloperKey.create!
+      access_token = AccessToken.create!(user: @user, developer_key: developer_key)
+      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+    end
+  end
+
+  describe 'root_account_id' do
+    let(:root_account) { account_model }
+    let(:sub_account) { root_account.sub_accounts.create! name: 'sub' }
+    let(:root_account_key) { DeveloperKey.create!(account: root_account) }
+    let(:site_admin_key) { DeveloperKey.create! }
+
+    it "uses root_account value from developer key association" do
+      at = AccessToken.create!(user: user_model, developer_key: root_account_key)
+      expect(at.root_account_id).to eq(root_account_key.root_account_id)
+    end
+
+    it "inherits root_account value from siteadmin context" do
+      at = AccessToken.create!(user: user_model, developer_key: site_admin_key)
+      expect(at.root_account_id).to eq Account.site_admin.id
+    end
+
+    it "keeps set value if it already exists" do
+      at = AccessToken.create!(
+        user: user_model,
+        developer_key: root_account_key,
+        root_account_id: sub_account.id
+      )
+      expect(at.root_account_id).to eq(sub_account.id)
+    end
+  end
 end

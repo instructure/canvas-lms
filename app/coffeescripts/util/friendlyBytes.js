@@ -20,7 +20,7 @@ import I18n from 'i18nObj'
 const units = ['byte', 'bytes', 'KB', 'MB', 'GB', 'TB']
 
 // converts bytes into a nice representation with unit. e.g. 13661855 -> 13.7 MB, 825399 -> 825 KB, 1396 -> 1 KB
-export default function friendlyBytes (value) {
+export default function friendlyBytes(value) {
   let resInt, resValue
   const bytes = parseInt(value, 10)
   if (bytes.toString() === 'NaN') return '--'

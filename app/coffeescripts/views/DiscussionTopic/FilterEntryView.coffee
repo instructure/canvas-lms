@@ -15,68 +15,66 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'i18n!discussions'
-  '../DiscussionTopic/EntryView'
-  'jst/discussions/results_entry'
-], ({View}, I18n, EntryView, template) ->
+import {View} from 'Backbone'
+import I18n from 'i18n!discussions'
+import EntryView from './EntryView'
+import template from 'jst/discussions/results_entry'
 
-  class FilterEntryView extends View
+export default class FilterEntryView extends View
 
-    els:
-      '.discussion_entry:first': '$entryContent'
-      '.discussion-read-state-btn:first': '$readStateToggle'
+  els:
+    '.discussion_entry:first': '$entryContent'
+    '.discussion-read-state-btn:first': '$readStateToggle'
 
-    events:
-      'click': 'click'
-      'click .discussion-read-state-btn': 'toggleRead'
+  events:
+    'click': 'click'
+    'click .discussion-read-state-btn': 'toggleRead'
 
-    tagName: 'li'
+  tagName: 'li'
 
-    className: 'entry'
+  className: 'entry'
 
-    template: template
+  template: template
 
-    initialize: ->
-      super
-      @model.on 'change:read_state', @updateReadState
+  initialize: ->
+    super
+    @model.on 'change:read_state', @updateReadState
 
-    toJSON: ->
-      json = @model.attributes
-      json.edited_at = $.datetimeString(json.updated_at)
-      if json.editor
-        json.editor_name = json.editor.display_name
-        json.editor_href = json.editor.html_url
-      else
-        json.editor_name = I18n.t 'unknown', 'Unknown'
-        json.editor_href = "#"
-      json
+  toJSON: ->
+    json = @model.attributes
+    json.edited_at = $.datetimeString(json.updated_at)
+    if json.editor
+      json.editor_name = json.editor.display_name
+      json.editor_href = json.editor.html_url
+    else
+      json.editor_name = I18n.t 'unknown', 'Unknown'
+      json.editor_href = "#"
+    json
 
-    click: ->
-      @trigger 'click', this
+  click: ->
+    @trigger 'click', this
 
-    afterRender: ->
-      super
-      @updateReadState()
+  afterRender: ->
+    super
+    @updateReadState()
 
-    toggleRead: (e) ->
-      e.stopPropagation()
-      e.preventDefault()
-      if @model.get('read_state') is 'read'
-        @model.markAsUnread()
-      else
-        @model.markAsRead()
+  toggleRead: (e) ->
+    e.stopPropagation()
+    e.preventDefault()
+    if @model.get('read_state') is 'read'
+      @model.markAsUnread()
+    else
+      @model.markAsRead()
 
-    updateReadState: =>
-      @updateTooltip()
-      @$entryContent.toggleClass 'unread', @model.get('read_state') is 'unread'
-      @$entryContent.toggleClass 'read', @model.get('read_state') is 'read'
+  updateReadState: =>
+    @updateTooltip()
+    @$entryContent.toggleClass 'unread', @model.get('read_state') is 'unread'
+    @$entryContent.toggleClass 'read', @model.get('read_state') is 'read'
 
-    updateTooltip: ->
-      tooltip = if @model.get('read_state') is 'unread'
-        I18n.t('mark_as_read', 'Mark as Read')
-      else
-        I18n.t('mark_as_unread', 'Mark as Unread')
+  updateTooltip: ->
+    tooltip = if @model.get('read_state') is 'unread'
+      I18n.t('mark_as_read', 'Mark as Read')
+    else
+      I18n.t('mark_as_unread', 'Mark as Unread')
 
-      @$readStateToggle.attr('title', tooltip)
+    @$readStateToggle.attr('title', tooltip)

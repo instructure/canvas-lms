@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -42,6 +44,8 @@ class Tableless < ActiveRecord::Base
               sql_type.to_s, null]
       columns << ActiveRecord::ConnectionAdapters::Column.new(*args)
     end
+
+    def table_exists?; false; end
   end
 
   # Override the save method to prevent exceptions.

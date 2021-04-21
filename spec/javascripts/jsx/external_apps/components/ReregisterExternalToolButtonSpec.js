@@ -26,7 +26,9 @@ import store from 'jsx/external_apps/lib/ExternalAppsStore'
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 
-const createElement = data => <ReregisterExternalToolButton tool={data.tool} canAddEdit returnFocus={()=>{}} />
+const createElement = data => (
+  <ReregisterExternalToolButton tool={data.tool} canAddEdit returnFocus={() => {}} />
+)
 
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 

@@ -20,7 +20,7 @@
                                             asset.appointment_group.contexts.first.name  :
                                             asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %>
 <% if asset.appointment_group.available_slots -%>
-<%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots %>
+<%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots(current_only: true) %>
 <% end -%>
 
 <%= t :instructions, 'Sign up for a different time slot at the following link: %{link}', :link => content(:link) %>

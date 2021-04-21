@@ -21,9 +21,9 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
 import $ from 'jquery'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import I18n from 'i18n!grading_periods'
+import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
+import I18n from 'i18n!GradingPeriodSetForm'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -71,9 +71,10 @@ class GradingPeriodSetForm extends React.Component {
     const associatedEnrollmentTerms = _.where(props.enrollmentTerms, {
       gradingPeriodGroupId: props.set.id
     })
-    const set = _.extend({}, props.set, {
+    const set = {
+      ...props.set,
       enrollmentTermIDs: _.pluck(associatedEnrollmentTerms, 'id')
-    })
+    }
 
     this.state = {set: buildSet(set)}
   }

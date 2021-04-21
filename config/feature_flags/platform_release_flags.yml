@@ -1,0 +1,52 @@
+---
+live_event_subscription_webhooks:
+  state: hidden
+  display_name: Live Event Subscription Webhooks
+  description: |-
+    Allow Live Event Subscription to be set to be delivered
+    via HTTPS webhooks
+  applies_to: SiteAdmin
+live_event_lti_documentation:
+  state: hidden
+  display_name: Live Event Tool Documentation
+  description: |-
+    Show embedded documentation in Live Events LTI Tool
+  applies_to: SiteAdmin
+developer_key_support_includes:
+  state: hidden
+  display_name: Developer Key Include Parameter Support
+  description: |-
+    Provides a flag on the Devloper Key to support Include Parameters on API requests
+  applies_to: SiteAdmin
+site_admin_keys_only:
+  state: hidden
+  display_name: Only show site admin keys in the site admin UI
+  description: |-
+    If enabled, the site admin developer key UI will only show
+    site admin developer keys. Note that this only affects
+    Canvas instances where root accounts are on the same shard
+    as the site admin account. Behavior in other instances
+    already behaved in this way.
+  applies_to: SiteAdmin
+use_oembed_token:
+  state: hidden
+  display_name: Require signed token for oEmbed
+  description: |-
+    If enabled, oEmbed endpoints will require a
+    tool-generated token to verify the origin
+    of an oEmbed resource request.
+  applies_to: SiteAdmin
+disable_graphql_authentication:
+  state: hidden
+  display_name: Disable authentication for GraphQL
+  description: |-
+    If enabled, GraphQL queries will not require
+    users to be signed in or use an access token.
+  applies_to: SiteAdmin
+microsoft_group_enrollments_syncing:
+  state: hidden
+  display_name: Microsoft Group enrollment syncing
+  description: |-
+    If enabled, syncing course enrollments to Microsoft Groups will be
+    available. Account admins may enable this in account settings.
+  applies_to: RootAccount

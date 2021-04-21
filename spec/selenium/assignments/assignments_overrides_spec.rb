@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -23,14 +25,13 @@ describe "assignment groups" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-
     let(:due_at) { Time.zone.now }
     let(:unlock_at) { Time.zone.now - 1.day }
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
-      make_full_screen
+
       course_with_teacher_logged_in
     end
 
@@ -58,6 +59,7 @@ describe "assignment groups" do
     end
 
     it "should edit a due date", priority: "2", test_id: 216346 do
+      skip('flaky spec, LA-749')
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
@@ -86,16 +88,14 @@ describe "assignment groups" do
 
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
-      default_section_due = Time.zone.now + 1.days
+      default_section_due = Time.zone.now + 1.day
       other_section_due = Time.zone.now + 2.days
 
       assign = create_assignment!
       visit_assignment_edit_page(assign)
-
       wait_for_ajaximations
       select_first_override_section(default_section.name)
       select_first_override_header("Mastery Paths")
-
       first_due_at_element.clear
       first_due_at_element.
         send_keys(format_date_for_view(default_section_due, :medium))
@@ -103,7 +103,6 @@ describe "assignment groups" do
       add_override
       wait_for_ajaximations
       select_last_override_section(other_section.name)
-
       last_due_at_element.
         send_keys(format_date_for_view(other_section_due, :medium))
 
@@ -194,7 +193,7 @@ describe "assignment groups" do
 
       get "/courses/#{@course.id}/assignments"
       expect(f('.assignment .assignment-date-due')).to include_text "Multiple Dates"
-      driver.mouse.move_to f(".assignment .assignment-date-due a")
+      driver.action.move_to(f(".assignment .assignment-date-due a")).perform
       wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
@@ -209,7 +208,7 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
-      make_full_screen
+
       course_with_student_logged_in(:active_all => true)
     end
 

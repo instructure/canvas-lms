@@ -16,42 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import MockDate from 'mockdate';
-import { EmptyDays } from '../index';
+import React from 'react'
+import {shallow} from 'enzyme'
+import MockDate from 'mockdate'
+import {EmptyDays} from '../index'
 
-const TZ = 'Asia/Tokyo';
+const TZ = 'Asia/Tokyo'
 
 const getDefaultProps = (overrides = {}) => {
-  return Object.assign({
+  return {
     day: '2017-04-23',
     endday: '2017-04-26',
     animatableIndex: 0,
     timeZone: TZ,
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-  }, overrides);
-};
+    ...overrides
+  }
+}
 
-beforeAll (() => {
-  MockDate.set('2017-04-22', TZ);
-});
+beforeAll(() => {
+  MockDate.set('2017-04-22', TZ)
+})
 
-afterAll (() => {
-  MockDate.reset();
-});
+afterAll(() => {
+  MockDate.reset()
+})
 
 it('renders the component', () => {
-  const wrapper = shallow(
-    <EmptyDays {...getDefaultProps()} />
-  );
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<EmptyDays {...getDefaultProps()} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders the today className when surrounds Today', () => {
-  const wrapper = shallow(
-    <EmptyDays {...getDefaultProps({day: '2017-04-22'})} />
-  );
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<EmptyDays {...getDefaultProps({day: '2017-04-22'})} />)
+  expect(wrapper).toMatchSnapshot()
+})

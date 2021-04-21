@@ -29,7 +29,7 @@
 {{/unless}}
 
 <div id="discussion-details-tab">
-  <fieldset>
+  <fieldset style="min-width: 0;">
     <div class="control-group">
       {{#if lockedItems.content}}
         <h1 id="discussion-title" class="title">{{title}}</h1>
@@ -53,14 +53,16 @@
           {{convertApiUserContent message}}
         </div>
       {{else}}
-        <div style="float: right;">
-          <a href="#" class="rte_switch_views_link">
-            {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-          </a>
-          <a href="#" class="rte_switch_views_link" style="display:none;">
-            {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-          </a>
-        </div>
+        {{#unless use_rce_enhancements}}
+          <div style="float: right;">
+            <a href="#" class="rte_switch_views_link">
+              {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+            </a>
+            <a href="#" class="rte_switch_views_link" style="display:none;">
+              {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+            </a>
+          </div>
+        {{/unless}}
         <div style="clear:both;"></div>
         <textarea name="message"
                   class="input-block-level"
@@ -72,11 +74,11 @@
 
   </fieldset>
   <fieldset>
-    <div id="sections_autocomplete_root"></div>
+    <div id="sections_autocomplete_root" style="margin-right: 80px"></div>
     {{#if canAttach}}
-    <div class="control-group">
+    <div class="control-group" style="margin-left: -75px">
       {{#if lockedItems.content}}
-        <label class="control-label" {{#t "attachment"}}Attachment{{/t}}</label>
+        <label class="control-label">{{#t "attachment"}}Attachment{{/t}}</label>
       {{else}}
         <label class="control-label"
           aria-label="{{#t}}Add Attachment{{/t}}"
@@ -106,15 +108,31 @@
         {{/unless}}
       </div>
     </div>
+    {{#if ENV.FEATURES.usage_rights_discussion_topics }}
+      {{#if ENV.USAGE_RIGHTS_REQUIRED }}
+        {{#if ENV.PERMISSIONS.manage_files }}
+        <div class="control-group" style="margin-left: -75px">
+          <label class="control-label"
+            for="usage_rights_control">
+            {{#t}}Set usage rights{{/t}}
+          </label>
+          <div class="controls">
+            <div id="usage_rights_control" />
+            <div id="usage_rights_modal" />
+          </div>
+        </div>
+        {{/if}}
+      {{/if}}
+    {{/if}}
     {{/if}}
   </fieldset>
 
-  <fieldset>
+  <fieldset style="display:flex; flex-direction:column">
 
     {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
-    <legend class="control-label">{{#t "options"}}Options{{/t}}</legend>
+    <legend class="control-label" style="text-align:start; margin-bottom: 0">{{#t "options"}}Options{{/t}}</legend>
     <div class="control-group">
-      <div class="controls">
+      <div class="controls" style="text-align:start; margin-left:0">
         {{#if isTopic}}
           <div><label class="checkbox short-label" for="threaded">
             {{checkbox "threaded"}}
@@ -148,18 +166,20 @@
                      title="{{accessibleDateFormat}}" />
             </label></div>
             {{#unless announcementsLocked}}
-            <div><label class="checkbox short-label" for="allow_user_comments">
-              {{#if title}}
-              {{checkbox "allow_user_comments" checked=unlocked}}
-              {{else}}
-              {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
-              {{/if}}
-              {{#t}}Allow users to comment{{/t}}
-            </label></div>
-            <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
-              {{checkbox "require_initial_post"}}
-              {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-            </label></div>
+              {{#unless homeroomCourse}}
+                <div><label class="checkbox short-label" for="allow_user_comments">
+                  {{#if title}}
+                  {{checkbox "allow_user_comments" checked=unlocked}}
+                  {{else}}
+                  {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
+                  {{/if}}
+                  {{#t}}Allow users to comment{{/t}}
+                </label></div>
+                <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
+                  {{checkbox "require_initial_post"}}
+                  {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
+                </label></div>
+              {{/unless}}
             {{/unless}}
           {{else}}
           <div><label class="checkbox short-label" for="require_initial_post">
@@ -169,22 +189,24 @@
           {{/if}}
         {{/if}}
         {{#if canModerate}}
-          <div><label class="checkbox short-label" for="podcast_enabled">
-            {{checkbox "podcast_enabled"
-              checked=podcast_url
-              class="element_toggler"
-              aria-controls="podcast_has_student_posts_container"}}
-            {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
-          </label></div>
-
-          {{#if contextIsCourse}}
-            <div><label id="podcast_has_student_posts_container"
-                   style="{{hiddenUnless podcast_url}}"
-                   class="checkbox short-label" for="podcast_has_student_posts">
-              {{checkbox "podcast_has_student_posts"}}
-              {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
+          {{#unless homeroomCourse}}
+            <div><label class="checkbox short-label" for="podcast_enabled">
+              {{checkbox "podcast_enabled"
+                checked=podcast_url
+                class="element_toggler"
+                aria-controls="podcast_has_student_posts_container"}}
+              {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
             </label></div>
-          {{/if}}
+
+            {{#if contextIsCourse}}
+              <div><label id="podcast_has_student_posts_container"
+                    style="{{hiddenUnless podcast_url}}"
+                    class="checkbox short-label" for="podcast_has_student_posts">
+                {{checkbox "podcast_has_student_posts"}}
+                {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
+              </label></div>
+            {{/if}}
+          {{/unless}}
         {{/if}}
         {{#if showAssignment}}
           <div><label class="checkbox short-label" for="use_for_grading">
@@ -197,30 +219,32 @@
           </label></div>
         {{/if}}
 
-        <div><label class="checkbox short-label" for="allow_rating">
-          {{checkbox "allow_rating"
-            id="allow_rating"
-            class="element_toggler"
-            checked=allow_rating
-            aria-controls="rating_settings_container"}}
-          {{#t "allow_liking"}}Allow liking{{/t}}
-        </label></div>
-        <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
-          <div><label class="checkbox short-label" for="only_graders_can_rate">
-            {{checkbox "only_graders_can_rate"
-              id="only_graders_can_rate"
+        {{#unless homeroomCourse}}
+          <div><label class="checkbox short-label" for="allow_rating">
+            {{checkbox "allow_rating"
+              id="allow_rating"
               class="element_toggler"
-              checked=only_graders_can_rate}}
-            {{#t "only_graders_can_like"}}Only graders can like{{/t}}
+              checked=allow_rating
+              aria-controls="rating_settings_container"}}
+            {{#t "allow_liking"}}Allow liking{{/t}}
           </label></div>
-          <div><label class="checkbox short-label" for="sort_by_rating">
-            {{checkbox "sort_by_rating"
-              id="sort_by_rating"
-              class="element_toggler"
-              checked=sort_by_rating}}
-            {{#t "sort_by_likes"}}Sort by likes{{/t}}
-          </label></div>
-        </div>
+          <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
+            <div><label class="checkbox short-label" for="only_graders_can_rate">
+              {{checkbox "only_graders_can_rate"
+                id="only_graders_can_rate"
+                class="element_toggler"
+                checked=only_graders_can_rate}}
+              {{#t "only_graders_can_like"}}Only graders can like{{/t}}
+            </label></div>
+            <div><label class="checkbox short-label" for="sort_by_rating">
+              {{checkbox "sort_by_rating"
+                id="sort_by_rating"
+                class="element_toggler"
+                checked=sort_by_rating}}
+              {{#t "sort_by_likes"}}Sort by likes{{/t}}
+            </label></div>
+          </div>
+        {{/unless}}
 
         {{#if ENV.STUDENT_PLANNER_ENABLED}}
           {{#if isTopic}}
@@ -245,14 +269,14 @@
   {{#if isTopic}}
     {{#unless isLargeRoster}}
       {{#if contextIsCourse}}
-        <div id="group_category_options" class="control-group"></div>
+        <div id="group_category_options" class="control-group" style="width: 295px"></div>
       {{/if}}
     {{/unless}}
 
     {{#if contextIsCourse}}
       <div id="availability_options" style="{{hiddenIf set_assignment}}">
         <fieldset>
-          <div class="control-group">
+          <div class="control-group" style="margin-left: -66px">
             <label class="control-label" for="delayed_post_at">
               {{#t "available_from"}}Available From{{/t}}
             </label>
@@ -263,6 +287,7 @@
             <div class="controls">
               <input type="text"
                      class="datetime_field input-medium"
+                     style="width: 122px"
                      name="delayed_post_at"
                      id="delayed_post_at"
                      aria-labelledby="discussion_topic_available_from_accessible_label"
@@ -280,7 +305,7 @@
 
         {{#if isTopic}}
           <fieldset>
-            <div class="control-group">
+            <div class="control-group" style="margin-left: -66px">
               <label class="control-label" for="lock_at">{{#t "until"}}Until{{/t}}</label>
               <label class="screenreader-only" id="discussion_topic_available_until_accessible_label">
                 {{#t}}Discussion Topic will be available until{{/t}}
@@ -289,6 +314,7 @@
               <div class="controls">
                 <input type="text"
                        class="datetime_field input-medium"
+                       style="width: 122px"
                        name="lock_at"
                        id="lock_at"
                        aria-labelledby="discussion_topic_available_until_accessible_label"
@@ -361,7 +387,7 @@
 
 <div id="assignment_external_tools"></div>
 
-<div id="edit_discussion_form_buttons" class="form-actions flush">
+<div id="edit_discussion_form_buttons" class="form-actions flush" style="padding-left: 0px; margin-right: -0.75em">
   <button type="button" class="btn cancel_button">
     {{#t}}Cancel{{/t}}
   </button>

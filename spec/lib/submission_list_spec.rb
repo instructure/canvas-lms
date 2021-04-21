@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -39,6 +41,9 @@ describe SubmissionList do
   end
 
   it "should take the time zone into account when dividing grading history into days" do
+    Timecop.travel(Time.utc(2011, 12, 31, 23, 0)) do
+      Auditors::ActiveRecord::Partitioner.process
+    end
     course_with_teacher(:active_all => true)
     course_with_student(:course => @course, :active_all => true)
 
@@ -148,7 +153,7 @@ describe SubmissionList do
           :current_grader, :grade_matches_current_submission, :graded_at,
           :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
           :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-          :previous_grader, :process_attempts, :processed, :published_grade,
+          :previous_grader, :processed, :published_grade,
           :published_score, :safe_grader_id, :score, :student_entered_score,
           :student_user_id, :submission_id, :student_name, :submission_type,
           :updated_at, :url, :user_id, :workflow_state

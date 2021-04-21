@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -20,6 +22,7 @@ module Api::V1::SubmissionComment
   include GradebookSettingsHelpers
 
   ANONYMOUS_MODERATED_JSON_ATTRIBUTES = %i[
+    attempt
     author_id
     author_name
     cached_attachments
@@ -73,16 +76,22 @@ module Api::V1::SubmissionComment
 
     submission_comments.map do |comment|
       json = comment.as_json(include_root: false, methods: comment_methods, only: ANONYMOUS_MODERATED_JSON_ATTRIBUTES)
-      author_id = comment.author_id.to_s
-
       json[:publishable] = comment.publishable_for?(current_user)
-      if (
-          anonymous_students?(current_user: current_user, assignment: assignment) &&
-          student_ids_to_anonymous_ids(current_user: current_user, submissions: submissions, assignment: assignment, course: course).key?(author_id)
+      author_id = comment.author_id.to_s
+      student_anonymous_ids = student_ids_to_anonymous_ids(
+        assignment: assignment,
+        course: course,
+        current_user: current_user,
+        submissions: submissions
       )
+
+      if anonymous_students?(current_user: current_user, assignment: assignment) &&
+          student_anonymous_ids.key?(author_id) &&
+          comment.author != current_user
+
         json.delete(:author_id)
         json.delete(:author_name)
-        json[:anonymous_id] = student_ids_to_anonymous_ids(current_user: current_user, submissions: submissions, assignment: assignment, course: course)[author_id]
+        json[:anonymous_id] = student_anonymous_ids[author_id]
         json[:avatar_path] = User.default_avatar_fallback if display_avatars
       elsif anonymous_graders?(current_user: current_user, assignment: assignment) && assignment.grader_ids_to_anonymous_ids.key?(author_id)
         json.delete(:author_id)
@@ -135,7 +144,7 @@ module Api::V1::SubmissionComment
   def students(course:, assignment:, current_user:)
     @students ||= begin
       includes = gradebook_includes(user: current_user, course: course)
-      assignment.representatives(current_user, includes: includes)
+      assignment.representatives(user: current_user, includes: includes)
     end
   end
 

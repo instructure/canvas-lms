@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -21,6 +23,18 @@ module Lti
   class ToolProxyService
 
     attr_reader :tc_half_secret
+
+    class << self
+      def delete_subscriptions(tool_proxy)
+        Rails.logger.info { "in: ToolProxyService::delete_subscriptions, tool_proxy_id: #{tool_proxy.id}" }
+        tool_proxy.delete_subscription
+      end
+
+      def recreate_missing_subscriptions(tool_proxy)
+        Rails.logger.info { "in: ToolProxyService::recreate_missing_subscriptions, tool_proxy_id: #{tool_proxy.id}" }
+        tool_proxy.manage_subscription
+      end
+    end
 
     def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil, registration_url: nil)
       @tc_half_secret = tc_half_shared_secret
@@ -68,18 +82,6 @@ module Lti
       else
         security_contract.shared_secret
       end
-    end
-
-    def delete_subscriptions_for(tool_proxy)
-      product_family = tool_proxy.product_family
-      subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
-      lookups = AssignmentConfigurationToolLookup.where(tool_product_code: product_family.product_code,
-                                                        tool_vendor_code: product_family.vendor_code)
-      lookups.each { |l| subscription_helper.send_later(:destroy_subscription, l.subscription_id) }
-    end
-
-    def self.delete_subscriptions(tool_proxy)
-      self.new.delete_subscriptions_for(tool_proxy)
     end
 
     private
@@ -201,11 +203,11 @@ module Lti
     def create_placements(mh, message_handler)
 
       message_handler.placements.each do |placement|
-        placement.destroy unless ResourcePlacement::DEFAULT_PLACEMENTS.include? placement.placement
+        placement.destroy unless ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include? placement.placement
       end
 
       if (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
-        ResourcePlacement::DEFAULT_PLACEMENTS.each do |p|
+        ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each do |p|
           message_handler.placements.where(placement: p).first_or_create!
         end
       else

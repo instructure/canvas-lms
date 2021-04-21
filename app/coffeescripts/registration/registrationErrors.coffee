@@ -15,18 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../models/User'
-  '../models/Pseudonym'
-  'jsx/login/ObserverPairingCodeModel'
-  '../object/flatten'
-], (User, Pseudonym, ObserverPairingCode, flatten) ->
+import User from '../models/User'
+import Pseudonym from '../models/Pseudonym'
+import ObserverPairingCode from 'jsx/login/ObserverPairingCodeModel'
+import flatten from '../object/flatten'
 
-  # normalize errors we get from POST /user (user creation API)
-  registrationErrors = (errors, passwordPolicy = ENV.PASSWORD_POLICY) ->
-    flatten
-      user: User::normalizeErrors(errors.user)
-      pseudonym: Pseudonym::normalizeErrors(errors.pseudonym, passwordPolicy)
-      observee: Pseudonym::normalizeErrors(errors.observee, passwordPolicy)
-      pairing_code: ObserverPairingCode::normalizeErrors(errors.pairing_code)
-    , arrays: false
+# normalize errors we get from POST /user (user creation API)
+export default registrationErrors = (errors, passwordPolicy = ENV.PASSWORD_POLICY) ->
+  flatten
+    user: User::normalizeErrors(errors.user)
+    pseudonym: Pseudonym::normalizeErrors(errors.pseudonym, passwordPolicy)
+    observee: Pseudonym::normalizeErrors(errors.observee, passwordPolicy)
+    pairing_code: ObserverPairingCode::normalizeErrors(errors.pairing_code)
+  , arrays: false

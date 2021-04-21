@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -25,11 +27,7 @@ class InitNewGradeHistoryAuditLogIndexes < ActiveRecord::Migration[4.2]
   end
 
   def self.up
-    DataFixup::InitNewGradeHistoryAuditLogIndexes.send_later_if_production_enqueue_args(
-      :run, {
-        priority: Delayed::LOW_PRIORITY,
-        strand: "init_new_grade_history_audit_log_indexes:#{Shard.current.database_server.id}"
-      }
-    )
+    DataFixup::InitNewGradeHistoryAuditLogIndexes.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      strand: "init_new_grade_history_audit_log_indexes:#{Shard.current.database_server.id}").run
   end
 end

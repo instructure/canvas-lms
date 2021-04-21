@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LtiAdvantage::Claims
   require_relative 'claims/assignment_and_grade_service'
   require_relative 'claims/context'

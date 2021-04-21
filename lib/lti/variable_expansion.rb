@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -33,8 +35,12 @@ module Lti
       @default_name = default_name
     end
 
-    def expand(expander)
-      expand_for?(expander) ? expander.instance_exec(&@expansion_proc) : "$#{name}"
+    def expand(expander, *args)
+      if expand_for?(expander)
+        expander.instance_exec(*args, &@expansion_proc)
+      else
+        "$#{name}"
+      end
     end
 
     private

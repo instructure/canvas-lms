@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -27,8 +29,8 @@ module Types
     DOC
 
     implements GraphQL::Types::Relay::Node
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, "legacy canvas id", null: false, method: :id
     field :post_manually, Boolean, null: false
 
     field :assignment, Types::AssignmentType, null: true

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,7 +23,8 @@ module SIS
     class UserImporter < CSVBaseImporter
 
       def self.user_csv?(row)
-        row.include?('user_id') && row.include?('login_id')
+        login_csv = (row & %w{existing_user_id existing_integration_id existing_canvas_user_id}.freeze).empty?
+        row.include?('user_id') && row.include?('login_id') && login_csv
       end
 
       def self.identifying_fields
@@ -55,6 +58,7 @@ module SIS
           first_name: row['first_name'],
           last_name: row['last_name'],
           email: row['email'],
+          pronouns: row['pronouns'],
           password: row['password'],
           ssha_password: row['ssha_password'],
           integration_id: row['integration_id'],
@@ -63,6 +67,7 @@ module SIS
           sortable_name: row['sortable_name'],
           lineno: row['lineno'],
           csv: csv,
+          row: row,
           authentication_provider_id: row['authentication_provider_id']
         )
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -23,4 +25,8 @@ RSpec.configure do |config|
   config.color = true
 
   config.order = 'random'
+end
+
+class NullLogger
+  def warn(msg);end
 end

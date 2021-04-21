@@ -24,30 +24,13 @@ import EntryCollection from '../../collections/EntryCollection'
 import rEscape from '../../regexp/rEscape'
 
 export default class DiscussionFilterResultsView extends EntryCollectionView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.resetCollection = this.resetCollection.bind(this)
-    this.add = this.add.bind(this)
-    this.clearModel = this.clearModel.bind(this)
-    this.render = this.render.bind(this)
-    this.renderOrTeardownResults = this.renderOrTeardownResults.bind(this)
-    this.unreadFilter = this.unreadFilter.bind(this)
-    this.queryFilter = this.queryFilter.bind(this)
-    super(...args)
-  }
-
   static initClass() {
-    this.prototype.defaults = _.extend({}, EntryCollectionView.prototype.defaults, {
+    this.prototype.defaults = {
+      ...EntryCollectionView.prototype.defaults,
       descendants: 0,
       displayShowMore: true,
       threaded: true
-    })
+    }
   }
 
   initialize() {
@@ -56,7 +39,7 @@ export default class DiscussionFilterResultsView extends EntryCollectionView {
   }
 
   attach() {
-    return this.model.on('change', this.renderOrTeardownResults)
+    return this.model.on('change', this.renderOrTeardownResults, this)
   }
 
   setAllReadState(newReadState) {
@@ -68,7 +51,7 @@ export default class DiscussionFilterResultsView extends EntryCollectionView {
   resetCollection(models) {
     const collection = new EntryCollection(models, {perPage: 10})
     this.collection = collection.getPageAsCollection(0)
-    this.collection.on('add', this.add)
+    this.collection.on('add', this.add, this)
     this.render()
     // sync read_state changes between @collection and @allData materialized view
     return this.collection.on('change:read_state', (entry, read_state) => {

@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ready from '@instructure/ready'
 import UserObserveesView from 'compiled/views/UserObserveesView'
 import UserObserveesCollection from 'compiled/collections/UserObserveesCollection'
 
 const collection = new UserObserveesCollection()
 collection.user_id = ENV.current_user_id
 
-const userObservees = new UserObserveesView({collection})
-userObservees.render()
-userObservees.$el.appendTo('#content')
+ready(() => {
+  const userObservees = new UserObserveesView({collection})
+  userObservees.render()
+  userObservees.$el.appendTo('#content')
 
-collection.fetch()
+  collection.fetch()
+})

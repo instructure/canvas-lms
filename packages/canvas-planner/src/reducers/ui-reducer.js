@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { handleActions } from 'redux-actions';
+import {handleActions} from 'redux-actions'
 
-function handleSetNaiAboveScreen (state, action) {
-  return {...state, naiAboveScreen: action.payload};
+function handleSetNaiAboveScreen(state, action) {
+  return {...state, naiAboveScreen: action.payload}
 }
 
-export default handleActions({
-  SET_NAI_ABOVE_SCREEN: handleSetNaiAboveScreen,
-}, {
-  naiAboveScreen: false,
-});
+export default handleActions(
+  {
+    SET_NAI_ABOVE_SCREEN: handleSetNaiAboveScreen
+  },
+  {
+    naiAboveScreen: false
+  }
+)

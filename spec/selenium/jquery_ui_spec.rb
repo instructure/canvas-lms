@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -34,7 +34,7 @@ describe "jquery ui" do
 
   def create_simple_modal
     driver.execute_script(<<-JS)
-      return $('<div><select /><input /></div>')
+      $('<div><select /><input /></div>')
         .dialog()
         .find('select')
         .focus()

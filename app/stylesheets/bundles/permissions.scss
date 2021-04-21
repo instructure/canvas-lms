@@ -52,21 +52,16 @@ $darkRowBg: #f9f9f9;
 .ic-permissions__table-container {
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
-  width: 72vw;
-  height: 64vh;
+
+  margin: $ic-sp 0;
+  @include breakpoint(tablet) {
+    height: 64vh;
+  }
 
   // needed for scrolling + sticky headers
   overflow: auto;
   position: relative;
-
   border: 1px solid $border-color;
-
-  margin: direction-sides(20px 20px 20px 0px);
-}
-
-.permissions-v2__header_contianer {
-  width: 70vw;
-  margin: direction-sides(20px 20px 20px 0px);
 }
 
 .ic-permissions_role_tray {
@@ -112,8 +107,10 @@ $darkRowBg: #f9f9f9;
   }
 
   // content cell, aka a table cell with permission buttons inside it
+  // IconButtons and Checkboxes get slightly different margins because
+  // of the difference in size.
   .ic-permissions__cell-content {
-    margin-#{direction(left)}: 20px;
+    margin-#{direction(left)}: 18px;
     text-align: center;
   }
 
@@ -146,18 +143,6 @@ $darkRowBg: #f9f9f9;
     z-index: 9;
   }
 
-  // the header cells of the expanded row
-  .ic-permissions__left-header__expanded {
-    position: sticky;
-    #{direction(left)}: 0;
-
-    .ic-permissions__left-header__col-wrapper {
-
-      .ic-permissions__header-content {
-        text-align: direction(right);
-      }
-    }
-  }
   // specifically for the column header content
   .ic-permissions__header-content-col {
     justify-content: center;

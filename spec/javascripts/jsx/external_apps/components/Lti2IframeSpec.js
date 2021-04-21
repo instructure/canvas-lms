@@ -88,6 +88,11 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
       renderComponent()
       equal(getIframe().getAttribute('allow'), 'media; midi')
     })
+
+    test('sets the "data-lti-launch" attribute', () => {
+      renderComponent()
+      equal(getIframe().getAttribute('data-lti-launch'), 'true')
+    })
   })
 
   QUnit.module('"handleInstall" prop', hooks => {

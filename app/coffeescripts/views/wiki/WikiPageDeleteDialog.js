@@ -16,14 +16,13 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!pages'
-import DialogFormView from '../DialogFormView'
+import DialogFormView, {getResponsiveWidth} from '../DialogFormView'
 
 const dialogDefaults = {
   fixDialogButtons: false,
   title: I18n.t('delete_dialog_title', 'Delete Page'),
-  width: 400,
+  width: getResponsiveWidth(240, 400),
   height: 'auto'
 }
 
@@ -33,7 +32,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
 
     this.optionProperty('wiki_pages_path')
     this.optionProperty('focusOnCancel')
-    this.optionProperty('focusOnDelete')
+    this.optionProperty('onDelete')
   }
 
   wrapperTemplate() {
@@ -45,7 +44,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
   }
 
   initialize(options) {
-    return super.initialize(_.extend({}, dialogDefaults, options))
+    return super.initialize({...dialogDefaults, ...options})
   }
 
   submit(event) {
@@ -94,7 +93,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
       this.dialog.close()
     }
     if (this.buttonClicked === 'delete') {
-      return this.focusOnDelete != null ? this.focusOnDelete.focus() : undefined
+      return this.onDelete != null ? this.onDelete() : undefined
     } else {
       return this.focusOnCancel != null ? this.focusOnCancel.focus() : undefined
     }

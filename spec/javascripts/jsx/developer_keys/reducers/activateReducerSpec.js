@@ -19,51 +19,51 @@
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
 import reducer from 'jsx/developer_keys/reducers/activateReducer'
 
-QUnit.module('activateReducer');
+QUnit.module('activateReducer')
 
 const defaults = reducer(undefined, {})
 
 test('there are defaults', () => {
-  equal(defaults.activateDeveloperKeyPending, false);
-  equal(defaults.activateDeveloperKeySuccessful, false);
-  equal(defaults.activateDeveloperKeyError, null);
-});
+  equal(defaults.activateDeveloperKeyPending, false)
+  equal(defaults.activateDeveloperKeySuccessful, false)
+  equal(defaults.activateDeveloperKeyError, null)
+})
 
 test('responds to activateDeveloperKeyStart', () => {
   const state = {
     activateDeveloperKeyPending: false,
     activateDeveloperKeySuccessful: true,
     activateDeveloperKeyError: {}
-  };
+  }
 
-  const action = actions.activateDeveloperKeyStart();
-  const newState = reducer(state, action);
-  equal(newState.activateDeveloperKeyPending, true);
-  equal(newState.activateDeveloperKeySuccessful, false);
-  equal(newState.activateDeveloperKeyError, null);
-});
+  const action = actions.activateDeveloperKeyStart()
+  const newState = reducer(state, action)
+  equal(newState.activateDeveloperKeyPending, true)
+  equal(newState.activateDeveloperKeySuccessful, false)
+  equal(newState.activateDeveloperKeyError, null)
+})
 
 test('responds to activateDeveloperKeySuccessful', () => {
   const state = {
     activateDeveloperKeyPending: true,
-    activateDeveloperKeySuccessful: false,
-  };
-  const payload = {};
-  const action = actions.activateDeveloperKeySuccessful(payload);
-  const newState = reducer(state, action);
-  equal(newState.activateDeveloperKeyPending, false);
-  equal(newState.activateDeveloperKeySuccessful, true);
-});
+    activateDeveloperKeySuccessful: false
+  }
+  const payload = {}
+  const action = actions.activateDeveloperKeySuccessful(payload)
+  const newState = reducer(state, action)
+  equal(newState.activateDeveloperKeyPending, false)
+  equal(newState.activateDeveloperKeySuccessful, true)
+})
 
 test('responds to activateDeveloperKeyFailed', () => {
   const state = {
     activateDeveloperKeyPending: true,
     activateDeveloperKeyError: null
-  };
-  const error = {};
+  }
+  const error = {}
 
-  const action = actions.activateDeveloperKeyFailed(error);
-  const newState = reducer(state, action);
-  equal(newState.activateDeveloperKeyPending, false);
-  equal(newState.activateDeveloperKeyError, error);
-});
+  const action = actions.activateDeveloperKeyFailed(error)
+  const newState = reducer(state, action)
+  equal(newState.activateDeveloperKeyPending, false)
+  equal(newState.activateDeveloperKeyError, error)
+})

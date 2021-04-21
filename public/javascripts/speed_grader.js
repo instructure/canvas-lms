@@ -19,9 +19,11 @@
 /* global jsonData */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextArea} from '@instructure/ui-text-area'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
 import StatusPill from 'jsx/grading/StatusPill'
@@ -30,23 +32,26 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
+import originalityReportSubmissionKey from 'jsx/gradebook/shared/helpers/originalityReportSubmissionKey'
+import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
+import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
+import {isGraded, isPostable, similarityIcon} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
-import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
-import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import FailedUploadTreeKite from 'jsx/speed_grader/FailedUploadTreeKite'
-import WaitingWristWatch from 'jsx/speed_grader/WaitingWristWatch'
-import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {
+  IconUploadLine,
+  IconWarningLine,
+  IconCheckMarkIndeterminateLine
+} from '@instructure/ui-icons'
+import {Pill} from '@instructure/ui-pill'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!speed_grader'
 import natcompare from 'compiled/util/natcompare'
 import $ from 'jquery'
 import qs from 'qs'
@@ -64,6 +69,7 @@ import SpeedgraderHelpers, {
   setupIsAnonymous,
   setupIsModerated
 } from './speed_grader_helpers'
+import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
 import turnitinInfoTemplate from 'jst/_turnitinInfo'
 import turnitinScoreTemplate from 'jst/_turnitinScore'
 import vericiteInfoTemplate from 'jst/_vericiteInfo'
@@ -74,6 +80,7 @@ import './jquery.instructure_forms' /* ajaxJSONFiles */
 import './jquery.doc_previews' /* loadDocPreview */
 import './jquery.instructure_date_and_time' /* datetimeString */
 import 'jqueryui/dialog'
+import 'jqueryui/menu'
 import './jquery.instructure_misc_helpers' /* replaceTags */
 import './jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
 import './jquery.keycodes'
@@ -92,7 +99,10 @@ const selectors = new JQuerySelectorCache()
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
+const SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT = 'speed_grader_post_grades_menu_mount_point'
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
+const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
+  'speed_grader_hidden_submission_pill_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
@@ -103,6 +113,9 @@ let anonymizableUserId
 let anonymizableStudentId
 let anonymizableAuthorId
 let isModerated
+
+let commentSubmissionInProgress
+let reassignAssignmentInProgress
 
 let $window
 let $full_width_container
@@ -122,6 +135,7 @@ let $add_a_comment
 let $add_a_comment_submit_button
 let $add_a_comment_textarea
 let $comment_attachment_input_blank
+let $reassign_assignment
 let fileIndex
 let $add_attachment
 let $submissions_container
@@ -160,6 +174,7 @@ let $comment_submitted
 let $comment_submitted_message
 let $comment_saved
 let $comment_saved_message
+let $reassignment_complete
 let $selectmenu
 let browserableCssClasses
 let snapshotCache
@@ -175,7 +190,7 @@ let provisionalGraderDisplayNames
 let EG
 const customProvisionalGraderLabel = I18n.t('Custom')
 const anonymousAssignmentDetailedReportTooltip = I18n.t(
-  'Cannot view detailed reports for anonymous assignments until grades are unmuted.'
+  'Cannot view detailed reports for anonymous assignments until grades are posted.'
 )
 
 const HISTORY_PUSH = 'push'
@@ -305,21 +320,21 @@ function mergeStudentsAndSubmission() {
 
   // handle showing students only in a certain section.
   if (!jsonData.GROUP_GRADING_MODE) {
-    if (ENV.new_gradebook_enabled) {
-      sectionToShow = ENV.selected_section_id
-    } else {
-      sectionToShow = userSettings.contextGet('grading_show_only_section')
-    }
+    sectionToShow = ENV.selected_section_id
   }
 
+  // We have already have done the filtering by section on the server, so this
+  // is redundant (but not the worst thing in the world since we still need to
+  // send the user away if there are no students in the section).
   if (sectionToShow) {
     sectionToShow = sectionToShow.toString()
-    const tempArray = $.grep(
-      jsonData.studentsWithSubmissions,
-      student => $.inArray(sectionToShow, student.section_ids) != -1
+
+    const studentsInSection = jsonData.studentsWithSubmissions.filter(student =>
+      student.section_ids.includes(sectionToShow)
     )
-    if (tempArray.length) {
-      jsonData.studentsWithSubmissions = tempArray
+
+    if (studentsInSection.length > 0) {
+      jsonData.studentsWithSubmissions = studentsInSection
     } else {
       alert(
         I18n.t(
@@ -331,7 +346,7 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  jsonData.studentMap = _.indexBy(jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
@@ -437,7 +452,7 @@ function initDropdown() {
 
     $menu
       .insertBefore($selectmenu_list)
-      .bind('mouseenter mouseleave', function(event) {
+      .bind('mouseenter mouseleave', function (event) {
         $(this)
           .toggleClass(
             'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
@@ -449,7 +464,7 @@ function initDropdown() {
       .find('ul')
       .hide()
       .menu()
-      .delegate('a', 'click mousedown', function() {
+      .delegate('a', 'click mousedown', function () {
         EG.changeToSection($(this).data('section-id'))
       })
 
@@ -487,33 +502,44 @@ function initDropdown() {
   }
 }
 
-function setupHeader() {
-  return {
-    elements: {
-      mute: {
-        icon: $('#mute_link i'),
-        label: $('#mute_link .mute_label'),
-        link: $('#mute_link'),
-        modal: $('#mute_dialog')
-      },
-      unmute: {
-        modal: $('#unmute_dialog')
-      },
-      nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
-      settings: {form: $('#settings_form')}
+function setupPostPolicies() {
+  const {jsonData} = window
+  const gradesPublished = !jsonData.moderated_grading || jsonData.grades_published_at != null
+
+  EG.postPolicies = new PostPolicies({
+    assignment: {
+      anonymousGrading: jsonData.anonymous_grading,
+      gradesPublished,
+      id: jsonData.id,
+      name: jsonData.title
     },
+    sections: jsonData.context.active_course_sections,
+    updateSubmission: EG.setOrUpdateSubmission,
+    afterUpdateSubmission() {
+      EG.showGrade()
+    }
+  })
+
+  renderPostGradesMenu()
+}
+
+function setupHeader() {
+  const elements = {
+    nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
+    settings: {form: $('#settings_form')}
+  }
+
+  return {
+    elements,
     courseId: utils.getParam('courses'),
     assignmentId: utils.getParam('assignment_id'),
     init() {
-      this.muted = this.elements.mute.link.data('muted')
       this.addEvents()
       this.createModals()
       return this
     },
     addEvents() {
       this.elements.nav.click($.proxy(this.toAssignment, this))
-      this.elements.mute.link.click($.proxy(this.onMuteClick, this))
-
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this))
     },
     createModals() {
@@ -528,68 +554,23 @@ function setupHeader() {
       // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
       // button. So here we'll manually re-enable it.
       this.elements.settings.form.find('.submit_button').removeAttr('disabled')
-
-      this.elements.mute.modal.dialog({
-        autoOpen: false,
-        buttons: [
-          {
-            text: I18n.t('cancel_button', 'Cancel'),
-            click: $.proxy(function() {
-              this.elements.mute.modal.dialog('close')
-            }, this)
-          },
-          {
-            text: I18n.t('mute_assignment', 'Mute Assignment'),
-            class: 'btn-primary btn-mute',
-            click: $.proxy(function() {
-              this.toggleMute()
-              this.elements.mute.modal.dialog('close')
-            }, this)
-          }
-        ],
-        modal: true,
-        resizable: false,
-        title: this.elements.mute.modal.data('title'),
-        width: 400
-      })
-      this.elements.unmute.modal.dialog({
-        autoOpen: false,
-        buttons: [
-          {
-            text: I18n.t('Cancel'),
-            click: $.proxy(function() {
-              this.elements.unmute.modal.dialog('close')
-            }, this)
-          },
-          {
-            text: I18n.t('Unmute Assignment'),
-            class: 'btn-primary btn-unmute',
-            click: $.proxy(function() {
-              this.toggleMute()
-              this.elements.unmute.modal.dialog('close')
-            }, this)
-          }
-        ],
-        modal: true,
-        resizable: false,
-        title: this.elements.unmute.modal.data('title'),
-        width: 400
-      })
     },
 
     toAssignment(e) {
       e.preventDefault()
       const classes = e.target.getAttribute('class').split(' ')
-      if (_.contains(classes, 'prev')) {
+      if (classes.includes('prev')) {
         EG.prev()
-      } else if (_.contains(classes, 'next')) {
+      } else if (classes.includes('next')) {
         EG.next()
       }
     },
 
     keyboardShortcutInfoModal() {
-      const questionMarkKeyDown = $.Event('keydown', {keyCode: 191})
-      $(document).trigger(questionMarkKeyDown)
+      if (!ENV.disable_keyboard_shortcuts) {
+        const questionMarkKeyDown = $.Event('keydown', {keyCode: 191, shiftKey: true})
+        $(document).trigger(questionMarkKeyDown)
+      }
     },
 
     submitSettingsForm(e) {
@@ -617,56 +598,6 @@ function setupHeader() {
         event.preventDefault()
       }
       this.elements.settings.form.dialog('open')
-    },
-
-    onMuteClick(e) {
-      e.preventDefault()
-      if (this.muted) {
-        this.elements.unmute.modal.dialog('open')
-      } else {
-        this.elements.mute.modal.dialog('open')
-      }
-    },
-
-    muteUrl() {
-      return `/courses/${this.courseId}/assignments/${this.assignmentId}/mute`
-    },
-
-    toggleMute() {
-      this.muted = !this.muted
-      const label = this.muted
-          ? I18n.t('unmute_assignment', 'Unmute Assignment')
-          : I18n.t('mute_assignment', 'Mute Assignment'),
-        action = this.muted ? 'mute' : 'unmute',
-        actions = {
-          /* Mute action */
-          mute() {
-            this.elements.mute.icon.removeClass('icon-unmuted').addClass('icon-muted')
-            $.ajaxJSON(
-              this.muteUrl(),
-              'put',
-              {status: true},
-              $.proxy(function() {
-                this.elements.mute.label.text(label)
-              }, this)
-            )
-          },
-
-          /* Unmute action */
-          unmute() {
-            this.elements.mute.icon.removeClass('icon-muted').addClass('icon-unmuted')
-            $.ajaxJSON(
-              this.muteUrl(),
-              'put',
-              {status: false},
-              $.proxy(function() {
-                this.elements.mute.label.text(label)
-              }, this)
-            )
-          }
-        }
-
-      actions[action].apply(this)
     }
   }
 }
@@ -678,21 +609,47 @@ function unmountCommentTextArea() {
 
 function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
-  let icon = []
-  switch (attachment.workflow_state) {
-    case 'pending_upload':
-      icon = [<IconUpload />, I18n.t('Uploading Submission')]
-      break
-    case 'errored':
-      icon = [<IconWarning />, I18n.t('Submission Failed to Submit')]
-      break
-    case 'processed':
-      break
-    default:
-      icon = [<IconCheckMarkIndeterminate />, I18n.t('No File Submitted')]
+  const iconAndTipMap = {
+    pending: {
+      icon: <IconUploadLine />,
+      tip: I18n.t('Uploading Submission')
+    },
+    failed: {
+      icon: <IconWarningLine />,
+      tip: I18n.t('Submission Failed to Submit')
+    },
+    default: {
+      icon: <IconCheckMarkIndeterminateLine />,
+      tip: I18n.t('No File Submitted')
+    }
   }
 
-  ReactDOM.render(<Tooltip tip={icon[1]}>{icon[0]}</Tooltip>, mountPoint)
+  if (attachment.upload_status === 'success') {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  } else {
+    const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
+    const tooltip = (
+      <Tooltip tip={tip} on={['click', 'hover', 'focus']}>
+        <Button variant="icon" icon={icon}>
+          <ScreenReaderContent>toggle tooltip</ScreenReaderContent>
+        </Button>
+      </Tooltip>
+    )
+    ReactDOM.render(tooltip, mountPoint)
+  }
+}
+
+function renderHiddenSubmissionPill(submission) {
+  const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
+
+  if (isPostable(submission)) {
+    ReactDOM.render(
+      <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
+      mountPoint
+    )
+  } else {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
 }
 
 function renderCommentTextArea() {
@@ -733,9 +690,7 @@ function initCommentBox() {
         'create',
         'any',
         (id, type) => {
-          $('#media_media_recording')
-            .data('comment_id', id)
-            .data('comment_type', type)
+          $('#media_media_recording').data('comment_id', id).data('comment_type', type)
           EG.addSubmissionComment()
         },
         () => {
@@ -764,7 +719,7 @@ function initCommentBox() {
       ),
       mic_blocked: I18n.t(
         'mic_blocked_message',
-        'Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream'
+        'Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone'
       ),
       no_speech: I18n.t(
         'nodetect_message',
@@ -791,9 +746,7 @@ function initCommentBox() {
             text: I18n.t('buttons.dialog_buttons', 'Cancel'),
             click() {
               recognition.stop()
-              $(this)
-                .dialog('close')
-                .remove()
+              $(this).dialog('close').remove()
             }
           },
           {
@@ -810,19 +763,15 @@ function initCommentBox() {
         ],
         close() {
           recognition.stop()
-          $(this)
-            .dialog('close')
-            .remove()
+          $(this).dialog('close').remove()
         }
       })
       return false
     })
     // show the div that contains the button because it is hidden from browsers that dont support speech
-    $('.speech_recognition_link')
-      .closest('div.speech-recognition')
-      .show()
+    $('.speech_recognition_link').closest('div.speech-recognition').show()
 
-    var processSpeech = function($this) {
+    var processSpeech = function ($this) {
       if ($('#record_button').attr('recording') == 'true') {
         recognition.stop()
         const current_comment = $('#final_results').html() + $('#interim_results').html()
@@ -834,7 +783,7 @@ function initCommentBox() {
       }
     }
 
-    var formatComment = function(current_comment) {
+    var formatComment = function (current_comment) {
       return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
     }
 
@@ -843,14 +792,14 @@ function initCommentBox() {
       recognition.interimResults = true
       let final_transcript = ''
 
-      recognition.onstart = function() {
+      recognition.onstart = function () {
         $('#dialog_message').text(messages.recording)
         $('#record_button')
           .attr('recording', true)
           .attr('aria-label', I18n.t('dialog_button.aria_stop', 'Hit "Stop" to end recording.'))
       }
 
-      recognition.onresult = function(event) {
+      recognition.onresult = function (event) {
         let interim_transcript = ''
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
@@ -863,21 +812,21 @@ function initCommentBox() {
         }
       }
 
-      recognition.onaudiostart = function(event) {
+      recognition.onaudiostart = function (event) {
         // this call is required for onaudioend event to trigger
       }
 
-      recognition.onaudioend = function(event) {
+      recognition.onaudioend = function (event) {
         if ($('#final_results').text() != '' || $('#interim_results').text() != '') {
           $('#dialog_message').text(messages.recording_expired)
         }
       }
 
-      recognition.onend = function(event) {
+      recognition.onend = function (event) {
         final_transcript = ''
       }
 
-      recognition.onerror = function(event) {
+      recognition.onerror = function (event) {
         if (event.error == 'not-allowed') {
           $('#dialog_message').text(messages.mic_blocked)
         } else if ((event.error = 'no-speech')) {
@@ -890,19 +839,14 @@ function initCommentBox() {
 
       // xsslint safeString.function linebreak
       function linebreak(transcript) {
-        return htmlEscape(transcript)
-          .replace(/\n\n/g, '<p></p>')
-          .replace(/\n/g, '<br>')
+        return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')
       }
     }
   }
 }
 
 function hideMediaRecorderContainer() {
-  $('#media_media_recording')
-    .hide()
-    .removeData('comment_id')
-    .removeData('comment_type')
+  $('#media_media_recording').hide().removeData('comment_id').removeData('comment_type')
 }
 
 function isAssessmentEditableByMe(assessment) {
@@ -1000,10 +944,8 @@ function initRubricStuff() {
     }
   })
 
-  $('.save_rubric_button').click(function() {
-    const $rubric = $(this)
-      .parents('#rubric_holder')
-      .find('.rubric')
+  $('.save_rubric_button').click(function () {
+    const $rubric = $(this).parents('#rubric_holder').find('.rubric')
     const data = rubricAssessment.assessmentData($rubric)
     if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
       data.provisional = '1'
@@ -1020,7 +962,7 @@ function initRubricStuff() {
     } else {
       data.graded_anonymously = utils.shouldHideStudentNames()
     }
-    const url = $('.update_rubric_assessment_url').attr('href')
+    const url = ENV.update_rubric_assessment_url
     const method = 'POST'
     EG.toggleFullRubric('close')
 
@@ -1030,19 +972,21 @@ function initRubricStuff() {
         rubricAssessment.updateRubricAssociation($rubric, response.rubric_association)
         delete response.rubric_association
       }
-      for (let i = 0; i < EG.currentStudent.rubric_assessments.length; i++) {
-        if (response.id === EG.currentStudent.rubric_assessments[i].id) {
-          $.extend(true, EG.currentStudent.rubric_assessments[i], response)
+
+      // If the student has a submission, update it with the data returned,
+      // otherwise we need to create a submission for them.
+      const assessedStudent = EG.setOrUpdateSubmission(response.artifact)
+
+      for (let i = 0; i < assessedStudent.rubric_assessments.length; i++) {
+        if (response.id === assessedStudent.rubric_assessments[i].id) {
+          $.extend(true, assessedStudent.rubric_assessments[i], response)
           found = true
           continue
         }
       }
       if (!found) {
-        EG.currentStudent.rubric_assessments.push(response)
+        assessedStudent.rubric_assessments.push(response)
       }
-
-      // if this student has a submission, update it with the data returned, otherwise we need to create a submission for them
-      EG.setOrUpdateSubmission(response.artifact)
 
       // this next part will take care of group submissions, so that when one member of the group gets assessesed then everyone in the group will get that same assessment.
       $.each(response.related_group_submissions_and_assessments, (i, submissionAndAssessment) => {
@@ -1071,6 +1015,9 @@ function initRubricStuff() {
 }
 
 function initKeyCodes() {
+  if (ENV.disable_keyboard_shortcuts) {
+    return
+  }
   const keycodeOptions = {
     keyCodes: 'j k p n c r g',
     ignore: 'input, textarea, embed, object'
@@ -1100,24 +1047,23 @@ function initGroupAssignmentMode() {
   }
 }
 
-function refreshGrades(cb) {
+function refreshGrades(callback) {
   const courseId = ENV.course_id
   const assignmentId = EG.currentStudent.submission.assignment_id
   const studentId = EG.currentStudent.submission[anonymizableUserId]
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}.json?include[]=submission_history`
   const currentStudentIDAsOfAjaxCall = EG.currentStudent[anonymizableId]
   $.getJSON(url, submission => {
-    if (currentStudentIDAsOfAjaxCall === EG.currentStudent[anonymizableId]) {
-      EG.currentStudent.submission = submission
-      EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(
-        EG.currentStudent,
-        ENV.grading_role
-      )
+    const studentToRefresh = window.jsonData.studentMap[currentStudentIDAsOfAjaxCall]
+    EG.setOrUpdateSubmission(submission)
+
+    EG.updateSelectMenuStatus(studentToRefresh)
+    if (studentToRefresh === EG.currentStudent) {
       EG.showGrade()
-      EG.updateSelectMenuStatus(EG.currentStudent)
-      if (cb) {
-        cb(submission)
-      }
+    }
+
+    if (callback) {
+      callback(submission)
     }
   })
 }
@@ -1162,6 +1108,49 @@ function renderSubmissionCommentsDownloadLink(submission) {
   return mountPoint
 }
 
+function renderDeleteAttachmentLink($submission_file, attachment) {
+  if (ENV.can_delete_attachments) {
+    const $delete_link = $submission_file.find('a.submission-file-delete')
+    $delete_link.click(function (event) {
+      event.preventDefault()
+      const url = $(this).attr('href')
+      if (
+        confirm(
+          I18n.t(
+            'Deleting a submission file is typically done only when a student posts inappropriate or private material.\n\nThis action is irreversible. Are you sure you wish to delete %{file}?',
+            {file: attachment.display_name}
+          )
+        )
+      ) {
+        $full_width_container.disableWhileLoading(
+          $.ajaxJSON(
+            url,
+            'DELETE',
+            {},
+            _data => {
+              // a more targeted refresh would be preferable but this works (and `EG.showSubmission()` doesn't)
+              window.location.reload()
+            },
+            data => {
+              if (data.status === 'unauthorized') {
+                $.flashError(
+                  I18n.t(
+                    'You do not have permission to delete %{file}. Please contact your account administrator.',
+                    {file: attachment.display_name}
+                  )
+                )
+              } else {
+                $.flashError(I18n.t('Error deleting %{file}', {file: attachment.display_name}))
+              }
+            }
+          )
+        )
+      }
+    })
+    $delete_link.show()
+  }
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -1177,7 +1166,7 @@ EG = {
       $resize_overlay.hide()
     })
     // it should disappear before it's clickable, but just in case...
-    $resize_overlay.click(function(event) {
+    $resize_overlay.click(function (event) {
       $(this).hide()
     })
     $width_resizer
@@ -1216,13 +1205,13 @@ EG = {
           $resize_overlay.hide()
         }
       })
-      .click(function(event) {
+      .click(function (event) {
         event.preventDefault()
         if ($full_width_container.hasClass('full_width')) {
           $full_width_container.removeClass('full_width')
         } else {
           makeFullWidth()
-          $(this).addClass('highlight', 100, function() {
+          $(this).addClass('highlight', 100, function () {
             $(this).removeClass('highlight', 4000)
           })
         }
@@ -1248,11 +1237,9 @@ EG = {
     header.init()
     initKeyCodes()
 
-    $('.dismiss_alert').click(function(e) {
+    $('.dismiss_alert').click(function (e) {
       e.preventDefault()
-      $(this)
-        .closest('.alert')
-        .hide()
+      $(this).closest('.alert').hide()
     })
 
     $('#eg_sort_by').val(userSettings.get('eg_sort_by'))
@@ -1279,7 +1266,7 @@ EG = {
     mergeStudentsAndSubmission()
 
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
-      if (window.history.length === 1) {
+      if (SpeedgraderHelpers.getHistory().length === 1) {
         alert(
           I18n.t(
             'alerts.no_students_in_groups_close',
@@ -1294,22 +1281,37 @@ EG = {
             "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
           )
         )
-        window.history.back()
+        SpeedgraderHelpers.getHistory().back()
       }
     } else if (!jsonData.studentsWithSubmissions.length) {
-      alert(
-        I18n.t(
-          'alerts.no_active_students',
-          'Sorry, there are either no active students in the course or none are gradable by you.'
+      // If we're trying to load a section with no students, we already showed
+      // a "could not find any students in that section" alert and arranged
+      // for a reload of the page, so don't show a second alert--but also don't
+      // execute the else clause below this one since we don't want to set up
+      // the rest of SpeedGrader
+      if (sectionToShow == null) {
+        alert(
+          I18n.t(
+            'alerts.no_active_students',
+            'Sorry, there are either no active students in the course or none are gradable by you.'
+          )
         )
-      )
-      window.history.back()
+        SpeedgraderHelpers.getHistory().back()
+      }
     } else {
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+
+      if (ENV.student_group_reason_for_change != null) {
+        SpeedGraderAlerts.showStudentGroupChangeAlert({
+          selectedStudentGroup: ENV.selected_student_group,
+          reasonForChange: ENV.student_group_reason_for_change
+        })
+      }
+      setupPostPolicies()
     }
   },
 
@@ -1323,10 +1325,15 @@ EG = {
     const queryParams = EG.parseDocumentQuery()
     if (queryParams && queryParams[anonymizableStudentId]) {
       initialStudentId = queryParams[anonymizableStudentId]
-    } else if (document.location.hash !== '') {
-      initialStudentId = extractStudentIdFromHash(document.location.hash)
+    } else if (SpeedgraderHelpers.getLocationHash() !== '') {
+      initialStudentId = extractStudentIdFromHash(SpeedgraderHelpers.getLocationHash())
     }
-    document.location.hash = ''
+    SpeedgraderHelpers.setLocationHash('')
+
+    const attemptParam = utils.getParam('attempt')
+    if (attemptParam) {
+      EG.initialVersion = parseInt(attemptParam, 10) - 1
+    }
 
     // Check if this student ID "resolves" to a different one (e.g., it's an
     // invalid ID, or is in a group with someone else as a representative).
@@ -1377,9 +1384,7 @@ EG = {
     }
 
     if (rubricFull.filter(':visible').length || force === 'close') {
-      $('#grading')
-        .show()
-        .height('auto')
+      $('#grading').show().height('auto')
       rubricFull.fadeOut()
       $('.toggle_full_rubric').focus()
     } else {
@@ -1428,9 +1433,9 @@ EG = {
     )
 
     if (behavior === HISTORY_PUSH) {
-      window.history.pushState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().pushState(stateHash, '', url)
     } else {
-      window.history.replaceState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().replaceState(stateHash, '', url)
     }
   },
 
@@ -1456,23 +1461,12 @@ EG = {
   },
 
   goToStudent(studentIdentifier, historyBehavior = null) {
-    const hideStudentNames = utils.shouldHideStudentNames()
     const student = jsonData.studentMap[studentIdentifier]
 
     if (student) {
       $selectmenu.selectmenu('value', student[anonymizableId])
       if (!this.currentStudent || this.currentStudent[anonymizableId] !== student[anonymizableId]) {
-        handleStudentOrSectionSelected(studentIdentifier, historyBehavior)
-      }
-
-      if (hideStudentNames || isAnonymous || !student.avatar_path) {
-        $avatar_image.hide()
-      } else {
-        // If there's any kind of delay in loading the user's avatar, it's
-        // better to show a blank image than the previous student's image.
-        const $new_image = $avatar_image.clone().show()
-        $avatar_image.after($new_image.attr('src', student.avatar_path)).remove()
-        $avatar_image = $new_image
+        EG.handleStudentChanged(historyBehavior)
       }
     }
   },
@@ -1493,6 +1487,8 @@ EG = {
     // calling _.values on a large collection could be slow, that's why we're fetching from studentMap first
     this.currentStudent =
       jsonData.studentMap[selectMenuValue] || _.values(jsonData.studentsWithSubmissions)[0]
+
+    EG.resetReassignButton()
 
     if (historyBehavior) {
       EG.updateHistoryForCurrentStudent(historyBehavior)
@@ -1524,6 +1520,64 @@ EG = {
       $full_width_container.disableWhileLoading(this.fetchProvisionalGrades())
     } else {
       this.showStudent()
+    }
+
+    this.setCurrentStudentAvatar()
+  },
+
+  resetReassignButton() {
+    // Restore the tooltip text for the reassignment button
+    // and enable the reassignment button if this user has
+    // posted a comment since submission
+    if ($reassign_assignment[0]) {
+      const redoRequest = this.currentStudent?.submission?.redo_request
+      let disableReassign = true
+      let submittedAt = this.currentStudent?.submission?.submitted_at
+      let maxAttempts = false
+      let tooltipText = ''
+      if (submittedAt) {
+        const {allowed_attempts} = window.jsonData
+        maxAttempts =
+          allowed_attempts != null && allowed_attempts > 0
+            ? (this.currentStudent.submission.attempt || 1) >= window.jsonData.allowed_attempts
+            : false
+        submittedAt = new Date(submittedAt)
+        let submissionComments = this.currentStudent.submission.submission_comments
+        if (submissionComments) {
+          submissionComments = submissionComments.filter(
+            comment => comment.author_id === ENV.current_user_id
+          )
+          const lastCommentByUser = submissionComments[submissionComments.length - 1]
+          if (lastCommentByUser?.created_at) {
+            const commentedAt = new Date(lastCommentByUser.created_at)
+            disableReassign = redoRequest || commentedAt < submittedAt || maxAttempts
+          }
+        }
+      }
+      $reassign_assignment.attr('disabled', disableReassign)
+      $reassign_assignment.text(redoRequest ? I18n.t('Reassigned') : I18n.t('Reassign Assignment'))
+      if (disableReassign) {
+        if (redoRequest) {
+          tooltipText = I18n.t('Assignment is reassigned.')
+        } else if (maxAttempts) {
+          tooltipText = I18n.t('Student has met maximum allowed attempts.')
+        } else {
+          tooltipText = I18n.t('Student feedback required in comments above to reassign.')
+        }
+      }
+      $reassign_assignment.parent().attr('title', tooltipText)
+    }
+  },
+
+  setCurrentStudentAvatar() {
+    if (utils.shouldHideStudentNames() || isAnonymous || !this.currentStudent.avatar_path) {
+      $avatar_image.hide()
+    } else {
+      // If there's any kind of delay in loading the user's avatar, it's
+      // better to show a blank image than the previous student's image.
+      const $new_image = $avatar_image.clone().show()
+      $avatar_image.after($new_image.attr('src', this.currentStudent.avatar_path)).remove()
+      $avatar_image = $new_image
     }
   },
 
@@ -1684,6 +1738,25 @@ EG = {
     }
   },
 
+  plagiarismIndicator({plagiarismAsset, reportUrl = null, tooltip} = {}) {
+    const {status, similarity_score} = plagiarismAsset
+
+    const $indicator = reportUrl != null ? $('<a />').attr('href', reportUrl) : $('<span />')
+    $indicator
+      .attr('title', tooltip)
+      .addClass('similarity_score_container')
+      .append($(similarityIcon(plagiarismAsset)))
+
+    if (status === 'scored') {
+      const $similarityScore = $('<span />')
+        .addClass('turnitin_similarity_score')
+        .html(htmlEscape(`${similarity_score}%`))
+      $indicator.append($similarityScore)
+    }
+
+    return $indicator
+  },
+
   populateTurnitin(
     submission,
     assetString,
@@ -1693,7 +1766,8 @@ EG = {
     isMostRecent
   ) {
     let $turnitinSimilarityScore = null
-    const showLegacyResubmit = isMostRecent && !submission.has_plagiarism_tool
+    const showLegacyResubmit =
+      isMostRecent && (jsonData.vericite_enabled || jsonData.turnitin_enabled)
 
     // build up new values based on this asset
     if (
@@ -1705,20 +1779,30 @@ EG = {
         $assignment_submission_turnitin_report_url,
         $assignment_submission_originality_report_url
       )
-      const reportUrl = $.replaceTags(urlContainer.attr('href'), {
+      const tooltip = I18n.t('Similarity Score - See detailed report')
+      let reportUrl = $.replaceTags(urlContainer.attr('href'), {
         [anonymizableUserId]: submission[anonymizableUserId],
         asset_string: assetString
       })
-      const tooltip = I18n.t('Similarity Score - See detailed report')
+      reportUrl += (reportUrl.includes('?') ? '&' : '?') + 'attempt=' + submission.attempt
 
-      $turnitinScoreContainer.html(
-        turnitinScoreTemplate({
-          state: `${turnitinAsset.state || 'no'}_score`,
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        const $indicator = this.plagiarismIndicator({
+          plagiarismAsset: turnitinAsset,
           reportUrl,
-          tooltip,
-          score: `${turnitinAsset.similarity_score}%`
+          tooltip
         })
-      )
+        $turnitinScoreContainer.empty().append($indicator)
+      } else {
+        $turnitinScoreContainer.html(
+          turnitinScoreTemplate({
+            state: `${turnitinAsset.state || 'no'}_score`,
+            reportUrl,
+            tooltip,
+            score: `${turnitinAsset.similarity_score}%`
+          })
+        )
+      }
     } else if (turnitinAsset.status) {
       // status == 'error' or status == 'pending'
       const pendingTooltip = I18n.t(
@@ -1729,14 +1813,23 @@ EG = {
           'turnitin.tooltip.error',
           'Similarity Score - See submission error details'
         )
-      $turnitinSimilarityScore = $(
-        turnitinScoreTemplate({
-          state: `submission_${turnitinAsset.status}`,
-          reportUrl: '#',
-          tooltip: turnitinAsset.status == 'error' ? errorTooltip : pendingTooltip,
-          icon: `/images/turnitin_submission_${turnitinAsset.status}.png`
+      const tooltip = turnitinAsset.status === 'error' ? errorTooltip : pendingTooltip
+
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        $turnitinSimilarityScore = this.plagiarismIndicator({
+          plagiarismAsset: turnitinAsset,
+          tooltip
         })
-      )
+      } else {
+        $turnitinSimilarityScore = $(
+          turnitinScoreTemplate({
+            icon: `/images/turnitin_submission_${turnitinAsset.status}.png`,
+            reportUrl: '#',
+            state: `submission_${turnitinAsset.status}`,
+            tooltip
+          })
+        )
+      }
       $turnitinScoreContainer.append($turnitinSimilarityScore)
       $turnitinSimilarityScore.click(event => {
         event.preventDefault()
@@ -1744,13 +1837,10 @@ EG = {
       })
 
       const defaultInfoMessage = I18n.t(
-          'turnitin.info_message',
-          'This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score.'
-        ),
-        defaultErrorMessage = I18n.t(
-          'turnitin.error_message',
-          'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
-        )
+        'turnitin.info_message',
+        'This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score.'
+      )
+      const defaultErrorMessage = SpeedgraderHelpers.plagiarismErrorMessage(turnitinAsset)
       const $turnitinInfo = $(
         turnitinInfoTemplate({
           assetString,
@@ -1798,14 +1888,23 @@ EG = {
         tooltip = anonymousAssignmentDetailedReportTooltip
       }
 
-      $vericiteScoreContainer.html(
-        vericiteScoreTemplate({
-          state: `${vericiteAsset.state || 'no'}_score`,
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        const $indicator = this.plagiarismIndicator({
+          plagiarismAsset: vericiteAsset,
           reportUrl,
-          tooltip,
-          score: `${vericiteAsset.similarity_score}%`
+          tooltip
         })
-      )
+        $vericiteScoreContainer.empty().append($indicator)
+      } else {
+        $vericiteScoreContainer.html(
+          vericiteScoreTemplate({
+            state: `${vericiteAsset.state || 'no'}_score`,
+            reportUrl,
+            tooltip,
+            score: `${vericiteAsset.similarity_score}%`
+          })
+        )
+      }
     } else if (vericiteAsset.status) {
       // status == 'error' or status == 'pending'
       const pendingTooltip = I18n.t(
@@ -1816,14 +1915,22 @@ EG = {
           'vericite.tooltip.error',
           'VeriCite Similarity Score - See submission error details'
         )
-      $vericiteSimilarityScore = $(
-        vericiteScoreTemplate({
-          state: `submission_${vericiteAsset.status}`,
-          reportUrl: '#',
-          tooltip: vericiteAsset.status == 'error' ? errorTooltip : pendingTooltip,
-          icon: `/images/turnitin_submission_${vericiteAsset.status}.png`
+      const tooltip = vericiteAsset.status === 'error' ? errorTooltip : pendingTooltip
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        $vericiteSimilarityScore = this.plagiarismIndicator({
+          plagiarismAsset: vericiteAsset,
+          tooltip
         })
-      )
+      } else {
+        $vericiteSimilarityScore = $(
+          vericiteScoreTemplate({
+            icon: `/images/turnitin_submission_${vericiteAsset.status}.png`,
+            reportUrl: '#',
+            state: `submission_${vericiteAsset.status}`,
+            tooltip
+          })
+        )
+      }
       $vericiteScoreContainer.append($vericiteSimilarityScore)
       $vericiteSimilarityScore.click(event => {
         event.preventDefault()
@@ -1855,11 +1962,9 @@ EG = {
           $assignment_submission_resubmit_to_vericite_url.attr('href'),
           {user_id: submission[anonymizableUserId]}
         )
-        $vericiteInfo.find('.vericite_resubmit_button').click(function(event) {
+        $vericiteInfo.find('.vericite_resubmit_button').click(function (event) {
           event.preventDefault()
-          $(this)
-            .attr('disabled', true)
-            .text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
+          $(this).attr('disabled', true).text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
 
           $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
             SpeedgraderHelpers.reloadPage()
@@ -1907,7 +2012,8 @@ EG = {
       submission.turnitin_data && submission.turnitin_data.provider === 'vericite'
 
     SpeedgraderHelpers.plagiarismResubmitButton(
-      submission.has_originality_score,
+      submission.has_originality_score &&
+        Object.values(submission.turnitin_data).every(tiid => tiid.status !== 'error'),
       $('#plagiarism_platform_info_container')
     )
 
@@ -1943,8 +2049,14 @@ EG = {
       var $turnitinScoreContainer = $grade_container.find('.turnitin_score_container').empty(),
         $turnitinInfoContainer = $grade_container.find('.turnitin_info_container').empty(),
         assetString = `submission_${submission.id}`,
+        turnitinAsset = null
+
+      if (turnitinEnabled && submission.turnitin_data) {
         turnitinAsset =
-          turnitinEnabled && submission.turnitin_data && submission.turnitin_data[assetString]
+          submission.turnitin_data[originalityReportSubmissionKey(submission)] ||
+          submission.turnitin_data[assetString]
+      }
+
       // There might be a previous submission that was text_entry, but the
       // current submission is an upload. The turnitin asset for the text
       // entry would still exist
@@ -1959,6 +2071,8 @@ EG = {
         )
       }
     }
+
+    let studentViewedAtHTML = ''
 
     // handle the files
     $submission_files_list.empty()
@@ -1988,13 +2102,11 @@ EG = {
         inlineableAttachments.push(attachment)
       }
 
-      let viewedAtHTML = ''
       if (!jsonData.anonymize_students || isAdmin) {
-        viewedAtHTML = studentViewedAtTemplate({
+        studentViewedAtHTML = studentViewedAtTemplate({
           viewed_at: $.datetimeString(attachment.viewed_at)
         })
       }
-      $submission_attachment_viewed_at.html($.raw(viewedAtHTML))
 
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment)
@@ -2007,20 +2119,20 @@ EG = {
             [anonymizableSubmissionIdKey]: submission[anonymizableUserId],
             attachmentId: attachment.id,
             display_name: attachment.display_name,
-            attachmentWorkflow: attachment.workflow_state
+            attachmentWorkflow: attachment.upload_status
           },
           hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
         })
         .appendTo($submission_files_list)
         .find('a.display_name')
         .data('attachment', attachment)
-        .click(function(event) {
+        .click(function (event) {
           event.preventDefault()
           EG.loadSubmissionPreview($(this).data('attachment'), null)
         })
         .end()
         .find('a.submission-file-download')
-        .bind('dragstart', function(event) {
+        .bind('dragstart', function (event) {
           // check that event dataTransfer exists
           event.originalEvent.dataTransfer &&
             // handle dragging out of the browser window only if it is supported.
@@ -2030,7 +2142,8 @@ EG = {
             )
         })
         .end()
-        .show()
+      renderDeleteAttachmentLink($submission_file, attachment)
+      $submission_file.show()
       $turnitinScoreContainer = $submission_file.find('.turnitin_score_container')
       assetString = `attachment_${attachment.id}`
       turnitinAsset =
@@ -2062,9 +2175,11 @@ EG = {
 
       renderProgressIcon(attachment)
     })
+    $submission_attachment_viewed_at.html($.raw(studentViewedAtHTML))
 
     $submission_files_container.showIf(
-      submission.versioned_attachments && submission.versioned_attachments.length
+      submission.submission_type === 'online_text_entry' ||
+        (submission.versioned_attachments && submission.versioned_attachments.length)
     )
 
     let preview_attachment = null
@@ -2078,16 +2193,13 @@ EG = {
 
     // if there is any submissions after this one, show a notice that they are not looking at the newest
     $submission_not_newest_notice.showIf(
-      $submission_to_view
-        .filter(':visible')
-        .find(':selected')
-        .nextAll().length
+      $submission_to_view.filter(':visible').find(':selected').nextAll().length
     )
 
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
     $enrollment_inactive_notice.showIf(
-      _.any(jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments, enrollment => {
+      _.some(jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments, enrollment => {
         if (enrollment.workflow_state === 'inactive') {
           $full_width_container.addClass('with_enrollment_notice')
           return true
@@ -2113,6 +2225,7 @@ EG = {
     if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass('with_enrollment_notice')
     }
+    EG.showDiscussion()
   },
 
   isStudentConcluded(student) {
@@ -2120,7 +2233,7 @@ EG = {
       return false
     }
 
-    return _.any(
+    return _.some(
       jsonData.studentMap[student].enrollments,
       enrollment => enrollment.workflow_state === 'completed'
     )
@@ -2195,7 +2308,7 @@ EG = {
         })
       })
     }
-    $multiple_submissions.html($.raw(innerHTML))
+    $multiple_submissions.html($.raw(innerHTML || ''))
     StatusPill.renderPills()
   },
 
@@ -2204,12 +2317,32 @@ EG = {
     const currentSubmission = this.currentStudent.submission
     if (currentSubmission && currentSubmission.workflow_state !== 'unsubmitted') {
       this.refreshSubmissionsToView()
-      const lastIndex = currentSubmission.submission_history.length - 1
-      $(`#submission_to_view option:eq(${lastIndex})`).attr('selected', 'selected')
+      let index = currentSubmission.submission_history.length - 1
+
+      if (EG.hasOwnProperty('initialVersion')) {
+        if (EG.initialVersion >= 0 && EG.initialVersion <= index) {
+          index = EG.initialVersion
+          currentSubmission.currentSelectedIndex = index
+        }
+        delete EG.initialVersion
+      }
+
+      $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
       $submission_details.show()
+      if (
+        !!currentSubmission.cached_due_date &&
+        currentSubmission.submission_type &&
+        currentSubmission.submission_type.startsWith('online_') &&
+        currentSubmission.submission_type !== 'online_quiz'
+      ) {
+        $reassign_assignment.show()
+      } else {
+        $reassign_assignment.hide()
+      }
     } else {
       // there's no submission
       $submission_details.hide()
+      $reassign_assignment.hide()
     }
     this.handleSubmissionSelectionChange()
   },
@@ -2235,14 +2368,14 @@ EG = {
     if (scores.length) {
       // if there are some submissions that have been graded.
       $average_score_wrapper.show()
-      const avg = function(arr) {
+      const avg = function (arr) {
         let sum = 0
         for (let i = 0, j = arr.length; i < j; i++) {
           sum += arr[i]
         }
         return sum / arr.length
       }
-      const roundWithPrecision = function(number, precision) {
+      const roundWithPrecision = function (number, precision) {
         precision = Math.abs(parseInt(precision, 10)) || 0
         const coefficient = 10 ** precision
         return Math.round(number * coefficient) / coefficient
@@ -2273,26 +2406,10 @@ EG = {
   totalStudentCount() {
     if (sectionToShow) {
       return _.filter(jsonData.context.students, student =>
-        _.contains(student.section_ids, sectionToShow)
+        _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
       return jsonData.context.students.length
-    }
-  },
-
-  progressSubmissionPreview(attachment) {
-    if (attachment === undefined) {
-      return [
-        <FailedUploadTreeKite />,
-        I18n.t('Upload Failed'),
-        I18n.t('Please have the student submit the file again')
-      ]
-    } else {
-      return [
-        <WaitingWristWatch />,
-        I18n.t('Uploading'),
-        I18n.t('Canvas is attempting to retreive the submissions. Please check back again later.')
-      ]
     }
   },
 
@@ -2317,41 +2434,10 @@ EG = {
     } else if (attachment) {
       this.renderAttachment(attachment)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
-      this.renderLtiLaunch(
-        $iframe_holder,
-        ENV.lti_retrieve_url,
-        submission.external_tool_url || submission.url
-      )
-    } else if (this.canDisplaySpeedGraderImagePreview(jsonData.context, attachment, submission)) {
-      this.emptyIframeHolder()
-      const mountPoint = document.getElementById('iframe_holder')
-      mountPoint.style = ''
-      const state = this.progressSubmissionPreview(attachment)
-      ReactDOM.render(
-        <View margin="large" display="block" as="div" textAlign="center">
-          {state[0]}
-          <Text weight="bold" size="large" as="div">
-            {state[1]}
-          </Text>
-          <Text size="medium" as="div">
-            {state[2]}
-          </Text>
-        </View>,
-        mountPoint
-      )
+      this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
     } else {
       this.renderSubmissionPreview()
     }
-  },
-
-  canDisplaySpeedGraderImagePreview(context, attachment, submission) {
-    const type = submission.submission_type
-    return (
-      !context.quiz &&
-      (type !== 'online_text_entry' && type !== 'media_recording' && type !== 'online_url') &&
-      attachment === undefined &&
-      (submission !== undefined || attachment.workflow_state === 'pending_upload')
-    )
   },
 
   emptyIframeHolder(elem) {
@@ -2385,11 +2471,16 @@ EG = {
     $iframe_holder.html($.raw(iframe)).show()
   },
 
-  renderLtiLaunch($div, urlBase, externalToolUrl) {
+  renderLtiLaunch($div, urlBase, submission) {
+    const externalToolUrl = submission.external_tool_url || submission.url
+
+    urlBase += SpeedgraderHelpers.resourceLinkLookupUuidParam(submission)
+
     this.emptyIframeHolder()
     const launchUrl = `${urlBase}&url=${encodeURIComponent(externalToolUrl)}`
     const iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
       className: 'tool_launch',
+      allow: iframeAllowances(),
       allowfullscreen: true
     })
     $div.html($.raw(iframe)).show()
@@ -2482,9 +2573,7 @@ EG = {
 
       const currentStudentIDAsOfAjaxCall = this.currentStudent[anonymizableId]
       previewOptions = $.extend(previewOptions, {
-        ajax_valid: _.bind(function() {
-          return currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
-        }, this)
+        ajax_valid: () => currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
       })
       $iframe_holder.show().loadDocPreview(previewOptions)
     } else if (browserableCssClasses.test(attachment.mime_class)) {
@@ -2509,11 +2598,11 @@ EG = {
     if (attachment.mime_class === 'image') {
       contents = `<img src="${htmlEscape(src)}" style="max-width:100%;max-height:100%;">`
     } else {
-      contents = SpeedgraderHelpers.buildIframe(
-        htmlEscape(src),
-        {frameborder: 0, allowfullscreen: true},
-        domElement
-      )
+      const options = {frameborder: 0, allowfullscreen: true}
+      if (attachment.mime_class === 'html') {
+        options.className = 'attachment-html-iframe'
+      }
+      contents = SpeedgraderHelpers.buildIframe(htmlEscape(src), options, domElement)
     }
 
     return $.raw(contents)
@@ -2587,7 +2676,7 @@ EG = {
     const defaultOpts = {
       commentAttachmentBlank: $comment_attachment_blank
     }
-    const opts = _.extend({}, defaultOpts, incomingOpts)
+    const opts = {...defaultOpts, ...incomingOpts}
     const attachment = attachmentData.attachment ? attachmentData.attachment : attachmentData
     let attachmentElement = opts.commentAttachmentBlank.clone(true)
 
@@ -2619,7 +2708,7 @@ EG = {
 
     commentElement
       .find('.delete_comment_link')
-      .click(function(_event) {
+      .click(function (_event) {
         $(this)
           .parents('.comment')
           .confirmDelete({
@@ -2645,7 +2734,7 @@ EG = {
               }
 
               // and also remove it from the DOM
-              $(this).slideUp(function() {
+              $(this).slideUp(function () {
                 $(this).remove()
               })
             }
@@ -2664,7 +2753,7 @@ EG = {
         let updateUrl = ''
         let updateData = {}
         let updateAjaxOptions = {}
-        const commentUpdateSucceeded = function(data) {
+        const commentUpdateSucceeded = function (data) {
           let updatedComments = []
           const $replacementComment = that.renderComment(data.submission_comment)
           $replacementComment.show()
@@ -2682,7 +2771,7 @@ EG = {
 
           that.currentStudent.submission.submission_comments = updatedComments
         }
-        const commentUpdateFailed = function(_jqXHR, _textStatus) {
+        const commentUpdateFailed = function (_jqXHR, _textStatus) {
           $.flashError(I18n.t('Failed to submit draft comment'))
         }
         const confirmed = confirm(I18n.t('Are you sure you want to submit this comment?'))
@@ -2692,9 +2781,7 @@ EG = {
           updateData = {submission_comment: {draft: 'false'}}
           updateAjaxOptions = {url: updateUrl, data: updateData, dataType: 'json', type: 'PATCH'}
 
-          $.ajax(updateAjaxOptions)
-            .done(commentUpdateSucceeded)
-            .fail(commentUpdateFailed)
+          $.ajax(updateAjaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed)
         }
       })
       .showIf(comment.publishable && !isConcluded)
@@ -2711,7 +2798,7 @@ EG = {
       commentBlank: $comment_blank,
       commentAttachmentBlank: $comment_attachment_blank
     }
-    const opts = _.extend({}, defaultOpts, incomingOpts)
+    const opts = {...defaultOpts, ...incomingOpts}
     let commentElement = opts.commentBlank.clone(true)
 
     // Serialization seems to have changed... not sure if it's changed everywhere, though...
@@ -2767,17 +2854,11 @@ EG = {
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)
 
     if (comment.avatar_path && !hideStudentName) {
-      commentElement
-        .find('.avatar')
-        .attr('src', comment.avatar_path)
-        .show()
+      commentElement.find('.avatar').attr('src', comment.avatar_path).show()
     }
 
     if (comment.media_comment_type && comment.media_comment_id) {
-      commentElement
-        .find('.play_comment_link')
-        .data(comment)
-        .show()
+      commentElement.find('.play_comment_link').data(comment).show()
     }
 
     // TODO: Move attachment handling into a separate function
@@ -2795,6 +2876,13 @@ EG = {
     return commentElement
   },
 
+  currentDisplayedSubmission() {
+    const displayedHistory = this.currentStudent.submission?.submission_history?.[
+      this.currentStudent.submission.currentSelectedIndex
+    ]
+    return displayedHistory?.submission || this.currentStudent.submission
+  },
+
   showDiscussion() {
     const that = this
     const commentRenderingOptions = {
@@ -2805,8 +2893,18 @@ EG = {
 
     $comments.html('')
 
+    const submission = EG.currentDisplayedSubmission()
     if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
       $.each(this.currentStudent.submission.submission_comments, (i, comment) => {
+        if (ENV.group_comments_per_attempt) {
+          // Due to the fact that the unsubmitted attempt 0 submission is no longer viewable
+          // from the submission histories after the attempt 1 submission has been submitted,
+          // treat comments from attempt 0 and attempt 1 as if they were both on attempt 1.
+          if ((comment.attempt || 1) !== (submission.attempt || 1)) {
+            return
+          }
+        }
+
         const commentElement = that.renderComment(comment, commentRenderingOptions)
 
         if (commentElement) {
@@ -2840,9 +2938,60 @@ EG = {
       $comment_submitted_message.attr('tabindex', -1).focus()
     }
     $add_a_comment_submit_button.text(I18n.t('submit', 'Submit'))
+    EG.resetReassignButton()
+  },
+
+  reassignAssignment() {
+    if (reassignAssignmentInProgress) {
+      return false
+    }
+    reassignAssignmentInProgress = true
+    const url = `${assignmentUrl}/${isAnonymous ? 'anonymous_' : ''}submissions/${
+      EG.currentStudent[anonymizableId]
+    }/reassign`
+    const method = 'PUT'
+    const formData = {}
+
+    function formSuccess(studentId) {
+      jsonData.submissionsMap[studentId].redo_request = true
+      // Check if we're still on the same student submission
+      if (studentId === EG.currentStudent?.id) {
+        $reassign_assignment.text(I18n.t('Reassigned'))
+        $reassign_assignment.parent().attr('title', I18n.t('Assignment is reassigned.'))
+      }
+      reassignAssignmentInProgress = false
+      $reassignment_complete.show()
+      $reassignment_complete.attr('tabindex', -1).focus()
+    }
+
+    function formError(data, studentId) {
+      EG.handleGradingError(data)
+      // Check if we're still on the same student submission
+      if (studentId === EG.currentStudent?.id) {
+        $reassign_assignment.text(I18n.t('Reassign Assignment'))
+        $reassign_assignment.removeAttr('disabled')
+      }
+      reassignAssignmentInProgress = false
+    }
+    $reassign_assignment.attr('disabled', true)
+    $reassign_assignment.text(I18n.t('Reassigning ...'))
+    $.ajaxJSON(
+      url,
+      method,
+      formData,
+      () => formSuccess(EG.currentStudent.id),
+      data => formError(data, EG.currentStudent.id)
+    )
   },
 
   addSubmissionComment(draftComment) {
+    // Avoid submitting additional comments if a request is already in progress.
+    // This can happen if the user submits a comment and then switches students
+    // (which attempts to save a draft comment) before the request finishes.
+    if (commentSubmissionInProgress) {
+      return false
+    }
+
     // This is to continue existing behavior of creating finalized comments by default
     if (draftComment === undefined) {
       draftComment = false
@@ -2858,6 +3007,8 @@ EG = {
       // that means that they did not type a comment, attach a file or record any media. so dont do anything.
       return false
     }
+
+    commentSubmissionInProgress = true
     const url = `${assignmentUrl}/${isAnonymous ? 'anonymous_' : ''}submissions/${
       EG.currentStudent[anonymizableId]
     }`
@@ -2869,6 +3020,11 @@ EG = {
       'submission[draft_comment]': draftComment,
       [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId]
     }
+
+    if (ENV.group_comments_per_attempt) {
+      formData['submission[attempt]'] = EG.currentDisplayedSubmission().attempt
+    }
+
     if ($('#media_media_recording').data('comment_id')) {
       $.extend(formData, {
         'submission[media_comment_type]': $('#media_media_recording').data('comment_type'),
@@ -2880,18 +3036,20 @@ EG = {
     }
 
     function formSuccess(submissions) {
-      $.each(submissions, function() {
+      $.each(submissions, function () {
         EG.setOrUpdateSubmission(this.submission)
       })
       EG.revertFromFormSubmit({draftComment})
       window.setTimeout(() => {
         $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500)
       })
+      commentSubmissionInProgress = false
     }
 
     const formError = (data, _xhr, _textStatus, _errorThrown) => {
       EG.handleGradingError(data)
       EG.revertFromFormSubmit({errorSubmitting: true})
+      commentSubmissionInProgress = false
     }
 
     if ($add_a_comment.find("input[type='file']:visible").length) {
@@ -2925,11 +3083,17 @@ EG = {
     // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
     // depends on it being there. so mimic it.
     if (typeof submission.submission_history === 'undefined') {
-      submission.submission_history = [
-        {
-          submission: $.extend(true, {}, submission)
-        }
-      ]
+      let historyIndex =
+        student.submission?.submission_history?.findIndex(history => {
+          const historySubmission = history.submission || history
+          if (historySubmission.attempt == null) {
+            return false
+          }
+          return historySubmission.attempt === submission.attempt
+        }) || 0
+      historyIndex = historyIndex === -1 ? 0 : historyIndex
+      submission.submission_history = Array.from({length: historyIndex + 1})
+      submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
     }
 
     $.extend(true, student.submission, submission)
@@ -2953,6 +3117,8 @@ EG = {
       }
     }
 
+    renderPostGradesMenu()
+
     return student
   },
 
@@ -2966,8 +3132,8 @@ EG = {
       return
     }
 
-    const url = $('.update_submission_grade_url').attr('href')
-    const method = $('.update_submission_grade_url').attr('title')
+    const url = ENV.update_submission_grade_url
+    const method = 'POST'
     const formData = {
       'submission[assignment_id]': jsonData.id,
       [`submission[${anonymizableUserId}]`]: EG.currentStudent[anonymizableId],
@@ -3007,7 +3173,7 @@ EG = {
         }
       }
 
-      $.each(submissions, function() {
+      $.each(submissions, function () {
         // setOrUpdateSubmission returns the student it just updated.
         // This is only operating on a subset of people, so it should
         // be fairly fast to call updateSelectMenuStatus for each one.
@@ -3031,7 +3197,10 @@ EG = {
           existingGrade.score = score
         }
 
-        EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade)
+        if (ENV.final_grader_id === ENV.current_user_id) {
+          EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade)
+        }
+
         EG.setActiveProvisionalGradeFields({
           grade: existingGrade,
           label: customProvisionalGraderLabel
@@ -3096,6 +3265,9 @@ EG = {
       $score.text('')
     }
 
+    if (ENV.MANAGE_GRADES || (jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
+      renderHiddenSubmissionPill(submission)
+    }
     EG.updateStatsInHeader()
   },
 
@@ -3191,13 +3363,11 @@ EG = {
       fileIndex++
       $('#comment_attachments').append($attachment.show())
     })
-    $comment_attachment_input_blank.find('a').click(function(event) {
+    $comment_attachment_input_blank.find('a').click(function (event) {
       event.preventDefault()
-      $(this)
-        .parents('.comment_attachment_input')
-        .remove()
+      $(this).parents('.comment_attachment_input').remove()
     })
-    $right_side.delegate('.play_comment_link', 'click', function() {
+    $right_side.delegate('.play_comment_link', 'click', function () {
       if ($(this).data('media_comment_id')) {
         $(this)
           .parents('.comment')
@@ -3212,13 +3382,23 @@ EG = {
       }
       return false // so that it doesn't hit the $("a.instructure_inline_media_comment").live('click' event handler
     })
+    $reassign_assignment.click(event => {
+      event.preventDefault()
+      EG.reassignAssignment()
+    })
+    if ($reassign_assignment[0]) {
+      $reassign_assignment.parent().tooltip({
+        position: {my: 'left bottom', at: 'left top'},
+        tooltipClass: 'center bottom vertical'
+      })
+    }
   },
 
   // Note: do not use compareStudentsBy if your dataset includes 0.
   compareStudentsBy(f) {
     const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
 
-    return function(studentA, studentB) {
+    return function (studentA, studentB) {
       const a = f(studentA)
       const b = f(studentB)
 
@@ -3338,13 +3518,13 @@ EG = {
     const provisionalGrades = currentStudentProvisionalGrades()
 
     provisionalGrades.forEach(grade => {
-      if (grade.readonly) {
+      if (grade.scorer_id === ENV.final_grader_id) {
+        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel
+      } else {
         const displayName = grade.anonymous_grader_id
           ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName
-      } else {
-        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel
       }
     })
   },
@@ -3447,6 +3627,7 @@ EG = {
     }
 
     const props = {
+      finalGraderId: ENV.final_grader_id,
       gradingType: ENV.grading_type,
       onGradeSelected: params => {
         this.handleProvisionalGradeSelected(params)
@@ -3461,15 +3642,6 @@ EG = {
   },
 
   changeToSection(sectionId) {
-    // Update the selected section in old gradebook
-    if (sectionId === 'all') {
-      // We're removing all filters and resetting to default
-      userSettings.contextRemove('grading_show_only_section')
-    } else {
-      userSettings.contextSet('grading_show_only_section', sectionId)
-    }
-
-    // ...and in new gradebook
     if (ENV.settings_url) {
       $.post(ENV.settings_url, {selected_section_id: sectionId}, () => {
         SpeedgraderHelpers.reloadPage()
@@ -3502,24 +3674,39 @@ function getGradingPeriods() {
 
 function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
   const speedGraderJSON = speedGraderJsonResponse[0]
-  speedGraderJSON.gradingPeriods = _.indexBy(gradingPeriods, 'id')
+  speedGraderJSON.gradingPeriods = _.keyBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()
 }
 
-function speedGraderJSONErrorFn(data, _xhr, _textStatus, _errorThrown) {
-  if (data.status === 504) {
+function buildAlertMessage() {
+  let alertMessage
+  if (
+    ENV.filter_speed_grader_by_student_group_feature_enabled &&
+    !ENV.filter_speed_grader_by_student_group
+  ) {
+    alertMessage = I18n.t(
+      'Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.',
+      {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]}
+    ).string
+  } else {
+    alertMessage = I18n.t('Something went wrong. Please try refreshing the page.')
+  }
+  return {__html: alertMessage}
+}
+
+function speedGraderJSONErrorFn(_data, xhr, _textStatus, _errorThrown) {
+  if (xhr.status === 504) {
     const alertProps = {
       variant: 'error',
       dismissible: false
     }
-    const alertMessage = I18n.t(
-      'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "%{assignmentTitle}" to load SpeedGrader.',
-      {assignmentTitle: ENV.assignment_title}
-    )
+
     ReactDOM.render(
-      <Alert {...alertProps}>{alertMessage}</Alert>,
+      <Alert {...alertProps}>
+        <span dangerouslySetInnerHTML={buildAlertMessage()} />
+      </Alert>,
       document.getElementById('speed_grader_timeout_alert')
     )
   }
@@ -3533,6 +3720,7 @@ function setupSelectors() {
   $add_a_comment_submit_button = $add_a_comment.find('button:submit')
   $add_a_comment_textarea = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
   $add_attachment = $('#add_attachment')
+  $reassign_assignment = $('#reassign_assignment')
   $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url')
   $assignment_submission_resubmit_to_vericite_url = $(
     '#assignment_submission_resubmit_to_vericite_url'
@@ -3542,18 +3730,15 @@ function setupSelectors() {
   $avatar_image = $('#avatar_image')
   $average_score = $('#average_score')
   $average_score_wrapper = $('#average-score-wrapper')
-  $comment_attachment_blank = $('#comment_attachment_blank')
-    .removeAttr('id')
-    .detach()
+  $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach()
   $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach()
-  $comment_blank = $('#comment_blank')
-    .removeAttr('id')
-    .detach()
+  $comment_blank = $('#comment_blank').removeAttr('id').detach()
   $comment_saved = $('#comment_saved')
   $comment_saved_message = $('#comment_saved_message')
   $comment_submitted = $('#comment_submitted')
   $comment_submitted_message = $('#comment_submitted_message')
   $comments = $('#comments')
+  $reassignment_complete = $('#reassignment_complete')
   $deduction_box = $('#deduction-box')
   $enrollment_concluded_notice = $('#enrollment_concluded_notice')
   $enrollment_inactive_notice = $('#enrollment_inactive_notice')
@@ -3579,9 +3764,7 @@ function setupSelectors() {
   $selectmenu = null
   $submission_attachment_viewed_at = $('#submission_attachment_viewed_at_container')
   $submission_details = $('#submission_details')
-  $submission_file_hidden = $('#submission_file_hidden')
-    .removeAttr('id')
-    .detach()
+  $submission_file_hidden = $('#submission_file_hidden').removeAttr('id').detach()
   $submission_files_container = $('#submission_files_container')
   $submission_files_list = $('#submission_files_list')
   $submission_late_notice = $('#submission_late_notice')
@@ -3597,7 +3780,7 @@ function setupSelectors() {
   fileIndex = 1
   gradeeLabel = studentLabel
   groupLabel = I18n.t('group', 'Group')
-  isAdmin = _.include(ENV.current_user_roles, 'admin')
+  isAdmin = _.includes(ENV.current_user_roles, 'admin')
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
   header = setupHeader()
@@ -3621,11 +3804,53 @@ function renderSettingsMenu() {
     openOptionsModal: showOptionsModal,
     openKeyboardShortcutsModal: showKeyboardShortcutsModal,
     showModerationMenuItem: ENV.grading_role === 'moderator',
-    showHelpMenuItem: ENV.show_help_menu_item
+    showHelpMenuItem: ENV.show_help_menu_item,
+    showKeyboardShortcutsMenuItem: !ENV.disable_keyboard_shortcuts
   }
 
-  const settingsMenu = <SpeedGraderSettingsMenu {...props} />
-  ReactDOM.render(settingsMenu, document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT))
+  const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
+}
+
+function teardownSettingsMenu() {
+  const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  ReactDOM.unmountComponentAtNode(mountPoint)
+}
+
+function renderPostGradesMenu() {
+  const {submissionsMap} = window.jsonData
+  const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
+
+  const hasGradesOrPostableComments = submissions.some(
+    submission => submission && (isGraded(submission) || submission.has_postable_comments)
+  )
+  const allowHidingGradesOrComments = submissions.some(
+    submission => submission && submission.posted_at != null
+  )
+  const allowPostingGradesOrComments = submissions.some(
+    submission => submission && isPostable(submission)
+  )
+
+  function onHideGrades() {
+    EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
+  }
+
+  function onPostGrades() {
+    EG.postPolicies.showPostAssignmentGradesTray({submissionsMap, submissions})
+  }
+
+  const props = {
+    allowHidingGradesOrComments,
+    allowPostingGradesOrComments,
+    hasGradesOrPostableComments,
+    onHideGrades,
+    onPostGrades
+  }
+
+  ReactDOM.render(
+    <SpeedGraderPostGradesMenu {...props} />,
+    document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
+  )
 }
 
 // Helper function that guard against provisional_grades being null, allowing
@@ -3675,6 +3900,8 @@ export default {
       speedGraderJSONErrorFn
     )
 
+    commentSubmissionInProgress = false
+
     $.when(getGradingPeriods(), speedGraderJsonDfd).then(setupSpeedGrader)
 
     // run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
@@ -3688,6 +3915,11 @@ export default {
       EG.tearDownAssessmentAuditTray()
     }
 
+    if (EG.postPolicies) {
+      EG.postPolicies.destroy()
+    }
+
+    teardownSettingsMenu()
     teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()
   },

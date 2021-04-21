@@ -34,7 +34,8 @@ QUnit.module('brandableCss.loadStylesheet')
 
 test('should load correctly', () => {
   brandableCss.loadStylesheet(testBundleId, {combinedChecksum: testFingerprint})
-  const expectedHref = `${window.ENV.ASSET_HOST || ''}/dist/brandable_css/new_styles_normal_contrast/${testBundleId}-${testFingerprint}.css`
+  const expectedHref = `${window.ENV.ASSET_HOST ||
+    ''}/dist/brandable_css/new_styles_normal_contrast/${testBundleId}-${testFingerprint}.css`
   equal($('head link[rel="stylesheet"]:last').attr('href'), expectedHref)
 })
 

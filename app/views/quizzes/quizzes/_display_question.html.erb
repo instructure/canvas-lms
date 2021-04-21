@@ -17,6 +17,7 @@
 %>
 
 <%
+  require 'sanitize'
   display_question ||= nil
   question = display_question
   question_type = answer_type(question)
@@ -33,9 +34,22 @@
   display_correct_answers = show_correct_answers?
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
-  unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
+  unanswered =
+    (%w{
+      multiple_choice_question
+      true_false_question
+      short_answer_question
+      numerical_question
+      calculated_question
+    }.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
+    (%w{
+      matching_question
+      multiple_dropdowns_question
+      fill_in_multiple_blanks_question
+    }.include?(hash_get(question, 'question_type')) && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '' }.length == 0) ||
     (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) ||
     (hash_get(question, 'question_type') == 'file_upload_question' && hash_get(user_answer, 'attachment_ids').blank?) ||
+    (hash_get(question, 'question_type') == 'essay_question' && hash_get(user_answer, 'text').blank?) ||
     false
   partial_credit = user_answer && hash_get(user_answer, :correct) == 'partial'
   asset_string ||= (question_bank_id ? 'assessment_question' : 'quiz_question') + "_#{hash_get(question, :id)}"
@@ -57,7 +71,9 @@
 
     <% if assessing && @quiz_presenter.can_go_back? %>
       <a href="#" class="flag_question" role="checkbox" aria-checked="<%= marked ? "true" : "false" %>">
-        <span class="screenreader-only"><%= t(:flag_this_question, "Flag this Question") %></span>
+        <span class="screenreader-only">
+          <%= t(:flag_question, "Flag question: %{question_name}", :question_name => hash_get(question, :question_name) ) %>
+        </span>
       </a>
     <% end %>
     <div class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
@@ -131,8 +147,8 @@
     </div>
     <div class="text">
       <div class="original_question_text" style="display: none;">
-        <textarea style="display: none;" name="text_after_answers" class="textarea_text_after_answers"><%= h(hash_get(question, :text_after_answers)) %></textarea>
-        <textarea style="display: none;" name="question_text" class="textarea_question_text"><%= h(hash_get(question, :question_text)) %></textarea>
+        <textarea disabled style="display: none;" name="text_after_answers" class="textarea_text_after_answers"><%= h(hash_get(question, :text_after_answers)) %></textarea>
+        <textarea disabled style="display: none;" name="question_text" class="textarea_question_text"><%= h(hash_get(question, :question_text)) %></textarea>
       </div>
       <div id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
         <% if user_answer && user_answer[:regrade_option] %>
@@ -239,7 +255,7 @@
         </div>
       </div>
       <div class="equation_combinations_holder_holder calculated_question_answers" style="<%= hidden unless question && hash_get(question, :question_type) == 'calculated_question' %>">
-        <div style="display: none;" class="answer_tolerance"><%= hash_get(question, :answer_tolerance, 0) %></div>
+        <div style="display: none;" class="answer_tolerance"><%= render_number(hash_get(question, :answer_tolerance, 0)) %></div>
         <div style="display: none;" class="formula_decimal_places"><%= hash_get(question, :formula_decimal_places, 0) %></div>
         <div class="calculated_question_answers_header"><%= t('headers.possible_solutions', "Possible Solutions") %></div>
         <div class="calculated_question_answers_content equation_combinations_holder">
@@ -259,7 +275,7 @@
                     <% hash_get(answer, :variables).each do |variable| %>
                       <td><%= hash_get(variable, :value) %></td>
                     <% end %>
-                    <td class='final_answer'><%= hash_get(answer, :answer) || hash_get(answer, :exact) %></td>
+                    <td class='final_answer'><%= render_number(hash_get(answer, :answer) || hash_get(answer, :exact)) %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -281,9 +297,14 @@
         <% if assessing %>
           <% if question %>
             <% if question_type.display_answers == "multiple" && !["missing_word_question", "fill_in_multiple_blanks_question"].include?(hash_get(question, :question_type)) %>
-              <% list = hash_get(question, :answers, []) %>
-              <%= render :partial => "quizzes/quizzes/multi_answer", :collection => list, :locals =>
-                  {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
+              <fieldset>
+                <legend class="screenreader-only">
+                  <%= t(:group_of_answer_choices, "Group of answer choices") %>
+                </legend>
+                <% list = hash_get(question, :answers, []) %>
+                <%= render :partial => "quizzes/quizzes/multi_answer", :collection => list, :locals =>
+                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
+              </fieldset>
             <% elsif question_type.display_answers == "single" %>
               <%= render :partial => "quizzes/quizzes/single_answer", :locals =>
                     {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer, :editable => assessing} %>
@@ -360,9 +381,9 @@
                   end %>
                   <% answer_classes = ['selected_answer']
                     if display_correct_answers && hash_get(question,:question_type) != 'file_upload_question'
-                     answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
-                   end
-                   answer_classes << 'no_answer' if hash_get(user_answer, :text).blank? || hash_get(user_answer, :attachment_ids).blank?
+                      answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
+                    end
+                    answer_classes << 'no_answer' if hash_get(user_answer, :text).blank? || hash_get(user_answer, :attachment_ids).blank?
                   %>
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
                     <%= render :partial => "quizzes/quizzes/single_answer", :locals =>
@@ -423,19 +444,19 @@
           <div class="comment_top"></div>
           <div class="correct_comments_header comments_header"><%= t('Correct answer comments') %></div>
           <div class="question_comment_text correct_comments" <%= hidden(true) if hash_get(question, :correct_comments_html).present? %>><%= hash_get(question, :correct_comments) %></div>
-          <div class="question_comment_html correct_comments_html"><%= user_content sanitize(hash_get(question, :correct_comments_html)) %></div>
+          <div class="question_comment_html correct_comments_html"><%= user_content Sanitize.clean(hash_get(question, :correct_comments_html) || '', CanvasSanitize::SANITIZE) %></div>
         </div>
         <div title="<%= t('titles.question_incorrect_comment', "Students will see this comment if they get the question wrong") %>" class="quiz_comment question_incorrect_comment" <%= hidden(true) unless question && comment_get(question, :incorrect_comments).present? %>>
           <div class="comment_top"></div>
           <div class="incorrect_comments_header comments_header"><%= t('Wrong answer comments') %></div>
           <div class="question_comment_text incorrect_comments" <%= hidden(true) if hash_get(question, :incorrect_comments_html).present? %>><%= hash_get(question, :incorrect_comments) %></div>
-          <div class="question_comment_html incorrect_comments_html"><%= user_content sanitize(hash_get(question, :incorrect_comments_html)) %></div>
+          <div class="question_comment_html incorrect_comments_html"><%= user_content Sanitize.clean(hash_get(question, :incorrect_comments_html) || '', CanvasSanitize::SANITIZE) %></div>
         </div>
         <div title="<%= t('titles.question_neutral_comment', "Students will see this comment once they've answered the question") %>" class="quiz_comment question_neutral_comment" <%= hidden(true) unless question && comment_get(question, :neutral_comments).present? %>>
           <div class="comment_top"></div>
           <div class="neutral_comments_header comments_header"><%= t('General answer comments') %></div>
           <div class="question_comment_text neutral_comments" <%= hidden(true) if hash_get(question, :neutral_comments_html).present? %>><%= hash_get(question, :neutral_comments) %></div>
-          <div class="question_comment_html neutral_comments_html"><%= user_content sanitize(hash_get(question, :neutral_comments_html)) %></div>
+          <div class="question_comment_html neutral_comments_html"><%= user_content Sanitize.clean(hash_get(question, :neutral_comments_html) || '', CanvasSanitize::SANITIZE) %></div>
         </div>
       </div>
     <% end %>

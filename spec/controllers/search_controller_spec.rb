@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -77,7 +79,7 @@ describe SearchController do
       @course2.enroll_student(@user).accept
       @course2.update_attribute(:name, "course2")
       term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
-      @course2.update_attributes! :enrollment_term => term
+      @course2.update! :enrollment_term => term
       get 'recipients', params: {search: 'course', :messageable_only => true}
       expect(response.body).to include('course1')
       expect(response.body).not_to include('course2')
@@ -85,7 +87,7 @@ describe SearchController do
 
     it "should return an empty list when searching in a non-messageable context" do
       course_with_student_logged_in(:active_all => true)
-      @enrollment.update_attributes(workflow_state: 'deleted')
+      @enrollment.update(workflow_state: 'deleted')
       get 'recipients', params: {search: 'foo', :context => @course.asset_string}
       expect(response.body).to match /\[\]\z/
     end
@@ -124,6 +126,27 @@ describe SearchController do
         }
         expect(response).to be_successful
         expect(response.body).to include('other section')
+      end
+
+      it "should return sub-contexts with user counts" do
+        account_admin_user
+        user_session(@user)
+        course_factory(active_all: true)
+        @section = @course.course_sections.create!(:name => 'Section1')
+        @section2 = @course.course_sections.create!(:name => 'Section2')
+        @student1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @section.enroll_user(@student1, 'StudentEnrollment', 'active')
+        @student2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+        @section2.enroll_user(@student2, 'StudentEnrollment', 'active')
+
+        get 'recipients', params: {
+          type: 'section', exclude: ["section_#{@section2.id}"],
+          synthetic_contexts: true, context: "course_#{@course.id}_sections",
+          search_all_contexts: true
+        }
+        expect(response.body).to include('Section1')
+        expect(response.body).to include('"user_count":1')
+        expect(response.body).not_to include('Section2')
       end
 
       it "should return sub-users" do

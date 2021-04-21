@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_courses'
+import I18n from 'i18n!blueprint_LockItemFormat'
 import {lockLabels} from './labels'
 
-export function formatLockArray (lockableAttributes) {
+export function formatLockArray(lockableAttributes) {
   const items = lockableAttributes.map(item => lockLabels[item])
 
   switch (items.length) {
@@ -32,8 +32,7 @@ export function formatLockArray (lockableAttributes) {
   }
 }
 
-export function formatLockObject (itemLocks) {
-  const items = Object.keys(itemLocks)
-    .filter(item => itemLocks[item])
+export function formatLockObject(itemLocks) {
+  const items = Object.keys(itemLocks).filter(item => itemLocks[item])
   return formatLockArray(items)
 }

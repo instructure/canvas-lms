@@ -22,9 +22,9 @@
       instance_variable_set(name, nil)
     end
   end
-  (@body_classes ||= []) << 'full-width'
+  add_body_class 'full-width'
 %>
-<% content_for :page_title, t('title', 'Page Error') %>
+<% provide :page_title, t('title', 'Page Error') %>
 
 <div class="ic-Error-page">
   <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/500_pageerror.svg">

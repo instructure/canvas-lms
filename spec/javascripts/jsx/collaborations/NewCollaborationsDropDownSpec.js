@@ -29,6 +29,7 @@ const defaultProps = {
 
 test('renders the create-collaborations-dropdown div', () => {
   ENV.context_asset_string = 'courses_1'
+  ENV.CREATE_PERMISSION = true
 
   const component = TestUtils.renderIntoDocument(<NewCollaborationsDropDown {...defaultProps} />)
   ok(TestUtils.findRenderedDOMComponentWithClass(component, 'create-collaborations-dropdown'))
@@ -36,6 +37,7 @@ test('renders the create-collaborations-dropdown div', () => {
 
 test('has a link to open the lti tool to create a collaboration', () => {
   ENV.context_asset_string = 'courses_1'
+  ENV.CREATE_PERMISSION = true
 
   const component = TestUtils.renderIntoDocument(<NewCollaborationsDropDown {...defaultProps} />)
   const button = TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')[0]
@@ -48,6 +50,7 @@ test('has a link to open the lti tool to create a collaboration', () => {
 
 test('has a dropdown if there is more than one tool', () => {
   ENV.context_asset_string = 'courses_1'
+  ENV.CREATE_PERMISSION = true
 
   const props = {
     ltiCollaborators: [

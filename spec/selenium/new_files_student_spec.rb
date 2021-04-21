@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,9 +20,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
   include FilesCommon
+
+  before do
+    set_granular_permission
+  end
 
   context "as a student" do
     before :once do
@@ -44,7 +53,7 @@ describe "better_file_browsing" do
         end
       end
 
-      it "should search for a file", :xbrowser, priority: "1", test_id: 220355 do
+      it "should search for a file", priority: "1", test_id: 220355 do
         get "/courses/#{@course.id}/files"
         f("input[type='search']").send_keys "b_fi", :return
         expect(all_files_folders).to have_size 1
@@ -93,7 +102,7 @@ describe "better_file_browsing" do
       end
 
       it "should see calendar icon on restricted files within a given timeframe", priority: "1", test_id: 133108 do
-        @files[0].update_attributes unlock_at: Time.zone.now - 1.week,
+        @files[0].update unlock_at: Time.zone.now - 1.week,
                                     lock_at: Time.zone.now + 1.week
         get "/courses/#{@course.id}/files"
         expect(f('.icon-calendar-day')).to be_displayed
@@ -130,5 +139,18 @@ describe "better_file_browsing" do
         expect(f('.ef-file-preview-header')).to be_present
       end
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

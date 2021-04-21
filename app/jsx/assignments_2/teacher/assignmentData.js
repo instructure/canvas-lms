@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import gql from 'graphql-tag'
-import {bool, number, oneOf, shape, string, arrayOf} from 'prop-types'
+import {bool, number, oneOf, oneOfType, shape, string, arrayOf} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
 // something different when assignments are being created, which is a different
@@ -37,6 +37,47 @@ export const EnvShape = shape({
   }).isRequired
 })
 
+const userFields = gql`
+  fragment UserFields on User {
+    __typename
+    gid: id
+    lid: _id
+    name
+    shortName
+    sortableName
+    avatarUrl
+    email
+  }
+`
+const assignmentOverridesNodes = gql`
+  fragment AssignmentOverrides on AssignmentOverrideConnection {
+    nodes {
+      gid: id
+      lid: _id
+      title
+      dueAt
+      lockAt
+      unlockAt
+      set {
+        __typename
+        ... on Section {
+          lid: _id
+          sectionName: name
+        }
+        ... on Group {
+          lid: _id
+          groupName: name
+        }
+        ... on AdhocStudents {
+          students {
+            lid: _id
+            studentName: name
+          }
+        }
+      }
+    }
+  }
+`
 export const TEACHER_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
@@ -46,12 +87,13 @@ export const TEACHER_QUERY = gql`
       gid: id
       name
       description
-      dueAt
-      unlockAt
-      lockAt
+      dueAt(applyOverrides: false)
+      unlockAt(applyOverrides: false)
+      lockAt(applyOverrides: false)
       pointsPossible
       state
       needsGradingCount
+      onlyVisibleToOverrides
       lockInfo {
         isLocked
       }
@@ -66,30 +108,17 @@ export const TEACHER_QUERY = gql`
       submissionTypes
       allowedExtensions
       allowedAttempts
+      anonymizeStudents
       course {
         lid: _id
-        modulesConnection {
+        modulesConnection(first: 0) {
           pageInfo {
-            startCursor
-            endCursor
             hasNextPage
-            hasPreviousPage
-          }
-          nodes {
-            lid: _id
-            name
           }
         }
-        assignmentGroupsConnection {
+        assignmentGroupsConnection(first: 0) {
           pageInfo {
-            startCursor
-            endCursor
             hasNextPage
-            hasPreviousPage
-          }
-          nodes {
-            lid: _id
-            name
           }
         }
       }
@@ -100,34 +129,10 @@ export const TEACHER_QUERY = gql`
           hasNextPage
           hasPreviousPage
         }
-        nodes {
-          gid: id
-          lid: _id
-          title
-          dueAt
-          lockAt
-          unlockAt
-          set {
-            __typename
-            ... on Section {
-              lid: _id
-              name
-            }
-            ... on Group {
-              lid: _id
-              name
-            }
-            ... on AdhocStudents {
-              students {
-                lid: _id
-                name
-              }
-            }
-          }
-        }
+        ...AssignmentOverrides
       }
       submissions: submissionsConnection(
-        filter: {states: [submitted, unsubmitted, graded, pending_review]}
+        filter: {states: [submitted, unsubmitted, graded, ungraded, pending_review]}
       ) {
         pageInfo {
           startCursor
@@ -138,6 +143,7 @@ export const TEACHER_QUERY = gql`
         nodes {
           gid: id
           lid: _id
+          attempt
           submissionStatus
           grade
           gradingStatus
@@ -147,18 +153,146 @@ export const TEACHER_QUERY = gql`
           latePolicyStatus
           submittedAt
           user {
-            gid: id
-            lid: _id
-            name
-            shortName
-            sortableName
-            avatarUrl
-            email
+            ...UserFields
           }
         }
       }
     }
   }
+  ${userFields}
+  ${assignmentOverridesNodes}
+`
+
+const assignmentGroup = gql`
+  fragment CourseAssignmentGroups on AssignmentGroupConnection {
+    __typename
+    nodes {
+      lid: _id
+      gid: id
+      name
+      __typename
+    }
+  }
+`
+
+export const COURSE_ASSIGNMENT_GROUPS_QUERY = gql`
+  query GetCourseAssignmentGroups($courseId: ID!, $cursor: String) {
+    course(id: $courseId) {
+      lid: _id
+      gid: id
+      assignmentGroupsConnection(first: 200, after: $cursor) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        ...CourseAssignmentGroups
+      }
+    }
+  }
+  ${assignmentGroup}
+`
+export const COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL = gql`
+  query GetCourseAssignmentGroupsLocal($courseId: ID!) {
+    course(id: $courseId) @client {
+      lid: _id
+      gid: id
+      assignmentGroupsConnection(first: 200) {
+        ...CourseAssignmentGroups
+      }
+    }
+  }
+  ${assignmentGroup}
+`
+
+const assignmentModule = gql`
+  fragment CourseModules on ModuleConnection {
+    __typename
+    nodes {
+      lid: _id
+      gid: id
+      name
+      position
+      __typename
+    }
+  }
+`
+
+// FYI, modules are areturned sorted by position
+export const COURSE_MODULES_QUERY = gql`
+  query GetCourseModules($courseId: ID!, $cursor: String) {
+    course(id: $courseId) {
+      lid: _id
+      gid: id
+      modulesConnection(first: 200, after: $cursor) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        ...CourseModules
+      }
+    }
+  }
+  ${assignmentModule}
+`
+
+export const COURSE_MODULES_QUERY_LOCAL = gql`
+  query GetCourseModules($courseId: ID!) {
+    course(id: $courseId) @client {
+      lid: _id
+      gid: id
+      modulesConnection(first: 200) {
+        ...CourseModules
+      }
+    }
+  }
+  ${assignmentModule}
+`
+
+export const STUDENT_SEARCH_QUERY = gql`
+  query SearchStudents(
+    $assignmentId: ID!
+    $userSearch: String
+    $orderBy: [SubmissionSearchOrder!]
+  ) {
+    assignment(id: $assignmentId) {
+      id
+      submissions: submissionsConnection(
+        filter: {
+          userSearch: $userSearch
+          enrollmentTypes: StudentEnrollment
+          states: [submitted, unsubmitted, graded, ungraded, pending_review]
+        }
+        orderBy: $orderBy
+      ) {
+        nodes {
+          lid: _id
+          gid: id
+          attempt
+          excused
+          state
+          score
+          submittedAt
+          submissionDraft {
+            submissionAttempt
+          }
+          submissionStatus
+          user {
+            ...UserFields
+          }
+          submissionHistories: submissionHistoriesConnection(
+            filter: {states: [graded, pending_review, submitted, ungraded]}
+          ) {
+            nodes {
+              attempt
+              score
+              submittedAt
+            }
+          }
+        }
+      }
+    }
+  }
+  ${userFields}
 `
 
 export const SET_WORKFLOW = gql`
@@ -171,6 +305,52 @@ export const SET_WORKFLOW = gql`
       }
     }
   }
+`
+
+export const SAVE_ASSIGNMENT = gql`
+  mutation SaveAssignment(
+    $id: ID!
+    $name: String
+    $description: String
+    $dueAt: DateTime
+    $unlockAt: DateTime
+    $lockAt: DateTime
+    $pointsPossible: Float
+    $state: AssignmentState
+    $assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
+  ) {
+    updateAssignment(
+      input: {
+        id: $id
+        name: $name
+        description: $description
+        dueAt: $dueAt
+        unlockAt: $unlockAt
+        lockAt: $lockAt
+        pointsPossible: $pointsPossible
+        state: $state
+        assignmentOverrides: $assignmentOverrides
+      }
+    ) {
+      assignment {
+        __typename
+        id
+        lid: _id
+        gid: id
+        dueAt
+        unlockAt
+        lockAt
+        name
+        description
+        pointsPossible
+        state
+        assignmentOverrides {
+          ...AssignmentOverrides
+        }
+      }
+    }
+  }
+  ${assignmentOverridesNodes}
 `
 
 export const CourseShape = shape({
@@ -200,7 +380,7 @@ export const OverrideShape = shape({
   dueAt: string,
   lockAt: string,
   unlockAt: string,
-  submissionTypes: arrayOf(string), // currently copied from the asisgnment
+  submissionTypes: arrayOf(string), // currently copied from the assignment
   allowedAttempts: number, // currently copied from the assignment
   allowedExtensions: arrayOf(string), // currently copied from the assignment
   set: shape({
@@ -210,7 +390,7 @@ export const OverrideShape = shape({
   })
 })
 
-const UserShape = shape({
+export const UserShape = shape({
   lid: string,
   gid: string,
   name: string,
@@ -220,9 +400,20 @@ const UserShape = shape({
   email: string
 })
 
-const SubmissionShape = shape({
+export const SubmissionHistoryShape = shape({
+  attempt: number,
+  score: number,
+  submittedAt: string
+})
+
+export const SubmissionDraftShape = shape({
+  submissionAttempt: string
+})
+
+export const SubmissionShape = shape({
   gid: string,
   lid: string,
+  attempt: number,
   submissionStatus: oneOf(['resubmitted', 'missing', 'late', 'submitted', 'unsubmitted']),
   grade: string,
   gradingStatus: oneOf([null, 'excused', 'needs_review', 'needs_grading', 'graded']),
@@ -231,30 +422,46 @@ const SubmissionShape = shape({
   excused: bool,
   latePolicyStatus: oneOf([null, 'missing']),
   submittedAt: string, // datetime
-  user: UserShape
+  user: UserShape,
+  submissionHistoriesConnection: shape({
+    nodes: arrayOf(SubmissionHistoryShape)
+  }),
+  submissionDraft: SubmissionDraftShape
 })
 
 export const TeacherAssignmentShape = shape({
-  lid: string.isRequired,
-  name: string.isRequired,
-  pointsPossible: number.isRequired,
+  lid: string,
+  name: string,
+  pointsPossible: oneOfType([number, string]),
   dueAt: string,
   lockAt: string,
   unlockAt: string,
   description: string,
   state: oneOf(['published', 'unpublished', 'deleted']).isRequired,
-  assignmentGroup: AssignmentGroupShape.isRequired,
+  assignmentGroup: AssignmentGroupShape,
   modules: arrayOf(ModuleShape).isRequired,
-  course: CourseShape.isRequired,
+  course: CourseShape.isRequired, // not edited by the teacher
   lockInfo: LockInfoShape.isRequired,
   submissionTypes: arrayOf(string).isRequired,
   allowedExtensions: arrayOf(string).isRequired,
+  allowedAttempts: number,
   assignmentOverrides: shape({
     nodes: arrayOf(OverrideShape)
   }).isRequired,
   submissions: shape({
     nodes: arrayOf(SubmissionShape)
   }).isRequired
+})
+
+export const StudentSearchQueryShape = shape({
+  assignmentId: string.isRequired,
+  userSearch: string,
+  orderBy: arrayOf(
+    shape({
+      field: string,
+      direction: oneOf(['ascending', 'descending'])
+    })
+  )
 })
 
 // custom proptype validator

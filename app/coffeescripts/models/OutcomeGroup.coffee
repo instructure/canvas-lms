@@ -16,76 +16,74 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'Backbone'
-  '../collections/OutcomeCollection'
-  '../collections/PaginatedCollection'
-], (Backbone, OutcomeCollection, PaginatedCollection) ->
+import Backbone from 'Backbone'
+import OutcomeCollection from '../collections/OutcomeCollection'
+import PaginatedCollection from '../collections/PaginatedCollection'
 
-  class OutcomeGroup extends Backbone.Model
-    initialize: (options) ->
-      @setUpOutcomesAndGroupsIfNeeded()
-      super
+class OutcomeGroup extends Backbone.Model
+  initialize: (options) ->
+    @setUpOutcomesAndGroupsIfNeeded()
+    super
 
-    name: ->
-      @get 'title'
+  name: ->
+    @get 'title'
 
-    # The api returns abbreviated data by default
-    # which in most cases means there's no description.
-    # Run fetch() to get all the data.
-    isAbbreviated: ->
-      !@has('description')
+  # The api returns abbreviated data by default
+  # which in most cases means there's no description.
+  # Run fetch() to get all the data.
+  isAbbreviated: ->
+    !@has('description')
 
-    setUrlTo: (action) ->
-      @url =
-        switch action
-          when 'add', 'move' then @get('parent_outcome_group').subgroups_url
-          when 'edit', 'delete' then @get 'url'
+  setUrlTo: (action) ->
+    @url =
+      switch action
+        when 'add', 'move' then @get('parent_outcome_group').subgroups_url
+        when 'edit', 'delete' then @get 'url'
 
-    setUpOutcomesAndGroupsIfNeeded: ->
-      unless @outcomeGroups
-        @outcomeGroups = new OutcomeGroupCollection [], parentGroup: this
-      unless @outcomes
-        @outcomes = new OutcomeCollection []
+  setUpOutcomesAndGroupsIfNeeded: ->
+    unless @outcomeGroups
+      @outcomeGroups = new OutcomeGroupCollection [], parentGroup: this
+    unless @outcomes
+      @outcomes = new OutcomeCollection []
 
-    getSubtrees: ->
-      @outcomeGroups
+  getSubtrees: ->
+    @outcomeGroups
 
-    getItems: ->
-      @outcomes
+  getItems: ->
+    @outcomes
 
-    expand: (force=false, options={}) ->
-      @isExpanded = true
-      @trigger 'expanded'
-      return $.when() if @expandDfd || force
-      @isExpanding = true
-      @trigger 'beginexpanding'
-      @expandDfd = $.Deferred().done =>
-        @isExpanding = false
-        @trigger 'endexpanding'
+  expand: (force=false, options={}) ->
+    @isExpanded = true
+    @trigger 'expanded'
+    return $.when() if @expandDfd || force
+    @isExpanding = true
+    @trigger 'beginexpanding'
+    @expandDfd = $.Deferred().done =>
+      @isExpanding = false
+      @trigger 'endexpanding'
 
-      outcomeGroupDfd = @outcomeGroups?.fetch() unless @get('outcomeGroups_count') is 0
-      outcomesDfd = @outcomes?.fetch() if (@get('outcomes_count') isnt 0) and !options.onlyShowSubtrees
-      $.when(outcomeGroupDfd, outcomesDfd).done(@expandDfd.resolve)
+    outcomeGroupDfd = @outcomeGroups?.fetch() unless @get('outcomeGroups_count') is 0
+    outcomesDfd = @outcomes?.fetch() if (@get('outcomes_count') isnt 0) and !options.onlyShowSubtrees
+    $.when(outcomeGroupDfd, outcomesDfd).done(@expandDfd.resolve)
 
-    collapse: ->
-      @isExpanded = false
-      @trigger 'collapsed'
+  collapse: ->
+    @isExpanded = false
+    @trigger 'collapsed'
 
-    toggle: (options) ->
-      if @isExpanded
-        @collapse()
-      else
-        @expand(false, options)
+  toggle: (options) ->
+    if @isExpanded
+      @collapse()
+    else
+      @expand(false, options)
 
-  # OutcomeGroupCollection is redefined inside of this file instead of pointing
-  # towards collections/outcomeGroupCollection because RequireJS sucks at
-  # figuring out circular dependencies.
-  class OutcomeGroupCollection extends PaginatedCollection
-    @optionProperty 'parentGroup'
-    model: OutcomeGroup
+# OutcomeGroupCollection is redefined inside of this file instead of pointing
+# towards collections/outcomeGroupCollection because RequireJS sucks at
+# figuring out circular dependencies.
+class OutcomeGroupCollection extends PaginatedCollection
+  @optionProperty 'parentGroup'
+  model: OutcomeGroup
 
-    url: ->
-      @parentGroup.attributes.subgroups_url
+  url: ->
+    @parentGroup.attributes.subgroups_url
 
-  return OutcomeGroup
+export default OutcomeGroup

@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t '#crumbs.groups', 'Groups' %><% end %>
+<% provide :page_title do %><%= t '#crumbs.groups', 'Groups' %><% end %>
 <% add_crumb t('#crumbs.groups', 'Groups') %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
 <% end %>
 
 <% css_bundle :course_list %>

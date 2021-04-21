@@ -15,7 +15,5 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-], (Backbone) ->
-  class ContentCheckbox extends Backbone.Model
+import Backbone from 'Backbone'
+export default class ContentCheckbox extends Backbone.Model

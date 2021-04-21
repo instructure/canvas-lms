@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!gradingdataRow'
 import numberHelper from '../shared/helpers/numberHelper'
 
 const {bool, func, number} = PropTypes
@@ -91,7 +91,9 @@ class DataRow extends React.Component {
       onClick={this.triggerInsertRow}
       type="button"
     >
-      <span className="screenreader-only">{I18n.t('Insert row below')}</span>
+      <span className="screenreader-only">
+        {I18n.t('Insert row below %{name}', {name: this.getRowData().name})}
+      </span>
       <i className="icon-add" />
     </button>
   )
@@ -122,7 +124,9 @@ class DataRow extends React.Component {
         onClick={this.triggerDeleteRow}
         type="button"
       >
-        <span className="screenreader-only">{I18n.t('Remove row')}</span>
+        <span className="screenreader-only">
+          {I18n.t('Remove row %{name}', {name: this.getRowData().name})}
+        </span>
         <i className="icon-end" />
       </button>
     )
@@ -136,7 +140,7 @@ class DataRow extends React.Component {
           {this.getRowData().name}
         </div>
       </td>
-      <td className="row_cell max_score_cell" ariaLabel={I18n.t('Upper limit of range')}>
+      <td className="row_cell max_score_cell" aria-label={I18n.t('Upper limit of range')}>
         <div>
           <span className="max_score" ref="maxScore" title="Upper limit of range">
             {`${this.renderMaxScore()}%`}
@@ -173,7 +177,7 @@ class DataRow extends React.Component {
             onChange={this.triggerRowNameChange}
             className="standard_name"
             title={I18n.t('Range name')}
-            ariaLabel={I18n.t('Range name')}
+            aria-label={I18n.t('Range name')}
             name={`grading_standard[standard_data][scheme_${this.props.uniqueId}[name]`}
             value={this.getRowData().name}
           />
@@ -187,7 +191,7 @@ class DataRow extends React.Component {
       </td>
       <td className="row_cell">
         <div>
-          <span className="range_to" ariaHidden="true">
+          <span className="range_to" aria-hidden="true">
             {I18n.t('to ')}
           </span>
           <input
@@ -199,11 +203,11 @@ class DataRow extends React.Component {
             onChange={this.triggerRowMinScoreChange}
             onBlur={this.triggerRowMinScoreBlur}
             title={I18n.t('Lower limit of range')}
-            ariaLabel={I18n.t('Lower limit of range')}
+            aria-label={I18n.t('Lower limit of range')}
             name={`grading_standard[standard_data][scheme_${this.props.uniqueId}][value]`}
             value={this.renderMinScore()}
           />
-          <span ariaHidden="true"> % </span>
+          <span aria-hidden="true"> % </span>
         </div>
       </td>
       <td className="row_cell last_row_cell">{this.renderDeleteRowButton()}</td>

@@ -15,10 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../conferences/ConferenceView'
-  'jst/conferences/concludedConference'
-], (ConferenceView, template) ->
+import ConferenceView from './ConferenceView'
+import template from 'jst/conferences/concludedConference'
 
-  class ConcludedConferenceView extends ConferenceView
-    template: template
+export default class ConcludedConferenceView extends ConferenceView
+  template: template

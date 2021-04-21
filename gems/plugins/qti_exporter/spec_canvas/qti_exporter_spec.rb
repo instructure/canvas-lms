@@ -1,5 +1,5 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -37,16 +37,16 @@ describe Qti::Converter do
     expect(quiz).to be_present
     expect(quiz.quiz_questions.count).to eq 2
     quiz.quiz_questions.each do |q|
-      text = Nokogiri::HTML::DocumentFragment.parse(q.question_data['question_text'])
+      text = Nokogiri::HTML5.fragment(q.question_data['question_text'])
       expect(text.css('img').first['src']).to eq "/courses/#{@course.id}/files/#{attachment.id}/preview"
 
       # verify that the associated assessment_question got links translated
       aq = q.assessment_question
-      text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['question_text'])
+      text = Nokogiri::HTML5.fragment(aq.question_data['question_text'])
       expect(text.css('img').first['src']).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
 
       if aq.question_data['answers'][1]["comments_html"] =~ /\<img/
-        text = Nokogiri::HTML::DocumentFragment.parse(aq.question_data['answers'][1]["comments_html"])
+        text = Nokogiri::HTML5.fragment(aq.question_data['answers'][1]["comments_html"])
         expect(text.css('img').first['src']).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
       end
     end
@@ -65,7 +65,7 @@ describe Qti::Converter do
       @copy = Tempfile.new(['spec-canvas', '.zip'])
       FileUtils.cp(fname, @copy.path)
       Zip::File.open(@copy.path) do |zf|
-        zf.file.open("settings.xml", 'w') do |f|
+        zf.file.open("settings.xml", +'w') do |f|
           f.write <<-XML
           <settings>
             <setting name='hasSettings'>true</setting>
@@ -254,7 +254,7 @@ describe Qti::Converter do
          "weight"=>0,
          "id"=>9001}],
       "question_text"=>
-       "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size: 12pt;\">∂♥∃Δƒ</span>"},
+       "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size:12pt;\">∂♥∃Δƒ</span>"},
      {"position"=>2,
       "correct_comments"=>"correct answer feedback",
       "question_type"=>"true_false_question",

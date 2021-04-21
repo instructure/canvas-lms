@@ -15,7 +15,7 @@ To retrieve a JWT access token for this purpose first build a JWT using the foll
 ```javascript
 my_jwt = {
   "sub": 10000000000003, // Canvas developer key global id
-  // This URL is sent in the initial registration request as a param named 'oauth2_access_token_url' if the "Send Authorization URL in LTI2 Registration" feature flag is enabled.
+  // This URL is sent in the initial registration request as a param named 'oauth2_access_token_url'.
   "aud": "http://my.canvas.com/api/lti/accounts/1/authorize",
   "exp": 1486393868, // expiration time
   "iat": 1486393800, // issued at
@@ -32,7 +32,7 @@ signed_jwt = my_jwt.sign(<my_dev_key_secret>).to_string
 
 We highly recommend using a library to create and sign these tokens.
 
-Then, make a request to the authorization endpoint to retrieve your JWT access token. The URL you should use to make this request is sent in the initial registration request sent from Canvas as a parameter named oauth2_access_token_url. To receive this parameter in the registration request you must first enable the account-level feature flag named “Send Authorization URL in LTI2 Registration.” This parameter will be sent by default without requiring the feature flag in the future.
+Then, make a request to the authorization endpoint to retrieve your JWT access token. The URL you should use to make this request is sent in the initial registration request sent from Canvas as a parameter named oauth2_access_token_url.
 
 The signed JWT should be used as the `assertion` parameter, the `grant_type` parameter should be set to `authorization_code`, and the `code` parameter should be set to the value of the `reg_key` received from the registration message sent by the tool consumer.
 
@@ -81,7 +81,7 @@ signed_jwt = my_jwt.sign("tool-proxy-shared-secret").to_string
 
 We highly recommend using a library to create and sign these tokens.
 
-Next make a request to the authorization endpoint to retrieve your JWT access token. The URL you should use to make this request if sent in the initial registration request sent from Canvas as a parameter named `oauth2_access_token_url`. To receive this parameter in the registration request you must first enable the account-level feature flag named “Send Authorization URL in LTI2 Registration.” This parameter will be sent by default without requiring the feature flag in the future.
+Next make a request to the authorization endpoint to retrieve your JWT access token. The URL you should use to make this request if sent in the initial registration request sent from Canvas as a parameter named `oauth2_access_token_url`.
 
 
 This signed JWT should be used as the `assertion` parameter and the `grant_type` parameter  should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`

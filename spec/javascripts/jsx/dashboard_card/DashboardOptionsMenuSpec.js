@@ -75,14 +75,14 @@ QUnit.module('Dashboard Options Menu', {
   }
 })
 
-test('it renders', function() {
+test('it renders', () => {
   const dashboardMenu = TestUtils.renderIntoDocument(
     <DashboardOptionsMenu onDashboardChange={() => {}} />
   )
   ok(dashboardMenu)
 })
 
-test('it should call onDashboardChange when new view is selected', function() {
+test('it should call onDashboardChange when new view is selected', () => {
   const onDashboardChangeSpy = sinon.spy()
 
   const wrapper = shallow(
@@ -94,7 +94,7 @@ test('it should call onDashboardChange when new view is selected', function() {
   ok(onDashboardChangeSpy.calledWith('cards'))
 })
 
-test('it should not call onDashboardChange when correct view is already set', function() {
+test('it should not call onDashboardChange when correct view is already set', () => {
   const onDashboardChangeSpy = sinon.spy()
 
   const wrapper = mount(
@@ -112,7 +112,7 @@ test('it should not call onDashboardChange when correct view is already set', fu
   wrapper.unmount()
 })
 
-test('it should include a List View menu item when Student Planner is enabled', function() {
+test('it should include a List View menu item when Student Planner is enabled', () => {
   const wrapper = mount(<DashboardOptionsMenu planner_enabled onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
@@ -120,7 +120,7 @@ test('it should include a List View menu item when Student Planner is enabled', 
   wrapper.unmount()
 })
 
-test('it should display toggle color overlay option if card view is set', function() {
+test('it should display toggle color overlay option if card view is set', () => {
   const wrapper = mount(<DashboardOptionsMenu onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
 
@@ -133,7 +133,7 @@ test('it should display toggle color overlay option if card view is set', functi
   wrapper.unmount()
 })
 
-test('it should not display toggle color overlay option if recent activity view is set', function() {
+test('it should not display toggle color overlay option if recent activity view is set', () => {
   const wrapper = mount(<DashboardOptionsMenu view="activity" onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
 
@@ -146,7 +146,7 @@ test('it should not display toggle color overlay option if recent activity view 
   wrapper.unmount()
 })
 
-test('it should toggle color overlays', function() {
+test('it should toggle color overlays', () => {
   sandbox.stub(DashboardOptionsMenu.prototype, 'postToggleColorOverlays')
   let dashboardMenu = null
   ReactDOM.render(

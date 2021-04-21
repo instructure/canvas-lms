@@ -30,6 +30,14 @@
         <input type="password" id="student_password_confirmation" name="pseudonym[password_confirmation]">
       </div>
     </div>
+    {{#if require_email}}
+    <div class="control-group">
+      <label class="control-label" for="student_email">{{#t "labels.email"}}Email{{/t}}</label>
+      <div class="controls">
+        <input type="email" id="student_email" name="pseudonym[path]">
+      </div>
+    </div>
+    {{/if}}
     {{#if terms_required}}
     <div class="control-group">
       <div class="controls">
@@ -37,6 +45,13 @@
           <input type="checkbox" name="user[terms_of_use]" value="1">
           {{{terms_html}}}
         </label>
+      </div>
+    </div>
+    {{/if}}
+    {{#if recaptcha}}
+    <div class="control-group">
+      <div class="controls">
+        <div class="g-recaptcha"></div>
       </div>
     </div>
     {{/if}}

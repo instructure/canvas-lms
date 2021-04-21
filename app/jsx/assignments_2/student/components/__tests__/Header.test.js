@@ -15,108 +15,215 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
 
-import {mockAssignment} from '../../test-utils'
 import Header from '../Header'
+import {mockAssignmentAndSubmission, mockSubmission} from '../../mocks'
+import React from 'react'
+import {render} from '@testing-library/react'
+import StudentViewContext from '../Context'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-  window.pageYOffset = 0
+jest.mock('../AttemptSelect')
+
+it('renders normally', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByTestId} = render(<Header {...props} />)
+  expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
 })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+it('will not render LatePolicyStatusDisplay if the submission is not late', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('late-policy-container')).not.toBeInTheDocument()
 })
 
-it('renders normally', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
+it('will render LatePolicyStatusDisplay if the submission status is late', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {
+      ...SubmissionMocks.graded,
+      submissionStatus: 'late'
+    }
+  })
+  const {getByTestId} = render(<Header {...props} />)
+  expect(getByTestId('late-policy-container')).toBeInTheDocument()
+})
+
+it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {
+      ...SubmissionMocks.graded,
+      latePolicyStatus: 'late'
+    }
+  })
+  const {getByTestId} = render(<Header {...props} />)
+  expect(getByTestId('late-policy-container')).toBeInTheDocument()
+})
+
+it('will render the latest grade instead of the displayed submissions grade', async () => {
+  const latestSubmission = await mockSubmission({
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '147',
+      enteredGrade: '147'
+    }
+  })
+
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {pointsPossible: 150},
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '131',
+      enteredGrade: '131'
+    }
+  })
+
+  const {queryByText, queryAllByText} = render(
+    <StudentViewContext.Provider value={{latestSubmission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
   )
-  const element = $('[data-testid="assignments-2-student-header"]')
-  expect(element).toHaveLength(1)
+
+  expect(queryAllByText('147/150 Points')[0]).toBeInTheDocument()
+  expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })
 
-it('dispatches scroll event properly when less than threshold', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
+it('will not render the grade if the latest submission is excused', async () => {
+  const latestSubmission = await mockSubmission({
+    Submission: {
+      ...SubmissionMocks.excused,
+      grade: '147',
+      enteredGrade: '147'
+    }
+  })
+
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {pointsPossible: 150},
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '131',
+      enteredGrade: '131'
+    }
+  })
+
+  const {getByTestId} = render(
+    <StudentViewContext.Provider value={{latestSubmission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
   )
-  const scrollEvent = new Event('scroll')
-  window.pageYOffset = 100
-  window.dispatchEvent(scrollEvent)
-  const foundClassElement = $('[data-test-id="assignment-student-header-normal"]')
-  expect(foundClassElement).toHaveLength(1)
+
+  expect(getByTestId('grade-display').textContent).toEqual('Excused!')
 })
 
-it('dispatches scroll event properly when greather than threshold', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
-  const scrollEvent = new Event('scroll')
-  window.pageYOffset = 500
-  window.dispatchEvent(scrollEvent)
-  const foundClassElement = $('[data-test-id="assignment-student-header-sticky"]')
-  expect(foundClassElement).toHaveLength(1)
+describe('submission workflow tracker', () => {
+  it('is rendered when a submission exists and the assignment is available', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
+  })
+
+  it('is not rendered when no submission object is present', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: null})
+    props.allSubmissions = [{id: 1}]
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when there is no current user', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.currentUser = null
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the assignment has not been unlocked yet', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.modulePrereq = 'simulate not null'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the assignment has uncompleted prerequisites', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.unlockDate = 'soon'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
 })
 
-it('displays element filler when scroll offset is in correct place', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
-  const scrollEvent = new Event('scroll')
-  window.pageYOffset = 100
-  window.dispatchEvent(scrollEvent)
-  const normalHeader = $('[data-test-id="assignment-student-header-normal"]')
-  expect(normalHeader).toHaveLength(1)
-  window.pageYOffset = 200
-  window.dispatchEvent(scrollEvent)
-  const fillerElement = $('[data-test-id="header-element-filler"]')
-  expect(fillerElement).toHaveLength(1)
-  const stickyHeader = $('.assignment-student-header-sticky')
-  expect(stickyHeader).toHaveLength(1)
+describe('if submitted and there are more attempts', () => {
+  it('will render a New Attempt button if changes can be made to the submission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted}
+    })
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
+  })
+
+  it('will not render a New Attempt button if changes cannot be made to the submission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.submitted}
+    })
+    const {queryByTestId} = render(
+      <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+        <Header {...props} />
+      </StudentViewContext.Provider>
+    )
+    expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+  })
 })
 
-it('will not render LatePolicyStatusDisplay if the submission is not late', () => {
-  const assignment = mockAssignment()
-  assignment.submissionsConnection.nodes[0].latePolicyStatus = null
-  assignment.submissionsConnection.nodes[0].submissionStatus = null
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const foundClassElement = $('[data-test-id="late-policy-container"]')
-  expect(foundClassElement).toHaveLength(0)
+it('renders the attempt select', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  props.allSubmissions = [props.submission]
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).toBeInTheDocument()
 })
 
-it('will render LatePolicyStatusDisplay if the submission status is late', () => {
-  const assignment = mockAssignment()
-  assignment.submissionsConnection.nodes[0].latePolicyStatus = null
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const foundClassElement = $('[data-test-id="late-policy-container"]')
-  expect(foundClassElement).toHaveLength(1)
+it('does not render the attempt select if there is no submission', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: null})
+  props.allSubmissions = [{id: 1}]
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
 })
 
-it('will render LatePolicyStatusDisplay if the latePolicyStatus is late status is late', () => {
-  const assignment = mockAssignment()
-  assignment.submissionsConnection.nodes[0].submissionStatus = null
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const foundClassElement = $('[data-test-id="late-policy-container"]')
-  expect(foundClassElement).toHaveLength(1)
+it('does not render the attempt select if allSubmissions is not provided', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if not submitted', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if excused', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.excused}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if the assignment is locked', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {lockInfo: {isLocked: true}},
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if there are no more attempts', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {allowedAttempts: 1},
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
 })

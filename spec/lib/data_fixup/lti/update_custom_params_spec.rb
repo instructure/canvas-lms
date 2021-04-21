@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -64,7 +66,7 @@ describe 'UpdateCustomParams' do
     course_model
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
-    @course.update_attributes!(account: @account)
+    @course.update!(account: @account)
     @to_process_url = 'tool.instructure.com'
     @unprocessed_url = 'some_other_tool.instructure.com'
     @subdomain_url = 'subdomain.tool.instructure.com'

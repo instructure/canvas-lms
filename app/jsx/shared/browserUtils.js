@@ -17,8 +17,8 @@
  */
 
 export function getBrowser() {
-  const ua = navigator.userAgent;
-  let tem;
+  const ua = navigator.userAgent
+  let tem
   let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []
   if (/trident/i.test(M[1])) {
     tem = /\brv[ :]+(\d+)/g.exec(ua) || []

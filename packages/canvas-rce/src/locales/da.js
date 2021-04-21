@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/da.json";
-import "../rce/languages/da";
-formatMessage.addLocale({ da: locale });
+import formatMessage from '../format-message'
+import locale from '@instructure/translations/lib/canvas-rce/da.json'
+import '../rce/languages/da'
+
+formatMessage.addLocale({da: locale})

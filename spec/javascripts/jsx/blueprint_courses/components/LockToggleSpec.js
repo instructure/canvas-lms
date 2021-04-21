@@ -24,11 +24,11 @@ QUnit.module('LockToggle component')
 
 const defaultProps = () => ({
   isLocked: true,
-  isToggleable: true,
+  isToggleable: true
 })
 
 test('renders the LockToggle component', () => {
-  const tree = enzyme.shallow(<LockToggle {...defaultProps()} />)
+  const tree = enzyme.mount(<LockToggle {...defaultProps()} />)
   const node = tree.find('.bpc-lock-toggle')
   ok(node.exists())
 })
@@ -52,15 +52,15 @@ test('does not render a button when LockToggle is not toggleable', () => {
 test('renders a locked icon when LockToggle is locked', () => {
   const props = defaultProps()
   props.isLocked = true
-  const tree = enzyme.shallow(<LockToggle {...props} />)
-  const node = tree.find('IconBlueprintLock')
+  const tree = enzyme.mount(<LockToggle {...props} />)
+  const node = tree.find('IconBlueprintLockSolid')
   ok(node.exists())
 })
 
 test('renders an unlocked icon when LockToggle is unlocked', () => {
   const props = defaultProps()
   props.isLocked = false
-  const tree = enzyme.shallow(<LockToggle {...props} />)
-  const node = tree.find('IconBlueprint')
+  const tree = enzyme.mount(<LockToggle {...props} />)
+  const node = tree.find('IconBlueprintSolid')
   ok(node.exists())
 })

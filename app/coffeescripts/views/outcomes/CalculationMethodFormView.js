@@ -20,6 +20,7 @@ import _ from 'underscore'
 import Backbone from 'Backbone'
 import template from 'jst/outcomes/outcomeCalculationMethodForm'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
+import CalculationMethodContent from '../../models/grade_summary/CalculationMethodContent'
 
 export default class CalculationMethodFormView extends Backbone.View {
   static initClass() {
@@ -45,7 +46,7 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   attach() {
-    return this.model.on('change:calculation_method', this.render)
+    return this.model.on('change:calculation_method', this.render, this)
   }
 
   blur(e) {
@@ -91,7 +92,15 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   toJSON() {
-    return _.extend(super.toJSON(...arguments), {
+    let data
+    if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES && ENV.MASTERY_SCALE?.outcome_calculation_method) {
+      const methodModel = new CalculationMethodContent(ENV.MASTERY_SCALE.outcome_calculation_method)
+      data = {...ENV.MASTERY_SCALE.outcome_calculation_method, ...methodModel.present()}
+    } else {
+      data = super.toJSON(...arguments)
+    }
+
+    return _.extend(data, {
       state: this.state,
       writeStates: ['add', 'edit']
     })

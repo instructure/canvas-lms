@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,6 +24,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   belongs_to :discussion_topic
   belongs_to :user
 
+  before_create :set_root_account_id
   before_save :check_unread_count
   after_save :check_planner_cache
 
@@ -47,5 +50,9 @@ class DiscussionTopicParticipant < ActiveRecord::Base
       (unread_entry_count_before_last_save > 0 && unread_entry_count == 0)
       PlannerHelper.clear_planner_cache(user)
     end
+  end
+
+  def set_root_account_id
+    self.root_account_id = self.discussion_topic.root_account_id
   end
 end

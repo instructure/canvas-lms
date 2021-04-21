@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -87,6 +89,34 @@ describe LearningOutcome do
       })
       @result.reload
       @rubric.reload
+    end
+
+    it "adding outcomes to a rubric should increment datadog counter" do
+      expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome.align')
+      @rubric = Rubric.new(:context => @course)
+      @rubric.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => @outcome.id
+        }
+      ]
+      @rubric.save!
     end
 
     it "should allow learning outcome rows in the rubric" do
@@ -861,6 +891,65 @@ describe LearningOutcome do
     end
   end
 
+  context "root account ids" do
+    let_once(:root_account) { account_model }
+    let_once(:subaccount) { account_model parent_account: root_account }
+    let_once(:course) { course_model account: subaccount }
+
+    context 'sets root account ids on save' do
+      it 'when context is account' do
+        outcome = LearningOutcome.create! title:'outcome', context: subaccount
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+
+      it 'when context is course' do
+        outcome = LearningOutcome.create! title:'outcome', context: course
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+    end
+
+    it 'sets empty root account ids when context is nil' do
+      outcome = LearningOutcome.create! title:'outcome', context: nil
+      expect(outcome.root_account_ids).to eq []
+    end
+
+    it 'sets multiple root account ids based on associations' do
+      second_root_account = account_model
+      outcome = LearningOutcome.create! title: 'outcome'
+      course.root_outcome_group.add_outcome(outcome)
+      second_root_account.root_outcome_group.add_outcome(outcome)
+      outcome.update! root_account_ids: nil
+      expect(outcome.root_account_ids).to match_array [root_account.id, second_root_account.id]
+    end
+
+    context 'add_root_account_id_for_context!' do
+      it 'adds root account id for account' do
+        outcome = LearningOutcome.create! title: 'outcome'
+        outcome.add_root_account_id_for_context! subaccount
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+
+      it 'adds root account id for course' do
+        outcome = LearningOutcome.create! title: 'outcome'
+        outcome.add_root_account_id_for_context! course
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+
+      it 'does not add anything for outcome group' do
+        outcome = LearningOutcome.create! title: 'outcome'
+        outcome.add_root_account_id_for_context! LearningOutcomeGroup.global_root_outcome_group
+        expect(outcome.root_account_ids).to eq []
+      end
+
+      it 'does not add anything when root accound id already present' do
+        outcome = LearningOutcome.create! title: 'outcome', context: subaccount
+        expect(outcome).not_to receive(:save)
+        outcome.add_root_account_id_for_context! course
+        expect(outcome.root_account_ids).to eq [root_account.id]
+      end
+    end
+  end
+
   context "account level outcome" do
     let(:outcome) do
       LearningOutcome.create!(
@@ -963,20 +1052,28 @@ describe LearningOutcome do
         })
         result.reload
         rubric.reload
-        { assignment: assignment, assessment: assessment, rubric: rubric }
+        { assignment: assignment, assessment: assessment, rubric: rubric, result: result }
       end
     end
 
     context "learning outcome results" do
-      it "properly reports whether assessed in a course" do
+      before do
         add_student.call(c1, c2)
         add_or_get_rubric(outcome)
         [c1, c2].each { |c| outcome.align(nil, c, :mastery_type => "points") }
-        assess_with.call(outcome, c1)
+        @result = assess_with.call(outcome, c1)[:result]
+      end
 
-        expect(outcome.alignments.length).to eq(3)
+      it "properly reports whether assessed in a course" do
         expect(outcome).to be_assessed
         expect(outcome).to be_assessed(c1)
+        expect(outcome).not_to be_assessed(c2)
+      end
+
+      it 'does not include deleted results when testing assessed' do
+        @result.destroy
+        expect(outcome).not_to be_assessed
+        expect(outcome).not_to be_assessed(c1)
         expect(outcome).not_to be_assessed(c2)
       end
     end
@@ -1050,41 +1147,6 @@ describe LearningOutcome do
           expect(account1.learning_outcome_links).to be_empty
         end
       end
-    end
-  end
-
-  context 'enable new guid columns' do
-    before :once do
-      assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
-    end
-
-    it "should read vendor_guid_2" do
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@outcome.vendor_guid).to be_nil
-      @outcome.vendor_guid = "GUID-XXXX"
-      @outcome.save!
-      expect(@outcome.vendor_guid).to eql "GUID-XXXX"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
-      expect(@outcome.vendor_guid).to eql "GUID-XXXX"
-      @outcome.write_attribute('vendor_guid_2', "GUID-YYYY")
-      expect(@outcome.vendor_guid).to eql "GUID-YYYY"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@outcome.vendor_guid).to eql "GUID-XXXX"
-    end
-
-    it "should read migration_id_2" do
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@outcome.migration_id).to be_nil
-      @outcome.migration_id = "GUID-XXXX"
-      @outcome.save!
-      expect(@outcome.migration_id).to eql "GUID-XXXX"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
-      expect(@outcome.migration_id).to eql "GUID-XXXX"
-      @outcome.write_attribute('migration_id_2', "GUID-YYYY")
-      expect(@outcome.migration_id).to eql "GUID-YYYY"
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
-      expect(@outcome.migration_id).to eql "GUID-XXXX"
     end
   end
 

@@ -18,17 +18,18 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!blueprint_settings'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import I18n from 'i18n!blueprint_settingsMigrationOptions'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {TextArea} from '@instructure/ui-text-area'
+import {Text} from '@instructure/ui-text'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -47,96 +48,108 @@ export default class MigrationOptions extends React.Component {
     enableSendNotification: PropTypes.func.isRequired,
     includeCustomNotificationMessage: PropTypes.func.isRequired,
     includeCourseSettings: PropTypes.func.isRequired,
-    setNotificationMessage: PropTypes.func.isRequired,
+    setNotificationMessage: PropTypes.func.isRequired
   }
 
-  componentWillReceiveProps (newProps) {
-    if (newProps.notificationMessage !== this.props.notificationMessage
-      && newProps.notificationMessage.length > WARNING_MESSAGE_LENGTH) {
-      $.screenReaderFlashMessage(I18n.t('%{count} of %{max} maximum characters', {
-        count: newProps.notificationMessage.length,
-        max: MAX_NOTIFICATION_MESSAGE_LENGTH
-      }));
+  componentWillReceiveProps(newProps) {
+    if (
+      newProps.notificationMessage !== this.props.notificationMessage &&
+      newProps.notificationMessage.length > WARNING_MESSAGE_LENGTH
+    ) {
+      $.screenReaderFlashMessage(
+        I18n.t('%{count} of %{max} maximum characters', {
+          count: newProps.notificationMessage.length,
+          max: MAX_NOTIFICATION_MESSAGE_LENGTH
+        })
+      )
     }
   }
 
-  handleSendNotificationChange = (event) => {
+  handleSendNotificationChange = event => {
     this.props.enableSendNotification(event.target.checked)
   }
 
-  handleIncludeCourseSettingsChange = (event) => {
+  handleIncludeCourseSettingsChange = event => {
     this.props.includeCourseSettings(event.target.checked)
   }
 
-  handleAddAMessageChange = (event) => {
+  handleAddAMessageChange = event => {
     this.props.includeCustomNotificationMessage(event.target.checked)
   }
 
-  handleChangeMessage = (event) => {
+  handleChangeMessage = event => {
     if (event.target.value.length > MAX_NOTIFICATION_MESSAGE_LENGTH) {
       setTimeout(() => {
         $.screenReaderFlashMessage(
-          I18n.t('You have reached the limit of %{len} characters in the notification message', {len: MAX_NOTIFICATION_MESSAGE_LENGTH})
+          I18n.t('You have reached the limit of %{len} characters in the notification message', {
+            len: MAX_NOTIFICATION_MESSAGE_LENGTH
+          })
         )
-      }, 600);
+      }, 600)
     }
-    const msg = event.target.value.slice(0, MAX_NOTIFICATION_MESSAGE_LENGTH);
+    const msg = event.target.value.slice(0, MAX_NOTIFICATION_MESSAGE_LENGTH)
     this.props.setNotificationMessage(msg)
   }
 
-  render () {
+  render() {
     const isDisabled = MigrationStates.isLoadingState(this.props.migrationStatus)
 
     return (
-      <div className="bcs__history-notification">
-        <div className="bcs__history-settings">
-          <Checkbox
-            label={I18n.t('Include Course Settings')}
-            checked={this.props.willIncludeCourseSettings}
-            onChange={this.handleIncludeCourseSettingsChange}
-            size="small"
-            disabled={isDisabled}
-          />
-          <Checkbox
-            label={I18n.t('Send Notification')}
-            checked={this.props.willSendNotification}
-            onChange={this.handleSendNotificationChange}
-            size="small"
-            disabled={isDisabled}
-          />
-        </div>
-        {this.props.willSendNotification ?
+      <FormFieldGroup
+        description={<ScreenReaderContent>{I18n.t('History Settings')}</ScreenReaderContent>}
+        layout="stacked"
+        rowSpacing="small"
+      >
+        <Checkbox
+          label={I18n.t('Include Course Settings')}
+          checked={this.props.willIncludeCourseSettings}
+          onChange={this.handleIncludeCourseSettingsChange}
+          size="small"
+          disabled={isDisabled}
+        />
+        <Checkbox
+          label={I18n.t('Send Notification')}
+          checked={this.props.willSendNotification}
+          onChange={this.handleSendNotificationChange}
+          size="small"
+          disabled={isDisabled}
+        />
+        {this.props.willSendNotification ? (
           <div className="bcs__history-notification__add-message">
             <Checkbox
-              label={I18n.t('Add a Message')}
+              label={
+                <div>
+                  <Text size="small">{I18n.t('Add a Message ')}</Text>
+                  <Text
+                    aria-label={I18n.t('%{chars} written, max character length %{len}', {
+                      chars: this.props.notificationMessage.length,
+                      len: MAX_NOTIFICATION_MESSAGE_LENGTH
+                    })}
+                    color="secondary"
+                    size="small"
+                    role="presentation"
+                  >
+                    (
+                    {I18n.t('%{len}/%{maxLen}', {
+                      len: this.props.notificationMessage.length,
+                      maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH
+                    })}
+                    )
+                  </Text>
+                </div>
+              }
               checked={this.props.willIncludeCustomNotificationMessage}
               onChange={this.handleAddAMessageChange}
               inline
               size="small"
               disabled={isDisabled}
             />
-            <Text
-              aria-label={
-                I18n.t('%{chars} written, max character length %{len}',
-                  {
-                    chars: this.props.notificationMessage.length,
-                    len: MAX_NOTIFICATION_MESSAGE_LENGTH
-                  })
-              }
-              as="span" color="secondary" size="small" role="presentation"
-            >
-              ({I18n.t('%{len}/%{maxLen}', {len: this.props.notificationMessage.length, maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH})})
-            </Text>
-          </div> : null
-        }
-        {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ?
+          </div>
+        ) : null}
+        {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ? (
           <div className="bcs__history-notification__message">
             <TextArea
-              label={
-                <ScreenReaderContent>
-                  {I18n.t('Message text')}
-                </ScreenReaderContent>
-              }
+              label={<ScreenReaderContent>{I18n.t('Message text')}</ScreenReaderContent>}
               autoGrow={false}
               resize="vertical"
               inline
@@ -144,9 +157,9 @@ export default class MigrationOptions extends React.Component {
               onChange={this.handleChangeMessage}
               disabled={isDisabled}
             />
-          </div> : null
-        }
-      </div>
+          </div>
+        ) : null}
+      </FormFieldGroup>
     )
   }
 }

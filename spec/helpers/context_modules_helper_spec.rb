@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -54,9 +56,78 @@ describe ContextModulesHelper do
     end
   end
 
+  describe "module_item_publishable?" do
+    it "should return true for an itemless item like a subheader" do
+      item = t_module.add_item(type: 'context_module_sub_header')
+      expect(module_item_publishable?(item)).to be_truthy
+    end
+
+    it "returns true for an item that doesn't respond to can_publish?" do
+      tag = t_module.content_tags.build
+      tag.tag_type = 'context_module'
+      tag.content = Thumbnail.new
+      expect(module_item_publishable?(tag)).to be_truthy
+    end
+
+    it "returns the content's can_publish?" do
+      assignment = t_course.assignments.create(workflow_state: 'unpublished')
+      student_in_course(:course => t_course)
+      item = t_module.add_item(type: 'assignment', id: assignment.id)
+      expect(assignment.can_publish?).to be_truthy
+      expect(module_item_publishable?(item)).to be_truthy
+      assignment.publish!
+      item.content.reload
+      item.reload
+      expect(assignment.can_publish?).to be_truthy
+      expect(module_item_publishable?(item)).to be_truthy
+      assignment.workflow_state = 'duplicating'
+      assignment.save!
+      item.content.reload
+      item.reload
+      expect(assignment.can_publish?).to be_falsey
+      expect(module_item_publishable?(item)).to be_falsey
+    end
+  end
+
   describe "module_item_translated_content_type" do
     it 'returns "" for nil item' do
       expect(module_item_translated_content_type(nil)).to eq ''
+    end
+
+    it 'returns New Quiz for lti-quiz type' do
+      tool = t_course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+      assignment = t_course.assignments.create(
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: {
+          content: tool
+        }
+      )
+      item = t_module.add_item(type: 'assignment', id: assignment.id)
+      expect(module_item_translated_content_type(item)).to eq 'New Quiz'
+    end
+
+    it 'returns Quiz for lti-quiz type if is_student' do
+      tool = t_course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+    assignment = t_course.assignments.create(
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: {
+        content: tool
+      }
+    )
+    item = t_module.add_item(type: 'assignment', id: assignment.id)
+    expect(module_item_translated_content_type(item, true)).to eq 'Quiz'
     end
 
     it 'returns a string for a recognized content type' do
@@ -186,15 +257,15 @@ describe ContextModulesHelper do
     it "does not affect cache keys unless mastery paths enabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       student_in_course(course: t_course, active_all: true)
-      cache = add_mastery_paths_to_cache_key('foo', t_course, t_module, @student)
+      cache = add_mastery_paths_to_cache_key('foo', t_course, @student)
       expect(cache).to eq 'foo'
     end
 
     it "creates the same key for the same mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s2.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, s1.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, s2.user)
       expect(cache1).not_to eq 'foo'
       expect(cache1).to eq cache2
     end
@@ -202,17 +273,17 @@ describe ContextModulesHelper do
     it "creates different keys for different mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, s1.user)
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([3, 2, 1])
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s2.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, s2.user)
       expect(cache1).not_to eq cache2
     end
 
     it "creates the same key for the same mastery paths rules for a teacher" do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t1.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t2.user)
       expect(cache1).not_to eq 'foo'
       expect(cache1).to eq cache2
     end
@@ -220,9 +291,9 @@ describe ContextModulesHelper do
     it "creates different keys for different mastery paths rules for a teacher" do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
-      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t1.user)
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([3, 2, 1])
-      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t2.user)
       expect(cache1).not_to eq cache2
     end
   end

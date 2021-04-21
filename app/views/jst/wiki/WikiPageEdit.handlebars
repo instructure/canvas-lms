@@ -12,30 +12,33 @@
       <h2>{{title}}</h2>
     {{/if}}
     {{#unless content_is_locked}}
-      <div class="switch_views_container">
-        <div class="help_dialog"></div>
-        <a href="#" class="switch_views">
-          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-        </a>
-        <a href="#" class="switch_views" style="display:none;">
-          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-        </a>
-      </div>
+      {{#unless use_rce_enhancements}}
+        <div class="switch_views_container">
+          <div class="help_dialog"></div>
+          <a href="#" class="switch_views">
+            {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+          </a>
+          <a href="#" class="switch_views" style="display:none;">
+            {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+          </a>
+        </div>
+      {{/unless}}
     {{/unless}}
   </div>
 
   {{#if content_is_locked}}
     {{{body}}}
   {{else}}
+    <label for="wiki_page_body" class="hidden-readable" aria-hidden="true">{{#t}}Raw HTML Editor{{/t}}</label>
     <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
   {{/if}}
 
   {{#if CAN.EDIT_ROLES}}
-    <div class="control-group options">
+    <div class="responsive-control-group options">
       <label class="control-label"><strong>{{#t "options_label"}}Options{{/t}}</strong></label>
       <div class="controls">
-        <label id="editing_roles_label"  for="editing_roles">{{t "Can edit this page role selection"}}</label>
-        <select id="editing_roles" aria-label="{{t "Can edit this page role selection"}}" name="editing_roles">
+        <label id="editing_roles_label"  for="editing_roles">{{t "Users allowed to edit this page"}}</label>
+        <select id="editing_roles" aria-label="{{t "Users allowed to edit this page"}}" name="editing_roles" class="responsive-width">
           {{#if SHOW.COURSE_ROLES}}
             <option value="teachers"{{#if IS.TEACHER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.only_teachers"}}Only teachers{{/t}}</option>
             <option value="teachers,students"{{#if IS.STUDENT_ROLE}} selected{{/if}}>{{#t "course_editing_roles.teachers_and_students"}}Teachers and students{{/t}}</option>
@@ -45,27 +48,27 @@
             <option value="members,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "editing_roles.anyone"}}Anyone{{/t}}</option>
           {{/if}}
         </select>
+        {{#if ENV.CAN_SET_TODO_DATE}}
+          <div class="controls-section">
+            <label for="student_planner_checkbox" class="checkbox">
+            <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
+              {{#t}}Add to student to-do{{/t}}
+            </label>
+            <div id="todo_date_container" />
+          </div>
+        {{/if}}
+        {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
+          <div class="controls-section">
+            <label class="checkbox" for="conditional_content">
+              {{checkbox "assignment.set_assignment"
+                id="conditional_content"
+                class="element_toggler"
+                checked=set_assignment}}
+              {{#t}}Allow in mastery paths{{/t}}
+            </label>
+          </div>
+        {{/if}}
       </div>
-      {{#if ENV.STUDENT_PLANNER_ENABLED}}
-        <div class="controls">
-          <label for="student_planner_checkbox" class="checkbox">
-          <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
-            {{#t}}Add to student to-do{{/t}}
-          </label>
-          <div id="todo_date_container" />
-        </div>
-      {{/if}}
-      {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
-        <div class="controls">
-          <label class="checkbox" for="conditional_content">
-            {{checkbox "assignment.set_assignment"
-              id="conditional_content"
-              class="element_toggler"
-              checked=set_assignment}}
-            {{#t}}Allow in mastery paths{{/t}}
-          </label>
-        </div>
-      {{/if}}
     </div>
   {{/if}}
 </div>
@@ -76,10 +79,12 @@
       {{checkbox "notify_of_update"}}
       {{#t "notify_users_text"}}Notify users that this content has changed{{/t}}
     </label>
-    <button class="btn cancel">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
-    {{#if CAN.PUBLISH_NOW}}
-      <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
-    {{/if}}
-    <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
+    <div class="page-edit__action_buttons">
+      <button class="btn cancel">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
+      {{#if CAN.PUBLISH_NOW}}
+        <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
+      {{/if}}
+      <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
+    </div>
   </div>
 </div>

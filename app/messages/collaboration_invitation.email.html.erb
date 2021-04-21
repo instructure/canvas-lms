@@ -20,14 +20,14 @@
         :course_or_group => asset.collaboration.context.name,
         :user => asset.collaboration.user.short_name,
         :service => asset.collaboration.service_name,
-        :email => asset.user.gmail %>
+        :email => asset.user&.gmail %>
 <% else %>
   <%= t :body,
         "You've been invited to collaborate on a document, %{document} for %{course_or_group}.  The document was created in %{service} and you were invited using your email address, %{email}.",
         :document => asset.collaboration.title,
         :course_or_group => asset.collaboration.context.name,
         :service => asset.collaboration.service_name,
-        :email => asset.user.gmail %>
+        :email => asset.user&.gmail %>
 <% end %>
 </p>
 

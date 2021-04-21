@@ -24,10 +24,14 @@ import environment from './environment'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
 import NumberHelper from '../shared/helpers/numberHelper'
 import I18n from 'i18n!gradebook_history'
-import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import {IconOffLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {Table} from '@instructure/ui-table'
+import {Text} from '@instructure/ui-text'
 
+// Unclear on why that tab-index is there but not going to mess with it right now
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 function anonymouslyGraded(gradedAnonymously) {
   return gradedAnonymously ? (
     <div>
@@ -42,6 +46,7 @@ function anonymouslyGraded(gradedAnonymously) {
     <ScreenReaderContent>{I18n.t('Not anonymously graded')}</ScreenReaderContent>
   )
 }
+/* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 
 function displayGrade(grade, possible, displayAsPoints) {
   // show the points possible if the assignment is set to display grades as
@@ -56,7 +61,7 @@ function displayGrade(grade, possible, displayAsPoints) {
 }
 
 function displayStudentName(studentName, assignment) {
-  if (assignment.anonymousGrading && assignment.muted) {
+  if (assignment != null && assignment.anonymousGrading && assignment.muted) {
     return I18n.t('Not available; assignment is anonymous')
   }
 
@@ -67,9 +72,18 @@ function displayStudentName(studentName, assignment) {
   return studentName
 }
 
+function displayAssignmentName(assignment, courseOverrideGrade) {
+  if (courseOverrideGrade) {
+    return <Text fontStyle="italic">{I18n.t('Final Grade Override')}</Text>
+  }
+
+  return <Text>{assignment?.name || I18n.t('Not available')}</Text>
+}
+
 function SearchResultsRow(props) {
   const {
     assignment,
+    courseOverrideGrade,
     date,
     displayAsPoints,
     gradedAnonymously,
@@ -84,18 +98,18 @@ function SearchResultsRow(props) {
   } = props.item
 
   return (
-    <tr>
-      <td>
+    <Table.Row>
+      <Table.Cell>
         {$.datetimeString(new Date(date), {format: 'medium', timezone: environment.timezone()})}
-      </td>
-      <td>{anonymouslyGraded(gradedAnonymously)}</td>
-      <td>{displayStudentName(student, assignment)}</td>
-      <td>{grader || I18n.t('Not available')}</td>
-      <td>{assignment.name || I18n.t('Not available')}</td>
-      <td>{displayGrade(gradeBefore, pointsPossibleBefore, displayAsPoints)}</td>
-      <td>{displayGrade(gradeAfter, pointsPossibleAfter, displayAsPoints)}</td>
-      <td>{displayGrade(gradeCurrent, pointsPossibleCurrent, displayAsPoints)}</td>
-    </tr>
+      </Table.Cell>
+      <Table.Cell>{anonymouslyGraded(gradedAnonymously)}</Table.Cell>
+      <Table.Cell>{displayStudentName(student, assignment)}</Table.Cell>
+      <Table.Cell>{grader || I18n.t('Not available')}</Table.Cell>
+      <Table.Cell>{displayAssignmentName(assignment, courseOverrideGrade)}</Table.Cell>
+      <Table.Cell>{displayGrade(gradeBefore, pointsPossibleBefore, displayAsPoints)}</Table.Cell>
+      <Table.Cell>{displayGrade(gradeAfter, pointsPossibleAfter, displayAsPoints)}</Table.Cell>
+      <Table.Cell>{displayGrade(gradeCurrent, pointsPossibleCurrent, displayAsPoints)}</Table.Cell>
+    </Table.Row>
   )
 }
 
@@ -106,6 +120,7 @@ SearchResultsRow.propTypes = {
       muted: bool.isRequired,
       name: string.isRequired
     }),
+    courseOverrideGrade: bool.isRequired,
     date: string.isRequired,
     displayAsPoints: bool.isRequired,
     gradedAnonymously: bool.isRequired,
@@ -119,5 +134,7 @@ SearchResultsRow.propTypes = {
     student: string.isRequired
   }).isRequired
 }
+
+SearchResultsRow.displayName = 'Row'
 
 export default SearchResultsRow

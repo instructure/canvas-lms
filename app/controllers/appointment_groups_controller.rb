@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -356,6 +358,11 @@ class AppointmentGroupsController < ApplicationController
 
     raise ActiveRecord::RecordNotFound unless contexts.present?
 
+    # if all contexts are in the same shard, create the appointment group in the same shard
+    original_shard = Shard.current
+    context_shards = contexts.map(&:shard).uniq
+    context_shards.first.activate! if context_shards.size == 1
+
     publish = value_to_boolean(params[:appointment_group].delete(:publish))
     @group = AppointmentGroup.new(appointment_group_params.merge(:contexts => contexts))
     @group.update_contexts_and_sub_contexts
@@ -367,6 +374,8 @@ class AppointmentGroupsController < ApplicationController
         render :json => @group.errors, :status => :bad_request
       end
     end
+  ensure
+    original_shard&.activate!
   end
 
   # @API Get a single appointment group
@@ -473,7 +482,7 @@ class AppointmentGroupsController < ApplicationController
     @group.contexts = contexts if contexts
     if authorized_action(@group, @current_user, :update)
       publish = params[:appointment_group].delete(:publish) == "1"
-      if (publish && params[:appointment_group].blank?) || @group.update_attributes(appointment_group_params)
+      if (publish && params[:appointment_group].blank?) || @group.update(appointment_group_params)
         @group.publish! if publish
         render :json => appointment_group_json(@group, @current_user, session)
       else
@@ -595,50 +604,42 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def web_index
-    anchor = if @domain_root_account.feature_enabled?(:better_scheduler)
-      # start with the first reservable appointment group
-      group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
-      calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
-    else
-      calendar_fragment :view_name => :scheduler
-    end
+    # start with the first reservable appointment group
+    group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
+    anchor =calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
     return redirect_to calendar2_url(:anchor => anchor)
   end
 
   def web_show
     calendar_args = {}
-    anchor = if @domain_root_account.feature_enabled?(:better_scheduler)
-      args = {}
-      student_course_id = @group.contexts_for_user(@current_user).first.id
-      # If they are a student and they do not have an appointment, we should enter find appointment mode.
-      # Otherwise the appointment group will not be visible to student.
-      needs_appointment = (!params[:event_id] && student_course_id &&
-                           !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
-                           !@group.users_with_reservations_through_group.include?(@current_user.id))
-      if needs_appointment
-        # start at the appointment group; enter find-appointment mode for a relevant course
-        args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
-        args[:find_appointment] = "course_#{student_course_id}"
-        calendar_fragment({ :view_name => :agenda }.merge(args))
-      else
-        # start at the appointment event, or the group start if no event is given
-        event = params[:event_id] && CalendarEvent.find_by(id: params[:event_id])
-        # For the calendar to correctly pop-up the event we should use the parent event if the
-        # event is a user event and the user does not own the event.
-        # i.e. teacher viewing appointment slot filled by student.
-        event = event.parent_event if event && event.user && event.user != @current_user
-        event = nil unless event && event.grants_right?(@current_user, :read)
-        args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
-        if event
-          calendar_args[:event_id] = event.id
-          # Event pop-up only works in month or week mode.
-          calendar_fragment({ :view_name => :month }.merge(args))
-        else
-          calendar_fragment({ :view_name => :agenda }.merge(args))
-        end
-      end
+    args = {}
+    student_course_id = @group.contexts_for_user(@current_user).first.id
+    # If they are a student and they do not have an appointment, we should enter find appointment mode.
+    # Otherwise the appointment group will not be visible to student.
+    needs_appointment = (!params[:event_id] && student_course_id &&
+                         !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
+                         !@group.users_with_reservations_through_group.include?(@current_user.id))
+    anchor = if needs_appointment
+      # start at the appointment group; enter find-appointment mode for a relevant course
+      args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
+      args[:find_appointment] = "course_#{student_course_id}"
+      calendar_fragment({ :view_name => :agenda }.merge(args))
     else
-      calendar_fragment :view_name => :scheduler, :appointment_group_id => @group.id
+      # start at the appointment event, or the group start if no event is given
+      event = params[:event_id] && CalendarEvent.find_by(id: params[:event_id])
+      # For the calendar to correctly pop-up the event we should use the parent event if the
+      # event is a user event and the user does not own the event.
+      # i.e. teacher viewing appointment slot filled by student.
+      event = event.parent_event if event && event.user && event.user != @current_user
+      event = nil unless event && event.grants_right?(@current_user, :read)
+      args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
+      if event
+        calendar_args[:event_id] = event.id
+        # Event pop-up only works in month or week mode.
+        calendar_fragment({ :view_name => :month }.merge(args))
+      else
+        calendar_fragment({ :view_name => :agenda }.merge(args))
+      end
     end
     calendar_args[:anchor] = anchor
     redirect_to calendar2_url(calendar_args)

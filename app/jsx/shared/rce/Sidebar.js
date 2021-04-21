@@ -17,18 +17,10 @@
  */
 
 import $ from 'jquery'
-// for legacy pathways
 import serviceRCELoader from './serviceRCELoader'
-import featureFlag from './featureFlag'
-import wikiSidebar from 'wikiSidebar'
 
-function loadServiceSidebar (callback) {
+function loadServiceSidebar(callback) {
   serviceRCELoader.loadSidebarOnTarget($('#editor_tabs').get(0), callback)
-}
-
-function loadLegacySidebar (callback) {
-  wikiSidebar.init()
-  callback(wikiSidebar)
 }
 
 const Sidebar = {
@@ -50,21 +42,17 @@ const Sidebar = {
    *
    * @public
    */
-  init (subscriptions = {}) {
+  init(subscriptions = {}) {
     if (!this.instance && !this.initializing) {
       this.initializing = true
-      const callback = (sidebar) => {
+      const callback = sidebar => {
         this.initializing = false
         this.instance = sidebar
         if (this.pendingShow) {
           this.show()
         }
       }
-      if (featureFlag()) {
-        loadServiceSidebar(callback)
-      } else {
-        loadLegacySidebar(callback)
-      }
+      loadServiceSidebar(callback)
     }
     this.subscriptions = subscriptions
   },
@@ -76,7 +64,7 @@ const Sidebar = {
    *
    * @public
    */
-  show () {
+  show() {
     if (this.instance) {
       this.instance.show()
       if (this.subscriptions.show) {
@@ -94,7 +82,7 @@ const Sidebar = {
    *
    * @public
    */
-  hide () {
+  hide() {
     if (this.instance) {
       this.instance.hide()
       if (this.subscriptions.hide) {
@@ -110,7 +98,7 @@ const Sidebar = {
    *
    * @private
    */
-  reset () {
+  reset() {
     this.instance = undefined
     this.initializing = false
     this.subscriptions = {}

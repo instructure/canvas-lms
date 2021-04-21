@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -20,12 +22,12 @@
 # @beta
 #
 # API for enabling/disabling the use of Content Security Policy headers and
-# configuring whitelisted domains
+# configuring allowed domains
 
 class CspSettingsController < ApplicationController
   before_action :require_context, :require_user
-  before_action :require_read_permissions, only: [:get_csp_settings]
-  before_action :require_permissions, except: [:get_csp_settings]
+  before_action :require_read_permissions, only: [:get_csp_settings, :csp_log]
+  before_action :require_permissions, except: [:get_csp_settings, :csp_log]
   before_action :get_domain, :only => [:add_domain, :remove_domain]
 
   # @API Get current settings for account or course
@@ -35,12 +37,12 @@ class CspSettingsController < ApplicationController
   # @response_field enabled Whether CSP is enabled.
   # @response_field inherited Whether the current CSP settings are inherited from a parent account.
   # @response_field settings_locked Whether current CSP settings can be overridden by sub-accounts and courses.
-  # @response_field effective_whitelist If enabled, lists the currently whitelisted domains
-  #   (includes domains automatically whitelisted through external tools).
-  # @response_field tools_whitelist (Account-only) Lists the automatically whitelisted domains with
+  # @response_field effective_whitelist If enabled, lists the currently allowed domains
+  #   (includes domains automatically allowed through external tools).
+  # @response_field tools_whitelist (Account-only) Lists the automatically allowed domains with
   #   their respective external tools
   # @response_field current_account_whitelist (Account-only) Lists the current list of domains
-  #   explicitly whitelisted by this account. (Note: this list will not take effect unless
+  #   explicitly allowed by this account. (Note: this list will not take effect unless
   #   CSP is explicitly enabled on this account)
   def get_csp_settings
     render :json => csp_settings_json
@@ -56,7 +58,7 @@ class CspSettingsController < ApplicationController
   #
   # @argument status [Required, String, "enabled"|"disabled"|"inherited"]
   #   If set to "enabled" for an account, CSP will be enabled for all its courses and sub-accounts (that
-  #   have not explicitly enabled or disabled it), using the domain whitelist set on this account.
+  #   have not explicitly enabled or disabled it), using the allowed domains set on this account.
   #   If set to "disabled", CSP will be disabled for this account or course and for all sub-accounts
   #   that have not explicitly re-enabled it.
   #   If set to "inherited", this account or course will reset to the default state where CSP settings
@@ -85,6 +87,7 @@ class CspSettingsController < ApplicationController
     else
       return render :json => {:message => "invalid setting"}, :status => :bad_request
     end
+    RequestCache.clear # clear inherited account settings
     render :json => csp_settings_json
   end
 
@@ -108,9 +111,9 @@ class CspSettingsController < ApplicationController
     render :json => csp_settings_json
   end
 
-  # @API Add a domain to account whitelist
+  # @API Add an allowed domain to account
   #
-  # Adds a domain to the whitelist for the current account. Note: this will not take effect
+  # Adds an allowed domain for the current account. Note: this will not take effect
   # unless CSP is explicitly enabled on this account.
   #
   # @argument domain [Required, String]
@@ -122,9 +125,9 @@ class CspSettingsController < ApplicationController
     end
   end
 
-  # @API Add multiple domains to account whitelist
+  # @API Add multiple allowed domains to an account
   #
-  # Adds multiple domains to the whitelist for the current account. Note: this will not take effect
+  # Adds multiple allowed domains for the current account. Note: this will not take effect
   # unless CSP is explicitly enabled on this account.
   #
   # @argument domains [Required, Array]
@@ -149,9 +152,19 @@ class CspSettingsController < ApplicationController
     end
   end
 
-  # @API Remove a domain from account whitelist
+  # @API Retrieve reported CSP Violations for account
   #
-  # Removes a domain from the whitelist for the current account.
+  # Must be called on a root account.
+  def csp_log
+    return render status: 400, json: { message: 'must be called on a root account' } unless @context.root_account?
+    return render status: 503, json: { message: 'CSP logging is not configured on the server' } unless (ss = @context.csp_logging_config['shared_secret'])
+
+    render json: CanvasHttp.get("#{@context.csp_logging_config['host']}report/#{@context.global_id}", 'Authorization' => "Bearer #{ss}").body
+  end
+
+  # @API Remove a domain from account
+  #
+  # Removes an allowed domain from the current account.
   #
   # @argument domain [Required, String]
   def remove_domain
@@ -184,7 +197,7 @@ class CspSettingsController < ApplicationController
       :inherited => @context.csp_inherited?,
       :settings_locked => @context.csp_locked?,
     }
-    json[:effective_whitelist] = @context.csp_whitelisted_domains if @context.csp_enabled?
+    json[:effective_whitelist] = @context.csp_whitelisted_domains(request, include_files: false, include_tools: true) if @context.csp_enabled?
     if @context.is_a?(Account)
       tools_whitelist = {}
       @context.csp_tools_grouped_by_domain.each do |domain, tools|

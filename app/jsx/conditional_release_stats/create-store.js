@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux'
+import {createStore, applyMiddleware} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import rootReducer from './reducers/root-reducer'
 
-const createStoreWithMiddleware = applyMiddleware(
-  ReduxThunk
-)(createStore)
+const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 
-function configureStore (initialState) {
+function configureStore(initialState) {
   return createStoreWithMiddleware(rootReducer, initialState)
 }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -107,7 +109,7 @@ module NewCourseSearchPage
   end
 
   def select_term(term)
-    click_option('select:has([label="Show courses from"])', term.name)
+    click_INSTUI_Select_option('#termFilter', term.name)
     wait_for_spinner
   end
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!bundles_quesiton_bank'
 import $ from 'jquery'
 import {map} from 'underscore'
 import OutcomeGroup from 'compiled/models/OutcomeGroup'
@@ -25,20 +25,18 @@ import {updateAlignments, attachPageEvents} from 'question_bank'
 import 'jst/quiz/move_question'
 
 class QuestionBankPage {
-  static initClass () {
+  static initClass() {
     this.prototype.$els = {}
 
-    this.prototype.translations =
-        {findOutcome: I18n.t('titles.find_outcomes', 'Find Outcomes')}
+    this.prototype.translations = {findOutcome: I18n.t('titles.find_outcomes', 'Find Outcomes')}
   }
 
-  constructor () {
-    this.onAddOutcome = this.onAddOutcome.bind(this)
+  constructor() {
     this.rootOutcomeGroup = new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP)
     this.attachEvents()
   }
 
-  createDialog () {
+  createDialog() {
     this.$els.dialog = new FindDialog({
       title: this.translations.findOutcome,
       selectedGroup: this.rootOutcomeGroup,
@@ -50,11 +48,11 @@ class QuestionBankPage {
     this.$els.dialog.on('import', this.onOutcomeImport)
   }
 
-  attachEvents () {
+  attachEvents() {
     $('.add_outcome_link').on('click', this.onAddOutcome)
   }
 
-  onAddOutcome (e) {
+  onAddOutcome = e => {
     e.preventDefault()
     if (!this.$els.dialog) {
       this.createDialog()
@@ -62,19 +60,24 @@ class QuestionBankPage {
     this.$els.dialog.show()
   }
 
-  onOutcomeImport (outcome) {
-    const mastery = (outcome.quizMasteryLevel / 100.0) || 1.0
-    const alignments = map($('#aligned_outcomes_list .outcome:not(.blank)'), (o) => {
+  onOutcomeImport(outcome) {
+    const mastery = outcome.quizMasteryLevel / 100.0 || 1.0
+    const alignments = map($('#aligned_outcomes_list .outcome:not(.blank)'), o => {
       const $outcome = $(o)
-      const [id, percent] = Array.from([$outcome.data('id'), ($outcome.getTemplateData({textValues: ['mastery_threshold']}).mastery_threshold) / 100.0])
-      if (id !== outcome.get('id')) { return [id, percent] } return null
+      const [id, percent] = Array.from([
+        $outcome.data('id'),
+        $outcome.getTemplateData({textValues: ['mastery_threshold']}).mastery_threshold / 100.0
+      ])
+      if (id !== outcome.get('id')) {
+        return [id, percent]
+      }
+      return null
     })
     alignments.push([outcome.get('id'), mastery])
     updateAlignments(alignments)
   }
 }
 QuestionBankPage.initClass()
-
 
 $(document).ready(() => {
   new QuestionBankPage()

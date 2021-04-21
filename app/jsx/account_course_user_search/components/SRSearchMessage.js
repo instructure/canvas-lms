@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {Alert} from '@instructure/ui-alerts'
 import {oneOf, func, array, shape, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 

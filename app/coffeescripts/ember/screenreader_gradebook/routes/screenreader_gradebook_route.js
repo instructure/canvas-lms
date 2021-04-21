@@ -18,7 +18,7 @@
 import {ArrayProxy, ObjectProxy, Route} from 'ember'
 import _ from 'underscore'
 import fetchAllPages from '../../shared/xhr/fetch_all_pages'
-import {getFinalGradeOverrides} from 'jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import {getFinalGradeOverrides} from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 
 const ScreenreaderGradebookRoute = Route.extend({
   model() {

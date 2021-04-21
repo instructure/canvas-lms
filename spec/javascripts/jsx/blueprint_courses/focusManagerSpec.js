@@ -39,9 +39,9 @@ test('allocateNext() adds on to items', () => {
 test('allocateNext() returns an appropriate register ref function', () => {
   const manager = new FocusManager()
   const nextNode = manager.allocateNext()
-  nextNode.ref({ name: 'foo' })
+  nextNode.ref({name: 'foo'})
   equal(manager.items.length, 1)
-  deepEqual(manager.items[0], { name: 'foo' })
+  deepEqual(manager.items[0], {name: 'foo'})
 })
 
 test('reset() removes all items', () => {
@@ -55,38 +55,38 @@ test('reset() removes all items', () => {
 
 test('registerItem() sets a node at an index', () => {
   const manager = new FocusManager()
-  manager.registerItem({ name: 'foo' }, 0)
+  manager.registerItem({name: 'foo'}, 0)
 
   equal(manager.items.length, 1)
-  deepEqual(manager.items[0], { name: 'foo' })
+  deepEqual(manager.items[0], {name: 'foo'})
 })
 
 test('registerItemRef() returns a ref function that registers item at index', () => {
   const manager = new FocusManager()
   const ref = manager.registerItemRef(0)
-  ref({ name: 'foo' })
+  ref({name: 'foo'})
 
   equal(manager.items.length, 1)
-  deepEqual(manager.items[0], { name: 'foo' })
+  deepEqual(manager.items[0], {name: 'foo'})
 })
 
 test('registerBeforeRef() registers the before ref', () => {
   const manager = new FocusManager()
-  manager.registerBeforeRef({ name: 'foo' })
-  deepEqual(manager.before, { name: 'foo' })
+  manager.registerBeforeRef({name: 'foo'})
+  deepEqual(manager.before, {name: 'foo'})
 })
 
 test('registerAfterRef() registers the after ref', () => {
   const manager = new FocusManager()
-  manager.registerAfterRef({ name: 'foo' })
-  deepEqual(manager.after, { name: 'foo' })
+  manager.registerAfterRef({name: 'foo'})
+  deepEqual(manager.after, {name: 'foo'})
 })
 
 test('movePrev() moves focus to item before index', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
-  manager.registerItem({ focus: spy }, 0)
-  manager.registerItem({ focus: () => {} }, 1)
+  manager.registerItem({focus: spy}, 0)
+  manager.registerItem({focus: () => {}}, 1)
 
   manager.movePrev(1)
   equal(spy.callCount, 1)
@@ -95,8 +95,8 @@ test('movePrev() moves focus to item before index', () => {
 test('movePrev() moves focus to before if on first index', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
-  manager.before = { focus: spy }
-  manager.registerItem({ focus: () => {} }, 0)
+  manager.before = {focus: spy}
+  manager.registerItem({focus: () => {}}, 0)
 
   manager.movePrev(0)
   equal(spy.callCount, 1)
@@ -105,8 +105,8 @@ test('movePrev() moves focus to before if on first index', () => {
 test('moveNext() moves focus to item after index', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
-  manager.registerItem({ focus: () => {} }, 0)
-  manager.registerItem({ focus: spy }, 1)
+  manager.registerItem({focus: () => {}}, 0)
+  manager.registerItem({focus: spy}, 1)
 
   manager.moveNext(0)
   equal(spy.callCount, 1)
@@ -115,8 +115,8 @@ test('moveNext() moves focus to item after index', () => {
 test('moveNext() moves focus to after if on last index', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
-  manager.after = { focus: spy }
-  manager.registerItem({ focus: () => {} }, 0)
+  manager.after = {focus: spy}
+  manager.registerItem({focus: () => {}}, 0)
 
   manager.moveNext(0)
   equal(spy.callCount, 1)
@@ -125,7 +125,7 @@ test('moveNext() moves focus to after if on last index', () => {
 test('moveBefore() moves focus to before ', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
-  manager.before = { focus: spy }
+  manager.before = {focus: spy}
 
   manager.moveBefore()
   equal(spy.callCount, 1)
@@ -134,7 +134,7 @@ test('moveBefore() moves focus to before ', () => {
 test('moveAfter() moves focus to before ', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
-  manager.after = { focus: spy }
+  manager.after = {focus: spy}
 
   manager.moveAfter()
   equal(spy.callCount, 1)
@@ -144,6 +144,6 @@ test('focus() calls focus on thing ', () => {
   const manager = new FocusManager()
   const spy = sinon.spy()
 
-  manager.focus({ focus: spy })
+  manager.focus({focus: spy})
   equal(spy.callCount, 1)
 })

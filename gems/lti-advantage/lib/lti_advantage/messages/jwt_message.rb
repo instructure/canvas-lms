@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json/jwt'
 
 module LtiAdvantage::Messages
@@ -21,7 +23,7 @@ module LtiAdvantage::Messages
     ].freeze
 
     TYPED_ATTRIBUTES = {
-      aud: Array,
+      aud: [Array, String],
       context: LtiAdvantage::Claims::Context,
       custom: Hash,
       extensions: Hash,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -119,7 +121,7 @@ module IncomingMail
         when IncomingMail::Errors::UnknownSender
           ndr_subject = I18n.t("Undelivered message")
           ndr_body = I18n.t(<<-BODY, :subject => subject).gsub(/^ +/, '')
-          The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address [See https://community.canvaslms.com/docs/DOC-2281]. You may also contact this person via the Canvas Inbox [See https://community.canvaslms.com/docs/DOC-2670].
+          The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See https://community.canvaslms.com/t5/Canvas/ct-p/canvas].
 
           Thank you,
           Canvas Support
@@ -138,7 +140,9 @@ module IncomingMail
     end
 
     def valid_secure_id?(original_message_id, secure_id)
-      Canvas::Security.verify_hmac_sha1(secure_id, original_message_id)
+      options = {}
+      options[:truncate] = 16 if secure_id.length == 16
+      Canvas::Security.verify_hmac_sha1(secure_id, original_message_id, options)
     end
 
     def valid_user_and_context?(context, user)

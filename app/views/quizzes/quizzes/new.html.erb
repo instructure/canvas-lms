@@ -17,21 +17,19 @@
 %>
 
 <%
-  css_bundle :quizzes, :tinymce
-  js_bundle :quizzes_bundle
   js_env :QUIZZES => {:QUIZ => true}
-  content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
+  provide :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 
-<% unless editing_restricted?(@quiz, :content) %>
-  <% content_for :right_side do %>
-    <%= render :partial => "shared/wiki_sidebar" %>
-  <% end %>
+<% if editing_restricted?(@quiz, :content) %>
+  <% provide_blank :right_side %>
+<% else %>
+  <% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
 <% end %>
 
 <h1 class="screenreader-only"><%= @quiz.quiz_title %></h1>
 
-<div id="quiz_edit_wrapper">
+<div id="quiz_edit_wrapper" class="mathjax_ignore">
   <%= render :partial => "quiz_edit" %>
 </div>
 

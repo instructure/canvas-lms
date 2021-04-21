@@ -105,7 +105,10 @@ export default class TokenInput {
           }
         }
         $('<a href="#" class="browser">browse</a>')
-          .click(activateBrowse)
+          .click(e => {
+            e.preventDefault()
+            activateBrowse()
+          })
           .keypress(activateBrowse)
           .appendTo(this.$fakeInput)
         this.$fakeInput.addClass('browsable')

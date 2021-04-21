@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
@@ -40,7 +42,7 @@ describe ApplicationHelper do
     it "should work work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -50,7 +52,7 @@ describe ApplicationHelper do
     it "should limit depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 3
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -60,7 +62,7 @@ describe ApplicationHelper do
     it "should work without supplying all folders" do
       option_string = folders_as_options([@f])
 
-      html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
+      html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
       expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
@@ -253,13 +255,32 @@ describe ApplicationHelper do
           expect(output).to match %r{https://example.com/site_admin/account.css}
         end
 
-
         it "should not include anything if param is set to 0" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           params[:global_includes] = '0'
 
           output = helper.include_account_css
           expect(output).to be_nil
+        end
+
+        context "with user that doesn't work for that account" do
+          before do
+            @current_pseudonym = pseudonym_model
+            allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
+          end
+
+          it "won't render only JS" do
+            allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
+            expect(helper.include_account_css).to be_nil
+          end
+
+          it "will not render if there's javacscript" do
+            allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(
+              css_overrides: 'https://example.com/root/account.css',
+              js_overrides: 'https://example.com/root/account.js'
+            )
+            expect(helper.include_account_css).to be_nil
+          end
         end
       end
 
@@ -361,20 +382,47 @@ describe ApplicationHelper do
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/site_admin\\/account.js}
         end
 
+        it "will not render for user that doesn't work with that account" do
+          @current_pseudonym = pseudonym_model
+          allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
+          expect(helper.include_account_js).to be_nil
+        end
+
         context "sub-accounts" do
           before { set_up_subaccounts }
 
           it "should just include domain root account's when there is no context or @current_user" do
             output = helper.include_account_js
             expect(output).to have_tag 'script'
-            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
+            expect(output).to eq("<script>
+//<![CDATA[
+
+      ;[\"https://example.com/root/account.js\"].forEach(function(src) {
+        var s = document.createElement('script')
+        s.src = src
+        s.async = false
+        document.head.appendChild(s)
+      });
+//]]>
+</script>")
           end
 
           it "should load custom js even for high contrast users" do
             @current_user = user_factory
             user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
-            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
+            expect(output).to eq("<script>
+//<![CDATA[
+
+      ;[\"https://example.com/root/account.js\"].forEach(function(src) {
+        var s = document.createElement('script')
+        s.src = src
+        s.async = false
+        document.head.appendChild(s)
+      });
+//]]>
+</script>")
           end
 
           it "should include granchild, child, and root when viewing the grandchild or any course or group in it" do
@@ -382,11 +430,17 @@ describe ApplicationHelper do
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
               @context = context
-              expect(helper.include_account_js).to eq %{
-<script src="https://example.com/root/account.js" defer="defer"></script>
-<script src="https://example.com/child/account.js" defer="defer"></script>
-<script src="https://example.com/grandchild/account.js" defer="defer"></script>
-              }.strip
+              expect(helper.include_account_js).to eq("<script>
+//<![CDATA[
+
+      ;[\"https://example.com/root/account.js\", \"https://example.com/child/account.js\", \"https://example.com/grandchild/account.js\"].forEach(function(src) {
+        var s = document.createElement('script')
+        s.src = src
+        s.async = false
+        document.head.appendChild(s)
+      });
+//]]>
+</script>")
             end
           end
         end
@@ -516,12 +570,29 @@ describe ApplicationHelper do
     it "should return hash of tools if in group" do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool = @course.context_external_tools.new(
+        :name => "bob",
+        :consumer_key => "test",
+        :shared_secret => "secret",
+        :url => "http://example.com",
+        :description => "the description."
+      )
       tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
       tool.save!
       @context = @group
 
-      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400, :use_tray => false}])
+      expect(editor_buttons).to eq([{
+        :name=>"bob",
+        :id=>tool.id,
+        :url=>"http://example.com",
+        :icon_url=>"http://example.com",
+        :canvas_icon_class => 'icon-commons',
+        :width=>800,
+        :height=>400,
+        :use_tray => false,
+        :description => "<p>the description.</p>\n",
+        :favorite => false
+      }])
     end
 
     it "should return hash of tools if in course" do
@@ -532,7 +603,18 @@ describe ApplicationHelper do
       allow(controller).to receive(:group_external_tool_path).and_return('http://dummy')
       @context = @course
 
-      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400, :use_tray => false}])
+      expect(editor_buttons).to eq([{
+        :name=>"bob",
+        :id=>tool.id,
+        :url=>"http://example.com",
+        :icon_url=>"http://example.com",
+        :canvas_icon_class => 'icon-commons',
+        :width=>800,
+        :height=>400,
+        :use_tray => false,
+        :description => "",
+        :favorite => false
+      }])
     end
 
     it "should not include tools from the domain_root_account for users" do
@@ -636,69 +718,10 @@ describe ApplicationHelper do
 
   end
 
-
-  describe "include_head_js" do
-    before do
-      allow(helper).to receive(:js_bundles).and_return([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
-    end
-
-    it "creates the correct javascript tags" do
-      allow(helper).to receive(:js_env).and_return({
-        BIGEASY_LOCALE: 'nb_NO',
-        MOMENT_LOCALE: 'nb',
-        TIMEZONE: 'America/La_Paz',
-        CONTEXT_TIMEZONE: 'America/Denver'
-      })
-      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/vendor.js').and_return('vendor_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/America/La_Paz.js').and_return('La_Paz_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/America/Denver.js').and_return('Denver_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/nb_NO.js').and_return('nb_NO_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/moment/locale/nb.js').and_return('nb_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/appBootstrap.js').and_return('app_bootstrap_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/common.js').and_return('common_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_bundle.js').and_return('some_bundle_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').and_return('plugin_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/another_bundle.js').and_return('another_bundle_url')
-
-      expect(helper.include_head_js).to eq %{
-<script src="/vendor_url" defer="defer"></script>
-<script src="/La_Paz_url" defer="defer"></script>
-<script src="/Denver_url" defer="defer"></script>
-<script src="/nb_NO_url" defer="defer"></script>
-<script src="/nb_url" defer="defer"></script>
-<script src="/app_bootstrap_url" defer="defer"></script>
-<script src="/common_url" defer="defer"></script>
-<script src="/some_bundle_url" defer="defer"></script>
-<script src="/plugin_url" defer="defer"></script>
-<script src="/another_bundle_url" defer="defer"></script>
-      }.strip
-    end
-  end
-
-  describe "include_js_bundles" do
-    before do
-      allow(helper).to receive(:js_bundles).and_return([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
-    end
-    it "creates the correct javascript tags" do
-      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_bundle.js').and_return('some_bundle_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').and_return('plugin_url')
-      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/another_bundle.js').and_return('another_bundle_url')
-
-      expect(helper.include_js_bundles).to eq %{
-<script src="/some_bundle_url" defer="defer"></script>
-<script src="/plugin_url" defer="defer"></script>
-<script src="/another_bundle_url" defer="defer"></script>
-      }.strip
-    end
-  end
-
   describe "map_groups_for_planner" do
     context "with planner enabled" do
       before(:each) do
         @account = Account.default
-        @account.enable_feature! :student_planner
       end
 
       it "returns the list of groups the user belongs to" do
@@ -746,10 +769,6 @@ describe ApplicationHelper do
     end
 
     context "with student_planner feature flag enabled" do
-      before(:each) do
-        @domain_root_account.enable_feature! :student_planner
-      end
-
       it "returns false when a user has no student enrollments" do
         course_with_teacher(:active_all => true)
         @current_user = @user
@@ -1090,6 +1109,18 @@ describe ApplicationHelper do
     end
   end
 
+  describe "#prefetch_xhr" do
+    it "inserts a script tag that will have a `fetch` call with the right id, url, and options" do
+      expect(prefetch_xhr('some_url', id: 'some_id', options: {headers: {"x-some-header": "some-value"}})).to eq(
+"<script>
+//<![CDATA[
+(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[\"some_id\"] = fetch(\"some_url\", {\"credentials\":\"same-origin\",\"headers\":{\"Accept\":\"application/json+canvas-string-ids, application/json\",\"x-some-header\":\"some-value\"}})
+//]]>
+</script>"
+      )
+    end
+  end
+
   describe "#alt_text_for_login_logo" do
     before :each do
       @domain_root_account = Account.default
@@ -1103,6 +1134,150 @@ describe ApplicationHelper do
     it "returns the account short name when the logo is custom" do
       Account.default.create_brand_config!(variables: {"ic-brand-Login-logo" => "test.jpg"})
       expect(alt_text_for_login_logo).to eql "Default Account"
+    end
+  end
+
+  context "content security policy enabled" do
+
+    let(:account) { Account.create!(name: 'csp_account')}
+    let(:sub_account) { account.sub_accounts.create! }
+    let(:sub_2_account) { sub_account.sub_accounts.create! }
+    let(:headers) {{}}
+    let(:js_env) {{}}
+
+    before do
+      account.enable_feature!(:javascript_csp)
+
+      account.add_domain!("root_account.test")
+      account.add_domain!("root_account2.test")
+      sub_account.add_domain!("sub_account.test")
+      sub_2_account.add_domain!("sub_2_account.test")
+
+      allow(helper).to receive(:headers).and_return(headers)
+      allow(helper).to receive(:js_env) { |env| js_env.merge!(env) }
+      response.content_type = 'text/html'
+    end
+
+    context "on root account" do
+      before do
+        allow(helper).to receive(:csp_context).and_return(account)
+      end
+
+      it "doesn't set the CSP report only header if not configured" do
+        helper.add_csp_for_root
+        helper.include_custom_meta_tags
+        expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
+        expect(headers).to_not have_key('Content-Security-Policy')
+        expect(js_env).not_to have_key(:csp)
+      end
+
+      it "doesn't set the CSP header for non-html requests" do
+        response.content_type = 'application/json'
+        account.enable_csp!
+        helper.add_csp_for_root
+        expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
+        expect(headers).to_not have_key('Content-Security-Policy')
+      end
+
+      it "sets the CSP full header when active" do
+        account.enable_csp!
+
+        helper.add_csp_for_root
+        helper.include_custom_meta_tags
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test"
+        expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test"
+      end
+
+      it "includes the report URI" do
+        allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+        helper.add_csp_for_root
+        helper.include_custom_meta_tags
+        expect(headers['Content-Security-Policy-Report-Only']).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/"
+      end
+
+      it "includes the report URI when active" do
+        allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+        account.enable_csp!
+        helper.add_csp_for_root
+        helper.include_custom_meta_tags
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/"
+      end
+
+      it "includes canvadocs domain if enabled" do
+        account.enable_csp!
+
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        allow(Canvadocs).to receive(:config).and_return('base_url' => 'https://canvadocs.instructure.com/1')
+        helper.add_csp_for_root
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' canvadocs.instructure.com localhost root_account.test root_account2.test"
+      end
+
+      it "includes inst_fs domain if enabled" do
+        account.enable_csp!
+
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive(:app_host).and_return('https://inst_fs.instructure.com')
+        helper.add_csp_for_root
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' inst_fs.instructure.com localhost root_account.test root_account2.test"
+      end
+    end
+  end
+
+  describe 'mastery_scales_js_env' do
+    before(:once) do
+      course_model
+      @context = @course
+      @domain_root_account = @course.root_account
+      @proficiency = outcome_proficiency_model(@course.root_account)
+      @calculation_method = outcome_calculation_method_model(@course.root_account)
+    end
+
+    let(:js_env) {{}}
+
+    before do
+      allow(helper).to receive(:js_env) {|env| js_env.merge!(env)}
+    end
+
+    it 'does not include mastery scales FF when account_level_mastery_scales disabled' do
+      helper.mastery_scales_js_env
+      expect(js_env).not_to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+    end
+
+    it 'does not include improved outcomes management FF when account_level_mastery_scales disabled' do
+      helper.mastery_scales_js_env
+      expect(js_env).not_to have_key :IMPROVED_OUTCOMES_MANAGEMENT
+    end
+
+    context 'when account_level_mastery_scales enabled' do
+      before(:once) do
+        @course.root_account.enable_feature! :account_level_mastery_scales
+      end
+
+      it 'includes mastery scales FF' do
+        helper.mastery_scales_js_env
+        expect(js_env).to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+      end
+
+      it 'includes appropriate mastery scale data' do
+        helper.mastery_scales_js_env
+        mastery_scale = js_env[:MASTERY_SCALE]
+        expect(mastery_scale[:outcome_proficiency]).to eq @proficiency.as_json
+        expect(mastery_scale[:outcome_calculation_method]).to eq @calculation_method.as_json
+      end
+
+      it 'includes improved outcomes management FF' do
+        helper.mastery_scales_js_env
+        expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
+      end
+
+      context "when improved_outcomes_management enabled" do
+        it 'includes improved outcomes management FF' do
+          @course.root_account.enable_feature! :improved_outcomes_management
+          helper.mastery_scales_js_env
+          expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(true)
+        end
+      end
     end
   end
 end

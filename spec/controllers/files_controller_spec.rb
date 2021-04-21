@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,6 +38,9 @@ def new_valid_tool(course)
   tool
 end
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
@@ -93,6 +98,7 @@ describe FilesController do
     @other_user = user_factory(active_all: true)
     course_with_teacher active_all: true
     student_in_course active_all: true
+    set_granular_permission
   end
 
   describe "GET 'quota'" do
@@ -154,19 +160,6 @@ describe FilesController do
       expect(assigns[:contexts][0]).to eql(@course)
     end
 
-    it "should return a json format for wiki sidebar" do
-      user_session(@teacher)
-      r1 = Folder.root_folders(@course).first
-      f1 = course_folder
-      a1 = folder_file
-      get 'index', params: {:course_id => @course.id}, :format => 'json'
-      expect(response).to be_successful
-      data = json_parse
-      expect(data).not_to be_nil
-      # order expected
-      expect(data["folders"].map{|x| x["folder"]["id"]}).to eql([r1.id, f1.id])
-    end
-
     it "should work for a user context, too" do
       user_session(@student)
       get 'index', params: {:user_id => @student.id}
@@ -177,6 +170,13 @@ describe FilesController do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', params: {:group_id => @group.id}
       expect(response).to be_successful
+    end
+
+    it "refuses for a non-html format" do
+      group_with_user_logged_in(:group_context => Account.default)
+      get 'index', params: {:group_id => @group.id}, format: :js
+      expect(response.body).to include("endpoint does not support js")
+      expect(response.code.to_i).to eq(400)
     end
 
     it "should not show external tools in a group context" do
@@ -196,7 +196,6 @@ describe FilesController do
           :visibility => "admins"
         }
         @tool.save!
-        Account.default.enable_feature!(:lor_for_account)
       end
 
       before :each do
@@ -238,10 +237,6 @@ describe FilesController do
         expect(response).to be_successful
       end
 
-      it "authorizes users on a remote shard for JSON data" do
-        get 'index', params: {:user_id => @user.global_id}, :format => :json
-        expect(response).to be_successful
-      end
     end
   end
 
@@ -293,6 +288,12 @@ describe FilesController do
         verifier = Attachments::Verification.new(@file).verifier_for_user(@teacher)
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => verifier}, :format => 'json'
         expect(response).to be_successful
+      end
+
+      it "should emit an asset_accessed live event" do
+        allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
+        expect(Canvas::LiveEvents).to receive(:asset_access).with(@file, 'files', nil, nil)
+        get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => @file.uuid, download: 1}, :format => 'json'
       end
     end
 
@@ -536,6 +537,13 @@ describe FilesController do
         get 'show', params: {:user_id => @student.id, :id => @attachment.id, :inline => 1}
         expect(response).to be_successful
       end
+
+      it "is successful when viewing as an admin even if locked" do
+        @file.locked = true
+        @file.save!
+        get 'show', params: {:course_id => @course.id, :id => @file.id}
+        expect(response).to be_successful
+      end
     end
 
     describe "canvadoc_session_url" do
@@ -629,7 +637,7 @@ describe FilesController do
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to be_successful
         expect(response.body).to eq 'hello'
-        expect(response.content_type).to eq 'text/html'
+        expect(response.media_type).to eq 'text/html'
       end
 
       it "redirects for large html files" do
@@ -786,7 +794,8 @@ describe FilesController do
 
     context "usage_rights_required" do
       before do
-        @course.enable_feature! :usage_rights_required
+        @course.usage_rights_required = true
+        @course.save!
         user_session(@teacher)
         @file.update_attribute(:locked, true)
       end
@@ -972,7 +981,8 @@ describe FilesController do
     end
 
     it "should create the file in unlocked state if :usage_rights_required is disabled" do
-      @course.disable_feature! :usage_rights_required
+      @course.usage_rights_required = false
+      @course.save!
       user_session(@teacher)
       post 'create_pending', params: {:attachment => {
           :context_code => @course.asset_string,
@@ -983,7 +993,8 @@ describe FilesController do
     end
 
     it "should create the file in locked state if :usage_rights_required is enabled" do
-      @course.enable_feature! :usage_rights_required
+      @course.usage_rights_required = true
+      @course.save!
       user_session(@teacher)
       post 'create_pending', params: {:attachment => {
           :context_code => @course.asset_string,
@@ -1036,7 +1047,8 @@ describe FilesController do
     end
 
     it "does not require usage rights for group submissions to be visible to students" do
-      @course.root_account.enable_feature! :usage_rights_required
+      @course.usage_rights_required = true
+      @course.save!
       user_session(@student)
       category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
@@ -1117,24 +1129,24 @@ describe FilesController do
     end
 
     before :each do
-      @content = Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, 'courses.yml'), '')
+      @content = Rack::Test::UploadedFile.new(File.join(RSpec.configuration.fixture_path, 'courses.yml'), '')
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
       enable_forgery_protection
     end
 
     it "should accept the upload data if the policy and attachment are acceptable" do
       local_storage!
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response).to be_redirect
       @attachment.reload
       # the file is not available until the third api call is completed
       expect(@attachment.file_state).to eq 'deleted'
-      expect(@attachment.open.read).to eq File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
+      expect(@attachment.open.read).to eq File.read(File.join(RSpec.configuration.fixture_path, 'courses.yml'))
     end
 
     it "opens up cors headers" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
     end
@@ -1150,20 +1162,20 @@ describe FilesController do
     end
 
     it "should reject an expired policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60.seconds)
+      params = @attachment.ajax_upload_params("", "", :expiration => -60.seconds)
       post "api_create", params: params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end
 
     it "should reject a modified policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       params[:upload_params]['Policy'] << 'a'
       post "api_create", params: params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end
 
     it "should reject a good policy if the attachment data is already uploaded" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       @attachment.uploaded_data = @content
       @attachment.save!
       post "api_create", params: params[:upload_params].merge(:file => @content)
@@ -1172,7 +1184,7 @@ describe FilesController do
 
     it "should forward params[:success_include] to the api_create_success redirect as params[:include] if present" do
       local_storage!
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content, :success_include => 'foo')
       expect(response).to be_redirect
       expect(response.location).to include('include%5B%5D=foo') # include[]=foo, url encoded
@@ -1191,7 +1203,7 @@ describe FilesController do
       )
 
       local_storage!
-      params = profile_pic.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = profile_pic.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response).to be_redirect
       expect(response.location).to include('include%5B%5D=avatar') # include[]=avatar, url encoded
@@ -1201,7 +1213,7 @@ describe FilesController do
   describe "POST api_capture" do
     before :each do
       allow(InstFS).to receive(:enabled?).and_return(true)
-      allow(InstFS).to receive(:jwt_secret).and_return("jwt signing key")
+      allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
       @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
     end
 
@@ -1248,6 +1260,12 @@ describe FilesController do
         expect(folder.attachments.first).not_to be_nil
       end
 
+      it "should populate the md5 column with the instfs sha512" do
+        post "api_capture", params: params.merge(sha512: 'deadbeef')
+        assert_status(201)
+        expect(folder.attachments.first.md5).to eq 'deadbeef'
+      end
+
       it "should include the attachment json in the response" do
         post "api_capture", params: params
         assert_status(201)
@@ -1282,8 +1300,9 @@ describe FilesController do
         assert_status(201)
       end
 
-      context 'with an Assignment' do
+      context 'with Submission, Assignment, and Progress' do
         let(:assignment) { course.assignments.create! }
+        let(:submission) { assignment.submissions.create!(user: @student) }
         let(:assignment_params) do
           params.merge(
             context_type: "Assignment",
@@ -1298,7 +1317,13 @@ describe FilesController do
             uploaded_data: StringIO.new('meow?')
           )
         end
-        let!(:homework_service) { Services::SubmitHomeworkService.new(attachment, assignment) }
+        let(:progress) do
+          ::Progress.
+            new(context: assignment, user: user, tag: :test).
+            tap(&:start).
+            tap(&:save!)
+        end
+        let!(:homework_service) { Services::SubmitHomeworkService.new(attachment, progress) }
 
         before do
           allow(Mailer).to receive(:deliver)
@@ -1310,13 +1335,7 @@ describe FilesController do
           assert_status(201)
         end
 
-        context 'with a Progress' do
-          let(:progress) do
-            ::Progress.
-              new(context: assignment, user: user, tag: :test).
-              tap(&:start).
-              tap(&:save!)
-          end
+        context 'with progress_id param' do
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id
@@ -1355,25 +1374,35 @@ describe FilesController do
               tap(&:start).
               tap(&:save!)
           end
+
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
+              comment: comment,
               eula_agreement_timestamp: eula_agreement_timestamp
             )
           end
           let(:eula_agreement_timestamp) { '1522419910' }
+          let(:comment) { 'my assignment comment' }
           let(:request) { post "api_capture", params: progress_params }
 
           before do
             allow(homework_service).to receive(:queue_email)
           end
 
-          it 'should submit the attachment' do
-            expect(homework_service).to receive(:submit).with(
-              progress.created_at,
-              eula_agreement_timestamp
-            )
+          it 'should submit the attachment if the submit_assignment flag is not provided' do
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp, comment)
             request
+          end
+
+          it 'should submit the attachment if the submit_assignment param is set to true' do
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp, comment)
+            post "api_capture", params: progress_params.merge(submit_assignment: true)
+          end
+
+          it 'should not submit the attachment if the submit_assignment param is set to false' do
+            expect(homework_service).not_to receive(:submit)
+            post "api_capture", params: progress_params.merge(submit_assignment: false)
           end
 
           it 'should save the eula_agreement_timestamp' do
@@ -1382,13 +1411,24 @@ describe FilesController do
             expect(submission.first.turnitin_data[:eula_agreement_timestamp]).to eq(eula_agreement_timestamp)
           end
 
+          it 'should save the comment' do
+            request
+            submission = Submission.where(assignment_id: assignment.id)
+            expect(submission.first.submission_comments.first.comment).to eq(comment)
+          end
+
           it "returns a 201 http status" do
             request
             assert_status(201)
           end
 
+          it "marks the progress as completed" do
+            request
+            expect(progress.reload.workflow_state).to eq 'completed'
+          end
+
           it 'should send a failure email' do
-            allow(homework_service).to receive(:submit).and_raise('error')
+            expect(homework_service).to receive(:submit).and_raise('error')
             expect(homework_service).to receive(:failure_email)
             request
 
@@ -1475,5 +1515,49 @@ describe FilesController do
         expect(data).to eq({ "public_url" => old_file.public_url(secure: false) })
       end
     end
+  end
+
+  describe "GET 'image_thumbnail'" do
+    let(:image) {factory_with_protected_attributes(@teacher.attachments, uploaded_data: stub_png_data, instfs_uuid: "1234")}
+
+    it "should return default 'no_pic' thumbnail if attachment not found" do
+      user_session @teacher
+      get "image_thumbnail", params: { uuid: "bad uuid", id: "bad id" }
+      expect(response).to be_redirect
+    end
+
+    it "returns the same jwt if requested twice" do
+      enable_cache do
+        user_session @teacher
+        locations = 2.times.map {
+          get("image_thumbnail", params: {uuid: image.uuid, id: image.id}).location
+        }
+        expect(locations[0]).to eq(locations[1])
+      end
+    end
+
+    it "returns the different jwts if no_cache is passed" do
+      enable_cache do
+        user_session @teacher
+        locations = 2.times.map {
+          get("image_thumbnail", params: {uuid: image.uuid, id: image.id, no_cache: true}).location
+        }
+        expect(locations[0]).not_to eq(locations[1])
+      end
+    end
+
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { @course.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

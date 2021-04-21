@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * NOTICE: we need to re-visit our design and implementation with a11y
+ * in mind as our anchor tags would be more accessible as buttons
+ */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import store from '../lib/AppCenterStore'
@@ -52,10 +58,6 @@ export default class AppFilters extends React.Component {
   announceFilterResults = () => {
     const apps = store.filteredApps()
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} apps found', {count: apps.length}))
-  }
-
-  focus () {
-    this.filterText.focus()
   }
 
   render() {
@@ -99,20 +101,6 @@ export default class AppFilters extends React.Component {
                     {I18n.t('Installed')}
                   </a>
                 </li>
-                {
-                  window.ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED &&
-                  <li className={activeFilter === 'lti_1_3_tools' ? 'active' : ''}>
-                    <a
-                      ref={c => (this.tabLti13Tools = c)}
-                      onClick={this.handleFilterClick.bind(this, 'lti_1_3_tools')}
-                      href="#"
-                      role="tab"
-                      aria-selected={activeFilter === 'lti_1_3_tools' ? 'true' : 'false'}
-                    >
-                      {I18n.t('LTI 1.3')}
-                    </a>
-                  </li>
-                }
               </ul>
             </div>
             <div className="col-xs-5">

@@ -16,26 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { equal } from "assert";
-import sinon from "sinon";
-import indicatorRegion from "../../src/rce/indicatorRegion";
+import {equal} from 'assert'
+import sinon from 'sinon'
+import indicatorRegion from '../../src/rce/indicatorRegion'
 
-describe("IndicatorRegion module", () => {
-  let editor, iframe, target, offsetFake;
+describe('IndicatorRegion module', () => {
+  let editor, iframe, target, offsetFake
 
   beforeEach(() => {
-    iframe = {};
+    iframe = {}
     editor = {
       getContainer() {
-        return { querySelector: () => iframe };
+        return {querySelector: () => iframe}
       }
-    };
+    }
     offsetFake = sinon.stub().returns({
       top: 1,
       left: 2,
       width: 3,
       height: 4
-    });
+    })
     target = {
       getBoundingClientRect() {
         return {
@@ -43,33 +43,33 @@ describe("IndicatorRegion module", () => {
           left: 6,
           right: 16,
           bottom: 25
-        };
+        }
       }
-    };
-  });
+    }
+  })
 
-  describe("indicatorRegion", () => {
-    let region;
+  describe('indicatorRegion', () => {
+    let region
 
     beforeEach(() => {
-      region = indicatorRegion(editor, target, offsetFake);
-    });
+      region = indicatorRegion(editor, target, offsetFake)
+    })
 
-    it("includes the width and height of the target", () => {
-      equal(region.height, 20);
-      equal(region.width, 10);
-    });
+    it('includes the width and height of the target', () => {
+      equal(region.height, 20)
+      equal(region.width, 10)
+    })
 
-    it("gets offset of iframe", () => {
-      sinon.assert.calledWithExactly(offsetFake, iframe);
-    });
+    it('gets offset of iframe', () => {
+      sinon.assert.calledWithExactly(offsetFake, iframe)
+    })
 
-    it("includes sum of the left offsets of the target and iframe", () => {
-      equal(region.left, 8);
-    });
+    it('includes sum of the left offsets of the target and iframe', () => {
+      equal(region.left, 8)
+    })
 
-    it("includes sum of the top offsets minus the iframe scroll", () => {
-      equal(region.top, 6);
-    });
-  });
-});
+    it('includes sum of the top offsets minus the iframe scroll', () => {
+      equal(region.top, 6)
+    })
+  })
+})

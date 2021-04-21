@@ -46,7 +46,8 @@ QUnit.module('MessageStudents', hooks => {
   test('it renders', () => {
     subject = renderComponent({
       contextCode: 'course_1',
-      title: 'Send a message'
+      title: 'Send a message',
+      onRequestClose: () => {}
     })
     ok(subject)
   })
@@ -61,7 +62,8 @@ QUnit.module('MessageStudents', hooks => {
             id: 1,
             email: 'some@one.com'
           }
-        ]
+        ],
+        onRequestClose: () => {}
       })
 
       const requestData = subject.composeRequestData()
@@ -102,7 +104,8 @@ QUnit.module('MessageStudents', hooks => {
             id: 1,
             email: 'some@one.com'
           }
-        ]
+        ],
+        onRequestClose: () => {}
       })
       data = subject.composeRequestData()
       sinon.spy(subject, 'handleResponseSuccess')
@@ -169,7 +172,8 @@ QUnit.module('MessageStudents', hooks => {
     hooks.beforeEach(() => {
       subject = renderComponent({
         contextCode: 'course_1',
-        title: 'Send a message'
+        title: 'Send a message',
+        onRequestClose: () => {}
       })
     })
 
@@ -204,7 +208,8 @@ QUnit.module('MessageStudents', hooks => {
     hooks.beforeEach(() => {
       subject = renderComponent({
         contextCode: 'course_1',
-        title: 'Send a message'
+        title: 'Send a message',
+        onRequestClose: () => {}
       })
       subject.setState({
         errors: {
@@ -230,7 +235,8 @@ QUnit.module('MessageStudents', hooks => {
     hooks.beforeEach(() => {
       subject = renderComponent({
         contextCode: 'course_1',
-        title: 'Send a message'
+        title: 'Send a message',
+        onRequestClose: () => {}
       })
     })
 
@@ -261,7 +267,8 @@ QUnit.module('MessageStudents', hooks => {
     hooks.beforeEach(() => {
       subject = renderComponent({
         contextCode: 'course_1',
-        title: 'Send a message'
+        title: 'Send a message',
+        onRequestClose: () => {}
       })
       const buttons = document.querySelectorAll('button')
       closeButton = buttons[buttons.length - 2]
@@ -286,7 +293,8 @@ QUnit.module('MessageStudents', hooks => {
             id: 1,
             email: 'some@one.com'
           }
-        ]
+        ],
+        onRequestClose: () => {}
       })
       sinon.spy(subject, 'sendMessage')
 
@@ -357,7 +365,8 @@ QUnit.module('MessageStudents', hooks => {
             id: 1,
             email: 'some@one.com'
           }
-        ]
+        ],
+        onRequestClose: () => {}
       })
       subject.setState({
         hideAlert: true,
@@ -414,7 +423,8 @@ QUnit.module('MessageStudents', hooks => {
             id: 1,
             email: 'some@one.com'
           }
-        ]
+        ],
+        onRequestClose: () => {}
       })
       subject.setState({sending: true})
     })
@@ -449,7 +459,8 @@ QUnit.module('MessageStudents', hooks => {
             id: 1,
             email: 'some@one.com'
           }
-        ]
+        ],
+        onRequestClose: () => {}
       })
     })
 

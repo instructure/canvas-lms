@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -28,20 +30,18 @@ describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
         {
           answer_text: "Answer 1",
           answer_comments: "This is answer 1",
-          answer_weight: 0,
-          text_after_answers: "Text after Answer 1"
+          answer_comment_html: '<img src="x" onerror="alert(1)">',
+          answer_weight: 0
         },
         {
           answer_text: "Answer 2",
           answer_comments: "This is answer 2",
-          answer_weight: 100,
-          text_after_answers: "Text after Answer 2"
+          answer_weight: 100
         },
         {
           answer_text: "Answer 3",
           answer_comments: "This is answer 3",
-          answer_weight: 0,
-          text_after_answers: "Text after Answer 3"
+          answer_weight: 0
         }
       ]
     end

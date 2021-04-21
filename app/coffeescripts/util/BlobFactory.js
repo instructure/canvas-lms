@@ -23,7 +23,7 @@ xsslint xssable.receiver.whitelist builder
 */
 
 export default {
-  fromCanvas (canvas, type = 'image/jpeg') {
+  fromCanvas(canvas, type = 'image/jpeg') {
     const url = canvas.toDataURL(type)
     const binary = atob(url.split(',')[1])
     const codes = _.map(binary, char => char.charCodeAt(0))
@@ -31,11 +31,11 @@ export default {
     return this._newBlob(data, type)
   },
 
-  fromXHR (response, type = 'image/jpeg') {
+  fromXHR(response, type = 'image/jpeg') {
     return this._newBlob(response, type)
   },
 
-  _newBlob (src, type) {
+  _newBlob(src, type) {
     const builder = this._blobBuilder()
     if (builder) {
       builder.append(src)
@@ -45,10 +45,14 @@ export default {
     }
   },
 
-  _blobBuilder () {
+  _blobBuilder() {
     if (typeof window.Blob === 'function') return null
 
-    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder
+    window.BlobBuilder =
+      window.BlobBuilder ||
+      window.WebKitBlobBuilder ||
+      window.MozBlobBuilder ||
+      window.MSBlobBuilder
     if (typeof window.BlobBuilder === 'undefined') return null
     return new window.BlobBuilder()
   }

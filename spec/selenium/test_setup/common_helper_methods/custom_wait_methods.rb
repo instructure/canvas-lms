@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -121,7 +123,7 @@ module CustomWaitMethods
   end
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
-    frd_error = Selenium::WebDriver::Error::TimeOutError.new
+    frd_error = Selenium::WebDriver::Error::TimeoutError.new
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield
@@ -165,8 +167,8 @@ module CustomWaitMethods
     ::SeleniumExtensions::FinderWaiting.wait_for(*args, &block)
   end
 
-  def wait_for_no_such_element(method: nil)
-    wait_for(method: method, ignore: []) do
+  def wait_for_no_such_element(method: nil, timeout: SeleniumExtensions::FinderWaiting.timeout)
+    wait_for(method: method, timeout: timeout, ignore: []) do
       # so find_element calls return ASAP
       disable_implicit_wait do
         yield

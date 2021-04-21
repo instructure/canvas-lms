@@ -1,17 +1,28 @@
 #!/bin/bash
+
+set -x
+
 archive_path=$1
 if [[ $archive_path ]]; then
 
   for dir in /volumes/*_data; do
     (
+      echo "Attempting to read $DOCKER_CACHE_S3_REGION $archive_path/`basename "$dir"`"
+
       # wait for it to appear (if this is a CI worker)
       while ! aws s3 ls --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`"; do sleep 10; done
-      aws s3 cp --only-show-errors --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`" - | \
-        tar xzpPf - "$dir/"
+      echo "Finished waiting for aws s3 ls command"
+      aws s3 cp --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`" - | \
+        tar vxzpPf - "$dir/"
+      echo "PID is $! for aws cp on $DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`"
     ) &
   done
+
+  echo "jobs -p contains:"
+  jobs -p
   for job in $(jobs -p); do
-    wait $job || exit 1
+    echo "Waiting for $job to finish"
+    wait $job || { echo "$job did not finish"; exit 1; }
   done
 fi
 

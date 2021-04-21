@@ -25,18 +25,6 @@ import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 
 export default class EditRolesView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.update = this.update.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.mixin(RosterDialogMixin)
 
@@ -76,8 +64,7 @@ export default class EditRolesView extends DialogBaseView {
     const enrollments = this.model.enrollments()
 
     // section ids that already have the new role
-    const existing_section_ids = _.map(
-      _.filter(enrollments, en => en.role_id === new_role_id),
+    const existing_section_ids = _.filter(enrollments, en => en.role_id === new_role_id).map(
       en => en.course_section_id
     )
 
@@ -87,7 +74,7 @@ export default class EditRolesView extends DialogBaseView {
     const deferreds = []
 
     // limit to sections if all enrollments are limited
-    const section_limited = _.all(enrollments, en => en.limit_privileges_to_course_section)
+    const section_limited = _.every(enrollments, en => en.limit_privileges_to_course_section)
 
     for (const en of Array.from(enrollments)) {
       if (en.role_id !== new_role_id) {
@@ -96,7 +83,7 @@ export default class EditRolesView extends DialogBaseView {
         deleted_enrollments.push(en)
         deferreds.push($.ajaxJSON(`${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`, 'DELETE')) // delete the enrollment
 
-        if (!_.include(existing_section_ids, en.course_section_id)) {
+        if (!_.includes(existing_section_ids, en.course_section_id)) {
           // create a new enrollment unless there's alrady one with the new role and the same course section
           existing_section_ids.push(en.course_section_id)
           const data = {

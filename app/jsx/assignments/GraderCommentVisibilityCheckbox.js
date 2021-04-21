@@ -18,7 +18,7 @@
 
 import {bool, func} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!GraderCommentVisibilityCheckbox'
 
 export default class GraderCommentVisibilityCheckbox extends React.Component {
   static propTypes = {
@@ -28,7 +28,6 @@ export default class GraderCommentVisibilityCheckbox extends React.Component {
 
   constructor(props) {
     super(props)
-    this.handleChange = this.handleChange.bind(this)
     this.state = {checked: props.checked}
   }
 
@@ -38,7 +37,7 @@ export default class GraderCommentVisibilityCheckbox extends React.Component {
     }
   }
 
-  handleChange({target: checkbox}) {
+  handleChange = ({target: checkbox}) => {
     this.setState({checked: checkbox.checked})
   }
 

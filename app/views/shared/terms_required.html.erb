@@ -17,15 +17,14 @@
 %>
 
 <%
-  content_for :page_title, t('updated_terms_of_use', 'Updated Acceptable Use Policy')
+  provide :page_title, t('updated_terms_of_use', 'Updated Acceptable Use Policy')
 
   js_bundle :terms_of_use
   css_bundle :login_confirm
   disable_account_css
 
   @headers = false
-  @body_classes ||= []
-  @body_classes << "modal body--login-confirmation"
+  add_body_class "modal body--login-confirmation"
 %>
 
 <%= form_tag("/api/v1/users/self", method: "put", class: "reaccept_terms ic-Login-confirmation", id: "modal-box") do %>
@@ -35,8 +34,6 @@
   <div class="ic-Login-confirmation__content">
     <h2 class="ic-Login-confirmation__headline"><%= t('Acceptable Use Policy') %></h2>
     <% if @domain_root_account.terms_required? %>
-      <% TermsOfService.ensure_terms_for_account(@domain_root_account) %>
-      <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @domain_root_account.terms_of_service.terms_of_service_content&.content) %>
       <% js_bundle :terms_of_service_modal %>
     <% end %>
     <p>

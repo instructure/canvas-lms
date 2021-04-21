@@ -23,10 +23,10 @@ import page from 'page'
 import FilesApp from 'compiled/react_files/components/FilesApp'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import I18n from 'i18n!react_files'
-import Breadcrumbs from '../files/Breadcrumbs'
-import FolderTree from '../files/FolderTree'
-import FilesUsage from '../files/FilesUsage'
-import Toolbar from '../files/Toolbar'
+import Breadcrumbs from './Breadcrumbs'
+import FolderTree from './FolderTree'
+import FilesUsage from './FilesUsage'
+import Toolbar from './Toolbar'
 
 FilesApp.previewItem = function(item) {
   this.clearSelectedItems(() => {
@@ -61,16 +61,24 @@ FilesApp.render = function() {
     contextId = filesEnv.contextId
   }
 
-  const userCanManageFilesForContext = filesEnv.userHasPermission(
-    {contextType, contextId},
-    'manage_files'
-  )
-  const userCanRestrictFilesForContext = userCanManageFilesForContext && contextType !== 'groups'
+  const canManageFilesForContext = permission => {
+    return filesEnv.userHasPermission({contextType, contextId}, permission)
+  }
+
+  const userCanAddFilesForContext = canManageFilesForContext('manage_files_add')
+  const userCanEditFilesForContext = canManageFilesForContext('manage_files_edit')
+  const userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
+  const userCanManageFilesForContext =
+    userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
+  const userCanRestrictFilesForContext = userCanEditFilesForContext && contextType !== 'groups'
   const usageRightsRequiredForContext = filesEnv.contextsDictionary[`${contextType}_${contextId}`]
     ? filesEnv.contextsDictionary[`${contextType}_${contextId}`].usage_rights_required
     : false
   const externalToolsForContext = filesEnv.contextFor({contextType, contextId})
     ? filesEnv.contextFor({contextType, contextId}).file_menu_tools
+    : []
+  const indexExternalToolsForContext = filesEnv.contextFor({contextType, contextId})
+    ? filesEnv.contextFor({contextType, contextId}).file_index_menu_tools
     : []
 
   return (
@@ -85,20 +93,20 @@ FilesApp.render = function() {
           className="Button Button--link ic-app-course-nav-toggle"
           type="button"
           id="courseMenuToggle"
-          title={I18n.t('Show and hide courses menu')}
+          aria-label={I18n.t('Show and hide courses menu')}
           aria-hidden
         >
           <i className="icon-hamburger" aria-hidden="true" />
         </button>
+        <div className="ic-app-crumbs">
+          <Breadcrumbs
+            rootTillCurrentFolder={this.state.rootTillCurrentFolder}
+            showingSearchResults={this.state.showingSearchResults}
+            query={this.props.query}
+            contextAssetString={this.props.contextAssetString}
+          />
+        </div>
         <div className="TutorialToggleHolder" />
-      </div>
-      <div className="ic-app-crumbs">
-        <Breadcrumbs
-          rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-          showingSearchResults={this.state.showingSearchResults}
-          query={this.props.query}
-          contextAssetString={this.props.contextAssetString}
-        />
       </div>
       <Toolbar
         currentFolder={this.state.currentFolder}
@@ -108,9 +116,12 @@ FilesApp.render = function() {
         onMove={this.onMove}
         contextType={contextType}
         contextId={contextId}
-        userCanManageFilesForContext={userCanManageFilesForContext}
+        userCanAddFilesForContext={userCanAddFilesForContext}
+        userCanEditFilesForContext={userCanEditFilesForContext}
+        userCanDeleteFilesForContext={userCanDeleteFilesForContext}
         usageRightsRequiredForContext={usageRightsRequiredForContext}
         userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+        indexExternalToolsForContext={indexExternalToolsForContext}
         getPreviewQuery={this.getPreviewQuery}
         getPreviewRoute={this.getPreviewRoute}
         modalOptions={{
@@ -136,7 +147,12 @@ FilesApp.render = function() {
             }}
           />
         </aside>
-        <div className="ef-directory" role="region" aria-label={I18n.t('File List')}>
+        <div
+          className="ef-directory"
+          role="region"
+          aria-label={I18n.t('File List')}
+          ref={e => (this.filesDirectory = e)}
+        >
           {React.cloneElement(this.props.children, {
             key: this.state.key,
             pathname: this.props.pathname,
@@ -151,7 +167,9 @@ FilesApp.render = function() {
             toggleItemSelected: this.toggleItemSelected,
             toggleAllSelected: this.toggleAllSelected,
             areAllItemsSelected: this.areAllItemsSelected,
-            userCanManageFilesForContext,
+            userCanAddFilesForContext,
+            userCanEditFilesForContext,
+            userCanDeleteFilesForContext,
             userCanRestrictFilesForContext,
             usageRightsRequiredForContext,
             externalToolsForContext,
@@ -168,7 +186,8 @@ FilesApp.render = function() {
               onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
               onItemDrop: this.onItemDrop
             },
-            clearSelectedItems: this.clearSelectedItems
+            clearSelectedItems: this.clearSelectedItems,
+            filesDirectoryRef: this.filesDirectory
           })}
         </div>
       </div>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -301,12 +303,15 @@ class ConversationsController < ApplicationController
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
       end
       js_env(CONVERSATIONS: hash)
+      if @domain_root_account.feature_enabled?(:react_inbox)
+        css_bundle :canvas_inbox
+        js_bundle :canvas_inbox
+        render html: '', layout: true
+        return
+      end
+
       return render :index_new
     end
-  end
-
-  def toggle_new_conversations
-    redirect_to action: 'index'
   end
 
   # @API Create a conversation
@@ -332,10 +337,10 @@ class ConversationsController < ApplicationController
   #   Forces a new message to be created, even if there is an existing private conversation.
   #
   # @argument group_conversation [Boolean]
-  #   Defaults to false. If true, this will be a group conversation (i.e. all
-  #   recipients may see all messages and replies). If false, individual private
-  #   conversations will be started with each recipient. Must be set false if the
-  #   number of recipients is over the set maximum (default is 100).
+  #   Defaults to false.  When false, individual private conversations will be
+  #   created with each recipient. If true, this will be a group conversation
+  #   (i.e. all recipients may see all messages and replies). Must be set true if
+  #   the number of recipients is over the set maximum (default is 100).
   #
   # @argument attachment_ids[] [String]
   #   An array of attachments ids. These must be files that have been previously
@@ -382,7 +387,18 @@ class ConversationsController < ApplicationController
     shard = Shard.current
     if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
-      return render_error('context_code', 'invalid') unless valid_context?(context)
+
+      recipients_are_instructors = all_recipients_are_instructors?(context, @recipients)
+
+      if context.is_a?(Course) && !recipients_are_instructors && !observer_to_linked_students(@recipients) && !context.grants_right?(@current_user, session, :send_messages)
+        return render_error("Unable to send messages to users in #{context.name}", '')
+      elsif !valid_context?(context)
+        return render_error('context_code', 'invalid')
+      end
+
+      if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
+        return render_error('Course concluded', 'Unable to send messages')
+      end
 
       shard = context.shard
       context_type = context.class.name
@@ -408,6 +424,8 @@ class ConversationsController < ApplicationController
     shard.activate do
       if batch_private_messages || batch_group_messages
         mode = params[:mode] == 'async' ? :async : :sync
+        message.relativize_attachment_ids(from_shard: message.shard, to_shard: shard)
+        message.shard = shard
         batch = ConversationBatch.generate(message, @recipients, mode,
           subject: params[:subject], context_type: context_type,
           context_id: context_id, tags: @tags, group: batch_group_messages)
@@ -431,6 +449,8 @@ class ConversationsController < ApplicationController
     end
   rescue ActiveRecord::RecordInvalid => err
     render :json => err.record.errors, :status => :bad_request
+  rescue ConversationsHelper::InvalidContextError => err
+    render json: { message: err.message }, status: :bad_request
   end
 
   # @API Get running batches
@@ -577,7 +597,7 @@ class ConversationsController < ApplicationController
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
     messages = nil
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       messages = @conversation.messages
       ActiveRecord::Associations::Preloader.new.preload(messages, :asset)
     end
@@ -638,7 +658,7 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe", "full_name": "Joe TA"}]
   #   }
   def update
-    if @conversation.update_attributes(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
+    if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request
@@ -871,7 +891,14 @@ class ConversationsController < ApplicationController
   #   }
   #
   def add_message
+    # TODO: VICE-1037 logic is mostly duplicated in AddConversationMessage
     get_conversation(true)
+
+    context = @conversation.conversation.context
+    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
+      return render json: {message: "Unable to send messages in a concluded course"}, status: :unauthorized
+    end
+
     if @conversation.conversation.replies_locked_for?(@current_user)
       return render_unauthorized_action
     end
@@ -886,40 +913,24 @@ class ConversationsController < ApplicationController
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
-
-      # these checks could be folded into the initial ConversationMessage lookup for better efficiency
-      if message_ids
-
-        # sanity check: are the messages part of this conversation?
-        db_ids = ConversationMessage.where(:id => message_ids, :conversation_id => @conversation.conversation_id).pluck(:id)
-        unless db_ids.count == message_ids.count
-          return render_error('included_messages', 'not for this conversation')
-        end
-        message_ids = db_ids
-
-        # sanity check: can the user see the included messages?
-        found_count = 0
-        Shard.partition_by_shard(message_ids) do |shard_message_ids|
-          found_count += ConversationMessageParticipant.where(:conversation_message_id => shard_message_ids, :user_id => @current_user).count
-        end
-        unless found_count == message_ids.count
-          return render_error('included_messages', 'not a participant')
-        end
-      end
+      validate_message_ids(message_ids, @conversation)
 
       message_args = build_message_args
       if @conversation.should_process_immediately?
         message = @conversation.process_new_message(message_args, @recipients, message_ids, @tags)
         render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
       else
-        @conversation.send_later_enqueue_args(:process_new_message,
-          {:strand => "add_message_#{@conversation.global_conversation_id}", :max_attempts => 1},
-          message_args, @recipients, message_ids, @tags)
+        @conversation.delay(strand: "add_message_#{@conversation.global_conversation_id}").
+          process_new_message(message_args, @recipients, message_ids, @tags)
         return render :json => [], :status => :accepted
       end
     else
       render :json => {}, :status => :bad_request
     end
+  rescue ConversationsHelper::InvalidMessageForConversationError
+    render_error('included_messages', 'not for this conversation')
+  rescue ConversationsHelper::InvalidMessageParticipantError
+    render_error('included_messages', 'not a participant')
   end
 
   # @API Delete a message
@@ -1013,7 +1024,7 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|
@@ -1062,14 +1073,6 @@ class ConversationsController < ApplicationController
     content
   end
 
-  def watched_intro
-    unless @current_user.watched_conversations_intro?
-      @current_user.watched_conversations_intro
-      @current_user.save
-    end
-    render :json => {}
-  end
-
   private
 
   def render_error(attribute, message)
@@ -1088,7 +1091,7 @@ class ConversationsController < ApplicationController
       when 'unread'
         @current_user.conversations.unread
       when 'starred'
-        @current_user.conversations.starred
+        @current_user.starred_conversations
       when 'sent'
         @current_user.all_conversations.sent
       when 'archived'
@@ -1119,77 +1122,11 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def normalize_recipients
-    return unless params[:recipients]
-
-    unless params[:recipients].is_a? Array
-      params[:recipients] = params[:recipients].split ","
-    end
-
-    # unrecognized context codes are ignored
-    if AddressBook.valid_context?(params[:context_code])
-      context = AddressBook.load_context(params[:context_code])
-      if context.nil?
-        # recognized context code must refer to a valid course or group
-        return render json: { message: 'invalid context_code' }, status: :bad_request
-      end
-    end
-
-    users, contexts = AddressBook.partition_recipients(params[:recipients])
-    known = @current_user.address_book.known_users(users, context: context, conversation_id: params[:from_conversation_id])
-    contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
-    @recipients = known.uniq(&:id)
-    @recipients.reject!{|u| u.id == @current_user.id} unless @recipients == [@current_user] && params[:recipients].count == 1
-  end
-
-  def infer_tags
-    tags = param_array(:tags).concat(param_array(:recipients)).concat([params[:context_code]])
-    tags = SimpleTags.normalize_tags(tags)
-    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
-    @tags = tags.uniq
-  end
-
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
     scope = scope.where('message_count>0') unless allow_deleted
     @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first
     raise ActiveRecord::RecordNotFound unless @conversation
-  end
-
-  def build_message
-    Conversation.build_message(*build_message_args)
-  end
-
-  def build_message_args
-    [
-      @current_user,
-      params[:body],
-      {
-        :attachment_ids => params[:attachment_ids],
-        :forwarded_message_ids => params[:forwarded_message_ids],
-        :root_account_id => @domain_root_account.id,
-        :media_comment => infer_media_comment,
-        :generate_user_note => value_to_boolean(params[:user_note])
-      }
-    ]
-  end
-
-  def infer_media_comment
-    media_id = params[:media_comment_id]
-    media_type = params[:media_comment_type]
-    if media_id.present? && media_type.present?
-      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
-      unless media_comment
-        media_comment ||= MediaObject.new
-        media_comment.media_type = media_type
-        media_comment.media_id = media_id
-        media_comment.root_account_id = @domain_root_account.id
-        media_comment.user = @current_user
-      end
-      media_comment.context = @current_user
-      media_comment.save
-      media_comment
-    end
   end
 
   def include_private_conversation_enrollments
@@ -1205,32 +1142,4 @@ class ConversationsController < ApplicationController
     params[:auto_mark_as_read] ||= api_request?
     value_to_boolean(params[:auto_mark_as_read])
   end
-
-  # look up the param and cast it to an array. treat empty string same as empty
-  def param_array(key)
-    Array(params[key].presence || []).compact
-  end
-
-  def valid_context?(context)
-    case context
-    when nil then false
-    when Account then valid_account_context?(context)
-    when Course, Group then context.membership_for_user(@current_user) || context.grants_right?(@current_user, session, :send_messages)
-    else false
-    end
-  end
-
-  def valid_account_context?(account)
-    return false unless account.root_account?
-    return true if account.grants_right?(@current_user, session, :read_roster)
-    account.shard.activate do
-      user_sub_accounts = @current_user.associated_accounts.where(root_account_id: account).to_a
-      if user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
-        return true
-      end
-    end
-
-    false
-  end
-
 end

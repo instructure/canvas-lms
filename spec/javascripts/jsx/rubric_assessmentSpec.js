@@ -19,30 +19,31 @@
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
+import fakeENV from 'helpers/fakeENV'
 import rubric_assessment from 'rubric_assessment'
 import I18n from 'i18n!rubric_assessment'
 
 QUnit.module('RubricAssessment#roundAndFormat')
 
-test('rounds given number to two decimal places', function() {
+test('rounds given number to two decimal places', () => {
   strictEqual(rubric_assessment.roundAndFormat(42.325), '42.33')
   strictEqual(rubric_assessment.roundAndFormat(42.324), '42.32')
 })
 
-test('formats given number with I18n.n', function() {
+test('formats given number with I18n.n', () => {
   sandbox.stub(I18n, 'n').returns('formatted_number')
   strictEqual(rubric_assessment.roundAndFormat(42), 'formatted_number')
   strictEqual(I18n.n.callCount, 1)
   ok(I18n.n.calledWith(42))
 })
 
-test('returns empty string when passed null, undefined or empty string', function() {
+test('returns empty string when passed null, undefined or empty string', () => {
   strictEqual(rubric_assessment.roundAndFormat(null), '')
   strictEqual(rubric_assessment.roundAndFormat(undefined), '')
   strictEqual(rubric_assessment.roundAndFormat(''), '')
 })
 
-test('properly adds the "selected" class to a rating when score is equal', function() {
+test('properly adds the "selected" class to a rating when score is equal', () => {
   const $criterion = $(
     '<span>' +
       "<span class='rating'><span class='points'>5</span></span>" +
@@ -60,7 +61,7 @@ test('properly adds the "selected" class to a rating when score is equal', funct
   )
 })
 
-test('properly adds the "selected" class to proper rating when score is in range', function() {
+test('properly adds the "selected" class to proper rating when score is in range', () => {
   const $criterion = $(
     '<span>' +
       "<input type='checkbox' class='criterion_use_range' checked>" +
@@ -81,7 +82,7 @@ test('properly adds the "selected" class to proper rating when score is in range
 })
 
 QUnit.module('RubricAssessment#checkScoreAdjustment')
-test('displays a flash warning when rawPoints has been adjusted', function() {
+test('displays a flash warning when rawPoints has been adjusted', () => {
   const flashSpy = sinon.spy($, 'flashWarning')
   const $criterion = $(
     '<span>' +
@@ -102,7 +103,7 @@ test('displays a flash warning when rawPoints has been adjusted', function() {
   flashSpy.restore()
 })
 
-test('does not display a flash warning when rawPoints has not been adjusted', function() {
+test('does not display a flash warning when rawPoints has not been adjusted', () => {
   const flashSpy = sinon.spy($, 'flashWarning')
   const $criterion = $(
     '<span>' +
@@ -117,4 +118,112 @@ test('does not display a flash warning when rawPoints has not been adjusted', fu
   rubric_assessment.checkScoreAdjustment($criterion, rating, rawData)
   equal(flashSpy.callCount, 0)
   flashSpy.restore()
+})
+
+QUnit.module('RubricAssessment', moduleHooks => {
+  moduleHooks.beforeEach(() => {
+    fakeENV.setup()
+    ENV.RUBRIC_ASSESSMENT = {}
+  })
+
+  moduleHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  QUnit.module('#assessmentData', () => {
+    const createRubric = (contents = '') => $(`<div class="rubric">${contents}</div>`)
+
+    test('returns the user ID if assessment_user_id exists in the environment', () => {
+      ENV.RUBRIC_ASSESSMENT.assessment_user_id = '123'
+      const data = rubric_assessment.assessmentData(createRubric())
+
+      strictEqual(data['rubric_assessment[user_id]'], '123')
+    })
+
+    test('returns the user ID if one exists in the submitted rubric', () => {
+      const rubric = createRubric(`<div class="user_id">234</div>`)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[user_id]'], '234')
+    })
+
+    test('returns the anonymous ID if anonymous_id exists in the environment', () => {
+      ENV.RUBRIC_ASSESSMENT.anonymous_id = '7a8c1'
+      const data = rubric_assessment.assessmentData(createRubric())
+
+      strictEqual(data['rubric_assessment[anonymous_id]'], '7a8c1')
+    })
+
+    test('returns the anonymous ID if one exists in the submitted rubric', () => {
+      const rubric = createRubric(`<div class="anonymous_id">81bc2</div>`)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[anonymous_id]'], '81bc2')
+    })
+
+    test('returns the user ID if both flavors of ID are available', () => {
+      const rubric = createRubric(`
+        <div class="user_id">100</div>
+        <div class="anonymous_id">81bc2</div>
+      `)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[user_id]'], '100')
+    })
+
+    test('omits the anonymous ID if both flavors of ID are available', () => {
+      const rubric = createRubric(`
+        <div class="user_id">100</div>
+        <div class="anonymous_id">81bc2</div>
+      `)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[anonymous_id]'], undefined)
+    })
+  })
+
+  QUnit.module('#populateRubric', hooks => {
+    let $rubric
+
+    hooks.beforeEach(() => {
+      $rubric = $(`
+        <div class="rubric" id="this_is_not_actually_used">
+          <div class="user_id">
+          <div class="anonymous_id">
+        </div>
+      `)
+    })
+
+    test('populates the user_id element of the passed-in rubric with ENV.assessment_user_id if present', () => {
+      ENV.RUBRIC_ASSESSMENT.assessment_user_id = '123'
+      rubric_assessment.populateRubric($rubric, {})
+      strictEqual($rubric.find('.user_id').text(), '123')
+    })
+
+    test('populates the user_id element of the passed-in rubric with the value from the passed-in data if present', () => {
+      rubric_assessment.populateRubric($rubric, {user_id: '432'})
+      strictEqual($rubric.find('.user_id').text(), '432')
+    })
+
+    test('populates the anonymous_id element of the passed-in rubric with ENV.anonymous_id if present', () => {
+      ENV.RUBRIC_ASSESSMENT.anonymous_id = 'vcx12'
+      rubric_assessment.populateRubric($rubric, {})
+      strictEqual($rubric.find('.anonymous_id').text(), 'vcx12')
+    })
+
+    test('populates the anonymous_id element of the passed-in rubric with the value from the passed-in data if present', () => {
+      rubric_assessment.populateRubric($rubric, {anonymous_id: 'vv191'})
+      strictEqual($rubric.find('.anonymous_id').text(), 'vv191')
+    })
+
+    test('populates the user_id element if both flavors of ID are available', () => {
+      rubric_assessment.populateRubric($rubric, {user_id: '77', anonymous_id: 'vv191'})
+      strictEqual($rubric.find('.user_id').text(), '77')
+    })
+
+    test('does not populate the anonymous_id element if both flavors of ID are available', () => {
+      rubric_assessment.populateRubric($rubric, {user_id: '77', anonymous_id: 'vv191'})
+      strictEqual($rubric.find('.anonymous_id').text(), '')
+    })
+  })
 })

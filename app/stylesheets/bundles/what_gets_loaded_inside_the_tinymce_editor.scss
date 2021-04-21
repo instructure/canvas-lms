@@ -21,11 +21,22 @@
 @import 'components/ic-typography';
 
 // the first line of public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/content.css
-// sets these to undesireable values, rather than modify that vendor file, we just override them here
+// sets these to undesirable values, rather than modify that vendor file, we just override them here
 // to match the rest of the content in canvas
 body {
   margin: 0;
+}
+
+body.elementary-theme {
+  font-family: 'Balsamiq Sans', $ic-font-family;
+}
+
+body.default-theme {
   font-family: inherit;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 td {
@@ -33,7 +44,8 @@ td {
 }
 
 .mce-content-body {
-  margin: 11px;
+  box-sizing: border-box;
+  padding: 11px;
   td {
     padding: 2px;
     min-width: 20px;
@@ -69,7 +81,68 @@ table td[data-mce-selected] {
 
 body#tinymce,
 body#tinyrce {
-  height: 100vh;
+  min-height: 100vh;
+}
+
+.Underline-All-Links__enabled
+  a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
+  text-decoration: underline;
+}
+
+/* the span tinymce puts around the media player's iframe */
+.mce-content-body .mce-preview-object {
+  border-style: none;
+  display: inline;
+  font-size: 0;
+}
+
+[data-mce-p-data-media-id],
+iframe[data-media-id] {
+  background-color: #eee;
+}
+
+/* the svg and keyframe styles are lifted from instui spinner */
+span[data-placeholder-for] {
+  border: solid 1px #8b969e;
+  background-color: #ccc;
+  display: inline-block;
+  max-width: 100%;
+  svg {
+    max-height: 90%;
+    max-width: 90%;
+    animation: 2s linear infinite rotate;
+    circle.c1 {
+      stroke: #f5f5f5;
+    }
+    circle.c2 {
+      stroke: $electric;
+      stroke-dasharray: 148px;
+      animation: 1.75s ease infinite morph;
+      transform-origin: 50px 50px;
+    }
+  }
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes morph {
+  0% {
+    stroke-dashoffset: 190%;
+  }
+
+  50% {
+    stroke-dashoffset: 50%;
+    transform: rotate(90deg);
+  }
+
+  100% {
+    stroke-dashoffset: 190%;
+    transform: rotate(360deg);
+  }
 }
 
 @import 'our_custom_tiny_mce_stuff/_tinymce.editor_box.scss';

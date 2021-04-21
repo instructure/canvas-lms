@@ -19,28 +19,10 @@ import {View} from 'Backbone'
 import $ from 'jquery'
 import template from 'jst/quizzes/fileUploadQuestionState'
 import uploadedOrRemovedTemplate from 'jst/quizzes/fileUploadedOrRemoved'
-import _ from 'underscore'
 import 'jquery.instructure_forms'
 import 'jquery.disableWhileLoading'
 
 export default class FileUploadQuestion extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.checkForFileChange = this.checkForFileChange.bind(this)
-    this.openFileBrowser = this.openFileBrowser.bind(this)
-    this.render = this.render.bind(this)
-    this.removeFileStatusMessage = this.removeFileStatusMessage.bind(this)
-    this.processAttachment = this.processAttachment.bind(this)
-    this.deleteAttachment = this.deleteAttachment.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     // TODO: Handle quota errors?
     // TODO: Handle upload errors?
@@ -49,7 +31,8 @@ export default class FileUploadQuestion extends View {
       '.file-upload': '$fileUpload',
       '.file-upload-btn': '$fileDialogButton',
       '.attachment-id': '$attachmentID',
-      '.file-upload-box': '$fileUploadBox'
+      '.file-upload-box': '$fileUploadBox',
+      '#fileupload_in_progress': '$fileUploadInprogress'
     }
 
     this.prototype.events = {
@@ -68,7 +51,8 @@ export default class FileUploadQuestion extends View {
     if ((val = this.$fileUpload.val())) {
       this.removeFileStatusMessage()
       this.model.set('file', this.$fileUpload[0])
-      const dfrd = this.model.save(null, {success: this.processAttachment})
+      this.$fileUploadInprogress.val(true)
+      const dfrd = this.model.save(null, {success: this.processAttachment.bind(this)})
       return this.$fileUploadBox.disableWhileLoading(dfrd)
     }
   }
@@ -86,7 +70,7 @@ export default class FileUploadQuestion extends View {
     // For now, remove the input rendered in ERB-land, and the template is
     // responsible for rendering a fallback to a regular input type=file
     const isIE = !!$.browser.msie
-    this.$fileUploadBox.html(template(_.extend({}, this.model.present(), {isIE})))
+    this.$fileUploadBox.html(template({...this.model.present(), isIE}))
     this.$fileUpload = this.$('.file-upload')
     return this
   }
@@ -98,11 +82,12 @@ export default class FileUploadQuestion extends View {
   // For now we'll just process the first one.
   processAttachment(attachment) {
     this.$attachmentID.val(this.model.id).trigger('change')
+    this.$fileUploadInprogress.val(false)
     this.$fileUploadBox.addClass('file-upload-box-with-file')
     this.render()
     this.$fileUploadBox
       .parent()
-      .append(uploadedOrRemovedTemplate(_.extend({}, this.model.present(), {fileUploaded: true})))
+      .append(uploadedOrRemovedTemplate({...this.model.present(), fileUploaded: true}))
     return this.trigger('attachmentManipulationComplete')
   }
 
@@ -113,6 +98,7 @@ export default class FileUploadQuestion extends View {
     event.preventDefault()
     this.$attachmentID.val('').trigger('change')
     this.$fileUploadBox.removeClass('file-upload-box-with-file')
+    this.$fileUpload.val(null)
     const oldModel = this.model.present()
     this.model.clear()
     this.removeFileStatusMessage()

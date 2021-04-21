@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'shellwords'
 require 'json'
@@ -86,27 +87,22 @@ if long_lines.size > 0
     (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""), true
 end
 
-is_a_selinimum_test = commit_message.split("[selinimum:ignore_intermediate_commits]")
-if is_a_selinimum_test.size > 1
-  line = is_a_selinimum_test[0].count("\n") + 1
-  comment "error", line, "since you're telling selinimum to ignore intermediate commits, this commit may not be safe to merge"
-end
-
 starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
 commit_files = git("show --pretty=format:"" --name-only").split("\n")
+puts "detected file changes"
+puts commit_files
 only_affects_specs = commit_files.all? { |f| f =~ %r{\Aspec/} }
 if only_affects_specs
   comment "warn", 1, "since your commit only affects specs, please prefix your commit message with \"spec: \""
   exit
 end
 
-user_config_file = File.expand_path("../../gems/dr_diff/config/gergich_user_config.yml", __FILE__)
-if File.exists?(user_config_file)
-  config = YAML.load_file(user_config_file) || {}
-  user_list = config['only_report_errors'] || []
-  exit if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
+touches_db_migrate_file = commit_files.any? { |f| f =~ %r{\Adb\/migrate/}}
+if touches_db_migrate_file
+  comment "warn", 1, "Your commit modifies migration files. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/49643724/Rails+Migrations, including completing an additional migration review."
+  exit
 end
 
 gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)
@@ -125,7 +121,17 @@ if issue_ids.empty? && !gh_issue
   end
 end
 
+flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w\-]+)\s{0,3}$/)
+unless flag_name
+  comment "warn", 1, "ლ(ಠ益ಠლ) y u no add release flag? https://instructure.atlassian.net/wiki/spaces/CE/pages/603586589/Commit+Message+Release+Flags"
+end
+
 has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
+end
+
+skip_eslint_flag = commit_message.include? '[skip-eslint]'
+if skip_eslint_flag
+  comment "error", 1, "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"
 end

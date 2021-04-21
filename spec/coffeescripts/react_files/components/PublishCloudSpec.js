@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mockFilesEnv from '../mockFilesENV'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
+import wait from 'waait'
 import PublishCloud from 'jsx/shared/PublishCloud'
 import FilesystemObject from 'compiled/models/FilesystemObject'
 
@@ -36,7 +36,7 @@ QUnit.module('PublishCloud', {
     }
     const props = {
       model: this.model,
-      userCanManageFilesForContext: true
+      userCanEditFilesForContext: true
     }
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
@@ -51,9 +51,10 @@ test('model change event updates components state', function() {
   equal(this.publishCloud.state.published, true, 'changing models locked changes it to true')
 })
 
-test('clicking a published cloud opens restricted dialog', function() {
+test('clicking a published cloud opens restricted dialog', async function() {
   sandbox.stub(ReactDOM, 'render')
   Simulate.click(this.publishCloud.refs.publishCloud)
+  await wait(10)
   ok(ReactDOM.render.calledOnce, 'renders a component inside the dialog')
 })
 
@@ -71,7 +72,7 @@ QUnit.module('PublishCloud Student View', {
     }
     const props = {
       model: this.model,
-      userCanManageFilesForContext: false
+      userCanEditFilesForContext: false
     }
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
@@ -95,7 +96,7 @@ QUnit.module('PublishCloud#togglePublishedState', {
         hidden: false,
         id: 42
       }),
-      userCanManageFilesForContext: true
+      userCanEditFilesForContext: true
     }
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
@@ -139,7 +140,7 @@ test('sets published initial state based on params model hidden property', funct
   })
   const props = {
     model,
-    userCanManageFilesForContext: true
+    userCanEditFilesForContext: true
   }
   this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   equal(this.publishCloud.state.published, !model.get('locked'), 'not locked is published')

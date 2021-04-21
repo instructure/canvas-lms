@@ -31,6 +31,10 @@ QUnit.module('UploadFileView', {
       onImageLoaded: this.resolveImageLoaded
     })
     this.view.$el.appendTo('#fixtures')
+
+    // This spec currently depends on a real XHR request to the file system.
+    // Restoring the network will allow this spec to function correctly.
+    sandbox.server.restore()
     this.file = (function() {
       const dfd = $.Deferred()
       const xhr = new XMLHttpRequest()

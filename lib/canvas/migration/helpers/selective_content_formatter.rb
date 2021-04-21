@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ module Canvas::Migration::Helpers
             ['quizzes', -> { I18n.t('lib.canvas.migration.quizzes', 'Quizzes') }],
             ['assessment_question_banks', -> { I18n.t('lib.canvas.migration.assessment_question_banks', 'Question Banks') }],
             ['discussion_topics', -> { I18n.t('lib.canvas.migration.discussion_topics', 'Discussion Topics') }],
-            ['wiki_pages', -> { I18n.t('lib.canvas.migration.wikis', 'Wiki Pages') }],
+            ['wiki_pages', -> { I18n.t('lib.canvas.migration.wikis', 'Pages') }],
             ['context_external_tools', -> { I18n.t('lib.canvas.migration.external_tools', 'External Tools') }],
             ['tool_profiles', -> { I18n.t('lib.canvas.migration.tool_profiles', 'Tool Profiles') }],
             ['announcements', -> { I18n.t('lib.canvas.migration.announcements', 'Announcements') }],
@@ -36,13 +38,14 @@ module Canvas::Migration::Helpers
             ['attachments', -> { I18n.t('lib.canvas.migration.attachments', 'Files') }],
     ]
 
-    def initialize(migration=nil, base_url=nil)
+    def initialize(migration=nil, base_url=nil, global_identifiers: )
       @migration = migration
       @base_url = base_url
+      @global_identifiers = global_identifiers
     end
 
     def valid_type?(type=nil)
-      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type} || type.start_with?("submodules_")
+      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type} || type.start_with?("submodules_") || type.start_with?("learning_outcome_groups_")
     end
 
     def get_content_list(type=nil, source=nil)
@@ -87,6 +90,8 @@ module Canvas::Migration::Helpers
         data
       end
 
+      selectable_outcomes = @migration.context.respond_to?(:root_account) &&
+                            @migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       content_list = []
       if type
         if match_data = type.match(/submodules_(.*)/)
@@ -100,8 +105,14 @@ module Canvas::Migration::Helpers
           when 'attachments'
             attachment_data(content_list, course_data)
           else
-            course_data[type].each do |item|
-              content_list << item_hash(type, item)
+            processed = false
+            if type == 'learning_outcomes' && selectable_outcomes
+              processed = !outcome_data(content_list, course_data).nil?
+            end
+            unless processed
+              course_data[type].each do |item|
+                content_list << item_hash(type, item)
+              end
             end
           end
         end
@@ -115,13 +126,37 @@ module Canvas::Migration::Helpers
         SELECTIVE_CONTENT_TYPES.each do |type, title|
           if course_data[type] && course_data[type].count > 0
             hash = {type: type, property: "#{property_prefix}[all_#{type}]", title: title.call, count: course_data[type].count}
-            add_url!(hash, type)
+            add_url!(hash, type, selectable_outcomes)
             content_list << hash
           end
         end
       end
 
       content_list
+    end
+
+    # Build learning outcome hierarchy
+    def outcome_data(content_list, course_data)
+      # Earlier exports may not have groups in course data
+      return unless course_data['learning_outcome_groups']
+      outcomes = course_data['learning_outcomes']
+      course_data['learning_outcome_groups'].each do |group|
+        content_list << process_group(group, outcomes)
+      end
+      content_list.concat(
+        outcomes.select {|outcome| outcome['parent_migration_id'] == nil}.map {|outcome| item_hash('learning_outcomes', outcome)}
+      )
+    end
+
+    def process_group(group, outcomes)
+      item = item_hash('learning_outcome_groups', group)
+      item[:sub_items] = group['child_groups'].map do |subgroup|
+        process_group(subgroup, outcomes)
+      end
+      item[:sub_items].concat(
+        outcomes.select {|outcome| outcome['parent_migration_id'] == group['migration_id']}.map {|outcome| item_hash('learning_outcomes', outcome)}
+      )
+      item
     end
 
     # Returns all the assignments in their assignment groups
@@ -184,7 +219,7 @@ module Canvas::Migration::Helpers
             hash[:title] = default_bank.title
           end
           hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title
-          hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank')
+          hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank', global: @global_identifiers)
         end
       when 'context_modules'
         hash[:item_count] = item['item_count']
@@ -214,9 +249,12 @@ module Canvas::Migration::Helpers
 
     # returns lists of available content from a source course
     def get_content_from_course(type=nil, source=nil)
-      content_list = []
       source ||= @migration.source_course || Course.find(@migration.migration_settings[:source_course_id]) if @migration
-      if source
+      return [] unless source
+
+      selectable_outcomes = source.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
+      content_list = []
+      source.shard.activate do
         if type
           case type
             when 'assignments'
@@ -232,8 +270,15 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'learning_outcomes'
-              source.linked_learning_outcomes.active.select('learning_outcomes.id,short_description').each do |item|
-                content_list << course_item_hash(type, item)
+              if selectable_outcomes
+                root = source.root_outcome_group(false)
+                if root
+                  add_learning_outcome_group_content(root, content_list)
+                end
+              else
+                source.linked_learning_outcomes.active.select('learning_outcomes.id,short_description').each do |item|
+                  content_list << course_item_hash(type, item)
+                end
               end
             when 'tool_profiles'
               source.tool_proxies.active.select("id, name").each do |item|
@@ -261,6 +306,9 @@ module Canvas::Migration::Helpers
                 scope.each do |item|
                   content_list << course_item_hash(type, item)
                 end
+              elsif selectable_outcomes && (match_data = type.match(/learning_outcome_groups_(.*)/))
+                group = source.learning_outcome_groups.find(match_data[1])
+                add_learning_outcome_group_content(group, content_list)
               end
           end
         else
@@ -289,7 +337,7 @@ module Canvas::Migration::Helpers
 
             next if count == 0
             hash = {type: type, property: "#{property_prefix}[all_#{type}]", title: title.call, count: count}
-            add_url!(hash, type)
+            add_url!(hash, type, selectable_outcomes)
             content_list << hash
           end
         end
@@ -298,10 +346,21 @@ module Canvas::Migration::Helpers
       content_list
     end
 
-    def add_url!(hash, type)
-      return if type == 'learning_outcomes' # TODO: remove this when learning outcomes selection ui is finished
+    def add_url!(hash, type, selectable_outcomes = false)
+      return if !selectable_outcomes && type == 'learning_outcomes'
       if @base_url
         hash[:sub_items_url] = @base_url + "?type=#{type}"
+      end
+    end
+
+    def add_learning_outcome_group_content(group, content_list)
+      group.child_outcome_groups.active.order_by_title.select('learning_outcome_groups.id,title').each do |item|
+        hash = course_item_hash('learning_outcome_groups', item)
+        add_url!(hash, "learning_outcome_groups_#{item.id}")
+        content_list << hash
+      end
+      group.child_outcome_links.active.order_by_outcome_title.each do |item|
+        content_list << course_item_hash('learning_outcomes', item.content)
       end
     end
 
@@ -316,7 +375,7 @@ module Canvas::Migration::Helpers
 
       hash = {type: type, title: title}
       if @migration
-        mig_id = CC::CCHelper.create_key(item)
+        mig_id = CC::CCHelper.create_key(item, global: @global_identifiers)
         hash[:migration_id] = mig_id
         hash[:property] = "#{property_prefix}[#{type}][id_#{mig_id}]"
       else

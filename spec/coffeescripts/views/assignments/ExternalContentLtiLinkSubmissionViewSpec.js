@@ -21,20 +21,19 @@ import ExternalContentLtiLinkSubmissionView from 'compiled/views/assignments/Ext
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 
-;({
-  contentItem: {
-    '@type': 'LtiLinkItem',
-    url: 'http://lti.example.com/content/launch/42',
-    comment: 'Foo all the bars!'
-  }
-})
-
 QUnit.module('ExternalContentLtiLinkSubmissionView', {
   setup() {
+    const contentItem = {
+      '@type': 'LtiLinkItem',
+      url: 'http://lti.example.com/content/launch/42',
+      comment: 'Foo all the bars!',
+      lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    }
+
     fakeENV.setup()
     window.ENV.COURSE_ID = 42
     window.ENV.SUBMIT_ASSIGNMENT = {ID: 24}
-    this.model = new Backbone.Model(this.contentItem)
+    this.model = new Backbone.Model(contentItem)
     this.view = new ExternalContentLtiLinkSubmissionView({
       externalTool: {},
       model: this.model
@@ -52,6 +51,10 @@ test("buildSubmission must return an object with submission_type set to 'basic_l
 
 test('buildSubmission must return an object with url set to the value from the supplied model', function() {
   equal(this.view.buildSubmission().url, this.model.get('url'))
+})
+
+test('buildSubmission must return an object with resource_link_lookup_uuid set to the value from the supplied model.', function() {
+  equal(this.view.buildSubmission().resource_link_lookup_uuid, this.model.get('lookup_uuid'))
 })
 
 test("extractComment must return an object with the model's comment field", function() {

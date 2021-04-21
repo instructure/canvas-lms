@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -52,6 +54,14 @@ See CanvasPartman::Concerns::Partitioned.
       raise NotImplementedError
     end
 
+    # Check that the current partition, and n future partitions exist
+    #
+    # @param [Integer] advance
+    #   The number of partitions to check in advance
+    def partitions_created?(_advance = 1)
+      raise NotImplementedError
+    end
+
     # Prune old partitions
     #
     # @param [Integer] number_to_keep
@@ -75,7 +85,7 @@ See CanvasPartman::Concerns::Partitioned.
 
       constraint_check = generate_check_constraint(value)
 
-      base_class.transaction do
+      with_statement_timeout do
         execute(<<SQL)
         CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
           LIKE #{base_class.quoted_table_name} INCLUDING ALL,
@@ -85,7 +95,7 @@ SQL
 
         # copy foreign keys, since INCLUDING ALL won't bring them along
         base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
-          base_class.connection.add_foreign_key partition_table, foreign_key.to_table, foreign_key.options.except(:name)
+          base_class.connection.add_foreign_key partition_table, foreign_key.to_table, **foreign_key.options.except(:name)
         end
       end
 
@@ -102,13 +112,33 @@ SQL
 
     def drop_partition(value)
       partition_table = generate_name_for_partition(value)
+      drop_partition_table(partition_table)
+    end
 
+    def with_statement_timeout(timeout_override: nil)
+      tv = timeout_override || ::CanvasPartman.timeout_value
       base_class.transaction do
-        base_class.connection.drop_table(partition_table)
+        execute("SET LOCAL statement_timeout=#{tv}")
+        yield
       end
     end
 
     protected
+
+    def drop_partition_constraints(table_name)
+      base_class.connection.foreign_keys(table_name).each do |fk|
+        with_statement_timeout do
+          base_class.connection.remove_foreign_key table_name, name: fk.name
+        end
+      end
+    end
+
+    def drop_partition_table(table_name)
+      drop_partition_constraints(table_name)
+      with_statement_timeout do
+        base_class.connection.drop_table(table_name)
+      end
+    end
 
     def initialize(base_class)
       raise NotImplementedError if self.class == PartitionManager

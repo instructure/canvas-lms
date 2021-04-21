@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {shallow, mount} from 'enzyme'
 import PeopleReadyList from '../people_ready_list'
 
@@ -53,14 +52,13 @@ const props = {
 }
 
 describe('PeopleReadyList', () => {
-
   test('renders the component', () => {
     const wrapper = shallow(<PeopleReadyList {...props} />)
     expect(wrapper.exists()).toBeTruthy()
   })
 
   test('sets the correct values', () => {
-    const wrapper = shallow(<PeopleReadyList {...props} />)
+    const wrapper = mount(<PeopleReadyList {...props} />)
     const peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     const cols = peopleReadyList.find('thead th')
@@ -69,13 +67,25 @@ describe('PeopleReadyList', () => {
     const rows = peopleReadyList.find('tbody tr')
     expect(rows).toHaveLength(3) // 3 rows
 
-    const inst0 = rows.first().children().last().text()
+    const inst0 = rows
+      .first()
+      .children()
+      .last()
+      .text()
     expect(inst0).toEqual(props.nameList[0].account_name) // first user has correct institution
 
-    const inst2 = rows.at(2).children().last().text()
+    const inst2 = rows
+      .at(2)
+      .children()
+      .last()
+      .text()
     expect(inst2).toEqual(props.defaultInstitutionName) // last user has default institution name
 
-    const sisid = rows.at(1).children().at(3).text()
+    const sisid = rows
+      .at(1)
+      .children()
+      .at(3)
+      .text()
     expect(sisid).toEqual(props.nameList[1].sis_user_id) // 'middle user has sis id displayed'
   })
 
@@ -86,18 +96,20 @@ describe('PeopleReadyList', () => {
     const tbls = peopleReadyList.find('table')
     expect(tbls.exists()).toBeFalsy()
 
-    expect(peopleReadyList.find('Alert').prop('children')).toEqual('No users were selected to add to the course')
+    expect(peopleReadyList.find('Alert').prop('children')).toEqual(
+      'No users were selected to add to the course'
+    )
   })
 
   test('hides SIS ID column if not permitted', () => {
-    let wrapper = shallow(<PeopleReadyList {...props} canReadSIS />)
+    let wrapper = mount(<PeopleReadyList {...props} canReadSIS />)
     let peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     let cols = peopleReadyList.find('thead th')
     expect(cols.length).toEqual(5) // incluldes SIS ID column
     expect(cols.at(3).text()).toEqual('SIS ID')
 
-    wrapper = shallow(<PeopleReadyList {...props} canReadSIS={false} />)
+    wrapper = mount(<PeopleReadyList {...props} canReadSIS={false} />)
     peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     cols = peopleReadyList.find('thead th')

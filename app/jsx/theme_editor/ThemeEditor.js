@@ -28,6 +28,7 @@ import submitHtmlForm from './submitHtmlForm'
 import SaveThemeButton from './SaveThemeButton'
 import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
+import getCookie from '../shared/helpers/getCookie'
 
 /* eslint no-alert:0 */
 const TABS = [
@@ -121,9 +122,8 @@ export default class ThemeEditor extends React.Component {
   }
 
   onSubAccountProgress = data => {
-    const newSubAccountProgs = _.map(
-      this.state.activeSubAccountProgresses,
-      progress => (progress.tag == data.tag ? data : progress)
+    const newSubAccountProgs = _.map(this.state.activeSubAccountProgresses, progress =>
+      progress.tag == data.tag ? data : progress
     )
 
     this.filterAndSetActive(newSubAccountProgs)
@@ -513,7 +513,7 @@ export default class ThemeEditor extends React.Component {
           className="Theme__container"
         >
           <input name="utf8" type="hidden" value="✓" />
-          <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
+          <input name="authenticity_token" type="hidden" value={getCookie('_csrf_token')} />
 
           <div
             className={`Theme__layout ${!this.props.hasUnsavedChanges &&
@@ -556,10 +556,6 @@ export default class ThemeEditor extends React.Component {
               />
             </div>
           </div>
-          {/* Workaround to avoid corrupted XHR2 request body in IE10 / IE11,
-                needs to be last element in <form>. see:
-                https://blog.yorkxin.org/posts/2014/02/06/ajax-with-formdata-is-broken-on-ie10-ie11/ */}
-          <input type="hidden" name="_workaround_for_IE_10_and_11_formdata_bug" />
           {this.renderHeader(tooltipForWhyApplyIsDisabled)}
         </form>
 

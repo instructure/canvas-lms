@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -87,6 +89,7 @@ module Services
 
       let(:tool_proxy) do
         tool_proxy = double()
+        allow(tool_proxy).to receive(:id).and_return('1')
         allow(tool_proxy).to receive(:guid).and_return('151b52cd-d670-49fb-bf65-6a327e3aaca0')
         allow(tool_proxy).to receive(:product_family).and_return(product_family)
         tool_proxy
@@ -154,7 +157,7 @@ module Services
           allow(non_root_account_context).to receive(:root_account).and_return(root_account_object)
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:get)
-            expect(endpoint).to eq('http://example.com/api/subscriptions')
+            expect(endpoint).to eq('http://example.com/api/root_account_subscriptions')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt["DeveloperKey"]).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000007')
@@ -191,11 +194,11 @@ module Services
         it 'makes the expected request' do
           allow(tool_proxy).to receive(:context).and_return(root_account_context)
           allow(root_account_context).to receive(:root_account).and_return(root_account_object)
-          subscription = { 'my' => 'subscription' }
+          subscription = { 'my' => 'subscription', 'Id' => '1234' }
 
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:put)
-            expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
+            expect(endpoint).to eq('http://example.com/api/subscriptions/1234')
             expect(options[:headers]['Content-Type']).to eq('application/json')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt['DeveloperKey']).to eq('10000000000003')

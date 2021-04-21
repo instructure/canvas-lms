@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -15,14 +17,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class SubmissionCommentReadLoader < GraphQL::Batch::Loader
+  def initialize(current_user)
+    @current_user = current_user
+  end
+
+  def perform(submission_comments)
+    vsc = ViewedSubmissionComment.
+      where(submission_comment_id: submission_comments, user: @current_user).
+      pluck('submission_comment_id').
+      to_set
+
+    submission_comments.each do |sc|
+      fulfill(sc, vsc.include?(sc.id))
+    end
+  end
+end
 
 module Types
   class SubmissionCommentType < ApplicationObjectType
     graphql_name 'SubmissionComment'
 
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, 'legacy canvas id', null: true, method: :id
     field :comment, String, null: true
 
     field :author, Types::UserType, null: true
@@ -36,9 +54,7 @@ module Types
         load_association(:submission).then do |submission|
           Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
         end
-      ]).then {
-        object.author if object.grants_right?(current_user, :read_author)
-      }
+      ]).then { object.author if object.grants_right?(current_user, :read_author) }
     end
 
     field :attachments, [Types::FileType], null: true
@@ -58,9 +74,31 @@ module Types
       end
     end
 
+    field :read, Boolean, null: false
+    def read
+      load_association(:submission).then do |submission|
+        Promise.all([
+          Loaders::AssociationLoader.for(Submission, :content_participations).load(submission),
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+        ]).then do
+          next true if submission.read?(current_user)
+          SubmissionCommentReadLoader.for(current_user).load(object)
+        end
+      end
+    end
+
     field :media_object, Types::MediaObjectType, null: true
     def media_object
       Loaders::MediaObjectLoader.load(object.media_comment_id)
+    end
+
+    field :attempt, Integer, null: false
+    def attempt
+      # Attempt is nil in the database, but we are going to return it as 0 instead,
+      # as it ends up being much easier to work with on an api level. Attempting
+      # to fix this in the database is challenging because submission.attempt
+      # should be changed as well in order to keep everything consistent.
+      object.attempt.nil? ? 0 : object.attempt
     end
   end
 end

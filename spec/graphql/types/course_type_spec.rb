@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::CourseType do
   let_once(:course) { course_with_student(active_all: true); @course }
@@ -31,6 +33,10 @@ describe Types::CourseType do
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
     expect(course_type.resolve("name")).to eq course.name
+  end
+
+  it 'works for root_outcome_group' do
+    expect(course_type.resolve('rootOutcomeGroup { _id }')).to eq course.root_outcome_group.id.to_s
   end
 
   context "top-level permissions" do
@@ -50,6 +56,36 @@ describe Types::CourseType do
     end
   end
 
+  context "sis fields" do
+    let_once(:sis_course) { course.update!(sis_course_id: "SIScourseID"); course }
+
+    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false})}
+
+    it "returns sis_id if you have read_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: @teacher}).dig("data", "course", "sisId")
+          query { course(id: "#{sis_course.id}") { sisId } }
+        GQL
+      ).to eq("SIScourseID")
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: admin}).dig("data", "course", "sisId")
+          query { course(id: "#{sis_course.id}") { sisId } }
+        GQL
+      ).to eq("SIScourseID")
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: @student}).dig("data", "course", "sisId")
+          query { course(id: "#{sis_course.id}") { sisId } }
+        GQL
+      ).to be_nil
+    end
+  end
+
   describe "assignmentsConnection" do
     let_once(:assignment) {
       course.assignments.create! name: "asdf", workflow_state: "unpublished"
@@ -64,7 +100,7 @@ describe Types::CourseType do
       before(:once) do
         gpg = GradingPeriodGroup.create! title: "asdf",
           root_account: course.root_account
-        course.enrollment_term.update_attributes grading_period_group: gpg
+        course.enrollment_term.update grading_period_group: gpg
         @term1 = gpg.grading_periods.create! title: "past grading period",
         start_date: 2.weeks.ago,
           end_date: 1.weeks.ago
@@ -104,6 +140,43 @@ describe Types::CourseType do
         GQL
         expect(result.sort).to match course.assignments.published.map(&:to_param).sort
       end
+
+      it "returns assignments in order by position" do
+        ag = @course.assignment_groups.create! name: "Other Assignments", position: 1
+        other_ag_assignment = @course.assignments.create! assignment_group: ag, name: "other ag"
+
+        @term1_assignment1.assignment_group.update!(position: 2)
+        @term2_assignment1.update!(position: 1)
+        @term1_assignment1.update!(position: 2)
+
+        expect(
+          course_type.resolve(<<~GQL, current_user: @student)
+            assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
+          GQL
+        ).to eq [
+          other_ag_assignment,
+          @term2_assignment1,
+          @term1_assignment1,
+        ].map { |a| a.id.to_s }
+      end
+    end
+  end
+
+  describe "outcomeProficiency" do
+    it 'resolves to the account proficiency' do
+      outcome_proficiency_model(course.account)
+      expect(
+        course_type.resolve('outcomeProficiency { _id }', current_user: @teacher)
+      ).to eq course.account.outcome_proficiency.id.to_s
+    end
+  end
+
+  describe "outcomeCalculationMethod" do
+    it 'resolves to the account calculation method' do
+      outcome_calculation_method_model(course.account)
+      expect(
+        course_type.resolve('outcomeCalculationMethod { _id }', current_user: @teacher)
+      ).to eq course.account.outcome_calculation_method.id.to_s
     end
   end
 
@@ -170,13 +243,18 @@ describe Types::CourseType do
       ].sort
     end
 
-
     it "doesn't let students see other student's submissions" do
       expect(
         course_type.resolve(<<~GQL, current_user: @student2)
           submissionsConnection(
             studentIds: ["#{@student1.id}", "#{@student2.id}"],
           ) { edges { node { _id } } }
+        GQL
+      ).to eq [@student2a1_submission.id.to_s]
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @student2)
+          submissionsConnection { nodes { _id } }
         GQL
       ).to eq [@student2a1_submission.id.to_s]
     end
@@ -226,10 +304,34 @@ describe Types::CourseType do
           GQL
         ).to eq [ ]
       end
+
+      it "submitted_since" do
+        @student1a1_submission.update_attribute(:submitted_at, 1.month.ago)
+        @student1a2_submission.update_attribute(:submitted_at, 1.day.ago)
+
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              filter: { submittedSince: "#{5.days.ago.iso8601}" }
+            ) { nodes { _id } }
+          GQL
+        ).to eq [ @student1a2_submission.id.to_s ]
+      end
+
+      it "graded_since" do
+        @student2a1_submission.update_attribute(:graded_at, 1.week.from_now)
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              filter: { gradedSince: "#{1.day.from_now.iso8601}" }
+            ) { nodes { _id } }
+          GQL
+        ).to eq [ @student2a1_submission.id.to_s ]
+      end
     end
   end
 
-  describe "usersConnection" do
+  context "users and enrollments" do
     before(:once) do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
@@ -241,48 +343,73 @@ describe Types::CourseType do
       }.user
     end
 
-    it "returns all visible users" do
-      expect(
-        course_type.resolve(
-          "usersConnection { edges { node { _id } } }",
-          current_user: @teacher
-        )
-      ).to eq [@teacher, @student1, other_teacher, @student2, @inactive_user].map(&:to_param)
+    describe "usersConnection" do
+      it "returns all visible users" do
+        expect(
+          course_type.resolve(
+            "usersConnection { edges { node { _id } } }",
+            current_user: @teacher
+          )
+        ).to eq [@teacher, @student1, other_teacher, @student2, @inactive_user].map(&:to_param)
+      end
+
+      it "returns only the specified users" do
+        # deprecated method
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            usersConnection(userIds: ["#{@student1.id}"]) { edges { node { _id } } }
+          GQL
+        ).to eq [@student1.to_param]
+
+        # current method
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            usersConnection(filter: {userIds: ["#{@student1.id}"]}) { edges { node { _id } } }
+          GQL
+        ).to eq [@student1.to_param]
+      end
+
+      it "doesn't return users that aren't visible to you" do
+        expect(
+          course_type.resolve(
+            "usersConnection { edges { node { _id } } }",
+            current_user: other_teacher
+          )
+        ).to eq [other_teacher.id.to_s]
+      end
+
+      it "allows filtering by enrollment state" do
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            usersConnection(
+              filter: {enrollmentStates: [active completed]}
+            ) { edges { node { _id } } }
+          GQL
+        ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
+      end
     end
 
-    it "returns only the specified users" do
-      # deprecated method
-      expect(
-        course_type.resolve(<<~GQL, current_user: @teacher)
-          usersConnection(userIds: ["#{@student1.id}"]) { edges { node { _id } } }
-        GQL
-      ).to eq [@student1.to_param]
+    describe "enrollmentsConnection" do
+      it "works" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { _id } }",
+            current_user: @teacher,
+          )
+        ).to match_array @course.all_enrollments.map(&:to_param)
+      end
 
-      # current method
-      expect(
-        course_type.resolve(<<~GQL, current_user: @teacher)
-          usersConnection(filter: {userIds: ["#{@student1.id}"]}) { edges { node { _id } } }
-        GQL
-      ).to eq [@student1.to_param]
-    end
-
-    it "doesn't return users that aren't visible to you" do
-      expect(
-        course_type.resolve(
-          "usersConnection { edges { node { _id } } }",
-          current_user: other_teacher
-        )
-      ).to eq [other_teacher.id.to_s]
-    end
-
-    it "allows filtering by enrollment state" do
-      expect(
-        course_type.resolve(<<~GQL, current_user: @teacher)
-          usersConnection(
-            filter: {enrollmentStates: [active completed]}
-          ) { edges { node { _id } } }
-        GQL
-      ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
+      it "doesn't return users not visible to current_user" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { _id } }",
+            current_user: other_teacher
+          )
+        ).to match_array [
+          @teacher.enrollments.first.id.to_s,
+          other_teacher.enrollments.first.id.to_s,
+        ]
+      end
     end
   end
 
@@ -323,7 +450,7 @@ describe Types::CourseType do
 
   describe "term" do
     before(:once) do
-      course.enrollment_term.update_attributes(start_at: 1.month.ago)
+      course.enrollment_term.update(start_at: 1.month.ago)
     end
 
     it "works" do
@@ -349,13 +476,12 @@ describe Types::CourseType do
       let(:context) { { current_user: teacher } }
 
       it "returns the PostPolicy for the course" do
-        post_policy = course.post_policies.create!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("postPolicy { _id }").to_i).to eql post_policy.id
+        expect(resolver.resolve("postPolicy { _id }").to_i).to eql course.default_post_policy.id
       end
 
       it "returns null if there is no course-specific PostPolicy" do
-        course.post_policies.create!(assignment: assignment, post_manually: true)
+        course.default_post_policy.destroy
         resolver = GraphQLTypeTester.new(course, context)
         expect(resolver.resolve("postPolicy { _id }")).to be nil
       end
@@ -365,7 +491,7 @@ describe Types::CourseType do
       let(:context) { { current_user: student } }
 
       it "returns null in place of the PostPolicy" do
-        course.post_policies.create!(post_manually: true)
+        course.default_post_policy.update!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
         expect(resolver.resolve("postPolicy { _id }")).to be nil
       end
@@ -373,25 +499,20 @@ describe Types::CourseType do
   end
 
   describe "AssignmentPostPoliciesConnection" do
-    let(:assignment1) { course.assignments.create! }
-    let(:assignment2) { course.assignments.create! }
     let(:course) { Course.create!(workflow_state: "available") }
     let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
     let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
-
-    before(:each) do
-      course.post_policies.create!(post_manually: true)
-      @assignment1_post_policy = course.post_policies.create!(assignment: assignment1, post_manually: true)
-      @assignment2_post_policy = course.post_policies.create!(assignment: assignment2, post_manually: true)
-    end
 
     context "when user has manage_grades permission" do
       let(:context) { { current_user: teacher } }
 
       it "returns only the assignment PostPolicies for the course" do
+        assignment1 = course.assignments.create!
+        assignment2 = course.assignments.create!
+
         resolver = GraphQLTypeTester.new(course, context)
         ids = resolver.resolve("assignmentPostPolicies { nodes { _id } }").map(&:to_i)
-        expect(ids).to contain_exactly(@assignment1_post_policy.id, @assignment2_post_policy.id)
+        expect(ids).to contain_exactly(assignment1.post_policy.id, assignment2.post_policy.id)
       end
 
       it "returns null if there are no assignment PostPolicies" do
@@ -408,6 +529,50 @@ describe Types::CourseType do
         resolver = GraphQLTypeTester.new(course, context)
         expect(resolver.resolve("assignmentPostPolicies { nodes { _id } }")).to be nil
       end
+    end
+  end
+
+  describe 'Account' do
+    it 'works' do
+      expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s
+    end
+  end
+
+  describe 'imageUrl' do
+    before(:once) {
+      course.enable_feature! 'course_card_images'
+    }
+
+    it 'returns nil when the feature flag is disabled' do
+      course.disable_feature! 'course_card_images'
+      expect(course_type.resolve("imageUrl")).to be_nil
+    end
+
+    it 'returns a url from an uploaded image' do
+      course.image_id = attachment_model(context: @course).id
+      course.save!
+      expect(course_type.resolve("imageUrl")).to_not be_nil
+    end
+
+    it 'returns a url from id when url is blank' do
+      course.image_url = ''
+      course.image_id = attachment_model(context: @course).id
+      course.save!
+      expect(course_type.resolve("imageUrl")).to_not be_nil
+      expect(course_type.resolve("imageUrl")).to_not eq ""
+    end
+
+    it 'returns a url from settings' do
+      course.image_url = "http://some.cool/gif.gif"
+      course.save!
+      expect(course_type.resolve("imageUrl")).to eq "http://some.cool/gif.gif"
+    end
+  end
+
+  describe 'AssetString' do
+    it 'returns the asset string' do
+      result = course_type.resolve('assetString')
+      expect(result).to eq @course.asset_string
     end
   end
 end

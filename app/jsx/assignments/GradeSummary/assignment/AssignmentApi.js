@@ -25,7 +25,7 @@ export function speedGraderUrl(courseId, assignmentId, options) {
   return `${path}?${query}`
 }
 
-export function publishGrades(courseId, assignmentId) {
+export function releaseGrades(courseId, assignmentId) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/publish`
 
   return axios.post(url)

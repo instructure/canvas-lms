@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2014 Instructure, Inc.
 #
@@ -65,15 +67,6 @@ describe "API Authentication", type: :request do
         expect(response).to redirect_to("http://www.example.com/?login_success=1")
         get "/api/v1/courses.json", params: {}
         expect(response).to be_successful
-      end
-
-       it "should have anti-crsf meausre in normal session" do
-        get "/api/v1/courses.json", params: {}
-        # because this is a normal application session, the response is prepended
-        # with our anti-csrf measure
-        json = response.body
-        expect(json).to match(%r{^while\(1\);})
-        expect(JSON.parse(json.sub(%r{^while\(1\);}, '')).size).to eq 1
       end
 
       it "should not allow post without authenticity token in application session" do
@@ -154,7 +147,8 @@ describe "API Authentication", type: :request do
           expect(response).to be_successful
           json = JSON.parse(response.body)
           expect(json.size).to eq 1
-          expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @user.id, 'enrollment_state' => 'invited'}]
+          expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id,
+            'user_id' => @user.id, 'enrollment_state' => 'invited', 'limit_privileges_to_course_section' => false}]
           expect(AccessToken.authenticate(token)).to eq AccessToken.last
           expect(AccessToken.last.purpose).to eq 'fun'
 
@@ -227,7 +221,7 @@ describe "API Authentication", type: :request do
           follow_redirect!
           expect(response).to redirect_to("/login/cas")
           follow_redirect!
-          expect(response).to redirect_to(controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(url_for(controller: 'login/cas', action: :new))))
+          expect(response).to redirect_to(cas.add_service_to_login_url(url_for(controller: 'login/cas', action: :new)))
 
           get "/login/cas", params: {:ticket => 'ST-abcd'}
           expect(response).to be_redirect
@@ -422,7 +416,8 @@ describe "API Authentication", type: :request do
               expect(response).to be_successful
               json = JSON.parse(response.body)
               expect(json.size).to eq 1
-              expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @user.id, 'enrollment_state' => 'invited'}]
+              expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id,
+                'user_id' => @user.id, 'enrollment_state' => 'invited', 'limit_privileges_to_course_section' => false}]
               expect(AccessToken.last).to eq AccessToken.authenticate(token)
             end
           end
@@ -939,41 +934,6 @@ describe "API Authentication", type: :request do
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
-    end
-  end
-
-  describe "CSRF protection" do
-    before :once do
-      course_with_teacher(:active_all => true)
-      @course1 = @course
-      course_with_student(:user => @user, :active_all => true)
-      @course2 = @course
-    end
-
-    it "should not prepend the CSRF protection to API requests" do
-      user_with_pseudonym(:user => @user)
-      raw_api_call(:get, "/api/v1/users/self/profile",
-                      :controller => "profile", :action => "settings", :user_id => "self", :format => "json")
-      expect(response).to be_successful
-      raw_json = response.body
-      expect(raw_json).not_to match(%r{^while\(1\);})
-      json = JSON.parse(raw_json)
-      expect(json['id']).to eq @user.id
-    end
-
-    it "should prepend the CSRF protection for API endpoints, when session auth is used" do
-      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
-      allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "test1@example.com",
-        "pseudonym_session[password]" => "test1234"}
-      assert_response 302
-      get "/api/v1/users/self/profile"
-      expect(response).to be_successful
-      raw_json = response.body
-      expect(raw_json).to match(%r{^while\(1\);})
-      expect { JSON.parse(raw_json) }.to raise_error(JSON::ParserError)
-      json = JSON.parse(raw_json.sub(%r{^while\(1\);}, ''))
-      expect(json['id']).to eq @user.id
     end
   end
 end

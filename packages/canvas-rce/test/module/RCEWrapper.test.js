@@ -16,46 +16,64 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import jsdomify from "jsdomify";
-import sinon from "sinon";
-import Bridge from "../../src/bridge";
-import ReactDOM from "react-dom";
-import * as indicateModule from "../../src/common/indicate";
-import * as contentInsertion from "../../src/rce/contentInsertion";
-import RCEWrapper from "../../src/rce/RCEWrapper";
+import assert from 'assert'
+import jsdomify from 'jsdomify'
+import sinon from 'sinon'
+import Bridge from '../../src/bridge'
+import * as indicateModule from '../../src/common/indicate'
+import * as contentInsertion from '../../src/rce/contentInsertion'
+import RCEWrapper from '../../src/rce/RCEWrapper'
 
-const textareaId = "myUniqId";
+const textareaId = 'myUniqId'
 
-let React, fakeTinyMCE, execCommandSpy, editorCommandSpy, sd, editor;
+let React, fakeTinyMCE, editorCommandSpy, sd, editor
 
 // ====================
 //        HELPERS
 // ====================
 
 function requireReactDeps() {
-  React = require("react");
-  sd = require("skin-deep");
+  React = require('react')
+  sd = require('skin-deep')
 }
 
 function createBasicElement(opts) {
-  let props = Object.assign({ textareaId, tinymce: fakeTinyMCE }, opts);
-  return new RCEWrapper(props);
+  if (opts && opts.textareaId) {
+    // so RCEWrapper.mceInstance() works
+    fakeTinyMCE.editors[0].id = opts.textareaId
+  }
+  const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...opts}
+  return new RCEWrapper(props)
 }
 
 function createdMountedElement(additionalProps = {}) {
-  let tree = sd.shallowRender(
+  const tree = sd.shallowRender(
     React.createElement(RCEWrapper, {
-      defaultContent: "an example string",
-      textareaId: textareaId,
+      defaultContent: 'an example string',
+      textareaId,
       tinymce: fakeTinyMCE,
+      editorOptions: {},
+      ...trayProps(),
       ...additionalProps
     })
-  );
-  return tree;
+  )
+  return tree
 }
 
-describe("RCEWrapper", () => {
+function trayProps() {
+  return {
+    trayProps: {
+      contextType: 'course',
+      contextId: '17',
+      containingContext: {
+        contextType: 'course',
+        contextId: '17'
+      }
+    }
+  }
+}
+
+describe('RCEWrapper', () => {
   // ====================
   //   SETUP & TEARDOWN
   // ====================
@@ -67,527 +85,881 @@ describe("RCEWrapper", () => {
         <textarea id="${textareaId}" />
       </div>
       </body></html>
-    `);
+    `)
     // must create react after jsdom setup
-    requireReactDeps();
-    editorCommandSpy = sinon.spy();
+    requireReactDeps()
+    editorCommandSpy = sinon.spy()
     editor = {
-      content: "I got called with: ",
+      content: 'I got called with: ',
       id: textareaId,
       dom: {
         getParent: () => {
-          return null;
+          return null
         },
         decode: input => {
-          return input;
-        }
+          return input
+        },
+        isEmpty: () => editor.content.length === 0,
+        remove: elem => {
+          elem.remove()
+        },
+        doc: document.createElement('div')
       },
       selection: {
         getEnd: () => {
-          return 0;
+          return 0
         },
         getNode: () => {
-          return null;
+          return null
         },
         getContent: () => {
-          return "";
-        }
+          return ''
+        },
+        collapse: () => undefined
+      },
+      undoManager: {
+        ignore: fn => fn()
       },
       insertContent: contentToInsert => {
-        editor.content = editor.content + contentToInsert;
+        editor.content += contentToInsert
       },
       getContainer: () => {
-        return {};
+        return {}
       },
       setContent: sinon.spy(c => (editor.content = c)),
       getContent: () => editor.content,
+      getBody: () => editor.content,
       hidden: false,
+      hide: () => (editor.hidden = true),
+      show: () => (editor.hidden = false),
       isHidden: () => {
-        return editor.hidden;
+        return editor.hidden
       },
       execCommand: editorCommandSpy,
-      serializer: { serialize: sinon.stub() }
-    };
+      serializer: {serialize: sinon.stub()},
+      ui: {registry: {addIcon: () => {}}},
+      isDirty: () => false
+    }
 
     fakeTinyMCE = {
-      triggerSave: () => "called",
-      execCommand: () => "command executed",
+      triggerSave: () => 'called',
+      execCommand: () => 'command executed',
       editors: [editor]
-    };
+    }
 
-    execCommandSpy = sinon.spy(fakeTinyMCE, "execCommand");
-    sinon.spy(editor, "insertContent");
-  });
+    sinon.spy(editor, 'insertContent')
+  })
 
   afterEach(() => {
-    jsdomify.destroy();
-    execCommandSpy.restore();
-  });
+    jsdomify.destroy()
+  })
 
   // ====================
   //        TESTS
   // ====================
 
-  describe("static methods", () => {
-    describe("getByEditor", () => {
-      it("gets instances by rendered tinymce object reference", () => {
-        const editor = {};
-        const wrapper = new RCEWrapper({});
-        const options = wrapper.wrapOptions({});
-        options.setup(editor);
-        assert.equal(RCEWrapper.getByEditor(editor), wrapper);
-      });
-    });
-  });
+  describe('static methods', () => {
+    describe('getByEditor', () => {
+      it('gets instances by rendered tinymce object reference', () => {
+        const editor = {
+          ui: {registry: {addIcon: () => {}}}
+        }
+        const wrapper = new RCEWrapper({tinymce: fakeTinyMCE, ...trayProps()})
+        const options = wrapper.wrapOptions({})
+        options.setup(editor)
+        assert.equal(RCEWrapper.getByEditor(editor), wrapper)
+      })
+    })
+  })
 
-  describe("tinyMCE instance interactions", () => {
-    let element;
+  describe('tinyMCE instance interactions', () => {
+    let element
 
     beforeEach(() => {
-      element = createBasicElement();
-    });
+      element = createBasicElement()
+    })
 
-    it("calls toggle on its tinyMCE instance", () => {
-      element.toggle();
-      assert(
-        execCommandSpy.withArgs("mceToggleEditor", false, textareaId).called
-      );
-    });
+    it('syncs content during toggle if coming back from hidden instance', () => {
+      element = createdMountedElement().getMountedInstance()
+      editor.hidden = true
+      document.getElementById(textareaId).value = 'Some Input HTML'
+      element.toggleView()
+      assert.equal(element.getCode(), 'Some Input HTML')
+    })
 
-    it("syncs content during toggle if coming back from hidden instance", () => {
-      element = createdMountedElement().getMountedInstance();
-      editor.hidden = true;
-      document.getElementById(textareaId).value = "Some Input HTML";
-      element.toggle();
-      assert.equal(element.getCode(), "Some Input HTML");
-    });
+    it('calls focus on its tinyMCE instance', () => {
+      element = createBasicElement({textareaId: 'myOtherUniqId'})
+      element.focus()
+      assert(editorCommandSpy.withArgs('mceFocus', false, 'myOtherUniqId', undefined).called)
+    })
 
-    it("calls focus on its tinyMCE instance", () => {
-      element = createBasicElement({ textareaId: "myOtherUniqId" });
-      element.focus();
-      assert(
-        execCommandSpy.withArgs("mceFocus", false, "myOtherUniqId").called
-      );
-    });
+    it('resets the doc of the editor on removal', () => {
+      element.destroy()
+      assert(editorCommandSpy.calledWith('mceNewDocument'))
+    })
 
-    it("resets the doc of the editor on removal", () => {
-      element.destroy();
-      assert(editorCommandSpy.calledWith("mceNewDocument"));
-    });
+    it('calls handleUnmount when destroyed', () => {
+      const handleUnmount = sinon.spy()
+      element = createBasicElement({handleUnmount})
+      element.destroy()
+      sinon.assert.called(handleUnmount)
+    })
 
-    it("calls handleUnmount when destroyed", () => {
-      const handleUnmount = sinon.spy();
-      element = createBasicElement({ handleUnmount });
-      element.destroy();
-      sinon.assert.called(handleUnmount);
-    });
+    it("doesn't reset the doc for other commands", () => {
+      element.toggleView()
+      assert(!editorCommandSpy.calledWith('mceNewDocument'))
+    })
 
-    it("doesnt reset the doc for other commands", () => {
-      element.toggle();
-      assert(!editorCommandSpy.calledWith("mceNewDocument"));
-    });
+    it('proxies hidden checks to editor', () => {
+      assert.equal(element.isHidden(), false)
+    })
+  })
 
-    it("proxies hidden checks to editor", () => {
-      assert.equal(element.isHidden(), false);
-    });
-  });
-
-  describe("calling methods dynamically", () => {
-    it("pipes arguments to specified method", () => {
-      const element = createBasicElement();
-      sinon.stub(element, "set_code");
-      element.call("set_code", "new content");
-      assert(element.set_code.calledWith("new content"));
-    });
+  describe('calling methods dynamically', () => {
+    it('pipes arguments to specified method', () => {
+      const element = createBasicElement()
+      sinon.stub(element, 'set_code')
+      element.call('set_code', 'new content')
+      assert(element.set_code.calledWith('new content'))
+    })
 
     it("handles 'exists?'", () => {
-      const element = createBasicElement();
-      sinon.stub(element, "set_code");
-      assert(element.call("exists?"));
-    });
-  });
+      const element = createBasicElement()
+      sinon.stub(element, 'set_code')
+      assert(element.call('exists?'))
+    })
+  })
 
-  describe("getting and setting content", () => {
-    let instance;
+  describe('getting and setting content', () => {
+    let instance
 
     beforeEach(() => {
-      instance = createdMountedElement().getMountedInstance();
+      instance = createdMountedElement().getMountedInstance()
       // no rce ref since it is a shallow render
-      instance.refs = {};
-      instance.refs.rce = { forceUpdate: () => "no op" };
-      instance.indicator = () => {};
-    });
+      instance.refs = {}
+      instance.refs.rce = {forceUpdate: () => 'no op'}
+      instance.indicator = () => {}
 
-    afterEach(() => {
-      editor.content = "I got called with: ";
-    });
-
-    it("sets code properly", () => {
-      const expected = "new content";
-      instance.setCode(expected);
-      sinon.assert.calledWith(editor.setContent, expected);
-    });
-
-    it("gets code properly", () => {
-      assert.equal(editor.getContent(), instance.getCode());
-    });
-
-    it("inserts code properly", () => {
-      const code = {};
-      sinon.stub(contentInsertion, "insertContent");
-      instance.insertCode(code);
-      assert.ok(contentInsertion.insertContent.calledWith(editor, code));
-      contentInsertion.insertContent.restore();
-    });
-
-    it("inserts links", () => {
-      let link = {};
-      sinon.stub(contentInsertion, "insertLink");
-      instance.insertLink(link);
-      assert.ok(contentInsertion.insertLink.calledWith(editor, link));
-      contentInsertion.insertLink.restore();
-    });
-
-    describe("insert image", () => {
-      it("works when no element is returned from content insertion", () => {
-        sinon.stub(contentInsertion, "insertImage").returns(null);
-        instance.insertImage({});
-        contentInsertion.insertImage.restore();
+      sinon.stub(instance, 'iframe').value({
+        contentDocument: {
+          body: {
+            clientWidth: 500
+          }
+        }
       })
     })
 
-    describe("indicator", () => {
-      it("does not indicate() if editor is hidden", () => {
-        let indicateDefaultStub = sinon.stub(indicateModule, "default");
-        editor.hidden = true;
-        sinon.stub(instance, "mceInstance");
-        instance.mceInstance.returns(editor);
-        instance.indicateEditor(null);
-        assert.ok(indicateDefaultStub.neverCalledWith());
-        indicateModule.default.restore();
-      });
+    afterEach(() => {
+      editor.content = 'I got called with: '
+    })
 
-      it("waits until images are loaded to indicate", () => {
-        let image = { complete: false };
-        sinon.spy(instance, "indicateEditor");
-        sinon.stub(contentInsertion, "insertImage").returns(image);
-        instance.insertImage(image);
-        assert.ok(instance.indicateEditor.notCalled);
-        image.onload();
-        assert.ok(instance.indicateEditor.called);
-        contentInsertion.insertImage.restore();
-      });
-    });
+    it('sets code properly', () => {
+      const expected = 'new content'
+      instance.setCode(expected)
+      sinon.assert.calledWith(editor.setContent, expected)
+    })
 
-    describe("broken images", () => {
-      it("calls checkImageLoadError when complete", () => {
-        let image = { complete: true };
-        sinon.spy(instance, "checkImageLoadError");
-        sinon.stub(contentInsertion, "insertImage").returns(image);
-        instance.insertImage(image);
-        assert.ok(instance.checkImageLoadError.called);
-        instance.checkImageLoadError.restore();
-        contentInsertion.insertImage.restore();
-      });
+    it('gets code properly', () => {
+      assert.equal(editor.getContent(), instance.getCode())
+    })
+    it('inserts code properly', () => {
+      const code = {}
+      sinon.stub(contentInsertion, 'insertContent')
+      instance.insertCode(code)
+      assert.ok(contentInsertion.insertContent.calledWith(editor, code))
+      contentInsertion.insertContent.restore()
+    })
 
-      it("sets an onerror handler when not complete", () => {
-        let image = { complete: false };
-        sinon.spy(instance, "checkImageLoadError");
-        sinon.stub(contentInsertion, "insertImage").returns(image);
-        instance.insertImage(image);
-        assert.ok(typeof image.onerror === "function");
-        image.onerror();
-        assert.ok(instance.checkImageLoadError.called);
-        instance.checkImageLoadError.restore();
-        contentInsertion.insertImage.restore();
-      });
+    it('inserts links', () => {
+      const link = {}
+      sinon.stub(contentInsertion, 'insertLink')
+      instance.insertLink(link)
+      assert.ok(contentInsertion.insertLink.calledWith(editor, link))
+      contentInsertion.insertLink.restore()
+    })
 
-      describe("checkImageLoadError", () => {
-        it("does not error if called without an element", () => {
-          instance.checkImageLoadError();
-        });
+    describe('checkReadyToGetCode', () => {
+      afterEach(() => {
+        editor.dom.doc = document.createElement('div') // reset
+      })
+      it('returns true if there are no elements with data-placeholder-for attributes', () => {
+        assert.ok(instance.checkReadyToGetCode(() => {}))
+      })
 
-        it("does not error if called without a non-image element", () => {
-          const div = { tagName: "DIV" };
-          instance.checkImageLoadError(div);
-        });
+      it('calls promptFunc if there is an element with data-placeholder-for attribute', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        const spy = sinon.spy()
+        instance.checkReadyToGetCode(spy)
+        sinon.assert.calledWith(
+          spy,
+          'Content is still being uploaded, if you continue it will not be embedded properly.'
+        )
+      })
 
-        it("checks onload for images not done loading", done => {
+      it('returns true if promptFunc returns true', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        const stub = sinon.stub().returns(true)
+        assert.ok(instance.checkReadyToGetCode(stub))
+      })
+
+      it('returns false if promptFunc returns false', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        const stub = sinon.stub().returns(false)
+        assert.ok(!instance.checkReadyToGetCode(stub))
+      })
+    })
+
+    describe('insertImagePlaceholder', () => {
+      let globalImage
+      function mockImage(props) {
+        // jsdom doesn't support Image
+        // mock enough for RCEWrapper.insertImagePlaceholder
+        globalImage = global.Image
+        global.Image = function () {
+          return {
+            src: null,
+            width: '10',
+            height: '10',
+            ...props
+          }
+        }
+      }
+      function restoreImage() {
+        global.Image = globalImage
+      }
+
+      it('inserts a placeholder image with the proper metadata', () => {
+        mockImage()
+        const greenSquare =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'green_square',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="green_square"
+      style="width: 10px; height: 10px; vertical-align: middle;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+        restoreImage()
+      })
+
+      it('inserts a placeholder image with an encoded name to prevent nested quotes', () => {
+        mockImage()
+        const greenSquare =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'filename "with" quotes',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="filename%20%22with%22%20quotes"
+      style="width: 10px; height: 10px; vertical-align: middle;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+        restoreImage()
+      })
+
+      it('constrains the image placeholder to the width of the rce', () => {
+        mockImage({width: 1000, height: 1000})
+        const greenSquare =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'green_square',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="green_square"
+      style="width: 500px; height: 500px; vertical-align: middle;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+        restoreImage()
+      })
+
+      it('inserts a text file placeholder image with the proper metadata', () => {
+        const props = {
+          name: 'file.txt',
+          domObject: {},
+          contentType: 'text/plain'
+        }
+
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="file.txt"
+      style="width: 8rem; height: 1rem; vertical-align: middle;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+      })
+
+      it('inserts a video file placeholder image with the proper metadata', () => {
+        const props = {
+          name: 'file.mov',
+          domObject: {},
+          contentType: 'video/quicktime'
+        }
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="file.mov"
+      style="width: 400px; height: 225px; vertical-align: bottom;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+      })
+
+      it('inserts an audio file placeholder image with the proper metadata', () => {
+        const props = {
+          name: 'file.mp3',
+          domObject: {},
+          contentType: 'audio/mp3'
+        }
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="file.mp3"
+      style="width: 320px; height: 14.25rem; vertical-align: bottom;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+      })
+
+      it('inserts a little placeholder for images displayed as links', () => {
+        mockImage()
+        const square =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'square.png',
+          domObject: {
+            preview: square
+          },
+          contentType: 'image/png',
+          displayAs: 'link'
+        }
+
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="square.png"
+      style="width: 10rem; height: 1rem; vertical-align: middle;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+        restoreImage()
+      })
+    })
+
+    describe('removePlaceholders', () => {
+      it('removes placeholders that match the given name', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        instance.removePlaceholders('image1')
+        assert.ok(!editor.dom.doc.querySelector(`[data-placeholder-for="image1"]`))
+      })
+
+      it('does not remove placeholders that do not match the given name', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        const placeholder2 = document.createElement('img')
+        placeholder2.setAttribute('data-placeholder-for', 'image2')
+        editor.dom.doc.appendChild(placeholder2)
+        instance.removePlaceholders('image1')
+        assert.ok(!editor.dom.doc.querySelector(`[data-placeholder-for="image1"]`))
+        assert.ok(editor.dom.doc.querySelector(`[data-placeholder-for="image2"]`))
+      })
+    })
+
+    describe('insert image', () => {
+      it('works when no element is returned from content insertion', () => {
+        sinon.stub(contentInsertion, 'insertImage').returns(null)
+        instance.insertImage({})
+        contentInsertion.insertImage.restore()
+      })
+    })
+
+    describe('insert media', () => {
+      let insertedSpy
+
+      beforeEach(() => {
+        insertedSpy = sinon.spy(instance, 'contentInserted')
+      })
+
+      afterEach(() => {
+        instance.contentInserted.restore()
+      })
+
+      it('inserts video', () => {
+        sinon.stub(contentInsertion, 'insertVideo').returns('<iframe/>')
+        instance.insertVideo({})
+        assert.equal(insertedSpy.getCall(0).args[0], '<iframe/>')
+      })
+
+      it('inserts audio', () => {
+        sinon.stub(contentInsertion, 'insertAudio').returns('<iframe/>')
+        instance.insertAudio({})
+        assert.equal(insertedSpy.getCall(0).args[0], '<iframe/>')
+      })
+
+      it('inserts embed code', () => {
+        sinon.stub(contentInsertion, 'insertContent')
+        instance.insertEmbedCode('embed me!')
+        assert(insertedSpy.called)
+      })
+    })
+
+    describe('indicator', () => {
+      it('does not indicate() if editor is hidden', () => {
+        const indicateDefaultStub = sinon.stub(indicateModule, 'default')
+        editor.hidden = true
+        sinon.stub(instance, 'mceInstance')
+        instance.mceInstance.returns(editor)
+        instance.indicateEditor(null)
+        assert.ok(indicateDefaultStub.neverCalledWith())
+        indicateModule.default.restore()
+      })
+
+      it('waits until images are loaded to indicate', () => {
+        const image = {complete: false}
+        sinon.spy(instance, 'indicateEditor')
+        sinon.stub(contentInsertion, 'insertImage').returns(image)
+        instance.insertImage(image)
+        assert.ok(instance.indicateEditor.notCalled)
+        image.onload()
+        assert.ok(instance.indicateEditor.called)
+        contentInsertion.insertImage.restore()
+      })
+    })
+
+    describe('broken images', () => {
+      it('calls checkImageLoadError when complete', () => {
+        const image = {complete: true}
+        sinon.spy(instance, 'checkImageLoadError')
+        sinon.stub(contentInsertion, 'insertImage').returns(image)
+        instance.insertImage(image)
+        assert.ok(instance.checkImageLoadError.called)
+        instance.checkImageLoadError.restore()
+        contentInsertion.insertImage.restore()
+      })
+
+      it('sets an onerror handler when not complete', () => {
+        const image = {complete: false}
+        sinon.spy(instance, 'checkImageLoadError')
+        sinon.stub(contentInsertion, 'insertImage').returns(image)
+        instance.insertImage(image)
+        assert.ok(typeof image.onerror === 'function')
+        image.onerror()
+        assert.ok(instance.checkImageLoadError.called)
+        instance.checkImageLoadError.restore()
+        contentInsertion.insertImage.restore()
+      })
+
+      describe('checkImageLoadError', () => {
+        it('does not error if called without an element', () => {
+          instance.checkImageLoadError()
+        })
+
+        it('does not error if called without a non-image element', () => {
+          const div = {tagName: 'DIV'}
+          instance.checkImageLoadError(div)
+        })
+
+        it('checks onload for images not done loading', done => {
           const fakeElement = {
             complete: false,
-            tagName: "IMG",
+            tagName: 'IMG',
             naturalWidth: 0,
             style: {}
-          };
-          instance.checkImageLoadError(fakeElement);
-          assert.equal(Object.keys(fakeElement.style).length, 0);
-          fakeElement.complete = true;
-          fakeElement.onload();
+          }
+          instance.checkImageLoadError(fakeElement)
+          assert.equal(Object.keys(fakeElement.style).length, 0)
+          fakeElement.complete = true
+          fakeElement.onload()
           setTimeout(() => {
             try {
-              assert.ok(fakeElement.style.border === "1px solid #000");
-              assert.ok(fakeElement.style.padding === "2px");
-              done();
+              assert.ok(fakeElement.style.border === '1px solid #000')
+              assert.ok(fakeElement.style.padding === '2px')
+              done()
             } catch (err) {
-              done(err);
+              done(err)
             }
-          }, 0);
-        });
+          }, 0)
+        })
 
-        it("sets the proper styles when the naturalWidth is 0", done => {
+        it('sets the proper styles when the naturalWidth is 0', done => {
           const fakeElement = {
             complete: true,
-            tagName: "IMG",
+            tagName: 'IMG',
             naturalWidth: 0,
             style: {}
-          };
-          instance.checkImageLoadError(fakeElement);
+          }
+          instance.checkImageLoadError(fakeElement)
           setTimeout(() => {
             try {
-              assert.ok(fakeElement.style.border === "1px solid #000");
-              assert.ok(fakeElement.style.padding === "2px");
-              done();
+              assert.ok(fakeElement.style.border === '1px solid #000')
+              assert.ok(fakeElement.style.padding === '2px')
+              done()
             } catch (err) {
-              done(err);
+              done(err)
             }
-          }, 0);
-        });
-      });
-    });
-  });
+          }, 0)
+        })
+      })
+    })
+  })
 
-  describe("alias functions", () => {
-    it("sets aliases properly", () => {
-      const element = createBasicElement();
+  describe('alias functions', () => {
+    it('sets aliases properly', () => {
+      const element = createBasicElement()
       const aliases = {
-        set_code: "setCode",
-        get_code: "getCode",
-        insert_code: "insertCode"
-      };
+        set_code: 'setCode',
+        get_code: 'getCode',
+        insert_code: 'insertCode'
+      }
       Object.keys(aliases).forEach(k => {
-        const v = aliases[k];
-        assert(element[v], element[k]);
-      });
-    });
-  });
+        const v = aliases[k]
+        assert(element[v], element[k])
+      })
+    })
+  })
 
-  describe("is_dirty()", () => {
-    it("is true if not hidden and defaultContent is not equal to getConent()", () => {
-      const c = createBasicElement({ defaultContent: "different" });
-      editor.hidden = false;
-      assert(c.is_dirty());
-    });
+  describe('is_dirty()', () => {
+    it('is true if not hidden and defaultContent is not equal to getConent()', () => {
+      editor.serializer.serialize.returns(editor.content)
+      const c = createBasicElement()
+      c.setCode('different')
+      editor.hidden = false
+      assert(c.is_dirty())
+    })
 
-    it("is false if not hidden and defaultContent is equal to getConent()", () => {
-      editor.serializer.serialize.returns(editor.content);
-      const c = createBasicElement();
-      editor.hidden = false;
-      assert(!c.is_dirty());
-    });
+    it('is false if not hidden and defaultContent is equal to getConent()', () => {
+      editor.serializer.serialize.returns(editor.content)
+      const c = createBasicElement()
+      editor.hidden = false
+      assert(!c.is_dirty())
+    })
 
-    it("is true if hidden and defaultContent is not equal to textarea value", () => {
-      const c = createBasicElement({ textareaId, defaultContent: "default" });
-      editor.hidden = true;
-      document.getElementById(textareaId).value = "different";
-      assert(c.is_dirty());
-    });
+    it('is true if hidden and defaultContent is not equal to textarea value', () => {
+      const c = createBasicElement({textareaId, defaultContent: 'default'})
+      editor.hidden = true
+      document.getElementById(textareaId).value = 'different'
+      assert(c.is_dirty())
+    })
 
-    it("is false if hidden and defaultContent is equal to textarea value", () => {
-      const defaultContent = "default content";
-      editor.serializer.serialize.returns(defaultContent);
-      const c = createBasicElement({ textareaId, defaultContent });
-      editor.hidden = true;
-      document.getElementById(textareaId).value = defaultContent;
-      assert(!c.is_dirty());
-    });
+    it('is false if hidden and defaultContent is equal to textarea value', () => {
+      const defaultContent = 'default content'
+      editor.serializer.serialize.returns(defaultContent)
+      const c = createBasicElement({textareaId, defaultContent, editorView: 'RAW'})
+      editor.hidden = true
+      document.getElementById(textareaId).value = defaultContent
+      assert(!c.is_dirty())
+    })
 
-    it("compares content with defaultContent serialized by editor serializer", () => {
-      editor.serializer.serialize.returns(editor.content);
-      const defaultContent = "foo";
-      const c = createBasicElement({ defaultContent });
-      editor.hidden = false;
-      assert(!c.is_dirty());
+    it('compares content with defaultContent serialized by editor serializer', () => {
+      editor.serializer.serialize.returns(editor.content)
+      const defaultContent = 'foo'
+      const c = createBasicElement({defaultContent})
+      editor.hidden = false
+      assert(!c.is_dirty())
       sinon.assert.calledWithExactly(
         editor.serializer.serialize,
         sinon.match(
           el => el.innerHTML === defaultContent,
           `div with "${defaultContent}" as inner html`
         ),
-        { getInner: true }
-      );
-    });
-  });
+        {getInner: true}
+      )
+    })
+  })
 
-  describe("onFocus", () => {
+  describe('onFocus', () => {
     beforeEach(() => {
-      sinon.stub(Bridge, "focusEditor");
-    });
+      sinon.stub(Bridge, 'focusEditor')
+    })
 
     afterEach(() => {
-      Bridge.focusEditor.restore();
-    });
+      Bridge.focusEditor.restore()
+    })
 
-    it("calls Bridge.focusEditor with editor", () => {
-      const editor = createBasicElement();
-      editor.onFocus();
-      sinon.assert.calledWith(Bridge.focusEditor, editor);
-    });
+    it('calls Bridge.focusEditor with editor', () => {
+      const editor = createBasicElement()
+      editor.handleFocus()
+      sinon.assert.calledWith(Bridge.focusEditor, editor)
+    })
 
-    it("calls props.onFocus with editor if exists", () => {
-      const editor = createBasicElement({ onFocus: sinon.spy() });
-      editor.onFocus();
-      sinon.assert.calledWith(editor.props.onFocus, editor);
-    });
-  });
+    it('calls props.onFocus with editor if exists', () => {
+      const editor = createBasicElement({onFocus: sinon.spy()})
+      editor.handleFocus()
+      sinon.assert.calledWith(editor.props.onFocus, editor)
+    })
+  })
 
-  describe("onRemove", () => {
-    let domNode;
-
+  describe('onRemove', () => {
     beforeEach(() => {
-      domNode = {};
-      sinon.stub(ReactDOM, "unmountComponentAtNode");
-      sinon.stub(ReactDOM, "findDOMNode").returns(domNode);
-      sinon.stub(Bridge, "detachEditor");
-    });
+      sinon.stub(Bridge, 'detachEditor')
+    })
 
     afterEach(() => {
-      ReactDOM.unmountComponentAtNode.restore();
-      ReactDOM.findDOMNode.restore();
-      Bridge.detachEditor.restore();
-    });
+      Bridge.detachEditor.restore()
+    })
 
-    it("calls Bridge.detachEditor with editor", () => {
-      const editor = createBasicElement();
-      editor.onRemove();
-      sinon.assert.calledWith(Bridge.detachEditor, editor);
-    });
+    it('calls Bridge.detachEditor with editor', () => {
+      const editor = createBasicElement()
+      editor.onRemove()
+      sinon.assert.calledWith(Bridge.detachEditor, editor)
+    })
 
-    it("calls props.onRemove with editor if exists", () => {
-      const editor = createBasicElement({ onRemove: sinon.spy() });
-      editor.onRemove();
-      sinon.assert.calledWith(editor.props.onRemove, editor);
-    });
+    it('calls props.onRemove with editor if exists', () => {
+      const editor = createBasicElement({onRemove: sinon.spy()})
+      editor.onRemove()
+      sinon.assert.calledWith(editor.props.onRemove, editor)
+    })
+  })
 
-    it("unmounts the rce component", () => {
-      const editor = createBasicElement();
-      editor.refs = { rce: {} };
-      editor.onRemove();
-      sinon.assert.calledWith(ReactDOM.findDOMNode, editor.refs.rce);
-      sinon.assert.calledWith(ReactDOM.unmountComponentAtNode, domNode);
-    });
-  });
-
-  describe("setup option", () => {
-    let editorOptions;
+  describe('setup option', () => {
+    let editorOptions
 
     beforeEach(() => {
       editorOptions = {
         setup: sinon.spy(),
         other: {}
-      };
-    });
+      }
+    })
 
-    it("registers editor to allow getting wrapper by editor", () => {
-      const editor = {};
-      const tree = createdMountedElement({ editorOptions });
-      tree.subTree("TinyMCE").props.config.setup(editor);
-      assert.equal(RCEWrapper.getByEditor(editor), tree.getMountedInstance());
-    });
+    it('registers editor to allow getting wrapper by editor', () => {
+      const editor = {ui: {registry: {addIcon: () => {}}}}
+      const tree = createdMountedElement({editorOptions})
+      tree.subTree('Editor').props.init.setup(editor)
+      assert.equal(RCEWrapper.getByEditor(editor), tree.getMountedInstance())
+    })
 
-    it("it calls original setup from editorOptions", () => {
-      const editor = {};
-      const spy = editorOptions.setup;
-      const tree = createdMountedElement({ editorOptions });
-      tree.subTree("TinyMCE").props.config.setup(editor);
-      sinon.assert.calledWithExactly(spy, editor);
-    });
+    it('it calls original setup from editorOptions', () => {
+      const editor = {ui: {registry: {addIcon: () => {}}}}
+      const spy = editorOptions.setup
+      const tree = createdMountedElement({editorOptions})
+      tree.subTree('Editor').props.init.setup(editor)
+      sinon.assert.calledWithExactly(spy, editor)
+    })
 
-    it("does not throw if options does not have a setup function", () => {
-      delete editorOptions.setup;
-      createdMountedElement({ editorOptions });
-    });
+    it('does not throw if options does not have a setup function', () => {
+      delete editorOptions.setup
+      createdMountedElement({editorOptions})
+    })
 
-    it("passes other options through unchanged", () => {
-      const tree = createdMountedElement({ editorOptions });
-      tree.subTree("TinyMCE").props.config.setup(editor);
-      assert.equal(
-        tree.subTree("TinyMCE").props.config.other,
-        editorOptions.other
-      );
-    });
-  });
+    it('passes other options through unchanged', () => {
+      const tree = createdMountedElement({editorOptions})
+      tree.subTree('Editor').props.init.setup(editor)
+      assert.equal(tree.subTree('Editor').props.init.other, editorOptions.other)
+    })
+  })
 
-  describe("textarea", () => {
-    let instance, elem;
+  describe('textarea', () => {
+    let instance, elem
 
-    function stubEventListeners(elem) {
-      sinon.stub(elem, "addEventListener");
-      sinon.stub(elem, "removeEventListener");
+    function stubEventListeners(elm) {
+      sinon.stub(elm, 'addEventListener')
+      sinon.stub(elm, 'removeEventListener')
     }
 
     beforeEach(() => {
-      instance = createBasicElement();
-      elem = document.getElementById(textareaId);
-      stubEventListeners(elem);
-    });
+      instance = createBasicElement()
+      elem = document.getElementById(textareaId)
+      stubEventListeners(elem)
+      sinon.stub(instance, 'doAutoSave')
+    })
 
-    describe("lifecycle", () => {
-      it("adds change listener after mount", () => {
-        instance.componentDidMount();
-        sinon.assert.calledWith(
-          elem.addEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-      });
+    describe('handleTextareaChange', () => {
+      it('updates the editor content if editor is hidden', () => {
+        const value = 'foo'
+        elem.value = value
+        editor.hidden = true
+        instance.handleTextareaChange()
+        sinon.assert.calledWith(editor.setContent, value)
+        sinon.assert.called(instance.doAutoSave)
+      })
 
-      it("updates change listener if textarea changes", () => {
-        instance.componentDidMount();
-        const oldElem = elem;
-        const appElem = document.getElementById("app");
-        appElem.removeChild(elem);
-        elem = document.createElement("textarea");
-        elem.id = textareaId;
-        stubEventListeners(elem);
-        appElem.appendChild(elem);
-        instance.componentDidUpdate();
-        sinon.assert.calledWith(
-          elem.addEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-        sinon.assert.calledWith(
-          oldElem.removeEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-      });
+      it('does not update the editor if editor is not hidden', () => {
+        editor.hidden = false
+        instance.handleTextareaChange()
+        sinon.assert.notCalled(editor.setContent)
+        sinon.assert.notCalled(instance.doAutoSave)
+      })
+    })
+  })
 
-      it("removes change listener before component unmounts", () => {
-        instance.componentDidMount();
-        instance.componentWillUnmount();
-        sinon.assert.calledWith(
-          elem.removeEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-      });
-    });
+  describe('alert area', () => {
+    afterEach(() => {
+      jsdomify.destroy()
+    })
 
-    describe("handleTextareaChange", () => {
-      it("updates the editor content if editor is hidden", () => {
-        const value = "foo";
-        elem.value = value;
-        editor.hidden = true;
-        instance.handleTextareaChange();
-        sinon.assert.calledWith(editor.setContent, value);
-      });
+    it('adds an alert and attaches an id when addAlert is called', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance()
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      assert.ok(rce.state.messages[0].id === 0)
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 1)
+    })
 
-      it("does not update the editor if editor is not hidden", () => {
-        editor.hidden = false;
-        instance.handleTextareaChange();
-        sinon.assert.notCalled(editor.setContent);
-      });
-    });
-  });
-});
+    it('adds multiple alerts', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance()
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading 2, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading 3, check your connection and try again.',
+        variant: 'error'
+      })
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 3)
+    })
+
+    it('does not add alerts with the exact same text', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance()
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 1)
+    })
+
+    it('removes an alert when removeAlert is called', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance()
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'First',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Second',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Third',
+        variant: 'error'
+      })
+      rce.removeAlert(1)
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 2)
+    })
+  })
+
+  describe('wrapOptions', () => {
+    it('includes instructure_record in toolbar if not instRecordDisabled', () => {
+      const wrapper = new RCEWrapper({
+        tinymce: fakeTinyMCE,
+        ...trayProps(),
+        instRecordDisabled: false
+      })
+      const options = wrapper.wrapOptions({})
+      const expected = [
+        'instructure_links',
+        'instructure_image',
+        'instructure_record',
+        'instructure_documents'
+      ]
+      assert.deepStrictEqual(options.toolbar[2].items, expected)
+    })
+
+    it('instructure_record in not toolbar if instRecordDisabled is set', () => {
+      const wrapper = new RCEWrapper({
+        tinymce: fakeTinyMCE,
+        ...trayProps(),
+        instRecordDisabled: true
+      })
+      const options = wrapper.wrapOptions({})
+      const expected = ['instructure_links', 'instructure_image', 'instructure_documents']
+      assert.deepStrictEqual(options.toolbar[2].items, expected)
+    })
+  })
+})

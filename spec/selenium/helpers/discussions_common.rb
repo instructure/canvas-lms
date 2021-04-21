@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -162,11 +164,11 @@ module DiscussionsCommon
   def add_attachment_and_validate
     filename, fullpath, _data = get_file("testfile5.zip")
     f('input[name=attachment]').send_keys(fullpath)
-    type_in_tiny('textarea[name=message]', 'file attachement discussion')
+    type_in_tiny('textarea[name=message]', 'file attachment discussion')
     yield if block_given?
     expect_new_page_load { submit_form('.form-actions') }
     wait_for_ajaximations
-    expect(f('.zip')).to include_text(filename)
+    expect(fxpath('//a[contains(text(), ".zip")]')).to include_text(filename)
   end
 
   def edit(title, message)

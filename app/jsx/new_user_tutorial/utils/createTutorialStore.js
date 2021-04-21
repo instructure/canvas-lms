@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createStore from '../../shared/helpers/createStore';
+import createStore from '../../shared/helpers/createStore'
 
-  const defaultState = Object.freeze({
-    isCollapsed: false
-  });
+const defaultState = Object.freeze({
+  isCollapsed: false
+})
 
-  const createTutorialStore = (initialState = defaultState) => {
-    const store = createStore(Object.assign({}, initialState));
-    return store;
-  }
+const createTutorialStore = (initialState = defaultState) => {
+  const store = createStore({...initialState})
+  return store
+}
 
-export default createTutorialStore;
+export default createTutorialStore

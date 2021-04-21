@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!OutcomeView'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -25,9 +25,11 @@ import CalculationMethodFormView from './CalculationMethodFormView'
 import outcomeTemplate from 'jst/outcomes/outcome'
 import outcomeFormTemplate from 'jst/outcomes/outcomeForm'
 import criterionTemplate from 'jst/outcomes/_criterion'
-import confirmOutcomeEditModal, {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
-import { addCriterionInfoButton } from 'jsx/outcomes/CriterionInfo'
+import criterionHeaderTemplate from 'jst/outcomes/_criterionHeader'
+import {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
+import {addCriterionInfoButton} from 'jsx/outcomes/CriterionInfo'
 import 'jqueryui/dialog'
+import CalculationMethodContent from '../../models/grade_summary/CalculationMethodContent'
 
 // For outcomes in the main content view.
 
@@ -55,7 +57,10 @@ export default class OutcomeView extends OutcomeContentBase {
           }
         },
         mastery_points(data) {
-          if (_.isNaN(data.mastery_points) || data.mastery_points < 0) {
+          if (
+            !ENV.ACCOUNT_LEVEL_MASTERY_SCALES &&
+            (_.isNaN(data.mastery_points) || data.mastery_points < 0)
+          ) {
             return I18n.t('mastery_error', 'Must be greater than or equal to 0')
           }
         }
@@ -64,25 +69,14 @@ export default class OutcomeView extends OutcomeContentBase {
     )
   }
 
-  constructor({setQuizMastery, useForScoring}) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.editRating = this.editRating.bind(this)
-    this.deleteRating = this.deleteRating.bind(this)
-    this.insertRating = this.insertRating.bind(this)
-    this.updateCalcMethod = this.updateCalcMethod.bind(this)
+  initialize({setQuizMastery, useForScoring}) {
     this.setQuizMastery = setQuizMastery
     this.useForScoring = useForScoring
-    super(...arguments)
     this.calculationMethodFormView = new CalculationMethodFormView({
       model: this.model
     })
     this.originalConfirmableValues = this.getFormData()
+    super.initialize(...arguments)
   }
 
   submit(event) {
@@ -95,11 +89,14 @@ export default class OutcomeView extends OutcomeContentBase {
       assessed: this.model.get('assessed'),
       hasUpdateableRubrics: this.model.get('has_updateable_rubrics'),
       modifiedFields: this.getModifiedFields(newData),
-      onConfirm: _confirmEvent => OutcomeView.prototype.__proto__.submit.call(this, event) // super == submit
+      onConfirm: _confirmEvent => super.submit(event)
     })
   }
 
   getModifiedFields(data) {
+    if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+      return {}
+    }
     return {
       masteryPoints:
         data.mastery_points !== numberHelper.parse(this.originalConfirmableValues.mastery_points),
@@ -124,25 +121,38 @@ export default class OutcomeView extends OutcomeContentBase {
   // overriding superclass
   getFormData() {
     const data = super.getFormData()
-    data.mastery_points = numberHelper.parse(data.mastery_points)
-    data.ratings = _.map(data.ratings, rating =>
-      _.extend(rating, {points: numberHelper.parse(rating.points)})
-    )
-    if (['highest', 'latest'].includes(data.calculation_method)) {
-      delete data.calculation_int
+    if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+      delete data.mastery_points
+      delete data.ratings
     } else {
-      data.calculation_int = parseInt(numberHelper.parse(data.calculation_int))
+      data.mastery_points = numberHelper.parse(data.mastery_points)
+      data.ratings = _.map(data.ratings, rating =>
+        _.extend(rating, {points: numberHelper.parse(rating.points)})
+      )
+      if (['highest', 'latest'].includes(data.calculation_method)) {
+        delete data.calculation_int
+      } else {
+        data.calculation_int = parseInt(numberHelper.parse(data.calculation_int), 10)
+      }
     }
     return data
   }
 
   editRating(e) {
     e.preventDefault()
+    const childIdx = $(e.currentTarget)
+      .closest('.rating')
+      .index()
+    const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
     const $showWrapper = $(e.currentTarget).parents('.show:first')
     const $editWrapper = $showWrapper.next()
 
     $showWrapper.attr('aria-expanded', 'false').hide()
     $editWrapper.attr('aria-expanded', 'true').show()
+    $th
+      .find('h5')
+      .attr('aria-expanded', 'false')
+      .hide()
     return $editWrapper.find('.outcome_rating_description').focus()
   }
 
@@ -151,6 +161,8 @@ export default class OutcomeView extends OutcomeContentBase {
     e.preventDefault()
     if (this.$('.rating').length > 1) {
       const deleteBtn = $(e.currentTarget)
+      const childIdx = deleteBtn.closest('.rating').index()
+      const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
       let focusTarget = deleteBtn
         .closest('.rating')
         .prev()
@@ -161,6 +173,7 @@ export default class OutcomeView extends OutcomeContentBase {
           .next()
           .find('.edit_rating')
       }
+      $th.remove()
       deleteBtn.closest('td').remove()
       focusTarget.focus()
       return this.updateRatings()
@@ -169,9 +182,13 @@ export default class OutcomeView extends OutcomeContentBase {
 
   saveRating(e) {
     e.preventDefault()
+    const childIdx = $(e.currentTarget)
+      .closest('.rating')
+      .index()
+    const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
     const $editWrapper = $(e.currentTarget).parents('.edit:first')
     const $showWrapper = $editWrapper.prev()
-    $showWrapper.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
+    $th.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
     let points = numberHelper.parse($editWrapper.find('input.outcome_rating_points').val())
     if (_.isNaN(points)) {
       points = 0
@@ -181,6 +198,10 @@ export default class OutcomeView extends OutcomeContentBase {
     $showWrapper.find('.points').text(points)
     $editWrapper.attr('aria-expanded', 'false').hide()
     $showWrapper.attr('aria-expanded', 'true').show()
+    $th
+      .find('h5')
+      .attr('aria-expanded', 'true')
+      .show()
     $showWrapper.find('.edit_rating').focus()
     return this.updateRatings()
   }
@@ -188,14 +209,21 @@ export default class OutcomeView extends OutcomeContentBase {
   insertRating(e) {
     e.preventDefault()
     const $rating = $(criterionTemplate({description: '', points: '', _index: 99}))
+    const childIdx = $(e.currentTarget)
+      .closest('.rating-header')
+      .index()
+    const $ratingHeader = $(criterionHeaderTemplate({description: '', _index: 99}))
+    const $tr = $('.criterion tbody tr')
     $(e.currentTarget)
-      .closest('.rating')
-      .after($rating)
+      .closest('.rating-header')
+      .after($ratingHeader)
+    $tr.find(`> td:nth-child(${childIdx + 1})`).after($rating)
     $rating
       .find('.show')
       .hide()
       .next()
       .show(200)
+    $ratingHeader.hide().show(200)
     $rating.find('.edit input:first').focus()
     return this.updateRatings()
   }
@@ -266,10 +294,18 @@ export default class OutcomeView extends OutcomeContentBase {
       case 'edit':
       case 'add':
         this.$el.html(
-          outcomeFormTemplate(_.extend(data, {calculationMethods: this.model.calculationMethods()}))
+          outcomeFormTemplate(
+            _.extend(data, {
+              calculationMethods: this.model.calculationMethods(),
+              use_rce_enhancements: ENV.use_rce_enhancements,
+              hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES
+            })
+          )
         )
 
-        addCriterionInfoButton(this.$el.find("#react-info-link")[0])
+        if (!ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+          addCriterionInfoButton(this.$el.find('#react-info-link')[0])
+        }
 
         this.readyForm()
         break
@@ -284,6 +320,21 @@ export default class OutcomeView extends OutcomeContentBase {
         if (!data.mastery_points) {
           data.mastery_points = 0
         }
+
+        if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+          if (ENV.MASTERY_SCALE?.outcome_proficiency) {
+            data.ratings = ENV.MASTERY_SCALE.outcome_proficiency.ratings
+            data.mastery_points = data.ratings.find(r => r.mastery).points
+            data.points_possible = Math.max(...data.ratings.map(r => r.points))
+          }
+          if (ENV.MASTERY_SCALE?.outcome_calculation_method) {
+            const methodModel = new CalculationMethodContent(
+              ENV.MASTERY_SCALE.outcome_calculation_method
+            )
+            _.extend(data, ENV.MASTERY_SCALE.outcome_calculation_method, methodModel.present())
+          }
+        }
+
         var can_manage = !this.readOnly() && this.model.canManage()
         var can_edit = can_manage && this.model.isNative()
         var can_unlink = can_manage && this.model.outcomeLink.can_unlink
@@ -297,6 +348,8 @@ export default class OutcomeView extends OutcomeContentBase {
               setQuizMastery: this.setQuizMastery,
               useForScoring: this.useForScoring,
               isLargeRoster: ENV.IS_LARGE_ROSTER,
+              hideMasteryScale:
+                ENV.ACCOUNT_LEVEL_MASTERY_SCALES && !this.useForScoring && !this.setQuizMastery,
               assessedInContext:
                 !this.readOnly() &&
                 (this.model.outcomeLink.assessed ||

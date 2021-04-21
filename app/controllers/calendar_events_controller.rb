@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,11 +19,12 @@
 #
 
 class CalendarEventsController < ApplicationController
+  include CalendarConferencesHelper
+
   before_action :require_context
-  before_action :rich_content_service_config, only: [:new, :edit]
+  before_action :rce_js_env, only: [:new, :edit]
 
   add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
-
 
   def show
     @event = @context.calendar_events.find(params[:id])
@@ -44,19 +47,18 @@ class CalendarEventsController < ApplicationController
     end
   end
 
-
   def new
     @event = @context.calendar_events.temp_record
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
-    @event.assign_attributes(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
-    js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => feature_context.feature_enabled?(:recurring_calendar_events))
-    authorized_action(@event, @current_user, :create)
+    @event.assign_attributes(permit_params(params, [:title, :start_at, :end_at, :location_name, :location_address, web_conference: strong_anything]))
+    add_conference_types_to_js_env([@context])
+    authorized_action(@event, @current_user, :create) && authorize_user_for_conference(@current_user, @event.web_conference)
   end
 
   def create
     params[:calendar_event][:time_zone_edited] = Time.zone.name if params[:calendar_event]
     @event = @context.calendar_events.build(calendar_event_params)
-    if authorized_action(@event, @current_user, :create)
+    if authorized_action(@event, @current_user, :create) && authorize_user_for_conference(@current_user, @event.web_conference)
       respond_to do |format|
         @event.updating_user = @current_user
         if @event.save
@@ -72,22 +74,27 @@ class CalendarEventsController < ApplicationController
   end
 
   def edit
-    @event = @context.calendar_events.find(params[:id])
+    @event = CalendarEvent.find(params[:id])
+    event_params = permit_params(params, [:title, :start_at, :end_at, :location_name, :location_address, web_conference: strong_anything])
+    return unless authorize_user_for_conference(@current_user, event_params[:web_conference])
     if @event.grants_right?(@current_user, session, :update)
-      @event.update_attributes!(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
+      @event.update!(event_params)
     end
     if authorized_action(@event, @current_user, :update_content)
+      add_conference_types_to_js_env([@context])
       render :new
     end
   end
 
   def update
-    @event = @context.calendar_events.find(params[:id])
+    @event = CalendarEvent.find(params[:id])
     if authorized_action(@event, @current_user, :update)
       respond_to do |format|
-        params[:calendar_event][:time_zone_edited] = Time.zone.name if params[:calendar_event]
+        params_for_update = calendar_event_params
+        params_for_update[:calendar_event][:time_zone_edited] = Time.zone.name if params_for_update[:calendar_event]
+        return unless authorize_user_for_conference(@current_user, params_for_update[:web_conference])
         @event.updating_user = @current_user
-        if @event.update_attributes(calendar_event_params)
+        if @event.update(params_for_update)
           log_asset_access(@event, "calendar", "calendar", 'participate')
           flash[:notice] = t 'notices.updated', "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }
@@ -113,10 +120,6 @@ class CalendarEventsController < ApplicationController
   end
 
   protected
-  def rich_content_service_config
-    rce_js_env(:sidebar)
-  end
-
   def feature_context
     if @context.is_a?(User)
       @domain_root_account
@@ -128,7 +131,19 @@ class CalendarEventsController < ApplicationController
   end
 
   def calendar_event_params
-    params.require(:calendar_event).
-      permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
+    permit_params(
+      params.require(:calendar_event),
+      CalendarEvent.permitted_attributes + [:child_event_data => strong_anything, web_conference: strong_anything]
+    )
+  end
+
+  def permit_params(params, attrs)
+    params.permit(attrs).tap do |p|
+      if Account.site_admin.feature_enabled?(:calendar_conferences)
+        if p.key?(:web_conference)
+          p[:web_conference] = find_or_initialize_conference(@context, p[:web_conference])
+        end
+      end
+    end
   end
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import getCookie from './shared/helpers/getCookie'
 import gql from 'graphql-tag'
 import {ApolloClient} from 'apollo-client'
 import {InMemoryCache, IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
@@ -43,7 +43,7 @@ function setHeadersLink() {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'GraphQL-Metrics': true,
-        'X-CSRF-Token': $.cookie('_csrf_token')
+        'X-CSRF-Token': getCookie('_csrf_token')
       }
     })
     return forward(operation)
@@ -57,15 +57,26 @@ function createHttpLink() {
   })
 }
 
-function createClient(opts = {}) {
-  const cache = new InMemoryCache({
+function createCache() {
+  return new InMemoryCache({
     addTypename: true,
-    dataIdFromObject: object => object.id || null,
+    dataIdFromObject: object => {
+      if (object.id) {
+        return object.id
+      } else if (object._id && object.__typename) {
+        return object.__typename + object._id
+      } else {
+        return null
+      }
+    },
     fragmentMatcher: new IntrospectionFragmentMatcher({
       introspectionQueryResultData
     })
   })
+}
 
+function createClient(opts = {}) {
+  const cache = createCache()
   const defaults = opts.defaults || {}
   const resolvers = opts.resolvers || {}
   const stateLink = withClientState({
@@ -87,4 +98,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {createClient, gql, ApolloProvider, Query}
+export {createClient, gql, ApolloProvider, Query, createCache}

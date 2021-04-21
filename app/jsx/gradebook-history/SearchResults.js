@@ -22,11 +22,11 @@ import {arrayOf, bool, func, node, shape, string} from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
+import {Table} from '@instructure/ui-table'
 import {getHistoryNextPage} from './actions/SearchResultsActions'
 import SearchResultsRow from './SearchResultsRow'
 
@@ -35,7 +35,7 @@ const colHeaders = [
   <ScreenReaderContent>{I18n.t('Anonymous Grading')}</ScreenReaderContent>,
   I18n.t('Student'),
   I18n.t('Grader'),
-  I18n.t('Assignment'),
+  I18n.t('Artifact'),
   I18n.t('Before'),
   I18n.t('After'),
   I18n.t('Current')
@@ -126,20 +126,18 @@ class SearchResultsComponent extends Component {
   showResults = () => (
     <div>
       <Table caption={this.props.caption}>
-        <thead>
-          <tr>
+        <Table.Head>
+          <Table.Row>
             {colHeaders.map(header => (
-              <th scope="col" key={`${header}-column`}>
-                {header}
-              </th>
+              <Table.ColHeader key={`${header}-column`}>{header}</Table.ColHeader>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
           {this.props.historyItems.map(item => (
             <SearchResultsRow key={`history-items-${item.id}`} item={item} />
           ))}
-        </tbody>
+        </Table.Body>
       </Table>
     </div>
   )
@@ -148,7 +146,7 @@ class SearchResultsComponent extends Component {
     if (this.props.requestingResults) {
       $.screenReaderFlashMessage(I18n.t('Loading more gradebook history results.'))
 
-      return <Spinner size="small" title={I18n.t('Loading Results')} />
+      return <Spinner size="small" renderTitle={I18n.t('Loading Results')} />
     }
 
     if (this.noResultsFound()) {
@@ -187,9 +185,6 @@ const mapDispatchToProps = dispatch => ({
   }
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SearchResultsComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(SearchResultsComponent)
 
 export {SearchResultsComponent}

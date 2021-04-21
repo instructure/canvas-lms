@@ -17,27 +17,56 @@
  */
 
 import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
+import moment from 'moment'
 import PageViewCollection from 'compiled/collections/PageViewCollection'
 import PageViewView from 'compiled/views/contexts/PageViewView'
+import ready from '@instructure/ready'
 
-const $container = $('#pageviews')
-const $table = $container.find('table')
-const userId = $table.attr('data-user-id')
+function renderTable(date) {
+  const $container = $('#pageviews')
+  const $table = $container.find('table')
+  const userId = $table.attr('data-user-id')
 
-const pageViews = new PageViewCollection()
-pageViews.url = `/api/v1/users/${userId}/page_views`
+  const pageViews = new PageViewCollection()
+  pageViews.url = `/api/v1/users/${userId}/page_views`
+  const $csvLink = $('#page_views_csv_link')
+  let csvUrl = $csvLink.attr('href').split('?')[0]
+  if (date) {
+    const start_time = $.unfudgeDateForProfileTimezone(date)
+    const end_time = moment(start_time).add(1, 'days')
+    const date_params = `?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`
+    pageViews.url += date_params
+    csvUrl += date_params
+  }
+  $csvLink.attr('href', csvUrl)
 
-const fetchOptions = {reset: true}
+  const fetchOptions = {reset: true}
 
-const pageViewsView = new PageViewView({
-  collection: pageViews,
-  el: $table,
-  fetchOptions
-})
+  const pageViewsView = new PageViewView({
+    collection: pageViews,
+    el: $table,
+    fetchOptions
+  })
 
   // Add events
-pageViews.on('reset', pageViewsView.render, pageViewsView)
+  pageViews.on('reset', pageViewsView.render, pageViewsView)
 
   // Fetch page views
-const fetchParams = {per_page: 100}
-pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))
+  const fetchParams = {per_page: 100}
+  pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))
+
+  return pageViewsView
+}
+
+ready(() => {
+  let view = renderTable()
+  $('#page_view_date')
+    .datetime_field({dateOnly: true})
+    .change(event => {
+      const date = $(event.target).data('date')
+      view.stopPaginationListener()
+      $('#page_view_results').empty()
+      view = renderTable(date)
+    })
+})

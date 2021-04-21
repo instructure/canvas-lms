@@ -17,54 +17,62 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import OverrideDetail from '../OverrideDetail'
 
-it('renders readonly override details', () => {
-  const override = mockOverride({
-    submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+function renderOD(override, props = {}) {
+  return render(
+    <OverrideDetail
+      override={override}
+      onChangeOverride={() => {}}
+      onValidate={() => true}
+      invalidMessage={() => undefined}
+      {...props}
+    />
+  )
+}
+
+describe('OverrideDetail', () => {
+  it('renders readonly override details', () => {
+    const override = mockOverride({
+      submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+    })
+
+    const {getByText, getAllByText, getByTestId} = renderOD(override, {readOnly: true})
+
+    // the labels
+    expect(getByText('Assign to:')).toBeInTheDocument()
+    expect(getByText('Due:')).toBeInTheDocument()
+    expect(getByText('Available:')).toBeInTheDocument()
+    expect(getByText('Until:')).toBeInTheDocument()
+    expect(getAllByText('Submission Items')[0]).toBeInTheDocument()
+    expect(getByText('Attempts Allowed')).toBeInTheDocument()
+    // the sub-components
+    expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
+    expect(getByTestId('OverrideDates')).toBeInTheDocument()
+    expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
+    expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
   })
 
-  const {getByText, getByTestId} = render(
-    <OverrideDetail override={override} onChangeOverride={() => {}} readOnly />
-  )
+  it('renders editable override details', () => {
+    const override = mockOverride({
+      submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+    })
 
-  // the labels
-  expect(getByText('Assign to:')).toBeInTheDocument()
-  expect(getByText('Due:')).toBeInTheDocument()
-  expect(getByText('Available:')).toBeInTheDocument()
-  expect(getByText('Until:')).toBeInTheDocument()
-  expect(getByText('Submission Type')).toBeInTheDocument()
-  expect(getByText('Attempts Allowed')).toBeInTheDocument()
-  expect(getByText('Score to keep')).toBeInTheDocument()
-  // the sub-components
-  expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
-  expect(getByTestId('OverrideDates')).toBeInTheDocument()
-  expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
-  expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
-})
+    const {getByText, getAllByText, getByTestId} = renderOD(override)
 
-it('renders editable override details', () => {
-  const override = mockOverride({
-    submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+    // the labels
+    expect(getByText('Assign to:')).toBeInTheDocument()
+    expect(getByText('Due:')).toBeInTheDocument()
+    expect(getByText('Available:')).toBeInTheDocument()
+    expect(getByText('Until:')).toBeInTheDocument()
+    expect(getAllByText('Submission Items')[0]).toBeInTheDocument()
+    expect(getByText('Attempts Allowed')).toBeInTheDocument()
+    // the sub-components
+    expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
+    expect(getByTestId('OverrideDates')).toBeInTheDocument()
+    expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
+    expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
   })
-
-  const {getByText, getByTestId} = render(
-    <OverrideDetail override={override} onChangeOverride={() => {}} readOnly={false} />
-  )
-
-  // the labels
-  expect(getByText('Assign to:')).toBeInTheDocument()
-  expect(getByText('Due:')).toBeInTheDocument()
-  expect(getByText('Available:')).toBeInTheDocument()
-  expect(getByText('Until:')).toBeInTheDocument()
-  expect(getByText('Submission Type')).toBeInTheDocument()
-  expect(getByText('Attempts Allowed')).toBeInTheDocument()
-  expect(getByText('Score to keep')).toBeInTheDocument()
-  // the sub-components
-  expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
-  expect(getByTestId('OverrideDates')).toBeInTheDocument()
-  expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
-  expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 })

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -35,25 +37,6 @@ describe "calendar2" do
     end
 
     describe "main calendar" do
-      it "should validate appointment group popup link functionality" do
-        create_appointment_group
-        ag = AppointmentGroup.first
-        ag.appointments.first.reserve_for @student, @me
-
-        @user = @me
-        get "/calendar2"
-
-        # navigate to the next month for end of month
-        f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
-        fj('.fc-event:visible').click
-        expect(fj("#popover-0")).to be_displayed
-        expect_new_page_load { driver.execute_script("$('#popover-0 .view_event_link').hover().click()") }
-
-
-        expect(f('#scheduler')).to have_class('active')
-        expect(f('#appointment-group-list')).to include_text(ag.title)
-      end
-
       context "the event modal" do
         it "should allow other users to see attendees after reservation" do
           create_appointment_group(
@@ -77,6 +60,52 @@ describe "calendar2" do
           expect(f("#reservations li")).to include_text "nobody@example.com"
         end
 
+        it "should allow users to see all attendees on events up to 25 reservations" do
+          create_appointment_group(
+            :contexts => [@course],
+            :title => "eh",
+            :max_appointments_per_participant => 1,
+            :min_appointments_per_participant => 1,
+            :participants_per_appointment => 15,
+            :participant_visibility => "protected"
+          )
+          ag1 = AppointmentGroup.first
+          ag1.appointments.first.reserve_for @student, @student
+          students = create_users_in_course(@course, 12, return_type: :record)
+          students.each do |student_temp|
+            ag1.appointments.first.reserve_for student_temp, student_temp
+          end
+          get "/calendar2"
+          f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
+          fj('.fc-event:visible').click
+          wait_for_ajaximations
+          expected_string = "Attendees\nnobody@example.com\n#{students.map(&:name).join("\n")}"
+          expect(f("#reservations")).to include_text expected_string
+        end
+
+        it "should show dots indicating more users available if more than 25 reservations" do
+          create_appointment_group(
+            :contexts => [@course],
+            :title => "eh",
+            :max_appointments_per_participant => 1,
+            :min_appointments_per_participant => 1,
+            :participants_per_appointment => 27,
+            :participant_visibility => "protected"
+          )
+          ag1 = AppointmentGroup.first
+          ag1.appointments.first.reserve_for @student, @student
+          students = create_users_in_course(@course, 25, return_type: :record)
+          students.each do |student_temp|
+            ag1.appointments.first.reserve_for student_temp, student_temp
+          end
+          get "/calendar2"
+          f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
+          fj('.fc-event:visible').click
+          wait_for_ajaximations
+          expected_string = "Attendees\nnobody@example.com\n#{students[0, 24].map(&:name).join("\n")}\n(...)"
+          expect(f("#reservations")).to include_text expected_string
+        end
+
         it "should not display attendees for reservation with no participants" do
           create_appointment_group(
             :contexts => [@course],
@@ -87,14 +116,15 @@ describe "calendar2" do
             :participant_visibility => "protected"
           )
           ag1 = AppointmentGroup.first
-          # create an appointment and cancel appointment to make no participants
           ag1.appointments.first.reserve_for @student, @student
-          ag1.appointments.first.reserve_for @student, @student, cancel_existing: true
           get "/calendar2"
           # navigate to the next month for end of month
           f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
           fj('.fc-event:visible').click
-          expect(f("#reservations")).not_to contain_css("#attendees_header_text")
+          f('.unreserve_event_link').click
+          fj("button:contains('Delete')").click
+          wait_for_ajaximations
+          expect(f('.fc-body')).not_to contain_css('.fc-event')
         end
       end
 
@@ -149,7 +179,7 @@ describe "calendar2" do
         group.add_user @student
         group.save!
         get '/calendar2'
-        fj('.calendar .fc-week .fc-today').click
+        move_to_click_element(fj('.calendar .fc-week .fc-today'))
         edit_event_dialog = f('#edit_event_tabs')
         expect(edit_event_dialog).to be_displayed
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')

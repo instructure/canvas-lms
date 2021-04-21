@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -24,6 +26,8 @@ describe 'quizzes question with html answers' do
 
   before(:each) do
     course_with_teacher_logged_in
+    Account.default.enable_feature!(:rce_enhancements)
+    stub_rcs_config
   end
 
   def edit_first_html_answer(question_type=nil)
@@ -124,8 +128,10 @@ describe 'quizzes question with html answers' do
 
     # open it up in the editor, make sure the text matches the input
     edit_first_html_answer
-    content = driver.execute_script "return $('.answer:eq(3) textarea')._justGetCode()"
-    expect(content).to eq '<p>ohai</p>'
+    keep_trying_until do
+      content = driver.execute_script "return tinyMCE.activeEditor.getContent()"
+      expect(content).to eq '<p>ohai</p>'
+    end
 
     # clear it out, make sure the original input is empty also
     driver.execute_script "tinyMCE.activeEditor.setContent('')"

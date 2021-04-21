@@ -17,13 +17,19 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {mockAssignment} from '../../test-utils'
 import ContentTabs from '../ContentTabs'
 
 it('renders', () => {
   const {container} = render(
-    <ContentTabs assignment={mockAssignment()} onChangeAssignment={() => {}} />
+    <ContentTabs
+      assignment={mockAssignment()}
+      onChangeAssignment={() => {}}
+      onMessageStudentsClick={() => {}}
+      onValidate={() => true}
+      invalidMessage={() => undefined}
+    />
   )
   expect(container.querySelectorAll('[role="tab"]')).toHaveLength(4)
 })

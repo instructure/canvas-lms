@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, t(:page_title, "App Login")
+  provide :page_title, t(:page_title, "App Login")
 %>
 
 <div class="face">
@@ -29,7 +29,7 @@
       <button type="submit" class="Button Button--primary Button--block"><%= t 'authorize', 'Authorize' %></button>
       <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>
     </div>
-    <% if true#unless @provider.scopes.blank? %>
+    <% if @provider.scopes == ["/auth/userinfo"] %>
       <div class="control-group">
         <label class="checkbox" for="remember_access">
           <%= check_box_tag(:remember_access, "1", false, :class => "checkbox") %>

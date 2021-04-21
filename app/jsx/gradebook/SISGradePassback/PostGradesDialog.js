@@ -18,10 +18,10 @@
 
 import _ from 'underscore'
 import React from 'react'
-import assignmentUtils from '../../gradebook/SISGradePassback/assignmentUtils'
-import PostGradesDialogCorrectionsPage from '../../gradebook/SISGradePassback/PostGradesDialogCorrectionsPage'
-import PostGradesDialogNeedsGradingPage from '../../gradebook/SISGradePassback/PostGradesDialogNeedsGradingPage'
-import PostGradesDialogSummaryPage from '../../gradebook/SISGradePassback/PostGradesDialogSummaryPage'
+import assignmentUtils from './assignmentUtils'
+import PostGradesDialogCorrectionsPage from './PostGradesDialogCorrectionsPage'
+import PostGradesDialogNeedsGradingPage from './PostGradesDialogNeedsGradingPage'
+import PostGradesDialogSummaryPage from './PostGradesDialogSummaryPage'
 
 class PostGradesDialog extends React.Component {
   componentDidMount() {

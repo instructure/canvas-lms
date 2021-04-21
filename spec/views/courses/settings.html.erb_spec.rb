@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,8 +22,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/settings.html.erb" do
-  before do
-    @subaccount = Account.default.sub_accounts.create!(:name => 'subaccount')
+  before :once do
+    @subaccount = account_model(:parent_account => Account.default, name: 'subaccount')
+    @other_subaccount = account_model(:parent_account => Account.default)
+    @sub_subaccount1 = account_model(:parent_account => @subaccount)
+    @sub_subaccount2 = account_model(:parent_account => @subaccount)
+
     course_with_teacher(:active_all => true, :account => @subaccount)
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
@@ -30,6 +36,23 @@ describe "courses/settings.html.erb" do
     assign(:user_counts, {})
     assign(:all_roles, Role.custom_roles_and_counts_for_course(@course, @user))
     assign(:course_settings_sub_navigation_tools, [])
+  end
+
+  describe "Hide sections on course users page checkbox" do
+    it "should not display checkbox for teacher when there is one section" do
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+      expect(response).to_not have_tag("input#course_hide_sections_on_course_users_page")
+    end
+
+    it "should display checkbox for teacher when there is more than one section" do
+      @course.course_sections.create!
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+      expect(response).to have_tag("input#course_hide_sections_on_course_users_page")
+    end
   end
 
   describe "sis_source_id edit box" do
@@ -116,52 +139,119 @@ describe "courses/settings.html.erb" do
     end
   end
 
+  describe "Large Course settings" do
+    before :once do
+      @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+    end
+
+    before :each do
+      view_context(@course, @teacher)
+    end
+
+    it "does not render when the 'Filter SpeedGrader by Student Group' feature flag is not enabled" do
+      @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
+      render
+      expect(response).not_to have_tag "input#course_filter_speed_grader_by_student_group"
+    end
+
+    it "has a Large Course label" do
+      render
+      expect(response).to have_tag("label[for=course_large_course]")
+    end
+
+    describe "filter SpeedGrader by student group" do
+      it "has a checkbox" do
+        render
+        expect(response).to have_tag "input#course_filter_speed_grader_by_student_group[type=checkbox]"
+      end
+
+      it "has a label describing it" do
+        render
+        expect(response).to have_tag("label[for=course_filter_speed_grader_by_student_group]")
+      end
+
+      it "checkbox is checked when filter_speed_grader_by_student_group is true" do
+        @course.update!(filter_speed_grader_by_student_group: true)
+        render
+        expect(response).to have_tag "input#course_filter_speed_grader_by_student_group[type=checkbox][checked=checked]"
+      end
+
+      it "checkbox is not checked when filter_speed_grader_by_student_group is false" do
+        render
+        expect(response).not_to have_tag "input#course_filter_speed_grader_by_student_group[type=checkbox][checked=checked]"
+      end
+    end
+  end
+
   context "account_id selection" do
     it "should let sub-account admins see other accounts within their sub-account as options" do
-      root_account = Account.create!(:name => 'root')
-      subaccount = account_model(:parent_account => root_account)
-      other_subaccount = account_model(:parent_account => root_account) # should not include
-      sub_subaccount1 = account_model(:parent_account => subaccount)
-      sub_subaccount2 = account_model(:parent_account => subaccount)
-
-      @course.account = sub_subaccount1
-      @course.save!
-
-      @user = account_admin_user(:account => subaccount, :active_user => true)
-      expect(root_account.grants_right?(@user, :manage_courses)).to be_falsey
+      @user = account_admin_user(:account => @subaccount, :active_user => true)
+      expect(Account.default.grants_right?(@user, :manage_courses)).to be_falsey
       view_context(@course, @user)
 
       render
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("select#course_account_id")
       expect(select).not_to be_nil
       #select.children.count.should == 3
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i rescue c.to_s}
-      expect(option_ids.sort).to eq [subaccount.id, sub_subaccount1.id, sub_subaccount2.id].sort
+      expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 
     it "should let site admins see all accounts within their root account as options" do
-      root_account = Account.create!(:name => 'root')
-      subaccount = account_model(:parent_account => root_account)
-      other_subaccount = account_model(:parent_account => root_account)
-      sub_subaccount1 = account_model(:parent_account => subaccount)
-      sub_subaccount2 = account_model(:parent_account => subaccount)
-
-      @course.account = sub_subaccount1
-      @course.save!
-
       @user = site_admin_user
       view_context(@course, @user)
 
       render
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("select#course_account_id")
       expect(select).not_to be_nil
-      all_accounts = [root_account] + root_account.all_accounts
+      all_accounts = [Account.default] + Account.default.all_accounts
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i}
       expect(option_ids.sort).to eq all_accounts.map(&:id).sort
+    end
+  end
+
+  context "course template checkbox" do
+    it "is not visible if the feature isn't enabled" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css("input#course_template")).to be_nil
+    end
+
+    context "with the feature enabled" do
+      before { Account.default.enable_feature!(:course_templates) }
+
+      it "is visible" do
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect((checkbox = doc.at_css("input#course_template"))).not_to be_nil
+        expect(checkbox['disabled']).to eq 'disabled'
+      end
+
+      it "is editable if you have permission" do
+        @user = site_admin_user
+        view_context(@course, @user)
+        # have to remove the teacher
+        @course.enrollments.each(&:destroy)
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        checkbox = doc.at_css("input#course_template")
+        expect(checkbox['disabled']).to be_nil
+      end
+
+      it "is not editable even if you have permission, but it's not possible" do
+        @user = site_admin_user
+        view_context(@course, @user)
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        checkbox = doc.at_css("input#course_template")
+        expect(checkbox['disabled']).to eq 'disabled'
+      end
     end
   end
 end

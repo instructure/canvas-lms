@@ -15,67 +15,65 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!groups'
-  '../../DialogFormView'
-  'jst/EmptyDialogFormWrapper'
-  'jst/groups/manage/groupCategoryClone'
-], (I18n, DialogFormView, wrapperTemplate, template) ->
+import I18n from 'i18n!groups'
+import DialogFormView from '../../DialogFormView'
+import wrapperTemplate from 'jst/EmptyDialogFormWrapper'
+import template from 'jst/groups/manage/groupCategoryClone'
 
-  class GroupCategoryCloneView extends DialogFormView
+export default class GroupCategoryCloneView extends DialogFormView
 
-    template: template
-    wrapperTemplate: wrapperTemplate
-    className: "form-dialog group-category-clone"
-    cloneSuccess: false
-    changeGroups: false
+  template: template
+  wrapperTemplate: wrapperTemplate
+  className: "form-dialog group-category-clone"
+  cloneSuccess: false
+  changeGroups: false
 
-    defaults:
-      width: 520
-      height: 450
-      title: I18n.t("Clone Group Set")
+  defaults:
+    width: 520
+    height: 450
+    title: I18n.t("Clone Group Set")
 
-    events: Object.assign {},
-      DialogFormView::events
-      'click .dialog_closer': 'close'
-      'click .clone-options-toggle': 'toggleCloneOptions'
+  events: Object.assign {},
+    DialogFormView::events
+    'click .dialog_closer': 'close'
+    'click .clone-options-toggle': 'toggleCloneOptions'
 
-    openAgain: ->
-      @cloneSuccess = false
-      @changeGroups = false
-      super
-      # reset the form contents
-      @render()
-      $('.ui-dialog-titlebar-close').focus()
+  openAgain: ->
+    @cloneSuccess = false
+    @changeGroups = false
+    super
+    # reset the form contents
+    @render()
+    $('.ui-dialog-titlebar-close').focus()
 
-    toJSON: ->
-      json = super
-      json.displayCautionOptions = @options.openedFromCaution
-      json
+  toJSON: ->
+    json = super
+    json.displayCautionOptions = @options.openedFromCaution
+    json
 
-    toggleCloneOptions: ->
-      cloneOption = @$("input:radio[name=clone_option]:checked").val()
-      if cloneOption == "clone"
-        @$('.cloned_category_name_option').show()
-        @$('.cloned_category_name_option').attr('aria-hidden', false)
-      else
-        @$('.cloned_category_name_option').hide()
-        @$('.cloned_category_name_option').attr('aria-hidden', true)
+  toggleCloneOptions: ->
+    cloneOption = @$("input:radio[name=clone_option]:checked").val()
+    if cloneOption == "clone"
+      @$('.cloned_category_name_option').show()
+      @$('.cloned_category_name_option').attr('aria-hidden', false)
+    else
+      @$('.cloned_category_name_option').hide()
+      @$('.cloned_category_name_option').attr('aria-hidden', true)
 
-    submit: (event) ->
-      event.preventDefault()
+  submit: (event) ->
+    event.preventDefault()
 
-      data = @getFormData()
+    data = @getFormData()
 
-      if data['clone_option'] == 'do_not_clone'
-        @changeGroups = true
-        @close()
-      else
-        super(event)
+    if data['clone_option'] == 'do_not_clone'
+      @changeGroups = true
+      @close()
+    else
+      super(event)
 
-    saveFormData: (data) ->
-      @model.cloneGroupCategoryWithName(data['name'])
+  saveFormData: (data) ->
+    @model.cloneGroupCategoryWithName(data['name'])
 
-    onSaveSuccess: =>
-      @cloneSuccess = true
-      super
+  onSaveSuccess: =>
+    @cloneSuccess = true
+    super

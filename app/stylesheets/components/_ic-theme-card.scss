@@ -277,34 +277,3 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
     margin: 0 2px;
   }
 }
-
-.ic-ThemeCard-overlay__heading {
-  color: $ic-color-light;
-  margin: 0 0 $ic-sp;
-}
-
-.ic-ThemeCard-overlay-transition-enter {
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-.ic-ThemeCard-overlay-transition-enter.ic-ThemeCard-overlay-transition-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition-property: transform, opacity;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-out;
-}
-
-.ic-ThemeCard-overlay-transition-leave {
-  opacity: 1;
-  transform: scale(1);
-  transition-property: transform, opacity;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-in;
-}
-
-.ic-ThemeCard-overlay-transition-leave.ic-ThemeCard-overlay-transition-leave-active {
-  opacity: 0;
-  transform: scale(0.5);
-}

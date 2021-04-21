@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -131,12 +133,15 @@ describe "dashboard" do
     end
 
     it "should show account notifications on the dashboard", priority: "1", test_id: 215582 do
+      u = User.create!
       a1 = @course.account.announcements.create!(:subject => 'test',
                                                  :message => "hey there",
+                                                 :user => u,
                                                  :start_at => Time.zone.today - 1.day,
                                                  :end_at => Time.zone.today + 1.day)
       a2 = @course.account.announcements.create!(:subject => 'test 2',
                                                  :message => "another annoucement",
+                                                 :user => u,
                                                  :start_at => Time.zone.today - 2.days,
                                                  :end_at => Time.zone.today + 1.day)
 
@@ -145,13 +150,14 @@ describe "dashboard" do
       fj('span[role="menuitemradio"]:contains("Recent Activity")').click
       messages = ff("#dashboard .account_notification .notification_message")
       expect(messages.size).to eq 2
-      expect(messages[0].text).to eq a1.message
-      expect(messages[1].text).to eq a2.message
+      expect(messages[0].text).to eq a2.message
+      expect(messages[1].text).to eq a1.message
     end
 
     it "should interpolate the user's domain in global notifications" do
       announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
                                                            :subject => 'test',
+                                                           :user => User.create!,
                                                            :start_at => Date.today,
                                                            :end_at => Date.today + 1.day)
 
@@ -162,6 +168,7 @@ describe "dashboard" do
     it "should interpolate the user's id in global notifications" do
       announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
                                                            :subject => 'test',
+                                                           :user => User.create!,
                                                            :start_at => Date.today,
                                                            :end_at => Date.today + 1.day)
       get "/"
@@ -183,7 +190,7 @@ describe "dashboard" do
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
       # appointment group update notification
-      @appointment_group.update_attributes(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
+      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
 
       get "/"
       expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3
@@ -195,7 +202,7 @@ describe "dashboard" do
 
     describe "course menu" do
       before do
-        @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+        @course.update(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
         Enrollment.update_all(:created_at => 1.minute.ago)
         get "/"
       end
@@ -225,10 +232,6 @@ describe "dashboard" do
         list = fj("[aria-label='Groups tray']")
         expect(list).to include_text(group.name)
         expect(list).to_not include_text(other_group.name)
-      end
-
-      it "should present /courses as the href of the courses nav item", priority: "2", test_id: 215612 do
-        expect(f('#global_nav_courses_link').attribute('href')).to match(/\/courses$/)
       end
 
       it "should go to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do
@@ -342,7 +345,7 @@ describe "dashboard" do
       term.save!
       c1 = @course
       c1.name = 'a_soft_concluded_course'
-      c1.update_attributes!(:enrollment_term => term)
+      c1.update!(:enrollment_term => term)
       c1.reload
       get "/courses"
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
@@ -375,13 +378,13 @@ describe "dashboard" do
         course_with_student(:active_all => true)
         @c1 = @course
         @c1.name = 'a future course'
-        @c1.update_attributes!(:enrollment_term => term)
+        @c1.update!(:enrollment_term => term)
 
         course_with_student(:active_course => true, :user => @student)
         @c2 = @course
         @c2.name = "a restricted future course"
         @c2.restrict_student_future_view = true
-        @c2.update_attributes!(:enrollment_term => term)
+        @c2.update!(:enrollment_term => term)
       end
 
       before do

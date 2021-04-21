@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,9 +20,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe "better_file_browsing, folders" do
   include_context "in-process server selenium tests"
   include FilesCommon
+
+  before do
+    set_granular_permission
+  end
 
   context "Folders" do
     before(:each) do
@@ -36,16 +45,20 @@ describe "better_file_browsing, folders" do
     end
 
     it "should create a new folder", :xbrowser, priority: "1", test_id: 133121 do
-      expect(fln("new test folder")).to be_present
+      # locator was changed from fln in this test due to an issue with edgedriver
+      # We can not use fln here
+      expect(fj("a:contains('new test folder')")).to be_present
     end
 
-    it "should display all cog icon options", :xbrowser, priority: "1", test_id: 133124 do
-      create_new_folder
-      ff('.al-trigger')[0].click
-      expect(fln("Download")).to be_displayed
-      expect(fln("Rename")).to be_displayed
-      expect(fln("Move")).to be_displayed
-      expect(fln("Delete")).to be_displayed
+    it "should display all cog icon options", priority: "1", test_id: 133124 do
+      expect(fj("a:contains('new test folder')")).to be_present
+      ff('.ef-item-row').first.click # ensure folder item has focus
+      f('button.al-trigger.btn-link').click # toggle cog menu button
+      wait_for_animations
+      expect(fln('Download')).to be_displayed
+      expect(fln('Rename')).to be_displayed
+      expect(fln('Move')).to be_displayed
+      expect(fln('Delete')).to be_displayed
     end
 
     it "should edit folder name", priority: "1", test_id: 223501 do
@@ -129,7 +142,7 @@ describe "better_file_browsing, folders" do
        expect(new_folder.text).to match(/New Folder/)
      end
 
-     it "should handle duplicate folder names", :xbrowser, priority: "1", test_id: 133130 do
+     it "should handle duplicate folder names", priority: "1", test_id: 133130 do
        create_new_folder
        add_folder("New Folder")
        expect(all_files_folders.last.text).to match(/New Folder 2/)
@@ -166,5 +179,18 @@ describe "better_file_browsing, folders" do
        wait_for_ajaximations
        expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
      end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

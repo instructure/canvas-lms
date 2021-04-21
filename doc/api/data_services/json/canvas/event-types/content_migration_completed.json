@@ -1,0 +1,39 @@
+{
+  "name": "content_migration_completed",
+  "definition": "The event is emitted anytime a content migration request is completed.",
+  "trigger": "Triggered anytime a content migration request is completed.",
+  "schema": {
+    "content_migration_id": "The Canvas id of the content migration.",
+    "context_id": "The Canvas id of the context associated with the content migration.",
+    "context_type": "The type of context associated with the content migration.",
+    "context_uuid": "The uuid of the context associated with the content migration.",
+    "import_quizzes_next": "Indicates whether the user requested that the quizzes in the content migration be created in Quizzes.Next (true) or in native Canvas (false).",
+    "lti_context_id": "The lti context id of the context associated with the content migration."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "context_id": "21070000000008972",
+          "context_type": "Course",
+          "event_name": "content_migration_completed",
+          "event_time": "2019-11-01T19:11:02.024Z",
+          "job_id": "1020020528469291",
+          "job_tag": "ContentMigration#import_content",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "content_migration_id": "21070000000000072",
+          "context_id": "21070000000008972",
+          "context_type": "Course",
+          "context_uuid": "Uc69p8GCYLMYWQJqkyzQGqg1kNMXbmnRl8qdCJge",
+          "import_quizzes_next": false,
+          "lti_context_id": "694d2e30346f6a94ad20cea11ce78d19bd849c9c"
+        }
+      }
+    }
+  ]
+}

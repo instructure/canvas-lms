@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -16,10 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::DateTimeType = GraphQL::ScalarType.define do
-  name "DateTime"
+class Types::DateTimeType < Types::BaseScalar
+  graphql_name "DateTime"
   description "an ISO8601 formatted time string"
 
-  coerce_input ->(time_str, _) { time_str }
-  coerce_result ->(time, _) { time.iso8601 }
+  def self.coerce_input(time_str, _)
+    Time.zone.iso8601(time_str)
+  rescue ArgumentError
+    raise GraphQL::CoercionError, "#{time_str.inspect} is not a iso8601 formatted date"
+  end
+
+  def self.coerce_result(time, _)
+    time.iso8601
+  end
 end

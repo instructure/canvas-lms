@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -76,7 +78,7 @@ class NotificationPreferencesController < ApplicationController
   end
 
   # @API Get a preference
-  # Fetch the preference for the given notification for the given communicaiton channel
+  # Fetch the preference for the given notification for the given communication channel
   # @returns NotificationPreference
   def show
     render json: { notification_preferences: [notification_policy_json(NotificationPolicy.find_or_update_for(@cc, params[:notification]), @current_user, session)] }
@@ -98,7 +100,12 @@ class NotificationPreferencesController < ApplicationController
   def update_preferences_by_category
     return render_unauthorized_action unless @user == @current_user
     preference = notification_preferences_param
-    policies = NotificationPolicy.find_or_update_for_category(@cc, params[:category].titleize, preference[:frequency])
+
+    # Every other category is along the lines of `Due Date`, which is processed correctly by
+    # titleize. Make `DiscussionEntry` not a special snowflake here.
+    category = params[:category].casecmp?('discussionentry') ? 'DiscussionEntry' : params[:category].titleize
+
+    policies = NotificationPolicy.find_or_update_for_category(@cc, category, preference[:frequency])
     render json: { notification_preferences: policies.map{ |p| notification_policy_json(p, @current_user, session) } }
   end
 

@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import Ember from 'ember'
 import _ from 'underscore'
-import GradebookHeaderMenu from '../../../gradebook/GradebookHeaderMenu'
+import GradebookHeaderMenu from 'jsx/gradebook/views/GradebookHeaderMenu'
 import SubmissionDetailsDialog from '../../../SubmissionDetailsDialog'
 
 const AssignmentsView = Ember.View.extend({
@@ -40,7 +40,7 @@ const AssignmentsView = Ember.View.extend({
         context_url: ENV.GRADEBOOK_OPTIONS.context_url,
         speed_grader_enabled: ENV.GRADEBOOK_OPTIONS.speed_grader_enabled,
         change_grade_url: ENV.GRADEBOOK_OPTIONS.change_grade_url,
-        isAdmin: _.contains(ENV.current_user_roles, 'admin')
+        isAdmin: _.includes(ENV.current_user_roles, 'admin')
       }
 
       const dialogs = {

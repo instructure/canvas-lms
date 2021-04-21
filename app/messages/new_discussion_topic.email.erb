@@ -10,7 +10,12 @@
 
 <%= asset.title %>
 
-<%= html_to_text(asset.message, :base_url => dashboard_url) %>
+<% if !asset.available_for?(user, :check_policies => true) %>
+  <%= t("Discussion content is locked or not yet available") %>
+<% else %>
+  <%= html_to_text(asset.message, :base_url => dashboard_url) %>
+<% end %>
+
 <% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
   <%= polymorphic_url([asset.context, :file_download], file_id: asset.attachment) %>
 <% end %>

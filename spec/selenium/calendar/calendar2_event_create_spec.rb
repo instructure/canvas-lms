@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -21,6 +23,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common'
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+
+  before(:once) do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
 
   before(:each) do
     Account.default.tap do |a|
@@ -69,7 +75,7 @@ describe "calendar2" do
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         # submit_form makes the spec fragile
-        f('#editCalendarEventFull').submit
+        wait_for_new_page_load { f('#editCalendarEventFull').submit }
         expect(CalendarEvent.last.location_name).to eq location_name
         expect(CalendarEvent.last.location_address).to eq location_address
       end
@@ -123,12 +129,10 @@ describe "calendar2" do
       end
 
       it "should create an event that is recurring", priority: "1", test_id: 223510 do
-        Account.default.enable_feature!(:recurring_calendar_events)
-        make_full_screen
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
-        f('.calendar .fc-week .fc-today').click
+        move_to_click_element(f('.calendar .fc-week .fc-today'))
         edit_event_dialog = f('#edit_event_tabs')
         expect(edit_event_dialog).to be_displayed
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
@@ -138,7 +142,7 @@ describe "calendar2" do
         replace_content(f("input[type=text][name= 'end_time']"), "6:00pm")
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
-        wait_for_tiny(f(".mce-edit-area"))
+        wait_for_tiny(f('iframe', f('.ic-RichContentEditor')))
         expect(f('.title')).to have_value "Test Event"
         move_to_click('#duplicate_event')
         replace_content(f("input[type=number][name='duplicate_count']"), 2)
@@ -151,7 +155,6 @@ describe "calendar2" do
       end
 
       it "should create recurring section-specific events" do
-        Account.default.enable_feature!(:recurring_calendar_events)
         section1 = @course.course_sections.first
         section2 = @course.course_sections.create!(:name => "other section")
 
@@ -159,11 +162,9 @@ describe "calendar2" do
         day2 = 2.days.from_now.to_date
 
         get '/calendar2'
-        fj('.calendar .fc-week .fc-today').click
-        edit_event_dialog = f('#edit_event_tabs')
-        edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
-        title = edit_event_form.find('#calendar_event_title')
-        replace_content(title, "Test Event")
+        move_to_click_element(f('.calendar .fc-week .fc-today'))
+        wait_for_ajaximations
+        f('#edit_event #edit_event_tabs') # using implicit wait for element to be displayed
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
 
@@ -205,7 +206,7 @@ describe "calendar2" do
 
         get "/courses/#{@course.id}/calendar_events/new"
         wait_for_ajaximations
-        wait_for_tiny(f(".mce-edit-area"))
+        wait_for_tiny(f('iframe', f('.ic-RichContentEditor')))
         f('#use_section_dates').click
 
         num_rows = ff(".show_if_using_sections .row_header").length
@@ -216,7 +217,6 @@ describe "calendar2" do
 
   context "to-do dates" do
     before :once do
-      Account.default.enable_feature!(:student_planner)
       @course = Course.create!(name: "Course 1")
       @course.offer!
       @student1 = User.create!(name: 'Student 1')
@@ -277,7 +277,7 @@ describe "calendar2" do
       end
 
       it "respects the calendars checkboxes" do
-        make_full_screen
+
         get "/calendar2"
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
 

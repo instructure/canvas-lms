@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -33,6 +35,7 @@ module GroupCategories
       group_category.group_limit = params.group_limit
       if context.is_a?(Course)
         group_category.create_group_count = params.create_group_count
+        group_category.create_group_member_count = params.create_group_member_count
         unless params.assign_async
           group_category.assign_unassigned_members = params.assign_unassigned_members
           group_category.group_by_section = params.group_by_section

@@ -16,9 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :head do%>
-  <base target="_top" />
-<% end %>
+<base target="_top" />
 <ul id="quiz_student_details">
   <li>
     <span class="title"><%= t('headers.due', 'Due') %></span>
@@ -37,7 +35,7 @@
 
   <li style="<%= hidden if @quiz.quiz_type == 'survey' %>">
     <span class="title"><%= t('headers.points', "Points") %></span>
-    <span class="value"><%= round_if_whole(@quiz.points_possible) || 0 %></span>
+    <span class="value"><%= render_score(@quiz.points_possible) || 0 %></span>
   </li>
 
   <li>

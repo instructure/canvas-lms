@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -48,6 +50,36 @@ describe InfoController do
     end
   end
 
+  describe "GET 'health_prognosis'" do
+    it "should work if partitions are up to date" do
+      # just in case
+      Quizzes::QuizSubmissionEventPartitioner.process
+      Version::Partitioner.process
+      Messages::Partitioner.process
+
+      get "health_prognosis"
+      expect(response).to be_successful
+    end
+
+    it "should fail if partitions haven't been running" do
+      # stick a Version into last partition
+      last_partition = CanvasPartman::PartitionManager.create(Version).partition_tables.last
+      v_id = (last_partition.sub("versions_", "").to_i * Version.partition_size) + 1
+
+      # don't have to make a real version anymore, just an object that _could_ make a version
+      Course.create.wiki_pages.create!(:id => v_id, :title => "t")
+
+      Timecop.freeze(4.years.from_now) do # and jump forward a ways
+        get "health_prognosis"
+        expect(response).to be_server_error
+        body = response.body
+        %w{messages_partition quizzes_submission_events_partition versions_partition}.each do |type|
+          expect(body).to include(type)
+        end
+      end
+    end
+  end
+
   describe "GET 'help_links'" do
     it "should work" do
       get 'help_links'
@@ -67,7 +99,7 @@ describe InfoController do
 
     it "should filter the links based on the current user's role" do
       account = Account.create!
-      allow(Account::HelpLinks).to receive(:default_links).and_return([
+      allow(account.help_links_builder).to receive(:default_links).and_return([
         {
           :available_to => ['student'],
           :text => 'Ask Your Instructor a Question',
@@ -79,7 +111,7 @@ describe InfoController do
           :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
           :text => 'Search the Canvas Guides',
           :subtext => 'Find answers to common questions',
-          :url => 'http://community.canvaslms.com/community/answers/guides',
+          :url => 'https://community.canvaslms.com/t5/Canvas/ct-p/canvas',
           :is_default => 'true'
         },
         {
@@ -97,6 +129,20 @@ describe InfoController do
       get 'help_links'
       links = json_parse(response.body)
       expect(links.select {|link| link[:text] == 'Ask Your Instructor a Question'}.size).to eq 0
+    end
+  end
+
+  describe "GET 'web-app-manifest'" do
+    it "should work" do
+      get 'web_app_manifest'
+      expect(response).to be_successful
+    end
+
+    it "should return icon path correct" do
+      get 'web_app_manifest'
+      manifest = json_parse(response.body)
+      src = manifest["icons"].first["src"]
+      expect(src).to start_with("/dist/images/")
     end
   end
 end

@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-  'jst/grade_summary/progress_bar'
-], (_, Backbone, template) ->
-  class ProgressBarView extends Backbone.View
-    className: 'bar'
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/grade_summary/progress_bar'
+
+export default class ProgressBarView extends Backbone.View
+  className: 'bar'
+  template: template

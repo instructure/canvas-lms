@@ -20,16 +20,21 @@ import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import editCalendarEventTemplate from 'jst/calendar/editCalendarEvent'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
 import 'vendor/date'
-import commonEventFactory from '../calendar/commonEventFactory'
+import commonEventFactory from './commonEventFactory'
 import coupleTimeFields from '../util/coupleTimeFields'
 import fcUtil from '../util/fcUtil'
-import '../calendar/fcMomentHandlebarsHelpers'
+import './fcMomentHandlebarsHelpers'
+import CalendarConferenceWidget from 'jsx/conferences/calendar/CalendarConferenceWidget'
+import filterConferenceTypes from 'jsx/conferences/utils/filterConferenceTypes'
+import getConferenceType from 'jsx/conferences/utils/getConferenceType'
 
 export default class EditCalendarEventDetails {
   constructor(selector, event, contextChangeCB, closeCB) {
@@ -43,7 +48,9 @@ export default class EditCalendarEventDetails {
         contexts: this.event.possibleContexts(),
         lockedTitle: this.event.lockedTitle,
         location_name: this.event.location_name,
-        date: this.event.startDate()
+        date: this.event.startDate(),
+        is_child: this.event.object.parent_event_id != null,
+        include_conference_selection: ENV.CALENDAR?.CONFERENCES_ENABLED
       })
     )
     $(selector).append(this.$form)
@@ -51,9 +58,9 @@ export default class EditCalendarEventDetails {
     this.setupTimeAndDatePickers()
 
     this.$form.submit(this.formSubmit)
-    this.$form.find('.more_options_link').click(this.moreOptionsClick)
-    this.$form.find('select.context_id').change(this.contextChange)
-    this.$form.find('#duplicate_event').change(this.duplicateCheckboxChanged)
+    this.$form.find('.more_options_link').click(this.moreOptionsClick.bind(this))
+    this.$form.find('select.context_id').change(this.contextChange.bind(this))
+    this.$form.find('#duplicate_event').change(this.duplicateCheckboxChanged.bind(this))
     this.$form.find('select.context_id').triggerHandler('change', false)
 
     // show context select if the event allows moving between calendars
@@ -68,6 +75,47 @@ export default class EditCalendarEventDetails {
     // duplication only works on create
     if (!this.event.isNewEvent()) {
       this.$form.find('.duplicate_event_row, .duplicate_event_toggle_row').hide()
+    }
+    this.conference = event.webConference
+    this.renderConferenceWidget()
+  }
+
+  canUpdateConference() {
+    return !this.event.lockedTitle
+  }
+
+  setConference = conference => {
+    this.conference = conference
+    setTimeout(this.renderConferenceWidget, 0)
+  }
+
+  getActiveConferenceTypes() {
+    const conferenceTypes = ENV.conferences?.conference_types || []
+    const context = this.currentContextInfo.asset_string
+    return filterConferenceTypes(conferenceTypes, context)
+  }
+
+  renderConferenceWidget = () => {
+    if (!ENV.CALENDAR?.CONFERENCES_ENABLED) {
+      return
+    }
+    const conferenceNode = document.getElementById('calendar_event_conference_selection')
+    const activeConferenceTypes = this.getActiveConferenceTypes()
+    const setConference = this.canUpdateConference() ? this.setConference : null
+    if (!this.conference && (!this.canUpdateConference() || activeConferenceTypes.length === 0)) {
+      this.conference = null
+      conferenceNode.closest('tr').className = 'hide'
+    } else {
+      conferenceNode.closest('tr').className = ''
+      ReactDOM.render(
+        <CalendarConferenceWidget
+          context={this.currentContextInfo.asset_string}
+          conference={this.conference}
+          setConference={setConference}
+          conferenceTypes={activeConferenceTypes}
+        />,
+        conferenceNode
+      )
     }
   }
 
@@ -123,8 +171,6 @@ export default class EditCalendarEventDetails {
   }
 
   moreOptionsClick = jsEvent => {
-    if (this.event.object.parent_event_id) return
-
     jsEvent.preventDefault()
     const params = {return_to: window.location.href}
 
@@ -145,6 +191,14 @@ export default class EditCalendarEventDetails {
     if (data.start_time) params.start_time = data.start_time
     if (data.end_time) params.end_time = data.end_time
     if (data.duplicate) params.duplicate = data.duplicate
+
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
+      if (this.conference) {
+        params.web_conference = this.conference
+      } else {
+        params.web_conference = ''
+      }
+    }
 
     const pieces = $(jsEvent.target)
       .attr('href')
@@ -176,6 +230,17 @@ export default class EditCalendarEventDetails {
       moreOptionsHref = `${this.event.fullDetailsURL()}/edit`
     }
     this.$form.find('.more_options_link').attr('href', moreOptionsHref)
+
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
+      // check conference is still valid in context
+      if (
+        this.conference &&
+        undefined === getConferenceType(this.getActiveConferenceTypes(), this.conference)
+      ) {
+        this.setConference(null)
+      }
+      this.renderConferenceWidget()
+    }
   }
 
   duplicateCheckboxChanged = (jsEvent, _propagate) =>
@@ -196,7 +261,7 @@ export default class EditCalendarEventDetails {
 
     // set them up as appropriate variants of datetime_field
     $date.date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))}
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
     })
     $start.time_field()
     $end.time_field()
@@ -224,6 +289,33 @@ export default class EditCalendarEventDetails {
       'calendar_event[end_at]': data.end_at ? data.end_at.toISOString() : '',
       'calendar_event[location_name]': location_name
     }
+    if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
+      if (this.conference) {
+        const webConference = {
+          ...this.conference,
+          title:
+            this.conference.conference_type !== 'LtiConference'
+              ? params['calendar_event[title]']
+              : this.conference.title,
+          user_settings: {
+            ...this.conference.user_settings,
+            scheduled_date: params['calendar_event[start_at]']
+          }
+        }
+        const conferenceParams = new URLSearchParams(
+          $.param({
+            calendar_event: {
+              web_conference: webConference
+            }
+          })
+        )
+        for (const [key, value] of conferenceParams.entries()) {
+          params[key] = value
+        }
+      } else {
+        params['calendar_event[web_conference]'] = ''
+      }
+    }
 
     if (data.duplicate != null) params['calendar_event[duplicate]'] = data.duplicate
 
@@ -235,7 +327,8 @@ export default class EditCalendarEventDetails {
           start_at: data.start_at ? data.start_at.toISOString() : null,
           end_at: data.end_at ? data.end_at.toISOString() : null,
           location_name,
-          context_code: this.$form.find('.context_id').val()
+          context_code: this.$form.find('.context_id').val(),
+          webConference: this.conference
         }
       }
       const newEvent = commonEventFactory(objectData, this.event.possibleContexts())
@@ -246,6 +339,7 @@ export default class EditCalendarEventDetails {
       this.event.start = fcUtil.wrap(data.start_at)
       this.event.end = fcUtil.wrap(data.end_at)
       this.event.location_name = location_name
+      this.event.webConference = this.conference
       if (this.event.can_change_context && data.context_code !== this.event.object.context_code) {
         this.event.old_context_code = this.event.object.context_code
         this.event.removeClass(`group_${this.event.old_context_code}`)

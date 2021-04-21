@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -63,7 +65,7 @@ module WeightingSetup
 
     backend_group_helper = Factories::GradingPeriodGroupHelper.new
     @gpg = backend_group_helper.create_for_account_with_term(Account.default, @term_name)
-    @gpg.update_attributes(display_totals_for_all_grading_periods: true)
+    @gpg.update(display_totals_for_all_grading_periods: true)
 
     backend_period_helper = Factories::GradingPeriodHelper.new
     @gp1 = backend_period_helper.create_for_group(@gpg, {

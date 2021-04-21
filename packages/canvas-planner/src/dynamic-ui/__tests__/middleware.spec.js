@@ -16,67 +16,67 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createDynamicUiMiddleware as createMiddleware} from '../middleware';
+import {createDynamicUiMiddleware as createMiddleware} from '../middleware'
 
-function createManager () {
+function createManager() {
   return {
     setStore: jest.fn(),
     handleAction: jest.fn(),
-    uiStateUnchanged: jest.fn(),
-  };
+    uiStateUnchanged: jest.fn()
+  }
 }
 
-function createStore () {
+function createStore() {
   return {
     getState: jest.fn(),
-    dispatch: jest.fn(),
-  };
+    dispatch: jest.fn()
+  }
 }
 
 it('registers the store with the manager', () => {
-  const mockManager = createManager();
-  createMiddleware(mockManager)('the store');
-  expect(mockManager.setStore).toHaveBeenCalledWith('the store');
-});
+  const mockManager = createManager()
+  createMiddleware(mockManager)('the store')
+  expect(mockManager.setStore).toHaveBeenCalledWith('the store')
+})
 
 it('notifies manager of actions', () => {
-  const mockManager = createManager();
-  const mockAction = {some: 'action'};
-  createMiddleware(mockManager)(createStore())(jest.fn())({some: 'action'});
-  expect(mockManager.handleAction).toHaveBeenCalledWith(mockAction);
-});
+  const mockManager = createManager()
+  const mockAction = {some: 'action'}
+  createMiddleware(mockManager)(createStore())(jest.fn())({some: 'action'})
+  expect(mockManager.handleAction).toHaveBeenCalledWith(mockAction)
+})
 
 it('behaves as middleware', () => {
-  const mockManager = createManager();
-  const mockNext = jest.fn(() => 'next result');
-  const result = createMiddleware(mockManager)(createStore())(mockNext)({some: 'action'});
-  expect(result).toEqual('next result');
-});
+  const mockManager = createManager()
+  const mockNext = jest.fn(() => 'next result')
+  const result = createMiddleware(mockManager)(createStore())(mockNext)({some: 'action'})
+  expect(result).toEqual('next result')
+})
 
 it('notifies the manager when the state is unchanged', () => {
-  const mockManager = createManager();
-  const mockStore = createStore();
-  const theState = {};
-  mockStore.getState.mockReturnValue(theState);
-  const theAction = {type: 'an action'};
-  createMiddleware(mockManager)(mockStore)(jest.fn())(theAction);
-  expect(mockManager.uiStateUnchanged).toHaveBeenCalledWith(theAction);
-});
+  const mockManager = createManager()
+  const mockStore = createStore()
+  const theState = {}
+  mockStore.getState.mockReturnValue(theState)
+  const theAction = {type: 'an action'}
+  createMiddleware(mockManager)(mockStore)(jest.fn())(theAction)
+  expect(mockManager.uiStateUnchanged).toHaveBeenCalledWith(theAction)
+})
 
 it('does not notify the manager of unchanged state when the state has changed', () => {
-  const mockManager = createManager();
-  const mockStore = createStore();
-  mockStore.getState
-    .mockReturnValueOnce({state: 'first'})
-    .mockReturnValueOnce({state: 'second'});
-  createMiddleware(mockManager)(mockStore)(jest.fn())({some: 'action'});
-  expect(mockManager.uiStateUnchanged).not.toHaveBeenCalled();
-});
+  const mockManager = createManager()
+  const mockStore = createStore()
+  mockStore.getState.mockReturnValueOnce({state: 'first'}).mockReturnValueOnce({state: 'second'})
+  createMiddleware(mockManager)(mockStore)(jest.fn())({some: 'action'})
+  expect(mockManager.uiStateUnchanged).not.toHaveBeenCalled()
+})
 
 it('notifies the manager of the action before it is processed by the reducers', () => {
-  const mockManager = createManager();
-  const mockStore = createStore();
-  const actionFailure = () => { throw new Error('foo'); };
-  expect(() => createMiddleware(mockManager)(mockStore)(actionFailure)({some: 'action'})).toThrow();
-  expect(mockManager.handleAction).toHaveBeenCalled();
-});
+  const mockManager = createManager()
+  const mockStore = createStore()
+  const actionFailure = () => {
+    throw new Error('foo')
+  }
+  expect(() => createMiddleware(mockManager)(mockStore)(actionFailure)({some: 'action'})).toThrow()
+  expect(mockManager.handleAction).toHaveBeenCalled()
+})

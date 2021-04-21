@@ -32,7 +32,7 @@ test('publish updates the state of the model', () => {
   equal(cModule.get('published'), true)
 })
 
-test('publish saves to the server', function() {
+test('publish saves to the server', () => {
   const cModule = buildModule(true)
   const saveStub = sandbox.stub(cModule, 'save')
   cModule.publish()
@@ -46,7 +46,7 @@ test('unpublish updates the state of the model', () => {
   equal(cModule.get('published'), false)
 })
 
-test('unpublish saves to the server', function() {
+test('unpublish saves to the server', () => {
   const cModule = buildModule(true)
   const saveStub = sandbox.stub(cModule, 'save')
   cModule.unpublish()

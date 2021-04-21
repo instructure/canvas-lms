@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,12 +27,12 @@ describe SIS::CSV::CourseImporter do
   it 'should skip bad content' do
     before_count = Course.count
     importer = process_csv_data(
-      "course_id,short_name,long_name,account_id,term_id,status",
-      "C001,Hum101,Humanities,A001,T001,active",
-      ",Hum102,Humanities 2,A001,T001,active",
-      "C003,Hum102,Humanities 2,A001,T001,inactive",
-      "C004,,Humanities 2,A001,T001,active",
-      "C005,Hum102,,A001,T001,active"
+      "course_id,short_name,long_name,term_id,status",
+      "C001,Hum101,Humanities,T001,active",
+      ",Hum102,Humanities 2,T001,active",
+      "C003,Hum102,Humanities 2,T001,inactive",
+      "C004,,Humanities 2,T001,active",
+      "C005,Hum102,,T001,active"
     )
     expect(Course.count).to eq before_count + 1
 
@@ -50,6 +52,15 @@ describe SIS::CSV::CourseImporter do
     expect(course.course_code).to eql("TC 101")
     expect(course.name).to eql("Test Course 101")
     expect(course.associated_accounts.map(&:id).sort).to eq [@account.id]
+  end
+
+  it "should throw an error when account is not found" do
+    importer = process_csv_data(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,VERY_INVALID_ACCOUNT,,active"
+    )
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["Account not found \"VERY_INVALID_ACCOUNT\" for course test_1"]
   end
 
   it "should support term stickiness" do
@@ -584,6 +595,25 @@ describe SIS::CSV::CourseImporter do
     expect(course).to be_completed
   end
 
+  it "should allow publishing a course" do
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,published"
+    )
+    course = Course.where(sis_source_id: "test_1").first
+    expect(course).to be_available
+  end
+
+  it "should allow publishing an existing course" do
+    course = @account.courses.create!(sis_source_id: 'test_1', workflow_state: 'claimed')
+    Course.where(id: course).update_all(stuck_sis_fields: Set.new)
+    process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,published"
+    )
+    expect(course.reload).to be_available
+  end
+
   it 'sets and updates course_format' do
     process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,course_format",
@@ -623,13 +653,17 @@ describe SIS::CSV::CourseImporter do
   it 'should allow unpublished to be passed for active' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
-      "c1,TC 101,Test Course 1,A001,T001,unpublished"
+      "c1,TC 101,Test Course 1,,T001,unpublished"
     )
     expect(Course.active.where(sis_source_id: 'c1').take).to be_present
   end
 
   it 'should create rollback data' do
-    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    sis_user = user_model
+    batch1 = @account.sis_batches.create! do |sb|
+      sb.data = {}
+      sb.user = sis_user
+    end
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "data_1,TC 101,Test Course 101,,,active",
@@ -644,7 +678,10 @@ describe SIS::CSV::CourseImporter do
       "course_id,user_id,role,section_id,status,associated_user_id",
       "data_2,student_user,student,,active,"
     )
-    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    batch2 = @account.sis_batches.create! do |sb|
+      sb.data = {}
+      sb.user = sis_user
+    end
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "data_1,TC 101,Test Course 101,,,active",
@@ -691,6 +728,20 @@ describe SIS::CSV::CourseImporter do
       expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is associated to another blueprint course")
     end
 
+    it "should give a warning when trying to associate to a course not in the account chain" do
+      sub_account = @account.sub_accounts.create!
+      mc2 = sub_account.courses.create!(:sis_source_id => "otheraccountmastercourse")
+      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+
+      ac = @account.courses.create!(:sis_source_id => "otheraccountcoursetoassociate")
+
+      importer = process_csv_data(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{ac.sis_source_id},shortname,long name,active,#{mc2.sis_source_id}"
+      )
+      expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is not in the same or lower account as the blueprint course")
+    end
+
     it "shouldn't fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
@@ -724,6 +775,15 @@ describe SIS::CSV::CourseImporter do
       )
       expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
       expect(template2.child_subscriptions.active.pluck(:child_course_id)).to eq([c3.id])
+    end
+
+    it "should give one warning per row" do
+      courses = (1..3).map{|x| @account.courses.create!(:sis_source_id => "acourse#{x}")}
+      rows = ["course_id,short_name,long_name,status,blueprint_course_id"] +
+        courses.map{|c| "#{c.sis_source_id},shortname,long name,active,missingid"}
+      importer = process_csv_data(*rows)
+      expected = courses.map{|c| "Unknown blueprint course \"missingid\" for course \"#{c.sis_source_id}\""}
+      expect(importer.errors.map(&:last)).to match_array(expected)
     end
 
     it "should try to queue a migration afterwards" do
@@ -760,6 +820,51 @@ describe SIS::CSV::CourseImporter do
       mm = @template.reload.master_migrations.last
       expect(mm).to_not eq other_mm
       expect(mm).to be_completed
+    end
+
+    it 'sets and updates grade_passback_setting' do
+      Setting.set('valid_grade_passback_settings', 'disabled,nightly_sync,other')
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
+        "test_1,TC 101,Test Course 101,,,active,disabled",
+        "test_2,TC 102,Test Course 102,,,active,other",
+        "test_3,TC 103,Test Course 103,,,active,nightly_sync"
+      )
+      expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to eq 'disabled'
+      expect(Course.where(sis_source_id: 'test_2').take.grade_passback_setting).to eq 'other'
+      expect(Course.where(sis_source_id: 'test_3').take.grade_passback_setting).to eq 'nightly_sync'
+
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
+        "test_1,TC 101,Test Course 101,,,active,",
+        "test_2,TC 102,Test Course 102,,,active,\"\"",
+        "test_3,TC 103,Test Course 103,,,active,nightly_sync"
+      )
+      expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to be_nil
+      expect(Course.where(sis_source_id: 'test_2').take.grade_passback_setting).to be_nil
+      expect(Course.where(sis_source_id: 'test_3').take.grade_passback_setting).to eq 'nightly_sync'
+
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_3,TC 103,Test Course 103,,,active"
+      )
+      expect(Course.where(sis_source_id: 'test_3').take.grade_passback_setting).to eq 'nightly_sync'
+    end
+
+    it 'respects stuck grade_passback setting' do
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
+        "test_1,TC 101,Test Course 101,,,active,nightly_sync"
+      )
+      expect((course = Course.where(sis_source_id: 'test_1').take).grade_passback_setting).to eq 'nightly_sync'
+      course.grade_passback_setting=nil
+      course.save!
+
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
+        "test_1,TC 101,Test Course 101,,,active,nightly_sync"
+      )
+      expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to be_nil
     end
   end
 end

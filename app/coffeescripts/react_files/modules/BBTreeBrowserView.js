@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!BBTreeBrowserView'
 import TreeBrowserView from '../../views/TreeBrowserView'
 
 export default class BBTreeBrowserView {
@@ -34,9 +33,7 @@ export default class BBTreeBrowserView {
     if (options.render) {
       if (options.element == null) {
         console.error(
-          I18n.t(
-            "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
-          )
+          "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
         )
       }
       if (options.element) {

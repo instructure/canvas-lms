@@ -24,6 +24,7 @@ export default class CourseRestore extends Backbone.Model {
   baseUrl() {
     return `/api/v1/accounts/${this.get('account_id')}/courses`
   }
+
   searchUrl() {
     return `${this.baseUrl()}/${this.get('id')}?include[]=all_courses`
   }

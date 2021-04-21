@@ -16,15 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  var Helper = {}
+import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl'
 
-  Helper.setWindowLocation = function (url) {
-    window.location = url
-  }
+const Helper = {}
 
-  Helper.externalUrlLinkClick = function (event, $elt) {
-    event.preventDefault()
-    this.setWindowLocation($elt.attr('data-item-href'))
-  }.bind(Helper)
+Helper.setWindowLocation = function(url) {
+  window.location = url
+}
+
+Helper.externalUrlLinkClick = function(event, $elt) {
+  event.preventDefault()
+  this.setWindowLocation(sanitizeUrl($elt.attr('data-item-href')))
+}.bind(Helper)
 
 export default Helper

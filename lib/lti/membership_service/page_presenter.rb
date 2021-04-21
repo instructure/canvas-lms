@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -59,7 +61,7 @@ module Lti
       def context
         IMS::LTI::Models::MembershipService::Context.new(
           name: @membership_collator.context.name,
-          membership: @membership_collator.memberships,
+          membership: @membership_collator.memberships(context: @membership_collator.context),
           context_id: Lti::Asset.opaque_identifier_for(@membership_collator.context)
         )
       end

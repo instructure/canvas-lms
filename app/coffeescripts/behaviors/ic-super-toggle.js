@@ -21,6 +21,6 @@ import $ from 'jquery'
 // (they should respond to the ENTER key)
 const KEY_CODE_ENTER = 13
 
-$(document).on('keydown', '.ic-Super-toggle__input', (event) => {
+$(document).on('keydown', '.ic-Super-toggle__input', event => {
   if (event.which === KEY_CODE_ENTER) $(event.target).click()
 })

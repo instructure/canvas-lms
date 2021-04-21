@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -19,6 +21,14 @@ module GlobalLookups
   unless singleton_class.method_defined?(:enabled?)
     def self.enabled?
       false
+    end
+  end
+
+  module DevUtils
+    unless singleton_class.method_defined?(:initialize_ddb_for_development!)
+      def self.initialize_ddb_for_development!
+        puts("Nothing to do for global lookups stub")
+      end
     end
   end
 end

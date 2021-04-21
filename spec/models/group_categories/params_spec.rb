@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -161,6 +163,19 @@ module GroupCategories
         params = build_params(args)
         expect(params.create_group_count).to eq 2
       end
+    end
+
+    describe '#create_group_member_count' do
+      it 'is nil if the option to split by member count was not selected' do
+        params = build_params(split_groups: '1', create_group_member_count: '5')
+        expect(params.create_group_member_count).to be_nil
+      end
+
+      it 'passes on the parameter value' do
+        params = build_params(split_groups: '2', create_group_member_count: '5')
+        expect(params.create_group_member_count).to eq 5
+      end
+
     end
 
     describe '#assign_unassigned_members' do

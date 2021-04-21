@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -17,12 +19,20 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require_relative '../grades/pages/gradebook_page'
+require_relative '../grades/pages/gradebook_cells_page'
 require_relative 'pages/student_context_tray_page'
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe "admin avatars" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before do
+    set_granular_permission
+  end
+
+  before(:each) do
     course_with_admin_logged_in
     Account.default.enable_service(:avatars)
     Account.default.settings[:avatars] = 'enabled_pending'
@@ -40,7 +50,7 @@ describe "admin avatars" do
   end
 
   def verify_avatar_state(user, opts={})
-    if (opts.empty?)
+    if opts.empty?
       expect(f("#submitted_profile")).to include_text "Submitted 1"
       f("#submitted_profile").click
     else
@@ -62,12 +72,12 @@ describe "admin avatars" do
     user
   end
 
-  it "should verify that the profile pictures is submitted " do
+  it "should verify that the profile picture is submitted " do
     user = create_avatar_state
     verify_avatar_state(user)
   end
 
-  it "should verify that the profile pictures is reported " do
+  it "should verify that the profile picture is reported " do
     user = create_avatar_state("reported")
     opts = {"#reported_profile" => "Reported 1"}
     verify_avatar_state(user, opts)
@@ -124,13 +134,12 @@ describe "admin avatars" do
     include StudentContextTray
 
     before(:each) do
-      preload_graphql_schema
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
       @student = student_in_course.user
       @student.avatar_image_url = "http://www.example.com"
-      Gradebook.visit_gradebook(@course)
-      Gradebook.student_name_link(@student.id).click
+      Gradebook.visit(@course)
+      Gradebook::Cells.student_cell_name_link(@student).click
     end
 
     it "should display student avatar in tray", priority: "1", test_id: 3299466 do
@@ -138,5 +147,18 @@ describe "admin avatars" do
 
       expect(student_avatar_link).to be_displayed
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_manage_users) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_manage_users) }
   end
 end

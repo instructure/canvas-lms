@@ -23,10 +23,11 @@ describe('parseLinkHeader', () => {
     const axiosResponse = {
       data: {},
       headers: {
-        link: '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="current",' +
-              '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="first",' +
-              '<http://canvas.example.com/api/v1/someendpoint&page=2&per_page=50>; rel="next",' +
-              '<http://canvas.example.com/api/v1/someendpoint&page=3&per_page=50>; rel="last"'
+        link:
+          '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="current",' +
+          '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="first",' +
+          '<http://canvas.example.com/api/v1/someendpoint&page=2&per_page=50>; rel="next",' +
+          '<http://canvas.example.com/api/v1/someendpoint&page=3&per_page=50>; rel="last"'
       }
     }
 

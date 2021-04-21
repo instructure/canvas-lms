@@ -110,9 +110,7 @@ class AssignmentConfigurationTools extends React.Component {
       endpoint = `/courses/${this.props.courseId}/external_tools/retrieve`
     } else {
       query = `?display=borderless&secure_params=${this.props.secureParams}`
-      endpoint = `/courses/${this.props.courseId}/lti/basic_lti_launch_request/${
-        tool.definition_id
-      }`
+      endpoint = `/courses/${this.props.courseId}/lti/basic_lti_launch_request/${tool.definition_id}`
     }
 
     return endpoint + query
@@ -172,7 +170,7 @@ class AssignmentConfigurationTools extends React.Component {
       value={this.state.selectedToolValue}
     >
       <option title="Plagiarism Review Tool" data-launch="about:blank" data-type="none">
-        None
+        {I18n.t('None')}
       </option>
       {this.state.tools.map(tool => (
         <option
@@ -198,12 +196,8 @@ class AssignmentConfigurationTools extends React.Component {
   )
 
   renderConfigTool = () => {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
     return (
       <div style={{display: this.state.toolLaunchUrl === 'about:blank' ? 'none' : 'block'}}>
         <div
@@ -226,6 +220,7 @@ class AssignmentConfigurationTools extends React.Component {
           ref={e => {
             this.iframe = e
           }}
+          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}
@@ -248,7 +243,7 @@ class AssignmentConfigurationTools extends React.Component {
     return (
       <div>
         <div className="form-column-left">
-          <label htmlFor="similarity_detection_tool">Plagiarism Review</label>
+          <label htmlFor="similarity_detection_tool">{I18n.t('Plagiarism Review')}</label>
         </div>
 
         <div className="form-column-right">

@@ -16,65 +16,142 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
+import {render} from '@testing-library/react'
 
-import {mockAssignment} from '../../test-utils'
+import {mockAssignmentAndSubmission} from '../../mocks'
 import StepContainer from '../StepContainer'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
+const unavailableSteps = ['Unavailable', 'Upload', 'Submit', 'Not Graded Yet']
+const availableSteps = ['Available', 'Upload', 'Submit', 'Not Graded Yet']
+const uploadedSteps = ['Available', 'Uploaded', 'Submit', 'Not Graded Yet']
+const submittedSteps = ['Available', 'Uploaded', 'Submitted', 'Not Graded Yet']
+const gradedSteps = ['Available', 'Uploaded', 'Submitted', 'Graded']
+
+/**
+ * @param stepContainer the step container to verify; the step
+ *                      container should include all the steps
+ *                      characteristic to it
+ * @param stepArray     an array of the steps, represented as
+ *                      strings, that are characteristic to the
+ *                      step container
+ * @param getStep       the function that retrieves the steps
+ *                      from the step container
+ */
+function verifySteps(stepContainer, stepArray, getStep) {
+  stepArray.forEach(step => {
+    expect(stepContainer).toContainElement(getStep(step))
+  })
+}
+
+it('will render collapsed label if steps is collapsed', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+  const {getAllByText, getByTestId} = render(<StepContainer {...props} isCollapsed />)
+  expect(getByTestId('collapsed-step-container')).toContainElement(getAllByText('Submitted')[0])
 })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
-
-it('will render the availaible step container if assignment is not locked', () => {
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(<StepContainer assignment={assignment} />, document.getElementById('fixtures'))
-
-  const expectedElement = $('.in-progress')
-  const unexpectedElement = $('.unavailable')
-  expect(expectedElement).toHaveLength(1)
-  expect(unexpectedElement).toHaveLength(0)
-})
-
-it('will render the unavailaible step container if assignment is locked', () => {
-  const assignment = mockAssignment({lockInfo: {isLocked: true}})
-  ReactDOM.render(<StepContainer assignment={assignment} />, document.getElementById('fixtures'))
-
-  const expectedElement = $('.unavailable')
-  const unexpectedElement = $('.in-progress')
-  expect(expectedElement).toHaveLength(1)
-  expect(unexpectedElement).toHaveLength(0)
-})
-
-it('will render collapsed label if steps is collapsed', () => {
-  const label = 'TEST'
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(
-    <StepContainer assignment={assignment} isCollapsed collapsedLabel={label} />,
-    document.getElementById('fixtures')
+it('will not render collapsed label if steps is not collapsed', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+  const {getByText, queryByTestId} = render(
+    <StepContainer {...props} isCollapsed={false} collapsedLabel="TEST" />
   )
-
-  const expectedElement = $('.steps-main-status-label')
-  expect(expectedElement.text()).toBe(label)
+  expect(queryByTestId('collapsed-step-container')).not.toBeInTheDocument()
+  expect(getByText('Uploaded')).toBeInTheDocument()
 })
 
-it('will not render collapsed label if steps is collapsed', () => {
-  const label = 'TEST'
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(
-    <StepContainer assignment={assignment} isCollapsed={false} collapsedLabel={label} />,
-    document.getElementById('fixtures')
-  )
+describe('the assignment is unavailable', () => {
+  it('renders the pizza tracker with the first state as unavailable for unsubmitted and undrafted assignments', async () => {
+    const props = await mockAssignmentAndSubmission({LockInfo: {isLocked: true}})
+    const {getByText, getByTestId} = render(<StepContainer {...props} />)
+    verifySteps(getByTestId('available-step-container'), unavailableSteps, getByText)
+  })
 
-  const expectedElement = $('.steps-main-status-label')
-  expect(expectedElement.text()).toHaveLength(0)
+  it('renders the pizza tracker with the current step icon as locked for drafted assignments', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        submissionDraft: {
+          meetsAssignmentCriteria: true
+        }
+      },
+      LockInfo: {isLocked: true}
+    })
+    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
+    verifySteps(
+      getByTestId('uploaded-step-container'),
+      ['Uploaded', 'Submit', 'Not Graded Yet'],
+      getByText
+    )
+    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
+  })
+
+  it('will render the unavailable state tracker with all the appropriate steps', async () => {
+    const {getByText, getByTestId} = render(<StepContainer />)
+    verifySteps(getByTestId('unavailable-step-container'), unavailableSteps, getByText)
+  })
+})
+
+describe('the assignment is available', () => {
+  it('will render the available state tracker with all the appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
+    verifySteps(getByTestId('available-step-container'), availableSteps, getByText)
+  })
+
+  it('will render the availaible state tracker if assignment is not locked, uploaded, or submitted', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId} = render(<StepContainer {...props} />)
+    expect(getByTestId('available-step-container')).toBeInTheDocument()
+  })
+
+  it('will render the availaible state tracker if there are no attachments', async () => {
+    const props = await mockAssignmentAndSubmission({SubmissionDraft: {attachments: []}})
+    const {getByTestId} = render(<StepContainer {...props} />)
+    expect(getByTestId('available-step-container')).toBeInTheDocument()
+  })
+
+  it('will render the availaible state tracker if there is an empty submission draft', async () => {
+    const props = await mockAssignmentAndSubmission({SubmissionDraft: null})
+    const {getByTestId} = render(<StepContainer {...props} />)
+    expect(getByTestId('available-step-container')).toBeInTheDocument()
+  })
+})
+
+describe('the assignment is uploaded', () => {
+  it('will render the uploaded state tracker with all appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
+    verifySteps(getByTestId('uploaded-step-container'), uploadedSteps, getByText)
+  })
+
+  it('will render the uploaded state tracker if an assignment is not submitted', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {getByTestId} = render(<StepContainer {...props} />)
+    expect(getByTestId('uploaded-step-container')).toBeInTheDocument()
+  })
+})
+
+describe('the assignment is submitted', () => {
+  it('will render the submitted state tracker with all appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
+    verifySteps(getByTestId('submitted-step-container'), submittedSteps, getByText)
+  })
+
+  it('will render the submitted state tracker if an assignment is not graded', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+    const {getByTestId} = render(<StepContainer {...props} />)
+    expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+  })
+})
+
+describe('the assignment is graded', () => {
+  it('will render the graded state tracker with all appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
+    verifySteps(getByTestId('graded-step-container'), gradedSteps, getByText)
+  })
 })

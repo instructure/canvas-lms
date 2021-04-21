@@ -17,21 +17,20 @@
  */
 
 import * as AssignmentApi from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
-import FakeServer, {paramsFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {
+  paramsFromRequest,
+  pathFromRequest
+} from 'jsx/shared/network/__tests__/FakeServer'
 
 QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
-  let qunitTimeout
   let server
 
   suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // avoid accidental unresolved async
     server = new FakeServer()
   })
 
   suiteHooks.afterEach(() => {
     server.teardown()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   QUnit.module('.speedGraderUrl()', () => {
@@ -48,19 +47,19 @@ QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
     })
   })
 
-  QUnit.module('.publishGrades()', () => {
+  QUnit.module('.releaseGrades()', () => {
     const url = `/api/v1/courses/1201/assignments/2301/provisional_grades/publish`
 
-    test('sends a request to publish provisional grades', async () => {
+    test('sends a request to release provisional grades', async () => {
       server.for(url).respond({status: 200, body: {}})
-      await AssignmentApi.publishGrades('1201', '2301')
+      await AssignmentApi.releaseGrades('1201', '2301')
       const request = server.receivedRequests[0]
       equal(pathFromRequest(request), url)
     })
 
     test('sends a POST request', async () => {
       server.for(url).respond({status: 200, body: {}})
-      await AssignmentApi.publishGrades('1201', '2301')
+      await AssignmentApi.releaseGrades('1201', '2301')
       const request = server.receivedRequests[0]
       equal(request.method, 'POST')
     })
@@ -68,7 +67,7 @@ QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
     test('does not catch failures', async () => {
       server.for(url).respond({status: 500, body: {error: 'server error'}})
       try {
-        await AssignmentApi.publishGrades('1201', '2301')
+        await AssignmentApi.releaseGrades('1201', '2301')
       } catch (e) {
         ok(e.message.includes('500'))
       }

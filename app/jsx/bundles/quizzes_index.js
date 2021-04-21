@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!quizzes'
+import I18n from 'i18n!quizzes_index'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
@@ -26,9 +26,9 @@ import IndexView from 'compiled/views/quizzes/IndexView'
 import QuizCollection from 'compiled/collections/QuizCollection'
 import QuizOverrideLoader from 'compiled/models/QuizOverrideLoader'
 import vddTooltip from 'compiled/util/vddTooltip'
+import {monitorLtiMessages} from 'lti/messages'
 
 const QuizzesIndexRouter = Backbone.Router.extend({
-
   routes: {
     '': 'index'
   },
@@ -40,18 +40,30 @@ const QuizzesIndexRouter = Backbone.Router.extend({
     toggleMessage: I18n.t('toggle_message', 'toggle quiz visibility')
   },
 
-  initialize () {
+  initialize() {
     this.allQuizzes = ENV.QUIZZES
 
     this.quizzes = {
-      assignment: this.createQuizItemGroupView(this.allQuizzes.assignment, this.translations.assignmentQuizzes, 'assignment'),
-      open: this.createQuizItemGroupView(this.allQuizzes.open, this.translations.practiceQuizzes, 'open'),
-      surveys: this.createQuizItemGroupView(this.allQuizzes.surveys, this.translations.surveys, 'surveys'),
+      assignment: this.createQuizItemGroupView(
+        this.allQuizzes.assignment,
+        this.translations.assignmentQuizzes,
+        'assignment'
+      ),
+      open: this.createQuizItemGroupView(
+        this.allQuizzes.open,
+        this.translations.practiceQuizzes,
+        'open'
+      ),
+      surveys: this.createQuizItemGroupView(
+        this.allQuizzes.surveys,
+        this.translations.surveys,
+        'surveys'
+      ),
       noQuizzes: new NoQuizzesView()
     }
   },
 
-  index () {
+  index() {
     this.view = new IndexView({
       assignmentView: this.quizzes.assignment,
       openView: this.quizzes.open,
@@ -65,22 +77,30 @@ const QuizzesIndexRouter = Backbone.Router.extend({
     if (this.shouldLoadOverrides()) this.loadOverrides()
   },
 
-  loadOverrides () {
-    const quizModels = ['assignment', 'open', 'surveys'].reduce((out, quizType) =>
-      out.concat(this.quizzes[quizType].collection.models)
-    , [])
+  loadOverrides() {
+    const newQuizzes = []
+    const classicQuizzes = []
+    const quizTypes = ['assignment', 'open', 'surveys']
+    quizTypes.forEach(quizType => {
+      this.quizzes[quizType].collection.models.forEach(model => {
+        if (model.attributes.quiz_type === 'quizzes.next') {
+          newQuizzes.push(model)
+        } else {
+          classicQuizzes.push(model)
+        }
+      })
+    })
 
-    return QuizOverrideLoader.loadQuizOverrides(quizModels, ENV.URLS.assignment_overrides)
+    QuizOverrideLoader.loadQuizOverrides(newQuizzes, ENV.URLS.new_quizzes_assignment_overrides)
+    return QuizOverrideLoader.loadQuizOverrides(classicQuizzes, ENV.URLS.assignment_overrides)
   },
 
-  createQuizItemGroupView (collection, title, type) {
-    const { options } = this.allQuizzes
+  createQuizItemGroupView(collection, title, type) {
+    const {options} = this.allQuizzes
 
     // get quiz attributes from root container and add options
     return new QuizItemGroupView({
-      collection: new QuizCollection(_.map(collection, quiz =>
-        $.extend(quiz, options[quiz.id]))
-      ),
+      collection: new QuizCollection(_.map(collection, quiz => $.extend(quiz, options[quiz.id]))),
       isSurvey: type === 'surveys',
       listId: `${type}-quizzes`,
       title,
@@ -88,7 +108,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
     })
   },
 
-  shouldLoadOverrides () {
+  shouldLoadOverrides() {
     return true
   }
 })
@@ -98,3 +118,4 @@ const router = new QuizzesIndexRouter()
 Backbone.history.start()
 
 vddTooltip()
+monitorLtiMessages()

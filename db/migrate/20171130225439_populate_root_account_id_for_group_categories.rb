@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,10 +22,6 @@ class PopulateRootAccountIdForGroupCategories < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    DataFixup::PopulateRootAccountIdForGroupCategories.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      max_attempts: 1,
-      n_strand: 'long_datafixups')
+    DataFixup::PopulateRootAccountIdForGroupCategories.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -51,6 +53,8 @@ module Api::V1::FeatureFlag
       hash['hidden'] = feature_flag.hidden? ||
           !feature_flag.default? && feature_flag.context == context && feature_flag.unhides_feature?
     end
+    # To allow for determinations of when to delete vs update
+    hash['parent_state'] = context.lookup_feature_flag(feature_flag.feature, skip_cache: true, inherited_only: true)&.state
     hash
   end
 

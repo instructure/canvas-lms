@@ -16,37 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!GroupsTray'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {View} from '@instructure/ui-view'
+import {List} from '@instructure/ui-list'
+import {Heading} from '@instructure/ui-heading'
+import {Spinner} from '@instructure/ui-spinner'
+import {Link} from '@instructure/ui-link'
 
 export default function GroupsTray({groups, hasLoaded}) {
   return (
     <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Groups')}</Heading>
-      <hr role="presentation"/>
-      <List variant="unstyled"  margin="small 0" itemSpacing="small">
+      <Heading level="h3" as="h2">
+        {I18n.t('Groups')}
+      </Heading>
+      <hr role="presentation" />
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
-          groups.map(group =>
-            <ListItem key={group.id}>
-              <Link href={`/groups/${group.id}`}>{group.name}</Link>
-            </ListItem>
-          ).concat([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="all">
-              <Link href="/groups">{I18n.t('All Groups')}</Link>
-            </ListItem>
-          ])
+          groups
+            .map(group => (
+              <List.Item key={group.id}>
+                <Link isWithinText={false} href={`/groups/${group.id}`}>
+                  {group.name}
+                </Link>
+              </List.Item>
+            ))
+            .concat([
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="all">
+                <Link isWithinText={false} href="/groups">
+                  {I18n.t('All Groups')}
+                </Link>
+              </List.Item>
+            ])
         ) : (
-          <ListItem>
-            <Spinner size="small" title={I18n.t('Loading')} />
-          </ListItem>
+          <List.Item>
+            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+          </List.Item>
         )}
       </List>
     </View>
@@ -54,10 +63,12 @@ export default function GroupsTray({groups, hasLoaded}) {
 }
 
 GroupsTray.propTypes = {
-  groups: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })).isRequired,
+  groups: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
   hasLoaded: bool.isRequired
 }
 

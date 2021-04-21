@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -124,6 +126,7 @@
 class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
   include Api::V1::ExternalTools
+  include NewQuizzesFeaturesHelper
 
   before_action :require_context
   before_action :require_auth
@@ -171,11 +174,15 @@ class ContentMigrationsController < ApplicationController
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
       js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
       js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
-      js_env(:SHOW_SELECT => @current_user.manageable_courses.count <= 100)
+
+      js_env(:SHOW_SELECT => should_show_course_copy_dropdown)
       js_env(:CONTENT_MIGRATIONS_EXPIRE_DAYS => ContentMigration.expire_days)
-      js_env(:QUIZZES_NEXT_CONFIGURED_ROOT => @context.root_account.feature_allowed?(:quizzes_next) &&
-             @context.root_account.feature_enabled?(:import_to_quizzes_next))
-      js_env(:QUIZZES_NEXT_ENABLED => @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?)
+      js_env(:QUIZZES_NEXT_ENABLED => new_quizzes_enabled?)
+      js_env(:NEW_QUIZZES_IMPORT => new_quizzes_import_enabled?)
+      js_env(:NEW_QUIZZES_MIGRATION => new_quizzes_migration_enabled?)
+      js_env(:NEW_QUIZZES_IMPORT_THIRD => new_quizzes_import_third_party?)
+      js_env(:NEW_QUIZZES_MIGRATION_DEFAULT => new_quizzes_migration_default)
+      js_env(:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT => @domain_root_account.feature_enabled?('selectable_outcomes_in_course_copy'))
       set_tutorial_js_env
     end
   end
@@ -247,6 +254,10 @@ class ContentMigrationsController < ApplicationController
   #
   # @argument settings[file_url] [string] A URL to download the file from. Must not require authentication.
   #
+  # @argument settings[content_export_id] [String]
+  #   The id of a ContentExport to import. This allows you to import content previously exported from Canvas
+  #   without needing to download and re-upload it.
+  #
   # @argument settings[source_course_id] [String]
   #   The course to copy from for a course copy migration. (required if doing
   #   course copy)
@@ -266,6 +277,23 @@ class ContentMigrationsController < ApplicationController
   # @argument settings[question_bank_name] [String]
   #   The question bank to import questions into if not specified in the content
   #   package, if both bank id and name are set, id will take precedence.
+  #
+  # @argument settings[insert_into_module_id] [Integer]
+  #   The id of a module in the target course. This will add all imported items
+  #   (that can be added to a module) to the given module.
+  #
+  # @argument settings[insert_into_module_type] [String,"assignment"|"discussion_topic"|"file"|"page"|"quiz"]
+  #   If provided (and +insert_into_module_id+ is supplied),
+  #   only add objects of the specified type to the module.
+  #
+  # @argument settings[insert_into_module_position] [Integer]
+  #   The (1-based) position to insert the imported items into the course
+  #   (if +insert_into_module_id+ is supplied). If this parameter
+  #   is omitted, items will be added to the end of the module.
+  #
+  # @argument settings[move_to_assignment_group_id] [Integer]
+  #   The id of an assignment group in the target course. If provided, all
+  #   imported assignments will be moved to the given assignment group.
   #
   # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course
@@ -300,6 +328,15 @@ class ContentMigrationsController < ApplicationController
   #   {api:ContentMigrationsController#update Update endpoint} and provide these
   #   copy parameters to start the import.
   #
+  # @argument select [Optional, Hash, "folders"|"files"|"attachments"|"quizzes"|"assignments"|"announcements"|"calendar_events"|"discussion_topics"|"modules"|"module_items"|"pages"|"rubrics"]
+  #   For +course_copy_importer+ migrations, this parameter allows you to select
+  #   the objects to copy without using the +selective_import+ argument and
+  #   +waiting_for_select+ state as is required for uploaded imports (though that
+  #   workflow is also supported for course copy migrations).
+  #   The keys are object types like 'files', 'folders', 'pages', etc. The value
+  #   for each key is a list of object ids. An id can be an integer or a string.
+  #   Multiple object types can be selected in the same call.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/content_migrations' \
@@ -329,8 +366,8 @@ class ContentMigrationsController < ApplicationController
 
     settings = @plugin.settings || {}
     if settings[:requires_file_upload]
-      if !(params[:pre_attachment] && params[:pre_attachment][:name].present?) && !(params[:settings] && params[:settings][:file_url].present?)
-        return render(:json => {:message => t('must_upload_file', "File upload or url is required")}, :status => :bad_request)
+      if params.dig(:pre_attachment, :name).blank? && params.dig(:settings, :file_url).blank? && params.dig(:settings, :content_export_id).blank?
+        return render(:json => {:message => t("File upload, file_url, or content_export_id is required")}, :status => :bad_request)
       end
     end
     source_course = lookup_sis_source_course
@@ -344,7 +381,7 @@ class ContentMigrationsController < ApplicationController
       user: @current_user,
       context: @context,
       migration_type: params[:migration_type],
-      initiated_source: :api
+      initiated_source: (in_app? ? :api_in_app : :api)
     )
     @content_migration.workflow_state = 'created'
     @content_migration.source_course = source_course if source_course
@@ -460,7 +497,8 @@ class ContentMigrationsController < ApplicationController
   def content_list
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
-    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration, base_url)
+    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration, base_url,
+      global_identifiers: @content_migration.use_global_identifiers?)
 
     unless formatter.valid_type?(params[:type])
       return render :json => {:message => "unsupported migration type"}, :status => :bad_request
@@ -498,8 +536,16 @@ class ContentMigrationsController < ApplicationController
         @content_migration.workflow_state = 'exported'
         params[:do_not_run] = true
       end
+    elsif params[:select] && params[:migration_type] == 'course_copy_importer'
+      copy_options = ContentMigration.process_copy_params(params[:select]&.to_unsafe_h,
+        global_identifiers: @content_migration.use_global_identifiers?,
+        for_content_export: true)
+      @content_migration.migration_settings[:migration_ids_to_import] ||= {}
+      @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+      @content_migration.copy_options = copy_options
     elsif params[:copy]
-      copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h)
+      copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h,
+        global_identifiers: @content_migration.use_global_identifiers?)
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options
@@ -519,13 +565,48 @@ class ContentMigrationsController < ApplicationController
         end
         @content_migration.save!
         @content_migration.reset_job_progress
-      elsif !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
-        @content_migration.queue_migration(@plugin)
+      else
+        if params.dig(:settings, :content_export_id).present?
+          return false unless link_content_export_attachment
+        end
+
+        if !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
+          @content_migration.shard.activate do
+            @content_migration.queue_migration(@plugin)
+          end
+        end
       end
 
       render :json => content_migration_json(@content_migration, @current_user, session, preflight_json)
     else
       render :json => @content_migration.errors, :status => :bad_request
     end
+  end
+
+  def should_show_course_copy_dropdown
+    if @current_user.adminable_accounts.any?
+      false # assume that if they're an account admin they're probably managing so many courses it's not worth it to even try the count
+    else
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(true).count }.sum
+      course_count <= 100
+    end
+  end
+
+  def link_content_export_attachment
+    ret = false
+    export = ContentExport.find_by_id(params[:settings][:content_export_id])
+    if export && export.grants_right?(@current_user, session, :read)
+      if export.workflow_state == 'exported' && export.attachment
+        @content_migration.attachment = export.attachment.clone_for(@content_migration)
+        ret = true
+      else
+        render(:json => { :message => "content export is incomplete" }, :status => :bad_request)
+      end
+    else
+      render(:json => { :message => "invalid content export" }, :status => :bad_request)
+    end
+    @content_migration.workflow_state = 'pre_process_error' unless ret
+    @content_migration.save!
+    ret
   end
 end

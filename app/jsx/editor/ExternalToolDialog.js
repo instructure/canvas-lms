@@ -21,12 +21,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ExternalToolDialogModal from './ExternalToolDialog/Modal'
 import ExternalToolDialogTray from './ExternalToolDialog/Tray'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import I18n from 'i18n!editor'
+import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
+import I18n from 'i18n!ExternalToolDialog'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
-import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
-import {processContentItemsForEditor} from '../deep_linking/ContentItemProcessor'
+import processEditorContentItems from '../deep_linking/processors/processEditorContentItems'
+import {Flex} from '@instructure/ui-flex'
 
 const EMPTY_BUTTON = {
   height: 300,
@@ -46,6 +47,7 @@ export default class ExternalToolDialog extends React.Component {
       addEventListener: PropTypes.func.isRequired,
       removeEventListener: PropTypes.func.isRequired,
       confirm: PropTypes.func.isRequired,
+      dispatchEvent: PropTypes.func.isRequired,
       height: PropTypes.number.isRequired,
       $: PropTypes.func.isRequired
     }).isRequired,
@@ -54,7 +56,8 @@ export default class ExternalToolDialog extends React.Component {
       selection: PropTypes.shape({
         getContent: PropTypes.func.isRequired
       }),
-      getContent: PropTypes.func.isRequired
+      getContent: PropTypes.func.isRequired,
+      focus: PropTypes.func.isRequired
     }).isRequired,
     contextAssetString: PropTypes.string.isRequired,
     iframeAllowances: PropTypes.string.isRequired,
@@ -71,7 +74,8 @@ export default class ExternalToolDialog extends React.Component {
     open: false,
     button: EMPTY_BUTTON,
     infoAlert: null,
-    form: EMPTY_FORM
+    form: EMPTY_FORM,
+    iframeLoaded: false
   }
 
   open(button) {
@@ -119,8 +123,12 @@ export default class ExternalToolDialog extends React.Component {
   handleDeepLinking = ev => {
     const {editor, deepLinkingOrigin} = this.props
     // Only accept messages from the same origin
-    if (ev.origin === deepLinkingOrigin) {
-      processContentItemsForEditor(ev, editor, this)
+    if (
+      ev.origin === deepLinkingOrigin &&
+      ev.data &&
+      ev.data.messageType === 'LtiDeepLinkingResponse'
+    ) {
+      processEditorContentItems(ev, editor, this)
     }
   }
 
@@ -132,10 +140,15 @@ export default class ExternalToolDialog extends React.Component {
     }
   }
 
-  handleOpen = () => this.formRef.submit()
+  handleOpen = () => {
+    if (this.state.open) this.formRef.submit()
+  }
 
   handleRemove = () => {
     this.setState({button: EMPTY_BUTTON})
+    this.props.editor.focus()
+    // force tinyMCE to redraw sticky toolbar otherwise it never goes away
+    this.props.win.dispatchEvent(new Event('resize'))
   }
 
   handleInfoAlertFocus = ev => this.setState({infoAlert: ev.target})
@@ -143,13 +156,13 @@ export default class ExternalToolDialog extends React.Component {
   handleInfoAlertBlur = () => this.setState({infoAlert: null})
 
   render() {
-    const {open, button, form, infoAlert} = this.state
+    const {open, button, form, infoAlert, iframeLoaded} = this.state
     const {iframeAllowances, win} = this.props
     const label = I18n.t('embed_from_external_tool', 'Embed content from External Tool')
     const frameHeight = Math.max(Math.min(win.height - 100, 550), 100)
     const Overlay = button.use_tray ? ExternalToolDialogTray : ExternalToolDialogModal
     return (
-      <React.Fragment>
+      <>
         <form
           ref={ref => (this.formRef = ref)}
           method="POST"
@@ -167,53 +180,60 @@ export default class ExternalToolDialog extends React.Component {
           onOpen={this.handleOpen}
           onClose={this.handleRemove}
           onCloseButton={this.handleClose}
-          closeLabel={I18n.t('Close')}
           name={button.name}
         >
-          <FlexItem>
-            <div
-              ref={ref => (this.beforeInfoAlertRef = ref)}
-              tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-              onFocus={this.handleInfoAlertFocus}
-              onBlur={this.handleInfoAlertBlur}
-              className={
-                infoAlert && infoAlert === this.beforeInfoAlertRef ? '' : 'screenreader-only'
-              }
-            >
-              <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
-            </div>
-          </FlexItem>
+          <div
+            ref={ref => (this.beforeInfoAlertRef = ref)}
+            tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+            onFocus={this.handleInfoAlertFocus}
+            onBlur={this.handleInfoAlertBlur}
+            className={
+              infoAlert && infoAlert === this.beforeInfoAlertRef ? '' : 'screenreader-only'
+            }
+          >
+            <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
+          </div>
+          {!iframeLoaded && (
+            <Flex alignItems="center" justifyItems="center">
+              <Flex.Item>
+                <Spinner
+                  renderTitle={I18n.t('Loading External Tool')}
+                  size="large"
+                  margin="0 0 0 medium"
+                />
+              </Flex.Item>
+            </Flex>
+          )}
+
           <iframe
             title={label}
             ref={ref => (this.iframeRef = ref)}
             name="external_tool_launch"
-            src="/images/ajax-loader-medium-444.gif"
+            src=""
             id="external_tool_button_frame"
             style={{
-              flexGrow: '1',
-              flexShrink: '1',
-              width: button.use_tray ? undefined : button.width || 800,
-              height: button.use_tray ? undefined : button.height || frameHeight,
-              border: '0'
+              width: button.use_tray ? '100%' : button.width || 800,
+              height: button.use_tray ? '100%' : button.height || frameHeight,
+              border: '0',
+              display: 'block',
+              visibility: iframeLoaded ? 'visible' : 'hidden'
             }}
             allow={iframeAllowances}
             borderstyle="0"
+            data-lti-launch="true"
+            onLoad={() => this.setState({iframeLoaded: true})}
           />
-          <FlexItem>
-            <div
-              ref={ref => (this.afterInfoAlertRef = ref)}
-              tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-              onFocus={this.handleInfoAlertFocus}
-              onBlur={this.handleInfoAlertBlur}
-              className={
-                infoAlert && infoAlert === this.afterInfoAlertRef ? '' : 'screenreader-only'
-              }
-            >
-              <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
-            </div>
-          </FlexItem>
+          <div
+            ref={ref => (this.afterInfoAlertRef = ref)}
+            tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+            onFocus={this.handleInfoAlertFocus}
+            onBlur={this.handleInfoAlertBlur}
+            className={infoAlert && infoAlert === this.afterInfoAlertRef ? '' : 'screenreader-only'}
+          >
+            <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
+          </div>
         </Overlay>
-      </React.Fragment>
+      </>
     )
   }
 }

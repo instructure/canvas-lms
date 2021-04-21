@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -16,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require "spec_helper"
 
 describe CanvadocSessionsController do
+  include HmacHelper
+
   before :once do
     course_with_teacher(:active_all => true)
     student_in_course
@@ -35,7 +39,155 @@ describe CanvadocSessionsController do
     user_session(@teacher)
   end
 
+  describe "#create" do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+      @submission = submission_model(assignment: @assignment, user: @student)
+      @attachment = attachment_model(content_type: "application/pdf", user: @student)
+      Canvadoc.create!(attachment: @attachment)
+    end
+
+    before(:each) do
+      Account.site_admin.enable_feature!(:annotated_document_submissions)
+      @assignment.update!(annotatable_attachment_id: @attachment.id)
+      user_session(@student)
+    end
+
+    let(:params) do
+      {
+        submission_attempt: "draft",
+        submission_id: @submission.id
+      }
+    end
+
+    let(:canvadocs_session_url_params) do
+      json_response = json_parse(response.body)
+      Rack::Utils.parse_query(URI(json_response["canvadocs_session_url"]).query)
+    end
+
+    it "renders unauthorized if the feature flag is off" do
+      Account.site_admin.disable_feature!(:annotated_document_submissions)
+      post :create, params: params
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "renders unauthorized if the user does not own the submission" do
+      user_session(@teacher)
+      post :create, params: params
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "renders unauthorized if the assignment is not annotatable" do
+      @assignment.update!(annotatable_attachment_id: nil)
+      post :create, params: params
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "returns unauthorized if the submission is deleted" do
+      new_student = @course.enroll_student(User.create!).user
+      new_submission = @assignment.submissions.find_by(user: new_student)
+      new_submission.update!(workflow_state: :deleted)
+
+      user_session(new_student)
+      post :create, params: {submission_attempt: "draft", submission_id: new_submission.id}
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "renders bad_request if submission is out of attempts and draft is true" do
+      @assignment.update!(allowed_attempts: 2)
+      @submission.update!(attempt: 2)
+
+      post :create, params: params
+
+      aggregate_failures do
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["error"]).to eq "There are no more attempts available for this submission"
+      end
+    end
+
+    it "renders bad_request if the submission_attempt does not match any CanvadocsAnnotationContext" do
+      new_student = @course.enroll_student(User.create!).user
+      new_submission = @assignment.submissions.find_by(user: new_student)
+
+      user_session(new_student)
+      post :create, params: {submission_attempt: 1000, submission_id: new_submission.id}
+
+      aggregate_failures do
+        expect(response).to have_http_status(:bad_request)
+        expect(json_parse(response.body)["error"]).to eq "No annotations associated with that submission_attempt"
+      end
+    end
+
+    it "contains a canvadocs_session_url in the response" do
+      post :create, params: params
+      expect(json_parse(response.body)["canvadocs_session_url"]).not_to be_nil
+    end
+
+    it "contains a blob param in the returned canvadocs_session_url" do
+      post :create, params: params
+      expect(canvadocs_session_url_params["blob"]).not_to be_nil
+    end
+
+    it "contains an hmac param in the returned canvadocs_session_url" do
+      post :create, params: params
+      expect(canvadocs_session_url_params["hmac"]).not_to be_nil
+    end
+
+    it "successfully signed the blob" do
+      post :create, params: params
+      expect {
+        extract_blob(canvadocs_session_url_params["hmac"], canvadocs_session_url_params["blob"])
+      }.not_to raise_error
+    end
+
+    it "creates a CanvadocsAnnotationContext when one does not exist" do
+      new_student = @course.enroll_student(User.create!).user
+      new_submission = @assignment.submissions.find_by(user: new_student)
+
+      user_session(new_student)
+
+      expect {
+        post :create, params: {submission_attempt: "draft", submission_id: new_submission.id}
+      }.to change {
+        new_submission.canvadocs_annotation_contexts.where(attachment: @attachment, submission_attempt: nil).count
+      }.by(1)
+    end
+
+    describe "blob params" do
+      let(:blob) do
+        extract_blob(canvadocs_session_url_params["hmac"], canvadocs_session_url_params["blob"])
+      end
+
+      it "contains an annotation_context" do
+        annotation_context = @submission.canvadocs_annotation_contexts.create!(
+          attachment: @attachment,
+          submission_attempt: 1
+        )
+        post :create, params: params.merge(submission_attempt: 1)
+        expect(blob["annotation_context"]).to eq annotation_context.launch_id
+      end
+
+      it "contains the attachment_id" do
+        post :create, params: params
+        expect(blob["attachment_id"]).to be @attachment.id
+      end
+
+      it "contains the submission_id" do
+        post :create, params: params
+        expect(blob["submission_id"]).to be @submission.id
+      end
+    end
+  end
+
   describe '#show' do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+      @submission = submission_model(assignment: @assignment, user: @student)
+      @attachment = attachment_model(content_type: 'application/pdf', user: @student)
+      @attachment.associate_with(@submission)
+      Canvadoc.create!(attachment: @attachment)
+    end
+
     before do
       @blob = {
         attachment_id: @attachment1.global_id,
@@ -112,11 +264,112 @@ describe CanvadocSessionsController do
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
     end
 
-    it "should send region" do
+    it "should send canvas_base_url when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
-        expect(arg2[:region].class).to eq String
+        expect(arg2[:canvas_base_url]).to eq @course.root_account.domain
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should contain multiple submission_user_ids when group assignment" do
+      group = @course.groups.create(:name => "some group")
+      student2 = User.create
+      group.add_user(@student, 'accepted', true)
+      group.add_user(student2, 'accepted', true)
+      group_assignment = assignment_model(course: @course, assignment_group: @group)
+      group_submission = submission_model(assignment: group_assignment, user: @student)
+      group_attachment = attachment_model(content_type: 'application/pdf', user: @student)
+      group_attachment.associate_with(group_submission)
+      Canvadoc.create!(attachment: group_attachment)
+
+      allow(Attachment).to receive(:find).and_return(group_attachment)
+      expect(group_attachment).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:submission_user_ids].length()).to eq 2
+        expect(arg2[:submission_user_ids]).to match_array [@student.id, student2.id]
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send user_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:user_id]).to eq @teacher.id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send submission_user_ids when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:submission_user_ids]).to match_array [@submission.user_id]
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send course_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:course_id]).to eq @assignment.context_id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send assignment_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:assignment_id]).to eq @assignment.id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send submission_id when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:submission_id]).to eq @submission.id
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send post_manually when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:post_manually]).to eq @assignment.post_manually?
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send posted_at when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:posted_at]).to eq @submission.posted_at
+      end
+
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send assignment_name when annotatable" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:assignment_name]).to eq @assignment.name
       end
 
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
@@ -214,6 +467,73 @@ describe CanvadocSessionsController do
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
+      context "when annotation_context is present" do
+        before(:once) do
+          @assignment.update!(annotatable_attachment: @attachment, submission_types: "annotated_document")
+          @submission.update!(attempt: 2)
+          @annotation_context = @submission.canvadocs_annotation_contexts.create!(
+            attachment: @attachment,
+            submission_attempt: @submission.attempt
+          )
+        end
+
+        it "sends along the annotation_context" do
+          custom_blob = blob.merge(annotation_context: @annotation_context.launch_id).to_json
+          custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+          expect(@attachment.canvadoc).
+            to receive(:session_url).
+            with(hash_including(annotation_context: @annotation_context.launch_id))
+
+          get :show, params: {blob: custom_blob, hmac: custom_hmac}
+        end
+
+        context "when the user is a student" do
+          before(:each) do
+            user_session(@student)
+          end
+
+          it "sets read_only to true if the CanvadocsAnnotationContext is not a draft" do
+            custom_blob = blob.merge(annotation_context: @annotation_context.launch_id).to_json
+            custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+            expect(@attachment.canvadoc).
+              to receive(:session_url).
+              with(hash_including(read_only: true))
+
+            get :show, params: {blob: custom_blob, hmac: custom_hmac}
+          end
+
+          it "sets read_only to false if the CanvadocsAnnotationContext is a draft" do
+            draft_annotation_context = @submission.annotation_context(draft: true)
+            custom_blob = blob.merge(annotation_context: draft_annotation_context.launch_id).to_json
+            custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+            expect(@attachment.canvadoc).
+              to receive(:session_url).
+              with(hash_including(read_only: false))
+
+            get :show, params: {blob: custom_blob, hmac: custom_hmac}
+          end
+        end
+
+        it "always sets read_only to false when the user is a teacher" do
+          user_session(@teacher)
+          custom_blob = blob.merge(
+            annotation_context: @annotation_context.launch_id,
+            enrollment_type: "teacher",
+            user_id: @teacher.global_id
+          ).to_json
+          custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+          expect(@attachment.canvadoc).
+            to receive(:session_url).
+            with(hash_including(read_only: false))
+
+          get :show, params: {blob: custom_blob, hmac: custom_hmac}
+        end
+      end
+
       it "sends along the audit url when annotations are enabled and assignment is anonymous" do
         @assignment.update!(anonymous_grading: true)
         domain = @assignment.course.root_account.domain
@@ -250,6 +570,19 @@ describe CanvadocSessionsController do
 
       it "enables submission annotations when passed enable_annotations true" do
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(enable_annotations: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "passes use_cloudfront as true when feature flag is set to true" do
+        Account.site_admin.enable_feature!(:use_cloudfront_for_docviewer)
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "passes use_cloudfront as false when feature flag is not set to true" do
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: false))
 
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end

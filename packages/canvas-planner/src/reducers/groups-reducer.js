@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions';
+import {handleActions} from 'redux-actions'
 
-export default handleActions({
-  INITIAL_OPTIONS: (state, action) => action.payload.env.STUDENT_PLANNER_GROUPS,
-}, []);
+export default handleActions(
+  {
+    INITIAL_OPTIONS: (state, action) => action.payload.env.STUDENT_PLANNER_GROUPS
+  },
+  []
+)

@@ -18,14 +18,19 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {shape, string} from 'prop-types'
 import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!gradinggradingStandard'
 import _ from 'underscore'
 import splitAssetString from 'compiled/str/splitAssetString'
 
 class GradingStandard extends React.Component {
+  static propTypes = {
+    standard: shape({title: string.isRequired}).isRequired
+  }
+
   state = {
     editingStandard: $.extend(true, {}, this.props.standard),
     saving: false,
@@ -130,16 +135,12 @@ class GradingStandard extends React.Component {
       .uniq()
       .value()
     const inputsAreUniqueAndNonEmpty = sanitizedRowValues.length === rowValues.length
-    const valuesDoNotOverlap = !_.any(
-      this.state.editingStandard.data,
-      function(element, index, list) {
-        if (index < 1) return false
-        const thisMinScore = this.props.round(element[1])
-        const aboveMinScore = this.props.round(list[index - 1][1])
-        return thisMinScore >= aboveMinScore
-      },
-      this
-    )
+    const valuesDoNotOverlap = !_.some(this.state.editingStandard.data, (element, index, list) => {
+      if (index < 1) return false
+      const thisMinScore = this.props.round(element[1])
+      const aboveMinScore = this.props.round(list[index - 1][1])
+      return thisMinScore >= aboveMinScore
+    })
 
     return inputsAreUniqueAndNonEmpty && valuesDoNotOverlap
   }
@@ -227,12 +228,7 @@ class GradingStandard extends React.Component {
   renderSaveButton = () => {
     if (this.state.saving) {
       return (
-        <button
-          type="button"
-          ref="saveButton"
-          className="btn btn-primary save_button"
-          disabled="true"
-        >
+        <button type="button" ref="saveButton" className="btn btn-primary save_button" disabled>
           {I18n.t('Saving...')}
         </button>
       )
@@ -270,6 +266,8 @@ class GradingStandard extends React.Component {
 
   renderEditAndDeleteIcons = () => {
     if (!this.props.editing) {
+      const {title} = this.props.standard
+
       return (
         <div>
           <button
@@ -280,7 +278,9 @@ class GradingStandard extends React.Component {
             onClick={this.triggerEditGradingStandard}
             type="button"
           >
-            <span className="screenreader-only">{I18n.t('Edit Grading Scheme')}</span>
+            <span className="screenreader-only">
+              {I18n.t('Edit Grading Scheme %{title}', {title})}
+            </span>
             <i className="icon-edit" />
           </button>
           <button
@@ -289,7 +289,9 @@ class GradingStandard extends React.Component {
             onClick={this.triggerDeleteGradingStandard}
             type="button"
           >
-            <span className="screenreader-only">{I18n.t('Delete Grading Scheme')}</span>
+            <span className="screenreader-only">
+              {I18n.t('Delete Grading Scheme %{title}', {title})}
+            </span>
             <i className="icon-trash" />
           </button>
         </div>
@@ -408,44 +410,34 @@ class GradingStandard extends React.Component {
         >
           {this.renderStandardAlert()}
           <div>
-            <table>
-              <caption className="screenreader-only">
-                {I18n.t(
-                  'A table containing the name of the grading scheme and buttons for editing or deleting the scheme.'
-                )}
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col" className="insert_row_container" tabIndex="-1" />
-                  <th scope="col" colSpan="5" className="standard_title">
-                    {this.renderIconsAndTitle()}
-                  </th>
-                </tr>
-                <tr>
-                  <th scope="col" className="insert_row_container" />
-                  <th scope="col" className="name_header">
-                    {I18n.t('Name')}
-                  </th>
-                  <th scope="col" className="range_container" colSpan="2">
-                    <div className="range_label">{I18n.t('Range')}</div>
-                    <div className="clear" />
-                  </th>
-                </tr>
-              </thead>
-            </table>
             <table className="grading_standard_data">
               <caption className="screenreader-only">
                 {I18n.t(
-                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
+                  'A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
                 )}
               </caption>
-              <thead ariaHidden="true">
-                <tr>
-                  <td />
-                  <td />
-                  <td />
-                  <td />
-                  <td />
+              <thead>
+                <tr className="grading_standard_headers">
+                  <th scope="col" className="icon_row_cell" tabIndex="-1">
+                    <div className="screenreader-only">{I18n.t('Insert row in edit mode')}</div>
+                  </th>
+                  <th scope="col" colSpan="4" className="standard_title">
+                    {this.renderIconsAndTitle()}
+                  </th>
+                </tr>
+                <tr className="grading_standard_headers">
+                  <th scope="col" className="icon_row_cell">
+                    <div className="screenreader-only">{I18n.t('Insert row in edit mode')}</div>
+                  </th>
+                  <th scope="col" className="name_row_cell">
+                    {I18n.t('Name')}
+                  </th>
+                  <th scope="col" className="range_row_cell" colSpan="2">
+                    {I18n.t('Range')}
+                  </th>
+                  <th scope="col" className="icon_row_cell">
+                    <div className="screenreader-only">{I18n.t('Remove row in edit mode')}</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>{this.renderDataRows()}</tbody>

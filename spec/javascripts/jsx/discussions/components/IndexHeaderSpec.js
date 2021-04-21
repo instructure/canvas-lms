@@ -17,25 +17,29 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import merge from 'lodash/merge'
 
 import IndexHeader from 'jsx/discussions/components/IndexHeader'
 
-const makeProps = (props = {}) => merge({
-  contextType: 'course',
-  contextId: '1',
-  userSettings: {mark_as_read: true},
-  fetchUserSettings: () => {},
-  permissions: {
-    create: true,
-    manage_content: true,
-    moderate: true,
-  },
-  isBusy: false,
-  selectedCount: 0,
-  applicationElement: () => document.getElementById('fixtures'),
-}, props)
+const makeProps = (props = {}) =>
+  merge(
+    {
+      contextType: 'course',
+      contextId: '1',
+      userSettings: {mark_as_read: true},
+      fetchUserSettings: () => {},
+      permissions: {
+        create: true,
+        manage_content: true,
+        moderate: true
+      },
+      isBusy: false,
+      selectedCount: 0,
+      applicationElement: () => document.getElementById('fixtures')
+    },
+    props
+  )
 
 QUnit.module('IndexHeader component')
 
@@ -47,52 +51,46 @@ test('renders the component', () => {
 
 test('renders the search input', () => {
   const props = makeProps()
-  const tree = mount( <IndexHeader {...props} />)
+  const tree = mount(<IndexHeader {...props} />)
   const select = tree.find('TextInput')
   ok(select.exists())
 })
 
 test('renders the filter input', () => {
   const props = makeProps()
-  const tree = mount( <IndexHeader {...props} />)
-  const filter = tree.find('Select')
+  const tree = mount(<IndexHeader {...props} />)
+  const filter = tree.find('select')
   ok(filter.exists())
 })
 
 test('renders create discussion button if we have create permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { create: true } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {create: true}})} />)
   const node = tree.find('#add_discussion')
   ok(node.exists())
 })
 
 test('does not render create discussion button if we do not have create permissions', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ permissions: { create: false } })} />
-  )
+  const tree = mount(<IndexHeader {...makeProps({permissions: {create: false}})} />)
   const node = tree.find('#add_discussion')
   notOk(node.exists())
 })
 
 test('renders discussionSettings', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps()} />
-  )
+  const tree = mount(<IndexHeader {...makeProps()} />)
   const node = tree.find('#discussion_settings')
   ok(node.exists())
 })
 
-test('calls onFilterChange when entering a search term', (assert) => {
+test('calls onFilterChange when entering a search term', assert => {
   const done = assert.async()
   const props = makeProps()
   const searchSpy = sinon.spy()
   props.searchDiscussions = searchSpy
 
-  const tree = mount( <IndexHeader {...props} />)
+  const tree = mount(<IndexHeader {...props} />)
   const select = tree.find('TextInput')
   const input = select.find('input')
-  input.simulate('change', { target: { value: 'foobar' } })
+  input.simulate('change', {target: {value: 'foobar'}})
 
   setTimeout(() => {
     ok(searchSpy.calledOnce)
@@ -100,16 +98,16 @@ test('calls onFilterChange when entering a search term', (assert) => {
   }, 750) // Need the longer timout here cause of debounce
 })
 
-test('calls onFilterChange when selecting a new filter', (assert) => {
+test('calls onFilterChange when selecting a new filter', assert => {
   const done = assert.async()
   const props = makeProps()
   const filterSpy = sinon.spy()
   props.searchDiscussions = filterSpy
 
-  const tree = mount( <IndexHeader {...props} />)
-  const instuiSelect = tree.find('Select')
+  const tree = mount(<IndexHeader {...props} />)
+  const instuiSelect = tree.find('select')
   const rawSelect = instuiSelect.find('select')
-  rawSelect.simulate('change', { target: { value: 'unread' } })
+  rawSelect.simulate('change', {target: {value: 'unread'}})
 
   setTimeout(() => {
     ok(filterSpy.calledOnce)

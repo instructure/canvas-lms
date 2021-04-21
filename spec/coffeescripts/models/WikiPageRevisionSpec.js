@@ -99,7 +99,7 @@ test('toJSON omits the id', () => {
   strictEqual(revision.toJSON().id, undefined, 'id omitted')
 })
 
-test('restore POSTs to the revision', function() {
+test('restore POSTs to the revision', () => {
   const revision = new WikiPageRevision(
     {revision_id: 42},
     {
@@ -118,7 +118,7 @@ test('restore POSTs to the revision', function() {
 
 QUnit.module('WikiPageRevision::fetch')
 
-test('the summary flag is passed to the server', function() {
+test('the summary flag is passed to the server', () => {
   sandbox.stub($, 'ajax').returns($.Deferred())
   const revision = new WikiPageRevision(
     {},
@@ -132,7 +132,7 @@ test('the summary flag is passed to the server', function() {
   strictEqual($.ajax.args[0][0].data.summary, true, 'summary provided')
 })
 
-test('pollForChanges performs a fetch at most every interval', function() {
+test('pollForChanges performs a fetch at most every interval', () => {
   const revision = new WikiPageRevision({}, {pageUrl: 'page-url'})
   const clock = sinon.useFakeTimers()
   sandbox.stub(revision, 'fetch').returns($.Deferred())

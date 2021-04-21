@@ -16,27 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import I18n from 'i18n!assignments_2_student_header'
-
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
-import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
-import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
-import DateTitle from './DateTitle'
+import {Assignment} from '../graphqlData/Assignment'
+import AttemptSelect from './AttemptSelect'
+import AssignmentDetails from './AssignmentDetails'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import GradeDisplay from './GradeDisplay'
+import {Heading} from '@instructure/ui-heading'
+import I18n from 'i18n!assignments_2_student_header'
+import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
+import {number, arrayOf, func} from 'prop-types'
+import React from 'react'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StepContainer from './StepContainer'
-import Attempt from './Attempt'
-import {number} from 'prop-types'
-
-import {StudentAssignmentShape} from '../assignmentData'
+import StudentViewContext from './Context'
+import {Submission} from '../graphqlData/Submission'
+import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
+import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
 
 class Header extends React.Component {
   static propTypes = {
-    assignment: StudentAssignmentShape,
-    scrollThreshold: number.isRequired
+    allSubmissions: arrayOf(Submission.shape),
+    assignment: Assignment.shape,
+    onChangeSubmission: func,
+    scrollThreshold: number.isRequired,
+    submission: Submission.shape
+  }
+
+  static defaultProps = {
+    scrollThreshold: 150,
+    onChangeSubmission: () => {}
   }
 
   state = {
@@ -63,12 +73,85 @@ class Header extends React.Component {
     }
   }
 
-  render() {
-    const submission = this.props.assignment.submissionsConnection.nodes[0]
+  isSubmissionLate = () => {
+    if (!this.props.submission || this.props.submission.gradingStatus !== 'graded') {
+      return false
+    }
     return (
-      <React.Fragment>
+      this.props.submission.latePolicyStatus === 'late' ||
+      this.props.submission.submissionStatus === 'late'
+    )
+  }
+
+  renderFakeMostRecent = () => {
+    return (
+      <Flex.Item as="div" align="end" textAlign="end">
+        {I18n.t('Calculated by: ')}
+        <div>{I18n.t('Most Recent')}</div>
+      </Flex.Item>
+    )
+  }
+
+  renderLatestGrade = () => (
+    <StudentViewContext.Consumer>
+      {context => {
+        const submission = context.latestSubmission || {grade: null, gradingStatus: null}
+        return (
+          <GradeDisplay
+            gradingStatus={submission.gradingStatus}
+            gradingType={this.props.assignment.gradingType}
+            receivedGrade={submission.grade}
+            pointsPossible={this.props.assignment.pointsPossible}
+          />
+        )
+      }}
+    </StudentViewContext.Consumer>
+  )
+
+  shouldRenderNewAttempt(context) {
+    const {assignment, submission} = this.props
+    return (
+      !assignment.lockInfo.isLocked &&
+      (submission.state === 'graded' || submission.state === 'submitted') &&
+      submission.gradingStatus !== 'excused' &&
+      context.isLatestAttempt &&
+      context.allowChangesToSubmission &&
+      (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
+    )
+  }
+
+  renderNewAttemptButton = () => (
+    <StudentViewContext.Consumer>
+      {context => {
+        if (this.shouldRenderNewAttempt(context)) {
+          return (
+            <Button
+              data-testid="new-attempt-button"
+              color="primary"
+              margin="small xxx-small"
+              onClick={context.startNewAttemptAction}
+            >
+              {I18n.t('New Attempt')}
+            </Button>
+          )
+        }
+        return null
+      }}
+    </StudentViewContext.Consumer>
+  )
+
+  render() {
+    const lockAssignment =
+      this.props.assignment.env.modulePrereq || this.props.assignment.env.unlockDate
+
+    return (
+      <>
         <div
-          data-testid="assignments-2-student-header"
+          data-testid={
+            this.state.isSticky
+              ? 'assignment-student-header-sticky'
+              : 'assignment-student-header-normal'
+          }
           id="assignments-2-student-header"
           className={
             this.state.isSticky
@@ -84,67 +167,75 @@ class Header extends React.Component {
           </Heading>
 
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
-          <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'}>
-            <FlexItem shrink>
-              <DateTitle assignment={this.props.assignment} />
-            </FlexItem>
-            <FlexItem grow>
-              <GradeDisplay
-                gradingType={this.props.assignment.gradingType}
-                receivedGrade={submission.grade}
-                pointsPossible={this.props.assignment.pointsPossible}
+          <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'} wrap="wrap" wrapItems>
+            <Flex.Item shrink>
+              <AssignmentDetails
+                isSticky={this.state.isSticky}
+                assignment={this.props.assignment}
               />
-              <FlexItem as="div" align="end" textAlign="end">
-                <Flex direction="column">
-                  {submission.gradingStatus === 'graded' &&
-                    (submission.latePolicyStatus === 'late' ||
-                      submission.submissionStatus === 'late') && (
-                      <FlexItem grow>
+            </Flex.Item>
+            <Flex.Item grow align="start">
+              {this.renderLatestGrade()}
+              {this.renderFakeMostRecent()}
+              {this.props.submission && (
+                <Flex.Item as="div" align="end" textAlign="end">
+                  <Flex direction="column">
+                    {this.isSubmissionLate() && (
+                      <Flex.Item grow>
                         <LatePolicyStatusDisplay
+                          attempt={this.props.submission.attempt}
                           gradingType={this.props.assignment.gradingType}
                           pointsPossible={this.props.assignment.pointsPossible}
-                          originalGrade={submission.enteredGrade}
-                          pointsDeducted={submission.deductedPoints}
-                          grade={submission.grade}
+                          originalGrade={this.props.submission.enteredGrade}
+                          pointsDeducted={this.props.submission.deductedPoints}
+                          grade={this.props.submission.grade}
                         />
-                      </FlexItem>
+                      </Flex.Item>
                     )}
-                  <FlexItem grow>
-                    <SubmissionStatusPill submissionStatus={submission.submissionStatus} />
-                  </FlexItem>
-                </Flex>
-              </FlexItem>
-            </FlexItem>
+                    <Flex.Item grow>
+                      <SubmissionStatusPill
+                        submissionStatus={this.props.submission.submissionStatus}
+                      />
+                    </Flex.Item>
+                    <Flex.Item grow>
+                      {!this.state.isSticky && this.renderNewAttemptButton()}
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+              )}
+            </Flex.Item>
           </Flex>
-          {!this.state.isSticky && <Attempt assignment={this.props.assignment} />}
-          <div className="assignment-pizza-header-outer">
-            <div
-              className="assignment-pizza-header-inner"
-              data-test-id={
-                this.state.isSticky
-                  ? 'assignment-student-header-sticky'
-                  : 'assignment-student-header-normal'
-              }
-            >
-              <StepContainer
-                assignment={this.props.assignment}
-                isCollapsed={this.state.isSticky}
-                collapsedLabel={I18n.t('Submitted')}
-              />
-            </div>
-          </div>
+
+          {this.props.submission && (
+            <Flex>
+              {this.props.allSubmissions && (
+                <Flex.Item>
+                  <AttemptSelect
+                    allSubmissions={this.props.allSubmissions}
+                    onChangeSubmission={this.props.onChangeSubmission}
+                    submission={this.props.submission}
+                  />
+                </Flex.Item>
+              )}
+              {this.props.assignment.env.currentUser && !lockAssignment && (
+                <Flex.Item>
+                  <SubmissionWorkflowTracker submission={this.props.submission} />
+                </Flex.Item>
+              )}
+            </Flex>
+          )}
         </div>
         {
-          // We need this element to fill the gap that is missing when the regular header is removed in the transtion
-          // to the sticky header
+          // We need this element to fill the gap that is missing when the regular
+          // header is removed in the transtion to the sticky header
         }
         {this.state.isSticky && (
           <div
-            data-test-id="header-element-filler"
+            data-testid="header-element-filler"
             style={{height: `${this.state.nonStickyHeaderheight - this.props.scrollThreshold}px`}}
           />
         )}
-      </React.Fragment>
+      </>
     )
   }
 }

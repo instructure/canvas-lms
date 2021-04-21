@@ -23,7 +23,7 @@ const rCRLF = /\r?\n/g
 const rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|file)$/i
 // radio / checkbox are not included, since they are handled by the @checked check
 
-function elements () {
+function elements() {
   if (this.elements) {
     return $.makeArray(this.elements)
   } else {
@@ -36,16 +36,20 @@ function elements () {
   }
 }
 
-function isSerializable () {
-  return this.name && !this.disabled && (this.checked || rselectTextarea.test(this.nodeName) || rinput.test(this.type))
+function isSerializable() {
+  return (
+    this.name &&
+    !this.disabled &&
+    (this.checked || rselectTextarea.test(this.nodeName) || rinput.test(this.type))
+  )
 }
 
-function resultFor (name, value) {
+function resultFor(name, value) {
   if (typeof value === 'string') value = value.replace(rCRLF, '\r\n')
   return {name, value}
 }
 
-function getValue () {
+function getValue() {
   const $input = $(this)
   const value = (() => {
     if (this.type === 'file') {
@@ -75,9 +79,8 @@ function getValue () {
 // identical to $.fn.serializeArray, except:
 // 1. it works on non-forms (see elements)
 // 2. it handles file, date picker and tinymce inputs (see getValue)
-export default $.fn.serializeForm = function () {
-  return this
-    .map(elements)
+export default $.fn.serializeForm = function() {
+  return this.map(elements)
     .filter(isSerializable)
     .map(getValue)
     .get()

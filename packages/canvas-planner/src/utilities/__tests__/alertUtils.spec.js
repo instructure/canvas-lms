@@ -15,37 +15,37 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import * as AlertUtils from '../alertUtils';
+import * as AlertUtils from '../alertUtils'
 
 describe('alert', () => {
-  const fakeVisualSuccess = jest.fn();
-  const fakeVisualError = jest.fn();
+  const fakeVisualSuccess = jest.fn()
+  const fakeVisualError = jest.fn()
 
   beforeAll(() => {
     AlertUtils.initialize({
       visualSuccessCallback: fakeVisualSuccess,
       visualErrorCallback: fakeVisualError
-    });
-  });
+    })
+  })
 
   it('calls the visualSuccessCallback when isError is false (by default)', () => {
-    AlertUtils.alert('Hey');
-    expect(fakeVisualSuccess).toHaveBeenCalledWith('Hey');
-  });
+    AlertUtils.alert('Hey')
+    expect(fakeVisualSuccess).toHaveBeenCalledWith('Hey')
+  })
 
   it('call the visualErrorCallback when isError is true', () => {
-    AlertUtils.alert('Hey You', true);
-    expect(fakeVisualError).toHaveBeenCalledWith('Hey You');
-  });
-});
+    AlertUtils.alert('Hey You', true)
+    expect(fakeVisualError).toHaveBeenCalledWith('Hey You')
+  })
+})
 
 describe('srAlert', () => {
   it('calls srAlertCallback', () => {
-    const fakeSRAlert = jest.fn();
+    const fakeSRAlert = jest.fn()
     AlertUtils.initialize({
       srAlertCallback: fakeSRAlert
-    });
-    AlertUtils.srAlert('This is something else :)');
-    expect(fakeSRAlert).toHaveBeenCalledWith('This is something else :)');
-  });
-});
+    })
+    AlertUtils.srAlert('This is something else :)')
+    expect(fakeSRAlert).toHaveBeenCalledWith('This is something else :)')
+  })
+})

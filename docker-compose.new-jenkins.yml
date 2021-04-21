@@ -1,0 +1,55 @@
+# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
+version: "2.3"
+services:
+  canvas:
+    image: $PATCHSET_TAG
+    depends_on:
+      - postgres
+      - cassandra
+      - redis
+      - dynamodb
+    environment:
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+      RAILS_ENV: test
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      RANDOMIZE_SEQUENCES: 1
+      DISABLE_SPRING: 'true'
+      RERUNS_RETRY:
+      MAX_FAIL:
+      COVERAGE:
+      FORCE_FAILURE:
+      CANVAS_RAILS6_0:
+
+      # parallel_tests
+      CI_NODE_TOTAL:
+      CI_NODE_INDEX:
+      DOCKER_PROCESSES:
+      EXCLUDE_TESTS:
+      TEST_PATTERN:
+      # rspec-parallel-log build
+      RSPEC_LOG:
+    # this will stop passenger from booting so the container isn't running anything at all once up
+    command: sleep infinity
+    init: true
+
+  redis:
+    image: starlord.inscloudgate.net/jenkins/redis:alpine
+    init: true
+
+  postgres:
+    image: $POSTGRES_IMAGE_TAG
+    environment:
+      PGDATA: /data
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    init: true
+
+  cassandra:
+    image: $CASSANDRA_IMAGE_TAG
+    environment:
+      CASSANDRA_START_RPC: 'true'
+    init: true
+
+  dynamodb:
+    image: $DYNAMODB_IMAGE_TAG
+    command: -jar DynamoDBLocal.jar
+    init: true

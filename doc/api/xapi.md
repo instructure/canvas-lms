@@ -2,7 +2,7 @@ xAPI with LTI tools
 ===================
 
 Canvas has implemented a small piece of xAPI (Tin Can API).
-<a href="http://www.adlnet.gov/xAPI">Go here to learn more about xAPI</a>.
+<a href="https://www.adlnet.gov/experience-api">Go here to learn more about xAPI</a>.
 
 An external tool can ask for an xAPI callback URL, and then POST back an interaction
 activity to Canvas. This will update the activity time for the user in Canvas, and add a
@@ -16,7 +16,7 @@ Instructions
  * The tool can then save the url value that is given when launched.
  * The tool POSTs to that url and signs the request with the LTI OAuth parameters.
  * The content-type should be `application/json`, with an xAPI body.
-   * Here are some good examples: <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA">Example Statements</a>
+   * Here are some good examples: <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#Appendix2A">Example Statements</a>
  * The `object.id` will be logged as the page view URL.
  * `result.duration` must be an <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601 duration</a> if supplied.
    * Canvas page views cap at 5 minutes for now. So any value greater than that is just logged as 5 minutes.

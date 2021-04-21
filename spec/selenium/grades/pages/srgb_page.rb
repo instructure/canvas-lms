@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -30,6 +32,12 @@ class SRGB
 
     def switch_to_default_gradebook_link
       f('#switch_to_default_gradebook')
+    end
+
+    def switch_to_default_gradebook
+      f('[data-component="GradebookSelector"] input').click
+      wait_for_animations
+      fj("[role=\"option\"]:contains(\"Gradebook…\")").click
     end
 
     def assignment_sorting_dropdown
@@ -121,8 +129,8 @@ class SRGB
       f('#show_notes')
     end
 
-    def show_final_grade_override_option
-      f('#show_final_grade_override')
+    def allow_final_grade_override_option
+      f('#allow_final_grade_override')
     end
 
     def all_content
@@ -180,7 +188,7 @@ class SRGB
     end
 
     def select_student(student)
-      click_option(student_dropdown, student.name)
+      click_option(student_dropdown, student.sortable_name)
     end
 
     def select_grading_period(grading_period)
@@ -233,4 +241,3 @@ class SRGB
 
   end
 end
-

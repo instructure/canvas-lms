@@ -153,7 +153,7 @@ test('poll', function() {
   component.poll()
   ok(!this.storeSpy.called, 'should not fetch from progress store without progress id')
 
-  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id}/>
+  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
   ok(this.storeSpy.called, 'should fetch when progress id is present')

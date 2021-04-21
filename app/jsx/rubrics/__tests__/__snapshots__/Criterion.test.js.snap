@@ -21,6 +21,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -31,12 +32,14 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -44,7 +47,6 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -60,6 +62,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -74,12 +77,11 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
 `;
 
 exports[`Free-form Rubric with a custom criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -89,6 +91,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -102,9 +105,9 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -131,9 +134,10 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -158,8 +162,8 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -181,6 +185,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -191,12 +196,14 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -204,7 +211,6 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -220,6 +226,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -234,12 +241,11 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -249,6 +255,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -262,9 +269,9 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -291,9 +298,10 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -318,8 +326,8 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
       onPointChange={[Function]}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -341,6 +349,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -351,12 +360,14 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -364,7 +375,6 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -380,6 +390,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -394,12 +405,11 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -409,6 +419,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -422,9 +433,9 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -436,9 +447,10 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -448,26 +460,30 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
 <Button
   as="button"
-  buttonRef={[Function]}
   cursor="pointer"
+  display="inline-block"
+  elementRef={[Function]}
   fluidWidth={true}
   margin="0"
   onClick={[Function]}
   size="medium"
+  textAlign="center"
   type="button"
   variant="link"
+  withBackground={true}
 >
   <Text
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -493,6 +509,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -503,12 +520,14 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -516,7 +535,6 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -532,6 +550,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -547,7 +566,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
 
 exports[`Free-form Rubric with a outcome criterion by default renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -563,18 +582,18 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Thresh
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -585,6 +604,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -604,9 +624,9 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -634,9 +654,10 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -662,26 +683,30 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
 <Button
   as="button"
-  buttonRef={[Function]}
   cursor="pointer"
+  display="inline-block"
+  elementRef={[Function]}
   fluidWidth={true}
   margin="0"
   onClick={[Function]}
   size="medium"
+  textAlign="center"
   type="button"
   variant="link"
+  withBackground={true}
 >
   <Text
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -707,6 +732,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -717,12 +743,14 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -730,7 +758,6 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -746,6 +773,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -761,7 +789,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -777,18 +805,18 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Th
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -799,6 +827,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -818,9 +847,9 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -848,9 +877,10 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -876,26 +906,30 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
       onPointChange={[Function]}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
 <Button
   as="button"
-  buttonRef={[Function]}
   cursor="pointer"
+  display="inline-block"
+  elementRef={[Function]}
   fluidWidth={true}
   margin="0"
   onClick={[Function]}
   size="medium"
+  textAlign="center"
   type="button"
   variant="link"
+  withBackground={true}
 >
   <Text
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -921,6 +955,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -931,12 +966,14 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -944,7 +981,6 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -960,6 +996,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -975,7 +1012,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -991,18 +1028,18 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1013,6 +1050,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -1032,9 +1070,9 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Comments
       allowSaving={true}
@@ -1046,9 +1084,10 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       setComments={[Function]}
       setSaveLater={[Function]}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -1058,8 +1097,8 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1081,6 +1120,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1091,12 +1131,14 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -1104,7 +1146,6 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1120,6 +1161,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1134,12 +1176,11 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1149,6 +1190,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -1162,9 +1204,9 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -1230,9 +1272,10 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -1257,8 +1300,8 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1280,6 +1323,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1290,12 +1334,14 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -1303,7 +1349,6 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1319,6 +1364,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1333,12 +1379,11 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1348,6 +1393,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -1361,9 +1407,9 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={true}
@@ -1429,9 +1475,10 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -1456,8 +1503,8 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       onPointChange={[Function]}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
@@ -1479,6 +1526,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1489,12 +1537,14 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -1502,7 +1552,6 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1518,6 +1567,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1532,12 +1582,11 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1547,6 +1596,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -1560,9 +1610,9 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
         open={false}
       />
     </div>
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -1600,9 +1650,10 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={true}
@@ -1612,26 +1663,30 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       onPointChange={null}
       pointsPossible={8}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
 <Button
   as="button"
-  buttonRef={[Function]}
   cursor="pointer"
+  display="inline-block"
+  elementRef={[Function]}
   fluidWidth={true}
   margin="0"
   onClick={[Function]}
   size="medium"
+  textAlign="center"
   type="button"
   variant="link"
+  withBackground={true}
 >
   <Text
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -1657,6 +1712,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1667,12 +1723,14 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -1680,7 +1738,6 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1696,6 +1753,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1711,7 +1769,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
 
 exports[`Point Rubric with a outcome criterion by default renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -1727,18 +1785,18 @@ exports[`Point Rubric with a outcome criterion by default renders the Threshold 
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -1749,6 +1807,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -1768,9 +1827,9 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -1837,9 +1896,10 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -1865,26 +1925,30 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
 <Button
   as="button"
-  buttonRef={[Function]}
   cursor="pointer"
+  display="inline-block"
+  elementRef={[Function]}
   fluidWidth={true}
   margin="0"
   onClick={[Function]}
   size="medium"
+  textAlign="center"
   type="button"
   variant="link"
+  withBackground={true}
 >
   <Text
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -1910,6 +1974,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1920,12 +1985,14 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -1933,7 +2000,6 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -1949,6 +2015,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1964,7 +2031,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
 
 exports[`Point Rubric with a outcome criterion when assessing renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -1980,18 +2047,18 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Thresh
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -2002,6 +2069,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -2021,9 +2089,9 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={true}
@@ -2090,9 +2158,10 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -2118,26 +2187,30 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       onPointChange={[Function]}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
 <Button
   as="button"
-  buttonRef={[Function]}
   cursor="pointer"
+  display="inline-block"
+  elementRef={[Function]}
   fluidWidth={true}
   margin="0"
   onClick={[Function]}
   size="medium"
+  textAlign="center"
   type="button"
   variant="link"
+  withBackground={true}
 >
   <Text
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -2163,6 +2236,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -2173,12 +2247,14 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     variant="default"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="medium"
       onClick={[Function]}
       placement="end"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -2186,7 +2262,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       Criterion Long Description
@@ -2202,6 +2277,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -2217,7 +2293,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -2233,18 +2309,18 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
-<tr
-  className="rubric-criterion"
+<Row
+  data-testid="rubric-criterion"
 >
-  <th
-    className="description-header"
-    scope="row"
+  <RowHeader
+    textAlign="start"
   >
     <div
       className="description react-rubric-cell"
@@ -2255,6 +2331,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -2274,9 +2351,9 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     <Threshold
       threshold={3}
     />
-  </th>
-  <td
-    className="ratings"
+  </RowHeader>
+  <Cell
+    textAlign="start"
   >
     <Ratings
       assessing={false}
@@ -2314,9 +2391,10 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       }
       useRange={false}
     />
-  </td>
-  <td
-    className="criterion_points"
+  </Cell>
+  <Cell
+    data-testid="criterion-points"
+    textAlign="start"
   >
     <Points
       allowExtraCredit={false}
@@ -2326,6 +2404,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       onPointChange={null}
       pointsPossible={3}
     />
-  </td>
-</tr>
+  </Cell>
+</Row>
 `;

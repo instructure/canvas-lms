@@ -46,7 +46,9 @@ export default class ProfileShow extends Backbone.View {
     if (!confirm(I18n.t('Are you sure you want to report this profile picture?'))) return
     const link = $(e.currentTarget)
     $('.avatar').hide()
-    return $.ajaxJSON(link.attr('href'), 'POST', {}, data => $.flashMessage(I18n.t('The profile picture has been reported')))
+    return $.ajaxJSON(link.attr('href'), 'POST', {}, data =>
+      $.flashMessage(I18n.t('The profile picture has been reported'))
+    )
   }
 
   handleDeclarativeClick(event) {
@@ -122,6 +124,16 @@ export default class ProfileShow extends Backbone.View {
         'user_profile[title]': function(value) {
           if (value && value.length > 255) {
             return I18n.t('profile_title_too_long', 'Title is too long')
+          }
+        },
+        'user_profile[bio]': function(value) {
+          if (value && value.length > 65536) {
+            return I18n.t('profile_bio_too_long', 'Bio is too long')
+          }
+        },
+        'link_urls[]': function(value) {
+          if (value && /\s/.test(value)) {
+            return I18n.t('invalid_url', 'Invalid URL')
           }
         }
       }

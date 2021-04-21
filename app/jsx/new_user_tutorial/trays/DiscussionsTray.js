@@ -18,22 +18,47 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const DiscussionsTray = () => (
   <TutorialTrayContent
     heading={I18n.t('Discussions')}
-    subheading={I18n.t('Encourage class participation')}
-    image="/images/tutorial-tray-images/discussions.svg"
-  >
-    <Text as="p">
+    subheading={I18n.t('Encourage student discourse')}
+    image="/images/tutorial-tray-images/Panda_Discussions.svg"
+    imageWidth="9rem"
+    seeAllLink={{
+      label: I18n.t('See more in Canvas Guides'),
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+    }}
+    links={[
       {
-        I18n.t(`Create as many discussion topics as needed, as assignments
-          for grading or as a forum for shared ideas and information.`)
+        label: I18n.t('How do I create a discussion as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029'
+      },
+      {
+        label: I18n.t('How do I publish or unpublish a discussion as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590'
+      },
+      {
+        label: I18n.t('How do I reply to a discussion as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110'
+      },
+      {
+        label: I18n.t('How do I view and sort discussion replies as an instructor?'),
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908'
       }
-    </Text>
+    ]}
+  >
+    {I18n.t(`Discussions allow students and instructors to communicate about
+      course topics at any time. Create discussions for a grade, or facilitiate
+      discussions for students to exchange ideas and solve problems. Threaded
+      discussions are perfect for keeping in-depth or long-term discussions
+      organized, while Focused discussions are best suited for short-lived exchanges.`)}
   </TutorialTrayContent>
-);
+)
 
-export default DiscussionsTray;
+export default DiscussionsTray

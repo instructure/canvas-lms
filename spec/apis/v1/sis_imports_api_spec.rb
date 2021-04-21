@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2014 Instructure, Inc.
 #
@@ -71,6 +73,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
           "multi_term_batch_mode" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
           "skip_deletes" => false,
@@ -116,6 +119,7 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
           "skip_deletes" => false,
@@ -157,6 +161,7 @@ describe SisImportsApiController, type: :request do
                                     "admins" => 0,
                                     "grade_publishing_results" => 0,
                                     "users" => 1,
+                                    "logins" => 0,
                                     "user_observers" => 0,
                                     "xlists" => 0,
                                     "group_categories" => 0,
@@ -189,6 +194,7 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "skip_deletes" => false,
           "diffing_drop_status" => nil,
@@ -362,6 +368,7 @@ describe SisImportsApiController, type: :request do
         diffing_data_set_identifier: 'my-users-data',
         diffing_drop_status: 'inactive',
         change_threshold: 7,
+        diff_row_count_threshold: 4,
       })
     batch = SisBatch.find(json["id"])
     expect(batch.batch_mode).to be_falsey
@@ -369,6 +376,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:diffing_drop_status]).to eq 'inactive'
     expect(json['change_threshold']).to eq 7
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
+    expect(batch.diff_row_count_threshold).to eq 4
   end
 
   it "should allow for other diffing_drop_status" do
@@ -738,6 +746,7 @@ describe SisImportsApiController, type: :request do
                                                 "admins" => 0,
                                                 "grade_publishing_results" => 0,
                                                 "users" => 0,
+                                                "logins" => 0,
                                                 "user_observers" => 0,
                                                 "xlists" => 0,
                                                 "group_categories" => 0,
@@ -770,6 +779,7 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "skip_deletes" => false,
           "diffing_drop_status" => nil,
@@ -799,6 +809,26 @@ describe SisImportsApiController, type: :request do
     expect(atts_json.first["url"]).to be_present
   end
 
+  it "should return downloadable attachments from the diff if available" do
+    batch = @account.sis_batches.create
+    att1 = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new('blah'), :context => batch)
+    att2 = Attachment.create!(:filename => 'blah2.txt', :uploaded_data => StringIO.new('blah2'), :context => batch)
+    batch.data = {:downloadable_attachment_ids => [att1.id, att2.id], :diffed_attachment_ids => [att2.id]}
+    batch.save!
+
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { :controller => 'sis_imports_api', :action => 'index',
+        :format => 'json', :account_id => @account.id.to_s })
+
+    atts_json = json["sis_imports"].first["csv_attachments"]
+    expect(atts_json.count).to eq 1
+    expect(atts_json.first["id"]).to eq att1.id
+
+    diff_atts_json = json["sis_imports"].first["diffed_csv_attachments"]
+    expect(diff_atts_json.count).to eq 1
+    expect(diff_atts_json.first["id"]).to eq att2.id
+  end
+
   it "should filter sis imports by date if requested" do
     batch = @account.sis_batches.create
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -814,9 +844,9 @@ describe SisImportsApiController, type: :request do
     expect(json["sis_imports"].count).to eq 1
   end
 
-  it "should not fail when options are nil" do
+  it "should not fail when options are empty" do
     batch = @account.sis_batches.create
-    expect(batch.options).to be_nil
+    expect(batch.options).to be_empty
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'index',
                       :format => 'json', :account_id => @account.id.to_s })

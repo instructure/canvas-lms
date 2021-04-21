@@ -20,7 +20,7 @@ import React from 'react'
 import {shape, arrayOf, string, func} from 'prop-types'
 import {debounce} from 'underscore'
 import I18n from 'i18n!account_course_user_search'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CoursesStore from '../store/CoursesStore'
 import TermsStore from '../store/TermsStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
@@ -30,7 +30,7 @@ import SearchMessage from './SearchMessage'
 import SRSearchMessage from './SRSearchMessage'
 import {SEARCH_DEBOUNCE_TIME} from './UsersPane'
 
-const MIN_SEARCH_LENGTH = 3
+const MIN_SEARCH_LENGTH = 2
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]
 
 const defaultFilters = {
@@ -70,7 +70,7 @@ class CoursesPane extends React.Component {
 
   componentWillMount() {
     stores.forEach(s => s.addChangeListener(this.refresh))
-    const filters = Object.assign({}, defaultFilters, this.props.queryParams)
+    const filters = {...defaultFilters, ...this.props.queryParams}
     this.setState({filters, draftFilters: filters})
   }
 
@@ -84,7 +84,7 @@ class CoursesPane extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const filters = Object.assign({}, defaultFilters, nextProps.queryParams)
+    const filters = {...defaultFilters, ...nextProps.queryParams}
     this.setState({filters, draftFilters: filters})
   }
 
@@ -107,7 +107,7 @@ class CoursesPane extends React.Component {
     this.setState(
       {
         errors: {},
-        draftFilters: Object.assign({page: null}, this.state.draftFilters, newFilters)
+        draftFilters: {...this.state.draftFilters, ...newFilters, page: null}
       },
       this.debouncedApplyFilters
     )
@@ -132,10 +132,7 @@ class CoursesPane extends React.Component {
     const {sort, order} = this.state.filters
     const newOrder = column === sort && order === 'asc' ? 'desc' : 'asc'
 
-    const newFilters = Object.assign({}, this.state.filters, {
-      sort: column,
-      order: newOrder
-    })
+    const newFilters = {...this.state.filters, sort: column, order: newOrder}
     this.setState(
       {filters: newFilters, previousCourses: CoursesStore.get(this.state.filters)},
       this.fetchCourses

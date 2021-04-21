@@ -1,0 +1,5 @@
+custom_report_experimental:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Custom Reports: Experimental Features"
+  description: "Use experimental features before they are generally enabled in production"

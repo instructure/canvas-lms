@@ -31,7 +31,7 @@ import $ from 'jquery'
 // To prevent redirecting a particular click event, you must call
 // preventDefault on the event before redirectClickTo receives the
 // event. Click events on the target are allowed to pass through.
-export default $.fn.redirectClickTo = function (target, options = {}) {
+export default $.fn.redirectClickTo = function(target, options = {}) {
   // get the raw dom element
   target = $(target).get(0)
   if (!target) return
@@ -42,7 +42,7 @@ export default $.fn.redirectClickTo = function (target, options = {}) {
   if (css) this.css(css)
 
   this.off('.redirectClickTo')
-  return this.on('click.redirectClickTo', (event) => {
+  return this.on('click.redirectClickTo', event => {
     // ignore events for the target (prevents infinite recursion)
     let ignoreEvent = event.target === target
     // also ignore events that are marked to prevent default

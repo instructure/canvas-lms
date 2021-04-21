@@ -28,7 +28,8 @@ import 'helpers/jquery.simulate'
 
 const group = (opts = {}) => new AssignmentGroup({group_weight: 50, ...opts})
 
-const assignmentGroups = () => new AssignmentGroupCollection([group({name: "G1"}), group({name: "G2"})])
+const assignmentGroups = () =>
+  new AssignmentGroupCollection([group({name: 'G1'}), group({name: 'G2'})])
 
 const createView = function(opts = {}) {
   const course = new Course({apply_assignment_group_weights: opts.weighted})
@@ -96,7 +97,7 @@ test('changes the apply_assignment_group_weights flag', () => {
 })
 
 test('onSaveSuccess triggers weightedToggle event with expected argument', () => {
-  const sandbox = sinon.sandbox.create()
+  const sandbox = sinon.createSandbox()
   const stub1 = sandbox.stub()
   let view = createView({weighted: true})
   view.on('weightedToggle', stub1)
@@ -219,7 +220,7 @@ test('disables the Save and Cancel buttons', () => {
   view.remove()
 })
 
-test('disables the Save and Cancel button handlers', function() {
+test('disables the Save and Cancel button handlers', () => {
   const closed_group = group({any_assignment_in_closed_grading_period: true})
   const groups = new AssignmentGroupCollection([group(), closed_group])
   const view = createView({

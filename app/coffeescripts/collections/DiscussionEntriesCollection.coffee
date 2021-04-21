@@ -15,12 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  '../models/DiscussionEntry'
-], (Backbone, DiscussionEntry) ->
+import Backbone from 'Backbone'
+import DiscussionEntry from '../models/DiscussionEntry'
 
-  class DiscussionEntryCollection extends Backbone.Collection
+export default class DiscussionEntryCollection extends Backbone.Collection
 
-    model: DiscussionEntry
+  model: DiscussionEntry
 

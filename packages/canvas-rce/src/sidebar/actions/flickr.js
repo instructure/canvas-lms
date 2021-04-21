@@ -16,36 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const START_FLICKR_SEARCH = "START_FLICKR_SEARCH";
-export const RECEIVE_FLICKR_RESULTS = "RECEIVE_FLICKR_RESULTS";
-export const FAIL_FLICKR_SEARCH = "FAIL_FLICKR_SEARCH";
-export const TOGGLE_FLICKR_FORM = "TOGGLE_FLICKR_FORM";
+export const START_FLICKR_SEARCH = 'START_FLICKR_SEARCH'
+export const RECEIVE_FLICKR_RESULTS = 'RECEIVE_FLICKR_RESULTS'
+export const FAIL_FLICKR_SEARCH = 'FAIL_FLICKR_SEARCH'
+export const TOGGLE_FLICKR_FORM = 'TOGGLE_FLICKR_FORM'
 
 export function startFlickrSearch(term) {
-  return { type: START_FLICKR_SEARCH, term };
+  return {type: START_FLICKR_SEARCH, term}
 }
 
 export function receiveFlickrResults(results) {
-  return { type: RECEIVE_FLICKR_RESULTS, results };
+  return {type: RECEIVE_FLICKR_RESULTS, results}
 }
 
 export function failFlickrSearch(error) {
-  return { type: FAIL_FLICKR_SEARCH, error };
+  return {type: FAIL_FLICKR_SEARCH, error}
 }
 
 export function openOrCloseFlickrForm() {
-  return { type: TOGGLE_FLICKR_FORM };
+  return {type: TOGGLE_FLICKR_FORM}
 }
 
 export function searchFlickr(term) {
   return (dispatch, getState) => {
-    const { source, host, flickr } = getState();
+    const {source, host, flickr} = getState()
     if (flickr && !flickr.searching) {
-      dispatch(startFlickrSearch(term));
+      dispatch(startFlickrSearch(term))
       return source
-        .searchFlickr(term, { host })
+        .searchFlickr(term, {host})
         .then(results => dispatch(receiveFlickrResults(results)))
-        .catch(error => dispatch(failFlickrSearch(error)));
+        .catch(error => dispatch(failFlickrSearch(error)))
     }
-  };
+  }
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,6 +29,7 @@ class UserService < ActiveRecord::Base
   before_save :infer_defaults
   after_save :assert_relations
   after_save :touch_user
+  after_save :clear_cache_key
 
   def should_have_communication_channel?
     [CommunicationChannel::TYPE_TWITTER].include?(service) && self.user
@@ -44,6 +47,10 @@ class UserService < ActiveRecord::Base
       UserService.where(:user_id => self.user_id, :service => self.service).where("id<>?", self).delete_all
     end
     true
+  end
+
+  def clear_cache_key
+    self.user.clear_cache_key(:user_services)
   end
 
   def assert_communication_channel
@@ -154,8 +161,6 @@ class UserService < ActiveRecord::Base
       3
     when CommunicationChannel::TYPE_TWITTER
       4
-    when 'linked_in'
-      6
     when 'delicious'
       7
     when 'diigo'
@@ -177,8 +182,6 @@ class UserService < ActiveRecord::Base
       t '#user_service.descriptions.delicious', 'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
     when 'diigo'
       t '#user_service.descriptions.diigo', 'Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Diigo accounts to share links of similar interest.'
-    when 'linked_in'
-      t '#user_service.descriptions.linked_in', 'LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace.'
     when 'skype'
       t '#user_service.descriptions.skype', 'Skype is a free tool for online voice and video calls.'
     else
@@ -198,8 +201,6 @@ class UserService < ActiveRecord::Base
       'http://delicious.com/'
     when 'diigo'
       'https://www.diigo.com/sign-up'
-    when 'linked_in'
-      'https://www.linkedin.com/reg/join'
     when 'skype'
       'http://www.skype.com/go/register'
     else
@@ -219,21 +220,11 @@ class UserService < ActiveRecord::Base
         "http://www.delicious.com/#{service_user_name}"
       when 'diigo'
         "http://www.diigo.com/user/#{service_user_name}"
-      when 'linked_in'
-        service_user_url
       when 'skype'
         "skype:#{service_user_name}?add"
       else
         'http://www.instructure.com'
     end
-  end
-
-  def self.configured_services
-    [:google_drive, :twitter, :linked_in, :diigo]
-  end
-
-  def self.configured_service?(service)
-    configured_services.include?((service || "").to_sym)
   end
 
   def self.service_type(type)

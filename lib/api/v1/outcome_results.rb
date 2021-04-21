@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -60,7 +62,7 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcomes in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcomes.
-  def outcome_results_include_outcomes_json(outcomes, percents = {})
+  def outcome_results_include_outcomes_json(outcomes, context, percents = {})
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context])
@@ -71,13 +73,16 @@ module Api::V1::OutcomeResults
     end
     assessed_outcomes = []
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
-      assessed_outcomes += LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+      assessed_outcomes += LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     end
     outcomes.map do |o|
-      hash = outcome_json(o,
+      hash = outcome_json(
+        o,
         @current_user, session,
         assessed_outcomes: assessed_outcomes,
-        rating_percents: percents[o.id])
+        rating_percents: percents[o.id],
+        context: context
+      )
       hash.merge!(alignments: alignment_asset_string_map[o.id])
       hash
     end
@@ -93,8 +98,8 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcome links in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcome links.
-  def outcome_results_include_outcome_links_json(outcome_links)
-    ols_json = outcome_links_json(outcome_links, @current_user, session)
+  def outcome_results_include_outcome_links_json(outcome_links, context)
+    outcome_links_json(outcome_links, @current_user, session, {context: context})
   end
 
   # Public: Returns an Array of serialized Course objects for linked hash.
@@ -184,7 +189,7 @@ module Api::V1::OutcomeResults
     section_ids_func = if @section
                          ->(user) { [@section.id] }
                        else
-                         enrollments = @context.student_enrollments.active.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
+                        enrollments = @context.all_accepted_student_enrollments.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
                          ->(user) { enrollments.select{|e| e.user_id == user.id}.map(&:course_section_id) }
                        end
 
@@ -212,8 +217,9 @@ module Api::V1::OutcomeResults
     }
   end
 
-  def outcome_results_rollups_csv(rollups, outcomes, outcome_paths)
-    CSV.generate do |csv|
+  def outcome_results_rollups_csv(current_user, context, rollups, outcomes, outcome_paths)
+    options = CsvWithI18n.csv_i18n_settings(current_user)
+    CsvWithI18n.generate(**options) do |csv|
       row = []
       row << I18n.t(:student_name, 'Student name')
       row << I18n.t(:student_id, 'Student ID')
@@ -224,13 +230,13 @@ module Api::V1::OutcomeResults
         row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
       end
       csv << row
+      mastery_points = @context.root_account.feature_enabled?(:account_level_mastery_scales) && @context.resolved_outcome_proficiency&.mastery_points
       rollups.each do |rollup|
         row = [rollup.context.name, rollup.context.id]
         outcomes.each do |outcome|
           score = rollup.scores.find{|x| x.outcome == outcome}
-          criterion = outcome.data && outcome.data[:rubric_criterion]
           row << (score ? score.score : nil)
-          row << (criterion ? criterion[:mastery_points] : nil)
+          row << (mastery_points || outcome&.data&.dig(:rubric_criterion, :mastery_points))
         end
         csv << row
       end

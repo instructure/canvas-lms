@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -49,7 +51,7 @@ module Api
           else
             link
           end
-        rescue URI::InvalidURIError
+        rescue URI::Error
           link
         end
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
-      skip("Rails 5.1 specific") unless CANVAS_RAILS5_1
+      skip("Rails 6.0 specific") unless CANVAS_RAILS6_0
       translations = {'en' => I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...
@@ -29,6 +31,15 @@ describe I18n do
       expect(File.read('public/javascripts/translations/_core_en.js')).to eq(
           I18nTasks::Utils.dump_js(translations)
       )
+    end
+  end
+
+  context "DontTrustI18nPluralizations" do
+    it "should not raise an exception for a bad pluralization entry" do
+      missing_other_key = {en: {__pluralize_test: {one: "One thing"}}}
+      I18n.backend.stub(missing_other_key) do
+        expect(I18n.t(:__pluralize_test, count: 123)).to eq ""
+      end
     end
   end
 
@@ -59,6 +70,36 @@ describe I18n do
                       other: "%{count} things",
                       count: 1001)).to eq "1,001 things"
       end
+    end
+  end
+
+  context "genitives" do
+    before { I18n.locale = I18n.default_locale }
+    after { I18n.locale = I18n.default_locale }
+
+    it "forms with `'s` in english" do
+      I18n.locale = :en
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("Cody's")
+    end
+
+    it "forms with `s` in german generally" do
+      I18n.locale = :de
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("Codys")
+    end
+
+    it "forms with `'` in german when ending appropriately" do
+      I18n.locale = :de
+      expect(I18n.form_proper_noun_singular_genitive("Max")).to eq ("Max'")
+    end
+
+    it "forms with `de ` in spanish" do
+      I18n.locale = :es
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("de Cody")
+    end
+
+    it "returns it untouched in chinese" do
+      I18n.locale = :"zh-Hant"
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("Cody")
     end
   end
 end

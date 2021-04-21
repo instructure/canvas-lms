@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -66,8 +68,7 @@ shared_examples_for "settings basic tests" do |account_type|
 
   context "account settings" do
     def click_submit
-      submit_form("#account_settings")
-      wait_for_ajax_requests
+      wait_for_new_page_load { submit_form("#account_settings") }
     end
 
     before(:each) do
@@ -76,7 +77,7 @@ shared_examples_for "settings basic tests" do |account_type|
       get account_settings_url
     end
 
-    it "should change the account name", :xbrowser, priority: "1", test_id: pick_test_id(account_type, sub_account: 249782, root_account: 251032) do
+    it "should change the account name", priority: "1", test_id: pick_test_id(account_type, sub_account: 249782, root_account: 251032) do
       new_account_name = 'new default account name'
       replace_content(f("#account_name"), new_account_name)
       click_submit

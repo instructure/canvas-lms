@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -62,10 +64,8 @@ describe "quizzes questions" do
       answers = question.find_elements(:css, ".form_answers > div.answer")
       expect(answers.length).to eq 3
 
-      # check that the wiki sidebar is visible
-      expect(f('#editor_tabs .wiki-sidebar-header')).to include_text("Insert Content into the Page")
-
       submit_form(question)
+      wait_for_ajaximations
       question = f("#question_#{quest1.id}")
       expect(question.find_element(:css, ".question_name")).to include_text('edited question')
       f('#show_question_details').click
@@ -171,6 +171,16 @@ describe "quizzes questions" do
       answer_exact = fj('[name=answer_exact]')
       answer_exact.send_keys('0.000675', :tab)
       expect(answer_exact).to have_value('0.0007')
+    end
+
+    it "should allow points with various delimiters", priority: "1", test_id: 209956 do
+      quiz = quiz_model(course: @course)
+      quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
+      open_quiz_edit_form
+
+      expect(f(".points_possible").text).to eq '50'
+      add_quiz_question('1234.5')
+      expect(f(".points_possible").text).to eq '1,284.5'
     end
   end
 end

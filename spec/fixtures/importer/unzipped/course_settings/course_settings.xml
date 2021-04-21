@@ -4,6 +4,7 @@
   <course_code>Import/Export</course_code>
   <start_at>2017-06-12T22:35:22</start_at>
   <is_public>true</is_public>
+  <allow_final_grade_override>false</allow_final_grade_override>
   <allow_student_wiki_edits>false</allow_student_wiki_edits>
   <allow_student_forum_attachments>false</allow_student_forum_attachments>
   <lock_all_announcements>false</lock_all_announcements>

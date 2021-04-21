@@ -16,9 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!outcomesFindDialog'
 import $ from 'jquery'
-import _ from 'underscore'
 import OutcomeGroup from '../../models/OutcomeGroup'
 import Progress from '../../models/Progress'
 import DialogBaseView from '../DialogBaseView'
@@ -31,20 +30,6 @@ import 'jquery.disableWhileLoading'
 
 // Creates a popup dialog similar to the main outcomes browser minus the toolbar.
 export default class FindDialog extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.updateSelection = this.updateSelection.bind(this)
-    this.import = this.import.bind(this)
-    this.showOrHideImport = this.showOrHideImport.bind(this)
-    super(...args)
-  }
-
   dialogOptions() {
     return {
       id: 'import_dialog',
@@ -57,12 +42,12 @@ export default class FindDialog extends DialogBaseView {
       buttons: [
         {
           text: I18n.t('#buttons.cancel', 'Cancel'),
-          click: this.cancel
+          click: e => this.cancel(e)
         },
         {
           text: I18n.t('#buttons.import', 'Import'),
           class: 'btn-primary',
-          click: this.import
+          click: e => this.import(e)
         }
       ]
     }
@@ -101,8 +86,8 @@ export default class FindDialog extends DialogBaseView {
     })
 
     // sidebar events
-    this.sidebar.on('select', this.content.show)
-    this.sidebar.on('select', this.showOrHideImport)
+    this.sidebar.on('select', this.content.show.bind(this.content))
+    this.sidebar.on('select', this.showOrHideImport.bind(this))
 
     return this.showOrHideImport()
   }
@@ -139,11 +124,12 @@ export default class FindDialog extends DialogBaseView {
           source_outcome_group_id: model.get('id'),
           async: true
         })
-          .pipe((resp) => {
-          progress.set('url', resp.url);
-          progress.poll();
-          return progress.pollDfd;
-        }).pipe(() => $.ajaxJSON(progress.get('results').outcome_group_url, 'GET'));
+          .pipe(resp => {
+            progress.set('url', resp.url)
+            progress.poll()
+            return progress.pollDfd
+          })
+          .pipe(() => $.ajaxJSON(progress.get('results').outcome_group_url, 'GET'))
       } else {
         url = this.selectedGroup.get('outcomes_url')
         dfd = $.ajaxJSON(url, 'POST', {outcome_id: model.get('id')})
@@ -155,7 +141,7 @@ export default class FindDialog extends DialogBaseView {
           if (importedModel instanceof OutcomeGroup) {
             importedModel.set(response)
           } else {
-            importedModel.outcomeLink = _.extend({}, model.outcomeLink)
+            importedModel.outcomeLink = {...model.outcomeLink}
             importedModel.outcomeGroup = response.outcome_group
             importedModel.outcomeLink.url = response.url
             importedModel.set({
@@ -167,7 +153,14 @@ export default class FindDialog extends DialogBaseView {
           this.close()
           return $.flashMessage(I18n.t('flash.importSuccess', 'Import successful'))
         })
-        .fail(() => $.flashError(I18n.t('flash.importError', "An error occurred while importing. Please try again later.")));
+        .fail(() =>
+          $.flashError(
+            I18n.t(
+              'flash.importError',
+              'An error occurred while importing. Please try again later.'
+            )
+          )
+        )
     }
   }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -174,7 +176,7 @@ module GroupsCommon
       f('#group_max_membership').send_keys(params[:member_limit])
       wait_for_ajaximations
     end
-    f('#groupEditSaveButton').click
+    submit_form("span[aria-label='Add Group']")
     wait_for_ajaximations
   end
 
@@ -249,9 +251,9 @@ module GroupsCommon
   # Moves student from one group to another group. Assumes student can be seen by toggling group's collapse arrow.
   def move_student_to_group(group_destination, student=0)
     ff('.group-user-actions')[student].click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
     ff('.edit-group-assignment')[student].click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
     click_option('.move-select .move-select__group select', "#{@testgroup[group_destination].name}")
     wait_for_animations
     button = f('.move-select button[type="submit"]')
@@ -274,10 +276,10 @@ module GroupsCommon
 
   def manually_delete_group
     f('.group-actions .icon-more').click
-    wait_for_ajaximations
+    wait_for(method: nil, timeout: 1) { f('.delete-group').displayed? }
     f('.delete-group').click
 
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_animations
   end
 
@@ -287,7 +289,7 @@ module GroupsCommon
 
     fln('Delete').click
 
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_animations
   end
 
@@ -348,14 +350,9 @@ module GroupsCommon
   end
 
   def expand_files_on_content_pane
-    if Account.default.feature_enabled?(:rich_content_service_high_risk)
-      fj('[role="presentation"]:contains("Files")').click
-    else
-      expect(f('#editor_tabs')).to be_displayed
-      fj('.ui-state-default.ui-corner-top:contains("Files")').present?
-      fj('.ui-state-default.ui-corner-top:contains("Files")').click
-      f('.sign.plus').click
-    end
+    wait_for_ajaximations
+    fj('[role="tablist"] [role="presentation"]:not([aria-disabled]):contains("Files")').click
+    wait_for_ajaximations
   end
 
   def move_file_to_folder(file_name,destination_name)

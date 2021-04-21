@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -27,8 +29,6 @@ describe "assignments turn it in" do
     account.turnitin_shared_secret = 'asdf'
     account.settings[:enable_turnitin] = true
     account.save!
-    enable_all_rcs account
-    enable_all_rcs @course.account
     stub_rcs_config
   end
 

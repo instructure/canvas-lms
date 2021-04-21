@@ -35,7 +35,7 @@ Gerrit host. See the README for details.
 the tests in. Homebrew is the easiest way to go:
 
 ```sh
-brew install chromedriver # necessary for running tests in Chrome
+brew cask install chromedriver # necessary for running tests in Chrome
 brew install geckodriver # necessary for running tests in Firefox
 ```
 
@@ -83,6 +83,21 @@ or run a specific Selenium test:
 ```sh
 bundle exec rspec spec/selenium/accounts_spec.rb:36
 ```
+
+### Running Tests against Headless Chrome
+
+Selenium tests can be run against headless Chrome by changing a few properties in
+`config/selenium.yml`. Specifically, you'll need to set `headless` to `true` and
+`window_size` to something that makes sense, like so:
+
+```yaml
+  headless: true
+  window_size: "1237,974"
+```
+
+This can be useful when you don't need to see what your test is doing, since it
+can run in the background without stealing focus or interrupting other work. It's
+especially useful when running specs many times to check for flakiness.
 
 ## Running Selenium Tests in Docker
 

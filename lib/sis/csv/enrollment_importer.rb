@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,7 +28,7 @@ module SIS
       end
 
       def self.identifying_fields
-        %w[course_id section_id user_id user_integration_id role associated_user_id].freeze
+        %w[course_id section_id user_id user_integration_id role role_id associated_user_id].freeze
       end
 
       # expected columns
@@ -42,8 +44,15 @@ module SIS
             end
           end
         end
-        SisBatch.bulk_insert_sis_errors(messages)
+        persist_errors(csv, messages, @batch)
         count
+      end
+
+      def persist_errors(csv, messages, batch)
+        errors = messages.map do |message|
+          (message.is_a? SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch)
+        end
+        SisBatch.bulk_insert_sis_errors(errors)
       end
 
       private
@@ -59,6 +68,7 @@ module SIS
           root_account_id: row['root_account'],
           role_id: row['role_id'],
           limit_section_privileges: row['limit_section_privileges'],
+          notify: row['notify'],
           lineno: row['lineno'],
           csv: csv
         )

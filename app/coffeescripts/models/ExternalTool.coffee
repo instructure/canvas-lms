@@ -15,40 +15,38 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-  '../backbone-ext/DefaultUrlMixin'
-], (_, {Model}, DefaultUrlMixin) ->
+import _ from 'underscore'
+import {Model} from 'Backbone'
+import DefaultUrlMixin from '../backbone-ext/DefaultUrlMixin'
 
-  class ExternalTool extends Model
-    @mixin DefaultUrlMixin
+export default class ExternalTool extends Model
+  @mixin DefaultUrlMixin
 
-    initialize: ->
-      super
-      delete @url if _.has(@, 'url')
+  initialize: ->
+    super
+    delete @url if _.has(@, 'url')
 
-    resourceName: 'external_tools'
+  resourceName: 'external_tools'
 
-    computedAttributes: [
-      {
-        name: 'custom_fields_string'
-        deps: ['custom_fields']
-      }
-    ]
+  computedAttributes: [
+    {
+      name: 'custom_fields_string'
+      deps: ['custom_fields']
+    }
+  ]
 
-    urlRoot: ->
-      "/api/v1/#{@_contextPath()}/create_tool_with_verification"
+  urlRoot: ->
+    "/api/v1/#{@_contextPath()}/create_tool_with_verification"
 
-    custom_fields_string: ->
-      ("#{k}=#{v}" for k,v of @get('custom_fields')).join("\n")
+  custom_fields_string: ->
+    ("#{k}=#{v}" for k,v of @get('custom_fields')).join("\n")
 
-    launchUrl: (launchType, options = {})->
-      params = for key, value of options
-        "#{key}=#{value}"
-      url = "/#{@_contextPath()}/external_tools/#{@id}/resource_selection?launch_type=#{launchType}"
-      url = "#{url}&#{params.join('&')}" if params.length > 0
-      url
+  launchUrl: (launchType, options = {})->
+    params = for key, value of options
+      "#{key}=#{value}"
+    url = "/#{@_contextPath()}/external_tools/#{@id}/resource_selection?launch_type=#{launchType}"
+    url = "#{url}&#{params.join('&')}" if params.length > 0
+    url
 
-    assetString: () ->
-      "context_external_tool_#{@id}"
+  assetString: () ->
+    "context_external_tool_#{@id}"

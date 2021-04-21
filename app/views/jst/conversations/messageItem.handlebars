@@ -1,19 +1,26 @@
+{{#if responsive_awareness}}
+<div class="message-info">
+  <div class="user-info">
+{{else}}
 <div class="row-fluid message-info">
   <div class="span8 user-info">
-    {{>avatar author}}
+{{/if}}
+    <div id={{avatarContainerId}} class="fs-exclude avatar"></div>
     <div class="message-author-and-participants">
-      <b class="username">{{author.name}}</b>{{#if participants.length}},{{/if}}
+      <b class="username">{{author.name}}{{#if author.pronouns}} <i>({{author.pronouns}})</i> {{/if}}</b>{{#if participants.length}},{{/if}}
 
       <span class="message-participants-wrapper">
-        <span class="message-participants"
-              aria-live="polite"></span>
-
+        <span class="message-participants" aria-live="polite"></span>
         <div class="hidden">
           <span class="summarized-message-participants">
-            {{list summarizedParticipantNames}}...
+            {{#each summarizedParticipantNames}}
+              <span>{{name}}{{#if pronouns}} <i>({{pronouns}})</i>{{/if}}</span>
+            {{/each}}...
           </span>
           <span class="full-message-participants">
-            {{list participantNames}}
+            {{#each participantNames}}
+              <span>{{name}}{{#if pronouns}} <i>({{pronouns}})</i>{{/if}}</span>
+            {{/each}}
           </span>
         </div>
 
@@ -26,21 +33,29 @@
 
     </div>
   </div>
-
-	<div class="span4 message-metadata">
-		<div class="date pull-right">
+  {{#if responsive_awareness}}
+  <div class="message-metadata clearfix">
+    <div class="date">
+  {{else}}
+  <div class="span4 message-metadata">
+    <div class="date pull-right">
+  {{/if}}
 			{{tEventToString created_at "long" "tiny"}}
 		</div>
 
     {{#unless for_submission}}
+    {{#if responsive_awareness}}
+    <ul class="actions unstyled">
+    {{else}}
     <ul class="actions pull-right unstyled">
+    {{/if}}
       {{#unless cannot_reply}}
       <li>
         <a href="#"
            class="icon-reply-2 reply-btn Button Button--icon-action"
-           title="{{#t "reply"}}Reply{{/t}}"
+           title="{{#t}}Reply{{/t}}"
            data-tooltip>
-          <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
+          <span class="screenreader-only">{{#t}}Reply to conversation {{text}}{{/t}}</span>
         </a>
       </li>
       {{/unless}}
@@ -55,7 +70,7 @@
              data-tooltip>
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
+            <span class="screenreader-only">{{#t}}Message actions for {{text}}{{/t}}</span>
           </a>
           <ul class="al-options">
             {{#unless cannot_reply}}

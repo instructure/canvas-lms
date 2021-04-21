@@ -19,16 +19,12 @@ import I18n from 'i18n!assignments_2'
 import {bool, string} from 'prop-types'
 import React from 'react'
 
-import Pill from '@instructure/ui-elements/lib/components/Pill'
+import {Pill} from '@instructure/ui-pill'
 
-function SubmissionStatusPill(props) {
-  if (!props.excused && !props.submissionStatus) {
-    return null
-  }
+export default function SubmissionStatusPill(props) {
   if (props.excused) {
     return <Pill data-test-id="excused-pill" text={I18n.t('Excused')} margin="x-small 0 0 0" />
-  }
-  if (props.submissionStatus === 'missing') {
+  } else if (props.submissionStatus === 'missing') {
     return (
       <Pill
         data-test-id="missing-pill"
@@ -37,9 +33,10 @@ function SubmissionStatusPill(props) {
         margin="x-small 0 0 0"
       />
     )
-  }
-  if (props.submissionStatus === 'late') {
+  } else if (props.submissionStatus === 'late') {
     return <Pill data-test-id="late-pill" text={I18n.t('Late')} margin="x-small 0 0 0" />
+  } else {
+    return null
   }
 }
 
@@ -47,5 +44,3 @@ SubmissionStatusPill.propTypes = {
   excused: bool,
   submissionStatus: string
 }
-
-export default React.memo(SubmissionStatusPill)

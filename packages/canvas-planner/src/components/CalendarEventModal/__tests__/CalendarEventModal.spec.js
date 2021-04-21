@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import {shallow} from 'enzyme';
-import CalendarEventModal from '../index';
-import moment from 'moment-timezone';
-import { convertApiUserContent } from '../../../utilities/contentUtils';
+import React from 'react'
+import {shallow} from 'enzyme'
+import moment from 'moment-timezone'
+import CalendarEventModal from '../index'
+import {convertApiUserContent} from '../../../utilities/contentUtils'
 
-jest.mock('../../../utilities/contentUtils');
-convertApiUserContent.mockImplementation(p => p);
+jest.mock('../../../utilities/contentUtils')
+convertApiUserContent.mockImplementation(p => p)
 
-function defaultProps (options = {}) {
-  const currentUser = options.currentUser || {};
-  delete options.currentUser;
+function defaultProps(options = {}) {
+  const currentUser = options.currentUser || {}
+  delete options.currentUser
   return {
     open: true,
     requestClose: jest.fn(),
@@ -49,46 +49,46 @@ function defaultProps (options = {}) {
     allDay: false,
     timeZone: 'Asia/Tokyo',
     ...options
-  };
+  }
 }
 
 it('renders', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps()} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps()} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders with only the startTime', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps({endTime: null})} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps({endTime: null})} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders with allDay', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps({allDay: true})} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps({allDay: true})} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders with user displayName for calendar', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps({courseName: null})} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps({courseName: null})} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders without location', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps({location: null})} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps({location: null})} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders without address', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps({address: null})} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps({address: null})} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders without details', () => {
-  const wrapper = shallow(<CalendarEventModal {...defaultProps({details: null})} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<CalendarEventModal {...defaultProps({details: null})} />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('converts the details with convertApiUserContent', () => {
-  const props = defaultProps();
-  shallow(<CalendarEventModal {...props} />);
-  expect(convertApiUserContent).toHaveBeenCalledWith(props.details);
-});
+  const props = defaultProps()
+  shallow(<CalendarEventModal {...props} />)
+  expect(convertApiUserContent).toHaveBeenCalledWith(props.details)
+})

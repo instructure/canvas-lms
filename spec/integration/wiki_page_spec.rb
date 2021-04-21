@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -56,7 +58,7 @@ describe WikiPagesController do
       get url
       expect(response).to be_successful
 
-      html = Nokogiri::HTML(response.body)
+      html = Nokogiri::HTML5(response.body)
       html.css('#breadcrumbs a').each do |link|
         href = link.attr('href')
         next if href == "/"
@@ -118,18 +120,6 @@ describe WikiPagesController do
       expect(response).to redirect_to(course_wiki_page_revisions_url(@course, "a-page"))
     end
 
-  end
-
-  describe "wiki_sidebar" do
-
-    it "should load as many pages as the setting allows" do
-      Setting.get('wiki_sidebar_item_limit', 3)
-      4.times{ |i| @course.wiki_pages.create!(:title => "Page #{i}") }
-      get "/courses/#{@course.id}/pages/page-1/edit"
-      doc = Nokogiri::HTML(response.body)
-
-      expect(doc.css('#pages_accordion #pages_tab_panel li a').count).to eql(3)
-    end
   end
 end
 

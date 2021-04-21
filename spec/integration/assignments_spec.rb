@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -48,7 +50,7 @@ describe "assignments" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
-    expect(Nokogiri::HTML(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
+    expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
   end
 
   it "should correctly list ungraded and total submissions for ta" do
@@ -62,7 +64,7 @@ describe "assignments" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
-    expect(Nokogiri::HTML(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
+    expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
   end
 
   it "should show student view student submission as needing grading" do
@@ -74,7 +76,7 @@ describe "assignments" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
-    expect(Nokogiri::HTML(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
+    expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
   end
 
   describe "due date overrides" do
@@ -91,7 +93,7 @@ describe "assignments" do
     it "should show 'Everyone' when there are no overrides" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.css(".assignment_dates").text).to include "Everyone"
       expect(doc.css(".assignment_dates").text).not_to include "Everyone else"
     end
@@ -102,7 +104,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.css(".assignment_dates").text).to include "Everyone else"
     end
 
@@ -113,7 +115,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.css(".assignment_dates").text).not_to include "Everyone"
     end
   end
@@ -141,7 +143,7 @@ describe "download submissions link" do
   it "should not show download submissions button with no submissions" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
@@ -152,7 +154,7 @@ describe "download submissions link" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
@@ -163,7 +165,7 @@ describe "download submissions link" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
@@ -179,7 +181,7 @@ describe "download submissions link" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
@@ -199,7 +201,7 @@ describe "download submissions link" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
@@ -210,7 +212,7 @@ describe "download submissions link" do
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
@@ -239,7 +241,7 @@ describe "ratio of submissions graded" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
   end
 
@@ -253,7 +255,7 @@ describe "ratio of submissions graded" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "0 out of 2 Submissions Graded"
   end
 
@@ -269,7 +271,7 @@ describe "ratio of submissions graded" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "1 out of 2 Submissions Graded"
   end
 
@@ -289,7 +291,7 @@ describe "ratio of submissions graded" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "2 out of 2 Submissions Graded"
   end
 
@@ -301,12 +303,12 @@ describe "ratio of submissions graded" do
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
   end
 
   describe 'assignment moderation' do
-    let(:moderate_button) { Nokogiri::HTML(response.body).at_css('#moderated_grading_button') }
+    let(:moderate_button) { Nokogiri::HTML5(response.body).at_css('#moderated_grading_button') }
 
     it 'shows the moderation link for moderated assignments' do
       @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
@@ -318,6 +320,176 @@ describe "ratio of submissions graded" do
     it 'does not show the moderation link for non-moderated assignments' do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(moderate_button).to be_nil
+    end
+  end
+end
+
+describe "assignments_2 feature flag and parameter" do
+  context "as a teacher" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment")
+    end
+
+    before :each do
+      user_session @teacher
+    end
+
+    describe "with feature disabled" do
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        html = Nokogiri::HTML5(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+      end
+    end
+
+    describe "with feature enabled" do
+      before :once do
+        Account.default.enable_feature! :assignments_2_teacher
+      end
+
+      it "it shows new assignments" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        html = Nokogiri::HTML5(response.body)
+        expect(html.at_css('div#assignment_show')).not_to be
+      end
+
+      it "shows old assignments when explicitly requested" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
+        html = Nokogiri::HTML5(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+      end
+    end
+  end
+
+  describe "as a student" do
+    before :once do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment")
+    end
+
+    before :each do
+      user_session @student
+    end
+
+    describe "with feature disabled" do
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        html = Nokogiri::HTML5(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+      end
+    end
+
+    describe "with feature enabled" do
+      before :once do
+        Account.default.enable_feature! :assignments_2_student
+      end
+
+      it "shows new assignments by default" do
+        @assignment.submission_types = 'online_text_entry'
+        @assignment.save!
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        html = Nokogiri::HTML5(response.body)
+        expect(html.at_css('div#assignment_show')).not_to be
+      end
+
+      it "shows old assignments if requested" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
+        html = Nokogiri::HTML5(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+      end
+
+      it "sets the necessary RCS ENV" do
+        @assignment.submission_types = 'online_text_entry'
+        @assignment.save!
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(controller.js_env).to have_key(:RICH_CONTENT_APP_HOST)
+      end
+    end
+  end
+
+  describe "as an observer" do
+    before(:once) do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(title: "Some Assignment")
+      @observer = user_factory(active_all: true, active_state: 'active')
+      @course.enroll_user(
+        @observer,
+        'ObserverEnrollment',
+        section: @course.course_sections.first,
+        enrollment_state: 'active', allow_multiple_enrollments: true
+      )
+      add_linked_observer(@student, @observer)
+    end
+
+    before(:each) do
+      user_session(@observer)
+    end
+
+    let(:old_assignment_page_indicator) { Nokogiri::HTML5(response.body).at_css('div#assignment_show') }
+
+    context "with the feature disabled" do
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        expect(old_assignment_page_indicator).to be_present
+      end
+
+      it "shows the old assignments page without the query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(old_assignment_page_indicator).to be_present
+      end
+    end
+
+    context "with the feature enabled" do
+      before :once do
+        Account.default.enable_feature! :assignments_2_student
+      end
+
+      # we always send observers to the 'old' assignments page
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        expect(old_assignment_page_indicator).to be_present
+      end
+
+      it "shows the old assignments page without the query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(old_assignment_page_indicator).to be_present
+      end
+    end
+  end
+
+  describe "description" do
+    before :each do
+      skip "TODO doesn't work right because public_user_content is wonky"
+    end
+
+    let(:description) { <<~HTML }
+        <a href="#{attachment_model.public_download_url}">link</a>
+    HTML
+
+    it "excludes verifiers if course is not public" do
+      course_with_student(:active_all => true)
+      user_session(@student)
+      expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: false))
+      assignment = @course.assignments.create(
+        title: 'some assignment',
+        description: description
+      )
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+    end
+
+    it "includes verifiers if course is public" do
+      expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: true))
+      course = course_factory(
+        active_all: true,
+        is_public: true,
+      )
+      assignment = assignment_model(
+        course: course,
+        submission_types: "online_url",
+        description: description
+      )
+      get "/courses/#{course.id}/assignments/#{assignment.id}"
     end
   end
 end

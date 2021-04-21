@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['Backbone', 'i18n!discussions.participant'], (Backbone, I18n) ->
+import Backbone from 'Backbone'
+import I18n from 'i18n!discussions.participant'
 
-  class Participant extends Backbone.Model
+export default class Participant extends Backbone.Model
 
-    defaults:
-      avatar_image_url: ''
-      display_name: I18n.t('anonymous_user', 'Anonymous')
-      id: null
+  defaults:
+    avatar_image_url: ''
+    display_name: I18n.t('anonymous_user', 'Anonymous')
+    id: null
 

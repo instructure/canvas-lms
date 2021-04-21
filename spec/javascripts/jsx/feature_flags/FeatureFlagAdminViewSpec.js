@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
-import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView';
-import FeatureFlagCollection from 'compiled/collections/FeatureFlagCollection';
-import FeatureFlag from 'compiled/models/FeatureFlag';
+import $ from 'jquery'
+import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
+import FeatureFlagCollection from 'compiled/collections/FeatureFlagCollection'
+import FeatureFlag from 'compiled/models/FeatureFlag'
 
-let flags;
+let flags
 
 QUnit.module('FeatureFlagAdminView', {
-  setup () {
-    window.ENV.context_asset_string = 'user_1';
+  setup() {
+    window.ENV.context_asset_string = 'user_1'
     flags = [
       new FeatureFlag({
         feature: 'high_constrast',
@@ -72,9 +72,9 @@ QUnit.module('FeatureFlagAdminView', {
           }
         }
       })
-    ];
+    ]
   }
-});
+})
 
 test('it does not render feature flags that are passed in via the hiddenFlags option', () => {
   const hiddenFlags = ['new_user_tutorial_on_off']
@@ -82,18 +82,18 @@ test('it does not render feature flags that are passed in via the hiddenFlags op
   const view = new FeatureFlagAdminView({
     el: '#fixtures',
     hiddenFlags
-  });
+  })
 
   view.collection = new FeatureFlagCollection(flags)
-  view.render();
-  equal($('li.feature-flag').length, 2);
-  equal($('.new_user_tutorial_on_off').length, 0);
-});
+  view.render()
+  equal($('li.feature-flag').length, 2)
+  equal($('.new_user_tutorial_on_off').length, 0)
+})
 
 test('it renders all feature flags if you do not pass a hiddenFlags option', () => {
-  const view = new FeatureFlagAdminView({el: '#fixtures'});
+  const view = new FeatureFlagAdminView({el: '#fixtures'})
 
   view.collection = new FeatureFlagCollection(flags)
-  view.render();
-  equal($('li.feature-flag').length, 3);
+  view.render()
+  equal($('li.feature-flag').length, 3)
 })

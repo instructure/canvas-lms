@@ -17,74 +17,67 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
 
-function noop() {}
-const imageurl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
-describe('MissingPeopleSection', () =>{
+describe('ProfileTray', () => {
+  let props
+
+  beforeEach(() => {
+    props = {
+      userDisplayName: 'Sample Student',
+      userAvatarURL: imageUrl,
+      counts: {unreadShares: 12},
+      tabs: [
+        {
+          id: 'foo',
+          label: 'Foo',
+          html_url: '/foo'
+        },
+        {
+          id: 'bar',
+          label: 'Bar',
+          html_url: '/bar'
+        },
+        {
+          id: 'content_shares',
+          label: 'Shared Content',
+          html_url: '/shared'
+        }
+      ],
+      loaded: true
+    }
+  })
+
   it('renders the component', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled
-        eportfoliosEnabled
-        closeTray={noop}
-      />
-    )
-    expect(wrapper.find('Heading').text()).toEqual('Sample Student')
+    const {getByText} = render(<ProfileTray {...props} />)
+    getByText('Sample Student')
   })
 
-  it('renders the complete list', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled
-        eportfoliosEnabled
-        closeTray={noop}
-      />
-    )
-
-    expect(wrapper.find('Avatar').exists()).toBeTruthy()
-
-    expect(wrapper.find('ul li').map(n => n.text())).toEqual([
-      'Profile', 'Settings', 'Notifications', 'Files', 'ePortfolios'
-    ])
+  it('renders the avatar', () => {
+    const {getByAltText} = render(<ProfileTray {...props} />)
+    const avatar = getByAltText('User profile picture')
+    expect(avatar.src).toBe(imageUrl)
   })
 
-  it('renders the list without Profiles', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled={false}
-        eportfoliosEnabled
-        closeTray={noop}
-      />
-    )
-
-    expect(wrapper.find('ul li').map(n => n.text())).toEqual(
-      ['Settings', 'Notifications', 'Files', 'ePortfolios']
-    )
+  it('renders loading spinner', () => {
+    const {getByTitle, queryByText} = render(<ProfileTray {...props} loaded={false} />)
+    getByTitle('Loading')
+    expect(queryByText('Foo')).toBeFalsy()
   })
 
-  it('renders the list without ePortfolios', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled
-        eportfoliosEnabled={false}
-        closeTray={noop}
-      />
-    )
-    expect(wrapper.find('Avatar').exists()).toBeTruthy()
+  it('renders the tabs', () => {
+    const {getByText} = render(<ProfileTray {...props} />)
+    getByText('Foo')
+    getByText('Bar')
+  })
 
-    expect(wrapper.find('ul li').map(n => n.text())).toEqual(
-      ['Profile', 'Settings', 'Notifications', 'Files']
-    )
+  it('renders the unread count badge on Shared Content', () => {
+    const {container} = render(<ProfileTray {...props} />)
+    const elt = container.firstChild.querySelector('a[href="/shared"]')
+    domGetByText(elt, '12 unread.')
   })
 })

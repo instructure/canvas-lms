@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@ describe DiscussionTopic::MaterializedView do
     end
 
     it "should return the view if it exists but is out of date" do
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
       Delayed::Job.find_available(100).each(&:destroy)
@@ -57,7 +59,7 @@ describe DiscussionTopic::MaterializedView do
       # since the view was out of date, it's returned but a job is queued
       expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
       # after updating, the view should include the new entry
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
       expect(entries).to be_include(reply.id)
@@ -81,7 +83,7 @@ describe DiscussionTopic::MaterializedView do
 
   it "should build a materialized view of the structure, participants and entry ids" do
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
-    view.update_materialized_view_without_send_later
+    view.update_materialized_view(synchronous: true)
     structure, participant_ids, entry_ids = @topic.materialized_view
     expect(view.materialized_view_json).to eq [structure, participant_ids, entry_ids, []]
     expect(participant_ids.sort).to eq [@student.id, @teacher.id].sort
@@ -97,7 +99,7 @@ describe DiscussionTopic::MaterializedView do
     expect(json[0]['replies'][1]['replies'][0]['attachment']['url']).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     # verify the api_user_content functionality in a non-request context
     html_message = json[0]['replies'][1]['message']
-    html = Nokogiri::HTML::DocumentFragment.parse(html_message)
+    html = Nokogiri::HTML5.fragment(html_message)
     expect(html.at_css('a')['href']).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
     expect(html.at_css('video')['src']).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
@@ -127,10 +129,10 @@ describe DiscussionTopic::MaterializedView do
     bad_entry = @topic.reply_from(:user => @student, :html => %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>})
 
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
-    view.update_materialized_view_without_send_later
+    view.update_materialized_view(synchronous: true)
     structure, participant_ids, entry_ids = @topic.materialized_view
     entry_json = JSON.parse(structure).last
-    html = Nokogiri::HTML::DocumentFragment.parse(entry_json['message'])
+    html = Nokogiri::HTML5.fragment(entry_json['message'])
     expect(html.at_css('video track')['src']).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"
   end
 
@@ -139,7 +141,7 @@ describe DiscussionTopic::MaterializedView do
     specs_require_sharding
 
     it "users local ids when accessed from the same shard" do
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       structure, participant_ids, entry_ids = @topic.materialized_view
       expect(participant_ids.sort).to eq [@student.local_id, @teacher.local_id].sort
       expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:local_id).sort
@@ -182,7 +184,7 @@ describe DiscussionTopic::MaterializedView do
     end
 
     it "users global ids when accessed from a different shard" do
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       @shard1.activate!
       structure, participant_ids, entry_ids = @topic.materialized_view
       expect(participant_ids.sort).to eq [@student.global_id, @teacher.global_id].sort

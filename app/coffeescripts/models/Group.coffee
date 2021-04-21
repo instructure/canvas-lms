@@ -16,62 +16,60 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'Backbone'
-  '../collections/GroupUserCollection'
-], (Backbone, GroupUserCollection) ->
+import Backbone from 'Backbone'
+import GroupUserCollection from '../collections/GroupUserCollection'
 
-  class Group extends Backbone.Model
-    modelType: 'group'
-    resourceName: 'groups'
+export default class Group extends Backbone.Model
+  modelType: 'group'
+  resourceName: 'groups'
 
-    initialize: (attrs, options) ->
-      super
-      @newAndEmpty = options?.newAndEmpty
+  initialize: (attrs, options) ->
+    super
+    @newAndEmpty = options?.newAndEmpty
 
-    users: ->
-      initialUsers = if @newAndEmpty then [] else null
-      @_users = new GroupUserCollection initialUsers,
-        group: this
-        category: @collection?.category
-        markInactiveStudents: @collection?.options?.markInactiveStudents
+  users: ->
+    initialUsers = if @newAndEmpty then [] else null
+    @_users = new GroupUserCollection initialUsers,
+      group: this
+      category: @collection?.category
+      markInactiveStudents: @collection?.options?.markInactiveStudents
 
-      @_users.on 'fetched:last', => @set('members_count', @_users.length)
-      @users = -> @_users
-      @_users
+    @_users.on 'fetched:last', => @set('members_count', @_users.length)
+    @users = -> @_users
+    @_users
 
-    usersCount: ->
-      @get('members_count')
+  usersCount: ->
+    @get('members_count')
 
-    sync: (method, model, options = {}) ->
-      options.url = @urlFor(method)
-      Backbone.sync method, model, options
+  sync: (method, model, options = {}) ->
+    options.url = @urlFor(method)
+    Backbone.sync method, model, options
 
-    urlFor: (method) ->
-      if method is 'create'
-        "/api/v1/group_categories/#{@get('group_category_id')}/groups"
-      else
-        "/api/v1/groups/#{@id}"
+  urlFor: (method) ->
+    if method is 'create'
+      "/api/v1/group_categories/#{@get('group_category_id')}/groups"
+    else
+      "/api/v1/groups/#{@id}"
 
-    theLimit: ->
-      max_membership = @get('max_membership')
-      max_membership or @collection?.category?.get('group_limit')
+  theLimit: ->
+    max_membership = @get('max_membership')
+    max_membership or @collection?.category?.get('group_limit')
 
-    isFull: ->
-      limit = @get('max_membership')
-      (!limit and @groupCategoryLimitMet()) or (limit and @get('members_count') >= limit)
+  isFull: ->
+    limit = @get('max_membership')
+    (!limit and @groupCategoryLimitMet()) or (limit and @get('members_count') >= limit)
 
-    groupCategoryLimitMet: ->
-      limit = @collection?.category?.get('group_limit')
-      limit and @get('members_count') >= limit
+  groupCategoryLimitMet: ->
+    limit = @collection?.category?.get('group_limit')
+    limit and @get('members_count') >= limit
 
-    isLocked: ->
-      @collection?.category?.isLocked()
+  isLocked: ->
+    @collection?.category?.isLocked()
 
-    toJSON: ->
-      if ENV.student_mode
-        {name: @get('name')}
-      else
-        json = super
-        json.isFull = @isFull()
-        json
+  toJSON: ->
+    if ENV.student_mode
+      {name: @get('name')}
+    else
+      json = super
+      json.isFull = @isFull()
+      json

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -69,7 +71,7 @@ module BlueprintCourseCommon
 
     def update_child_discussion(minion)
       child_discussion = minion.discussion_topics.where(title: @discussion1.title).first
-      child_discussion.update(delayed_post_at: Time.zone.now+3.days)
+      child_discussion.update(require_initial_post: true)
     end
 
     def update_master_discussion_and_migrate(master)
@@ -146,19 +148,27 @@ module BlueprintCourseCommon
       wait_for_ajaximations
 
       # confirm it's open
-      expect(details_wrapper).to contain_css('.bca-table__course-row')
+      expect(details_wrapper).to contain_css('[data-testid="bca-table__course-row"]')
     end
 
-    # reutrn the <tboey> holding the list of avaiable courses
+    def term_options
+      INSTUI_Select_options('#termsFilter').map(&:text)
+    end
+
+    def sub_account_options
+      INSTUI_Select_options('#subAccountsFilter').map(&:text)
+    end
+
+    # return the <tbody> holding the list of available courses
     def available_courses_table
       f('.bca-table__content-wrapper tbody')
     end
 
     # return the <tr>s holding with the current list of available courses
     def available_courses
-      ff('.bca-table__content-wrapper tbody tr.bca-table__course-row')
+      ff('.bca-table__content-wrapper tbody tr[data-testid="bca-table__course-row"]')
     rescue
-      [] if f('.bca-table__no-results')
+      [] if f('tr[data-testid="bca-table__no-results"]')
     end
 
     # return the <tbody> holding the current associations

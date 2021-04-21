@@ -52,11 +52,11 @@ export default class GroupUserView extends View {
 
   toJSON() {
     const group = this.model.get('group')
-    const result = Object.assign(
-      {groupId: group && group.id},
-      this,
-      super.toJSON(...arguments)
-    )
+    const result = {
+      groupId: group && group.id,
+      ...this,
+      ...super.toJSON(...arguments)
+    }
     result.shouldMarkInactive =
       this.options.markInactiveStudents && this.model.attributes.is_inactive
     result.isLeader = this.isLeader()
@@ -65,8 +65,16 @@ export default class GroupUserView extends View {
 
   isLeader() {
     // transpiled from: @model.get('group')?.get?('leader')?.id == @model.get('id')
-    let ref, ref1;
-    return ((ref = this.model.get('group')) != null ? typeof ref.get === "function" ? (ref1 = ref.get('leader')) != null ? ref1.id : void 0 : void 0 : void 0) === this.model.get('id');
+    let ref, ref1
+    return (
+      ((ref = this.model.get('group')) != null
+        ? typeof ref.get === 'function'
+          ? (ref1 = ref.get('leader')) != null
+            ? ref1.id
+            : void 0
+          : void 0
+        : void 0) === this.model.get('id')
+    )
   }
 }
 GroupUserView.initClass()

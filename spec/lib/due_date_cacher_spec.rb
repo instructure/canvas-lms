@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -29,6 +31,13 @@ describe DueDateCacher do
       @instance = double('instance', :recompute => nil)
     end
 
+    it "doesn't call self.recompute_course if the assignment passed in hasn't been persisted" do
+      expect(DueDateCacher).not_to receive(:recompute_course)
+
+      assignment = Assignment.new(course: @course, workflow_state: :published)
+      DueDateCacher.recompute(assignment)
+    end
+
     it "wraps assignment in an array" do
       expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false)).
         and_return(@instance)
@@ -43,12 +52,10 @@ describe DueDateCacher do
 
     it "queues a delayed job in an assignment-specific singleton in production" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(
-          :recompute,
-          strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}",
-          max_attempts: 10
-        )
+      expect(@instance).to receive(:delay_if_production).
+        with(strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}",
+          max_attempts: 10).and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute(@assignment)
     end
 
@@ -128,20 +135,25 @@ describe DueDateCacher do
 
     it "queues a delayed job in a singleton in production if assignments.nil" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
+      expect(@instance).to receive(:delay_if_production).
+        with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course)
     end
 
     it "queues a delayed job without a singleton if assignments is passed" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, { max_attempts: 10 })
+      expect(@instance).to receive(:delay_if_production).with(max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
     it "does not queue a delayed job when passed run_immediately: true" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).not_to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
+      expect(@instance).not_to receive(:delay_if_production)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
     end
 
@@ -155,8 +167,10 @@ describe DueDateCacher do
       expect(DueDateCacher).to receive(:new).
         with(@course, match_array(@assignments.map(&:id).sort), hash_including(update_grades: false)).
         and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
+      expect(@instance).to receive(:delay_if_production).
+        with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course.id)
     end
 
@@ -238,20 +252,25 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-      expect(instance).to receive(:send_later_if_production_enqueue_args).
+      @instance = double()
+      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(@instance).to receive(:delay_if_production).
         with(
-          :recompute,
           singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::MD5.hexdigest(student_1.id.to_s)}",
           max_attempts: 10
-        )
+        ).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_users_for_course(student_1.id, @course)
     end
 
     it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-      expect(instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "what:up:dog", max_attempts: 10)
+      @instance = double()
+      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(@instance).to receive(:delay_if_production).
+        with(singleton: "what:up:dog", max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
     end
 
@@ -571,7 +590,7 @@ describe DueDateCacher do
           student2 = user_factory
           @course.enroll_student(student2, enrollment_state: 'active')
           submission2 = submission_model(assignment: @assignment, user: student2)
-          submission2.update_attributes(cached_due_date: nil)
+          submission2.update(cached_due_date: nil)
           student2.enrollments.find_by(course: @course).conclude
 
           DueDateCacher.new(@course, [@assignment]).recompute
@@ -625,7 +644,7 @@ describe DueDateCacher do
           student2 = user_factory
           @course.enroll_student(student2, enrollment_state: 'active')
           submission2 = submission_model(assignment: @assignment, user: student2)
-          submission2.update_attributes(cached_due_date: nil)
+          submission2.update(cached_due_date: nil)
           student2.enrollments.find_by(course: @course).conclude
 
           DueDateCacher.new(@course, [@assignment]).recompute
@@ -953,6 +972,46 @@ describe DueDateCacher do
         end
       end
     end
+
+    describe "cached_quiz_lti" do
+      let_once(:tool) do
+        @course.context_external_tools.create!(
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
+        )
+      end
+
+      it "sets cached_quiz_lti to false if the assignment is not a Quizzes.Next assignment" do
+        cacher.recompute
+        expect(submission).to_not be_cached_quiz_lti
+      end
+
+      it "sets cached_quiz_lti to true if the assignment's external tool identifies itself as Quizzes 2" do
+        @assignment.update!(submission_types: "external_tool")
+        tool.content_tags.create!(context: @assignment)
+
+        cacher.recompute
+        expect(submission).to be_cached_quiz_lti
+      end
+    end
+
+    describe "root_account_id" do
+      it "is set to the associated course's root account ID" do
+        new_student = user_model
+        @course.enroll_user(new_student)
+
+        submission = @assignment.submission_for_student(new_student)
+        expect(submission.root_account_id).to eq @assignment.course.root_account_id
+      end
+    end
+
+    it "should add course_id" do
+      cacher.recompute
+      expect(submission.course_id).to eq @course.id
+    end
   end
 
   describe "AnonymousOrModerationEvent logging" do
@@ -1096,6 +1155,24 @@ describe DueDateCacher do
       }.not_to change {
         AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
       }
+    end
+  end
+
+  context "error trapping" do
+    let(:due_date_cacher) { DueDateCacher.new(@course, @assignment) }
+
+    describe ".perform_submission_upsert" do
+      it "raises Delayed::RetriableError when deadlocked" do
+        allow(Submission.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
+
+        expect { due_date_cacher.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
+      end
+
+      it "raises Delayed::RetriableError when unique record violations occur" do
+        allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::RecordNotUnique)
+
+        expect { due_date_cacher.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
+      end
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -31,7 +33,7 @@ describe '/quizzes/quizzes/take_quiz' do
       params
     ))
     render 'quizzes/quizzes/take_quiz'
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.css('#quiz-instructions').first.content.strip).to eq 'Hello'
     expect(response).not_to be_nil
   end
@@ -68,5 +70,21 @@ describe '/quizzes/quizzes/take_quiz' do
     render 'quizzes/quizzes/take_quiz'
 
     expect(response).to include 'preview of the published version'
+  end
+
+  it 'should render timer_autosubmit_disabled value in template' do
+    course_with_student
+    view_context
+    quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
+    sub = assign(:submission, quiz.generate_submission(@user))
+    assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
+      quiz,
+      sub,
+      params
+    ))
+    render 'quizzes/quizzes/take_quiz'
+    doc = Nokogiri::HTML5(response.body)
+    expect(doc.css('.timer_autosubmit_disabled').first.content.strip).not_to be_nil
+    expect(response).not_to be_nil
   end
 end

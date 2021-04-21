@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'nokogiri'
-require 'qti/qti_plugin_validator'
 require 'shellwords'
 
 module Qti
@@ -36,7 +37,7 @@ module Qti
   def self.migration_executable
     @migration_executable
   end
-  
+
   def self.qti_enabled?
     if plugin = Canvas::Plugin.find(:qti_converter)
       return plugin.settings[:enabled].to_s == 'true'

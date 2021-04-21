@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@
 module HasContentTags
 
   def update_associated_content_tags_later
-    send_later(:update_associated_content_tags) if @associated_content_tags_need_updating != false
+    delay.update_associated_content_tags if @associated_content_tags_need_updating != false
   end
 
   def update_associated_content_tags
@@ -43,17 +45,13 @@ module HasContentTags
     klass.send(:before_save, :check_if_associated_content_tags_need_updating)
   end
 
-  def locked_cache_key(user)
+  def locked_request_cache_key(user)
     keys = ['_locked_for4', self, user]
     unlocked_at = self.respond_to?(:unlock_at) ? self.unlock_at : nil
     locked_at = self.respond_to?(:lock_at) ? self.lock_at : nil
     keys << (unlocked_at ? unlocked_at > Time.zone.now : false)
     keys << (locked_at ? locked_at < Time.zone.now : false)
-    keys.cache_key
-  end
-
-  def clear_locked_cache(user)
-    Rails.cache.delete locked_cache_key(user)
+    keys
   end
 
   def relock_modules!(relocked_modules=[], student_ids=nil)

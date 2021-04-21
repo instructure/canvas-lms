@@ -11,6 +11,8 @@
  *	jquery.ui.core.js
  */
 import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
 
 $.extend($.ui, { datepicker: { version: "@VERSION" } });
 

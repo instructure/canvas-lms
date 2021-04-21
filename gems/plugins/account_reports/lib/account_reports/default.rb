@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -38,8 +40,16 @@ module AccountReports
       GradeReports.new(account_report).grade_export
     end
 
+    def self.parallel_grade_export_csv(account_report, runner)
+      GradeReports.new(account_report, runner).grade_export_runner(runner)
+    end
+
     def self.mgp_grade_export_csv(account_report)
       GradeReports.new(account_report).mgp_grade_export
+    end
+
+    def self.parallel_mgp_grade_export_csv(account_report, runner)
+      GradeReports.new(account_report, runner).mgp_grade_export_runner(runner)
     end
 
     def self.sis_export_csv(account_report)
@@ -92,6 +102,10 @@ module AccountReports
 
     def self.lti_report_csv(account_report)
       LtiReports.new(account_report).lti_report
+    end
+
+    def self.eportfolio_report_csv(account_report)
+      EportfolioReports.new(account_report).eportfolio_report
     end
   end
 end

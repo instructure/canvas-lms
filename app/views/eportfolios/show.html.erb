@@ -16,23 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
-<%
-  js_bundle :eportfolio
-  css_bundle :tinymce
-  @no_left_side_list_view = true
-  js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
-%>
+<% provide :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
 
-<% content_for :auto_discovery do %>
-  <% if can_do(@portfolio, @current_user, :update) %>
-    <%= auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, :verifier => @portfolio.uuid), {:title => t('titles.feed', "Eportfolio Atom Feed") }) %>
-  <% elsif @portfolio.public %>
-    <%= auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), {:title => t('titles.feed', "Eportfolio Atom Feed") }) %>
-  <% end %>
-<% end %>
-
-<% content_for :left_side do %>
+<% provide :left_side do %>
   <div class="eportfolio-name">
     <h3><%= @portfolio.name %></h3>
     <% if @owner_url %>
@@ -44,7 +30,7 @@
   <%= render :partial => "eportfolios/section_list" %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div id="page_sidebar">
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
       <div class="rs-margin-bottom">
@@ -86,6 +72,26 @@
 <% end %>
 
 <% if @owner_view %>
+  <% if @portfolio.flagged_as_possible_spam? %>
+    <p>
+      <div class="ic-flash-warning eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been flagged as possible spam. Until it has been reviewed by an administrator, it will only be visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% elsif @portfolio.spam?(include_possible_spam: false) %>
+    <p>
+      <div class="ic-flash-error eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been identified as spam, and is only visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% end %>
+
   <h2><%= t('headers.welcome', "Welcome to Your ePortfolio") %></h2>
   <p><%= t(:welcome, <<-DETAILS)
     If this is your first time here, you may want to pop up the wizard and see
@@ -94,7 +100,7 @@
     DETAILS
   %></p>
   <ul class="unstyled_list" style="padding-<%= direction('left') %>: 20px; margin-bottom: 20px; line-height: 1.8em; font-size: 1.2em;">
-    <li><a href="#" class="wizard_popup_link icon-question"><%= t('links.wizard', "Getting Started Wizard") %></a></li>
+    <li><a href="?view=wizard_box" class="wizard_popup_link icon-question"><%= t('links.wizard', "Getting Started Wizard") %></a></li>
     <li><a href="?view=preview" class="icon-arrow-right"><%= t('links.portfolio', "Go to the Actual ePortfolio") %></a></li>
   </ul>
 
@@ -117,9 +123,15 @@
     %></p>
     <p>
     <%= t('links.share', "Copy and share this link to give others access to your private ePortfolio:") %><br />
-    <a href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>" id="eportfolio_share_link">
-      <%= eportfolio_url(@portfolio.id, :verifier => @portfolio.uuid) %>
-    </a>
+      <a
+        href="<%= eportfolio_path(@portfolio.id, :verifier => @portfolio.uuid) %>"
+        id="eportfolio_share_link"
+        <% if @domain_root_account.feature_enabled?(:responsive_misc) %>
+          style="overflow-wrap: break-word;"
+        <% end %>
+      >
+        <%= eportfolio_url(@portfolio.id, :verifier => @portfolio.uuid) %>
+      </a>
     </p>
   <% end %>
 
@@ -138,7 +150,7 @@
           class="submission_info">
           <%= submission.assignment.title %>, <%= submission.assignment.context.name %>
         </a>
-        <span class="text" style="font-size: 1.2em;">
+        <span class="text" style="font-size: 1.2em;" role="button">
           <span class="text assignment_title"><%= submission.assignment.title %></span>
           <span style="font-size: 0.8em; padding-<%= direction('left') %>: 5px;" class="text context_name"><%= submission.assignment.context.name %></span>
         </span>
@@ -228,6 +240,45 @@
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div style="float: <%= direction('right') %>; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
   <% end %>
+  <% if @portfolio.spam? && @portfolio.grants_right?(@current_user, :moderate)%>
+    <% if @portfolio.flagged_as_possible_spam? %>
+      <p>
+        <div class="ic-flash-warning eportfolio_spam_message">
+          <div class="ic-flash__icon" aria-hidden="true">
+            <i class="icon-warning"></i>
+          </div>
+          <%= t("This ePortfolio has been identified as possible spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe. Otherwise, you can confirm it as spam.") %>
+        </div>
+      </p>
+    <% else %>
+      <p>
+        <div class="ic-flash-error eportfolio_spam_message">
+          <div class="ic-flash__icon" aria-hidden="true">
+            <i class="icon-warning"></i>
+          </div>
+          <%= t("This ePortfolio has been identified as spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe.") %>
+        </div>
+      </p>
+    <% end %>
+  <% elsif @portfolio.flagged_as_possible_spam? && @portfolio.user == @current_user %>
+    <p>
+      <div class="ic-flash-warning eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been flagged as possible spam. Until it has been reviewed by an administrator, it will only be visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% elsif @portfolio.spam?(include_possible_spam: false) && @portfolio.user == @current_user %>
+    <p>
+      <div class="ic-flash-error eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been identified as spam, and is only visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
   <div class="form_content">
@@ -282,11 +333,12 @@
     </div>
     <div class="edit_submission_content form_content" style="display: none;">
       <%= before_label(:choose_submission, "Select an assignment submission to embed in this page") %><br/>
-      <% if @portfolio.user.submissions.empty? %>
+      <% submissions = @portfolio.user.submissions.except(:preload).preload(:assignment).to_a %>
+      <% if submissions.empty? %>
         <div style="margin: 5px 20px;"><%= t(:no_submissions, "No Submissions Found") %></div>
       <% end %>
       <ul class="submission_list">
-        <% @portfolio.user.submissions.each do |submission| %>
+        <% submissions.each do |submission| %>
           <li class="submission <%= 'already_used' if (@used_submission_ids.include?(submission.id) rescue false) %>" id="submission_<%= submission.id %>">
             <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>"
               style="display: none;"

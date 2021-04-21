@@ -2,14 +2,16 @@
 
 exports[`does not render end time if the same as start time 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -30,7 +32,9 @@ exports[`does not render end time if the same as start time 1`] = `
             Calendar Event This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -38,43 +42,66 @@ exports[`does not render end time if the same as start time 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -84,50 +111,47 @@ exports[`does not render end time if the same as start time 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              endTime={"2011-12-17T11:30:00.000Z"}
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="This Assignment is about awesome stuff"
-            />
-          </Link>
+            }
+            endTime={"2011-12-17T11:30:00.000Z"}
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="This Assignment is about awesome stuff"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -145,14 +169,16 @@ exports[`does not render end time if the same as start time 1`] = `
 
 exports[`prefers to render feedback if it and the location are available 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -173,7 +199,9 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             Assignment This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -181,43 +209,66 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -227,31 +278,28 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -263,23 +311,31 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
         </div>
       </div>
     </div>
-    <div>
-      <span>
+    <div
+      className="PlannerItem-styles__feedback"
+    >
+      <span
+        className="PlannerItem-styles__feedbackAvatar"
+      >
         <Avatar
-          inline={true}
+          data-fs-exclude={true}
+          display="inline-block"
           name="Dr. David Bowman"
           onImageLoaded={[Function]}
+          shape="circle"
           size="small"
           src="/avatar/is/here/"
-          variant="circle"
         />
       </span>
-      <span>
+      <span
+        className="PlannerItem-styles__feedbackComment"
+      >
         <Text
           as="span"
           fontStyle="italic"
           letterSpacing="normal"
           size="medium"
+          wrap="normal"
         >
           Open the pod bay doors, HAL.
         </Text>
@@ -291,14 +347,16 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
 
 exports[`renders Announcement correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -319,7 +377,9 @@ exports[`renders Announcement correctly with everything 1`] = `
             Announcement I am an Announcement is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -327,43 +387,66 @@ exports[`renders Announcement correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAnnouncement />
+    <IconAnnouncementLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Announcement
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -373,55 +456,49 @@ exports[`renders Announcement correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                4
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              4
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -439,14 +516,16 @@ exports[`renders Announcement correctly with everything 1`] = `
 
 exports[`renders Announcement correctly with just date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -467,7 +546,9 @@ exports[`renders Announcement correctly with just date 1`] = `
             Announcement I am an Announcement is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -475,43 +556,66 @@ exports[`renders Announcement correctly with just date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAnnouncement />
+    <IconAnnouncementLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Announcement
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -521,31 +625,28 @@ exports[`renders Announcement correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -563,14 +664,16 @@ exports[`renders Announcement correctly with just date 1`] = `
 
 exports[`renders Announcement correctly with just points 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -591,7 +694,9 @@ exports[`renders Announcement correctly with just points 1`] = `
             Announcement I am an Announcement is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -599,43 +704,66 @@ exports[`renders Announcement correctly with just points 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAnnouncement />
+    <IconAnnouncementLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Announcement
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -645,55 +773,49 @@ exports[`renders Announcement correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                2
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              2
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -711,14 +833,16 @@ exports[`renders Announcement correctly with just points 1`] = `
 
 exports[`renders Announcement correctly without right side content 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -739,7 +863,9 @@ exports[`renders Announcement correctly without right side content 1`] = `
             Announcement I am an Announcement is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -747,43 +873,66 @@ exports[`renders Announcement correctly without right side content 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAnnouncement />
+    <IconAnnouncementLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Announcement
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -793,31 +942,28 @@ exports[`renders Announcement correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -835,14 +981,16 @@ exports[`renders Announcement correctly without right side content 1`] = `
 
 exports[`renders Assignment correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -863,7 +1011,9 @@ exports[`renders Assignment correctly with everything 1`] = `
             Assignment I am an Assignment is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -871,43 +1021,66 @@ exports[`renders Assignment correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://www.non_default_url.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -917,55 +1090,49 @@ exports[`renders Assignment correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                4
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              4
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -983,14 +1150,16 @@ exports[`renders Assignment correctly with everything 1`] = `
 
 exports[`renders Assignment correctly with just date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1011,7 +1180,9 @@ exports[`renders Assignment correctly with just date 1`] = `
             Assignment I am an Assignment is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1019,43 +1190,66 @@ exports[`renders Assignment correctly with just date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1065,31 +1259,28 @@ exports[`renders Assignment correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1107,14 +1298,16 @@ exports[`renders Assignment correctly with just date 1`] = `
 
 exports[`renders Assignment correctly with just points 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1135,7 +1328,9 @@ exports[`renders Assignment correctly with just points 1`] = `
             Assignment I am an Assignment is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1143,43 +1338,66 @@ exports[`renders Assignment correctly with just points 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1189,55 +1407,49 @@ exports[`renders Assignment correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                2
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              2
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1255,14 +1467,16 @@ exports[`renders Assignment correctly with just points 1`] = `
 
 exports[`renders Assignment correctly without right side content 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1283,7 +1497,9 @@ exports[`renders Assignment correctly without right side content 1`] = `
             Assignment I am an Assignment is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1291,43 +1507,66 @@ exports[`renders Assignment correctly without right side content 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1337,31 +1576,28 @@ exports[`renders Assignment correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1379,14 +1615,16 @@ exports[`renders Assignment correctly without right side content 1`] = `
 
 exports[`renders Calendar Event correctly with an all day date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1407,7 +1645,9 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             Calendar Event I am a Calendar Event is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1415,43 +1655,66 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1461,49 +1724,46 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={true}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={true}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
-          </Link>
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1521,14 +1781,16 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
 
 exports[`renders Calendar Event correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1549,7 +1811,9 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             Calendar Event I am a Calendar Event is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1557,43 +1821,66 @@ exports[`renders Calendar Event correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1603,73 +1890,67 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
-          </Link>
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                4
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              4
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1687,14 +1968,16 @@ exports[`renders Calendar Event correctly with everything 1`] = `
 
 exports[`renders Calendar Event correctly with just date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1715,7 +1998,9 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             Calendar Event I am a Calendar Event is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1723,43 +2008,66 @@ exports[`renders Calendar Event correctly with just date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1769,49 +2077,46 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
-          </Link>
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1829,14 +2134,16 @@ exports[`renders Calendar Event correctly with just date 1`] = `
 
 exports[`renders Calendar Event correctly with start and end time 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1857,7 +2164,9 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             Calendar Event I am a Calendar Event is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1865,43 +2174,66 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -1911,50 +2243,47 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              endTime={"2011-12-17T13:30:00.000Z"}
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
-          </Link>
+            }
+            endTime={"2011-12-17T13:30:00.000Z"}
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className="undefined"
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics PlannerItem-styles__with_end_time"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -1972,14 +2301,16 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
 
 exports[`renders Calendar Event correctly without right side content 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2000,7 +2331,9 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             Calendar Event I am a Calendar Event is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2008,43 +2341,66 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2054,49 +2410,46 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
-          </Link>
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2114,14 +2467,16 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
 
 exports[`renders Discussion correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2142,7 +2497,9 @@ exports[`renders Discussion correctly with everything 1`] = `
             Discussion I am a Discussion is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2150,43 +2507,66 @@ exports[`renders Discussion correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDiscussion />
+    <IconDiscussionLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Discussion
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2196,55 +2576,49 @@ exports[`renders Discussion correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                4
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              4
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2262,14 +2636,16 @@ exports[`renders Discussion correctly with everything 1`] = `
 
 exports[`renders Discussion correctly with just date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2290,7 +2666,9 @@ exports[`renders Discussion correctly with just date 1`] = `
             Discussion I am a Discussion is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2298,43 +2676,66 @@ exports[`renders Discussion correctly with just date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDiscussion />
+    <IconDiscussionLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Discussion
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2344,31 +2745,28 @@ exports[`renders Discussion correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2386,14 +2784,16 @@ exports[`renders Discussion correctly with just date 1`] = `
 
 exports[`renders Discussion correctly with just points 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2414,7 +2814,9 @@ exports[`renders Discussion correctly with just points 1`] = `
             Discussion I am a Discussion is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2422,43 +2824,66 @@ exports[`renders Discussion correctly with just points 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDiscussion />
+    <IconDiscussionLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Discussion
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2468,55 +2893,49 @@ exports[`renders Discussion correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                2
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              2
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2534,14 +2953,16 @@ exports[`renders Discussion correctly with just points 1`] = `
 
 exports[`renders Discussion correctly without right side content 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2562,7 +2983,9 @@ exports[`renders Discussion correctly without right side content 1`] = `
             Discussion I am a Discussion is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2570,43 +2993,66 @@ exports[`renders Discussion correctly without right side content 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDiscussion />
+    <IconDiscussionLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Discussion
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2616,31 +3062,28 @@ exports[`renders Discussion correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2658,14 +3101,16 @@ exports[`renders Discussion correctly without right side content 1`] = `
 
 exports[`renders Note correctly with Group 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#F06291",
             "checkedBackground": "#F06291",
             "checkedBorderColor": "#F06291",
@@ -2686,7 +3131,9 @@ exports[`renders Note correctly with Group 1`] = `
             Page this is an account-level group page is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2694,43 +3141,66 @@ exports[`renders Note correctly with Group 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#F06291",
       }
     }
   >
-    <IconDocument />
+    <IconDocumentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             Account-level group 1 Page
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="/groups/9/pages/this-is-an-account-level-group-page"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2740,31 +3210,28 @@ exports[`renders Note correctly with Group 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                this is an account-level group page
-              </Text>
+              this is an account-level group page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2782,14 +3249,16 @@ exports[`renders Note correctly with Group 1`] = `
 
 exports[`renders Note correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": undefined,
             "checkedBackground": undefined,
             "checkedBorderColor": undefined,
@@ -2810,7 +3279,9 @@ exports[`renders Note correctly with everything 1`] = `
             To Do I am a Note is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2818,6 +3289,7 @@ exports[`renders Note correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__avatar"
     style={
       Object {
         "color": undefined,
@@ -2825,43 +3297,66 @@ exports[`renders Note correctly with everything 1`] = `
     }
   >
     <Avatar
-      inline={true}
+      data-fs-exclude={true}
+      display="inline-block"
       name="Jane"
       onImageLoaded={[Function]}
+      shape="circle"
       size="small"
       src="/picture/is/here"
-      variant="circle"
     />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             Math 101 To Do
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -2871,31 +3366,28 @@ exports[`renders Note correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Note
-              </Text>
+              I am a Note
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__editButton"
+          >
             <ApplyTheme
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__dUxGkD): Object {
+                  Symbol(Button__MTEzMjky): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -2903,15 +3395,17 @@ exports[`renders Note correctly with everything 1`] = `
             >
               <Button
                 as="button"
-                buttonRef={[Function]}
                 cursor="pointer"
-                fluidWidth={false}
+                display="inline-block"
+                elementRef={[Function]}
                 icon={[Function]}
                 margin="0"
                 onClick={[Function]}
                 size="medium"
+                textAlign="center"
                 type="button"
                 variant="icon"
+                withBackground={true}
               >
                 <ScreenReaderContent
                   as="span"
@@ -2921,12 +3415,14 @@ exports[`renders Note correctly with everything 1`] = `
               </Button>
             </ApplyTheme>
           </div>
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -2944,14 +3440,16 @@ exports[`renders Note correctly with everything 1`] = `
 
 exports[`renders Note correctly without Course 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": undefined,
             "checkedBackground": undefined,
             "checkedBorderColor": undefined,
@@ -2972,7 +3470,9 @@ exports[`renders Note correctly without Course 1`] = `
             To Do I am a Note is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2980,6 +3480,7 @@ exports[`renders Note correctly without Course 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__avatar"
     style={
       Object {
         "color": undefined,
@@ -2987,43 +3488,66 @@ exports[`renders Note correctly without Course 1`] = `
     }
   >
     <Avatar
-      inline={true}
+      data-fs-exclude={true}
+      display="inline-block"
       name="Jane"
       onImageLoaded={[Function]}
+      shape="circle"
       size="small"
       src="/picture/is/here"
-      variant="circle"
     />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
              To Do
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3033,31 +3557,28 @@ exports[`renders Note correctly without Course 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Note
-              </Text>
+              I am a Note
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__editButton"
+          >
             <ApplyTheme
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__dUxGkD): Object {
+                  Symbol(Button__MTEzMjky): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3065,15 +3586,17 @@ exports[`renders Note correctly without Course 1`] = `
             >
               <Button
                 as="button"
-                buttonRef={[Function]}
                 cursor="pointer"
-                fluidWidth={false}
+                display="inline-block"
+                elementRef={[Function]}
                 icon={[Function]}
                 margin="0"
                 onClick={[Function]}
                 size="medium"
+                textAlign="center"
                 type="button"
                 variant="icon"
+                withBackground={true}
               >
                 <ScreenReaderContent
                   as="span"
@@ -3083,12 +3606,14 @@ exports[`renders Note correctly without Course 1`] = `
               </Button>
             </ApplyTheme>
           </div>
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3106,14 +3631,16 @@ exports[`renders Note correctly without Course 1`] = `
 
 exports[`renders Page correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3134,7 +3661,9 @@ exports[`renders Page correctly with everything 1`] = `
             Page I am a Page is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3142,43 +3671,66 @@ exports[`renders Page correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDocument />
+    <IconDocumentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Page
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3188,55 +3740,49 @@ exports[`renders Page correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                4
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              4
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3254,14 +3800,16 @@ exports[`renders Page correctly with everything 1`] = `
 
 exports[`renders Page correctly with just date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3282,7 +3830,9 @@ exports[`renders Page correctly with just date 1`] = `
             Page I am a Page is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3290,43 +3840,66 @@ exports[`renders Page correctly with just date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDocument />
+    <IconDocumentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
              Page
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3336,31 +3909,28 @@ exports[`renders Page correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3378,14 +3948,16 @@ exports[`renders Page correctly with just date 1`] = `
 
 exports[`renders Page correctly with just points 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3406,7 +3978,9 @@ exports[`renders Page correctly with just points 1`] = `
             Page I am a Page is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3414,43 +3988,66 @@ exports[`renders Page correctly with just points 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDocument />
+    <IconDocumentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Page
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3460,55 +4057,49 @@ exports[`renders Page correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                2
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              2
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3526,14 +4117,16 @@ exports[`renders Page correctly with just points 1`] = `
 
 exports[`renders Page correctly without right side content 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3554,7 +4147,9 @@ exports[`renders Page correctly without right side content 1`] = `
             Page I am a Page is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3562,43 +4157,66 @@ exports[`renders Page correctly without right side content 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconDocument />
+    <IconDocumentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Page
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3608,31 +4226,28 @@ exports[`renders Page correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3650,14 +4265,16 @@ exports[`renders Page correctly without right side content 1`] = `
 
 exports[`renders Quiz correctly with everything 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3678,7 +4295,9 @@ exports[`renders Quiz correctly with everything 1`] = `
             Quiz I am a Quiz is marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3686,43 +4305,66 @@ exports[`renders Quiz correctly with everything 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconQuiz />
+    <IconQuizLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Quiz
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3732,55 +4374,49 @@ exports[`renders Quiz correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                4
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              4
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3798,14 +4434,16 @@ exports[`renders Quiz correctly with everything 1`] = `
 
 exports[`renders Quiz correctly with just date 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3826,7 +4464,9 @@ exports[`renders Quiz correctly with just date 1`] = `
             Quiz I am a Quiz is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3834,43 +4474,66 @@ exports[`renders Quiz correctly with just date 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconQuiz />
+    <IconQuizLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Quiz
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -3880,31 +4543,28 @@ exports[`renders Quiz correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -3922,14 +4582,16 @@ exports[`renders Quiz correctly with just date 1`] = `
 
 exports[`renders Quiz correctly with just points 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3950,7 +4612,9 @@ exports[`renders Quiz correctly with just points 1`] = `
             Quiz I am a Quiz is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3958,43 +4622,66 @@ exports[`renders Quiz correctly with just points 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconQuiz />
+    <IconQuizLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Quiz
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4004,55 +4691,49 @@ exports[`renders Quiz correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                2
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              2
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4070,14 +4751,16 @@ exports[`renders Quiz correctly with just points 1`] = `
 
 exports[`renders Quiz correctly without right side content 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4098,7 +4781,9 @@ exports[`renders Quiz correctly without right side content 1`] = `
             Quiz I am a Quiz is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4106,43 +4791,66 @@ exports[`renders Quiz correctly without right side content 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconQuiz />
+    <IconQuizLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Quiz
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4152,31 +4860,28 @@ exports[`renders Quiz correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4194,14 +4899,16 @@ exports[`renders Quiz correctly without right side content 1`] = `
 
 exports[`renders assignment peer reviews correctly 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4222,7 +4929,9 @@ exports[`renders assignment peer reviews correctly 1`] = `
             Peer Review some reviewable assignment is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4230,43 +4939,66 @@ exports[`renders assignment peer reviews correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconPeerReview />
+    <IconPeerReviewLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Peer Review
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4276,31 +5008,28 @@ exports[`renders assignment peer reviews correctly 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                some reviewable assignment
-              </Text>
+              some reviewable assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4318,14 +5047,16 @@ exports[`renders assignment peer reviews correctly 1`] = `
 
 exports[`renders correctly 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4346,7 +5077,9 @@ exports[`renders correctly 1`] = `
             Assignment This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4354,43 +5087,66 @@ exports[`renders correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4400,55 +5156,49 @@ exports[`renders correctly 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__score"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
-              size="medium"
+              size="large"
+              wrap="normal"
             >
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="large"
-              >
-                35
-              </Text>
-              <Text
-                as="span"
-                letterSpacing="normal"
-                size="x-small"
-              >
-                 
-                pts
-              </Text>
+              35
             </Text>
-          </div>
-          <div>
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
+            >
+               
+              pts
+            </Text>
+          </div>
+          <div
+            className="PlannerItem-styles__due"
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4466,14 +5216,16 @@ exports[`renders correctly 1`] = `
 
 exports[`renders feedback anonymously according to the assignment settings 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4494,7 +5246,9 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             Assignment This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4502,43 +5256,66 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4548,31 +5325,28 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4584,22 +5358,30 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
         </div>
       </div>
     </div>
-    <div>
-      <span>
+    <div
+      className="PlannerItem-styles__feedback"
+    >
+      <span
+        className="PlannerItem-styles__feedbackAvatar"
+      >
         <Avatar
-          inline={true}
+          data-fs-exclude={true}
+          display="inline-block"
           name="?"
           onImageLoaded={[Function]}
+          shape="circle"
           size="small"
-          variant="circle"
         />
       </span>
-      <span>
+      <span
+        className="PlannerItem-styles__feedbackComment"
+      >
         <Text
           as="span"
           fontStyle="italic"
           letterSpacing="normal"
           size="medium"
+          wrap="normal"
         >
           Open the pod bay doors, HAL.
         </Text>
@@ -4611,14 +5393,16 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
 
 exports[`renders feedback if available 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4639,7 +5423,9 @@ exports[`renders feedback if available 1`] = `
             Assignment This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4647,43 +5433,66 @@ exports[`renders feedback if available 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4693,31 +5502,28 @@ exports[`renders feedback if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4729,23 +5535,31 @@ exports[`renders feedback if available 1`] = `
         </div>
       </div>
     </div>
-    <div>
-      <span>
+    <div
+      className="PlannerItem-styles__feedback"
+    >
+      <span
+        className="PlannerItem-styles__feedbackAvatar"
+      >
         <Avatar
-          inline={true}
+          data-fs-exclude={true}
+          display="inline-block"
           name="Boyd Crowder"
           onImageLoaded={[Function]}
+          shape="circle"
           size="small"
           src="/avatar/is/here/"
-          variant="circle"
         />
       </span>
-      <span>
+      <span
+        className="PlannerItem-styles__feedbackComment"
+      >
         <Text
           as="span"
           fontStyle="italic"
           letterSpacing="normal"
           size="medium"
+          wrap="normal"
         >
           Death will not be the end of your suffering.
         </Text>
@@ -4757,14 +5571,16 @@ exports[`renders feedback if available 1`] = `
 
 exports[`renders media feedback if available 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4785,7 +5601,9 @@ exports[`renders media feedback if available 1`] = `
             Assignment This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4793,43 +5611,66 @@ exports[`renders media feedback if available 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4839,31 +5680,28 @@ exports[`renders media feedback if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -4875,23 +5713,31 @@ exports[`renders media feedback if available 1`] = `
         </div>
       </div>
     </div>
-    <div>
-      <span>
+    <div
+      className="PlannerItem-styles__feedback"
+    >
+      <span
+        className="PlannerItem-styles__feedbackAvatar"
+      >
         <Avatar
-          inline={true}
+          data-fs-exclude={true}
+          display="inline-block"
           name="Howard Stern"
           onImageLoaded={[Function]}
+          shape="circle"
           size="small"
           src="/avatar/is/here/"
-          variant="circle"
         />
       </span>
-      <span>
+      <span
+        className="PlannerItem-styles__feedbackComment"
+      >
         <Text
           as="span"
           fontStyle="italic"
           letterSpacing="normal"
           size="medium"
+          wrap="normal"
         >
           You have media feedback.
         </Text>
@@ -4903,14 +5749,16 @@ exports[`renders media feedback if available 1`] = `
 
 exports[`renders the end time if available 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4931,7 +5779,9 @@ exports[`renders the end time if available 1`] = `
             Calendar Event This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4939,43 +5789,66 @@ exports[`renders the end time if available 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconCalendarMonth />
+    <IconCalendarMonthLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Calendar Event
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -4985,50 +5858,47 @@ exports[`renders the end time if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
+          </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
               }
-              endTime={"2011-12-17T13:30:00.000Z"}
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="This Assignment is about awesome stuff"
-            />
-          </Link>
+            }
+            endTime={"2011-12-17T13:30:00.000Z"}
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="This Assignment is about awesome stuff"
+          />
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className="undefined"
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics PlannerItem-styles__with_end_time"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -5046,14 +5916,16 @@ exports[`renders the end time if available 1`] = `
 
 exports[`renders the location if available 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -5074,7 +5946,9 @@ exports[`renders the location if available 1`] = `
             Assignment This Assignment is about awesome stuff is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5082,43 +5956,66 @@ exports[`renders the location if available 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": "#d71f85",
       }
     }
   >
-    <IconAssignment />
+    <IconAssignmentLine />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             A Course about being Diffrient Assignment
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5128,31 +6025,28 @@ exports[`renders the location if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"
@@ -5164,12 +6058,14 @@ exports[`renders the location if available 1`] = `
         </div>
       </div>
     </div>
-    <div>
+    <div
+      className="PlannerItem-styles__location"
+    >
       <Text
         as="span"
-        color="secondary"
         letterSpacing="normal"
         size="medium"
+        wrap="normal"
       >
         Columbus, OH
       </Text>
@@ -5180,14 +6076,16 @@ exports[`renders the location if available 1`] = `
 
 exports[`renders user-created Todo correctly 1`] = `
 <div
-  className="planner-item"
+  className="PlannerItem-styles__root planner-item"
 >
-  <div>
+  <div
+    className="PlannerItem-styles__completed"
+  >
     <ApplyTheme
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade__hUzfii): Object {
+          Symbol(CheckboxFacade__yyQPt): Object {
             "borderColor": null,
             "checkedBackground": null,
             "checkedBorderColor": null,
@@ -5208,7 +6106,9 @@ exports[`renders user-created Todo correctly 1`] = `
             Task do that one thing is not marked as done.
           </ScreenReaderContent>
         }
+        labelPlacement="end"
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5216,6 +6116,7 @@ exports[`renders user-created Todo correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
+    className="PlannerItem-styles__icon"
     style={
       Object {
         "color": null,
@@ -5223,43 +6124,66 @@ exports[`renders user-created Todo correctly 1`] = `
     }
   >
     <Avatar
-      inline={true}
+      data-fs-exclude={true}
+      display="inline-block"
       name="Jane"
       onImageLoaded={[Function]}
+      shape="circle"
       size="small"
       src="/picture/is/here"
-      variant="circle"
     />
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerItem-styles__layout"
+  >
+    <div
+      className="PlannerItem-styles__innerLayout"
+    >
       <div
-        className=""
+        className="PlannerItem-styles__details PlannerItem-styles__details_no_badges"
       >
-        <div>
+        <div
+          className="PlannerItem-styles__type"
+        >
           <Text
             as="span"
             color="secondary"
             letterSpacing="normal"
             size="x-small"
+            wrap="normal"
           >
             To Do TO DO
           </Text>
         </div>
         <div
+          className="PlannerItem-styles__title"
           style={
             Object {
               "position": "relative",
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            textAlign="center"
+            theme={
+              Object {
+                "linkColor": undefined,
+                "linkHoverColor": undefined,
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
+            withBackground={true}
           >
             <ScreenReaderContent
               as="span"
@@ -5269,31 +6193,28 @@ exports[`renders user-created Todo correctly 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                do that one thing
-              </Text>
+              do that one thing
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
-        className=""
+        className="PlannerItem-styles__secondary PlannerItem-styles__secondary_no_badges"
       >
-        <div />
         <div
-          className=""
+          className="PlannerItem-styles__badges"
+        />
+        <div
+          className="PlannerItem-styles__metrics"
         >
-          <div>
+          <div
+            className="PlannerItem-styles__due"
+          >
             <Text
               as="span"
-              color="secondary"
               letterSpacing="normal"
               size="x-small"
+              wrap="normal"
             >
               <PresentationContent
                 as="span"

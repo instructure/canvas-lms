@@ -55,13 +55,12 @@ window.mejs.MepDefaults.speeds.push('0.50')
 // Tell mediaelementJS to use strings for the user's locale.
 // when we start doing locale-specific webpack builds,
 // change window.ENV.LOCALE to process.env.BUILD_LOCALE
-let strings
-try {
-  strings = require(`mediaelement/build/lang/me-i18n-locale-${window.ENV.LOCALE}`)
-} catch (error) {
+import(`mediaelement/build/lang/me-i18n-locale-${window.ENV.LOCALE}`).then(strings => {
+  if (strings) window.mejs.i18n.locale.language = window.ENV.LOCALE
+}).catch(() => {
   // medialementjs doesn't have strings for this locale
-}
-if (strings) window.mejs.i18n.locale.language = window.ENV.LOCALE
+})
+
 
 
 export default window.mejs

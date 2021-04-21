@@ -1,11 +1,8 @@
 <%= I18n.t("New assignment for %{course_name}", :course_name => asset.context.name) %>
-<%= asset.title %>
-
 <%
   multiple_dates_text = I18n.t("due: Multiple Dates")
   display_text = I18n.t("due: No Due Date")
 %>
-
 <% if asset.multiple_due_dates_apply_to?(user) %>
   <% display_text = multiple_dates_text %>
 <% elsif asset.due_at %>
@@ -19,7 +16,4 @@
     <% end %>
   <% end %>
 <% end %>
-
 <%= display_text %>
-
-<%= I18n.t("More info at %{course_name}", :course_name => HostUrl.context_host(asset.context)) %>

@@ -57,7 +57,7 @@ QUnit.module('TimeBlockRow', {
 test('should init properly', function() {
   const me = new TimeBlockRow(this.timeBlockList, {start: this.start, end: this.end})
   // make sure the <input> `value`s are right
-  equal(me.$date.val().trim(), tz.format(unfudged_start, 'date.formats.medium_with_weekday'))
+  equal(me.$date.val().trim(), tz.format(unfudged_start, 'date.formats.default'))
   equal(me.$start_time.val().trim(), tz.format(unfudged_start, 'time.formats.tiny'))
   equal(me.$end_time.val().trim(), tz.format(unfudged_end, 'time.formats.tiny'))
 })

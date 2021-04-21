@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ class CanvasLinkedInConfig
         secret_key: settings[:client_secret_dec]
       }.with_indifferent_access
     else
-      ConfigFile.load('linked_in')
+      ConfigFile.load('linked_in').dup
     end
 
   end

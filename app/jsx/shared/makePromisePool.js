@@ -54,31 +54,31 @@
  *      console.log(results.failures.length, 'failed to delete')
  *   })
  */
-export default function makePromisePool (dataList, makePromise, opts = {}) {
+export default function makePromisePool(dataList, makePromise, opts = {}) {
   const poolSize = opts.poolSize || 5
   const intervalTime = opts.intervalTime || 300
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const successes = []
     const failures = []
     let activeWorkers = 0
     let dataIndex = 0
 
-    function queueNextPromise () {
+    function queueNextPromise() {
       const data = dataList[dataIndex++]
       activeWorkers++
       makePromise(data)
         .then(res => {
-          successes.push({ data, res })
+          successes.push({data, res})
           activeWorkers--
         })
         .catch(err => {
-          failures.push({ data, err })
+          failures.push({data, err})
           activeWorkers--
         })
     }
 
-    function evaluateProgress () {
+    function evaluateProgress() {
       // if there are still items to process
       if (dataIndex < dataList.length) {
         // while there are items to process and we have room in our pool..
@@ -88,11 +88,11 @@ export default function makePromisePool (dataList, makePromise, opts = {}) {
 
         // check on the progress again after an interval timeout
         setTimeout(evaluateProgress, intervalTime)
-      } else  {
+      } else {
         // check that all workers are actually done
         if (activeWorkers === 0) {
           // looks like all our promises finished executing, so lets return results
-          resolve({ successes, failures })
+          resolve({successes, failures})
         } else {
           // check on the progress again after an interval timeout
           setTimeout(evaluateProgress, intervalTime)

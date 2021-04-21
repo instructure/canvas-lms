@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,11 +21,12 @@
 class GradingStandard < ActiveRecord::Base
   include Workflow
 
-  belongs_to :context, polymorphic: [:account, :course]
+  belongs_to :context, polymorphic: [:account, :course], required: true
   belongs_to :user
   has_many :assignments
 
-  validates :context_id, :context_type, :workflow_state, :data, presence: true
+  validates :workflow_state, presence: true
+  validates :data, presence: true
   validate :valid_grading_scheme_data
   validate :full_range_scheme
 
@@ -49,8 +52,10 @@ class GradingStandard < ActiveRecord::Base
   # 89.5 is an A-.
   serialize :data
 
+  before_save :trim_whitespace, if: :will_save_change_to_data?
   before_save :update_usage_count
   attr_accessor :default_standard
+  before_create :set_root_account_id
 
   workflow do
     state :active
@@ -106,10 +111,10 @@ class GradingStandard < ActiveRecord::Base
     # grade cutoffs.
     # otherwise, we step down just 1/10th of a point, which is the
     # granularity we support right now
-    elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= 0.01
-      ordered_scheme[idx - 1].last * 100.0 - 1.0
+    elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= 0.01.to_d
+      ordered_scheme[idx - 1].last * 100.0.to_d - 1.0.to_d
     elsif idx
-      ordered_scheme[idx - 1].last * 100.0 - 0.1
+      ordered_scheme[idx - 1].last * 100.0.to_d - 0.1.to_d
     else
       nil
     end
@@ -121,7 +126,7 @@ class GradingStandard < ActiveRecord::Base
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
     score = BigDecimal(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
-    ordered_scheme.max_by {|_, lower_bound| score >= lower_bound * 100 ? lower_bound : -lower_bound }[0]
+    ordered_scheme.max_by {|_, lower_bound| score >= lower_bound * 100.0.to_d ? lower_bound : -lower_bound }[0]
   end
 
   def data=(new_val)
@@ -129,7 +134,9 @@ class GradingStandard < ActiveRecord::Base
     # round values to the nearest 0.01 (0.0001 since e.g. 78 is stored as .78)
     # and dup the data while we're at it. (new_val.dup only dups one level, the
     # elements of new_val.dup are the same objects as the elements of new_val)
-    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] } unless new_val.nil?
+    if new_val.respond_to?(:map)
+      new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] }
+    end
     write_attribute(:data, new_val)
     @ordered_scheme = nil
   end
@@ -157,6 +164,13 @@ class GradingStandard < ActiveRecord::Base
       raise "Unknown GradingStandard data version: #{version}"
     end
   end
+
+  def trim_whitespace
+    data.each do |scheme|
+      scheme.first.strip!
+    end
+  end
+  private :trim_whitespace
 
   def update_usage_count
     self.usage_count = self.assignments.active.count
@@ -250,5 +264,9 @@ class GradingStandard < ActiveRecord::Base
       "D-" => 0.61,
       "F" => 0.0,
     }
+  end
+
+  def set_root_account_id
+    self.root_account_id ||= context.is_a?(Account) ? context.resolved_root_account_id : context.root_account_id
   end
 end

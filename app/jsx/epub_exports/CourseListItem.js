@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import GenerateLink from '../epub_exports/GenerateLink'
-import DownloadLink from '../epub_exports/DownloadLink'
+import GenerateLink from './GenerateLink'
+import DownloadLink from './DownloadLink'
 import ApiProgressBar from '../shared/ApiProgressBar'
-import CourseEpubExportStore from '../epub_exports/CourseStore'
+import CourseEpubExportStore from './CourseStore'
 import I18n from 'i18n!epub_exports'
 import FriendlyDatetime from '../shared/FriendlyDatetime'
 import classnames from 'classnames'
@@ -72,7 +72,7 @@ class CourseListItem extends React.Component {
   }
 
   render() {
-    let course = this.props.course,
+    const course = this.props.course,
       classes = {
         'ig-row': true
       }

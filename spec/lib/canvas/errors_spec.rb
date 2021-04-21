@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,10 +20,29 @@
 require 'spec_helper'
 require_dependency "canvas/errors"
 module Canvas
+  # TODO: Leaving one spec in here to make sure the shim
+  # works until we've successfully re-pointed all
+  # callsites to "CanvasErrors"
   describe Errors do
+    error_testing_class = Class.new do
+      attr_accessor :exception, :details, :level
+
+      def register!
+        target = self
+        Canvas::Errors.register!(:test_thing) do |e, d, l|
+          target.exception = e
+          target.details = d
+          target.level = l
+          "ERROR_BLOCK_RESPONSE"
+        end
+      end
+    end
+
     before(:each) do
       @old_registry = described_class.instance_variable_get(:@registry)
       described_class.clear_callback_registry!
+      @error_harness = error_testing_class.new
+      @error_harness.register!
     end
 
     after(:each) do
@@ -31,42 +52,13 @@ module Canvas
     let(:error){double("Some Error") }
 
     describe '.capture_exception' do
-      it 'tags with the exception type' do
-        exception = details = nil
-        Canvas::Errors.register!(:test_thing) do |e, d|
-          exception = e
-          details = d
-        end
+      it 'tags with the exception type and default level' do
         Canvas::Errors.capture_exception(:core_meltdown, error)
-        expect(exception).to eq(error)
-        expect(details).to eq({tags: {type: 'core_meltdown'}})
+        expect(@error_harness.exception).to eq(error)
+        expect(@error_harness.details[:tags][:type]).to eq('core_meltdown')
+        expect(@error_harness.level).to eq(:error)
       end
     end
 
-    it 'fires callbacks when it handles an exception' do
-      called_with = nil
-      Canvas::Errors.register!(:test_thing) do |exception|
-        called_with = exception
-      end
-      Canvas::Errors.capture(error)
-      expect(called_with).to eq(error)
-    end
-
-    it "passes through extra information if available wrapped in extra" do
-      extra_info = nil
-      Canvas::Errors.register!(:test_thing) do |_exception, details|
-        extra_info = details
-      end
-      Canvas::Errors.capture(double(), {detail1: 'blah'})
-      expect(extra_info).to eq({extra: {detail1: 'blah'}})
-    end
-
-    it 'captures output from each callback according to their registry tag' do
-      Canvas::Errors.register!(:test_thing) do
-        "FOO-BAR"
-      end
-      outputs = Canvas::Errors.capture(double())
-      expect(outputs[:test_thing]).to eq('FOO-BAR')
-    end
   end
 end

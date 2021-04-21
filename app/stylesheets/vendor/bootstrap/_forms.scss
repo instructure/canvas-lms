@@ -151,9 +151,9 @@ input[type="checkbox"] {
 // Set the height of select and file controls to match text inputs
 select,
 input[type="file"] {
-  // Adding "8" to the total to account for the extra padding on the updated button styles
-  height: $inputHeight + 8;
-  line-height: $inputHeight + 8;
+  // Adding "0.5" to the total to account for the extra padding on the updated button styles
+  height: $inputHeightRem + 0.5;
+  line-height: $inputHeightRem + 0.5;
 }
 
 // Make select elements obey height by applying a border
@@ -161,6 +161,11 @@ select {
   width: 220px; // default input width + 10px of padding that doesn't get applied
   border: 1px solid $inputBorder;
   background-color: $inputBackground; // Chrome on Linux and Mobile Safari need background-color
+}
+
+select.responsive-width {
+  width: unset;
+  min-width: 220px;
 }
 
 // Make multiple select elements height not fixed
@@ -669,6 +674,9 @@ legend + .control-group {
   .controls {
     margin-#{direction(left)}: $horizontalComponentOffset;
   }
+  .controls .controls-section {
+    margin-top: 5px;
+  }
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
     margin-bottom: 0;
@@ -684,5 +692,78 @@ legend + .control-group {
   // Move over buttons in .form-actions to align with .controls
   .form-actions {
     padding-#{direction(left)}: $horizontalComponentOffset;
+  }
+}
+
+.form-horizontal .margin-t-m { // todo: can we have margin utils?
+  margin-top: 1rem;
+}
+
+.form-horizontal .responsive-control-group {
+  display: flex;
+
+  .control-label {
+    flex-basis: $horizontalComponentOffset - $spacing-width;
+    flex-grow: 0;
+    padding-#{direction(right)}: $spacing-width;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    margin-#{direction(left)}: inherit; // undo cascade
+  }
+
+  .controls .input-append,
+  .responsive-input-with-add-on {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .controls .input-append input,
+  .responsive-control-input {
+    flex-grow: 1;
+  }
+
+  .controls .input-append .add-on,
+  .responsive-control-add-on {
+    flex-grow: 0;
+    width: auto; // potentially shrink it down to fit content
+  }
+}
+
+@include desktop-only {
+  .form-horizontal .responsive-control-group {
+    margin-bottom: $baseLineHeight;
+  }
+
+  .form-horizontal .responsive-button-container {
+    margin-left: $horizontalComponentOffset;
+  }
+
+  .form-horizontal .responsive-control-button {
+    align-self: flex-start;
+  }
+}
+
+@include mobile-only {
+  .form-horizontal .responsive-control-group {
+    flex-direction: column;
+  }
+
+  .form-horizontal .responsive-control-group .control-label {
+    flex-basis: inherit;  // undo cascade
+    float: inherit;  // undo cascade
+    padding-#{direction(right)}: inherit;
+    text-align: inherit; // undo cascade
+  }
+
+  .form-horizontal .responsive-button-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-horizontal .responsive-control-button {
+    flex-grow: 1;
   }
 }

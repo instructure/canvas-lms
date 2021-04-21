@@ -47,14 +47,12 @@ test('renders an unpublish input field', function() {
   ok(this.RestrictedRadioButtons.unpublishInput, 'should have an unpublish input field')
 })
 
-test('renders a permissions input field', function() {
-  Simulate.change(this.RestrictedRadioButtons.permissionsInput)
-  ok(this.RestrictedRadioButtons.permissionsInput, 'should have an permissions input field')
+test('renders a not-visible-in-student-files field', function() {
+  ok(this.RestrictedRadioButtons.linkOnly, 'should have an link-only input field')
 })
 
 test('renders a calendar option input field', function() {
-  Simulate.change(this.RestrictedRadioButtons.permissionsInput)
-  ok(this.RestrictedRadioButtons.dateRange, 'should have a dateRange input field')
+  ok(this.RestrictedRadioButtons.dateRange, 'should have a calendar input field')
 })
 
 QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
@@ -85,13 +83,8 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
 test('defaults to having nothing selected when non common items are selected', function() {
   equal(this.RestrictedRadioButtons.publishInput.checked, false, 'not selected')
   equal(this.RestrictedRadioButtons.unpublishInput.checked, false, 'not selected')
-  equal(this.RestrictedRadioButtons.permissionsInput.checked, false, 'not selected')
-})
-
-test('selecting the restricted access option default checks the hiddenInput option', function() {
-  this.RestrictedRadioButtons.permissionsInput.checked = true
-  Simulate.change(this.RestrictedRadioButtons.permissionsInput)
-  equal(this.RestrictedRadioButtons.link_only.checked, true, 'default checks hiddenInput')
+  equal(this.RestrictedRadioButtons.linkOnly.checked, false, 'not selected')
+  equal(this.RestrictedRadioButtons.dateRange.checked, false, 'not selected')
 })
 
 QUnit.module('RestrictedRadioButtons#extractFormValues', {
@@ -143,8 +136,7 @@ test('returns the correct object to unpublish an item', function() {
 })
 
 test('returns the correct object to hide an item', function() {
-  this.restrictedRadioButtons.permissionsInput.checked = true
-  Simulate.change(this.restrictedRadioButtons.permissionsInput)
+  Simulate.change(this.restrictedRadioButtons.linkOnly)
   const expectedObject = {
     hidden: true,
     unlock_at: '',
@@ -159,7 +151,6 @@ test('returns the correct object to hide an item', function() {
 })
 
 test('returns the correct object to restrict an item based on dates', function() {
-  Simulate.change(this.restrictedRadioButtons.permissionsInput)
   Simulate.change(this.restrictedRadioButtons.dateRange)
   this.restrictedRadioButtons.dateRange.checked = true
   $(this.restrictedRadioButtons.unlock_at).data('unfudged-date', 'something else')
@@ -208,12 +199,7 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
 
 test('commonly selected items will open the same defaulted options', function() {
   equal(
-    this.restrictedRadioButtons.permissionsInput.checked,
-    true,
-    'permissionsInput is checked for all of the selected items'
-  )
-  equal(
-    this.restrictedRadioButtons.link_only.checked,
+    this.restrictedRadioButtons.linkOnly.checked,
     true,
     'link_only is checked for all of the selected items'
   )

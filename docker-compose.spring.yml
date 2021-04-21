@@ -1,0 +1,43 @@
+# Append `:docker-compose.spring.yml` to COMPOSE_FILE in `.env`
+# invoke a console with `docker-compose run --rm web bin/rails console`
+# or with specs: `docker-compose run --rm web bin/rspec spec/path/to/file_spec.rb`
+version: '2.3'
+services:
+  web:
+    environment:
+      SPRING_TMP_PATH: tmp
+      SPRING_SOCKET: tmp/spring.sock
+      SPRING_PIDFILE: tmp/spring.pid
+    depends_on:
+      - spring
+
+  spring:
+    build: .
+    command: bundle exec spring server
+    volumes:
+      - .:/usr/src/app
+      - api_docs:/usr/src/app/public/doc/api
+      - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
+      - bundler:/home/docker/.bundler/
+      - canvas-docker-gems:/home/docker/.gem/
+      - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
+      - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
+      - generated_2:/usr/src/app/public/dist
+      - generated_3:/usr/src/app/public/javascripts/compiled
+      - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
+      - locales:/usr/src/app/config/locales/generated
+      - log:/usr/src/app/log
+      - node_modules:/usr/src/app/node_modules
+      - pacts:/usr/src/app/pacts
+      - reports:/usr/src/app/reports
+      - styleguide:/usr/src/app/app/views/info
+      - tmp:/usr/src/app/tmp
+      - translations:/usr/src/app/public/javascripts/translations
+      - yardoc:/usr/src/app/.yardoc
+      - yarn-cache:/home/docker/.cache/yarn
+    environment:
+      RAILS_ENV: development
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+      SPRING_TMP_PATH: tmp
+      SPRING_SOCKET: tmp/spring.sock
+      SPRING_PIDFILE: tmp/spring.pid

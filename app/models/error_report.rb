@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'iconv'
-
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
@@ -26,6 +26,7 @@ class ErrorReport < ActiveRecord::Base
   serialize :data, Hash
 
   before_save :guess_email
+  before_save :truncate_enormous_fields
 
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
@@ -34,9 +35,14 @@ class ErrorReport < ActiveRecord::Base
     run_callbacks(:on_send_to_external)
   end
 
+  def truncate_enormous_fields
+    self.message = message.truncate(1024, omission: '...<truncated>') if message
+    data['exception_message'] = data['exception_message'].truncate(1024, omission: '...<truncated>') if data['exception_message']
+  end
+
   class Reporter
 
-    IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError".freeze
+    IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError,Turnitin::Errors::SubmissionNotScoredError".freeze
 
     def ignored_categories
       Setting.get('ignored_error_report_categories', IGNORED_CATEGORIES).split(',')
@@ -90,7 +96,7 @@ class ErrorReport < ActiveRecord::Base
     end
 
     def create_error_report(opts)
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         begin
           report = ErrorReport.new
           report.assign_data(opts)
@@ -151,7 +157,9 @@ class ErrorReport < ActiveRecord::Base
         ErrorReport.log_captured(type, exception, error_report_info)
       end
     else
-      ErrorReport.log_captured(type, exception, error_report_info)
+      (exception.try(:current_shard) || Shard.current).activate do
+        ErrorReport.log_captured(type, exception, error_report_info)
+      end
     end
   end
 

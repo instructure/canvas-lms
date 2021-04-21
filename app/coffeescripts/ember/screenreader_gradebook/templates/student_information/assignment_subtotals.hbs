@@ -1,25 +1,27 @@
-<table class="ic-Table">
-  <thead>
-    <tr>
-    {{#if subtotal_by_period}}
-      <th scope="col">{{#t}}Grading Period{{/t}}</th>
-    {{else}}
-      <th scope="col">{{#t}}Assignment Group{{/t}}</th>
-    {{/if}}
-      <th scope="col">{{#t 'ag_group_grade'}}Grade{{/t}}</th>
-      <th scope="col">{{#t 'ag_letter_grade'}}Letter Grade{{/t}}</th>
-      <th scope="col">{{#t 'ag_group_percent_grade'}}% of Grade{{/t}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each assignment_subtotal in assignment_subtotals}}
-      {{
-        assignment-subtotal-grades
-        subtotal=assignment_subtotal
-        student=selectedStudent
-        weightingScheme=weightingScheme
-        gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
-      }}
-    {{/each}}
-  </tbody>
-</table>
+<div class="ic-Table-responsive-x-scroll">
+  <table class="ic-Table">
+    <thead>
+      <tr>
+      {{#if subtotal_by_period}}
+        <th scope="col">{{#t}}Grading Period{{/t}}</th>
+      {{else}}
+        <th scope="col">{{#t}}Assignment Group{{/t}}</th>
+      {{/if}}
+        <th scope="col">{{#t 'ag_group_grade'}}Grade{{/t}}</th>
+        <th scope="col">{{#t 'ag_letter_grade'}}Letter Grade{{/t}}</th>
+        <th scope="col">{{#t 'ag_group_percent_grade'}}% of Grade{{/t}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each assignment_subtotal in assignment_subtotals}}
+        {{
+          assignment-subtotal-grades
+          subtotal=assignment_subtotal
+          student=selectedStudent
+          weightingScheme=weightingScheme
+          gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
+        }}
+      {{/each}}
+    </tbody>
+  </table>
+</div>

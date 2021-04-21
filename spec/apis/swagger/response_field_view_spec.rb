@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -69,7 +71,7 @@ describe ResponseFieldView do
       response_field_view = ResponseFieldView.new(
         double(
           tag_name: 'response_field',
-          text: 'foo A description.'.force_encoding('binary'),
+          text: (+'foo A description.').force_encoding('binary'),
           types: ['String']
         )
       )
@@ -87,7 +89,7 @@ describe ResponseFieldView do
       response_field_view = ResponseFieldView.new(
         double(
           tag_name: 'response_field',
-          text: 'foo A description.'.force_encoding('binary'),
+          text: (+'foo A description.').force_encoding('binary'),
           types: ['String']
         )
       )

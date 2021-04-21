@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -35,24 +37,32 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "not found"
     end
 
-    return nil unless authorized_action?(assignment, :grade)
-    raise GraphQL::ExecutionError, "Post Policies feature not enabled" unless course.feature_enabled?(:post_policies)
+    verify_authorized_action!(assignment, :grade)
 
     unless assignment.grades_published?
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be hidden by section before grades are published"
     end
-    raise GraphQL::ExecutionError, "Anonymous assignments cannot be hidden by section" if assignment.anonymous_grading?
+    raise GraphQL::ExecutionError, "Anonymous assignments cannot be hidden by section" if assignment.anonymize_students?
 
     if sections.empty? || sections.count != input[:section_ids].size
       raise GraphQL::ExecutionError, "Invalid section ids"
     end
 
-    student_ids = course.student_enrollments.where(course_section: sections).pluck(:user_id)
-    submission_ids = assignment.submissions.active.where(user_id: student_ids).pluck(:id)
+    visible_enrollments = course.apply_enrollment_visibility(course.student_enrollments, current_user, sections)
+
+    submissions_scope = input[:graded_only] ? assignment.submissions.graded : assignment.submissions
+    submissions_scope = submissions_scope.joins(user: :enrollments).merge(visible_enrollments)
+
     progress = course.progresses.new(tag: "hide_assignment_grades_for_sections")
 
     if progress.save
-      progress.process_job(assignment, :hide_submissions, {preserve_method_args: true}, submission_ids: submission_ids)
+      progress.process_job(
+        assignment,
+        :hide_submissions,
+        {preserve_method_args: true},
+        progress: progress,
+        submission_ids: submissions_scope.pluck(:id)
+      )
       return {assignment: assignment, progress: progress, sections: sections}
     else
       raise GraphQL::ExecutionError, "Error hiding assignment grades for sections"

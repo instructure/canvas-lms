@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -24,6 +26,7 @@ describe "authentication_providers/index" do
 
   before do
     assign(:context, assign(:account, account))
+    assign(:domain_root_account, account)
     assign(:current_user, user_with_pseudonym)
     assign(:current_pseudonym, @pseudonym)
     assign(:saml_identifiers, [])
@@ -54,7 +57,7 @@ describe "authentication_providers/index" do
     timed_out_aac.save!
     expect(@presenter.configs).to include(timed_out_aac)
     render 'authentication_providers/index'
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.css('.last_timeout_failure').length).to eq 1
   end
 
@@ -64,7 +67,7 @@ describe "authentication_providers/index" do
       account.authentication_providers.create!(auth_type: 'ldap')
     end
     render 'authentication_providers/index'
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.css('input[value=ldap]').length).to eq(5) # 4 + 1 hidden for new
   end
 
@@ -72,7 +75,7 @@ describe "authentication_providers/index" do
     aac = account.authentication_providers.create!(auth_type: 'ldap')
     @pseudonym.update_attribute(:authentication_provider, aac)
     render 'authentication_providers/index'
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.css("#delete-aac-#{aac.id}")).to be_blank
   end
 end

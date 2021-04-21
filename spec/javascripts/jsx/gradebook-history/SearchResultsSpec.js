@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
+import {Table} from '@instructure/ui-table'
 import {SearchResultsComponent} from 'jsx/gradebook-history/SearchResults'
 
 function defaultHistoryItems() {
@@ -73,27 +73,27 @@ QUnit.module('SearchResults', {
   }
 })
 
-test('does not show a Table/Spinner if no historyItems passed', function() {
+test('does not show a Table/Spinner if no historyItems passed', () => {
   const wrapper = mountComponent({historyItems: []})
   notOk(wrapper.find(Table).exists())
 })
 
-test('shows a Table if there are historyItems passed', function() {
+test('shows a Table if there are historyItems passed', function () {
   ok(this.wrapper.find(Table).exists())
 })
 
-test('Table is passed the label and caption props', function() {
+test('Table is passed the label and caption props', function () {
   const table = this.wrapper.find(Table)
   equal(table.props().caption, 'search results caption')
 })
 
-test('Table has column headers in correct order', function() {
+test('Table has column headers in correct order', () => {
   const expectedHeaders = [
     'Date',
     'Anonymous Grading',
     'Student',
     'Grader',
-    'Assignment',
+    'Artifact',
     'Before',
     'After',
     'Current'
@@ -109,7 +109,7 @@ test('Table has column headers in correct order', function() {
   wrapper.unmount()
 })
 
-test('Table displays the formatted historyItems passed it', function() {
+test('Table displays the formatted historyItems passed it', () => {
   const items = defaultHistoryItems()
   const props = {...defaultProps(), items}
   const tableBody = mount(<SearchResultsComponent {...props} />)
@@ -117,17 +117,17 @@ test('Table displays the formatted historyItems passed it', function() {
   tableBody.unmount()
 })
 
-test('does not show a Spinner if requestingResults false', function() {
+test('does not show a Spinner if requestingResults false', function () {
   notOk(this.wrapper.find(Spinner).exists())
 })
 
-test('shows a Spinner if requestingResults true', function() {
+test('shows a Spinner if requestingResults true', () => {
   const wrapper = mountComponent({requestingResults: true})
   ok(wrapper.find(Spinner).exists())
   wrapper.unmount()
 })
 
-test('Table shows text if request was made but no results were found', function() {
+test('Table shows text if request was made but no results were found', () => {
   const props = {...defaultProps(), fetchHistoryStatus: 'success', historyItems: []}
   const wrapper = mount(<SearchResultsComponent {...props} />)
   const textBox = wrapper.find(Text)
@@ -136,17 +136,17 @@ test('Table shows text if request was made but no results were found', function(
   wrapper.unmount()
 })
 
-test('shows text indicating that the end of results was reached', function() {
+test('shows text indicating that the end of results was reached', () => {
   const historyItems = defaultHistoryItems()
   const props = {...defaultProps(), nextPage: '', requestingResults: false, historyItems}
   const wrapper = mount(<SearchResultsComponent {...props} />)
-  const textBox = wrapper.find(Text)
+  const textBox = wrapper.find(Text).last()
   ok(textBox.exists())
   equal(textBox.text(), 'No more results to load.')
   wrapper.unmount()
 })
 
-test('loads next page if possible and the first results did not result in a scrollbar', function() {
+test('loads next page if possible and the first results did not result in a scrollbar', () => {
   const actualInnerHeight = window.innerHeight
   // fake to test that there's not a vertical scrollbar
   window.innerHeight = document.body.clientHeight + 1
@@ -159,7 +159,7 @@ test('loads next page if possible and the first results did not result in a scro
   wrapper.unmount()
 })
 
-test('loads next page on scroll if possible', function() {
+test('loads next page on scroll if possible', () => {
   const actualInnerHeight = window.innerHeight
   const props = {
     ...defaultProps(),
@@ -174,7 +174,7 @@ test('loads next page on scroll if possible', function() {
   wrapper.unmount()
 })
 
-test('loads next page if available on window resize that causes window to not have a scrollbar', function() {
+test('loads next page if available on window resize that causes window to not have a scrollbar', () => {
   const historyItems = defaultHistoryItems()
   const props = {
     ...defaultProps(),

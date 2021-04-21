@@ -22,23 +22,23 @@ import File from '../../models/File'
 import ModuleFile from '../../models/ModuleFile'
 
 /*
-  * Sets usage rights on the models in memory based on the response from the
-  * API.
-  *    apiData - the response from the API
-  *    models - an array containing the files/folders to update
-  */
+ * Sets usage rights on the models in memory based on the response from the
+ * API.
+ *    apiData - the response from the API
+ *    models - an array containing the files/folders to update
+ */
 // Grab the ids affected from the apiData
 export default function updateModelsUsageRights(apiData, models) {
   const affectedIds = apiData && apiData.file_ids
   // Seperate the models array into a file group and a folder group.
-  const {files, folders} = _.groupBy(models, function(item) {
+  const {files, folders} = _.groupBy(models, item => {
     if (item instanceof File) return 'files'
     if (item instanceof ModuleFile) return 'files'
     if (item instanceof Folder) return 'folders'
   })
   // We'll go ahead and update the files and remove the id from our list.
   if (files) {
-    files.map(function(file, index) {
+    files.map((file, index) => {
       const id = parseInt(file[file.idAttribute], 10)
       const idx = affectedIds.indexOf(id)
 

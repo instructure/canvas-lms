@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ class GradingPeriodGradeSummaryPresenter < GradeSummaryPresenter
 
   def assignments_visible_to_student
     grading_period = GradingPeriod.for(@context).where(id: grading_period_id).first
-    grading_period.assignments_for_student(super, student)
+    grading_period.assignments_for_student(@context, super, student)
   end
 
   def groups

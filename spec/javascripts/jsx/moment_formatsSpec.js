@@ -20,7 +20,7 @@ import moment_formats from 'moment_formats'
 import I18nStubber from 'helpers/I18nStubber'
 
 QUnit.module('Moment formats', {
-  setup () {
+  setup() {
     I18nStubber.pushFrame()
     I18nStubber.setLocale('test')
     I18nStubber.stub('test', {
@@ -31,7 +31,7 @@ QUnit.module('Moment formats', {
       'time.event': '%{date} event %{time}'
     })
   },
-  teardown () {
+  teardown() {
     I18nStubber.popFrame()
   }
 })

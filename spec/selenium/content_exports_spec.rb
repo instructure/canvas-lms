@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ describe "content exports" do
       yield if block_given?
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
-      @export.export_without_send_later
+      @export.export(synchronous: true)
       new_download_link = f("#export_files a")
       expect(new_download_link).to have_attribute('href', %r{/files/\d+/download\?verifier=})
     end
@@ -56,7 +58,7 @@ describe "content exports" do
 
       run_export do
         f("input[value=qti]").click
-        f(%{.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2)}]"]}).click
+        f(%{.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2, global: true)}]"]}).click
       end
 
       expect(@export.export_type).to eq 'qti'
@@ -65,8 +67,8 @@ describe "content exports" do
       zip_file = Zip::File.open(file_handle.path)
       manifest_doc = Nokogiri::XML.parse(zip_file.read("imsmanifest.xml"))
 
-      expect(manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1)}]")).not_to be_nil
-      expect(manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q2)}]")).to be_nil
+      expect(manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1, global: true)}]")).not_to be_nil
+      expect(manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q2, global: true)}]")).to be_nil
     end
   end
 end

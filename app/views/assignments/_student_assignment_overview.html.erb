@@ -1,0 +1,66 @@
+<%
+  # Copyright (C) 2020 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<ul class='student-assignment-overview'>
+  <li>
+    <span class='title'><%= t :due_at, 'Due' %></span>
+    <span class='value'>
+          <span class="date_text">
+            <% if @assignment.multiple_due_dates? %>
+              <%= multiple_due_date_tooltip(@assignment, @current_user) %>
+            <% elsif @assignment.due_at %>
+              <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
+                <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
+                <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
+            <% else %>
+              <%= t :no_due_date, 'No Due Date' %>
+            <% end %>
+          </span>
+        </span>
+  </li>
+  <li>
+    <span class='title'><%= t :points, 'Points' %></span>
+    <span class='value'><%= n(round_if_whole(@assignment.points_possible)) || t(:no_points, 'None') %></span>
+  </li>
+  <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
+    <% turnitin_text = turnitin_active? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
+    <% vericite_text = vericite_active? ? ' ' + t(:vericite_enabled_short, '(VeriCite enabled)') : '' %>
+    <li>
+      <span class='title'><%= t :submitting, 'Submitting' %></span>
+      <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
+    </li>
+    <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
+      <li>
+        <span class='title'><%= t :submission_types, 'File Types' %></span>
+        <span class='value'><%= @assignment.allowed_extensions.to_sentence %></span>
+      </li>
+    <% end %>
+  <% end %>
+  <% if @assignment.allowed_attempts&.> 0 %>
+    <li>
+      <span class='title'><%= t :attempts, 'Attempts' %></span>
+      <span class='value'><%= @current_user_submission&.attempt || 0 %></span>
+    </li>
+    <li>
+      <span class='title'><%= t :allowed_attempts, 'Allowed Attempts' %></span>
+      <span class='value'><%= @assignment.allowed_attempts + (@current_user_submission&.extra_attempts || 0) %></span>
+    </li>
+  <% end %>
+  <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
+  <div class="clear"></div>
+</ul>

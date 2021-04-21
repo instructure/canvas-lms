@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -43,6 +45,14 @@ describe Canvas::PasswordPolicy do
 
       @pseudonym.password = @pseudonym.password_confirmation = "abcdefgh"
       expect(@pseudonym).to be_valid
+    end
+
+    it "validates confirmation matches" do
+      pseudonym_with_policy({})
+
+      @pseudonym.password = "abcdefgh"
+      expect(@pseudonym).not_to be_valid
+
     end
 
     it "should enforce minimum length" do

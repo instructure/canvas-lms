@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  '../collections/PaginatedCollection'
-  '../models/Outcome'
-], (PaginatedCollection, Outcome) ->
+import PaginatedCollection from '../collections/PaginatedCollection'
+import Outcome from '../models/Outcome'
 
-  class OutcomeCollection extends PaginatedCollection
-    model: Outcome
+export default class OutcomeCollection extends PaginatedCollection
+  model: Outcome

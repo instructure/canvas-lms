@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 Instructure, Inc.
 #
@@ -202,6 +204,7 @@ describe PeerReviewsApiController, type: :request do
       @assessment_with_user = {"assessor" => {"id"=>@student2.id,
                                               "display_name"=>"User",
                                               "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+                                              "pronouns"=>nil,
                                               "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}"},
                                "assessor_id"=>@student2.id,
                                "asset_id"=>@submission.id,
@@ -210,6 +213,7 @@ describe PeerReviewsApiController, type: :request do
                                "user" => {"id"=>@student1.id,
                                           "display_name"=>"User",
                                           "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+                                          "pronouns"=>nil,
                                           "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}"},
                                "user_id"=>@student1.id,
                                "workflow_state"=>@assessment_request.workflow_state}
@@ -245,6 +249,7 @@ describe PeerReviewsApiController, type: :request do
             "author" => {
               "id" => @student2.id,
               "display_name" => @student2.name,
+              "pronouns"=>nil,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student2.id}"
             }
@@ -379,6 +384,7 @@ describe PeerReviewsApiController, type: :request do
                                "id"=>@assessment_request.id,
                                "user" => {"id"=>@student1.id,
                                           "display_name"=>"User",
+                                          "pronouns"=>nil,
                                           "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
                                           "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}"},
                                "user_id"=>@student1.id,

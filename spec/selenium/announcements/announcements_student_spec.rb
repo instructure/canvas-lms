@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -22,46 +24,38 @@ describe "announcements" do
   include_context "in-process server selenium tests"
   include AnnouncementsCommon
 
-  it "should validate replies are not visible until after users post", priority: "1", test_id: 150533 do
-    password = 'asdfasdf'
-    student_2_entry = 'reply from student 2'
-    topic_title = 'new replies hidden until post topic'
+  before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
+    stub_rcs_config
+  end
 
-    course_factory
-    @course.offer
-    student = user_with_pseudonym(:unique_id => 'student@example.com', :password => password, :active_user => true)
-    teacher = user_with_pseudonym(:unique_id => 'teacher@example.com', :password => password, :active_user => true)
-    @course.enroll_user(student, 'StudentEnrollment').accept!
-    @course.enroll_user(teacher, 'TeacherEnrollment').accept!
-    create_session(teacher.primary_pseudonym)
+  context "should validate replies are not visible until after users post" do
+    before :each do
+      course_with_student_logged_in
+      topic_title = 'new replies hidden until post topic'
+      @announcement = @course.announcements.create!(
+        title: topic_title, message: 'blah', require_initial_post: true
+      )
+      student_2 = student_in_course.user
+      @reply = @announcement.discussion_entries.create!(user: student_2, message: 'hello from student 2')
+    end
 
-    get "/courses/#{@course.id}/announcements"
-    expect_new_page_load { f('#add_announcement').click }
-    wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
-    replace_content(f('input[name=title]'), topic_title)
-    type_in_tiny('textarea[name=message]', 'hi, first announcement')
-    f('#allow_user_comments').click
-    f('#require_initial_post').click
-    wait_for_ajaximations
-    expect_new_page_load { submit_form('.form-actions') }
-    announcement = Announcement.where(title: topic_title).first
-    expect(announcement[:require_initial_post]).to eq true
-    announcement.locked = false
-    announcement.save!
-    student_2 = student_in_course.user
-    announcement.discussion_entries.create!(:user => student_2, :message => student_2_entry)
+    it "should hide replies if user hasn't posted", priority: "1", test_id: 150533 do
+      get "/courses/#{@course.id}/announcements/#{@announcement.id}"
+      info_text = "Replies are only visible to those who have posted at least one reply."
+      expect(f('#discussion_subentries span').text).to eq info_text
+      ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(@reply.message) }
+    end
 
-    create_session(student.primary_pseudonym)
-    get "/courses/#{@course.id}/announcements/#{announcement.id}"
-    expect(f('#discussion_subentries span').text).to eq "Replies are only visible to those who have posted at least one reply."
-    ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(student_2_entry) }
-    f('.discussion-reply-action').click
-    wait_for_ajaximations
-    wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
-    type_in_tiny('textarea', 'reply')
-    submit_form('#discussion_topic .discussion-reply-form')
-    wait_for_ajaximations
-    expect(ff('.discussion_entry .message')[1]).to include_text(student_2_entry)
+    it "should show replies if user has posted", priority: "1", test_id: 3293301 do
+      get "/courses/#{@course.id}/announcements/#{@announcement.id}"
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      type_in_tiny('textarea', 'reply')
+      scroll_to_submit_button_and_click('#discussion_topic .discussion-reply-form')
+      wait_for_ajaximations
+      expect(ff('.discussion_entry .message')[1]).to include_text(@reply.message)
+    end
   end
 
   context "announcements as a student" do
@@ -80,7 +74,7 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
 
       expect(f("#content")).not_to contain_css(".ic-announcement-row")
-      announcement.update_attributes(:delayed_post_at => nil)
+      announcement.update(:delayed_post_at => nil)
       announcement.reload
       refresh_page # in order to see the announcement
       expect(f(".ic-announcement-row h3")).to include_text(announcement_title)
@@ -122,7 +116,7 @@ describe "announcements" do
     it "allows rating when enabled", priority: "1", test_id: 603587 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
-      make_full_screen
+
       f('.discussion-reply-action').click
       wait_for_ajaximations
       wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
@@ -150,6 +144,21 @@ describe "announcements" do
       wait_for_ajaximations
 
       expect(f("#content")).not_to contain_css('.discussion-rate-action')
+    end
+
+    it "does not display the Subscribe button after replying" do
+      announcement = @course.announcements.create!(title: 'Allow Replies', message: 'Reply Here')
+      get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
+
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
+      type_in_tiny('textarea', 'this is my reply')
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+
+      expect(f('.topic-unsubscribe-button')).not_to be_displayed
+      expect(f('.topic-subscribe-button')).not_to be_displayed
     end
 
     context "section specific announcements" do

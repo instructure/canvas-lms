@@ -2,33 +2,38 @@
 
 exports[`new activity button does not show when there is no new activity 1`] = `
 <div
-  className="undefined PlannerHeader"
+  className="PlannerHeader-styles__root PlannerHeader"
+  data-testid="PlannerHeader"
 >
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     id="planner-today-btn"
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="light"
+    withBackground={true}
   >
     Today
   </Button>
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="icon"
+    withBackground={true}
   >
     <ScreenReaderContent
       as="span"
@@ -38,15 +43,17 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   </Button>
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="icon"
+    withBackground={true}
   >
     <ScreenReaderContent
       as="span"
@@ -55,40 +62,39 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     </ScreenReaderContent>
   </Button>
   <Popover
-    alignArrow={false}
+    color="primary"
     constrain="window"
     contentRef={[Function]}
-    defaultFocusElement={null}
-    defaultShow={false}
+    defaultIsShowingContent={false}
     insertAt="bottom"
-    label={null}
-    liveRegion={null}
-    mountNode={null}
+    isShowingContent={false}
     offsetX={0}
     offsetY={0}
     on="click"
     onBlur={[Function]}
     onClick={[Function]}
-    onDismiss={[Function]}
     onFocus={[Function]}
+    onHideContent={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseOut={[Function]}
     onMouseOver={[Function]}
     onPositionChanged={[Function]}
     onPositioned={[Function]}
-    onShow={[Function]}
-    onToggle={[Function]}
+    onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
+    renderTrigger={null}
+    shadow="resting"
+    shouldAlignArrow={false}
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={false}
     shouldFocusContentOnTriggerBlur={false}
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
-    show={false}
+    shouldTrackPosition={true}
     stacking="topmost"
-    trackPosition={true}
-    variant="default"
     withArrow={true}
   >
     <PopoverTrigger>
@@ -109,13 +115,16 @@ exports[`new activity button does not show when there is no new activity 1`] = `
           as="button"
           buttonRef={[Function]}
           cursor="pointer"
-          fluidWidth={false}
+          display="inline-block"
+          elementRef={[Function]}
           icon={[Function]}
           margin="0"
           onClick={[Function]}
           size="medium"
+          textAlign="center"
           type="button"
           variant="icon"
+          withBackground={true}
         >
           <ScreenReaderContent
             as="span"
@@ -194,12 +203,14 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     size="small"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[Function]}
       placement="start"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -247,16 +258,26 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   >
     <View
       as="div"
+      borderColor="primary"
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
       padding="large large medium"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <CloseButton
-        buttonRef={[Function]}
+        as="button"
+        cursor="pointer"
         margin="0"
         offset="x-small"
         onClick={[Function]}
         placement="start"
         size="small"
+        type="button"
         variant="icon"
       >
         Close
@@ -276,6 +297,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     </View>
   </Tray>
   <Portal
+    elementRef={[Function]}
     insertAt="bottom"
     mountNode={<div />}
     onClose={[Function]}
@@ -288,7 +310,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       description="Scrolls up to the previous item with new activity."
       direction="up"
       id="new_activity_button"
-      offset="0"
       onClick={[Function]}
       zIndex={3}
     >
@@ -300,33 +321,38 @@ exports[`new activity button does not show when there is no new activity 1`] = `
 
 exports[`new activity button shows when there is new activity 1`] = `
 <div
-  className="undefined PlannerHeader"
+  className="PlannerHeader-styles__root PlannerHeader"
+  data-testid="PlannerHeader"
 >
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     id="planner-today-btn"
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="light"
+    withBackground={true}
   >
     Today
   </Button>
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="icon"
+    withBackground={true}
   >
     <ScreenReaderContent
       as="span"
@@ -336,15 +362,17 @@ exports[`new activity button shows when there is new activity 1`] = `
   </Button>
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="icon"
+    withBackground={true}
   >
     <ScreenReaderContent
       as="span"
@@ -353,40 +381,39 @@ exports[`new activity button shows when there is new activity 1`] = `
     </ScreenReaderContent>
   </Button>
   <Popover
-    alignArrow={false}
+    color="primary"
     constrain="window"
     contentRef={[Function]}
-    defaultFocusElement={null}
-    defaultShow={false}
+    defaultIsShowingContent={false}
     insertAt="bottom"
-    label={null}
-    liveRegion={null}
-    mountNode={null}
+    isShowingContent={false}
     offsetX={0}
     offsetY={0}
     on="click"
     onBlur={[Function]}
     onClick={[Function]}
-    onDismiss={[Function]}
     onFocus={[Function]}
+    onHideContent={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseOut={[Function]}
     onMouseOver={[Function]}
     onPositionChanged={[Function]}
     onPositioned={[Function]}
-    onShow={[Function]}
-    onToggle={[Function]}
+    onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
+    renderTrigger={null}
+    shadow="resting"
+    shouldAlignArrow={false}
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={false}
     shouldFocusContentOnTriggerBlur={false}
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
-    show={false}
+    shouldTrackPosition={true}
     stacking="topmost"
-    trackPosition={true}
-    variant="default"
     withArrow={true}
   >
     <PopoverTrigger>
@@ -407,13 +434,16 @@ exports[`new activity button shows when there is new activity 1`] = `
           as="button"
           buttonRef={[Function]}
           cursor="pointer"
-          fluidWidth={false}
+          display="inline-block"
+          elementRef={[Function]}
           icon={[Function]}
           margin="0"
           onClick={[Function]}
           size="medium"
+          textAlign="center"
           type="button"
           variant="icon"
+          withBackground={true}
         >
           <ScreenReaderContent
             as="span"
@@ -492,12 +522,14 @@ exports[`new activity button shows when there is new activity 1`] = `
     size="small"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[Function]}
       placement="start"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -545,16 +577,26 @@ exports[`new activity button shows when there is new activity 1`] = `
   >
     <View
       as="div"
+      borderColor="primary"
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
       padding="large large medium"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <CloseButton
-        buttonRef={[Function]}
+        as="button"
+        cursor="pointer"
         margin="0"
         offset="x-small"
         onClick={[Function]}
         placement="start"
         size="small"
+        type="button"
         variant="icon"
       >
         Close
@@ -574,6 +616,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     </View>
   </Tray>
   <Portal
+    elementRef={[Function]}
     insertAt="bottom"
     mountNode={<div />}
     onClose={[Function]}
@@ -586,7 +629,6 @@ exports[`new activity button shows when there is new activity 1`] = `
       description="Scrolls up to the previous item with new activity."
       direction="up"
       id="new_activity_button"
-      offset="0"
       onClick={[Function]}
       zIndex={3}
     >
@@ -598,33 +640,38 @@ exports[`new activity button shows when there is new activity 1`] = `
 
 exports[`renders the base component correctly with buttons and trays 1`] = `
 <div
-  className="undefined PlannerHeader"
+  className="PlannerHeader-styles__root PlannerHeader"
+  data-testid="PlannerHeader"
 >
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     id="planner-today-btn"
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="light"
+    withBackground={true}
   >
     Today
   </Button>
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="icon"
+    withBackground={true}
   >
     <ScreenReaderContent
       as="span"
@@ -634,15 +681,17 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   </Button>
   <Button
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
-    fluidWidth={false}
+    display="inline-block"
+    elementRef={[Function]}
     icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
     size="medium"
+    textAlign="center"
     type="button"
     variant="icon"
+    withBackground={true}
   >
     <ScreenReaderContent
       as="span"
@@ -651,40 +700,39 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     </ScreenReaderContent>
   </Button>
   <Popover
-    alignArrow={false}
+    color="primary"
     constrain="window"
     contentRef={[Function]}
-    defaultFocusElement={null}
-    defaultShow={false}
+    defaultIsShowingContent={false}
     insertAt="bottom"
-    label={null}
-    liveRegion={null}
-    mountNode={null}
+    isShowingContent={false}
     offsetX={0}
     offsetY={0}
     on="click"
     onBlur={[Function]}
     onClick={[Function]}
-    onDismiss={[Function]}
     onFocus={[Function]}
+    onHideContent={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseOut={[Function]}
     onMouseOver={[Function]}
     onPositionChanged={[Function]}
     onPositioned={[Function]}
-    onShow={[Function]}
-    onToggle={[Function]}
+    onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
+    renderTrigger={null}
+    shadow="resting"
+    shouldAlignArrow={false}
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={false}
     shouldFocusContentOnTriggerBlur={false}
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
-    show={false}
+    shouldTrackPosition={true}
     stacking="topmost"
-    trackPosition={true}
-    variant="default"
     withArrow={true}
   >
     <PopoverTrigger>
@@ -705,13 +753,16 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
           as="button"
           buttonRef={[Function]}
           cursor="pointer"
-          fluidWidth={false}
+          display="inline-block"
+          elementRef={[Function]}
           icon={[Function]}
           margin="0"
           onClick={[Function]}
           size="medium"
+          textAlign="center"
           type="button"
           variant="icon"
+          withBackground={true}
         >
           <ScreenReaderContent
             as="span"
@@ -790,12 +841,14 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     size="small"
   >
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[Function]}
       placement="start"
       size="small"
+      type="button"
       variant="icon"
     >
       Close
@@ -843,16 +896,26 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   >
     <View
       as="div"
+      borderColor="primary"
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
       padding="large large medium"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <CloseButton
-        buttonRef={[Function]}
+        as="button"
+        cursor="pointer"
         margin="0"
         offset="x-small"
         onClick={[Function]}
         placement="start"
         size="small"
+        type="button"
         variant="icon"
       >
         Close
@@ -872,6 +935,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     </View>
   </Tray>
   <Portal
+    elementRef={[Function]}
     insertAt="bottom"
     mountNode={<div />}
     onClose={[Function]}
@@ -884,7 +948,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       description="Scrolls up to the previous item with new activity."
       direction="up"
       id="new_activity_button"
-      offset="0"
       onClick={[Function]}
       zIndex={3}
     >

@@ -17,12 +17,12 @@
  */
 
 import Backbone from 'Backbone'
-import PropTypes from 'prop-types'
-import I18n from 'i18n!conversations'
 import {decodeQueryString} from 'jsx/shared/queryString'
+import {FormField} from '@instructure/ui-form-field'
+import I18n from 'i18n!ConversationStatusFilter'
+import PropTypes from 'prop-types'
 import React from 'react'
-import Select from '@instructure/ui-core/lib/components/Select'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class ConversationStatusFilter extends React.Component {
   static propTypes = {
@@ -90,20 +90,25 @@ export default class ConversationStatusFilter extends React.Component {
 
   render() {
     return (
-      <Select
-        layout="inline"
-        width="211"
-        id="conversation_filter_select"
+      <FormField
+        id="conversation_filter"
         label={<ScreenReaderContent>{I18n.t('Filter conversations by type')}</ScreenReaderContent>}
-        value={this.state.selected}
-        onChange={e => this.updateBackboneState(e.target.value)}
       >
-        {Object.keys(this.props.filters).map(key => (
-          <option value={key} key={key}>
-            {this.props.filters[key]}
-          </option>
-        ))}
-      </Select>
+        <select
+          id="conversation_filter_select"
+          onChange={e => this.updateBackboneState(e.target.value)}
+          style={{
+            width: '115%'
+          }}
+          value={this.state.selected}
+        >
+          {Object.keys(this.props.filters).map(key => (
+            <option value={key} key={key}>
+              {this.props.filters[key]}
+            </option>
+          ))}
+        </select>
+      </FormField>
     )
   }
 }

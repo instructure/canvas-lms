@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -65,15 +67,30 @@ module CustomValidators
   end
 
   def expect_flash_message(type = :warning, message = nil)
-    selector = ".ic-flash-#{type}"
-    selector << ":contains(#{message.inspect})" if message
-    expect(f("#flash_message_holder")).to contain_jqcss(selector)
+    if message
+      keep_trying_until(5) do
+        disable_implicit_wait do
+          expect(ff("#flash_message_holder .ic-flash-#{type}")).to be_any { |el| el.text.include?("#{message}") }
+        end
+      end
+    else
+      expect(f("#flash_message_holder .ic-flash-#{type}")).to be_displayed
+    end
+  end
+
+  def expect_instui_flash_message(message = nil)
+    text = ":contains(#{message.inspect})" if message
+    expect(f("#flashalert_message_holder")).to contain_jqcss(text)
   end
 
   def expect_no_flash_message(type = :warning, message = nil)
     selector = ".ic-flash-#{type}"
     selector << ":contains(#{message.inspect})" if message
     expect(f("#flash_message_holder")).not_to contain_jqcss(selector)
+  end
+
+  def expect_no_instui_flash_message
+    expect(f('body')).not_to contain_css('#flashalert_message_holder')
   end
 
   def assert_flash_notice_message(okay_message)
@@ -101,12 +118,9 @@ module CustomValidators
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield if block_given?
     wait_for(method: :wait_for_new_page_load) do
-      begin
-        driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
-      rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
-        raise unless accept_alert
-        driver.switch_to.alert.accept
-      end
+      raise if !accept_alert && alert_present?
+      driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoSuchAlertError
+      driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
     end or return false
     wait_for_dom_ready
     wait_for_ajaximations

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -23,18 +25,34 @@ require 'active_support/core_ext/object/blank'
 
 module LiveEvents
   class Client
+    ATTRIBUTE_BLACKLIST = [:compact_live_events].freeze
+
+    attr_reader :stream_name, :stream_client
+
     def self.config
       res = LiveEvents.settings
+      if res['stub_kinesis']
+        return true if !Rails.env.production?
+        
+        LiveEvents.logger.warn(
+          "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
+        )
+      end
       return nil unless res && !res['kinesis_stream_name'].blank? &&
                                (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
 
       res.dup
     end
 
-    def initialize(config = nil, stream_client = nil)
+    def initialize(config = nil, aws_stream_client = nil, aws_stream_name = nil, worker: nil)
       config ||= LiveEvents::Client.config
-      @stream_client = stream_client || Aws::Kinesis::Client.new(Client.aws_config(config))
-      @stream_name = config['kinesis_stream_name']
+      @stream_client = aws_stream_client || Aws::Kinesis::Client.new(Client.aws_config(config))
+      @stream_name = aws_stream_name || config['kinesis_stream_name']
+      if worker
+        @worker = worker
+        @worker.stream_client = @stream_client
+        @worker.stream_name = @stream_name
+      end
     end
 
     def self.aws_config(plugin_config)
@@ -45,10 +63,21 @@ module LiveEvents
         aws[:secret_access_key] = plugin_config['aws_secret_access_key_dec']
       end
 
+      if plugin_config['custom_aws_credentials']
+        aws[:credentials] = LiveEvents.aws_credentials(plugin_config)
+      end
+
       aws[:region] = plugin_config['aws_region'].presence || 'us-east-1'
 
       if plugin_config['aws_endpoint'].present?
-        aws[:endpoint] = plugin_config['aws_endpoint']
+        # to expose the strange error where this endpoint is present but not a real endpoint
+        # and to avoid breaking live events if that error occurs
+        endpoint = URI.parse(plugin_config['aws_endpoint'])
+        if URI::HTTPS === endpoint || URI::HTTP === endpoint
+          aws[:endpoint] = plugin_config['aws_endpoint']
+        else
+          LiveEvents.logger.warn("invalid endpoint value #{plugin_config['aws_endpoint']}")
+        end
       end
 
       aws
@@ -62,12 +91,21 @@ module LiveEvents
     end
 
     def post_event(event_name, payload, time = Time.now, ctx = {}, partition_key = nil)
-      statsd_prefix = "live_events.events.#{event_name}"
+      statsd_prefix = "live_events.events"
+      tags = { event: event_name }
 
       ctx ||= {}
-      attributes = ctx.merge({
+      if ctx.empty?
+        begin
+          raise "LiveEvent context is empty!"
+        rescue => e
+          LiveEvents.logger.error(([e.message]+e.backtrace).join($INPUT_RECORD_SEPARATOR))
+        end
+      end
+
+      attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
         event_name: event_name,
-        event_time: time.utc.iso8601
+        event_time: time.utc.iso8601(3)
       })
 
       event = {
@@ -79,24 +117,11 @@ module LiveEvents
       # let it be the user_id when that's available.
       partition_key ||= (ctx["user_id"] && ctx["user_id"].try(:to_s)) || rand(1000).to_s
 
-      event_json = event.to_json
+      pusher = @worker || LiveEvents.worker
 
-      job = proc do
-        begin
-          @stream_client.put_record(stream_name: @stream_name,
-                              data: event_json,
-                              partition_key: partition_key)
-
-          LiveEvents&.statsd&.increment("#{statsd_prefix}.sends")
-        rescue => e
-          LiveEvents.logger.error("Error posting event #{e} event: #{event_json}")
-          LiveEvents&.statsd&.increment("#{statsd_prefix}.send_errors")
-        end
-      end
-
-      unless LiveEvents.worker.push(job)
-        LiveEvents.logger.error("Error queueing job for worker event: #{event_json}")
-        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors")
+      unless pusher.push(event, partition_key)
+        LiveEvents.logger.error("Error queueing job for live event: #{event.to_json}")
+        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors", tags: tags)
       end
     end
   end

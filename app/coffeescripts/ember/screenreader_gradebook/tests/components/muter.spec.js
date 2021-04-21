@@ -16,10 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Ember from 'ember'
-import AssignmentMuter from '../../components/assignment_muter_component'
 import startApp from '../start_app'
 import fixtures from '../shared_ajax_fixtures'
-import $ from 'jquery'
 
 const {ContainerView, run} = Ember
 

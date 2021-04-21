@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -27,19 +29,6 @@ describe "assignment rubrics" do
       course_with_teacher_logged_in
     end
 
-    def create_assignment_with_points(points)
-      assignment_name = 'first test assignment'
-      due_date = Time.now.utc + 2.days
-      @group = @course.assignment_groups.create!(name: "default")
-      @assignment = @course.assignments.create(
-          name: assignment_name,
-          due_at: due_date,
-          points_possible: points,
-          assignment_group: @group
-      )
-      @assignment
-    end
-
     def get(url)
       super
       # terrible... some rubric dom handlers get set after dom ready
@@ -59,8 +48,7 @@ describe "assignment rubrics" do
     end
 
     it "should add a new rubric", priority: "2", test_id: 56587 do
-      get "/courses/#{@course.id}/outcomes"
-      expect_new_page_load{f(' .manage_rubrics').click}
+      get "/courses/#{@course.id}/rubrics"
 
       expect do
        f('.add_rubric_link').click
@@ -156,7 +144,7 @@ describe "assignment rubrics" do
       full_rubric_button = f('.toggle_full_rubric')
       expect(full_rubric_button).to be_displayed
       full_rubric_button.click
-      set_value(f('td.criterion_points input'), '2.5')
+      set_value(f('td[data-testid="criterion-points"] input'), '2.5')
       f('#rubric_holder .save_rubric_button').click
 
       expect(f("span[data-selenium='rubric_total']")).to include_text '2.5'
@@ -177,6 +165,51 @@ describe "assignment rubrics" do
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
       expect(f('#rubric_'+@rubric.id.to_s+' .rubric_title .title')).to include_text(@rubric.title)
+      expect(f('#rubrics span .rubric_total').text).to eq '8'
+    end
+
+    context "with the account_level_mastery_scales FF enabled" do
+      before :each do
+        create_assignment_with_points(2)
+        outcome_with_rubric(context: @course.account)
+        @course.account.enable_feature!(:account_level_mastery_scales)
+        @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+      end
+
+      context "enabled" do
+        before do
+          @course.account.enable_feature!(:account_level_mastery_scales)
+          proficiency = outcome_proficiency_model(@course)
+          @proficiency_rating_points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s}
+        end
+
+        it "should use the course mastery scale for outcome criterion when editing account rubrics within an assignment" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          points_before_edit = ff('tr.learning_outcome_criterion td.rating .points').map(&:text)
+          f("#rubric_#{@rubric.id} .edit_rubric_link").click
+          driver.switch_to.alert.accept
+          wait_for_ajax_requests
+          expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).reject!(&:empty?)).to eq @proficiency_rating_points
+          f('.cancel_button').click
+          wait_for_ajaximations
+          expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq points_before_edit
+        end
+      end
+
+      context "disabled" do
+        before do
+          @course.account.disable_feature!(:account_level_mastery_scales)
+        end
+
+        it "should not change existing outcome criterion when editing account rubrics within an assignment" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          points_before_edit = ff('tr.learning_outcome_criterion td.rating .points').map(&:text)
+          f("#rubric_#{@rubric.id} .edit_rubric_link").click
+          driver.switch_to.alert.accept
+          wait_for_ajax_requests
+          expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).reject!(&:empty?)).to eq points_before_edit
+        end
+      end
     end
 
     it "should not adjust points when importing an outcome to an assignment", priority: "1", test_id: 2896223 do
@@ -238,52 +271,6 @@ describe "assignment rubrics" do
       expect(f("#assignment_show .points_possible").text).to eq '5'
     end
 
-    it "should not allow XSS attacks through rubric descriptions", priority: "2", test_id: 220327 do
-      student = user_with_pseudonym active_user: true,
-                                    username: "student@example.com",
-                                    password: "password"
-      @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
-
-      @assignment = @course.assignments.create(name: 'assignment with rubric')
-      @rubric = Rubric.new(title: 'My Rubric', context: @course)
-      @rubric.data = [
-          {
-              points: 3,
-              description: "XSS Attack!",
-              long_description: "<b>This text should not be bold</b>",
-              id: 1,
-              ratings: [
-                  {
-                      points: 3,
-                      description: "Rockin'",
-                      criterion_id: 1,
-                      id: 2
-                  },
-                  {
-                      points: 0,
-                      description: "Lame",
-                      criterion_id: 1,
-                      id: 3
-                  }
-              ]
-          }
-      ]
-      @rubric.save!
-      @rubric.associate_with(@assignment, @course, purpose: 'grading')
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      expect(f("#rubric_#{@rubric.id} .long_description").text).
-        to eq "<b>This text should not be bold</b>"
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-      f(".toggle_full_rubric").click
-      wait_for_ajaximations
-      fj("span:contains('view longer description')").find_element(:xpath, './parent::button').click
-      expect(f("span[aria-label='Criterion Long Description']")).to include_text("This text should not be bold")
-    end
-
     it "should follow learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do
       student_in_course(active_all: true)
       outcome_with_rubric
@@ -300,7 +287,7 @@ describe "assignment rubrics" do
       f('.assess_submission_link').click
       wait_for_animations
       expect(f("span[data-selenium='rubric_total']")).to include_text "0 out of 5"
-      fj("span:contains('Amazing'):visible").click
+      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
       expect(f("span[data-selenium='rubric_total']")).to include_text "5 out of 5"
       scroll_into_view('.save_rubric_button')
       f('.save_rubric_button').click
@@ -486,6 +473,46 @@ describe "assignment rubrics" do
         expect(ffj('.range_rating:visible .min_points')[1]).to include_text "0"
       end
 
+      it "should properly update the lowest rating range when scaled up" do
+        rubric_params = {
+          :criteria => {
+            "0" => {
+              :criterion_use_range => true,
+              :points => 100,
+              :description => "no outcome row",
+              :long_description => 'non outcome criterion',
+              :ratings => {
+                "0" => {
+                  :points => 100,
+                  :description => "Amazing",
+                },
+                "1" => {
+                    :points => 50,
+                    :description => "Reduced Marks",
+                },
+                "2" => {
+                    :points => 20,
+                    :description => "Less than twenty percent",
+                }
+              }
+            }
+          }
+        }
+        @rubric.update_criteria(rubric_params)
+        @rubric.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["100", "50", "20"]
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+        criterion_points = fj('.criterion_points:visible')
+
+        set_value(criterion_points, '200')
+        fj(".save_button:visible").click
+        wait_for_ajaximations
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["200", "100", "40"]
+      end
+
       it "should display explicit rating when range is infinitely small", priority: "1", test_id: 220339 do
         @rubric.data[1][:criterion_use_range] = true
         @rubric.save!
@@ -645,8 +672,8 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(f("#rubrics .rubric_title").text).to eq "My Rubric"
-      f(".criterion_description .long_description_link").click
-      expect(f(".ui-dialog div.long_description").text).to eq "This is awesome."
+      expect(f(".criterion_description .description_title").text).to eq "Outcome row"
+      expect(f(".criterion_description .long_description").text).to eq "This is awesome."
     end
 
     it "should show criterion comments and only render when necessary", priority: "2", test_id: 220333 do

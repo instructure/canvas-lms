@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -45,7 +47,7 @@ describe "student groups" do
 
       f('#edit_group').click
       set_value f('#group_name'), "new group name"
-      expect_new_page_load {f('#ui-id-2').find_element(:css, 'button[type=submit]').click}
+      expect_new_page_load {submit_form("span[aria-label='Edit Group']")}
       expect(g1.reload.name).to include("new group name")
     end
 
@@ -285,8 +287,7 @@ describe "student groups" do
       end
 
       it "add/remove plurality to the word 'student' if one student", priority: "2", test_id: 180723 do
-        expect(f(".student-group-students")).to include_text("1 student")
-
+        skip('KNO-183')
         fln('Manage').click
         wait_for_ajaximations
 

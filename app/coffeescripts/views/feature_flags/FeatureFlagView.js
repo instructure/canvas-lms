@@ -17,8 +17,9 @@
 
 import $ from 'jquery'
 import Backbone from 'Backbone'
-import FeatureFlagDialog from '../feature_flags/FeatureFlagDialog'
+import FeatureFlagDialog from './FeatureFlagDialog'
 import template from 'jst/feature_flags/featureFlag'
+import I18n from 'i18n!feature_flags'
 
 export default class FeatureFlagView extends Backbone.View {
   static initClass() {
@@ -39,33 +40,44 @@ export default class FeatureFlagView extends Backbone.View {
   }
 
   afterRender() {
-    return this.$('.ui-buttonset').buttonset()
+    this.$('.ui-buttonset').buttonset()
   }
 
   onClickThreeState(e) {
     const $target = $(e.currentTarget)
     const action = $target.data('action')
-    return this.applyAction(action)
+    this.applyAction(action)
   }
 
   onClickToggle(e) {
     const $target = $(e.currentTarget)
-    return this.applyAction($target.is(':checked') ? 'on' : 'off')
+    this.applyAction($target.is(':checked') ? 'on' : 'off')
   }
 
-  onToggleDetails(e) {
-    return this.toggleDetailsArrow()
+  onToggleDetails() {
+    this.toggleDetailsArrow()
   }
 
   toggleDetailsArrow() {
     this.$detailToggle.toggleClass('icon-mini-arrow-right')
-    return this.$detailToggle.toggleClass('icon-mini-arrow-down')
+    this.$detailToggle.toggleClass('icon-mini-arrow-down')
+  }
+
+  maybeReload(action) {
+    const warning = this.model.warningFor(action)
+    if (warning.reload_page) {
+      window.location.reload()
+    }
   }
 
   applyAction(action) {
-    return $.when(this.canUpdate(action)).then(
-      () => this.model.updateState(action),
-      () => this.render() // undo UI change if user cancels
+    $.when(this.canUpdate(action)).then(
+      () =>
+        $.when(this.checkSiteAdmin()).then(
+          () => this.model.updateState(action).then(() => this.maybeReload(action)),
+          () => this.render() // undo UI change if user cancels
+        ),
+      () => this.render() // ditto
     )
   }
 
@@ -78,6 +90,22 @@ export default class FeatureFlagView extends Backbone.View {
       message: warning.message,
       title: this.model.get('display_name'),
       hasCancelButton: !warning.locked
+    })
+    view.render()
+    view.show()
+    return deferred
+  }
+
+  checkSiteAdmin() {
+    const deferred = $.Deferred()
+    if (!this.model.isSiteAdmin()) {
+      return deferred.resolve()
+    }
+    const view = new FeatureFlagDialog({
+      deferred,
+      message: I18n.t('This will affect every customer. Are you sure?'),
+      title: this.model.get('display_name'),
+      hasCancelButton: true
     })
     view.render()
     view.show()

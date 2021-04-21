@@ -88,9 +88,7 @@ export default class ThemeEditorImageRow extends Component {
             </div>
 
             <div
-              className={`Theme__editor_preview-img-container Theme__editor_preview-img-container--${
-                this.props.varDef.variable_name
-              }`}
+              className={`Theme__editor_preview-img-container Theme__editor_preview-img-container--${this.props.varDef.variable_name}`}
             >
               {/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}
               <div className="Theme__editor_preview-img">

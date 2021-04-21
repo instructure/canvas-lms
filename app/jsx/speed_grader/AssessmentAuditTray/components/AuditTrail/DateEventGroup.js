@@ -17,9 +17,9 @@
  */
 
 import React, {PureComponent} from 'react'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
+import {View} from '@instructure/ui-view'
 import I18n from 'i18n!speed_grader'
 import timezone from 'timezone'
 
@@ -48,9 +48,9 @@ export default class DateEventGroup extends PureComponent {
 
         <List variant="unstyled">
           {auditEvents.map(({auditEvent, studentAnonymity}) => (
-            <ListItem key={auditEvent.id} margin="small none none none">
+            <List.Item key={auditEvent.id} margin="small none none none">
               <AuditEvent auditEvent={auditEvent} studentAnonymity={studentAnonymity} />
-            </ListItem>
+            </List.Item>
           ))}
         </List>
       </View>

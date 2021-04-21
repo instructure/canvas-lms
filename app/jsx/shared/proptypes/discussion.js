@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { shape, arrayOf, string, number, bool, oneOf } from 'prop-types'
-import { author } from './user'
+import {shape, arrayOf, string, number, bool, oneOf} from 'prop-types'
+import {author} from './user'
 
 const discussion = shape({
   id: string.isRequired,
@@ -28,7 +28,7 @@ const discussion = shape({
   author: author.isRequired,
   read_state: oneOf(['read', 'unread']).isRequired,
   unread_count: number.isRequired,
-  subscribed: bool.isRequired,
+  subscribed: bool.isRequired
 })
 
 export const discussionList = arrayOf(discussion)

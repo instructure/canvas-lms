@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -18,12 +20,12 @@
 
 module Factories
   def late_policy_factory(**opts)
-    params = late_policy_params(opts)
+    params = late_policy_params(**opts)
     LatePolicy.create!(params)
   end
 
   def late_policy_model(**opts)
-    params = late_policy_params(opts)
+    params = late_policy_params(**opts)
     LatePolicy.new(params)
   end
 

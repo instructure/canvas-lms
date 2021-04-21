@@ -269,62 +269,104 @@ const default_grade_response = [
 const students = [
   {
     user_id: '1',
-    user: {id: '1', name: 'Bob', group_ids: [], sections: []},
+    user: {id: '1', name: 'Bob Barnes', group_ids: [], sections: [], sortable_name: 'Barnes, Bob'},
     course_section_id: '1'
   },
   {
     user_id: '2',
-    user: {id: '2', name: 'Fred', group_ids: [], sections: []},
+    user: {id: '2', name: 'Fred Flint', group_ids: [], sections: [], sortable_name: 'Flint, Fred'},
     course_section_id: '1'
   },
   {
     user_id: '3',
-    user: {id: '3', name: 'Suzy', group_ids: [], sections: []},
+    user: {id: '3', name: 'Suzy Smith', group_ids: [], sections: [], sortable_name: 'Smith, Suzy'},
     course_section_id: '1'
   },
   {
     user_id: '4',
-    user: {id: '4', name: 'Buffy', group_ids: [], sections: []},
+    user: {
+      id: '4',
+      name: 'Buffy Baker',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'Baker, Buffy'
+    },
     course_section_id: '2'
   },
   {
     user_id: '5',
-    user: {id: '5', name: 'Willow', group_ids: [], sections: []},
+    user: {
+      id: '5',
+      name: 'Willow West',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'West, Willow'
+    },
     course_section_id: '2'
   },
   {
     user_id: '5',
-    user: {id: '5', name: 'Willow', group_ids: [], sections: []},
+    user: {
+      id: '5',
+      name: 'Willow West',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'West, Willow'
+    },
     course_section_id: '1'
   },
   {
     user_id: '6',
-    user: {id: '6', name: 'Giles', group_ids: [], sections: []},
+    user: {
+      id: '6',
+      name: 'Giles Green',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'Green, Giles'
+    },
     course_section_id: '2'
   },
   {
     user_id: '7',
-    user: {id: '7', name: 'Xander', group_ids: [], sections: []},
+    user: {
+      id: '7',
+      name: 'Xander Xiao',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'Xiao, Xander'
+    },
     course_section_id: '2'
   },
   {
     user_id: '8',
-    user: {id: '8', name: 'Cordelia', group_ids: [], sections: []},
+    user: {
+      id: '8',
+      name: 'Cordelia Lu',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'Lu, Cordelia'
+    },
     course_section_id: '2'
   },
   {
     user_id: '9',
-    user: {id: '9', name: 'Drusilla', group_ids: [], sections: []},
+    user: {
+      id: '9',
+      name: 'Drusilla Da',
+      group_ids: [],
+      sections: [],
+      sortable_name: 'Da, Drusilla'
+    },
     course_section_id: '1'
   },
   {
     user_id: '10',
-    user: {id: '10', name: 'Spike', group_ids: [], sections: []},
+    user: {id: '10', name: 'Spike Long', group_ids: [], sections: [], sortable_name: 'Long, Spike'},
     course_section_id: '2'
   },
   {
     user_id: '10',
-    user: {id: '10', name: 'Spike', group_ids: [], sections: []},
+    user: {id: '10', name: 'Spike Long', group_ids: [], sections: [], sortable_name: 'Long, Spike'},
     course_section_id: '1'
   }
 ]
@@ -427,6 +469,7 @@ const assignmentGroups = [
         submission_types: ['none'],
         due_at: '2013-09-01T10:00:00Z',
         position: 9,
+        published: true,
         assignment_group_id: '2'
       }
     ]
@@ -607,7 +650,10 @@ const submissions = [
   }
 ]
 
-const sections = [{id: '1', name: 'Vampires and Demons'}, {id: '2', name: 'Slayers and Scoobies'}]
+const sections = [
+  {id: '1', name: 'Vampires and Demons'},
+  {id: '2', name: 'Slayers and Scoobies'}
+]
 
 const customColumns = [
   {
@@ -633,7 +679,10 @@ const outcomeRollupsRaw = {
   rollups: [
     {
       links: {user: '1'},
-      scores: [{links: {outcome: '1'}, score: 5}, {links: {outcome: '2'}, score: 4}]
+      scores: [
+        {links: {outcome: '1'}, score: 5},
+        {links: {outcome: '2'}, score: 4}
+      ]
     },
     {
       links: {user: '2'},
@@ -658,12 +707,11 @@ export default {
   sections,
   outcomes,
   outcome_rollups: outcomeRollups,
-  create(overrides) {
+  create() {
     window.ENV = {
       current_user_id: 1,
       context_asset_string: 'course_1',
       GRADEBOOK_OPTIONS: {
-        effective_due_dates_url: '/api/v1/courses/1/effective_due_dates',
         enrollments_url: '/api/v1/enrollments',
         enrollments_with_concluded_url: '/api/v1/concluded_enrollments',
         assignment_groups_url: '/api/v1/assignment_groups',

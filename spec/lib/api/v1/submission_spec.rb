@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -21,8 +23,11 @@ require 'spec_helper'
 describe Api::V1::Submission do
   subject(:fake_controller) do
     Class.new do
+      include Api
       include Api::V1::Submission
       include Rails.application.routes.url_helpers
+
+      attr_writer :current_user
 
       private
 
@@ -58,9 +63,8 @@ describe Api::V1::Submission do
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s, 'student_id' => user.id }
-        fragment = { 'provisional_grade_id' => provisional_grade.id }
-        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
+        query = { assignment_id: assignment.id, student_id: user.id }
+        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query)
       end
 
       it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
@@ -73,9 +77,8 @@ describe Api::V1::Submission do
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s, 'anonymous_id' => submission.anonymous_id }
-        fragment = { 'provisional_grade_id' => provisional_grade.id }
-        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
+        query = { assignment_id: assignment.id, anonymous_id: submission.anonymous_id }
+        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query)
       end
     end
   end
@@ -497,24 +500,83 @@ describe Api::V1::Submission do
         expect(json.fetch(field).count).to be 4
       end
     end
+
+    describe "posted_at" do
+      let(:field) { "posted_at" }
+      let(:submission) { assignment.submissions.build(user: user) }
+      let(:json) do
+        fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
+      end
+
+      it "is included" do
+        posted_at = Time.zone.now
+        submission.update!(posted_at: posted_at)
+
+        expect(json.fetch('posted_at')).to eq posted_at
+      end
+    end
+
+    describe "body" do
+      let(:field) { "body" }
+
+      it "is included if the submission is not quiz-based" do
+        assignment.update!(submission_types: "online_text_entry")
+        assignment.submit_homework(user, submission_type: "online_text_entry", body: "pay attention to me")
+
+        submission = assignment.submission_for_student(user)
+        submission_json = fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
+        expect(submission_json.fetch(field)).to eq "pay attention to me"
+      end
+
+      context "when the submission is quiz-based" do
+        # quiz_with_submission returns a QuizSubmission, but we want the
+        # attached (non-quiz) Submission object instead
+        let(:submission_for_quiz) { quiz_with_submission.submission }
+
+        let(:quiz_assignment) { submission_for_quiz.assignment }
+        let(:quiz) { quiz_assignment.quiz }
+        let(:course) { quiz_assignment.course }
+
+        it "it included if the caller has permission to see the user's grade" do
+          submission_json = fake_controller.submission_json(submission_for_quiz, quiz_assignment, teacher, session, course, [field], params)
+          # submissions for quizzes set the "body" field to a string of the form
+          # user: <id>, quiz: <id>, score: <score>, time: <time graded>
+          expect(submission_json.fetch(field)).to include("quiz: #{quiz.id}")
+        end
+
+        it "is not included if the caller does not have permission to see the user's grade" do
+          submission_json = fake_controller.submission_json(submission_for_quiz, quiz_assignment, user, session, course, [field], params)
+          expect(submission_json.fetch(field)).to be nil
+        end
+      end
+    end
   end
 
-  describe '#submission_zip' do
+  describe "#submission_zip" do
     let(:attachment) { fake_controller.submission_zip(assignment) }
 
-    it 'locks the attachment if the assignment is anonymous and muted' do
-      assignment.muted = true
-      assignment.anonymous_grading = true
+    it "locks the attachment if the assignment anonymizes students" do
+      allow(assignment).to receive(:anonymize_students?).and_return(true)
       expect(attachment).to be_locked
     end
 
-    it 'does not lock the attachment if the assignment is anonymous and unmuted' do
-      assignment.anonymous_grading = true
+    it 'does not lock the attachment if the assignment is not anonymous' do
+      allow(assignment).to receive(:anonymize_students?).and_return(false)
       expect(attachment).not_to be_locked
     end
 
-    it 'does not lock the attachment if the assignment is not anonymous' do
-      expect(attachment).not_to be_locked
+    it "does not blow up when a quiz has a prior attachment" do
+      qsub = quiz_with_submission()
+      quiz = qsub.quiz
+      quiz.attachments.create!(
+        display_name: "submissions.zip",
+        uploaded_data: default_uploaded_data,
+        workflow_state: 'zipped',
+        user_id: user.id,
+        locked: quiz.anonymize_students?
+      )
+      fake_controller.current_user = user
+      expect(fake_controller.submission_zip(quiz)).to be_truthy
     end
   end
 end

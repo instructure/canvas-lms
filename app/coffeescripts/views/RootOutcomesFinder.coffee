@@ -15,19 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../models/OutcomeGroup'
-  '../str/splitAssetString'
-], (OutcomeGroup, splitAssetString) ->
+import OutcomeGroup from '../models/OutcomeGroup'
+import splitAssetString from '../str/splitAssetString'
 
-  class RootOutcomesFinder
+export default class RootOutcomesFinder
 
-    find: ->
-      # purposely sharing these across instances of RootOutcomesFinder
-      contextOutcomeGroups = null
-      contextTypeAndId = splitAssetString(ENV.context_asset_string || '')
+  find: ->
+    # purposely sharing these across instances of RootOutcomesFinder
+    contextOutcomeGroups = null
+    contextTypeAndId = splitAssetString(ENV.context_asset_string || '')
 
-      contextOutcomeGroups = new OutcomeGroup
-      contextOutcomeGroups.url = "/api/v1/#{contextTypeAndId[0]}/#{contextTypeAndId[1]}/root_outcome_group"
-      contextOutcomeGroups.fetch()
-      [contextOutcomeGroups]
+    contextOutcomeGroups = new OutcomeGroup
+    contextOutcomeGroups.url = "/api/v1/#{contextTypeAndId[0]}/#{contextTypeAndId[1]}/root_outcome_group"
+    contextOutcomeGroups.fetch()
+    [contextOutcomeGroups]

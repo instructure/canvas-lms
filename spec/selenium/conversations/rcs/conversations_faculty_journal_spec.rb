@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -42,7 +44,6 @@ describe "conversations new" do
   context "Course with Faculty Journal not enabled" do
     before(:each) do
       site_admin_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

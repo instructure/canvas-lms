@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!help_dialog'
+import I18n from 'i18n!createTicketForm'
 import $ from 'jquery'
 import 'jquery.instructure_forms'
 import 'compiled/jquery.rails_flash_notifications'
@@ -75,7 +75,7 @@ class CreateTicketForm extends React.Component {
                 'For an instant answer, see if your issue is addressed in the *Canvas Guides*.',
                 {
                   wrappers: [
-                    '<a target="_blank" href="https://community.canvaslms.com/community/answers/guides">$1</a>'
+                    '<a target="_blank" href="https://community.canvaslms.com/t5/Canvas/ct-p/canvas">$1</a>'
                   ]
                 }
               )

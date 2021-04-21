@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -35,11 +37,19 @@ module Canvas
     end
 
     private
-    def masked_authenticity_token
+    def authenticity_token_options
       session_options = CanvasRails::Application.config.session_options
       options = session_options.slice(:domain, :secure)
       options[:httponly] = HostUrl.is_file_host?(request.host_with_port)
-      CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies, options)
+      options
+    end
+
+    def reset_authenticity_token!
+      CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies, authenticity_token_options)
+    end
+
+    def masked_authenticity_token
+      CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies, authenticity_token_options)
     end
   end
 end

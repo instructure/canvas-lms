@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
+import FilesystemObjectThumbnail from './FilesystemObjectThumbnail'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 
 const MAX_THUMBNAILS_TO_SHOW = 10

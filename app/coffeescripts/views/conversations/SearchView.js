@@ -21,18 +21,6 @@ import {View} from 'Backbone'
 import AutocompleteView from './AutocompleteView'
 
 export default class SearchView extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.onSearch = this.onSearch.bind(this)
-    super(...args)
-  }
-
   static initClass() {
     this.prototype.els = {'#search-autocomplete': '$autocomplete'}
   }
@@ -45,7 +33,7 @@ export default class SearchView extends View {
       single: true,
       excludeAll: true
     }).render()
-    return this.autocompleteView.on('changeToken', this.onSearch)
+    return this.autocompleteView.on('changeToken', this.onSearch, this)
   }
 
   onSearch(tokens) {

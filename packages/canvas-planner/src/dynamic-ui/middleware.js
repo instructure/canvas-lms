@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function createDynamicUiMiddleware (uiManager) {
+export function createDynamicUiMiddleware(uiManager) {
   return store => {
-    uiManager.setStore(store);
+    uiManager.setStore(store)
     return next => action => {
-      const beforeState = store.getState();
+      const beforeState = store.getState()
       // manager has to be notified before the reducers run so the animations
       // will be ready when the UI updates
-      uiManager.handleAction(action);
-      const result = next(action);
-      const afterState = store.getState();
-      if (beforeState === afterState) uiManager.uiStateUnchanged(action);
-      return result;
-    };
-  };
+      uiManager.handleAction(action)
+      const result = next(action)
+      const afterState = store.getState()
+      if (beforeState === afterState) uiManager.uiStateUnchanged(action)
+      return result
+    }
+  }
 }

@@ -1,8 +1,0 @@
-{
-  "name": "selinimum",
-  "private": true,
-  "version": "1.0.0",
-  "dependencies": {
-    "sass-graph": "^3"
-  }
-}

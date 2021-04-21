@@ -37,7 +37,7 @@
         <% if c.state == :unconfirmed %>
           <a href="#" class="path email_channel contact_channel_path ellipsis" title="<%=h c.path %>"><%= c.path %></a>
         <% else %>
-          <p class="path email_channel contact_channel_path ellipsis"><%= c.path %></>
+          <p class="path email_channel contact_channel_path ellipsis"><%= c.path %></p>
         <% end %>
       </th>
       <td class="email_meta">
@@ -139,7 +139,7 @@
     <% end %>
     <tr class="channel blank unconfirmed" style="display: none;">
       <td><a href="#" class="path">&nbsp;</a></td>
-      <td><%= t('contact_types.sms', "sms") %></td>
+      <td><span id="communication_text_type"><%= t("sms") %></span></td>
       <td style="padding: 0; text-align: center;">
         <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
         <span class="pseudonym_id" style="display: none;">&nbsp;</span>
@@ -162,6 +162,9 @@
 <ul>
   <li><a href="#register_email_address"><%= t('links.email', "Email") %></a></li>
   <li><a href="#register_sms_number"><%= t('links.text_sms', "Text (SMS)") %></a></li>
+  <% if @user.account.feature_enabled?(:slack_notifications)%>
+    <li><a href="#register_slack_handle"><%= t("Slack Email") %></a></li>
+  <% end %>
 </ul>
 <%= form_tag communication_channels_url, {:id => "register_email_address", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="email"/>
@@ -187,15 +190,31 @@
       <button type="submit" class="btn btn-primary"><%= t('buttons.register_email', "Register Email") %></button>
     </div>
 <% end %>
+
+<% if @user.account.feature_enabled?(:slack_notifications)%>
+  <%= form_tag communication_channels_url, {:id => "register_slack_handle", :class => 'form-horizontal'} do %>
+      <input type="hidden" name="communication_channel[type]" value="slack"/>
+      <div class="control-group">
+        <label for='communication_channel_slack' class='control-label'><%= t('Slack Email') %></label>
+        <div class="controls">
+          <input type="text" name="communication_channel_slack" class="sms_email" id="communication_channel_slack" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary"><%= t("Register Slack Email") %></button>
+      </div>
+  <% end %>
+<% end %>
+
 <%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="sms"/>
 
     <% if @user.account.feature_enabled?(:international_sms) %>
       <div class="control-group">
-        <label for="communication_channel_sms_country" class='control-label'><%=t('labels.country', 'Country') %></label>
+        <label for="communication_channel_sms_country" class='control-label'><%=t('Country or Region') %></label>
         <div class="controls">
           <select class="user_selected country" id="communication_channel_sms_country" name="communication_channel_sms_country">
-            <option value="undecided">[<%= t('Select Country') %>]</option>
+            <option value="undecided">[<%= t('Select Country or Region') %>]</option>
             <% CommunicationChannel.country_codes.each do |(numeric_code, name, use_email)| %>
               <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %></option>
             <% end %>
@@ -241,6 +260,7 @@
       <button type="submit" class="btn btn-primary"><%= t('buttons.register_sms', "Register SMS") %></button>
     </div>
 <% end %>
+
 </div>
 <div id="confirm_email_channel" style="display: none;" class="dialog" role="dialog">
   <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
@@ -263,7 +283,7 @@
   <input type="hidden" name="user_id" value=""/>
   <div id='sms_confirmation_instructions' style="text-align: center;">
   <%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
-    To activate SMS, enter the four-character confirmation code sent to %{sms_number}.
+    To activate this communication channel, enter the four-character confirmation code sent to %{sms_number}.
     TEXT
   %>
   <br>

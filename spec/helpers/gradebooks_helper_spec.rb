@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,22 +23,30 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
-    def anonymous_grading?
-      anonymous_grading
-    end
-  end.freeze
-  FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
-                              :workflow_state, :excused?).freeze
-  FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
-    def survey?
-      survey
-    end
+  before do
+    FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
+      def anonymous_grading?
+        anonymous_grading
+      end
+    end.freeze
+    FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
+                                :workflow_state, :excused?).freeze
+    FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
+      def survey?
+        survey
+      end
 
-    def anonymous_survey?
-      survey? && anonymous_submissions
-    end
-  end.freeze
+      def anonymous_survey?
+        survey? && anonymous_submissions
+      end
+    end.freeze
+  end
+
+  after do
+    Object.send(:remove_const, :FakeAssignment)
+    Object.send(:remove_const, :FakeSubmission)
+    Object.send(:remove_const, :FakeQuiz)
+  end
 
   let(:assignment) { FakeAssignment.new }
   let(:submission) { FakeSubmission.new(assignment) }
@@ -74,21 +84,15 @@ describe GradebooksHelper do
       expect(helper.force_anonymous_grading?(assignment)).to eq true
     end
 
-    it 'returns true for a muted anonymously-graded assignment' do
+    it 'returns true for an anonymously-graded assignment' do
       assignment = assignment_model
-      assignment.anonymous_grading = true
-      assignment.muted = true
+      allow(assignment).to receive(:anonymize_students?).and_return(true)
       expect(helper.force_anonymous_grading?(assignment)).to be true
-    end
-
-    it 'returns false for an unmuted anonymously-graded assignment' do
-      assignment = assignment_model
-      assignment.anonymous_grading = true
-      expect(helper.force_anonymous_grading?(assignment)).to be false
     end
 
     it 'returns false for a non-anonymously-graded assignment' do
       assignment = assignment_model
+      allow(assignment).to receive(:anonymize_students?).and_return(false)
       expect(helper.force_anonymous_grading?(assignment)).to eq false
     end
   end
@@ -105,8 +109,7 @@ describe GradebooksHelper do
 
     it 'returns anonymous grading' do
       assignment = assignment_model
-      assignment.anonymous_grading = true
-      assignment.muted = true
+      allow(assignment).to receive(:anonymize_students?).and_return(true)
       expect(helper.force_anonymous_grading_reason(assignment)).to match(/anonymous grading/)
     end
   end
@@ -114,7 +117,7 @@ describe GradebooksHelper do
   describe '#student_score_display_for(submission, can_manage_grades)' do
 
     let(:score_display) { helper.student_score_display_for(submission) }
-    let(:parsed_display) { Nokogiri::HTML.parse(score_display) }
+    let(:parsed_display) { Nokogiri::HTML5(score_display) }
     let(:score_icon) { parsed_display.at_css('i') }
     let(:score_screenreader_text) { parsed_display.at_css('.screenreader-only').text }
 

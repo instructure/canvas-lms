@@ -34,13 +34,6 @@ export default {
     return $(selector, $fixtures)
   },
   teardown() {
-    // detach any legacy editorBox stuff before removing
-    this.find('textarea').each((i, el) => {
-      const $editor = $(el)
-      if ($editor.data('rich_text')) {
-        return send($editor, 'destroy')
-      }
-    })
     return $fixtures.empty()
   }
 }

@@ -17,7 +17,6 @@
  */
 
 import I18n from 'i18n!student_groups'
-import _ from 'underscore'
 import React from 'react'
 import natcompare from 'compiled/util/natcompare'
 
@@ -231,10 +230,10 @@ class Group extends React.Component {
       >
         <div className="student-group-header clearfix">
           <div ref="groupTitle" className="student-group-title">
-            <h3 aria-label={groupName}>
+            <h2 aria-label={groupName}>
               {this.props.group.name}
               <small>&nbsp;{this.props.group.group_category.name}</small>
-            </h3>
+            </h2>
             {arrow}
             {visitLink}&nbsp;{manageLink}
           </div>

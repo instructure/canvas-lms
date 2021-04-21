@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@
 class ExternalIntegrationKey < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account]
 
-  validates_presence_of :context_id
+  validates_presence_of :context_id, unless: -> { new_record? && context&.new_record? }
   validates_presence_of :context_type
   validates_presence_of :key_type
   validates_presence_of :key_value

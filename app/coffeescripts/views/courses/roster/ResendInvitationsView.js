@@ -16,8 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
-import I18n from 'i18n!roster'
+import I18n from 'i18n!ResendInvitationsView'
 import {View} from 'Backbone'
 import template from 'jst/courses/roster/resendInvitations'
 import 'jquery.ajaxJSON'
@@ -35,7 +34,7 @@ export default class ResendInvitationsView extends View {
   }
 
   toJSON() {
-    return _.extend({}, this.model.toJSON(), this)
+    return {...this.model.toJSON(), ...this}
   }
 
   attach() {
@@ -55,7 +54,7 @@ export default class ResendInvitationsView extends View {
           I18n.t('error_sending_invitations', 'Error sending invitation. Please try again.')
         )
     )
-    return $.when(xhr).always(() => (this.sending = false), this.render)
+    return $.when(xhr).always(() => (this.sending = false), this.render.bind(this))
   }
 }
 ResendInvitationsView.initClass()

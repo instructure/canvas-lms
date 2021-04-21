@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ require 'lib/model_cache'
 describe ModelCache do
   before(:all) do
     class TestModelCacheUser < ActiveRecord::Base
-      self.table_name = :users # reuse exiting tables so AR doesn't asplode
+      self.table_name = :users # reuse existing tables so AR doesn't asplode
       include ModelCache
     end
 
@@ -46,8 +48,8 @@ describe ModelCache do
   after(:all) do
     ModelCache.keys.delete('TestModelCacheUser')
     ModelCache.keys.delete('TestModelCachePseudonym')
-    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCacheUser)
-    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCachePseudonym)
+    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('TestModelCacheUser')
+    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('TestModelCachePseudonym')
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end

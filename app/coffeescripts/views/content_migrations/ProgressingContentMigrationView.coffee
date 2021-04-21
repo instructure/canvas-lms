@@ -15,201 +15,200 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  'i18n!content_migrations'
-  'jst/content_migrations/ProgressingContentMigration'
-  'jst/content_migrations/ProgressingIssues'
-  '../PaginatedCollectionView'
-  './ContentMigrationIssueView'
-  './ProgressBarView'
-  './ProgressStatusView'
-  './SelectContentView'
-  './SourceLinkView'
-], ($, Backbone, I18n, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView, SelectContentView, SourceLinkView) ->
-  class ProgressingContentMigrationView extends Backbone.View
-    template: template
-    tagName: 'li'
-    className: 'clearfix migrationProgressItem'
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import I18n from 'i18n!content_migrations'
+import template from 'jst/content_migrations/ProgressingContentMigration'
+import progressingIssuesTemplate from 'jst/content_migrations/ProgressingIssues'
+import PaginatedCollectionView from '../PaginatedCollectionView'
+import ContentMigrationIssueView from './ContentMigrationIssueView'
+import ProgressBarView from './ProgressBarView'
+import ProgressStatusView from './ProgressStatusView'
+import SelectContentView from './SelectContentView'
+import SourceLinkView from './SourceLinkView'
 
-    events: 
-      'click .showIssues'       : 'toggleIssues'
-      'click .selectContentBtn' : 'showSelectContentDialog'
+export default class ProgressingContentMigrationView extends Backbone.View
+  template: template
+  tagName: 'li'
+  className: 'clearfix migrationProgressItem'
 
-    els:
-      '.showIssues'                          : '$showIssues'
-      '.migrationIssues'                     : '$migrationIssues'
-      '.changable'                           : '$changable'
-      '.progressStatus'                      : '$progressStatus'
-      '.selectContentDialog'                 : '$selectContentDialog'
-      '[data-bind=migration_issues_count]'  : '$issuesCount'
-      '.sourceLink'                         : '$sourceLink'
+  events:
+    'click .showIssues'       : 'toggleIssues'
+    'click .selectContentBtn' : 'showSelectContentDialog'
 
-    initialize: -> 
-      super
-      @issuesLoaded = false
+  els:
+    '.showIssues'                          : '$showIssues'
+    '.migrationIssues'                     : '$migrationIssues'
+    '.changable'                           : '$changable'
+    '.progressStatus'                      : '$progressStatus'
+    '.selectContentDialog'                 : '$selectContentDialog'
+    '[data-bind=migration_issues_count]'  : '$issuesCount'
+    '.sourceLink'                         : '$sourceLink'
 
-      @progress = @model.progressModel
-      @issues   = @model.issuesCollection
+  initialize: ->
+    super
+    @issuesLoaded = false
 
-      # Continue looking for progress after content is selected.
-      @model.on 'continue', =>
-        @progress?.poll()
-        @render()
+    @progress = @model.progressModel
+    @issues   = @model.issuesCollection
 
-      # Render the progress bar if workflow_state changes to running
-      @progress.on 'change:workflow_state', (event) => 
-        @renderProgressBar() if @progress.get('workflow_state') == "running"
+    # Continue looking for progress after content is selected.
+    @model.on 'continue', =>
+      @progress?.poll()
+      @render()
 
-      # When progress is complete, update
-      @progress.on 'complete', (event) => @updateMigrationModel()
+    # Render the progress bar if workflow_state changes to running
+    @progress.on 'change:workflow_state', (event) =>
+      @renderProgressBar() if @progress.get('workflow_state') == "running"
 
-    toJSON: -> 
-      json = super
-      json.display_name = @displayName()
-      json.created_at = @createdAt()
-      json.issuesCount = @model.get('migration_issues_count')
+    # When progress is complete, update
+    @progress.on 'complete', (event) => @updateMigrationModel()
 
-      switch @model.get('workflow_state')
-        when "waiting_for_select"
-          json.waiting_for_select = true
-        when "completed", "failed"
-          json.migration_issues = true if @model.get('migration_issues_count') > 0
-        when "failed"
-          json.message = @model.get('message') || @progress.get('message')
-        when "running"
-          json.loading = true
+  toJSON: ->
+    json = super
+    json.display_name = @displayName()
+    json.created_at = @createdAt()
+    json.issuesCount = @model.get('migration_issues_count')
 
-      json
+    switch @model.get('workflow_state')
+      when "waiting_for_select"
+        json.waiting_for_select = true
+      when "completed", "failed"
+        json.migration_issues = true if @model.get('migration_issues_count') > 0
+      when "failed"
+        json.message = @model.get('message') || @progress.get('message')
+      when "running"
+        json.loading = true
 
-    displayName: ->          @model.get('migration_type_title')  ||  I18n.t('content_migration', 'Content Migration')
-    createdAt:   ->          @model.get('created_at')            ||  (new Date()).toISOString()
+    json
 
-    # Render a collection view that represents issues for this migration. 
-    #
-    # @backbone override
+  displayName: ->          @model.get('migration_type_title')  ||  I18n.t('content_migration', 'Content Migration')
+  createdAt:   ->          @model.get('created_at')            ||  (new Date()).toISOString()
 
-    render: => 
-      super
-      issuesCollectionView = new PaginatedCollectionView
-                         collection: @issues
-                         itemView: ContentMigrationIssueView
-                         template: progressingIssuesTemplate
-                         autoFetch: true
-      @$migrationIssues.html issuesCollectionView.render().el
+  # Render a collection view that represents issues for this migration.
+  #
+  # @backbone override
 
-      progressStatus = new ProgressStatusView
-                         model: @model
-                         el: @$progressStatus
+  render: =>
+    super
+    issuesCollectionView = new PaginatedCollectionView
+                        collection: @issues
+                        itemView: ContentMigrationIssueView
+                        template: progressingIssuesTemplate
+                        autoFetch: true
+    @$migrationIssues.html issuesCollectionView.render().el
 
-      progressStatus.render()
+    progressStatus = new ProgressStatusView
+                        model: @model
+                        el: @$progressStatus
 
-      sourceLink = new SourceLinkView
-                         model: @model
-                         el: @$sourceLink
+    progressStatus.render()
 
-      sourceLink.render()
+    sourceLink = new SourceLinkView
+                        model: @model
+                        el: @$sourceLink
 
-      this
+    sourceLink.render()
 
-    # Render the initial progress bar after it renders, if its in a running state
-    #
-    # @expects void
-    # @api backbone override
+    this
 
-    afterRender: -> 
-      if @model.get('workflow_state') == "running"
-        @renderProgressBar() if @progress.get('workflow_state') == "running"
+  # Render the initial progress bar after it renders, if its in a running state
+  #
+  # @expects void
+  # @api backbone override
 
-    # Create a new progress bar with the @progress model. Replace the changable html 
-    # with this progress information. 
-    #
-    # @expects void 
-    # @api private
+  afterRender: ->
+    if @model.get('workflow_state') == "running"
+      @renderProgressBar() if @progress.get('workflow_state') == "running"
 
-    renderProgressBar: -> 
-      progressBarView = new ProgressBarView 
-                          model: @progress
-                          el: @$changable
-      progressBarView.render()
+  # Create a new progress bar with the @progress model. Replace the changable html
+  # with this progress information.
+  #
+  # @expects void
+  # @api private
 
-    # Does a fetch on the migration model. If successful it will re-render the progress
-    # view. 
-    #
-    # @api private
+  renderProgressBar: ->
+    progressBarView = new ProgressBarView
+                        model: @progress
+                        el: @$changable
+    progressBarView.render()
 
-    updateMigrationModel: -> 
-      @model.fetch
-              error: (model, response, option) => @model.set('status', 'failed')
-              success: (model, response, options) => @render()
+  # Does a fetch on the migration model. If successful it will re-render the progress
+  # view.
+  #
+  # @api private
 
-    # When clicking on the issues button for the first time it needs to fetch all of the issues.
-    # This progress view keeps track of if it's fetched issues for this migration with the 
-    # @issueLoaded class variable. If this is false more issues need to be fetched from the 
-    # server. Also, when toggled the text should change on the button.
-    #
-    # @expects event
-    # @api private
+  updateMigrationModel: ->
+    @model.fetch
+            error: (model, response, option) => @model.set('status', 'failed')
+            success: (model, response, options) => @render()
 
-    toggleIssues: (event) -> 
-      event.preventDefault()
+  # When clicking on the issues button for the first time it needs to fetch all of the issues.
+  # This progress view keeps track of if it's fetched issues for this migration with the
+  # @issueLoaded class variable. If this is false more issues need to be fetched from the
+  # server. Also, when toggled the text should change on the button.
+  #
+  # @expects event
+  # @api private
 
-      if @issuesLoaded
-        @$migrationIssues.toggle()
-        @$migrationIssues.attr('aria-expanded', @$migrationIssues.attr('aria-expanded') != 'true')
-        @setIssuesButtonText()
-      else
-        dfd = @fetchIssues()
-        dfd.done => 
-          @issuesLoaded = true
-          @toggleIssues(event)
+  toggleIssues: (event) ->
+    event.preventDefault()
 
-    # Fetches issues and adds a loading icon and text to the button.
-    # @api private
+    if @issuesLoaded
+      @$migrationIssues.toggle()
+      @$migrationIssues.attr('aria-expanded', @$migrationIssues.attr('aria-expanded') != 'true')
+      @setIssuesButtonText()
+    else
+      dfd = @fetchIssues()
+      dfd.done =>
+        @issuesLoaded = true
+        @toggleIssues(event)
 
-    fetchIssues: () -> 
-      @model.set('issuesButtonText', I18n.t('loading', 'Loading...'))
-      dfd = @issues.fetch()
-      @$el.disableWhileLoading dfd
-      dfd
+  # Fetches issues and adds a loading icon and text to the button.
+  # @api private
 
-    # Determines which text to add to the issues button. This is so when you click
-    # the issues button it changes from Show Issues to Hide Issues as well as 
-    # handles a case where loading text is still there an needs to be removed.
-    #
-    # @api private
+  fetchIssues: () ->
+    @model.set('issuesButtonText', I18n.t('loading', 'Loading...'))
+    dfd = @issues.fetch()
+    @$el.disableWhileLoading dfd
+    dfd
 
-    setIssuesButtonText: ->
-      btnText = @model.get('issuesButtonText')
-      if !@hiddenIssues
-        @$issuesCount.hide()
-        @model.set('issuesButtonText', I18n.t('hide_issues', 'Hide Issues'))
-        @$showIssues.attr('aria-label', I18n.t('hide_issues', 'Hide Issues'))
-        @$showIssues.attr('title', I18n.t('hide_issues', 'Hide Issues'))
-        @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
-        @hiddenIssues = true
-      else 
-        @$issuesCount.show()
-        @$showIssues.attr('aria-label', I18n.t('show_issues', 'Show Issues'))
-        @$showIssues.attr('title', I18n.t('show_issues', 'Show Issues'))
-        @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
-        @model.set('issuesButtonText', I18n.t('issues', 'issues'))
-        @hiddenIssues = false
+  # Determines which text to add to the issues button. This is so when you click
+  # the issues button it changes from Show Issues to Hide Issues as well as
+  # handles a case where loading text is still there an needs to be removed.
+  #
+  # @api private
 
-    # Render's a new SelectContentDialog which allows someone to select the migration
-    # content to be migrated. 
-    #
-    # @api private
+  setIssuesButtonText: ->
+    btnText = @model.get('issuesButtonText')
+    if !@hiddenIssues
+      @$issuesCount.hide()
+      @model.set('issuesButtonText', I18n.t('hide_issues', 'Hide Issues'))
+      @$showIssues.attr('aria-label', I18n.t('hide_issues', 'Hide Issues'))
+      @$showIssues.attr('title', I18n.t('hide_issues', 'Hide Issues'))
+      @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
+      @hiddenIssues = true
+    else
+      @$issuesCount.show()
+      @$showIssues.attr('aria-label', I18n.t('show_issues', 'Show Issues'))
+      @$showIssues.attr('title', I18n.t('show_issues', 'Show Issues'))
+      @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
+      @model.set('issuesButtonText', I18n.t('issues', 'issues'))
+      @hiddenIssues = false
 
-    showSelectContentDialog: (event) => 
-      event.preventDefault()
+  # Render's a new SelectContentDialog which allows someone to select the migration
+  # content to be migrated.
+  #
+  # @api private
 
-      @selectContentView ||= new SelectContentView 
-                              model: @model
-                              el: @$selectContentDialog
-                              title: I18n.t('#select_content', 'Select Content')
-                              width: 900
-                              height: 700
+  showSelectContentDialog: (event) =>
+    event.preventDefault()
 
-      @selectContentView.open()
+    @selectContentView ||= new SelectContentView
+                            model: @model
+                            el: @$selectContentDialog
+                            title: I18n.t('#select_content', 'Select Content')
+                            width: 900
+                            height: 700
+
+    @selectContentView.open()

@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import 'jquery.scrollToVisible'
 import tz from 'timezone'
 import _ from 'underscore'
 import Backbone from 'Backbone'
@@ -26,8 +29,11 @@ import WikiPageReloadView from './WikiPageReloadView'
 import PublishButtonView from '../PublishButtonView'
 import I18n from 'i18n!pages'
 import htmlEscape from 'str/htmlEscape'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'prerequisites_lookup'
 import 'content_locks'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 export default class WikiPageView extends Backbone.View {
   static initClass() {
@@ -38,13 +44,16 @@ export default class WikiPageView extends Backbone.View {
     this.prototype.els = {
       '.publish-button': '$publishButton',
       '.header-bar-outer-container': '$headerBarOuterContainer',
-      '.page-changed-alert': '$pageChangedAlert'
+      '.page-changed-alert': '$pageChangedAlert',
+      '.al-trigger': '$gearMenu'
     }
 
     this.prototype.events = {
       'click .delete_page': 'deleteWikiPage',
       'click .use-as-front-page-menu-item': 'useAsFrontPage',
-      'click .unset-as-front-page-menu-item': 'unsetAsFrontPage'
+      'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
+      'click .direct-share-send-to-menu-item': 'openSendTo',
+      'click .direct-share-copy-to-menu-item': 'openCopyTo'
     }
 
     this.optionProperty('modules_path')
@@ -57,6 +66,7 @@ export default class WikiPageView extends Backbone.View {
     this.optionProperty('course_home')
     this.optionProperty('course_title')
     this.optionProperty('display_show_all_pages')
+    this.optionProperty('show_immersive_reader')
   }
 
   initialize() {
@@ -85,7 +95,7 @@ export default class WikiPageView extends Backbone.View {
           lock_info.context_module.id
         }/prerequisites/wiki_page_${this.model.get('page_id')}`
         $('<a id="module_prerequisites_lookup_link" style="display: none;">')
-          .attr('href', prerequisites_lookup)
+          .attr('x-canvaslms-trusted-url', prerequisites_lookup)
           .appendTo($('.lock_explanation'))
         INST.lookupPrerequisites()
       }
@@ -99,19 +109,33 @@ export default class WikiPageView extends Backbone.View {
     this.publishButtonView.$el.appendTo(this.$publishButton)
     this.publishButtonView.render()
 
+    // Attach the immersive reader button if enabled
+    const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+    if (immersive_reader_mount_point) {
+      import('jsx/shared/components/ImmersiveReader')
+        .then(ImmersiveReader => {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {
+            title: document.querySelector('.page-title').textContent,
+            content: document.querySelector('.show-content').innerHTML
+          })
+        })
+        .catch(e => {
+          console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+        })
+    }
+
     // attach/re-attach the sequence footer (if this is a course, but not the home page)
     if (!this.$sequenceFooter && !this.course_home && !!this.course_id) {
       if (!this.$sequenceFooter) this.$sequenceFooter = $('<div></div>').hide()
       this.$sequenceFooter.moduleSequenceFooter({
         courseID: this.course_id,
         assetType: 'Page',
-        assetID: this.model.get('url'),
-        location
+        assetID: this.model.get('url')
       })
     } else if (this.$sequenceFooter != null) {
       this.$sequenceFooter.msfAnimation(false)
     }
-    if (this.$sequenceFooter) return this.$sequenceFooter.appendTo(this.$el)
+    if (this.$sequenceFooter) return this.$sequenceFooter.appendTo($('#module_navigation_target'))
   }
 
   navigateToLinkAnchor() {
@@ -122,14 +146,14 @@ export default class WikiPageView extends Backbone.View {
         $anchor = $(`#wiki_page_show .user_content a[name='${anchor_name}']`)
       }
       if ($anchor.length) {
-        $('html, body').scrollTo($anchor)
+        $('html, body').scrollToVisible($anchor)
       }
     }
   }
 
   afterRender() {
     super.afterRender(...arguments)
-    $('.header-bar-outer-container .header-bar-right').append($('#mark-as-done-checkbox'))
+    $('.page-toolbar .page-toolbar-end .buttons').append($('#mark-as-done-checkbox'))
     this.navigateToLinkAnchor()
     this.reloadView = new WikiPageReloadView({
       el: this.$pageChangedAlert,
@@ -145,7 +169,7 @@ export default class WikiPageView extends Backbone.View {
     this.reloadView.on('reload', () => this.render())
     this.reloadView.pollForChanges()
 
-    return $.publish('userContent/change')
+    return publish('userContent/change')
   }
 
   deleteWikiPage(ev) {
@@ -167,7 +191,7 @@ export default class WikiPageView extends Backbone.View {
     }
 
     return this.model.unsetFrontPage(() =>
-      $('#wiki_page_show .header-bar-right .al-trigger').focus()
+      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus()
     )
   }
 
@@ -177,7 +201,41 @@ export default class WikiPageView extends Backbone.View {
     }
     if (!this.model.get('published')) return
 
-    return this.model.setFrontPage(() => $('#wiki_page_show .header-bar-right .al-trigger').focus())
+    return this.model.setFrontPage(() =>
+      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus()
+    )
+  }
+
+  openSendTo(ev, open = true) {
+    if (ev) ev.preventDefault()
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={this.course_id}
+        contentShare={{content_type: 'page', content_id: this.model.id}}
+        onDismiss={() => {
+          this.openSendTo(null, false)
+          this.$gearMenu.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  openCopyTo(ev, open = true) {
+    if (ev) ev.preventDefault()
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={this.course_id}
+        contentSelection={{pages: [this.model.id]}}
+        onDismiss={() => {
+          this.openCopyTo(null, false)
+          this.$gearMenu.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
   }
 
   toJSON() {
@@ -188,16 +246,18 @@ export default class WikiPageView extends Backbone.View {
     json.wiki_page_history_path = this.wiki_page_history_path
     json.course_home = this.course_home
     json.course_title = this.course_title
+    json.show_immersive_reader = this.show_immersive_reader
     json.CAN = {
       VIEW_ALL_PAGES: !!this.display_show_all_pages || !!this.WIKI_RIGHTS.manage,
       VIEW_PAGES: !!this.WIKI_RIGHTS.read,
-      PUBLISH: !!this.WIKI_RIGHTS.manage && json.contextName === 'courses',
+      PUBLISH: !!this.WIKI_RIGHTS.publish_page,
       VIEW_UNPUBLISHED: !!this.WIKI_RIGHTS.manage || !!this.WIKI_RIGHTS.view_unpublished_items,
       UPDATE_CONTENT: !!this.PAGE_RIGHTS.update || !!this.PAGE_RIGHTS.update_content,
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions
     }
-    json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS
+    json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
+    json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
     json.CAN.VIEW_TOOLBAR =
       json.CAN.VIEW_PAGES ||
       json.CAN.PUBLISH ||

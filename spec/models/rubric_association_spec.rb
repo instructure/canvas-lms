@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -209,6 +211,20 @@ describe RubricAssociation do
       expect(request.reload).not_to be_nil
     end
 
+    it 'should soft delete learning outcome results when an association is replaced' do
+      student_in_course(active_all: true)
+      outcome_with_rubric
+      assessment = rubric_assessment_model(purpose: 'grading', rubric: @rubric, user: @student)
+      expect(assessment.learning_outcome_results.length).to eq 1
+
+      result = assessment.learning_outcome_results.first
+      expect(result).to be_active
+
+      # associate copy
+      rubric_association_model(purpose: 'grading', rubric: @rubric, association_object: @rubric_association.association_object)
+      expect(result.reload).to be_deleted
+    end
+
     it "should let account admins without manage_courses do things" do
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
       ra_params = rubric_association_params_for_assignment(@assignment)
@@ -416,6 +432,64 @@ describe RubricAssociation do
         purpose: "grading"
       )
       expect(ra).not_to be_auditable
+    end
+  end
+
+  describe 'create' do
+    let(:root_account) { Account.default }
+
+    it 'sets the root_account_id using course context' do
+      rubric_association_model
+      expect(@rubric_association.root_account_id).to eq @course.root_account_id
+    end
+
+    it 'sets the root_account_id using root account' do
+      rubric_association_model({context: root_account})
+      expect(@rubric_association.root_account_id).to eq root_account.id
+    end
+
+    it 'sets the root_account_id using sub account' do
+      sub_account = root_account.sub_accounts.create!
+      rubric_association_model({context: sub_account})
+      expect(@rubric_association.root_account_id).to eq sub_account.root_account_id
+    end
+  end
+
+  describe "workflow_state" do
+    before(:once) do
+      @course = Course.create!
+      @rubric = @course.rubrics.create!
+      @association = RubricAssociation.create!(
+        rubric: @rubric,
+        association_object: @course,
+        context: @course,
+        purpose: "bookmark"
+      )
+    end
+
+    it "is set to 'active' by default" do
+      expect(@association).to be_active
+    end
+
+    it "gets set to 'deleted' when soft-deleted" do
+      expect { @association.destroy }.to change {
+        @association.workflow_state
+      }.from("active").to("deleted")
+    end
+  end
+
+  describe "#restore" do
+    it "sets the workflow_state to 'active'" do
+      course = Course.create!
+      rubric = course.rubrics.create!
+      association = RubricAssociation.create!(
+        rubric: rubric,
+        association_object: course,
+        context: course,
+        purpose: "bookmark"
+      )
+      association.destroy
+      expect { association.restore }.to change { association.workflow_state }.from("deleted").to("active")
     end
   end
 end

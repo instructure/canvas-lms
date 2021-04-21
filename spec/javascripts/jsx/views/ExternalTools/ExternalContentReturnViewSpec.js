@@ -26,15 +26,18 @@ let iframe
 let info
 
 QUnit.module('ExternalContentReturnView screenreader only content', {
-  setup () {
-    fakeENV.setup({ context_asset_string: 'courses_1', LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media']})
-    view = new ExternalContentReturnView({ model: new ExternalTool() })
+  setup() {
+    fakeENV.setup({
+      context_asset_string: 'courses_1',
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media']
+    })
+    view = new ExternalContentReturnView({model: new ExternalTool()})
     view.render()
     el = view.$el
     iframe = el.find('iframe')
   },
 
-  teardown () {
+  teardown() {
     fakeENV.teardown()
   }
 })
@@ -70,10 +73,19 @@ test('hides ending info alert and removes class from iframe', () => {
 })
 
 test("doesn't show infos or add border to iframe by default", () => {
-  equal(el.find('.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only').length, 2)
+  equal(
+    el.find(
+      '.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only'
+    ).length,
+    2
+  )
   notOk(iframe.hasClass('info_alert_outline'))
 })
 
 test("sets the proper values for the iframe 'allow' attribute", () => {
   equal(iframe.attr('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+})
+
+test("sets the proper values for the iframe 'data-lti-launch' attribute", () => {
+  equal(iframe.attr('data-lti-launch'), 'true')
 })

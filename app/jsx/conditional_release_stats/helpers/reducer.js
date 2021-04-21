@@ -25,7 +25,7 @@ export const handleActions = (actionHandler, def) => {
     if (actionHandler[action.type]) {
       let stateCopy = state
       if (_.isObject(state)) {
-        stateCopy = _.extend({}, state)
+        stateCopy = {...state}
       } else if (Array.isArray(state)) {
         stateCopy = state.slice()
       }
@@ -39,4 +39,4 @@ export const handleActions = (actionHandler, def) => {
 
 export const getPayload = (state, action) => action.payload
 
-export const identity = (def = '') => (s, a) => s === undefined ? def : s
+export const identity = (def = '') => (s, a) => (s === undefined ? def : s)

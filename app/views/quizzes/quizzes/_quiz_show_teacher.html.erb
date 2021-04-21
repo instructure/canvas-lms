@@ -106,7 +106,7 @@
         </div>
         <div class="controls">
           <span class="value">
-            <%= @quiz.unlimited_attempts? ? "Unlimited" : @quiz.allowed_attempts %>
+            <%= @quiz.unlimited_attempts? ? t(:unlimited, "Unlimited") : @quiz.allowed_attempts %>
           </span>
         </div>
       </div>
@@ -205,7 +205,7 @@
               <%= @quiz.require_lockdown_browser_monitor ? t('#options.yes', "Yes") : t('#options.no', "No") %>
             </span>
           </div>
-      	</div>
+        </div>
       <% end %>
     <% end %>
 

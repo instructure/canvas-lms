@@ -55,7 +55,6 @@ QUnit.module('EditAssignmentDetails', {
   }
 })
 const createView = function(model, event) {
-  ;({model})
   const view = new EditAssignmentDetails(fixtures, event, null, null)
   view.$el.appendTo(fixtures)
   return view.render()

@@ -16,14 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import store from '../../external_apps/lib/ExternalAppsStore'
-import ExternalToolsTableRow from '../../external_apps/components/ExternalToolsTableRow'
-import InfiniteScroll from '../../external_apps/components/InfiniteScroll'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {IconButton} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconQuestionLine} from '@instructure/ui-icons'
+
+import store from '../lib/ExternalAppsStore'
+import ExternalToolsTableRow from './ExternalToolsTableRow'
+import InfiniteScroll from './InfiniteScroll'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+import splitAssetString from 'compiled/str/splitAssetString'
 
 export default class ExternalToolsTable extends React.Component {
   static propTypes = {
@@ -33,20 +38,26 @@ export default class ExternalToolsTable extends React.Component {
 
   state = store.getState()
 
+  get assetContextType() {
+    return splitAssetString(ENV.context_asset_string, false)[0]
+  }
+
   onChange = () => {
     this.setState(store.getState())
   }
 
   componentDidMount() {
     store.addChangeListener(this.onChange)
-    store.fetch()
+    if (!store.getState().isLoaded) {
+      store.fetch()
+    }
   }
 
   componentWillUnmount() {
     store.removeChangeListener(this.onChange)
   }
 
-  loadMore = page => {
+  loadMore = _page => {
     if (store.getState().hasMore && !store.getState().isLoading) {
       store.fetch()
     }
@@ -54,7 +65,7 @@ export default class ExternalToolsTable extends React.Component {
 
   loader = () => <div className="loadingIndicator" />
 
-  setFocusAbove = (tool) => () => {
+  setFocusAbove = tool => () => {
     const toolRow = tool && this[`externalTool${tool.app_id}`]
     if (toolRow && toolRow.button) {
       toolRow.focus()
@@ -63,34 +74,45 @@ export default class ExternalToolsTable extends React.Component {
     }
   }
 
-  setToolRowRef = (tool) => (node) => {
+  setToolRowRef = tool => node => {
     this[`externalTool${tool.app_id}`] = node
   }
 
-  trs = () => {
+  trs = show_lti_favorite_toggles => {
     if (store.getState().externalTools.length === 0) {
       return null
     }
     let t = null
-    return store
-      .getState()
-      .externalTools
-      .map((tool) => {
-        const toRender = <ExternalToolsTableRow
+    const externalTools = store.getState().externalTools
+    const rceFavCount = externalTools.reduce(
+      (accum, current) => accum + (current.is_rce_favorite ? 1 : 0),
+      0
+    )
+    return externalTools.map(tool => {
+      t = (
+        <ExternalToolsTableRow
           key={tool.app_id}
           ref={this.setToolRowRef(tool)}
           tool={tool}
           canAddEdit={this.props.canAddEdit}
           setFocusAbove={this.setFocusAbove(t)}
+          favoriteCount={rceFavCount}
+          contextType={this.assetContextType}
+          showLTIFavoriteToggles={show_lti_favorite_toggles}
         />
-        if (tool.lti_version !== '1.3') {
-          t = tool
-        }
-        return toRender
-      })
+      )
+      return t
+    })
   }
 
+  // Don't forget to change the tooltip text when the rce_enhancements flag goes away
   render() {
+    // only in account settings (not course), but not site_admin, and with the feature on, and with permissions
+    const show_lti_favorite_toggles =
+      /^account_/.test(ENV.context_asset_string) &&
+      !ENV.ACCOUNT?.site_admin &&
+      this.props.canAddEdit
+
     return (
       <div className="ExternalToolsTable">
         <InfiniteScroll
@@ -106,18 +128,36 @@ export default class ExternalToolsTable extends React.Component {
             <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
             <thead>
               <tr>
-                <th scope="col" width="5%">
+                <th scope="col" style={{width: '2rem'}}>
                   <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
                 </th>
-                <th scope="col" width="65%">
-                  {I18n.t('Name')}
-                </th>
-                <th scope="col" width="30%">
+                <th scope="col">{I18n.t('Name')}</th>
+                {show_lti_favorite_toggles && (
+                  <th scope="col" style={{width: '12rem', whiteSpace: 'nowrap'}}>
+                    {I18n.t('Add to RCE toolbar')}
+                    <Tooltip
+                      renderTip={I18n.t(
+                        'There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE.'
+                      )}
+                      placement="top"
+                      on={['click', 'focus']}
+                    >
+                      <IconButton
+                        renderIcon={IconQuestionLine}
+                        withBackground={false}
+                        withBorder={false}
+                        screenReaderLabel={I18n.t('Help')}
+                        size="small"
+                      />
+                    </Tooltip>
+                  </th>
+                )}
+                <th scope="col" style={{width: '4rem'}}>
                   <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
                 </th>
               </tr>
             </thead>
-            <tbody className="collectionViewItems">{this.trs()}</tbody>
+            <tbody className="collectionViewItems">{this.trs(show_lti_favorite_toggles)}</tbody>
           </table>
         </InfiniteScroll>
       </div>

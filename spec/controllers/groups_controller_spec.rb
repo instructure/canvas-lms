@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -83,7 +85,7 @@ describe GroupsController do
     end
 
     it "should return groups in sorted by group category name, then group name for student view" do
-      skip "requires pg_collkey on the server" if Group.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
+      skip_unless_pg_collkey_present
       user_session(@student)
       category1 = @course.group_categories.create(:name => "1")
       category2 = @course.group_categories.create(:name => "2")
@@ -642,7 +644,8 @@ describe GroupsController do
   describe "GET 'public_feed.atom'" do
     before :once do
       group_with_user(:active_all => true)
-      @group.discussion_topics.create!(:title => "hi", :message => "intros", :user => @user)
+      @dt = @group.discussion_topics.create!(:title => "hi", :message => "intros", :user => @user)
+      @wp = @group.wiki_pages.create! title: 'a page'
     end
 
     it "should require authorization" do
@@ -664,6 +667,19 @@ describe GroupsController do
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
       expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+    end
+
+    it "excludes unpublished things" do
+      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.size).to eq 2
+
+      @wp.unpublish
+      @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
+
+      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.size).to eq 0
     end
   end
 
@@ -739,7 +755,7 @@ describe GroupsController do
         @group.add_user(@student2)
         @group.add_user(@student3)
         @student2.enrollments.first.deactivate
-        @student3.enrollments.first.update_attributes(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
+        @student3.enrollments.first.update(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
       end
 
       it "include active status if requested" do

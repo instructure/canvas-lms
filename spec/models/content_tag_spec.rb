@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -549,6 +551,14 @@ describe ContentTag do
     expect(@module.reload.updated_at.to_i).to eq yesterday.to_i
   end
 
+  it "should update outcome root account ids after save" do
+    outcome = LearningOutcome.create! title: 'foo', context: nil
+    course = course_factory
+    expect(outcome.root_account_ids).to eq []
+    ContentTag.create(tag_type: "learning_outcome_association", content: outcome, context: course)
+    expect(outcome.root_account_ids).to eq [course.account.id]
+  end
+
   describe "visible_to_students_in_course_with_da" do
     before do
       course_with_student(active_all: true)
@@ -632,9 +642,11 @@ describe ContentTag do
   end
 
   describe "destroy" do
-    it "updates completion requirements on its associated ContextModule" do
+    before do
       course_with_teacher(:active_all => true)
+    end
 
+    it "updates completion requirements on its associated ContextModule" do
       @module = @course.context_modules.create!(:name => "some module")
       @assignment = @course.assignments.create!(:title => "some assignment")
       @assignment2 = @course.assignments.create!(:title => "some assignment2")
@@ -650,6 +662,93 @@ describe ContentTag do
       @tag.destroy
 
       expect(@module.reload.completion_requirements).to eq [{id: @tag2.id, type: 'must_submit'}]
+    end
+
+    it "runs the due date cacher when the content is Quizzes 2" do
+      @course.context_external_tools.create!(
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
+      )
+
+      assignment = @course.assignments.create!(title: "some assignment")
+      assignment.quiz_lti!
+      assignment.save!
+
+      tag = assignment.external_tool_tag
+
+      expect(DueDateCacher).to receive(:recompute).with(assignment)
+
+      tag.destroy!
+    end
+
+    it "does not run the due date cacher for general content" do
+      tool = @course.context_external_tools.create!(
+        name: 'Not Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Not Quizzes 2',
+        url: 'http://example.com/launch'
+      )
+
+      assignment = @course.assignments.create!(
+        title: "some assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: tool, url: tool.url }
+      )
+      tag = assignment.external_tool_tag
+
+      expect(DueDateCacher).to_not receive(:recompute).with(assignment)
+
+      tag.destroy!
+    end
+  end
+
+  context "Quizzes 2 calls backs" do
+    before do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:tool) do
+      @course.context_external_tools.create!(
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
+      )
+    end
+
+    it "runs the due date cacher when saved if the content is Quizzes 2" do
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: 'external_tool')
+
+      expect(DueDateCacher).to receive(:recompute).with(assignment)
+
+      ContentTag.create!(content: tool, url: tool.url, context: assignment)
+    end
+
+    it "does not run the due date cacher when saved if the content is Quizzes 2 but the context is a course" do
+      expect(DueDateCacher).to_not receive(:recompute)
+
+      ContentTag.create!(content: tool, url: tool.url, context: @course)
+    end
+
+    it "does not run the due date cacher when saved for general content" do
+      not_quizzes_tool = @course.context_external_tools.create!(
+        name: 'Not Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Not Quizzes 2',
+        url: 'http://example.com/launch'
+      )
+
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: 'external_tool')
+
+      expect(DueDateCacher).to_not receive(:recompute).with(assignment)
+
+      ContentTag.create!(content: not_quizzes_tool, url: not_quizzes_tool.url, context: assignment)
     end
   end
 
@@ -673,5 +772,72 @@ describe ContentTag do
     att.save!
     tag.reload
     expect(tag.unpublished?).to be_truthy
+  end
+
+  describe 'after_save' do
+    describe 'set_root_account' do
+      it 'should set root_account when context is Account' do
+        account = Account.default
+        tag = ContentTag.create!(context: account)
+        expect(tag.root_account).to eq account.root_account
+      end
+
+      it 'should set root_account when context is Assignment' do
+        course_factory
+        assignment = @course.assignments.create!(title: "test")
+        tag = ContentTag.create!(context: assignment)
+        expect(tag.root_account).to eq assignment.root_account
+      end
+
+      it 'should set root_account when context is Course' do
+        course_factory
+        tag = ContentTag.create!(context: @course)
+        expect(tag.root_account).to eq @course.root_account
+      end
+
+      it 'should set root_account when context is LearningOutcomeGroup' do
+        account = Account.default
+        group = LearningOutcomeGroup.create!(title: "test", context: account)
+        tag = ContentTag.create!(context: group)
+        expect(tag.root_account).to eq account.root_account
+      end
+
+      it 'should set root_account when context is Quiz' do
+        course_factory
+        quiz = @course.quizzes.create!
+        tag = ContentTag.create!(context: quiz)
+        expect(tag.root_account).to eq @course.root_account
+      end
+    end
+  end
+
+  describe 'quiz_lti' do
+    it 'returns true when the assignment content is quiz_lti' do
+      course_factory
+      assignment = new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      tag = ContentTag.create!(context: @course, content: assignment)
+      expect(tag.quiz_lti).to be true
+    end
+
+    it 'returns false if the assignment content is not quiz_lti' do
+      course_factory
+      assignment = course_factory.assignments.create!
+      tag = ContentTag.new(context: @course, content_type: "Assignment", content: assignment)
+      expect(tag.quiz_lti).to be false
+    end
+  end
+
+  describe 'json' do
+    it 'includes quiz_lti when running to_json' do
+      course_factory
+      tag = ContentTag.create!(context: @course)
+      expect(tag.to_json).to include('quiz_lti')
+    end
+
+    it 'includes quiz_lti when running as_json' do
+      course_factory
+      tag = ContentTag.create!(context: @course)
+      expect(tag.as_json["content_tag"]).to include('quiz_lti' => false)
+    end
   end
 end

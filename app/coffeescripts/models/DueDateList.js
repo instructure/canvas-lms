@@ -20,16 +20,6 @@ import Section from '../models/Section'
 
 export default class DueDateList {
   constructor(overrides, sections, assignment) {
-    this.getDefaultDueDate = this.getDefaultDueDate.bind(this)
-    this.overridesContainDefault = this.overridesContainDefault.bind(this)
-    this.containsSectionsWithoutOverrides = this.containsSectionsWithoutOverrides.bind(this)
-    this.sectionsWithOverrides = this.sectionsWithOverrides.bind(this)
-    this.sectionsWithoutOverrides = this.sectionsWithoutOverrides.bind(this)
-    this._overrideSectionIDs = this._overrideSectionIDs.bind(this)
-    this._onlyVisibleToOverrides = this._onlyVisibleToOverrides.bind(this)
-    this._addOverrideForDefaultSectionIfNeeded = this._addOverrideForDefaultSectionIfNeeded.bind(
-      this
-    )
     this.overrides = overrides
     this.sections = sections
     this.assignment = assignment
@@ -39,20 +29,20 @@ export default class DueDateList {
     this._addOverrideForDefaultSectionIfNeeded()
   }
 
-  getDefaultDueDate() {
+  getDefaultDueDate = () => {
     return this.overrides.getDefaultDueDate()
   }
 
-  overridesContainDefault() {
+  overridesContainDefault = () => {
     return this.overrides.containsDefaultDueDate()
   }
 
-  containsSectionsWithoutOverrides() {
+  containsSectionsWithoutOverrides = () => {
     if (this.overrides.containsDefaultDueDate()) return false
     return this.sectionsWithOverrides().length < this.courseSectionsLength
   }
 
-  sectionsWithOverrides() {
+  sectionsWithOverrides = () => {
     return this.sections.select(section => {
       let needle
       return (
@@ -62,7 +52,7 @@ export default class DueDateList {
     })
   }
 
-  sectionsWithoutOverrides() {
+  sectionsWithoutOverrides = () => {
     return this.sections.select(section => {
       let needle
       return (
@@ -74,15 +64,15 @@ export default class DueDateList {
 
   // --- private helpers ---
 
-  _overrideSectionIDs() {
+  _overrideSectionIDs = () => {
     return this.overrides.courseSectionIDs()
   }
 
-  _onlyVisibleToOverrides() {
+  _onlyVisibleToOverrides = () => {
     return this.assignment.isOnlyVisibleToOverrides()
   }
 
-  _addOverrideForDefaultSectionIfNeeded() {
+  _addOverrideForDefaultSectionIfNeeded = () => {
     if (this._onlyVisibleToOverrides()) return
     const override = AssignmentOverride.defaultDueDate({
       due_at: this.assignment.get('due_at'),

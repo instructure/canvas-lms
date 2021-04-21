@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -18,6 +20,8 @@
 module Lti::Ims::Providers
   class MembershipsProvider
     include Api::V1::User
+
+    MAX_PAGE_SIZE = 50
 
     attr_reader :context, :controller, :tool
 
@@ -86,6 +90,21 @@ module Lti::Ims::Providers
       controller.params[:rlid]
     end
 
+    def resource_link
+      return nil unless rlid?
+      @resource_link ||= begin
+        rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
+        # context here is a decorated context, we want the original
+        if rl.present? && rl.current_external_tool(Lti::Ims::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
+          raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+            "Tool does not have acess to rlid #{rlid}",
+            api_message: 'Tool does not have acess to rlid or rlid does not exist'
+          )
+        end
+        rl
+      end
+    end
+
     def rlid?
       rlid.present?
     end
@@ -113,7 +132,7 @@ module Lti::Ims::Providers
         return nil unless rlid?
         Assignment.active.for_course(course.id).
           joins(line_items: :resource_link).
-          where(lti_resource_links: { resource_link_id: rlid, context_external_tool_id: tool.id }).
+          where(lti_resource_links: { id: resource_link&.id }).
           distinct.
           take
       end
@@ -177,6 +196,10 @@ module Lti::Ims::Providers
       enrollments
     end
 
+    def preload_past_lti_ids(enrollments)
+      UserPastLtiId.manual_preload_past_lti_ids(enrollments, @context)
+    end
+
     def limit
       controller.params[:limit].to_i
     end
@@ -186,10 +209,13 @@ module Lti::Ims::Providers
     end
 
     def pagination_args
+      # Set a default page size to use if no page size is given in the request
+      pagination_args = { default_per_page: MAX_PAGE_SIZE }
+
       # Treat LTI's `limit` param as override of std `per_page` API pagination param. Is no LTI override for `page`.
-      pagination_args = {}
       if limit > 0
-        pagination_args[:per_page] = [limit, Api.max_per_page].min
+        pagination_args[:per_page] = [limit, MAX_PAGE_SIZE].min
+
         # Ensure page size reset isn't accidentally clobbered by other pagination API params
         clear_request_param :per_page
       end

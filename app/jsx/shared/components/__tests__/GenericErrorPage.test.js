@@ -16,99 +16,102 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@instructure/ui-themes/lib/canvas'
+import '@instructure/canvas-theme'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import GenericErrorPage from '../GenericErrorPage'
-import $ from 'jquery'
+import {render, fireEvent} from '@testing-library/react'
 import moxios from 'moxios'
-
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-})
 
 beforeEach(() => {
   moxios.install()
-  moxios.stubRequest('/error_reports', {
-    status: 200,
-    response: {
-      logged: true,
-      id: '7'
-    }
-  })
 })
 
 afterEach(() => {
   moxios.uninstall()
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
 const defaultProps = () => ({
   errorSubject: 'Testing Stuff',
-  errorCategory: 'Error Category'
+  errorCategory: 'Error Category',
+  imageUrl: 'testurl'
 })
 
 describe('GenericErrorPage component', () => {
   test('renders component correctly', () => {
-    ReactDOM.render(<GenericErrorPage {...defaultProps()} />, document.getElementById('fixtures'))
-    const element = $("#fixtures:contains('Something broke unexpectedly')")
-    expect(element.text()).toEqual(
-      'Something broke unexpectedly.If you have a moment,click here to tell us what happened'
-    )
+    const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
+    expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   test('show the comment box when feedback button is clicked', () => {
-    ReactDOM.render(<GenericErrorPage {...defaultProps()} />, document.getElementById('fixtures'))
-    const button = $('[data-test-id="generic-shared-error-page-button"]')
-    button.click()
-    const genericErrorBoxEmail = $('[data-test-id="generic-error-comment-box-email"] label')
-    expect(genericErrorBoxEmail.text()).toEqual('Email Address (Optional)')
+    const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
+    fireEvent.click(getByText('Report Issue'))
+    expect(getByText('Email Address (Optional)')).toBeInTheDocument()
   })
 
   test('show the submitted text when comment is submitted', done => {
-    ReactDOM.render(<GenericErrorPage {...defaultProps()} />, document.getElementById('fixtures'))
-    const button = $('[data-test-id="generic-shared-error-page-button"]')
-    button.click()
-    const submitButton = $('[data-test-id="generic-error-comment-box-submit-button"]')
-    submitButton.click()
-    moxios.wait(async () => {
-      const submittedText = $('[data-test-id="generic-error-comments-submitted"]')
-      expect(submittedText.text()).toEqual('Comment submitted!')
+    const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
+    moxios.stubRequest('/error_reports', {
+      status: 200,
+      response: {
+        logged: true,
+        id: '7'
+      }
+    })
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
+    moxios.wait(() => {
+      expect(getByText('Comment submitted!')).toBeInTheDocument()
       done()
     })
   })
 
   test('show the loading indicator when comment is submitted', () => {
-    ReactDOM.render(<GenericErrorPage {...defaultProps()} />, document.getElementById('fixtures'))
-    const button = $('[data-test-id="generic-shared-error-page-button"]')
-    button.click()
-    const submitButton = $('[data-test-id="generic-error-comment-box-submit-button"]')
-    submitButton.click()
-    const loadingIndicator = $('[data-test-id="generic-error=page-loading-indicator"]')
-    expect(loadingIndicator).toHaveLength(1)
+    const {getByText, getByTitle} = render(<GenericErrorPage {...defaultProps()} />)
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
+    expect(getByTitle('Loading')).toBeInTheDocument()
   })
 
   test('correct info posted to server', done => {
-    const errorSubject = 'Testing Stuff'
-    ReactDOM.render(
-      <GenericErrorPage errorSubject={errorSubject} />,
-      document.getElementById('fixtures')
-    )
-    const button = $('[data-test-id="generic-shared-error-page-button"]')
-    button.click()
-    const submitButton = $('[data-test-id="generic-error-comment-box-submit-button"]')
-    submitButton.click()
+    moxios.stubRequest('/error_reports', {
+      status: 200,
+      response: {
+        logged: true,
+        id: '7'
+      }
+    })
+    const modifiedProps = defaultProps()
+    modifiedProps.errorSubject = 'Testing Stuff'
+    const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
       const moxItem = await moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)
-      expect(requestData.error.subject).toEqual(errorSubject)
-      const submittedText = $('[data-test-id="generic-error-comments-submitted"]')
-      expect(submittedText.text()).toEqual('Comment submitted!')
+      expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
+      expect(getByText('Comment submitted!')).toBeInTheDocument()
+      done()
+    })
+  })
+
+  test('correctly handles error posted from server', done => {
+    moxios.stubRequest('/error_reports', {
+      status: 503,
+      response: {
+        logged: false,
+        id: '7'
+      }
+    })
+    const modifiedProps = defaultProps()
+    modifiedProps.errorSubject = 'Testing Stuff'
+    const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
+    fireEvent.click(getByText('Report Issue'))
+    fireEvent.click(getByText('Submit'))
+    moxios.wait(async () => {
+      const moxItem = await moxios.requests.mostRecent()
+      const requestData = JSON.parse(moxItem.config.data)
+      expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
+      expect(getByText('Comment failed to post! Please try again later.')).toBeInTheDocument()
       done()
     })
   })

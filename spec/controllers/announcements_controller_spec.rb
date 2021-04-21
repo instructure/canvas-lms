@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -100,6 +102,18 @@ describe AnnouncementsController do
       16.times { announcement_ids << course_announcement.id }
       announcement_ids.shift # Drop first announcement so we have the 15 most recent
 
+      get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
+
+      feed_entries = Atom::Feed.load_feed(response.body).entries
+      feed_entry_ids = feed_entries.map{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      expect(feed_entry_ids).to match_array(announcement_ids)
+    end
+
+    it "shows the 15 most recent announcements when posted_at is nil" do
+      announcement_ids = []
+      16.times { announcement_ids << course_announcement.id }
+      Announcement.where(id: announcement_ids).update_all(posted_at: nil)
+      announcement_ids.shift # Drop first announcement so we have the 15 most recent
       get 'public_feed', :format => 'atom', params: {:feed_code => @enrollment.feed_code}
 
       feed_entries = Atom::Feed.load_feed(response.body).entries

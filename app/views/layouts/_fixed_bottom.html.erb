@@ -19,10 +19,16 @@
 <div id="fixed_bottom">
   <% if @fixed_warnings.present? %>
     <% @fixed_warnings.each_with_index do |warning, index| %>
-      <div id="element_toggler_<%= index %>" class="element_toggler fixed_warning" role="button" aria-controls="element_toggler_<%= index %>" tabindex="0">
+      <div id="element_toggler_<%= index %>" class="fixed_warning" aria-expanded="true" role="banner" aria-label="<%= t("Warning") %>">
         <i class=<%= "icon-#{warning[:icon]}" %>></i>
         <b><%= warning[:title] %></b>
-        <div style="float: <%= direction('right') %>;"><%= warning[:message] %></div>
+        <div class="warning_message">
+          <%= warning[:message] %>
+          <button class="element_toggler Button--icon-action" aria-controls="element_toggler_<%= index %>" >
+            <i class="icon-x" aria-hidden="true"></i>
+            <span class="screenreader-only"><%= t("Close warning") %></span>
+          </button>
+        </div>
       </div>
     <% end %>
   <% end %>

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :head, include_common_stylesheets %>
+<% provide :head, include_common_stylesheets %>
 <%= render :partial => "layouts/head" %>
 <body style="margin:0; padding: 0; background: transparent;">
   <div id="content" class="file_preview_container" style="margin:0; padding: 0; position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); color: white; text-align: center;">

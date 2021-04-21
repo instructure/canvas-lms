@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -30,6 +32,19 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     end
   end
 
+  def i18n_decimal(val)
+    separator = I18n.t('number.format.separator')
+    delimiter = I18n.t('number.format.delimiter')
+
+    # we use BigDecimal here to avoid rounding errors at the edge of the tolerance
+    # e.g. in floating point, -11.7 with margin of 0.02 isn't inclusive of the answer -11.72
+    begin
+      BigDecimal(val.gsub(delimiter, '').gsub(separator, '.'))
+    rescue ArgumentError
+      BigDecimal('0.0')
+    end
+  end
+
   def answers
     @question_data[:answers].sort_by { |a| a[:weight] || CanvasSort::First }
   end
@@ -39,13 +54,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     return nil if answer_text.nil?
     return false if answer_text.blank?
 
-    # we use BigDecimal here to avoid rounding errors at the edge of the tolerance
-    # e.g. in floating point, -11.7 with margin of 0.02 isn't inclusive of the answer -11.72
-    begin
-      answer_number = BigDecimal(answer_text.to_s)
-    rescue ArgumentError
-      answer_number = BigDecimal('0.0')
-    end
+    answer_number = i18n_decimal(answer_text.to_s)
 
     match = answers.find do |answer|
       if answer[:numerical_answer_type] == "exact_answer"

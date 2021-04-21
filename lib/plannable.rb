@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -29,7 +31,7 @@ module Plannable
   end
 
   def update_associated_planner_overrides_later
-    send_later(:update_associated_planner_overrides) if @associated_planner_items_need_updating != false
+    delay.update_associated_planner_overrides if @associated_planner_items_need_updating != false
   end
 
   def update_associated_planner_overrides
@@ -281,7 +283,7 @@ module Plannable
         args.concat(clause_args)
         visited << [col, val]
       end
-      sql = "(" << top_clauses.join(" OR ") << ")"
+      sql = "(" + top_clauses.join(" OR ") + ")"
       return [sql, *args]
     end
   end

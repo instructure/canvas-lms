@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require_relative '../../spec_helper'
-require_relative '../../helpers/graphql_type_tester'
+require_relative "../graphql_spec_helper"
 
 describe Types::GradesType do
   let!(:account) { Account.create! }
@@ -106,6 +108,10 @@ describe Types::GradesType do
 
     it "resolves the gradingPeriod field to the score's associated grading period" do
       expect(resolve_grades_field("gradingPeriod { title }")).to eq 'Pleistocene'
+    end
+
+    it "resolves the state field to the Score's workflow_state" do
+      expect(resolve_grades_field("state")).to eq 'active'
     end
   end
 end

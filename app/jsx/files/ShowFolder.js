@@ -22,12 +22,13 @@ import _ from 'underscore'
 import classnames from 'classnames'
 import I18n from 'i18n!react_files'
 import ShowFolder from 'compiled/react_files/components/ShowFolder'
-import FilePreview from '../files/FilePreview'
-import FolderChild from '../files/FolderChild'
-import UploadDropZone from '../files/UploadDropZone'
-import ColumnHeaders from '../files/ColumnHeaders'
-import CurrentUploads from '../files/CurrentUploads'
-import LoadingIndicator from '../files/LoadingIndicator'
+import FilePreview from './FilePreview'
+import FolderChild from './FolderChild'
+import UploadDropZone from './UploadDropZone'
+import FileUpload from './FileUpload'
+import ColumnHeaders from './ColumnHeaders'
+import CurrentUploads from './CurrentUploads'
+import LoadingIndicator from './LoadingIndicator'
 import page from 'page'
 import FocusStore from 'compiled/react_files/modules/FocusStore'
 
@@ -78,7 +79,8 @@ ShowFolder.renderFolderChildOrEmptyContainer = function() {
           model={child}
           isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
           toggleSelected={this.props.toggleItemSelected.bind(null, child)}
-          userCanManageFilesForContext={this.props.userCanManageFilesForContext}
+          userCanEditFilesForContext={this.props.userCanEditFilesForContext}
+          userCanDeleteFilesForContext={this.props.userCanDeleteFilesForContext}
           userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
           externalToolsForContext={this.props.externalToolsForContext}
@@ -123,6 +125,12 @@ ShowFolder.render = function() {
     'screenreader-only': this.state.hideToggleAll
   })
 
+  const hasLoadedAll = !!(
+    this.props.currentFolder.folders.loadedAll && this.props.currentFolder.files.loadedAll
+  )
+
+  const showNewFileUpload = window.ENV?.FEATURES?.files_dnd
+
   // We have to put the "select all" checkbox out here because VO won't read the table properly
   // if it's in the table header, and won't read it at all if it's outside the table but inside
   // the <div role="grid">.
@@ -150,16 +158,38 @@ ShowFolder.render = function() {
             'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
           )}
         </div>
-        <UploadDropZone currentFolder={this.props.currentFolder} />
-        <CurrentUploads />
-        <ColumnHeaders
-          ref="columnHeaders"
-          query={this.props.query}
-          pathname={this.props.pathname}
-          areAllItemsSelected={this.props.areAllItemsSelected}
-          usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-        />
-        {this.renderFolderChildOrEmptyContainer()}
+        {!showNewFileUpload && (
+          <>
+            <UploadDropZone currentFolder={this.props.currentFolder} />
+            <CurrentUploads />
+            <ColumnHeaders
+              ref="columnHeaders"
+              query={this.props.query}
+              pathname={this.props.pathname}
+              areAllItemsSelected={this.props.areAllItemsSelected}
+              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+            />
+            {this.renderFolderChildOrEmptyContainer()}
+          </>
+        )}
+        {showNewFileUpload && hasLoadedAll && (
+          <>
+            {this.props.userCanAddFilesForContext && (
+              <FileUpload
+                currentFolder={this.props.currentFolder}
+                filesDirectoryRef={this.props.filesDirectoryRef}
+              />
+            )}
+            <ColumnHeaders
+              ref="columnHeaders"
+              query={this.props.query}
+              pathname={this.props.pathname}
+              areAllItemsSelected={this.props.areAllItemsSelected}
+              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+            />
+            {this.renderFolderChildOrEmptyContainer()}
+          </>
+        )}
         <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />
         {this.renderFilePreview()}
       </div>

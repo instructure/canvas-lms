@@ -18,14 +18,18 @@
 
 import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import IconBlueprintLine from '@instructure/ui-icons/lib/Line/IconBlueprint'
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
-import IconStatsLine from '@instructure/ui-icons/lib/Line/IconStats'
-import IconPublish from '@instructure/ui-icons/lib/Line/IconPublish'
+import {Button} from '@instructure/ui-buttons'
+import {Table} from '@instructure/ui-table'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {
+  IconBlueprintLine,
+  IconCollectionSolid,
+  IconPlusLine,
+  IconSettingsLine,
+  IconStatsLine,
+  IconPublishLine
+} from '@instructure/ui-icons'
 import axios from 'axios'
 import {uniqBy} from 'lodash'
 import $ from 'compiled/jquery.rails_flash_notifications'
@@ -39,15 +43,23 @@ export default class CoursesListRow extends React.Component {
     name: string.isRequired,
     workflow_state: string.isRequired,
     total_students: number.isRequired,
-    teachers: arrayOf(shape(UserLink.propTypes)),
+    teachers: arrayOf(
+      shape({
+        size: UserLink.propTypes.size,
+        href: UserLink.propTypes.href,
+        display_name: UserLink.propTypes.name,
+        avatar_url: UserLink.propTypes.src
+      })
+    ),
     teacher_count: number,
     sis_course_id: string,
     subaccount_name: string.isRequired,
     term: shape({name: string.isRequired}).isRequired,
     roles: arrayOf(shape({id: string.isRequired})),
-    showSISIds: bool.isRequired,
+    showSISIds: bool,
     can_create_enrollments: bool,
     blueprint: bool,
+    template: bool,
     concluded: bool
   }
 
@@ -56,6 +68,8 @@ export default class CoursesListRow extends React.Component {
     can_create_enrollments:
       window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_enrollments
   }
+
+  static displayName = 'Row'
 
   constructor(props) {
     super(props)
@@ -91,11 +105,18 @@ export default class CoursesListRow extends React.Component {
         )
       })
       const newStudents = newEnrollments.filter(e => e.enrollment.type === 'StudentEnrollment')
-      this.setState({newlyEnrolledStudents: this.state.newlyEnrolledStudents + newStudents.length})
+      this.setState(oldState => {
+        const newlyEnrolledStudents = oldState.newlyEnrolledStudents + newStudents.length
+        return {newlyEnrolledStudents}
+      })
     }
   }
 
   openAddUsersToCourseDialog = () => {
+    const filterFunc = ENV.FEATURES.granular_permissions_manage_users
+      ? role => role.addable_by_user
+      : role => role.manageable_by_user
+    // eslint-disable-next-line promise/catch-or-return
     this.getSections().then(sections => {
       this.addPeopleApp =
         this.addPeopleApp ||
@@ -103,7 +124,7 @@ export default class CoursesListRow extends React.Component {
           courseId: this.props.id,
           courseName: this.props.name,
           defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
-          roles: (this.props.roles || []).filter(role => role.manageable_by_user),
+          roles: (this.props.roles || []).filter(filterFunc),
           sections,
           onClose: () => {
             this.handleNewEnrollments(this.addPeopleApp.usersHaveBeenEnrolled())
@@ -120,7 +141,7 @@ export default class CoursesListRow extends React.Component {
   }
 
   allowAddingEnrollments() {
-    return this.props.can_create_enrollments && !this.props.concluded
+    return this.props.can_create_enrollments && !this.props.concluded && !this.props.template
   }
 
   renderAddEnrollments() {
@@ -149,7 +170,8 @@ export default class CoursesListRow extends React.Component {
       subaccount_name,
       showSISIds,
       term,
-      blueprint
+      blueprint,
+      template
     } = this.props
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
@@ -158,13 +180,14 @@ export default class CoursesListRow extends React.Component {
     const blueprintTip = I18n.t('This is a blueprint course')
     const statsTip = I18n.t('Statistics for %{name}', {name})
     const settingsTip = I18n.t('Settings for %{name}', {name})
+    const templateTip = I18n.t('This is a course template')
 
     return (
-      <tr>
-        <th scope="row" style={{textAlign: 'center'}}>
+      <Table.Row>
+        <Table.RowHeader textAlign="center">
           {isPublished ? (
             <span className="published-status published">
-              <IconPublish size="x-smll" />
+              <IconPublishLine size="x-small" />
               <ScreenReaderContent>{I18n.t('yes')}</ScreenReaderContent>
             </span>
           ) : (
@@ -172,22 +195,27 @@ export default class CoursesListRow extends React.Component {
               <ScreenReaderContent>{I18n.t('no')}</ScreenReaderContent>
             </span>
           )}
-        </th>
-        <td>
+        </Table.RowHeader>
+        <Table.Cell>
           <a href={url}>
-            {name}
+            <span style={{paddingRight: '0.5em'}}>{name}</span>
             {blueprint && (
               <Tooltip tip={blueprintTip}>
-                {' '}
                 <IconBlueprintLine />
                 <ScreenReaderContent>{blueprintTip}</ScreenReaderContent>
               </Tooltip>
             )}
+            {template && (
+              <Tooltip tip={templateTip}>
+                <IconCollectionSolid />
+                <ScreenReaderContent>{templateTip}</ScreenReaderContent>
+              </Tooltip>
+            )}
           </a>
-        </td>
-        {showSISIds && <td>{sis_course_id}</td>}
-        <td>{term.name}</td>
-        <td>
+        </Table.Cell>
+        {showSISIds && <Table.Cell>{sis_course_id}</Table.Cell>}
+        <Table.Cell>{template ? '\u2014' : term.name}</Table.Cell>
+        <Table.Cell>
           {(teachersToShow || []).map(teacher => (
             <div key={teacher.id}>
               <UserLink
@@ -205,10 +233,12 @@ export default class CoursesListRow extends React.Component {
             </Button>
           )}
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
-        </td>
-        <td>{subaccount_name}</td>
-        <td>{I18n.n(total_students + newlyEnrolledStudents)}</td>
-        <td style={{whiteSpace: 'nowrap', textAlign: 'end'}}>
+        </Table.Cell>
+        <Table.Cell>{subaccount_name}</Table.Cell>
+        <Table.Cell>
+          {template ? '\u2014' : I18n.n(total_students + newlyEnrolledStudents)}
+        </Table.Cell>
+        <Table.Cell textAlign="end">
           {this.renderAddEnrollments()}
           <Tooltip tip={statsTip}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
@@ -220,8 +250,8 @@ export default class CoursesListRow extends React.Component {
               <IconSettingsLine title={settingsTip} />
             </Button>
           </Tooltip>
-        </td>
-      </tr>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 }

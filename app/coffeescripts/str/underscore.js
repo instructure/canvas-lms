@@ -27,7 +27,7 @@
 // @param {String} string - the string to convert to underscores
 //
 // @return String
-export default function underscore (string) {
+export default function underscore(string) {
   if (typeof string !== 'string' || string === '') return string
   return string
     .replace(/([A-Z])/g, '_$1')

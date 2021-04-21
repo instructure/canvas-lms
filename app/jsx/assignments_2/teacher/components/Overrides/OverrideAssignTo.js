@@ -23,10 +23,9 @@ import React from 'react'
 import {bool, oneOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
-import generateElementId from '@instructure/ui-utils/lib/dom/generateElementId'
+import {FormField} from '@instructure/ui-form-field'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {OverrideShape} from '../../assignmentData'
 
 OverrideAssignTo.propTypes = {
@@ -36,7 +35,7 @@ OverrideAssignTo.propTypes = {
 }
 OverrideAssignTo.defaultProps = {
   variant: 'summary',
-  readOnly: true
+  readOnly: false
 }
 
 // mostly lifted from instui Pill, but that component uppercases
@@ -60,9 +59,9 @@ export default function OverrideAssignTo(props) {
 }
 
 function renderSummary(assignedTo) {
-  const list = assignedTo.length > 0 ? assignedTo.map(t => t.name).join(', ') : null
+  const list = assignedTo.length > 0 ? assignedTo.map(renderOverrideName).join(', ') : null
   return (
-    <Text weight="bold" data-testid="OverrideAssignTo">
+    <Text weight="bold" color="primary" data-testid="OverrideAssignTo" size="large">
       {list || <span dangerouslySetInnerHTML={{__html: '&nbsp;'}} />}
     </Text>
   )
@@ -70,18 +69,26 @@ function renderSummary(assignedTo) {
 
 // TODO: replace with the real deal with the popup and tabs etc. from the mockup
 function renderDetail(assignedTo) {
-  const id = generateElementId('assignto')
   return (
     <View as="div" margin="small 0" data-testid="OverrideAssignTo">
-      <FormField id={id} label={I18n.t('Assign to:')} layout="stacked">
-        <View id={id} as="div" borderWidth="small">
+      <FormField label={I18n.t('Assign to:')} layout="stacked">
+        <View as="div" borderWidth="small">
           {assignedTo.map(a => (
             <div key={a.lid} style={pillStyle}>
-              {a.name}
+              {renderOverrideName(a)}
             </div>
           ))}
         </View>
       </FormField>
     </View>
+  )
+}
+
+function renderOverrideName(assignedTo) {
+  return (
+    assignedTo.sectionName ||
+    assignedTo.studentName ||
+    (assignedTo.hasOwnProperty('groupName') && (assignedTo.groupName || 'unnamed group')) ||
+    ''
   )
 }

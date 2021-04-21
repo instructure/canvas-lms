@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -49,6 +51,10 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
   let(:launch_url) { 'https://abcdef.com/uuurrrlll00' }
 
+  let(:timestamp) { 1.day.ago.iso8601(3) }
+
+  let(:text) { "" }
+
   let(:xml) do
     request_xml(source_id, launch_url, "0.12")
   end
@@ -82,17 +88,21 @@ describe BasicLTI::QuizzesNextLtiResponse do
                   <textString>#{grade}</textString>
                 </resultScore>
                 <resultData>
-                  <ltiLaunchUrl>#{launch_url}</ltiLaunchUrl>
+                  <text>#{text}</text>
+                  <url>#{launch_url}</url>
                 </resultData>
               </result>
             </resultRecord>
+            <submissionDetails>
+              <submittedAt>#{timestamp}</submittedAt>
+            </submissionDetails>
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
     }
   end
 
-  describe "#handle_replaceResult" do
+  describe "#handle_replace_result" do
     it "accepts a grade" do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
@@ -143,24 +153,24 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(request.body).to eq '<replaceResultResponse />'
     end
 
-    it "sets 'submitted_at' to the current time" do
-      Timecop.freeze do
-        BasicLTI::BasicOutcomes.process_request(tool, xml)
-        submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.submitted_at).to eq Time.zone.now
-      end
+    it "reads 'submitted_at' from submissionDetails" do
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      submission = assignment.submissions.where(user_id: @user.id).first
+      expect(submission.submitted_at).to eq timestamp
     end
 
-    context 'with submitted_at details' do
-      let(:timestamp) { 1.day.ago.iso8601(3) }
-
-      it "sets submitted_at to submitted_at details if resultData is present" do
-        xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
-          "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
-        )
+    context "result url" do
+      it "reads the result_data_url when set" do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.submitted_at.iso8601(3)).to eq timestamp
+        expect(submission.url).to eq launch_url
+      end
+
+      it "reads the result_data_launch_url when set" do
+        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission = assignment.submissions.where(user_id: @user.id).first
+        expect(submission.url).to eq 'http://example.com/launch'
       end
     end
 
@@ -168,7 +178,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
       it "creates a new submission if there isn't one" do
         expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
           to change{assignment.submissions.not_placeholder.where(user_id: @user.id).count}.from(0).to(1)
-        expect(assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count).to be(1)
+        # it creates a unsubmitted version as well
+        expect(assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count).to be(2)
       end
 
       context "with previous versions" do
@@ -232,7 +243,75 @@ describe BasicLTI::QuizzesNextLtiResponse do
           }.
             to change{
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
-            }.from(4).to(5)
+            }.from(5).to(6)
+        end
+      end
+    end
+
+    context 'when json is passed back in resultData/text' do
+      let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
+      before do
+        allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
+      end
+
+      context 'when submissionDetails passed includes submitted_at' do
+        let(:timestamp) { 1.day.ago.iso8601(3) }
+
+        it "reads 'submitted_at' from submissionDetails" do
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+          submission = assignment.submissions.where(user_id: @user.id).first
+          expect(submission.submitted_at).to eq timestamp
+        end
+
+        it "doesn't revert submission history" do
+          expect(quiz_lti_submission).not_to receive(:revert_history)
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+        end
+      end
+
+      context 'when json passed includes graded_at' do
+        let(:graded_at_time) { 5.hours.ago.iso8601(3) }
+        let(:text) { "{ \"graded_at\" : \"#{graded_at_time}\" }" }
+
+        before do
+          submission = Submission.find_or_initialize_by(assignment: assignment, user: @user)
+          submission.grade = '0.67'
+          submission.score = 0.67
+          submission.graded_at = Time.zone.now
+          submission.grade_matches_current_submission = true
+          submission.grader_id = -1
+          submission.url = launch_url
+          submission.save!
+        end
+
+        it "reads 'graded_at' from resultData" do
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+          submission = assignment.submissions.where(user_id: @user.id).first
+          expect(submission.graded_at).to eq graded_at_time
+        end
+
+        it "doesn't revert submission history" do
+          expect(quiz_lti_submission).not_to receive(:revert_history)
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+        end
+      end
+
+      context 'when json passed includes graded_at and reopened (true)' do
+        let(:text) { "{ \"graded_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : true }" }
+
+        it "reads 'graded_at' from resultData" do
+          expect(quiz_lti_submission).to receive(:revert_history).with(launch_url, -tool.id).and_call_original
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+        end
+      end
+
+      context 'when json passed includes graded_at and reopened (false)' do
+        let(:text) { "{ \"submitted_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : false }" }
+
+        it "reads 'graded_at' from submissionDetails" do
+          expect(quiz_lti_submission).not_to receive(:revert_history)
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
         end
       end
     end

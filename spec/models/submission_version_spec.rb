@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -56,6 +58,11 @@ describe SubmissionVersion do
     it "should set the index record's assignment_id" do
       index = SubmissionVersion.index_version(@version)
       expect(index.assignment_id).to eq @submission.assignment_id
+    end
+
+    it "sets the index record's root_account_id" do
+      index = SubmissionVersion.index_version(@version)
+      expect(index.root_account_id).to eq @course.root_account_id
     end
   end
 

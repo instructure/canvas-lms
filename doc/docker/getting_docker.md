@@ -25,7 +25,7 @@ when you run create, you may want to increase the system resources you give the
 VM, like so:
 
 ```
-$ dinghy create --memory=4096 --disk=50000 --cpus=4 --provider=virtualbox
+$ dinghy create --memory=8192 --disk=150000 --cpus=4 --provider=virtualbox
 ```
 
 Type `docker ps` in your terminal to make sure your Docker environment
@@ -77,7 +77,7 @@ systemctl enable docker.service
 
 ### Avoid requiring sudo to run the docker command (optional)
 
-Because docker itelf runs with root privileges, you must be root
+Because docker itself runs with root privileges, you must be root
 in order to command it.  Unfortunately, this is very
 inconvenient and super annoying.  Fortunately, there is an elegant
 work-around that simply involves creating a 'docker' group and
@@ -124,7 +124,7 @@ gem install dory
 ## OS X
 
 ```
-$ brew install docker-compose --without-boot2docker
+$ brew install docker-compose
 ```
 
 ## Linux

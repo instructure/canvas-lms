@@ -16,30 +16,44 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!pages'
 import WikiPage from '../../models/WikiPage'
 import PaginatedCollectionView from '../PaginatedCollectionView'
 import WikiPageEditView from './WikiPageEditView'
 import itemView from './WikiPageIndexItemView'
 import template from 'jst/wiki/WikiPageIndex'
+import {deletePages} from 'jsx/wiki_pages/apiClient'
+import {showConfirmDelete} from 'jsx/wiki_pages/components/ConfirmDeleteModal'
 import StickyHeaderMixin from '../StickyHeaderMixin'
 import splitAssetString from '../../str/splitAssetString'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 import 'jquery.disableWhileLoading'
+import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class WikiPageIndexView extends PaginatedCollectionView {
   static initClass() {
     this.mixin(StickyHeaderMixin)
     this.mixin({
       events: {
+        'click .delete_pages': 'confirmDeletePages',
         'click .new_page': 'createNewPage',
         'keyclick .new_page': 'createNewPage',
-        'click .header-row a[data-sort-field]': 'sort'
+        'click .header-row a[data-sort-field]': 'sort',
+        'click .header-bar-right .menu_tool_link': 'openExternalTool',
+        'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect'
       },
 
       els: {
         '.no-pages': '$noPages',
         '.no-pages a:first-child': '$noPagesLink',
-        '.header-row a[data-sort-field]': '$sortHeaders'
+        '.header-row a[data-sort-field]': '$sortHeaders',
+        '#external-tool-mount-point': '$externalToolMountPoint',
+        '#copy-to-mount-point': '$copyToMountPoint',
+        '#send-to-mount-point': '$sendToMountPoint'
       }
     })
 
@@ -48,12 +62,19 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     this.optionProperty('default_editing_roles')
     this.optionProperty('WIKI_RIGHTS')
+    this.optionProperty('selectedPages')
 
     this.lastFocusField = null
   }
 
   initialize(options) {
     super.initialize(...arguments)
+
+    // Poor man's dependency injection just so we can stub out the react components
+    this.DirectShareCourseTray = DirectShareCourseTray
+    this.DirectShareUserModal = DirectShareUserModal
+    this.ContentTypeExternalToolTray = ContentTypeExternalToolTray
+
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
 
     if (!this.itemViewOptions) this.itemViewOptions = {}
@@ -67,7 +88,14 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (this.contextAssetString) {
       ;[this.contextName, this.contextId] = Array.from(splitAssetString(this.contextAssetString))
     }
+
+    this.wikiIndexPlacements = options != null ? options.wikiIndexPlacements : []
+    if (!this.wikiIndexPlacements) this.wikiIndexPlacements = []
+
     this.itemViewOptions.contextName = this.contextName
+
+    if (!this.selectedPages) this.selectedPages = {}
+    this.itemViewOptions.selectedPages = this.selectedPages
 
     this.collection.on('fetch', () => {
       if (!this.fetched) {
@@ -96,6 +124,12 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
   }
 
+  sortBySelect(event) {
+    event.preventDefault()
+    const {sortMobileField, sortMobileKey} = event.target.dataset
+    return this.$el.disableWhileLoading(this.collection.sortByField(sortMobileField, sortMobileKey))
+  }
+
   sort(event = {}) {
     let sortField, sortOrder
     event.preventDefault()
@@ -115,7 +149,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (!this.$sortHeaders) return
 
     const {sortOrders} = this.collection
-    for (let sortHeader of Array.from(this.$sortHeaders)) {
+    for (const sortHeader of Array.from(this.$sortHeaders)) {
       const $sortHeader = $(sortHeader)
       const $i = $sortHeader.find('i')
 
@@ -146,6 +180,35 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
   }
 
+  confirmDeletePages(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    const pages = Object.values(this.itemViewOptions.selectedPages)
+    if (pages.length > 0) {
+      const titles = pages.map(page => page.get('title'))
+      const urls = pages.map(page => page.get('url'))
+      showConfirmDelete({
+        pageTitles: titles,
+        onConfirm: () => deletePages(this.contextName, this.contextId, urls),
+        onHide: (confirmed, error) => this.onDeleteModalHide(confirmed, error)
+      })
+    }
+  }
+
+  onDeleteModalHide(confirmed, error) {
+    if (confirmed) {
+      if (error) {
+        $.flashError(I18n.t('Failed to delete selected pages'))
+      } else {
+        $.flashMessage(I18n.t('Selected pages have been deleted'))
+        this.itemViewOptions.selectedPages = {}
+        this.collection.fetch()
+      }
+    }
+    $('.delete_pages').focus()
+  }
+
   createNewPage(ev) {
     if (ev != null) {
       ev.preventDefault()
@@ -153,7 +216,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     this.$el.hide()
     $('body').removeClass('index')
-    $('body').addClass('edit with-right-side')
+    $('body').addClass(`edit ${window.ENV.use_rce_enhancements ? '' : 'with-right-side'}`)
 
     this.editModel = new WikiPage(
       {editing_roles: this.default_editing_roles},
@@ -165,7 +228,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       WIKI_RIGHTS: ENV.WIKI_RIGHTS,
       PAGE_RIGHTS: {
         update: ENV.WIKI_RIGHTS.update_page,
-        update_content: ENV.WIKI_RIGHTS.update_page_content,
+        update_content: ENV.WIKI_RIGHTS.update_page,
         read_revisions: ENV.WIKI_RIGHTS.read_revisions
       }
     })
@@ -182,10 +245,85 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     })
   }
 
-  collectionHasTodoDate() {
-    if (!ENV.STUDENT_PLANNER_ENABLED) {
-      return false
+  openExternalTool(ev) {
+    if (ev != null) {
+      ev.preventDefault()
     }
+    const tool = this.wikiIndexPlacements.find(t => t.id === ev.target.dataset.toolId)
+    this.setExternalToolTray(tool, $('.al-trigger')[0])
+  }
+
+  reloadPage() {
+    window.location.reload()
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        this.reloadPage()
+      }
+    }
+
+    const {ContentTypeExternalToolTray: ExternalToolTray} = this
+    ReactDOM.render(
+      <ExternalToolTray
+        tool={tool}
+        placement="wiki_index_menu"
+        acceptedResourceTypes={['page']}
+        targetResourceType="page"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      this.$externalToolMountPoint[0]
+    )
+  }
+
+  setCopyToItem(newCopyToItem, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setCopyToItem(null)
+      returnFocusTo.focus()
+    }
+
+    const pageId = newCopyToItem?.id
+    const {DirectShareCourseTray: CourseTray} = this
+    ReactDOM.render(
+      <CourseTray
+        open={newCopyToItem !== null}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{pages: [pageId]}}
+        shouldReturnFocus={false}
+        onDismiss={handleDismiss}
+      />,
+      this.$copyToMountPoint[0]
+    )
+  }
+
+  setSendToItem(newSendToItem, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setSendToItem(null)
+      // focus still gets mucked up even with shouldReturnFocus={false}, so set it later.
+      setTimeout(() => returnFocusTo.focus(), 100)
+    }
+
+    const pageId = newSendToItem?.id
+    const {DirectShareUserModal: UserModal} = this
+    ReactDOM.render(
+      <UserModal
+        open={newSendToItem !== null}
+        courseId={ENV.COURSE_ID}
+        contentShare={{content_type: 'page', content_id: pageId}}
+        shouldReturnFocus={false}
+        onDismiss={handleDismiss}
+      />,
+      this.$sendToMountPoint[0]
+    )
+  }
+
+  collectionHasTodoDate() {
     return !!this.collection.find(m => m.has('todo_date'))
   }
 
@@ -193,13 +331,20 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const json = super.toJSON(...arguments)
     json.CAN = {
       CREATE: !!this.WIKI_RIGHTS.create_page,
-      MANAGE: !!this.WIKI_RIGHTS.manage,
-      PUBLISH: !!this.WIKI_RIGHTS.manage && this.contextName === 'courses'
+      MANAGE: !!this.WIKI_RIGHTS.update || !!this.WIKI_RIGHTS.delete_page,
+      DELETE: !!this.WIKI_RIGHTS.delete_page,
+      PUBLISH: !!this.WIKI_RIGHTS.publish_page
     }
-    json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
+    json.CAN.VIEW_TOOLBAR = json.CAN.CREATE || json.CAN.DELETE
+    // NOTE: if permissions need to change for OPEN_MANAGE_OPTIONS, please update WikiPageIndexItemView.js to match
+    json.CAN.OPEN_MANAGE_OPTIONS =
+      json.CAN.MANAGE || json.CAN.CREATE || json.CAN.PUBLISH || ENV.DIRECT_SHARE_ENABLED
+
     json.fetched = !!this.fetched
     json.fetchedLast = !!this.fetchedLast
     json.collectionHasTodoDate = this.collectionHasTodoDate()
+    json.hasWikiIndexPlacements = this.wikiIndexPlacements.length > 0
+    json.wikiIndexPlacements = this.wikiIndexPlacements
     return json
   }
 }

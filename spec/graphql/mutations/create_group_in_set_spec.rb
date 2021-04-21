@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + "/../../spec_helper")
+require_relative "../graphql_spec_helper"
 
 describe Mutations::CreateGroupInSet do
   before(:once) do

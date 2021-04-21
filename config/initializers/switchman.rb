@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -16,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Rails.application.config.after_initialize do
-  Switchman.cache = -> { MultiCache.cache }
-
   # WillPaginate needs to allow args to Relation#to_a
   WillPaginate::ActiveRecord::RelationMethods.class_eval do
     def to_a(*args)
@@ -43,10 +43,6 @@ Rails.application.config.after_initialize do
       def settings
         return {} unless self.class.columns_hash.key?('settings')
         s = super
-        s = YAML.load(s) if s.is_a?(String) # no idea. it seems that sometimes rails forgets this column is serialized
-        unless s.is_a?(Hash) || s.nil?
-          s = s.unserialize(s.value)
-        end
         if s.nil?
           self.settings = s = {}
         end
@@ -83,40 +79,52 @@ Rails.application.config.after_initialize do
 
   Switchman::Shard.class_eval do
     self.primary_key = "id"
-    reset_column_information # make sure that the id column object knows it is the primary key
-
-    serialize :settings, Hash
-
-    # the default shard was already loaded, but didn't deserialize it
-    if default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
-      settings = serialized_attributes['settings'].load(default.read_attribute('settings'))
-      default.settings = settings
-    end
+    reset_column_information if connected? # make sure that the id column object knows it is the primary key
 
     before_save :encrypt_settings
 
     delegate :in_current_region?, to: :database_server
 
+    class << self
+      def non_existent_database_servers
+        @non_existent_database_servers ||= Shard.distinct.pluck(:database_server_id).compact - DatabaseServer.all.map(&:id)
+      end
+    end
+
     scope :in_region, ->(region) do
-      servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
-      if servers.include?(Shard.default.database_server.id)
-        where("database_server_id IN (?) OR database_server_id IS NULL", servers)
+      next in_current_region if region.nil?
+
+      dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
+      db_count_in_this_region = dbs_by_region[region]&.length.to_i + dbs_by_region[nil]&.length.to_i
+      db_count_in_other_regions = DatabaseServer.all.length - db_count_in_this_region + non_existent_database_servers.length
+
+      dbs_in_this_region = dbs_by_region[region]&.map(&:id) || []
+      dbs_in_this_region += dbs_by_region[nil]&.map(&:id) || [] if Shard.default.database_server.in_region?(region)
+
+      if db_count_in_this_region <= db_count_in_other_regions
+        if dbs_in_this_region.include?(Shard.default.database_server.id)
+          where("database_server_id IN (?) OR database_server_id IS NULL", dbs_in_this_region)
+        else
+          where(database_server_id: dbs_in_this_region)
+        end
+      elsif db_count_in_other_regions == 0
+        all
       else
-        where(database_server_id: servers)
+        dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region + non_existent_database_servers
+        if dbs_in_this_region.include?(Shard.default.database_server.id)
+          where("database_server_id NOT IN (?) OR database_server_id IS NULL", dbs_not_in_this_region)
+        else
+          where.not(database_server_id: dbs_not_in_this_region)
+        end
       end
     end
 
     scope :in_current_region, -> do
-      @current_region_scope ||=
-        if !default.is_a?(Switchman::Shard)
-          # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
-          # either way there's only one shard, and we always want to see it
-          [default]
-        elsif !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-          all
-        else
-          in_region(ApplicationController.region)
-        end
+      # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
+      # either way there's only one shard, and we always want to see it
+      return [default] unless default.is_a?(Switchman::Shard)
+      return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
+      in_region(ApplicationController.region)
     end
   end
 
@@ -136,6 +144,43 @@ Rails.application.config.after_initialize do
       @in_current_region
     end
 
+    def next_maintenance_window
+      return nil unless maintenance_window_start_hour
+
+      start_day = DateTime.now
+      # This array is effectively 1 indexed
+      relevant_weeks = maintenance_window_weeks_of_month.map { |i| WeekOfMonth::Constant::WEEKS_IN_SEQUENCE[i] }
+      maintenance_days = relevant_weeks.map do |ordinal|
+        Time.zone.local_to_utc(start_day.send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase))
+      end + relevant_weeks.map do |ordinal|
+        Time.zone.local_to_utc((start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase))
+      end 
+
+      next_day = maintenance_days.find { |d| d.future? }
+      # Time offsets are strange
+      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours
+      end_at = start_at + maintenance_window_duration
+
+      [start_at, end_at]
+    end
+
+    def maintenance_window_start_hour
+      Setting.get('maintenance_window_start_hour', nil)&.to_i
+    end
+
+    def maintenance_window_duration
+      # ISO 8601 duration
+      ActiveSupport::Duration.parse(Setting.get('maintenance_window_duration', "PT2H"))
+    end
+
+    def maintenance_window_weekday
+      Setting.get('maintenance_window_weekday', 'thursday').downcase
+    end
+
+    def maintenance_window_weeks_of_month
+      Setting.get('maintenance_window_weeks_of_month', "1,3").split(',').map(&:to_i)
+    end
+
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
       run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
 
@@ -152,24 +197,29 @@ Rails.application.config.after_initialize do
         next if db.shards.empty?
         regions << db.config[:region]
         db.shards.first.activate do
-          klass.send_later_enqueue_args(method, enqueue_args, *args)
+          klass.delay(**enqueue_args).__send__(method, *args)
         end
       end
     end
 
     def self.send_in_region(region, klass, method, enqueue_args = {}, *args)
-      return klass.send_later_enqueue_args(method, enqueue_args, *args) if region.nil?
+      return klass.delay(**enqueue_args).__send__(method, *args) if region.nil?
 
       shard = nil
       all.find { |db| db.config[:region] == region && (shard = db.shards.first) }
+
+      # the app server knows what region it's in, but the database servers don't?
+      # just send locally
+      if shard.nil? && all.all? { |db| db.config[:region].nil? }
+        return klass.delay(**enqueue_args).__send__(method, *args)
+      end
+
       raise "Could not find a shard in region #{region}" unless shard
       shard.activate do
-        klass.send_later_enqueue_args(method, enqueue_args, *args)
+        klass.delay(**enqueue_args).__send__(method, *args)
       end
     end
   end
-
-  Switchman.config[:on_fork_proc] = -> { Canvas.reconnect_redis }
 
   Object.send(:remove_const, :Shard) if defined?(::Shard)
   Object.send(:remove_const, :DatabaseServer) if defined?(::DatabaseServer)

@@ -1,5 +1,5 @@
 {{#if display_name}}
-  {{display_name}}<a href="#" role='button' class="pull-right icon-end delete-attachment" aria-label='{{#t "#buttons.delete_file" name=display_name}}Delete file {{name}}{{/t}}'></a>
+  {{display_name}}<button role='button' class="pull-right delete-attachment" aria-label='{{#t "#buttons.delete_file" name=display_name}}Delete file {{name}}{{/t}}'><i class="icon-end"/></button>
 {{else}}
   {{#if isIE}}
     <input name=file class="file-upload" type=file />

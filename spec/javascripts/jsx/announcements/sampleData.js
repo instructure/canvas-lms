@@ -17,28 +17,30 @@
  */
 
 const data = {
-  announcements: [{
-    id: '1',
-    position: 2,
-    published: true,
-    title: 'hello world',
-    message: 'lorem ipsum foo bar baz',
-    posted_at: (new Date).toString(),
-    author: {
+  announcements: [
+    {
       id: '1',
-      display_name: 'John Doe',
-      html_url: 'http://example.org/user/5',
-    },
-    read_state: 'read',
-    unread_count: 0,
-    discussion_subentry_count: 0,
-    locked: false,
-    user_count: 2,
-    html_url: 'http://example.org/announcement/5',
-    permissions: {
-      delete: true
+      position: 2,
+      published: true,
+      title: 'hello world',
+      message: 'lorem ipsum foo bar baz',
+      posted_at: new Date().toString(),
+      author: {
+        id: '1',
+        display_name: 'John Doe',
+        html_url: 'http://example.org/user/5'
+      },
+      read_state: 'read',
+      unread_count: 0,
+      discussion_subentry_count: 0,
+      locked: false,
+      user_count: 2,
+      html_url: 'http://example.org/announcement/5',
+      permissions: {
+        delete: true
+      }
     }
-  }],
+  ]
 }
 
 export default data

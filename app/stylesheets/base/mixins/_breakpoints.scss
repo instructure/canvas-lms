@@ -17,17 +17,45 @@
  */
 
 // Breakpoints
-@mixin breakpoint($breakpoint) {
+@mixin breakpoint($breakpoint, $maximum: false) {
+  $dimension: false;
+
   @if $breakpoint == mini-tablet {
-    @media only screen and (min-width: 500px) { @content; }
+    $dimension: 500px;
   }
   @else if $breakpoint == tablet {
-    @media only screen and (min-width: 768px) { @content; }
+    $dimension: 768px;
   }
   @else if $breakpoint == desktop {
-    @media only screen and (min-width: 992px) { @content; }
+    $dimension: 992px;
   }
   @else if $breakpoint == desktop--nav-open {
-    @media only screen and (min-width: 1140px) { @content; }
+    $dimension: 1140px;
+  }
+
+  @if $dimension {
+    @if $maximum {
+      @media only screen and (max-width: $dimension) { @content; }
+    } @else {
+      @media only screen and (min-width: $dimension) { @content; }
+    }
+  }
+}
+
+@mixin desktop-only {
+  @if $use_responsive_layout {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+  @else {
+    @content;
+  }
+}
+@mixin mobile-only {
+  @if $use_responsive_layout {
+    @media (max-width: 767px) {
+      @content;
+    }
   }
 }

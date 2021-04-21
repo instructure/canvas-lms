@@ -19,7 +19,7 @@
 import React from 'react'
 import I18n from 'i18n!assignments_2'
 import tz from 'timezone'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {mockAssignment, mockOverride} from '../../../test-utils'
 import EveryoneElse from '../EveryoneElse'
 
@@ -41,14 +41,21 @@ it("pulls everyone else's dates from the assignment", () => {
     }
   })
 
-  const {getByText} = render(<EveryoneElse assignment={assignment} onChangeAssignment={() => {}} />)
+  const {getByText, getAllByText} = render(
+    <EveryoneElse
+      assignment={assignment}
+      onChangeAssignment={() => {}}
+      onValidate={() => true}
+      invalidMessage={() => undefined}
+    />
+  )
   expect(getByText('Everyone else')).toBeInTheDocument()
 
   const due = `Due: ${tz.format(aDueAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(due, {exact: false})).toBeInTheDocument()
+  expect(getAllByText(due, {exact: false})[0]).toBeInTheDocument()
 
   const unlock = `${tz.format(aUnlockAt, I18n.t('#date.formats.short'))}`
-  const lock = `to ${tz.format(aLockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(unlock)).toBeInTheDocument()
-  expect(getByText(lock)).toBeInTheDocument()
+  const lock = `to ${tz.format(aLockAt, I18n.t('#date.formats.short'))}`
+  expect(getAllByText(unlock)[0]).toBeInTheDocument()
+  expect(getAllByText(lock)[0]).toBeInTheDocument()
 })

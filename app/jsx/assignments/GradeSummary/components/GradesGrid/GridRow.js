@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import {Button} from '@instructure/ui-buttons'
 
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 import GradeIndicator from './GradeIndicator'
@@ -61,7 +61,13 @@ export default class GridRow extends Component {
     return (
       <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`} role="row">
         <th className="GradesGrid__BodyRowHeader" role="rowheader" scope="row">
-          <Link href={this.props.row.speedGraderUrl}>{this.props.row.studentName}</Link>
+          <Button
+            variant="link"
+            theme={{mediumPadding: '0', mediumHeight: '1.25rem'}}
+            href={this.props.row.speedGraderUrl}
+          >
+            {this.props.row.studentName}
+          </Button>
         </th>
 
         {this.props.graders.map(grader => {

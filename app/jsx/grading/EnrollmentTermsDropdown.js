@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import I18n from 'i18n!grading_periods'
+import I18n from 'i18n!EnrollmentTermsDropdown'
 
 class EnrollmentTermsDropdown extends React.Component {
   static propTypes = {
@@ -28,10 +28,10 @@ class EnrollmentTermsDropdown extends React.Component {
   }
 
   sortedTerms = terms => {
-    const dated = _.select(terms, term => term.startAt)
+    const dated = _.filter(terms, term => term.startAt)
     const datedTermsSortedByStart = _.sortBy(dated, term => term.startAt).reverse()
 
-    const undated = _.select(terms, term => !term.startAt)
+    const undated = _.filter(terms, term => !term.startAt)
     const undatedTermsSortedByCreate = _.sortBy(undated, term => term.createdAt).reverse()
     return datedTermsSortedByStart.concat(undatedTermsSortedByCreate)
   }

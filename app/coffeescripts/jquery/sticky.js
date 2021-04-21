@@ -25,59 +25,57 @@ export default class Sticky {
 
   static $container = $(window)
 
-  static initialize () {
+  static initialize() {
     this.$container.on('scroll', _.debounce(this.checkInstances, 10))
     this.initialized = true
   }
 
-  static addInstance (instance) {
+  static addInstance(instance) {
     if (!this.initialized) this.initialize()
     this.instances.push(instance)
     this.checkInstances()
   }
 
-  static removeInstance (instance) {
+  static removeInstance(instance) {
     if (!this.initialized) this.initialize()
     this.instances = _.reject(this.instances, i => i === instance)
     this.checkInstances()
   }
 
-  static checkInstances () {
+  static checkInstances() {
     const containerTop = Sticky.$container.scrollTop()
-    Sticky.instances.forEach((instance) => {
+    Sticky.instances.forEach(instance => {
       if (containerTop >= instance.top) {
         if (!instance.stuck) instance.stick()
-      } else {
-        if (instance.stuck) instance.unstick()
-      }
+      } else if (instance.stuck) instance.unstick()
     })
   }
 
-  constructor ($el) {
+  constructor($el) {
     this.$el = $el
     this.top = this.$el.offset().top
     this.stuck = false
     this.constructor.addInstance(this)
   }
 
-  stick () {
+  stick() {
     this.$el.addClass('sticky')
     this.stuck = true
   }
 
-  unstick () {
+  unstick() {
     this.$el.removeClass('sticky')
     this.stuck = false
   }
 
-  remove () {
+  remove() {
     this.unstick()
     this.constructor.removeInstance(this)
   }
 }
 
-$.fn.sticky = function () {
-  return this.each(function () {
+$.fn.sticky = function() {
+  return this.each(function() {
     new Sticky($(this))
   })
 }

@@ -45,30 +45,30 @@ QUnit.module('QuizItemGroupView', {
   }
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', assert => {
   const view = new createView()
   const done = assert.async()
   return assertions.isAccessible(view, done, {a11yReport: true})
 })
 
-test('#isEmpty is false if any items arent hidden', function() {
+test('#isEmpty is false if any items arent hidden', () => {
   const view = new createView()
   ok(!view.isEmpty())
 })
 
-test('#isEmpty is true if collection is empty', function() {
+test('#isEmpty is true if collection is empty', () => {
   const collection = new QuizCollection([])
   const view = new createView(collection)
   ok(view.isEmpty())
 })
 
-test('#isEmpty is true if all items are hidden', function() {
+test('#isEmpty is true if all items are hidden', () => {
   const collection = new QuizCollection([{id: 1, hidden: true}, {id: 2, hidden: true}])
   const view = new createView(collection)
   ok(view.isEmpty())
 })
 
-test('should filter models with title that doesnt match term', function() {
+test('should filter models with title that doesnt match term', () => {
   const collection = new QuizCollection([{id: 1}, {id: 2}])
   const view = createView(collection)
   const model = new Quiz({title: 'Foo Name'})
@@ -77,7 +77,7 @@ test('should filter models with title that doesnt match term', function() {
   ok(!view.filter(model, 'zzz'))
 })
 
-test('should not use regexp to filter models', function() {
+test('should not use regexp to filter models', () => {
   const collection = new QuizCollection([{id: 1}, {id: 2}])
   const view = createView(collection)
   const model = new Quiz({title: 'Foo Name'})
@@ -86,7 +86,7 @@ test('should not use regexp to filter models', function() {
   ok(!view.filter(model, 'zzz'))
 })
 
-test('should filter models with multiple terms', function() {
+test('should filter models with multiple terms', () => {
   const collection = new QuizCollection([{id: 1}, {id: 2}])
   const view = createView(collection)
   const model = new Quiz({title: 'Foo Name bar'})
@@ -95,7 +95,7 @@ test('should filter models with multiple terms', function() {
   ok(!view.filter(model, 'zzz'))
 })
 
-test('should rerender on filter change', function() {
+test('should rerender on filter change', () => {
   const collection = new QuizCollection([{id: 1, title: 'hey'}, {id: 2, title: 'foo'}])
   const view = createView(collection)
   equal(view.$el.find('.collectionViewItems li').length, 2)
@@ -104,21 +104,21 @@ test('should rerender on filter change', function() {
   equal(view.$el.find('.collectionViewItems li').length, 1)
 })
 
-test('should not render no content message if quizzes are available', function() {
+test('should not render no content message if quizzes are available', () => {
   const collection = new QuizCollection([{id: 1}, {id: 2}])
   const view = createView(collection)
   equal(view.$el.find('.collectionViewItems li').length, 2)
   ok(!view.$el.find('.no_content').is(':visible'))
 })
 
-test('should render no content message if no quizzes available', function() {
+test('should render no content message if no quizzes available', () => {
   const collection = new QuizCollection([])
   const view = createView(collection)
   equal(view.$el.find('.collectionViewItems li').length, 0)
   ok(view.$el.find('.no_content').is(':visible'))
 })
 
-test('clicking the header should toggle arrow state', function() {
+test('clicking the header should toggle arrow state', () => {
   const collection = new QuizCollection([{id: 1}, {id: 2}])
   const view = createView(collection)
 

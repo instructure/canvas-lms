@@ -20,67 +20,78 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments_2_student_points_display'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
-const ACCESSIBLE = 'accessible'
-
-function defaultValue(gradingType, pointsPossible, options = {}) {
-  switch (gradingType) {
+export default function PointsDisplay(props) {
+  // We need to have a different ungraded values for screenreaders and visual users
+  // because voiceover does not read the '–' character in a string like '-/10'
+  let ungradedScreenreaderString = null
+  let ungradedVisualString = null
+  switch (props.gradingType) {
     case 'points':
-      return options.content === ACCESSIBLE
-        ? I18n.t('ungraded out of %{pointsPossible}', {pointsPossible})
-        : `–/${pointsPossible}`
-    case 'percent':
-      return options.content === ACCESSIBLE ? I18n.t('ungraded') : `–%`
+      ungradedScreenreaderString = I18n.t('ungraded/%{pointsPossible}', {
+        pointsPossible: props.pointsPossible
+      })
+      ungradedVisualString = `–/${props.pointsPossible}`
+      break
     case 'pass_fail':
-      return I18n.t('ungraded')
+      ungradedScreenreaderString = I18n.t('ungraded')
+      ungradedVisualString = I18n.t('ungraded')
+      break
     default:
-      return options.content === ACCESSIBLE ? I18n.t('ungraded') : '–'
+      ungradedScreenreaderString = I18n.t('ungraded')
+      ungradedVisualString = '–'
+      break
   }
-}
 
-function PointsDisplay(props) {
-  const {gradingType, receivedGrade, pointsPossible} = props
+  const formatGrade = ({forScreenReader}) => {
+    if (props.gradingStatus === 'excused' && !props.showGradeForExcused) {
+      return I18n.t('Excused!')
+    }
+
+    const formattedGrade = GradeFormatHelper.formatGrade(props.receivedGrade, {
+      gradingType: props.gradingType,
+      pointsPossible: props.pointsPossible,
+      defaultValue: forScreenReader ? ungradedScreenreaderString : ungradedVisualString,
+      formatType: 'points_out_of_fraction'
+    })
+
+    if (props.gradingType === 'points') {
+      return I18n.t('%{formattedGrade} Points', {formattedGrade})
+    } else {
+      return formattedGrade
+    }
+  }
 
   return (
     <div>
-      <ScreenReaderContent>
-        {GradeFormatHelper.formatGrade(receivedGrade, {
-          gradingType,
-          pointsPossible,
-          defaultValue: defaultValue(gradingType, pointsPossible, {content: ACCESSIBLE}),
-          formatType: 'points_out_of_fraction'
-        })}
-        {gradingType === 'points' ? I18n.t(' Points') : null}
-      </ScreenReaderContent>
+      <ScreenReaderContent>{formatGrade({forScreenReader: true})}</ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
-        <FlexItem>
-          <Text transform="capitalize" size="x-large" data-test-id="grade-display">
-            {GradeFormatHelper.formatGrade(receivedGrade, {
-              gradingType,
-              pointsPossible,
-              defaultValue: defaultValue(gradingType, pointsPossible),
-              formatType: 'points_out_of_fraction'
-            })}
-            {gradingType === 'points' ? I18n.t(' Points') : null}
+        <Flex.Item>
+          <Text transform="capitalize" size={props.displaySize} data-testid="grade-display">
+            {formatGrade({forScreenReader: false})}
           </Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </div>
   )
 }
 
 PointsDisplay.propTypes = {
+  displaySize: PropTypes.string,
+  gradingStatus: PropTypes.oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
   gradingType: PropTypes.string.isRequired,
+  pointsPossible: PropTypes.number.isRequired,
   receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  pointsPossible: PropTypes.number.isRequired
+  showGradeForExcused: PropTypes.bool
 }
 
 PointsDisplay.defaultProps = {
-  gradingType: 'points'
+  displaySize: 'x-large',
+  gradingStatus: null,
+  gradingType: 'points',
+  showGradeForExcused: false
 }
-
-export default React.memo(PointsDisplay)

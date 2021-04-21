@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -135,7 +137,7 @@ class RoleOverridesController < ApplicationController
       states = %w(active) if states.empty?
 
       roles = []
-      roles += Role.visible_built_in_roles if states.include?('active')
+      roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?('active')
 
       scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(true) : @context.roles
       roles += scope.where(:workflow_state => states).order(:id).to_a
@@ -170,7 +172,7 @@ class RoleOverridesController < ApplicationController
 
       js_bundle :permissions_index
       css_bundle :permissions
-      @active_tab = 'permissions'
+      set_active_tab 'permissions'
     end
   end
 
@@ -242,6 +244,7 @@ class RoleOverridesController < ApplicationController
   #     manage_site_settings             -- Manage site-wide and plugin settings
   #     manage_user_logins               -- Users - manage login details
   #     manage_user_observers            -- Users - add / remove observers
+  #     moderate_user_content            -- Users - moderate user-created content
   #     read_course_content              -- Course Content - view
   #     read_course_list                 -- Courses - view list
   #     read_messages                    -- View notifications sent to users
@@ -249,6 +252,7 @@ class RoleOverridesController < ApplicationController
   #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_course_changes              -- Courses - view change logs
   #     view_error_reports               -- View error reports
+  #     view_feature_flags               -- Feature Options - view
   #     view_grade_changes               -- Grades - view change logs
   #     view_jobs                        -- View background jobs
   #     view_notifications               -- Notifications - view
@@ -262,6 +266,12 @@ class RoleOverridesController < ApplicationController
   #            Lower-case letters indicate permissions that are off by default.
   #            A missing letter indicates the permission cannot be enabled for the role
   #            or any derived custom roles.
+  #     add_designer_to_course           -- [ Tad ] Add a designer enrollment to a course
+  #     add_observer_to_course           -- [ Tad ] Add an observer enrollment to a course
+  #     add_student_to_course            -- [ Tad ] Add a student enrollment to a course
+  #     add_ta_to_course                 -- [ Tad ] Add a TA enrollment to a course
+  #     add_teacher_to_course            -- [ Tad ] Add a Teacher enrollment to a course
+  #     allow_course_admin_actions       -- [ Tad ] Perform miscellaneous course and enrollment admin actions
   #     change_course_state              -- [ TaD ] Course State - manage
   #     create_collaborations            -- [STADo] Student Collaborations - create
   #     create_conferences               -- [STADo] Web conferences - create
@@ -273,16 +283,23 @@ class RoleOverridesController < ApplicationController
   #     manage_assignments               -- [ TADo] Assignments and Quizzes - add / edit / delete
   #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete events
   #     manage_content                   -- [ TADo] Course Content - add / edit / delete
+  #     manage_course_visibility         -- [ TAD ] Course - change visibility
   #     manage_files                     -- [ TADo] Course Files - add / edit / delete
   #     manage_grades                    -- [ TA  ] Grades - edit
   #     manage_groups                    -- [ TAD ] Groups - add / edit / delete
   #     manage_interaction_alerts        -- [ Ta  ] Alerts - add / edit / delete
   #     manage_outcomes                  -- [sTaDo] Learning Outcomes - add / edit / delete
-  #     manage_sections                  -- [ TaD ] Course Sections - add / edit / delete
+  #     manage_proficiency_calculations  -- [ t d ] Outcome Proficiency Calculations - add / edit / delete
+  #     manage_proficiency_scales        -- [ t d ] Outcome Proficiency/Mastery Scales - add / edit / delete
+  #     manage_sections_add              -- [ TaD ] Course Sections - add
+  #     manage_sections_edit             -- [ TaD ] Course Sections - edit
+  #     manage_sections_delete           -- [ TaD ] Course Sections - delete
   #     manage_students                  -- [ TAD ] Users - add / remove students in courses
   #     manage_user_notes                -- [ TA  ] Faculty Journal - manage entries
   #     manage_rubrics                   -- [ TAD ] Rubrics - add / edit / delete
-  #     manage_wiki                      -- [ TADo] Pages - add / edit / delete
+  #     manage_wiki_create               -- [ TADo] Pages - create
+  #     manage_wiki_delete               -- [ TADo] Pages - delete
+  #     manage_wiki_update               -- [ TADo] Pages - update
   #     moderate_forum                   -- [sTADo] Discussions - moderate
   #     post_to_forum                    -- [STADo] Discussions - post
   #     read_announcements               -- [STADO] Announcements - view
@@ -292,6 +309,11 @@ class RoleOverridesController < ApplicationController
   #     read_reports                     -- [ TAD ] Courses - view usage reports
   #     read_roster                      -- [STADo] Users - view list
   #     read_sis                         -- [sTa  ] SIS Data - read
+  #     remove_designer_from_course      -- [ Tad ] Remove a designer enrollment from a course
+  #     remove_observer_from_course      -- [ Tad ] Remove an observer enrollment from a course
+  #     remove_student_from_course       -- [ Tad ] Remove a student enrollment from a course
+  #     remove_ta_from_course            -- [ Tad ] Remove a TA enrollment from a course
+  #     remove_teacher_from_course       -- [ Tad ] Remove a Teacher enrollment from a course
   #     select_final_grade               -- [ TA  ] Grades - select final grade for moderation
   #     send_messages                    -- [STADo] Conversations - send messages to individual course members
   #     send_messages_all                -- [sTADo] Conversations - send messages to entire class
@@ -305,6 +327,22 @@ class RoleOverridesController < ApplicationController
   #   if a specified permission is inapplicable, it will be ignored.
   #
   #   Additional permissions may exist based on installed plugins.
+  #
+  #   Note that the "manage_admin_users" permission will soon be deprecated by eleven new
+  #   permissions which provide finer granularity in controlling the administration of
+  #   courses and course enrollments. "manage_admin_users" OR the eleven new permissions
+  #   will be available in the API, not both. The eleven new permissions are:
+  #          allow_course_admin_actions
+  #          add_designer_to_course
+  #          add_observer_to_course
+  #          add_student_to_course
+  #          add_ta_to_course
+  #          add_teacher_to_course
+  #          remove_designer_from_course
+  #          remove_observer_from_course
+  #          remove_student_from_course
+  #          remove_ta_from_course
+  #          remove_teacher_from_course
   #
   # @argument permissions[<X>][locked] [Boolean]
   #   If the value is 1, permission <X> will be locked downstream (new roles in
@@ -362,9 +400,10 @@ class RoleOverridesController < ApplicationController
     end
 
     # allow setting permissions immediately through API
-    result = set_permissions_for(role, @context, params[:permissions])
-    unless result
-      return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
+    begin
+      set_permissions_for(role, @context, params[:permissions])
+    rescue BadPermissionSettingError => e
+      return render json: {message: e}, status: :bad_request
     end
 
     # Add base_role_type_label for this role
@@ -486,13 +525,13 @@ class RoleOverridesController < ApplicationController
         end
       end
     end
-    result = set_permissions_for(@role, @context, params[:permissions])
 
-    unless result
-      return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
+    begin
+      set_permissions_for(@role, @context, params[:permissions])
+      render :json => role_json(@context, @role, @current_user, session)
+    rescue BadPermissionSettingError => e
+      return render json: {message: e}, status: :bad_request
     end
-    RoleOverride.clear_cached_contexts
-    render :json => role_json(@context, @role, @current_user, session)
   end
 
   def create
@@ -568,42 +607,72 @@ class RoleOverridesController < ApplicationController
   end
   protected :require_role
 
+  class BadPermissionSettingError < StandardError; end
+
   # Internal: Loop through and set permission on role given in params.
   #
   # role - The role to set permissions for.
   # context - The current context.
   # permissions - The permissions from the request params.
-  #
-  # Returns nothing.
   def set_permissions_for(role, context, permissions)
-    return true unless permissions.present?
+    return true if permissions.blank?
 
-    if role.course_role?
-      manageable_permissions = RoleOverride.manageable_permissions(context, role.base_role_type)
-    else
-      manageable_permissions = RoleOverride.manageable_permissions(context)
+    manageable_permissions =
+      if role.course_role?
+        RoleOverride.manageable_permissions(context, role.base_role_type)
+      else
+        RoleOverride.manageable_permissions(context)
+      end
+
+    # Hash of permission names and groups for easier updating. Make everything
+    # an array (even though only grouped permissions will have more then one
+    # element) so we can use the same logic for updating grouped and ungrouped permissions
+    grouped_permissions = Hash.new { |h, k| h[k] = [] }.with_indifferent_access
+    manageable_permissions.each do |permission_name, permission|
+      grouped_permissions[permission_name] << {name: permission_name, disable_locking: permission.key?(:group)}
+      if permission.key?(:group)
+        current_override = context.role_overrides.where(:permission => permission_name, :role_id => role.id).first
+        grouped_permissions[permission[:group]] << {name: permission_name, disable_locking: false, currently: current_override&.enabled}
+      end
     end
 
-    manageable_permissions.keys.each do |permission|
-      if settings = permissions[permission]
-        if !value_to_boolean(settings[:readonly])
-          if settings.has_key?(:enabled) && value_to_boolean(settings[:explicit])
-            override = value_to_boolean(settings[:enabled])
-          end
-          locked = value_to_boolean(settings[:locked]) if settings.key?(:locked)
-          applies_to_self = value_to_boolean(settings[:applies_to_self]) if settings.key? :applies_to_self
-          if settings.key? :applies_to_descendants
-            applies_to_descendants = value_to_boolean(settings[:applies_to_descendants])
-          end
+    RoleOverride.transaction do
+      permissions.each do |permission_or_group_name, permission_updates|
+        next if value_to_boolean(permission_updates[:readonly])
 
-          if applies_to_descendants == false && applies_to_self == false
-            return false
-          end
+        target_permissions = grouped_permissions[permission_or_group_name]
+        next if target_permissions.empty?
 
-          RoleOverride.manage_role_override(context, role, permission.to_s,
-                                            override: override, locked: locked,
-                                            applies_to_self: applies_to_self,
-                                            applies_to_descendants: applies_to_descendants)
+        if permission_updates.key?(:locked)
+          if target_permissions.any? { |permission| permission[:disable_locking] }
+            raise BadPermissionSettingError, t('Cannot change locked status on granular permission')
+          else
+            locked = value_to_boolean(permission_updates[:locked])
+          end
+        end
+
+        if permission_updates.key?(:enabled) && value_to_boolean(permission_updates[:explicit])
+          override = value_to_boolean(permission_updates[:enabled])
+        end
+
+        if permission_updates.key? :applies_to_self
+          applies_to_self = value_to_boolean(permission_updates[:applies_to_self])
+        end
+
+        if permission_updates.key? :applies_to_descendants
+          applies_to_descendants = value_to_boolean(permission_updates[:applies_to_descendants])
+        end
+
+        if applies_to_descendants == false && applies_to_self == false
+          raise BadPermissionSettingError, t('Permission must be enabled for someone')
+        end
+
+        target_permissions.each do |permission|
+          perm_override = value_to_boolean(permission_updates[:explicit]) && override.nil? ? permission[:currently] : override
+          RoleOverride.manage_role_override(
+            context, role, permission[:name].to_s, override: perm_override, locked: locked,
+            applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants
+          )
         end
       end
     end
@@ -621,6 +690,10 @@ class RoleOverridesController < ApplicationController
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       hash = {:label =>
              p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0]}
+      if p[1].key?(:group)
+        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
+        hash[:granular_permission_group_label] = p[1][:group_label].call
+      end
 
       # Check to see if the base role name is in the list of other base role names in p[1]
       is_course_permission = !(Role::ENROLLMENT_TYPES & p[1][:available_to]).empty?
@@ -675,8 +748,14 @@ class RoleOverridesController < ApplicationController
 
     # Add group_permissions
     RoleOverride.manageable_permissions(context).each do |p|
+      next if !context.root_account? && p[0].to_s == 'manage_developer_keys'
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       hash = {:label => p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0]}
+      if p[1].key?(:group)
+        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
+        hash[:granular_permission_group_label] = p[1][:group_label].call
+      end
+
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin
           site_admin[:group_permissions] << hash

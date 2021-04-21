@@ -16,8 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { setup } from 'submissions';
-import StatusPill from '../grading/StatusPill';
+import {setup} from 'submissions'
+import StatusPill from '../grading/StatusPill'
+import ready from '@instructure/ready'
 
-setup()
-StatusPill.renderPills()
+ready(() => {
+  setup()
+  StatusPill.renderPills()
+})

@@ -15,11 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { initializePlanner, loadPlannerDashboard, resetPlanner, renderToDoSidebar } from '../index';
-import moxios from 'moxios';
-import { initialize as alertInitialize } from '../utilities/alertUtils';
+import moxios from 'moxios'
+import {findByTestId, render} from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import {
+  initializePlanner,
+  loadPlannerDashboard,
+  resetPlanner,
+  renderToDoSidebar,
+  renderWeeklyPlannerHeader
+} from '../index'
+import {initialize as alertInitialize} from '../utilities/alertUtils'
 
-function defaultPlannerOptions () {
+function defaultPlannerOptions() {
   return {
     env: {
       MOMENT_LOCALE: 'en',
@@ -27,20 +35,31 @@ function defaultPlannerOptions () {
       current_user: {
         id: '42',
         display_name: 'Arthur Dent',
-        avatar_image_url: 'http://example.com',
+        avatar_image_url: 'http://example.com'
       },
       PREFERENCES: {
-        custom_colors: {},
+        custom_colors: {}
       },
+      K5_MODE: false
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
     srFlashMessage: jest.fn(),
-    convertApiUserContent: jest.fn(),
-  };
+    convertApiUserContent: jest.fn()
+  }
 }
 
-afterEach(() => { resetPlanner(); });
+beforeAll(() => {
+  window.ENV = {
+    FEATURES: {
+      canvas_for_elementary: false
+    }
+  }
+})
+
+afterEach(() => {
+  resetPlanner()
+})
 
 describe('with mock api', () => {
   beforeEach(() => {
@@ -50,72 +69,97 @@ describe('with mock api', () => {
       <div id="dashboard-planner-header"></div>
       <div id="dashboard-planner-header-aux"></div>
       <div id="dashboard-sidebar"></div>
-    `;
-    moxios.install();
+    `
+    moxios.install()
     alertInitialize({
       visualSuccessCallback: jest.fn(),
       visualErrorCallback: jest.fn(),
-      srAlertCallback: jest.fn(),
-    });
-  });
+      srAlertCallback: jest.fn()
+    })
+  })
 
   afterEach(() => {
-    moxios.uninstall();
-  });
+    moxios.uninstall()
+  })
 
   describe('initializePlanner', () => {
-    it('cannot be called twice', () => {
-      initializePlanner(defaultPlannerOptions());
-      expect(() => initializePlanner(defaultPlannerOptions())).toThrow();
-    });
+    it('cannot be called twice', async () => {
+      await initializePlanner(defaultPlannerOptions())
+      return expect(initializePlanner(defaultPlannerOptions())).rejects.toBeDefined()
+    })
 
-    it('requires flash methods', () => {
-      ['flashError', 'flashMessage', 'srFlashMessage'].forEach(flash => {
-        const options = defaultPlannerOptions();
-        options[flash] = null;
-        expect(() => initializePlanner(options)).toThrow();
-      });
-    });
+    it('requires flash methods', async () => {
+      ;(
+        await Promise.allSettled(
+          ['flashError', 'flashMessage', 'srFlashMessage'].map(flash => {
+            const options = defaultPlannerOptions()
+            options[flash] = null
+            return initializePlanner(options)
+          })
+        )
+      ).forEach(({status}) => expect(status).toBe('rejected'))
+    })
 
     it('requires convertApiUserContent', () => {
-      const options = defaultPlannerOptions();
-      options.convertApiUserContent = null;
-      expect(() => initializePlanner(options)).toThrow();
-    });
+      const options = defaultPlannerOptions()
+      options.convertApiUserContent = null
+      return expect(initializePlanner(options)).rejects.toBeDefined()
+    })
 
     it('requires timezone', () => {
-      const options = defaultPlannerOptions();
-      options.env.TIMEZONE = null;
-      expect(() => initializePlanner(options)).toThrow();
-    });
+      const options = defaultPlannerOptions()
+      options.env.TIMEZONE = null
+      return expect(initializePlanner(options)).rejects.toBeDefined()
+    })
 
     it('requires locale', () => {
-      const options = defaultPlannerOptions();
-      options.env.MOMENT_LOCALE = null;
-      expect(() => initializePlanner(options)).toThrow();
-    });
-  });
+      const options = defaultPlannerOptions()
+      options.env.MOMENT_LOCALE = null
+      return expect(initializePlanner(options)).rejects.toBeDefined()
+    })
+  })
 
   describe('loadPlannerDashboard', () => {
     beforeEach(() => {
-      initializePlanner(defaultPlannerOptions());
-    });
+      initializePlanner(defaultPlannerOptions())
+    })
 
-    it('renders into provided divs', () => {
-      loadPlannerDashboard();
-      expect(document.querySelector('.PlannerApp')).toBeTruthy();
-      expect(document.querySelector('.PlannerHeader')).toBeTruthy();
-    });
-  });
+    it('renders into provided divs', async () => {
+      loadPlannerDashboard()
+      await findByTestId(document.body, 'PlannerApp')
+      await findByTestId(document.body, 'PlannerHeader')
+      expect(document.querySelector('.PlannerApp')).toBeTruthy()
+      expect(document.querySelector('.PlannerHeader')).toBeTruthy()
+    })
+  })
 
   describe('renderToDoSidebar', () => {
     beforeEach(() => {
-      initializePlanner(defaultPlannerOptions());
-    });
+      initializePlanner(defaultPlannerOptions())
+    })
 
-    it('renders into provided element', () => {
-      renderToDoSidebar(document.querySelector('#dashboard-sidebar'));
-      expect(document.querySelector('.todo-list-header')).toBeTruthy();
-    });
-  });
-});
+    it('renders into provided element', async () => {
+      renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
+      await findByTestId(document.body, 'ToDoSidebar')
+      expect(document.querySelector('.todo-list-header')).toBeTruthy()
+    })
+  })
+
+  describe('renderWeeklyPlannerHeader', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES.canvas_for_elementary = true
+    })
+    beforeEach(() => {
+      const opts = defaultPlannerOptions()
+      opts.env.K5_MODE = true
+      initializePlanner(opts)
+    })
+
+    it('renders the WeeklyPlannerHeader', async () => {
+      const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
+
+      const wph = await findByTestId('WeeklyPlannerHeader')
+      expect(wph).toBeInTheDocument()
+    })
+  })
+})

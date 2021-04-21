@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2014 Instructure, Inc.
 #
@@ -67,6 +69,15 @@ describe "Accounts API", type: :request do
           'workflow_state' => 'active'
         },
       ]
+    end
+
+    it "doesn't return duplicates" do
+      role = custom_account_role("some role", :account => @a1)
+      @a1.account_users.create!(user: @user, role: role)
+
+      json = api_call(:get, "/api/v1/accounts.json",
+        { :controller => 'accounts', :action => 'index', :format => 'json' })
+      expect(json.map{|a| a['id']}).to match_array([@a1.id, @a2.id])
     end
 
     it "doesn't include deleted accounts" do
@@ -591,6 +602,38 @@ describe "Accounts API", type: :request do
         expect(@a1.default_group_storage_quota_mb).to eq 42
       end
     end
+
+    describe "privacy settings" do
+      let(:account) { @a1 }
+      let(:site_admin) { site_admin_user }
+      let(:payload) {
+        {
+          account: {
+            settings: {
+              enable_fullstory: false,
+              enable_google_analytics: false,
+            }
+          }
+        }
+      }
+
+      it 'ignores changes made through the API' do
+        user_session(site_admin)
+
+        expect {
+          api_call(:put, "/api/v1/accounts/#{account.to_param}", {
+            controller: 'accounts',
+            action: 'update',
+            id: account.to_param,
+            format: 'json'
+          }, payload)
+        }.to change { response&.status }.to(200).and not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+    end
   end
 
   it "should find accounts by sis in only this root account" do
@@ -656,10 +699,11 @@ describe "Accounts API", type: :request do
     it "should honor the includes[]" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb",
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb&include[]=account_name",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-                        :format => 'json', :include => ['storage_quota_used_mb'] }, {})
+                        :format => 'json', :include => ['storage_quota_used_mb', 'account_name'] }, {})
       expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
+      expect(json[0]).to have_key("account_name")
     end
 
     it "should don't include fake students" do
@@ -703,6 +747,22 @@ describe "Accounts API", type: :request do
       c2_hash = json.detect{|h| h['id'] == @c2.id}
       expect(c2_hash.has_key?('teachers')).to eq false
       expect(c2_hash['teacher_count']).to eq 2
+    end
+
+    it "should return a better teacher count if a teacher is in too many sections" do
+      @c1 = course_with_teacher(:account => @a1, :course_name => 'c1').course
+      s2 = @c1.course_sections.create!
+      # should not think there are two teachers if one is in multiple sections
+      @c1.enroll_teacher(@teacher, :section => s2, :allow_multiple_enrollments => true)
+      @c2 = course_with_teacher(:account => @a1, :course_name => 'c2', :user => @teacher).course
+
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=teachers&teacher_limit=1",
+        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+          :format => 'json', :include => ['teachers'], :teacher_limit => "1" })
+      [@c1, @c2].each do |c|
+        expect(json.detect{|h| h['id'] == c.id}['teachers'].map{|t| t['id']}).to eq [@teacher.id]
+      end
     end
 
     describe 'sort' do
@@ -939,6 +999,106 @@ describe "Accounts API", type: :request do
                           :format => 'json', :completed => "no" })
         expect(json.collect{|row|row['name']}).to eql ['c1']
       end
+
+      it "should filter and sort without asploding" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?completed=yes&sort=course_name&order=desc",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :completed => "yes",
+                          :sort => 'course_name', :order => 'desc' })
+        expect(json.collect{|row|row['name']}).to eql ['c4', 'c3', 'c2']
+      end
+    end
+
+    describe "?starts_before" do
+      before :once do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :start_at => 2.days.ago))
+        end
+
+        @c2.start_at = 1.week.ago
+        @c2.save!
+
+        term = @c3.root_account.enrollment_terms.create! :start_at => 3.days.ago.change(:usec => 0)
+        @c3.start_at = nil
+        @c3.enrollment_term = term
+        @c3.save!
+
+        @c4.start_at = nil
+        @c4.save!
+
+        @user = @me
+      end
+
+      it "should not apply if not specified" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api',
+                           :account_id => @a1.to_param, :format => 'json' })
+        expect(json.collect{|row| row['name']}).to eql ['c1', 'c2', 'c3', 'c4']
+      end
+
+      it "should filter inclusively and include null values" do
+        date = @c3.enrollment_term.start_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?starts_before=#{date.iso8601}",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :starts_before => date.iso8601 })
+        expect(json.collect{|row| row['name']}).to eql ['c2', 'c3', 'c4']
+      end
+
+      it "should filter and sort without asploding" do
+        date = @c3.enrollment_term.start_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?starts_before=#{date.iso8601}&sort=course_name&order=desc",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :starts_before => date.iso8601,
+                          :sort => 'course_name', :order => 'desc' })
+        expect(json.collect{|row| row['name']}).to eql ['c4', 'c3', 'c2']
+      end
+    end
+
+    describe "?ends_after" do
+      before :once do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :conclude_at => 2.days.from_now))
+        end
+
+        @c2.conclude_at = 1.week.from_now
+        @c2.save!
+
+        term = @c3.root_account.enrollment_terms.create! :end_at => 3.days.from_now.change(:usec => 0)
+        @c3.conclude_at = nil
+        @c3.enrollment_term = term
+        @c3.save!
+
+        @c4.conclude_at = nil
+        @c4.save!
+
+        @user = @me
+      end
+
+      it "should not apply if not specified" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api',
+                           :account_id => @a1.to_param, :format => 'json' })
+        expect(json.collect{|row| row['name']}).to eql ['c1', 'c2', 'c3', 'c4']
+      end
+
+      it "should filter inclusively and include null values" do
+        date = @c3.enrollment_term.end_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?ends_after=#{date.iso8601}",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :ends_after => date.iso8601 })
+        expect(json.collect{|row| row['name']}).to eql ['c2', 'c3', 'c4']
+      end
+
+      it "should filter and sort without asploding" do
+        date = @c3.enrollment_term.end_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?ends_after=#{date.iso8601}&sort=course_name&order=desc",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :ends_after => date.iso8601,
+                          :sort => 'course_name', :order => 'desc' })
+        expect(json.collect{|row| row['name']}).to eql ['c4', 'c3', 'c2']
+      end
     end
 
     describe "?by_teachers" do
@@ -1072,13 +1232,6 @@ describe "Accounts API", type: :request do
           :format => 'json', :search_term => search_term })
       expect(json.length).to eql 3
 
-      search_term = Shard.global_id_for(@course)
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
-        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-          :format => 'json', :search_term => search_term })
-      expect(json.length).to eql 1
-      expect(json.first['name']).to eq @course.name
-
       # Should return empty result set
       search_term = "0000000000"
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
@@ -1094,17 +1247,29 @@ describe "Accounts API", type: :request do
       expect(response).to eq 400
 
       # search on something that's a course name but looks like an id also
-      one_more = create_courses(
-        [{name: @courses[0].id.to_s, course_code: "name_looks_like_id"}],
-        account: @a1, account_associations: true, return_type: :record
-      )
-      @courses.push(*one_more)
-      search_term = @courses.last.name
+      course_with_long_id = @a1.courses.create!(:id => @courses[0].id + 100, :name => "long id") # make sure id is at least 3 characters long
+      one_more = @a1.courses.create!(:name => course_with_long_id.id.to_s)
+      search_term = one_more.name
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
         { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
           :format => 'json', :search_term => search_term })
       expect(json.length).to be 2
-      expect(json.map{ |c| [c['id'], c['name']] }).to match_array([[@courses.first.id, @courses.first.name], [@courses.last.id, @courses.last.name]])
+      expect(json.map{ |c| [c['id'], c['name']] }).to match_array([
+        [course_with_long_id.id, course_with_long_id.name], [one_more.id, one_more.name]])
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should be able to search on global id" do
+        @course = @a1.courses.create!(:name => "whee")
+        search_term = Shard.global_id_for(@course)
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
+          { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+            :format => 'json', :search_term => search_term })
+        expect(json.length).to eql 1
+        expect(json.first['name']).to eq @course.name
+      end
     end
 
     context "blueprint courses" do

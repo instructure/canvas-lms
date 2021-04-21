@@ -23,19 +23,16 @@ import React, {Component} from 'react'
 import {bool, node, string, func, shape, arrayOf, oneOf} from 'prop-types'
 import cx from 'classnames'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import View from '@instructure/ui-layout/lib/components/View'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu from '@instructure/ui-menu/lib/components/Menu'
-import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
-
-import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
+import {Text} from '@instructure/ui-text'
+import {Badge} from '@instructure/ui-badge'
+import {Avatar} from '@instructure/ui-avatar'
+import {Heading} from '@instructure/ui-heading'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {IconMoreLine, IconDragHandleLine, IconPeerReviewLine} from '@instructure/ui-icons'
 import LockIconView from 'compiled/views/LockIconView'
 import {author as authorShape} from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
@@ -139,7 +136,7 @@ export default class CourseItemRow extends Component {
         case 'toggleButton':
           break
         default:
-          throw new Error(I18n.t('Illegal element focus request'))
+          throw new Error('Illegal element focus request')
       }
       this.props.clearFocusDirectives()
     }
@@ -184,9 +181,18 @@ export default class CourseItemRow extends Component {
 
     return (
       <a className="ic-item-row__content-link" ref={refFn} href={this.props.itemUrl}>
-        <div className="ic-item-row__content-link-container">{component}</div>
+        <div
+          className="ic-item-row__content-link-container"
+          data-testId="single-announcement-test-id"
+        >
+          {component}
+        </div>
       </a>
     )
+  }
+
+  renderDiv(component) {
+    return <div className="ic-item-row__content-container">{component}</div>
   }
 
   render() {
@@ -229,19 +235,25 @@ export default class CourseItemRow extends Component {
             <div className="ic-item-row__author-col">
               <Avatar
                 size="small"
+                alt={this.props.author.display_name || I18n.t('Unknown')}
                 name={this.props.author.display_name || I18n.t('Unknown')}
                 src={this.props.author.avatar_image_url}
+                data-fs-exclude
               />
             </div>
           )}
           <div className="ic-item-row__content-col">
-            {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
             {this.renderClickableDiv(
-              <Heading level="h3">{this.props.title}</Heading>,
+              <Heading level="h3">
+                {!this.props.isRead && (
+                  <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
+                )}
+                {this.props.title}
+              </Heading>,
               '_titleElement'
             )}
             {this.props.sectionToolTip}
-            {this.props.body ? this.renderClickableDiv(this.props.body) : null}
+            {this.props.body ? this.renderDiv(this.props.body) : null}
             {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}
           </div>
           <div className="ic-item-row__meta-col">
@@ -266,7 +278,7 @@ export default class CourseItemRow extends Component {
                     onToggle={this.toggleManageMenuShown}
                     trigger={
                       <Button variant="icon" size="small">
-                        <IconMore />
+                        <IconMoreLine />
                         <ScreenReaderContent>
                           {I18n.t('Manage options for %{name}', {name: this.props.title})}
                         </ScreenReaderContent>

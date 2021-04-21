@@ -25,56 +25,49 @@ import AuthLoggingItemView from './AuthLoggingItemView'
 import authLoggingResultsTemplate from 'jst/accounts/admin_tools/authLoggingSearchResults'
 import usersTemplate from 'jst/accounts/usersList'
 import template from 'jst/accounts/admin_tools/authLoggingContentPane'
+import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
-export default class AuthLoggingContentPaneView extends Backbone.View {
-  static initClass() {
-    this.child('searchForm', '#authLoggingSearchForm')
-    this.child('resultsView', '#authLoggingSearchResults')
+_inherits(AuthLoggingContentPaneView, Backbone.View)
 
-    this.prototype.template = template
-  }
+export default function AuthLoggingContentPaneView(options) {
+  this.fetch = this.fetch.bind(this)
+  this.onFail = this.onFail.bind(this)
+  this.options = options
+  this.collection = new AuthLoggingCollection(null)
+  Backbone.View.apply(this, arguments)
 
-  constructor(options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.fetch = this.fetch.bind(this)
-    this.onFail = this.onFail.bind(this)
-    this.options = options
-    this.collection = new AuthLoggingCollection(null)
-    super(...arguments)
+  this.searchForm = new UserDateRangeSearchFormView({
+    formName: 'logging',
+    inputFilterView: new InputFilterView({
+      collection: this.options.users
+    }),
+    usersView: new PaginatedCollectionView({
+      collection: this.options.users,
+      itemView: UserView,
+      buffer: 1000,
+      template: usersTemplate
+    }),
+    collection: this.collection
+  })
+  this.resultsView = new PaginatedCollectionView({
+    template: authLoggingResultsTemplate,
+    itemView: AuthLoggingItemView,
+    collection: this.collection
+  })
+}
 
-    this.searchForm = new UserDateRangeSearchFormView({
-      formName: 'logging',
-      inputFilterView: new InputFilterView({
-        collection: this.options.users
-      }),
-      usersView: new PaginatedCollectionView({
-        collection: this.options.users,
-        itemView: UserView,
-        buffer: 1000,
-        template: usersTemplate
-      }),
-      collection: this.collection
-    })
-    this.resultsView = new PaginatedCollectionView({
-      template: authLoggingResultsTemplate,
-      itemView: AuthLoggingItemView,
-      collection: this.collection
-    })
-  }
+AuthLoggingContentPaneView.child('searchForm', '#authLoggingSearchForm')
+AuthLoggingContentPaneView.child('resultsView', '#authLoggingSearchResults')
 
+Object.assign(AuthLoggingContentPaneView.prototype, {
+  template,
   attach() {
     return this.collection.on('setParams', this.fetch)
-  }
+  },
 
   fetch() {
     return this.collection.fetch().fail(this.onFail)
-  }
+  },
 
   onFail() {
     // Received a 404, empty the collection and don't let the paginated
@@ -82,5 +75,4 @@ export default class AuthLoggingContentPaneView extends Backbone.View {
     this.collection.reset()
     return this.resultsView.detachScroll()
   }
-}
-AuthLoggingContentPaneView.initClass()
+})

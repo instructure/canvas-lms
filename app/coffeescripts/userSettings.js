@@ -33,27 +33,34 @@
 // # back on /courses/1/x
 // userSettings.contextRemove 'specialIds'
 
-import _ from 'underscore'
 import $ from 'jquery'
 import 'jquery.instructure_misc_helpers'
 
 const userSettings = {
-  globalEnv: window.ENV,
+  globalEnv: window.ENV
 }
 
-function addTokens (method, ...tokens) {
-  return function (key, value) {
+function addTokens(method, ...tokens) {
+  return function(key, value) {
     const stringifiedValue = JSON.stringify(value)
-    const joinedTokens = _(tokens).map(token => userSettings.globalEnv[token]).join('_')
-    const res = localStorage[`${method}Item`](`_${joinedTokens}_${key}`, stringifiedValue)
-    if (res === 'undefined') return undefined
-    if (res) return JSON.parse(res)
+    const joinedTokens = tokens.map(token => userSettings.globalEnv[token]).join('_')
+    try {
+      const res = localStorage[`${method}Item`](`_${joinedTokens}_${key}`, stringifiedValue)
+      if (res === 'undefined') return undefined
+      if (res) return JSON.parse(res)
+    } catch (_ex) {
+      return undefined
+    }
   }
 }
 
-['get', 'set', 'remove'].forEach((method) => {
+;['get', 'set', 'remove'].forEach(method => {
   userSettings[method] = addTokens(method, 'current_user_id')
-  userSettings[`context${$.capitalize(method)}`] = addTokens(method, 'current_user_id', 'context_asset_string')
+  userSettings[`context${$.capitalize(method)}`] = addTokens(
+    method,
+    'current_user_id',
+    'context_asset_string'
+  )
 })
 
 export default userSettings

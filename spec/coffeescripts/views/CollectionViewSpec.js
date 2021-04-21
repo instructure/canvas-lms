@@ -28,6 +28,7 @@ class Collection extends Backbone.Collection {
   static initClass() {
     this.prototype.model = Backbone.Model
   }
+
   comparator(a, b) {
     if (a.get('id') < b.get('id')) {
       return 1
@@ -42,9 +43,11 @@ class ItemView extends Backbone.View {
   static initClass() {
     this.prototype.tagName = 'li'
   }
+
   template({name}) {
     return name
   }
+
   remove() {
     super.remove(...arguments)
     if (this.constructor['testing removed'] == null) {
@@ -80,7 +83,9 @@ QUnit.module('CollectionView', {
 function assertRenderedItems(names = []) {
   const items = view.$list.children()
   equal(items.length, names.length, 'items length matches')
-  const joinedItems = Array.from(items).map(el => el.innerHTML).join(' ')
+  const joinedItems = Array.from(items)
+    .map(el => el.innerHTML)
+    .join(' ')
   const joinedNames = names.join(' ')
   const joinedModels = collection.map(item => item.get('name')).join(' ')
   equal(joinedModels, joinedNames, 'collection order matches')

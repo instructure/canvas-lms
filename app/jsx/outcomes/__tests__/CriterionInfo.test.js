@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import CriterionInfo from '../CriterionInfo'
 
 describe('The CriterionInfo component', () => {

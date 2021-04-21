@@ -14,16 +14,18 @@
 {{/if}}
 <div class='discussion-entry-reply-area hide-if-collapsed show-if-replying'>
   <form class="discussion-reply-form">
-    <div class="discussion-top-right-header pull-right">
-      <div class="toggle-wrapper pull-right">
-        <a href="#">
-          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-        </a>
-        <a href="#" style="display:none;">
-          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-        </a>
+    {{#unless use_rce_enhancements}}
+      <div class="discussion-top-right-header pull-right">
+        <div class="toggle-wrapper pull-right">
+          <a href="#">
+            {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+          </a>
+          <a href="#" style="display:none;">
+            {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+          </a>
+        </div>
       </div>
-    </div>
+    {{/unless}}
     <div class="clearfix" aria-hidden="true">&nbsp;</div>
     <textarea class="reply-textarea"
               id="{{#if root}}root_{{/if}}reply_message_for_{{id}}"></textarea>

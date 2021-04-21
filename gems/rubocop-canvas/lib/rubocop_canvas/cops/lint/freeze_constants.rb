@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -47,7 +49,7 @@ module RuboCop
 
         def target_isnt_structure_or_string(node)
           target = node.children.first
-          ![:hash, :array, :string].include?(target.type)
+          ![:hash, :array, :string].include?(target&.type)
         end
 
         def check_children(node, safe_at_next_level)

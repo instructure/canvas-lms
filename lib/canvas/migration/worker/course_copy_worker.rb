@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -30,6 +32,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
       begin
         source = cm.source_course || Course.find(cm.migration_settings[:source_course_id])
         ce = ContentExport.new
+        ce.shard = source.shard
         ce.context = source
         ce.content_migration = cm
         ce.selected_content = cm.copy_options
@@ -38,7 +41,9 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         ce.save!
         cm.content_export = ce
 
-        ce.export_without_send_later
+        source.shard.activate do
+          ce.export(synchronous: true)
+        end
 
         if ce.workflow_state == 'exported_for_course_copy'
           # use the exported attachment as the import archive
@@ -74,6 +79,10 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.migration_settings[:last_error] = "ContentExport failed to export course."
           cm.save
         end
+      rescue InstFS::ServiceError, ActiveRecord::RecordInvalid => e
+        Canvas::Errors.capture_exception(:course_copy, e, :warn)
+        cm.fail_with_error!(e)
+        raise Delayed::RetriableError, e.message
       rescue => e
         cm.fail_with_error!(e)
         raise e

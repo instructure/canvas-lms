@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -21,12 +23,16 @@ module DataFixup::AddRoleOverridesForNewPermission
   # (for instance if a custom account admin has :manage_admin_users, they will
   # suddenly no longer be able to add account admins anymore until this is run)
 
-  def self.run(base_permission, new_permission)
-    [base_permission, new_permission].each do |perm|
-      raise "#{perm} is not a valid permission" unless RoleOverride.permissions.keys.include?(perm.to_sym)
+  def self.run(base_permission, new_permission, skip_validation: false, base_role_type: nil)
+    unless skip_validation
+      [base_permission, new_permission].each do |perm|
+        raise "#{perm} is not a valid permission" unless RoleOverride.permissions.keys.include?(perm.to_sym)
+      end
     end
 
-    RoleOverride.where(:permission => base_permission).find_in_batches do |base_overrides|
+    rel = RoleOverride.where(:permission => base_permission)
+    rel = rel.joins(:role).where(roles: {base_role_type: base_role_type}) if base_role_type
+    rel.find_in_batches do |base_overrides|
       # just in case
       new_overrides = RoleOverride.where(:permission => new_permission, :context_id => base_overrides.map(&:context_id))
 
@@ -34,7 +40,7 @@ module DataFixup::AddRoleOverridesForNewPermission
         next if new_overrides.detect{|nro| nro.context_id == ro.context_id && nro.context_type == ro.context_type && nro.role_id == ro.role_id }
         new_ro = RoleOverride.new
         new_ro.permission = new_permission
-        attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env})
+        attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env root_account_id})
         new_ro.assign_attributes(attrs)
         new_ro.save!
       end

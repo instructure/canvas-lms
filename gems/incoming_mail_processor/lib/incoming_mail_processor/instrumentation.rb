@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -38,7 +40,9 @@ module IncomingMailProcessor
       result.delete_if { |_k, v| v.nil? }
       result.each_pair do |identifier, count|
         name = "incoming_mail_processor.mailbox_queue_size.#{identifier}"
-        CanvasStatsd::Statsd.gauge name, count
+        InstStatsd::Statsd.gauge(name, count,
+                                 short_stat: 'incoming_mail_processor.mailbox_queue_size',
+                                 tags: {identifier: identifier})
       end
     end
     private_class_method :report_unreads

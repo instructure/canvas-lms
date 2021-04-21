@@ -16,35 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- import React from 'react';
- import {animatable} from '../animatable';
- import {DynamicUiProvider} from '../provider';
- import {mount} from 'enzyme';
+import React from 'react'
+import {mount} from 'enzyme'
+import {animatable} from '../animatable'
+import {DynamicUiProvider} from '../provider'
 
 class MockComponent extends React.Component {
-  render () { return <div />; }
+  render() {
+    return <div />
+  }
 }
 
 it('passes trigger property functions and forwards the calls to the dynamic ui manager', () => {
-  const Wrapped = animatable(MockComponent);
+  const Wrapped = animatable(MockComponent)
   const mockManager = {
     handleAction: jest.fn(),
     registerAnimatable: jest.fn(),
     deregisterAnimatable: jest.fn(),
     preTriggerUpdates: jest.fn(),
-    triggerUpdates: jest.fn(),
-  };
+    triggerUpdates: jest.fn()
+  }
 
   const wrapper = mount(
     <DynamicUiProvider manager={mockManager}>
       <Wrapped />
     </DynamicUiProvider>
-  );
-  expect(wrapper).toMatchSnapshot();
+  )
+  expect(wrapper).toMatchSnapshot()
 
-  const mockComponentProps = wrapper.find('MockComponent').props();
-  mockComponentProps.registerAnimatable('type', 'component', 42, ['item']);
-  expect(mockManager.registerAnimatable).toHaveBeenCalledWith('type', 'component', 42, ['item']);
-  mockComponentProps.deregisterAnimatable('type', 'component', ['item']);
-  expect(mockManager.deregisterAnimatable).toHaveBeenCalledWith('type', 'component', ['item']);
-});
+  const mockComponentProps = wrapper.find('MockComponent').props()
+  mockComponentProps.registerAnimatable('type', 'component', 42, ['item'])
+  expect(mockManager.registerAnimatable).toHaveBeenCalledWith('type', 'component', 42, ['item'])
+  mockComponentProps.deregisterAnimatable('type', 'component', ['item'])
+  expect(mockManager.deregisterAnimatable).toHaveBeenCalledWith('type', 'component', ['item'])
+})
