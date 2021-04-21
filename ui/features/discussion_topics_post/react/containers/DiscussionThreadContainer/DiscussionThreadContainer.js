@@ -29,6 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
+import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
@@ -211,8 +212,6 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
-
-  const PER_PAGE = 25
 
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {

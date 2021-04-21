@@ -23,11 +23,10 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {PER_PAGE} from './utils/constants'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {useQuery} from 'react-apollo'
-
-export const PER_PAGE = 20
 
 const DiscussionTopicManager = props => {
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
