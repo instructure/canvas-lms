@@ -50,6 +50,17 @@
 module MicrosoftSync
   class StateMachineJob
     class InternalError < ArgumentError; end
+    class RetriesExhaustedError < StandardError
+      attr_reader :cause
+
+      def initialize(cause)
+        @cause = cause
+      end
+    end
+
+    # NOTE: if we ever use this class for something besides SyncerSteps, we may want
+    # to change this and the capture_exception() calls which just group by microsoft_sync_smj
+    STATSD_PREFIX = 'microsoft_sync.smj'
 
     # job_state_record is assumed to be a model with the following used here:
     #  - job_state
@@ -174,14 +185,18 @@ module MicrosoftSync
         # This normally shouldn't happen since we prevent jobs from running at once.
         # This could happen if a job's retry time is longer than restart_job_after_inactivity, since
         # a new job could start over and reset the state before the continuation job runs.
-        raise InternalError,
-              "Job step doesn't match state: #{step.inspect} != #{step_from_job_state.inspect}. " \
-              "workflow_state: #{job_state_record.workflow_state}, job_state: #{job_state.inspect}"
+        err = InternalError.new(
+          "Job step doesn't match state: #{step.inspect} != #{step_from_job_state.inspect}. " \
+          "workflow_state: #{job_state_record.workflow_state}, job_state: #{job_state.inspect}"
+        )
+        capture_exception(err)
+        raise err
       end
 
       updated_at = job_state&.dig(:updated_at)
       if updated_at && updated_at < steps_object.restart_job_after_inactivity.ago
         # Trying to run a new job, old job has possibly stalled. Clean up and start over.
+        statsd_increment(:stalled, step_from_job_state)
         steps_object.after_failure
         job_state_record.update!(job_state: nil)
         run_main_loop(nil, nil, synchronous)
@@ -205,8 +220,11 @@ module MicrosoftSync
         rescue => e
           update_state_record_to_errored_and_cleanup(e)
           if e.is_a?(GracefulCancelErrorMixin)
+            statsd_increment(:cancel, current_step, e)
             return
           else
+            statsd_increment(:failure, current_step, e)
+            capture_exception(e)
             raise
           end
         end
@@ -218,6 +236,7 @@ module MicrosoftSync
             workflow_state: :completed, job_state: nil, last_error: nil
           )
           steps_object.after_complete
+          statsd_increment(:complete)
           return
         when NextStep
           current_step, memory_state = result.step, result.memory_state
@@ -232,6 +251,11 @@ module MicrosoftSync
           raise InternalError, "Step returned #{result.inspect}, expected COMPLETE/NextStep/Retry"
         end
       end
+    end
+
+    def statsd_increment(bucket, step=nil, error=nil)
+      tags = {category: error&.class&.name, microsoft_sync_step: step&.to_s}.compact
+      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags: tags)
     end
 
     def log(&_blk)
@@ -267,6 +291,10 @@ module MicrosoftSync
       )
     end
 
+    def capture_exception(err)
+      Canvas::Errors.capture(err, {tags: {type: 'microsoft_sync_smj'}}, :error)
+    end
+
     def handle_delayed_next_step(delayed_next_step, synchronous)
       return unless update_state_record_to_retrying(
         step: delayed_next_step.step,
@@ -284,33 +312,38 @@ module MicrosoftSync
     # Otherwise sets the job_state to keep track of (step, data, retries) and
     # kicks off a retry
     def handle_retry(retry_object, current_step, synchronous)
-      current_step = retry_object.step if retry_object.step
+      retry_step = retry_object.step || current_step
 
       job_state = job_state_record.reload.job_state
 
       retries_by_step = job_state&.dig(:retries_by_step) || {}
-      retries = retries_by_step[current_step.to_s] || 0
+      retries = retries_by_step[retry_step.to_s] || 0
+
 
       if retries >= steps_object.max_retries
         update_state_record_to_errored_and_cleanup(retry_object.error)
+        statsd_increment(:final_retry, current_step, retry_object.error)
+        capture_exception(RetriesExhaustedError.new(retry_object.error))
         raise retry_object.error
       end
+
+      statsd_increment('retry', current_step, retry_object.error)
 
       retry_object.stash_block&.call
 
       return unless update_state_record_to_retrying(
-        step: current_step,
+        step: retry_step,
         data: retry_object.job_state_data,
-        retries_by_step: retries_by_step.merge(current_step.to_s => retries + 1),
+        retries_by_step: retries_by_step.merge(retry_step.to_s => retries + 1),
         # for debugging only:
         retried_on_error: "#{retry_object.error.class}: #{retry_object.error.message}",
       )
 
       delay_amount = retry_object.delay_amount
       delay_amount = delay_amount[retries] || delay_amount.last if delay_amount.is_a?(Array)
-      log { "handle_retry #{current_step} - #{delay_amount}" }
+      log { "handle_retry #{current_step} -> #{retry_step} - #{delay_amount}" }
 
-      run_with_delay(current_step, delay_amount, synchronous: synchronous)
+      run_with_delay(retry_step, delay_amount, synchronous: synchronous)
     end
   end
 end

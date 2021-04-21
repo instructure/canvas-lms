@@ -199,6 +199,14 @@ module MicrosoftSync
         expect(state_record.reload.workflow_state).to eq('completed')
       end
 
+      it 'increments a statsd counter when complete' do
+        expect(steps_object).to receive(:step_first).and_return StateMachineJob::COMPLETE
+        allow(InstStatsd::Statsd).to receive(:increment)
+        subject.send(:run, nil)
+        expect(InstStatsd::Statsd).to \
+          have_received(:increment).with('microsoft_sync.smj.complete', tags: {})
+      end
+
       describe 'retry counting' do
         let(:steps_object) { StateMachineJobTestSteps2.new(5) }
 
@@ -209,6 +217,17 @@ module MicrosoftSync
           expect(state_record.reload.job_state[:retries_by_step]['step_first']).to eq(2)
           subject.send(:run, :step_first)
           expect(state_record.reload.job_state[:retries_by_step]['step_first']).to eq(3)
+        end
+
+        it 'increments the "retry" statsd counter' do
+          allow(InstStatsd::Statsd).to receive(:increment)
+          subject.send(:run, nil)
+          expect(InstStatsd::Statsd).to have_received(:increment).with(
+            'microsoft_sync.smj.retry',
+            tags: {
+              microsoft_sync_step: 'step_first', category: 'MicrosoftSync::Errors::PublicError'
+            }
+          )
         end
 
         context 'when the number of retries for a step is exceeded' do
@@ -230,6 +249,26 @@ module MicrosoftSync
             expect(steps_object.steps_run.count(:stash)).to eq(4)
             steps_object.steps_run.clear
             expect(steps_object.steps_run).to be_empty
+          end
+
+          it 'increments the "final_retry" statsd counter' do
+            allow(InstStatsd::Statsd).to receive(:increment)
+            expect { subject.send(:run, :step_first) }.to raise_error(Errors::PublicError)
+            expect(InstStatsd::Statsd).to have_received(:increment).with(
+              'microsoft_sync.smj.final_retry',
+              tags: {microsoft_sync_step: 'step_first', category: 'MicrosoftSync::Errors::PublicError'}
+            )
+          end
+
+          it 'sends an RetriesExhaustedError to Canvas::Errors' do
+            expect(Canvas::Errors).to receive(:capture) do |error, options, level|
+              expect(error).to be_a(described_class::RetriesExhaustedError)
+              expect(error.cause).to be_a(MicrosoftSync::Errors::PublicError)
+              expect(options).to \
+                eq(tags: {type: 'microsoft_sync_smj'})
+              expect(level).to eq(:error)
+            end
+            expect { subject.send(:run, :step_first) }.to raise_error(Errors::PublicError)
           end
         end
 
@@ -276,6 +315,7 @@ module MicrosoftSync
                   error: StandardError.new, step: :step_second, delay_amount: 123
                 )
               )
+
               subject.send(:run, nil)
             end
 
@@ -345,18 +385,42 @@ module MicrosoftSync
       end
 
       context 'when an unhandled error occurs' do
-        it 'bubbles up the error, sets the record state to errored, and calls after_failure' do
-          subject.send(:run, nil)
-          subject.send(:run, :step_first)
+        let(:error) { Errors::PublicError.new('uhoh') }
 
-          error = Errors::PublicError.new('uhoh')
-          expect(steps_object).to receive(:step_second).and_raise(error)
-          expect { subject.send(:run, :step_first) }.to raise_error(error)
+        context "when the error doesn't include GracefulCancelTestError" do
+          before do
+            subject.send(:run, nil)
+            subject.send(:run, :step_first)
 
-          expect(state_record.reload.job_state).to eq(nil)
-          expect(state_record.workflow_state).to eq('errored')
-          expect(state_record.last_error).to eq(Errors.user_facing_message(error))
-          expect(steps_object.steps_run.last).to eq([:after_failure])
+            allow(steps_object).to receive(:step_second).and_raise(error)
+          end
+
+          it 'bubbles up the error, sets the record state to errored, and calls after_failure' do
+            expect { subject.send(:run, :step_first) }.to raise_error(error)
+
+            expect(state_record.reload.job_state).to eq(nil)
+            expect(state_record.workflow_state).to eq('errored')
+            expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+            expect(steps_object.steps_run.last).to eq([:after_failure])
+          end
+
+          it 'sends the error to Canvas::Errors.capture' do
+            expect(Canvas::Errors).to receive(:capture).with(
+              error, {tags: {type: 'microsoft_sync_smj'}}, :error
+            )
+            expect { subject.send(:run, :step_first) }.to raise_error(error)
+          end
+
+          it 'increments the "failure" statsd metric' do
+            allow(InstStatsd::Statsd).to receive(:increment)
+            expect { subject.send(:run, :step_first) }.to raise_error(error)
+            expect(InstStatsd::Statsd).to have_received(:increment).with(
+              'microsoft_sync.smj.failure',
+              tags: {
+                microsoft_sync_step: 'step_second', category: 'MicrosoftSync::Errors::PublicError'
+              }
+            )
+          end
         end
 
         context 'when the error includes GracefulCancelErrorMixin' do
@@ -364,9 +428,11 @@ module MicrosoftSync
             include MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin
           end
 
+          let(:error) { GracefulCancelTestError.new }
+
+          before { allow(steps_object).to receive(:step_first).and_raise(error) }
+
           it 'sets the record state, calls after_failure, and stops processing but does not bubble up the error' do
-            error = GracefulCancelTestError.new
-            expect(steps_object).to receive(:step_first).and_raise(error)
             subject.send(:run, nil)
             # nothing enqueued
             expect(steps_object.steps_run).to eq([[:after_failure]])
@@ -374,6 +440,18 @@ module MicrosoftSync
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
             expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+          end
+
+          it 'increments a "canceled" statsd metric' do
+            allow(InstStatsd::Statsd).to receive(:increment)
+            subject.send(:run, nil)
+            expect(InstStatsd::Statsd).to have_received(:increment).with(
+              'microsoft_sync.smj.cancel',
+              tags: {
+                microsoft_sync_step: 'step_first',
+                category: 'MicrosoftSync::GracefulCancelTestError'
+              }
+            )
           end
         end
       end
@@ -437,7 +515,12 @@ module MicrosoftSync
 
       context 'when there is a mismatch between the step in the job_state field and job arguments' do
         context 'when job_state is nil' do
-          it 'raises an error' do
+          it 'captures an error with Canvas::Errors and then raises it' do
+            expect(Canvas::Errors).to receive(:capture).with(
+              instance_of(StateMachineJob::InternalError),
+              {tags: {type: 'microsoft_sync_smj'}},
+              :error
+            )
             expect {
               subject.send(:run, :step_first)
             }.to raise_error(StateMachineJob::InternalError, /Job step doesn't match state: :step_first != nil/)
@@ -451,8 +534,11 @@ module MicrosoftSync
           end
 
           context 'when the updated_at is before restart_job_after_inactivity' do
-            it 'restarts the job (in-progress job has stalled)' do
+            before do
               Timecop.travel((6.hours + 1.second).from_now)
+            end
+
+            it 'restarts the job (in-progress job has stalled)' do
               expect(state_record.job_state[:step]).to eq(:step_first)
               expect(state_record.job_state[:retries_by_step]['step_first']).to eq(2)
               expect(steps_object).to receive(:step_first) do
@@ -462,6 +548,15 @@ module MicrosoftSync
               end
               expect { subject.send(:run, nil) }.to change{ state_record.job_state[:updated_at] }
               expect(state_record.job_state[:retries_by_step]['step_first']).to eq(1)
+            end
+
+            it 'increments a "stalled" statsd metric' do
+              allow(InstStatsd::Statsd).to receive(:increment)
+              subject.send(:run, nil)
+              expect(InstStatsd::Statsd).to have_received(:increment).with(
+                'microsoft_sync.smj.stalled',
+                tags: {microsoft_sync_step: 'step_first'}
+              )
             end
           end
 

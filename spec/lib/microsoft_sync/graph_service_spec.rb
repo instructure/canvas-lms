@@ -45,12 +45,18 @@ describe MicrosoftSync::GraphService do
 
   # http_method, url, with_params, and reponse_body will be defined with let()s below
 
+  let(:url_path_prefix_for_statsd) { URI.parse(url).path.split('/')[2] }
+
   shared_examples_for 'a graph service endpoint' do |opts={}|
     unless opts[:ignore_404]
       context 'with a 404 status code' do
         let(:response) { json_response(404, error: {message: 'uh-oh!'}) }
 
         it 'raises an HTTPNotFound error' do
+          expect(InstStatsd::Statsd).to receive(:increment).with(
+            'microsoft_sync.graph_service.notfound',
+            tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+          )
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPNotFound,
             /Graph service returned 404 for tenant mytenant.*uh-oh!/
@@ -64,12 +70,24 @@ describe MicrosoftSync::GraphService do
         let(:response) { json_response(code, error: {message: 'uh-oh!'}) }
 
         it 'raises an HTTPInvalidStatus with the code and message' do
+          expect(InstStatsd::Statsd).to receive(:increment).with(
+            'microsoft_sync.graph_service.error',
+            tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+          )
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPInvalidStatus,
             /Graph service returned #{code} for tenant mytenant.*uh-oh!/
           )
         end
       end
+    end
+
+    it 'increments a success statsd metric on success' do
+      expect(InstStatsd::Statsd).to receive(:increment).with(
+        'microsoft_sync.graph_service.success',
+        tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+      )
+      subject
     end
   end
 
@@ -346,21 +364,18 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
+    let(:response_body) { {'foo' => 'bar'} }
+
+    it_behaves_like 'a graph service endpoint', ignore_404: true
 
     context 'when the team exists' do
-      let(:response_body) { {'foo' => 'bar'} }
-
       it { is_expected.to eq(true) }
-
-      it_behaves_like 'a graph service endpoint', ignore_404: true
     end
 
     context "when the team doesn't exist" do
       let(:response) { json_response(404, error: {code: 'NotFound', message: 'Does not exist'}) }
 
       it { is_expected.to eq(false) }
-
-      it_behaves_like 'a graph service endpoint', ignore_404: true
     end
   end
 

@@ -32,6 +32,7 @@ module MicrosoftSync
     BASE_URL = 'https://graph.microsoft.com/v1.0/'
     DIRECTORY_OBJECT_PREFIX = 'https://graph.microsoft.com/v1.0/directoryObjects/'
     GROUP_USERS_ADD_BATCH_SIZE = 20
+    STATSD_PREFIX = 'microsoft_sync.graph_service'
 
     attr_reader :tenant
 
@@ -136,6 +137,8 @@ module MicrosoftSync
     # ===== Helpers =====
 
     def request(method, path, options={})
+      statsd_tag = InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
+
       options[:headers] ||= {}
       options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
       if options[:body]
@@ -156,7 +159,15 @@ module MicrosoftSync
         )
       end
 
-      response.parsed_response
+      result = response.parsed_response
+      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.success", tags: {msft_endpoint: statsd_tag})
+      result
+    rescue MicrosoftSync::Errors::HTTPNotFound
+      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.notfound", tags: {msft_endpoint: statsd_tag})
+      raise
+    rescue
+      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.error", tags: {msft_endpoint: statsd_tag})
+      raise
     end
 
     private
