@@ -43,9 +43,9 @@ describe Api::V1::Conferences do
       )
     end
 
-    it "excludes user_ids" do
+    it "includes user_ids" do
       json = ui_conferences_json(WebConference.where(id: @conference), @course, @teacher, nil)
-      expect(json.first.keys).not_to include('user_ids')
+      expect(json.first.keys).to include('user_ids')
     end
   end
 end

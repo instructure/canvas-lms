@@ -83,16 +83,20 @@ class NotificationPolicyOverride < ActiveRecord::Base
     raise ArgumentError, "can only pass one type of context" if contexts.map(&:class).map(&:name).uniq.length > 1
 
     if channel&.notification_policy_overrides&.loaded?
-      npos = []
-      contexts.each do |context|
-        npos += channel.notification_policy_overrides.select { |npo| npo.context_id == context.id && npo.context_type == context.class.name }
-      end
-      npos
+      loaded_policies_for(contexts, channel)
     elsif channel
       channel.notification_policy_overrides.where(context_id: contexts.map(&:id), context_type: contexts.first.class.name)
+    elsif user.notification_policy_overrides.loaded?
+      loaded_policies_for(contexts, user)
     else
       user.notification_policy_overrides.where(context_id: contexts.map(&:id), context_type: contexts.first.class.name)
     end
+  end
+
+  def self.loaded_policies_for(contexts, object)
+    contexts.map do |context|
+      object.notification_policy_overrides.select { |npo| npo.in_context?(context) }
+    end.flatten
   end
 
   def self.create_or_update_for(communication_channel, notification_category, frequency, context)
@@ -107,5 +111,9 @@ class NotificationPolicyOverride < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def in_context?(context)
+    context_id == context.id && context_type == context.class.name
   end
 end

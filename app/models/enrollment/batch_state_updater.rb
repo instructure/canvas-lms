@@ -78,8 +78,9 @@ class Enrollment::BatchStateUpdater
     updates[:sis_batch_id] = sis_batch.id if sis_batch
     Enrollment.where(id: batch).update_all_locked_in_order(updates)
     EnrollmentState.where(enrollment_id: batch).update_all_locked_in_order(state: 'deleted', state_valid_until: nil, updated_at: Time.now.utc)
-    # we need the order to match the insert/update in GradeCalculator#save_assignment_group_scores
-    Score.where(enrollment_id: batch).order(:enrollment_id, :assignment_group_id).update_all_locked_in_order(workflow_state: 'deleted', updated_at: Time.zone.now)
+    # we need the order to match the queries in GradeCalculator's save_course_and_grading_period_scores and save_assignment_group_scores,
+    # _and_ the fact that the former runs first
+    Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).update_all_locked_in_order(workflow_state: 'deleted', updated_at: Time.zone.now)
     data
   end
 
