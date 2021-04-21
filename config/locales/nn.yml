@@ -2701,7 +2701,7 @@ nn:
       gpa_scale: GPA-skala
       letter_grade: Bokstavkarakter
       not_graded: "Ikkje vurdert"
-      pass_fail: "Fullført / ikkje fullført"
+      pass_fail: "Godkjend / ikkje godkjend"
       percent: Prosenttal
       points: Poeng
     group_assignment_must_have_group_set: "Vel ei gruppe som er oppgitt for denne oppgåva"
