@@ -104,7 +104,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
       } catch (err) {
         showFlashAlert({
           message: err.message
-            ? I18n.t('An error occurred while creating this outcome: %{message}', {
+            ? I18n.t('An error occurred while creating this outcome: %{message}.', {
                 message: err.message
               })
             : I18n.t('An error occurred while creating this outcome.'),

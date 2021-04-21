@@ -19,7 +19,8 @@ import {
   CHILD_GROUPS_QUERY,
   GROUP_DETAIL_QUERY,
   GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
-  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
+  UPDATE_LEARNING_OUTCOME
 } from '../graphql/Management'
 
 export const accountMocks = ({
@@ -460,8 +461,7 @@ export const groupDetailMocks = ({
 
 export const setFriendlyDescriptionOutcomeMock = ({
   inputDescription = 'Updated alternate description',
-  failResponse = false,
-  failMutation = false
+  failResponse = false
 } = {}) => {
   const successfulResponse = {
     data: {
@@ -477,31 +477,17 @@ export const setFriendlyDescriptionOutcomeMock = ({
     }
   }
 
-  const failedMutationResponse = {
-    data: {
-      setFriendlyDescription: {
-        outcomeFriendlyDescription: null,
-        __typename: 'SetFriendlyDescriptionPayload',
-        errors: [
-          {
-            message: 'sure, mutation failed',
-            attribute: 'message',
-            __typename: 'ErrorMessage'
-          }
-        ]
-      }
-    }
-  }
-
   const failedResponse = {
     data: null,
-    errors: 'sure, why not'
+    errors: [
+      {
+        attribute: 'message',
+        message: 'mutation failed'
+      }
+    ]
   }
 
   let result = successfulResponse
-  if (failMutation) {
-    result = failedMutationResponse
-  }
   if (failResponse) {
     result = failedResponse
   }
@@ -521,6 +507,62 @@ export const setFriendlyDescriptionOutcomeMock = ({
     result
   }
 }
+
+export const updateOutcomeMocks = ({
+  id = '1',
+  title = 'Updated name',
+  displayName = 'Friendly outcome name',
+  description = 'Updated description'
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id,
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: {
+        updateLearningOutcome: {
+          learningOutcome: {
+            _id: '1',
+            title,
+            displayName,
+            description
+          },
+          errors: null
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id: '2',
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: null,
+      errors: [
+        {
+          attribute: 'title',
+          message: "can't be blank"
+        }
+      ]
+    }
+  }
+]
 
 export const smallOutcomeTree = () => [
   ...accountMocks({childGroupsCount: 2}),

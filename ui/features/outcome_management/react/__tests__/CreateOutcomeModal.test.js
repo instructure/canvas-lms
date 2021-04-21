@@ -234,7 +234,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runAllTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while creating this outcome: Network error',
+        message: 'An error occurred while creating this outcome: Network error.',
         type: 'error'
       })
     })
@@ -260,7 +260,7 @@ describe('CreateOutcomeModal', () => {
     })
   })
 
-  it('handles create outcome failure due to alternate description (response)', async () => {
+  it('handles create outcome failure due to alternate description', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
@@ -285,38 +285,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runAllTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while creating this outcome.',
-        type: 'error'
-      })
-    })
-  })
-
-  it('handles create outcome failure due to alternate description (mutation)', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
-    const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-      mocks: [
-        ...smallOutcomeTree('Account'),
-        setFriendlyDescriptionOutcomeMock({
-          inputDescription: 'Alternate description',
-          failMutation: true
-        })
-      ]
-    })
-    await act(async () => jest.runAllTimers())
-    fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
-    fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
-      target: {value: 'Alternate description'}
-    })
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account folder 0'))
-    fireEvent.click(getByText('Create'))
-    await act(async () => jest.runAllTimers())
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while creating this outcome.',
+        message: 'An error occurred while creating this outcome: GraphQL error: mutation failed.',
         type: 'error'
       })
     })

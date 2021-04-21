@@ -57,6 +57,7 @@ class Types::MutationType < Types::ApplicationObjectType
     existing assignment post policies.
   DESC
   field :create_learning_outcome, mutation: Mutations::CreateLearningOutcome
+  field :update_learning_outcome, mutation: Mutations::UpdateLearningOutcome
   field :create_outcome_proficiency, mutation: Mutations::CreateOutcomeProficiency
   field :update_outcome_proficiency, mutation: Mutations::UpdateOutcomeProficiency
   field :delete_outcome_proficiency, mutation: Mutations::DeleteOutcomeProficiency

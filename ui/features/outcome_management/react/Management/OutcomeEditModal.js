@@ -32,17 +32,20 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import useRCE from '../hooks/useRCE'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {titleValidator, displayNameValidator} from '../../validators/outcomeValidators'
 import {
-  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
-  updateOutcome
+  UPDATE_LEARNING_OUTCOME,
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
 } from '@canvas/outcomes/graphql/Management'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
-  const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(outcome.displayName)
-  const [description] = useInput(outcome.description)
+  const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(
+    outcome.displayName || ''
+  )
+  const [description] = useInput(outcome.description || '')
   const [
     alternateDescription,
     alternateDescriptionChangeHandler,
@@ -50,6 +53,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   ] = useInput(outcome.friendlyDescription?.description || '')
   const [setRCERef, getRCECode] = useRCE()
 
+  const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
 
   const canvasContext = useCanvasContext()
@@ -68,14 +72,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
     }
   }
 
-  const invalidTitle = !title.trim().length
-    ? I18n.t('Cannot be blank')
-    : title.length > 255
-    ? I18n.t('Must be 255 characters or less')
-    : null
-
-  const invalidDisplayName =
-    displayName.length > 255 ? I18n.t('Must be 255 characters or less') : null
+  const invalidTitle = titleValidator(title)
+  const invalidDisplayName = displayNameValidator(displayName)
 
   const alternativeDescriptionMessages = []
   if (alternateDescriptionChanged && alternateDescription.length > 255) {
@@ -93,15 +91,26 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
       const descriptionRCE = getRCECode()
-      const updatedOutcome = {}
-      if (title && titleChanged) updatedOutcome.title = title
-      if (descriptionRCE && descriptionRCE !== description)
-        updatedOutcome.description = descriptionRCE
-      if (displayName && displayNameChanged) updatedOutcome.display_name = displayName
+
       try {
         const promises = []
-        if (Object.keys(updatedOutcome).length > 0) {
-          promises.push(updateOutcome(outcome._id, updatedOutcome))
+        if (
+          (title && titleChanged) ||
+          (displayName && displayNameChanged) ||
+          (descriptionRCE && descriptionRCE !== description)
+        ) {
+          promises.push(
+            updateLearningOutcomeMutation({
+              variables: {
+                input: {
+                  id: outcome._id,
+                  title,
+                  displayName,
+                  description: descriptionRCE
+                }
+              }
+            })
+          )
         }
         if (alternateDescriptionChanged) {
           promises.push(
@@ -118,14 +127,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
           )
         }
 
-        const results = await Promise.all(promises)
-        const lastResult = results[results.length - 1]
-
-        // if last result is outcome friendly mutation
-        // check for error
-        if (lastResult?.data?.setFriendlyDescription?.errors) {
-          throw new Error()
-        }
+        await Promise.all(promises)
 
         showFlashAlert({
           message: I18n.t('This outcome was successfully updated.'),
@@ -134,7 +136,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
       } catch (err) {
         showFlashAlert({
           message: err.message
-            ? I18n.t('An error occurred while updating this outcome: %{message}', {
+            ? I18n.t('An error occurred while updating this outcome: %{message}.', {
                 message: err.message
               })
             : I18n.t('An error occurred while updating this outcome.'),
@@ -142,6 +144,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
         })
       }
     })()
+
     onCloseHandler()
   }
 

@@ -168,6 +168,23 @@ export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
   }
 `
 
+export const UPDATE_LEARNING_OUTCOME = gql`
+  mutation UpdateLearningOutcome($input: UpdateLearningOutcomeInput!) {
+    updateLearningOutcome(input: $input) {
+      learningOutcome {
+        _id
+        title
+        displayName
+        description
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const updateOutcomeGroup = (contextType, contextId, groupId, group) =>
   axios.put(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
@@ -185,9 +202,6 @@ export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
       contextType
     ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes/${outcomeId}`
   )
-
-export const updateOutcome = (outcomeId, outcome) =>
-  axios.put(`/api/v1/outcomes/${outcomeId}`, outcome)
 
 export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroupId) =>
   axios.put(

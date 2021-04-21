@@ -21,7 +21,6 @@ import {
   removeOutcomeGroup,
   removeOutcome,
   moveOutcomeGroup,
-  updateOutcome,
   createOutcome,
   addOutcomeGroup
 } from '../Management'
@@ -54,14 +53,6 @@ describe('api', () => {
     it('provides correct arguments to API request to delete outcome within course context', () => {
       removeOutcome('Course', '1', '2', '3')
       expect(axios.delete).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2/outcomes/3')
-    })
-  })
-
-  describe('updateOutcome', () => {
-    it('provides correct arguments to API request to update outcome', () => {
-      const outcome = {title: 'Outcome', description: 'Description', display_name: 'Display name'}
-      updateOutcome('1', outcome)
-      expect(axios.put).toHaveBeenCalledWith('/api/v1/outcomes/1', outcome)
     })
   })
 
