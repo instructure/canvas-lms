@@ -137,7 +137,11 @@ module GraphQLNodeLoader
     when "AssignmentGroupBySis"
       Loaders::SISIDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"
-      Loaders::IDLoader.for(DiscussionTopic).load(id).then(check_read_permission)
+      Loaders::IDLoader.for(DiscussionTopic).load(id).then do |topic|
+        next nil unless topic.grants_right?(ctx[:current_user], :read) && !topic.deleted?
+
+        topic
+      end
     when "DiscussionEntry"
       Loaders::IDLoader.for(DiscussionEntry).load(id).then(check_read_permission)
     when "Quiz"
