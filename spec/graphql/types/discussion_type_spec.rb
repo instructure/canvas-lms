@@ -173,4 +173,38 @@ describe Types::DiscussionType do
     result = discussion_type.resolve('canUnpublish')
     expect(result).to eq discussion.can_unpublish?
   end
+
+  context 'pagination' do
+    before(:once) do
+      # Add 10 root entries
+      @total_root_entries = 10
+      @total_root_entries.times do |i|
+        discussion.discussion_entries.create!(message: "Message #{i}", user: @teacher)
+      end
+      # Add 10 subentries
+      @total_subentries = 10
+      subentry = discussion.discussion_entries.first
+      @total_subentries.times do |i|
+        subentry.discussion_subentries.create!(
+          message: "Subentry #{i}",
+          user: @teacher,
+          discussion_topic_id: discussion.id
+        )
+      end
+
+      @total_entries = @total_root_entries + @total_subentries
+    end
+
+    it 'returns total number of root entry pages' do
+      (1..@total_root_entries).each do |i|
+        expect(discussion_type.resolve("rootEntriesTotalPages(perPage: #{i})")).to eq((@total_root_entries.to_f / i).ceil)
+      end
+    end
+
+    it 'returns total number of entry pages' do
+      (1..@total_entries).each do |i|
+        expect(discussion_type.resolve("entriesTotalPages(perPage: #{i})")).to eq((@total_entries.to_f / i).ceil)
+      end
+    end
+  end
 end
