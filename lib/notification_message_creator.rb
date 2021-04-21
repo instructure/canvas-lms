@@ -128,7 +128,8 @@ class NotificationMessageCreator
     return unless channel.bouncing? || too_many_messages_for?(user)
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
-      fallback_policy = channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
+      # notification_policies are already loaded, so use find instead of generating a query
+      fallback_policy = channel.notification_policies.find{ |np| np.frequency == 'daily' && np.notification_id == nil }
       fallback_policy ||= channel.notification_policies.create!(frequency: 'daily')
     end
 
