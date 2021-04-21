@@ -83,6 +83,7 @@ module Canvas
       end
 
       it "handles concurrent traffic" do
+        skip 'FOO-1895 4/21/21'
         lock_taken = false
         cache_key = "some-cache-key"
         cache_value = "THE VALUE"
@@ -120,6 +121,7 @@ module Canvas
       end
 
       it "will only clear once in a short window, unless forced" do
+        skip 'FOO-1895 4/21/21'
         @fast_cache.write("pre-clear-key", "pre-clear-value")
         expect(@fast_cache.read("pre-clear-key")).to eq("pre-clear-value")
         @fast_cache.clear
