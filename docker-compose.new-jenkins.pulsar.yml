@@ -12,6 +12,8 @@ services:
     ports:
       - "6650"
       - "8080"
+    volumes:
+      - pulsar-data:/pulsar/data
   pulsar-admin:
     image: apachepulsar/pulsar:latest
     volumes:

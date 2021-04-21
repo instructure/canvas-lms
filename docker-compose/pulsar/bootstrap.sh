@@ -1,13 +1,32 @@
 #!/bin/bash
-#
+
 # This assumes "pulsar" is the name
 # of the container we're interacting with,
 # which is a safe assumption for the test/build
 # environments
 ADMIN_URL=http://pulsar:8080/
 
-# give pulsar a chance to wake up
-sleep 20
+function check_ready {
+  bin/pulsar-admin --admin-url $ADMIN_URL tenants list
+  PULSAR_STATUS=$?
+  if [ $PULSAR_STATUS -eq 0 ]; then
+    return 0
+  fi
+  return 1
+}
+
+CHECK_COUNT=0
+until check_ready; do
+  echo "Waiting for pulsar to be ready ... $CHECK_COUNT ... "
+  sleep 5
+  CHECK_COUNT=$((CHECK_COUNT+1))
+  if [$CHECK_COUNT -gt 20]; then
+    echo ":cry: I don't think pulsar is ever going to be ready..."
+    exit 1
+  fi
+done
+
+echo "Pulsar is ready!"
 
 # These commands are necessary to create the tenants
 # and namespaces for canvas operations.  You can run them in

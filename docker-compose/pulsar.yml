@@ -9,7 +9,7 @@ services:
       REPLICATION_PASSWORD: impulse
       REPLICATION_DB: canvas
   web:
-    links:
+    depends_on:
       - pulsar
   pulsar:
     image: apachepulsar/pulsar:latest
@@ -23,7 +23,7 @@ services:
     image: apachepulsar/pulsar:latest
     volumes:
       - ./docker-compose/pulsar:/pulsar/scripts
-    links:
+    depends_on:
       - pulsar
 
 volumes:

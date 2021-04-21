@@ -64,12 +64,18 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
 ENV PULSAR_VERSION=2.6.1
 ENV PULSAR_CLIENT_SHA512=90fdb6e3ad85c9204f2b20a9077684f667f84be32df0952f8823ccee501c9d64a4c8131cab38a295a4cb66e2b63211afcc24f32130ded47e9da8f334ec6053f5
 ENV PULSAR_CLIENT_DEV_SHA512=d0cc58c0032cb35d4325769ab35018b5ed823bc9294d75edfb56e62a96861be4194d6546107af0d5f541a778cdc26274aac9cb7b5ced110521467f89696b2209
+# pulsar installs 4 versions of this library, but we only need
+# one, so at the end we remove the others to minimize the image size
 RUN cd "$(mktemp -d)" && \
     curl -SLO 'http://archive.apache.org/dist/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client.deb' && \
     curl -SLO 'http://archive.apache.org/dist/pulsar/pulsar-'$PULSAR_VERSION'/DEB/apache-pulsar-client-dev.deb' && \
     echo $PULSAR_CLIENT_SHA512 '*apache-pulsar-client.deb' | shasum -a 512 -c -s - && \
     echo $PULSAR_CLIENT_DEV_SHA512 '*apache-pulsar-client-dev.deb' | shasum -a 512 -c -s - && \
-    apt install ./apache-pulsar-client*.deb
+    apt install ./apache-pulsar-client*.deb && \
+    rm ./apache-pulsar-client*.deb && \
+    rm /usr/lib/libpulsarnossl.so* && \
+    rm /usr/lib/libpulsar.a && \
+    rm /usr/lib/libpulsarwithdeps.a
 
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
