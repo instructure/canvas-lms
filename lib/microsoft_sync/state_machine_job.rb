@@ -235,7 +235,7 @@ module MicrosoftSync
     end
 
     def log(&_blk)
-      Rails.logger.debug { "#{strand}: #{yield}" }
+      Rails.logger.info { "#{strand}: #{yield}" }
     end
 
     def strand
