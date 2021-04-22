@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!k5_dashboard'
 
+import useImmediate from '@canvas/use-immediate-hook'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
@@ -83,23 +84,27 @@ export const HomeroomPage = props => {
   const [announcementsLoading, setAnnouncementsLoading] = useState(true)
   const [courseModalOpen, setCourseModalOpen] = useState(false)
 
-  useEffect(() => {
-    setDashboardCards(
-      createDashboardCards(cards?.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
-        headingLevel: 'h3'
-      })
-    )
-  }, [cards])
+  useImmediate(
+    () => {
+      if (cards) {
+        setDashboardCards(
+          createDashboardCards(cards.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
+            headingLevel: 'h3'
+          })
+        )
 
-  useEffect(() => {
-    if (cards) {
-      setAnnouncementsLoading(true)
-      fetchHomeroomAnnouncements(cards)
-        .then(setHomeroomAnnouncements)
-        .catch(showFlashError(I18n.t('Failed to load announcements.')))
-        .finally(() => setAnnouncementsLoading(false))
-    }
-  }, [cards])
+        setAnnouncementsLoading(true)
+        fetchHomeroomAnnouncements(cards)
+          .then(setHomeroomAnnouncements)
+          .catch(showFlashError(I18n.t('Failed to load announcements.')))
+          .finally(() => setAnnouncementsLoading(false))
+      }
+    },
+    [cards],
+    // Need to do deep comparison on cards to only re-trigger if they actually changed
+    // (they shouldn't after they're set the first time)
+    {deep: true}
+  )
 
   const NUM_CARD_SKELETONS = ENV?.INITIAL_NUM_K5_CARDS || 5
   const skeletonCards = []

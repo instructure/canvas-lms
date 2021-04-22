@@ -117,6 +117,7 @@ describe('fetchGrades', () => {
     id: '1',
     name: 'Intro to Everything',
     image_download_url: 'https://course.img',
+    course_color: '#ace',
     has_grading_periods: true,
     homeroom_course: false,
     enrollments: [
@@ -149,6 +150,7 @@ describe('fetchGrades', () => {
         courseId: '1',
         courseName: 'Intro to Everything',
         courseImage: 'https://course.img',
+        courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
         gradingPeriods: [
@@ -177,6 +179,7 @@ describe('fetchGrades', () => {
         courseId: '1',
         courseName: 'Intro to Everything',
         courseImage: 'https://course.img',
+        courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
         gradingPeriods: [],

@@ -117,6 +117,26 @@ describe CourseForMenuPresenter do
       end
     end
 
+    context 'course color' do
+      before do
+        course.update! settings: course.settings.merge(course_color: '#789')
+      end
+
+      it 'sets `color` to nil if the course is not associated with a K-5 account' do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:color]).to be_nil
+      end
+
+      it 'sets `color` if the course is associated with a K-5 account' do
+        course.root_account.enable_feature!(:canvas_for_elementary)
+        course.account.settings[:enable_as_k5_account] = { value: true }
+        course.account.save!
+
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:color]).to eq '#789'
+      end
+    end
+
     context 'Dashcard Reordering' do
       it 'returns a position if one is set' do
         user.set_dashboard_positions(course.asset_string => 3)

@@ -33,7 +33,7 @@ import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import {fetchLatestAnnouncement, FOCUS_TARGETS} from '@canvas/k5/react/utils'
+import {fetchLatestAnnouncement, DEFAULT_COURSE_COLOR, FOCUS_TARGETS} from '@canvas/k5/react/utils'
 
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 
@@ -232,7 +232,7 @@ const K5DashboardCard = ({
   href,
   id,
   originalName,
-  backgroundColor = '#394B58',
+  courseColor,
   connectDragSource = c => c,
   connectDropTarget = c => c,
   headingLevel = 'h3',
@@ -250,6 +250,7 @@ const K5DashboardCard = ({
       )
       .finally(() => setLoadingAnnouncement(false))
   }, [id, originalName])
+  const backgroundColor = courseColor || DEFAULT_COURSE_COLOR
 
   const k5Context = useContext(K5DashboardContext)
   const assignmentsDueToday =
@@ -354,6 +355,7 @@ K5DashboardCard.propTypes = {
   id: PropTypes.string.isRequired,
   originalName: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string,
+  courseColor: PropTypes.string,
   connectDragSource: PropTypes.func,
   connectDropTarget: PropTypes.func,
   headingLevel: PropTypes.string,

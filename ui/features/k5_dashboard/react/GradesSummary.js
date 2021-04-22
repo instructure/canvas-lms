@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -32,9 +33,8 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!k5_dashboard'
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 import k5Theme from '@canvas/k5/react/k5-theme'
-import {PresentationContent} from '@instructure/ui-a11y-content'
+import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
 
-const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
 const DEFAULT_SIZE = 100
 
 const GradeSummaryShape = {
@@ -48,15 +48,10 @@ const GradeSummaryShape = {
   score: PropTypes.number
 }
 
-export const GradeCourseImage = ({
-  onClick,
-  courseImage,
-  courseColor = DEFAULT_COLOR,
-  size = DEFAULT_SIZE
-}) => (
+export const GradeCourseImage = ({onClick, courseImage, courseColor, size = DEFAULT_SIZE}) => (
   <div
     style={{
-      backgroundColor: !courseImage && courseColor,
+      backgroundColor: !courseImage && (courseColor || DEFAULT_COURSE_COLOR),
       backgroundImage:
         courseImage && `url(${instFSOptimizedImageUrl(courseImage, {x: size, y: size})})`,
       backgroundSize: 'cover',

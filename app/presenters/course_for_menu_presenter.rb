@@ -58,6 +58,7 @@ class CourseForMenuPresenter
       isHomeroom: course.homeroom_course,
       canManage: course.grants_right?(@user, :manage_content),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
+      color: course.elementary_enabled? ? course.course_color : nil,
       position: position.present? ? position.to_i : nil
     }.tap do |hash|
       if @opts[:tabs]

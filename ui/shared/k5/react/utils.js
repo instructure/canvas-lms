@@ -44,6 +44,7 @@ export const fetchGrades = (userId = 'self') =>
         courseId: course.id,
         courseName: course.name,
         courseImage: course.image_download_url,
+        courseColor: course.course_color,
         currentGradingPeriodId: enrollment.current_grading_period_id,
         currentGradingPeriodTitle: enrollment.current_grading_period_title,
         enrollmentType: enrollment.type,
@@ -161,3 +162,5 @@ export const FOCUS_TARGETS = {
   TODAY: 'today',
   MISSING_ITEMS: 'missing-items'
 }
+
+export const DEFAULT_COURSE_COLOR = '#394B58'
