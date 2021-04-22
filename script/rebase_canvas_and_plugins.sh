@@ -2,6 +2,7 @@
 set -o pipefail
 
 source script/common/utils/common.sh
+source script/common/utils/spinner.sh
 source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/rebase_canvas_and_plugins.log"
@@ -53,23 +54,32 @@ while :; do
 done
 
 function rebase_canvas {
-  echo_console_and_log "Rebasing canvas-lms on HEAD ..."
-  if ! _canvas_lms_track git pull --rebase origin master 2>&1 | tee -a "$LOG"; then
+  start_spinner "Rebasing canvas-lms on HEAD ..."
+  _canvas_lms_track_with_log git pull --rebase origin master
+  exit_code=$?
+  if [ $exit_code -ne 0 ]; then
+    stop_spinner $exit_code
     FAILED_REPOS+=("canvas-lms")
   fi
+  stop_spinner
   echo ""
 }
 
 function rebase_plugins {
+  message "Rebasing plugins..."
   iterate_plugins rebase_plugin
 }
 
 function rebase_plugin {
-    echo_console_and_log "Rebasing plugin $1 ..."
-    if ! _canvas_lms_track git pull --rebase origin master 2>&1 | tee -a "$LOG"; then
-      FAILED_REPOS+=("$1")
-    fi
-    echo ""
+  start_spinner "> Rebasing plugin $1 ..."
+  _canvas_lms_track_with_log git pull --rebase origin master
+  exit_code=$?
+  if [ $exit_code -ne 0 ]; then
+    stop_spinner $exit_code
+    FAILED_REPOS+=("$1")
+  fi
+  stop_spinner
+  echo ""
 }
 
 function iterate_plugins {
@@ -136,6 +146,7 @@ function check_for_changes {
 
 function print_results {
   exit_code=$?
+  stop_spinner $exit_code
   set +e
 
   if [ "${#FAILED_REPOS[@]}" -gt 0 ]; then
