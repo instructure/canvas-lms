@@ -31,14 +31,15 @@ describe Types::DiscussionType do
   end
 
   it 'allows querying for entry counts' do
-
     3.times { discussion.discussion_entries.create!(message: "sub entry", user: @teacher) }
-
+    discussion.discussion_entries.take.destroy
+    expect(discussion_type.resolve('entryCounts { deletedCount }')).to eq 1
     expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 0
-    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 2
     DiscussionEntryParticipant.where(user_id: @teacher).update_all(workflow_state: 'unread')
-    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 3
-    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+    expect(discussion_type.resolve('entryCounts { deletedCount }')).to eq 1
+    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 2
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 2
   end
 
   it "queries the attribute" do

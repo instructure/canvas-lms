@@ -35,8 +35,11 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
 
   def counts_sql(id_string)
     <<~SQL
-      #{id_string}, COUNT(discussion_entries.id) AS replies,
-      SUM(CASE WHEN discussion_entry_participants.workflow_state = 'read' THEN 1 ELSE 0 END) AS read
+      #{id_string},
+      SUM(CASE WHEN discussion_entries.workflow_state <> 'deleted' THEN 1 END) AS replies,
+      SUM(CASE WHEN discussion_entries.workflow_state = 'deleted' THEN 1 END) deleted_count,
+      SUM(CASE WHEN discussion_entry_participants.workflow_state = 'read'
+          AND discussion_entries.workflow_state <> 'deleted' THEN 1 END) AS read
     SQL
   end
 
@@ -55,6 +58,7 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
       end
       object_counts = {}
       object_counts["replies_count"] = counts[object.id]&.replies || 0
+      object_counts["deleted_count"] = counts[object.id]&.deleted_count || 0
       object_counts["unread_count"] = object_counts["replies_count"] - (counts[object.id]&.read || 0)
       fulfill(object, object_counts)
     end
