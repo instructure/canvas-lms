@@ -126,6 +126,7 @@ export const DiscussionThreadContainer = props => {
           unread: props.rootEntryParticipantCounts?.unreadCount
         })}
         onClick={() => setExpandReplies(!expandReplies)}
+        isExpanded={expandReplies}
       />
     )
   }
