@@ -12,9 +12,11 @@
   <div id="bulkEditRoot"></div>
 {{else}}
 
-<div tabindex="0" class="drag_and_drop_warning screenreader-only">
-  {{#t}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}
-</div>
+{{#if ENV.PERMISSIONS.manage}}
+  <div tabindex="0" class="drag_and_drop_warning screenreader-only">
+    {{#t}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}
+  </div>
+{{/if}}
 <div class="header-bar">
   <div class="header-bar-left ic-Form-control assignment-search">
     <div class="ic-Multi-input">
