@@ -22,6 +22,7 @@ import I18n from 'i18n!course_settings'
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
+import {IconWarningLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -29,19 +30,26 @@ import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
 const IntegrationRow = ({
-  name,
-  enabled,
-  loading,
-  onChange,
   children,
+  enabled,
   error,
   expanded,
+  info,
+  loading,
+  name,
+  onChange,
   onToggle
 }) => {
   const summary = () => (
     <Flex justifyItems="space-between">
       <Flex.Item>
         <Text>{name}</Text>
+        {error && (
+          <View>
+            &nbsp;
+            <IconWarningLine color="error" title={I18n.t('Integration error')} />
+          </View>
+        )}
       </Flex.Item>
       <Flex.Item>
         <Flex>
@@ -70,7 +78,7 @@ const IntegrationRow = ({
     </Flex>
   )
   const toggleLabel = () =>
-    enabled ? I18n.t('Hide %{name} details', {name}) : I18n.t('Show %{name} details', {name})
+    expanded ? I18n.t('Hide %{name} details', {name}) : I18n.t('Show %{name} details', {name})
 
   return (
     <ToggleGroup
@@ -83,15 +91,20 @@ const IntegrationRow = ({
       <div role="region" aria-live="polite">
         {error && !loading && (
           <Alert variant="error" margin="small">
-            <Text>{I18n.t('An error occurred, please try again. Error: %{error}', {error})}</Text>
+            <Text>
+              {error.message ||
+                I18n.t('An error occurred, please try again. Error: %{error}', {error})}
+            </Text>
           </Alert>
         )}
-        {!enabled && !loading && (
-          <Alert variant="info" margin="small">
+        {((!enabled && !loading) || info) && (
+          <Alert variant={info?.variant || 'info'} margin="small">
             <Text>
-              {I18n.t(
-                'This integration is not enabled. Please enable it to interact with settings.'
-              )}
+              {enabled
+                ? info?.message || info
+                : I18n.t(
+                    'This integration is not enabled. Please enable it to interact with settings.'
+                  )}
             </Text>
           </Alert>
         )}

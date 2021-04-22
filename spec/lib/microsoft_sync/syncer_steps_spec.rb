@@ -25,24 +25,39 @@ describe MicrosoftSync::SyncerSteps do
     course_model(name: 'sync test course')
   end
   let(:group) { MicrosoftSync::Group.create(course: course) }
-  let(:graph_service) { double('GraphService') }
-  let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: graph_service) }
+  let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: double('GraphService')) }
+  let(:graph_service) { graph_service_helpers.graph_service }
   let(:tenant) { 'mytenant123' }
   let(:sync_enabled) { true }
 
-  def expect_next_step(result, next_step, memory_state=nil)
+  def expect_next_step(result, step, memory_state=nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::NextStep)
-    expect { syncer_steps.method(next_step.to_sym) }.to_not raise_error
-    expect(result.next_step).to eq(next_step)
+    expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+    expect(result.step).to eq(step)
     expect(result.memory_state).to eq(memory_state)
   end
 
-  def expect_retry(result, error_class:, delay_amount: nil, job_state_data: nil)
+  def expect_delayed_next_step(result, step, delay_amount, job_state_data=nil)
+    expect(result).to be_a(MicrosoftSync::StateMachineJob::DelayedNextStep)
+    expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+    expect(result.step).to eq(step)
+    expect(result.delay_amount).to eq(delay_amount)
+    expect(result.job_state_data).to eq(job_state_data)
+  end
+
+  def expect_retry(result, error_class:, delay_amount: nil, job_state_data: nil, step: nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::Retry)
     expect(result.error.class).to eq(error_class)
     expect(result.delay_amount).to eq(delay_amount)
-    expect(result.delay_amount.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
+    # Check that we haven't specified any delays to big for our restart_job_after_inactivity
+    [result.delay_amount].flatten.each do |delay|
+      expect(delay.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
+    end
     expect(result.job_state_data).to eq(job_state_data)
+    expect(result.step).to eq(step)
+    if step
+      expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+    end
   end
 
   def new_http_error(code)
@@ -75,7 +90,7 @@ describe MicrosoftSync::SyncerSteps do
   describe '#max_retries' do
     subject { syncer_steps.max_retries }
 
-    it { is_expected.to eq(4) }
+    it { is_expected.to eq(3) }
   end
 
   describe '#after_failure' do
@@ -95,6 +110,27 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
+  shared_examples_for 'a step that returns retry on intermittent error' do |retry_args|
+    let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
+
+    [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
+      context "when hitting the Microsoft API raises a #{error_class}" do
+        it 'returns a Retry object' do
+          expect(graph_service).to receive(:request).and_raise(error_class.new)
+          expect_retry(subject, error_class: error_class, **retry_args)
+        end
+      end
+    end
+
+    context "when Microsoft API returns a 500" do
+      it 'returns a Retry object' do
+        expect(graph_service).to receive(:request).and_raise(new_http_error(500))
+        expect_retry(subject,
+                     error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
+      end
+    end
+  end
+
   describe '#step_ensure_class_group_exists' do
     subject { syncer_steps.step_ensure_class_group_exists(nil, nil) }
 
@@ -106,6 +142,8 @@ describe MicrosoftSync::SyncerSteps do
     shared_examples_for 'a group record which requires a new or updated MS group' do
       let(:education_class_ids) { [] }
 
+      it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+
       context 'when no remote MS group exists for the course' do
         # admin deleted the MS group we created, or a group never existed
 
@@ -113,7 +151,9 @@ describe MicrosoftSync::SyncerSteps do
           expect(graph_service_helpers).to \
             receive(:create_education_class).with(course).and_return('id' => 'newid')
 
-          expect_next_step(subject, :step_update_group_with_course_data, 'newid')
+          expect_delayed_next_step(
+            subject, :step_update_group_with_course_data, 2.seconds, 'newid'
+          )
         end
       end
 
@@ -123,7 +163,9 @@ describe MicrosoftSync::SyncerSteps do
         it 'goes to the "update group" step with the remote group ID' do
           expect(graph_service_helpers).to_not receive(:create_education_class)
 
-          expect_next_step(subject, :step_update_group_with_course_data, 'newid2')
+          expect_delayed_next_step(
+            subject, :step_update_group_with_course_data, 2.seconds, 'newid2'
+          )
         end
       end
 
@@ -142,12 +184,10 @@ describe MicrosoftSync::SyncerSteps do
         it 'raises a graceful cleanup error with a end-user-friendly name' do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
-          begin
-            subject
-          rescue => e
+          expect { subject }.to raise_error do |e|
+            expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
+            expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
           end
-          expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
-          expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
         end
       end
 
@@ -187,52 +227,43 @@ describe MicrosoftSync::SyncerSteps do
   end
 
   describe '#step_update_group_with_course_data' do
-    shared_examples_for 'updating group with course data' do
-      context 'on success' do
-        it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
-          expect(graph_service_helpers).to \
-            receive(:update_group_with_course_data).with('newid', course)
+    subject do
+      syncer_steps.step_update_group_with_course_data(nil, 'newid')
+    end
 
-          expect { subject }.to change { group.reload.ms_group_id }.to('newid')
-          expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
-        end
-      end
+    it_behaves_like 'a step that returns retry on intermittent error',
+                    delay_amount: [5, 20, 100], job_state_data: 'newid'
 
-      context 'on 404' do
-        it 'retries with a delay' do
-          expect(graph_service_helpers).to \
-            receive(:update_group_with_course_data).with('newid', course)
-            .and_raise(new_http_error(404))
-          expect { subject }.to_not change { group.reload.ms_group_id }
-          expect_retry(
-            subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-            delay_amount: 45.seconds, job_state_data: 'newid'
-          )
-        end
-      end
+    context 'on success' do
+      it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
+        expect(graph_service_helpers).to \
+          receive(:update_group_with_course_data).with('newid', course)
 
-      context 'on other failure' do
-        it 'bubbles up the error' do
-          expect(graph_service_helpers).to \
-            receive(:update_group_with_course_data).with('newid', course)
-            .and_raise(new_http_error(400))
-          expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
-        end
+        expect { subject }.to change { group.reload.ms_group_id }.to('newid')
+        expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
       end
     end
 
-    context 'when run for the first time with a new_group_id' do
-      subject { syncer_steps.step_update_group_with_course_data('newid', nil) }
-
-      it_behaves_like 'updating group with course data'
+    context 'on 404' do
+      it 'retries with a delay' do
+        expect(graph_service_helpers).to \
+          receive(:update_group_with_course_data).with('newid', course)
+          .and_raise(new_http_error(404))
+        expect { subject }.to_not change { group.reload.ms_group_id }
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100], job_state_data: 'newid'
+        )
+      end
     end
 
-    context 'when retrying' do
-      subject do
-        syncer_steps.step_update_group_with_course_data(nil, 'newid')
+    context 'on other failure' do
+      it 'bubbles up the error' do
+        expect(graph_service_helpers).to \
+          receive(:update_group_with_course_data).with('newid', course)
+          .and_raise(new_http_error(400))
+        expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
-
-      it_behaves_like 'updating group with course data'
     end
   end
 
@@ -263,61 +294,80 @@ describe MicrosoftSync::SyncerSteps do
         communication_channel(teacher, path_type: 'email', username: "teacher#{i}@example.com")
       end
 
-      allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-        raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
+    end
 
-        upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+
+    context "when Microsoft's API returns 404" do
+      it 'retries with a delay' do
+        expect(graph_service_helpers).to receive(:users_upns_to_aads).and_raise(new_http_error(404))
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100]
+        )
       end
     end
 
-    it 'creates a mapping for each of the enrollments' do
-      expect_next_step(subject, :step_generate_diff)
-      expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
-        students.each_with_index.map{|student, n| [student.id, "student#{n}-aad"]}.sort +
-        teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-aad"]}.sort
-      )
-    end
-
-    it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
-      expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
-      expect_next_step(subject, :step_generate_diff)
-    end
-
-    context "when Microsoft doesn't have AADs for the UPNs" do
-      it "doesn't add any UserMappings" do
-        expect(graph_service_helpers).to receive(:users_upns_to_aads).
-          at_least(:once).and_return({})
-        expect { subject }.to_not \
-          change { MicrosoftSync::UserMapping.count }.from(0)
-        expect_next_step(subject, :step_generate_diff)
-      end
-    end
-
-    context 'when some users already have a mapping for that root account id' do
+    context "when Microsoft's API returns success" do
       before do
-        MicrosoftSync::UserMapping.create!(
-          user: students.first, root_account_id: course.root_account_id, aad_id: 'manualstudent1'
-        )
-        MicrosoftSync::UserMapping.create!(
-          user: students.second, root_account_id: 0, aad_id: 'manualstudent2-wrong-rootaccount'
+        allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
+          raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
+
+          upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+        end
+      end
+
+      it 'creates a mapping for each of the enrollments' do
+        expect_next_step(subject, :step_generate_diff)
+        expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
+          students.each_with_index.map{|student, n| [student.id, "student#{n}-aad"]}.sort +
+          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-aad"]}.sort
         )
       end
 
-      it "doesn't lookup aads for those users" do
-        upns_looked_up = []
-        expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-          upns_looked_up += upns
-          {}
-        end
+      it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
+        expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
         expect_next_step(subject, :step_generate_diff)
-        expect(upns_looked_up).to_not include("student0@example.com")
-        expect(upns_looked_up).to include("student1@example.com")
+      end
+
+      context "when Microsoft doesn't have AADs for the UPNs" do
+        it "doesn't add any UserMappings" do
+          expect(graph_service_helpers).to receive(:users_upns_to_aads)
+            .at_least(:once).and_return({})
+          expect { subject }.to_not \
+            change { MicrosoftSync::UserMapping.count }.from(0)
+          expect_next_step(subject, :step_generate_diff)
+        end
+      end
+
+      context 'when some users already have a mapping for that root account id' do
+        before do
+          MicrosoftSync::UserMapping.create!(
+            user: students.first, root_account_id: course.root_account_id, aad_id: 'manualstudent1'
+          )
+          MicrosoftSync::UserMapping.create!(
+            user: students.second, root_account_id: 0, aad_id: 'manualstudent2-wrong-rootaccount'
+          )
+        end
+
+        it "doesn't lookup aads for those users" do
+          upns_looked_up = []
+          expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
+            upns_looked_up += upns
+            {}
+          end
+          expect_next_step(subject, :step_generate_diff)
+          expect(upns_looked_up).to_not include("student0@example.com")
+          expect(upns_looked_up).to include("student1@example.com")
+        end
       end
     end
   end
 
   describe '#step_generate_diff' do
     subject { syncer_steps.step_generate_diff(nil, nil) }
+
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
 
     before do
       course.enrollments.to_a.each_with_index do |enrollment, i|
@@ -340,28 +390,51 @@ describe MicrosoftSync::SyncerSteps do
         receive(:new).with(%w[m1 m2], %w[o1 o2]).and_return(diff)
       members_and_enrollment_types = []
       expect(diff).to receive(:set_local_member) { |*args| members_and_enrollment_types << args }
+      allow(diff).to receive(:local_owners) do
+        members_and_enrollment_types.select do |me|
+          MicrosoftSync::MembershipDiff::OWNER_ENROLLMENT_TYPES.include?(me.last)
+        end.map(&:first)
+      end
 
       expect_next_step(subject, :step_execute_diff, diff)
       expect(members_and_enrollment_types).to eq([['0', 'TeacherEnrollment']])
     end
+
+    context 'on 404' do
+      it 'retries with a delay' do
+        expect(graph_service_helpers).to receive(:get_group_users_aad_ids)
+          .and_raise(new_http_error(404))
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100]
+        )
+      end
+    end
   end
 
-  describe '#execute_diff' do
+  describe '#step_execute_diff' do
     subject { syncer_steps.step_execute_diff(diff, nil) }
 
     let(:diff) { double('MembershipDiff') }
 
-    before { group.update!(ms_group_id: 'mygroup') }
+    it_behaves_like 'a step that returns retry on intermittent error',
+                    delay_amount: [5, 20, 100], step: :step_generate_diff
 
-    it 'adds/removes users based on the diff' do
-      expect(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
-      expect(diff).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
-      expect(diff).to \
+    before do
+      group.update!(ms_group_id: 'mygroup')
+
+      allow(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
+      allow(diff).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
+      allow(diff).to \
         receive(:additions_in_slices_of).
         with(MicrosoftSync::GraphService::GROUP_USERS_ADD_BATCH_SIZE).
         and_yield(owners: %w[o3], members: %w[o1 o2]).
         and_yield(members: %w[o3])
 
+      allow(diff).to receive(:local_owners).and_return Set.new(%w[o3])
+    end
+
+    it 'adds/removes users based on the diff' do
       expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm1')
       expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm2')
       expect(graph_service).to receive(:remove_group_owner).once.with('mygroup', 'o1')
@@ -370,14 +443,39 @@ describe MicrosoftSync::SyncerSteps do
       expect(graph_service).to \
         receive(:add_users_to_group).with('mygroup', members: %w[o3])
 
-      expect_next_step(subject, :step_ensure_team_exists)
+      expect_next_step(subject, :step_check_team_exists)
+    end
+
+    context 'on 404' do
+      it 'goes back to step_generate_diff with a delay' do
+        expect(graph_service).to receive(:add_users_to_group).and_raise(new_http_error(404))
+        expect_retry(
+          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [5, 20, 100], step: :step_generate_diff
+        )
+      end
+    end
+
+    context 'when there are no local owners (course teacher enrollments)' do
+      it 'raises a graceful exit error informing the user' do
+        expect(diff).to receive(:local_owners).and_return Set.new
+        expect { subject }.to raise_error do |error|
+          expect(error).to be_a(MicrosoftSync::Errors::PublicError)
+          expect(error.public_message).to match(
+            /no users corresponding to the instructors of the Canvas course could be found/
+          )
+          expect(error).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+        end
+      end
     end
   end
 
-  describe '#ensure_team_exists' do
-    subject { syncer_steps.step_ensure_team_exists(nil, nil) }
+  describe '#step_check_team_exists' do
+    subject { syncer_steps.step_check_team_exists(nil, nil) }
 
     before { group.update!(ms_group_id: 'mygroupid') }
+
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
 
     context 'when there are no teacher/ta/designer enrollments' do
       it "doesn't check for team existence or create a team" do
@@ -385,60 +483,67 @@ describe MicrosoftSync::SyncerSteps do
           e.destroy if e.type =~ /^Teacher|Ta|Designer/
         end
         expect(graph_service).to_not receive(:team_exists?)
-        expect(graph_service).to_not receive(:create_team)
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
       end
     end
 
     context 'when the team already exists' do
-      it "doesn't create a team" do
+      it "returns COMPLETE" do
         expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(true)
-        expect(graph_service).to_not receive(:create_team)
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
       end
     end
 
     context "when the team doesn't exist" do
-      before do
-        allow(graph_service).to receive(:team_exists?).with('mygroupid').and_return(false)
+      it "moves on to step_create_team after a delay" do
+        expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(false)
+        expect_delayed_next_step(subject, :step_create_team, 10.seconds)
       end
+    end
+  end
 
-      it 'creates the team' do
+  describe '#step_create_team' do
+    subject { syncer_steps.step_create_team(nil, nil) }
+
+    before { group.update!(ms_group_id: 'mygroupid') }
+
+    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+
+    it 'creates the team' do
+      expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
+      expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
+    end
+
+    context 'when the Microsoft API errors with "group has no owners"' do
+      it "retries in (30, 90, 270 seconds)" do
         expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
-        expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
+          .and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
+        expect_retry(
+          subject,
+          error_class: MicrosoftSync::Errors::GroupHasNoOwners,
+          delay_amount: [30, 90, 270]
+        )
       end
+    end
 
-      context 'when the Microsoft API errors with "group has no owners"' do
-        it "retries in 1 minute" do
-          expect(graph_service).to receive(:create_education_class_team).with('mygroupid').
-            and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
-          expect_retry(
-            subject,
-            error_class: MicrosoftSync::Errors::GroupHasNoOwners,
-            delay_amount: 1.minute
-          )
-        end
+    context "when the Microsoft API errors with a 404 (e.g., group doesn't exist)" do
+      it "retries in (30, 90, 270 seconds)" do
+        expect(graph_service).to \
+          receive(:create_education_class_team).with('mygroupid').and_raise(new_http_error(404))
+        expect_retry(
+          subject,
+          error_class: MicrosoftSync::Errors::HTTPNotFound,
+          delay_amount: [30, 90, 270]
+        )
       end
+    end
 
-      context "when the Microsoft API errors with a 404 (e.g., group doesn't exist)" do
-        it "retries in 1 minute" do
-          expect(graph_service).to \
-            receive(:create_education_class_team).with('mygroupid').and_raise(new_http_error(404))
-          expect_retry(
-            subject,
-            error_class: MicrosoftSync::Errors::HTTPNotFound,
-            delay_amount: 1.minute
-          )
-        end
-      end
-
-      context 'when the Microsoft API errors with some other error' do
-        it "bubbles up the error" do
-          expect(graph_service).to \
-            receive(:create_education_class_team).with('mygroupid').
-            and_raise(new_http_error(400))
-          expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
-        end
+    context 'when the Microsoft API errors with some other error' do
+      it "bubbles up the error" do
+        expect(graph_service).to \
+          receive(:create_education_class_team).with('mygroupid')
+          .and_raise(new_http_error(400))
+        expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
   end

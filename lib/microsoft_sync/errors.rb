@@ -28,8 +28,9 @@ module MicrosoftSync
   module Errors
     def self.user_facing_message(error)
       error_name = error.class.name.underscore.split(%r{[_/]}).map(&:capitalize).join(' ')
-      case error
-      when MicrosoftSync::Errors::PublicError
+
+      if error.is_a?(MicrosoftSync::Errors::PublicError) && error.public_message.present? &&
+          error.public_message != error.class.name
         "#{error_name}: #{error.public_message}"
       else
         error_name
@@ -44,6 +45,7 @@ module MicrosoftSync
 
     class InvalidRemoteState < PublicError; end
     class GroupHasNoOwners < PublicError; end
+    class TeamAlreadyExists < PublicError; end
 
     # Makes public the status code but not anything about the response body.
     # The internal error message has the response body (truncated)
@@ -57,7 +59,12 @@ module MicrosoftSync
       def self.subclasses_by_status_code
         @subclasses_by_status_code ||= {
           400 => HTTPBadRequest,
-          404 => HTTPNotFound
+          404 => HTTPNotFound,
+          409 => HTTPConflict,
+          500 => HTTPInternalServerError,
+          502 => HTTPBadGateway,
+          503 => HTTPServiceUnavailable,
+          504 => HTTPGatewayTimeout,
         }
       end
 
@@ -76,5 +83,25 @@ module MicrosoftSync
 
     class HTTPNotFound < HTTPInvalidStatus; end
     class HTTPBadRequest < HTTPInvalidStatus; end
+    class HTTPConflict < HTTPInvalidStatus; end
+    class HTTPInternalServerError < HTTPInvalidStatus; end
+    class HTTPBadGateway < HTTPInvalidStatus; end
+    class HTTPServiceUnavailable < HTTPInvalidStatus; end
+    class HTTPGatewayTimeout < HTTPInvalidStatus; end
+
+    INTERMITTENT = [
+      EOFError,
+      Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EINVAL, Errno::ETIMEDOUT,
+      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
+      OpenSSL::SSL::SSLError,
+      SocketError,
+      Timeout::Error,
+
+      HTTPBadGateway, HTTPGatewayTimeout, HTTPInternalServerError, HTTPServiceUnavailable,
+    ].freeze
+
+    # Microsoft's API being eventually consistent requires us to retry 404s
+    # (HTTPNotFound) is many cases, particularly when first adding a group.
+    INTERMITTENT_AND_NOTFOUND = [*INTERMITTENT, HTTPNotFound].freeze
   end
 end

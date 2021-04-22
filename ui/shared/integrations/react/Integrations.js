@@ -23,14 +23,24 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import IntegrationRow from './IntegrationRow'
+
 import MicrosoftSync from './microsoft_sync/MicrosoftSync'
 import useMicrosoftSettings from './microsoft_sync/useSettings'
+import MicrosoftSyncButton from './microsoft_sync/MicrosoftSyncButton'
 
 const Integrations = () => {
-  const [msGroup, msEnabled, msLoading, msError, msToggleEnabled] = useMicrosoftSettings(
-    ENV.COURSE_ID
-  )
-  const [msExpanded, setMSExpanded] = useState(false)
+  const [
+    msGroup,
+    msEnabled,
+    msLoading,
+    msError,
+    msToggleEnabled,
+    setMSError,
+    setMSGroup
+  ] = useMicrosoftSettings(ENV.COURSE_ID)
+
+  const [msExpanded, setMSExpanded] = useState(!!msError)
+  const [msInfo, setMSInfo] = useState()
 
   return (
     <>
@@ -51,10 +61,21 @@ const Integrations = () => {
         loading={msLoading}
         onChange={msToggleEnabled}
         error={msError}
-        expanded={msExpanded || !!msError}
+        info={msInfo}
+        expanded={msExpanded}
         onToggle={() => setMSExpanded(expanded => !expanded)}
       >
-        <MicrosoftSync enabled={msEnabled} group={msGroup} loading={msLoading} />
+        <MicrosoftSync group={msGroup} loading={msLoading}>
+          <MicrosoftSyncButton
+            courseId={ENV.COURSE_ID}
+            enabled={msEnabled}
+            group={msGroup}
+            error={msError}
+            onError={setMSError}
+            onInfo={setMSInfo}
+            onSuccess={setMSGroup}
+          />
+        </MicrosoftSync>
       </IntegrationRow>
     </>
   )

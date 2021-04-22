@@ -53,6 +53,12 @@ describe('Integrations', () => {
       })
 
       const subject = render(<Integrations />)
+      expect(subject.getByText('Integration error')).toBeInTheDocument()
+
+      act(() => {
+        fireEvent.click(subject.getByText('Show Microsoft Sync details'))
+      })
+
       expect(
         subject.getByText('An error occurred, please try again. Error: error')
       ).toBeInTheDocument()
@@ -75,6 +81,21 @@ describe('Integrations', () => {
         url: `/api/v1/courses/2/microsoft_sync/group`
       })
       expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeTruthy()
+    })
+
+    it('renders a sync button', () => {
+      useFetchApi.mockImplementationOnce(({success, loading}) => {
+        success({workflow_state: 'active'})
+        loading(false)
+      })
+
+      const subject = render(<Integrations />)
+
+      act(() => {
+        fireEvent.click(subject.getByText('Show Microsoft Sync details'))
+      })
+
+      expect(subject.getByText('Sync Now')).toBeTruthy()
     })
 
     describe('when the integration is disabled', () => {

@@ -20,13 +20,23 @@ import $ from 'jquery'
 import '@canvas/datetime'
 import I18n from 'i18n!course_settings'
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {InlineList} from '@instructure/ui-list'
 
-const MicrosoftSync = ({enabled, group, loading}) => {
+const stateMap = {
+  pending: I18n.t('Ready for sync'),
+  scheduled: I18n.t('Sync scheduled'),
+  running: I18n.t('Sync currently running'),
+  retrying: I18n.t('Sync currently running'),
+  errored: I18n.t('The sync encountered an error and did not complete'),
+  completed: I18n.t('Sync completed successfully'),
+  deleted: I18n.t('Sync not enabled')
+}
+
+const MicrosoftSync = ({group, loading, children}) => {
   if (loading) {
     return (
       <View as="div" textAlign="center">
@@ -38,23 +48,27 @@ const MicrosoftSync = ({enabled, group, loading}) => {
   return (
     <>
       <Text>{I18n.t('Sync and Provision Microsoft Teams with your Canvas Course')}</Text>
-      <Flex margin="small none none none">
-        <Flex.Item>
-          <Button
-            withBackground={false}
-            color="primary"
-            margin="none small none none"
-            interaction={enabled ? 'enabled' : 'disabled'}
-          >
-            {I18n.t('Sync Now')}
-          </Button>
+      <Flex margin="small 0 0 0">
+        <Flex.Item size="8rem" margin="0 medium 0 0">
+          {children}
         </Flex.Item>
         <Flex.Item>
-          <Text fontStyle="italic">
-            {I18n.t('Last Sync: %{lastSyncTime}', {
-              lastSyncTime: $.datetimeString(group.last_synced_at)
-            })}
-          </Text>
+          <InlineList delimiter="pipe">
+            <InlineList.Item>
+              <Text weight="bold">Status:</Text>
+              <Text fontStyle="italic"> {stateMap[group.workflow_state]}</Text>
+            </InlineList.Item>
+            <InlineList.Item>
+              <Text weight="bold">{I18n.t('Last Sync:')}</Text>
+              <Text fontStyle="italic">
+                {' '}
+                {$.datetimeString(group.last_synced_at) || I18n.t('never')}
+              </Text>
+            </InlineList.Item>
+            {group.workflow_state !== 'errored' && (
+              <InlineList.Item>{I18n.t('No errors')}</InlineList.Item>
+            )}
+          </InlineList>
         </Flex.Item>
       </Flex>
     </>

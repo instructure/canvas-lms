@@ -66,6 +66,10 @@ module MicrosoftSync
     USERS_UPNS_TO_AADS_BATCH_SIZE = 15 # According to Microsoft
 
     # Returns a hash from UPN -> AAD. Accepts 15 at a time.
+    # A UPN (userPrincipalName) is en email address, username, or other
+    # property that Canvas has.  An AAD (short term for AAD [Azure Active
+    # Directory] object ID) is the ID for the user on the Microsoft side, which
+    # is what Microsoft references in their groups/teams.
     def users_upns_to_aads(upns)
       if upns.length > USERS_UPNS_TO_AADS_BATCH_SIZE
         raise ArgumentError, "Can't look up #{upns.length} UPNs at once"

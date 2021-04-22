@@ -41,6 +41,17 @@ class MicrosoftSync::Group < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
 
+  # States at which a manual sync is allowed
+  COOLDOWN_NOT_REQUIRED_STATES = %i(
+    pending
+    errored
+  ).freeze
+
+  RUNNING_STATES = %i(
+    running
+    retrying
+  ).freeze
+
   belongs_to :course
   validates_presence_of :course
   validates_uniqueness_of :course_id
@@ -49,6 +60,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
   workflow do
     state :pending # Initial state, before first sync
+    state :scheduled
     state :running
     state :retrying
     state :errored
@@ -59,6 +71,10 @@ class MicrosoftSync::Group < ActiveRecord::Base
   serialize :job_state
 
   resolves_root_account through: :course
+
+  def self.manual_sync_cooldown
+    Setting.get('msft_sync.manual_sync_cooldown', 90.minutes.to_s).to_i
+  end
 
   alias_method :destroy_permanently!, :destroy
   def destroy

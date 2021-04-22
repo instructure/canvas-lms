@@ -59,14 +59,16 @@ describe MicrosoftSync::GraphService do
       end
     end
 
-    context 'with a non-200 status code' do
-      let(:response) { json_response(403, error: {message: 'uh-oh!'}) }
+    [400, 403, 409].each do |code|
+      context "with a #{code} status code" do
+        let(:response) { json_response(code, error: {message: 'uh-oh!'}) }
 
-      it 'raises an HTTPInvalidStatus with the code and message' do
-        expect { subject }.to raise_error(
-          MicrosoftSync::Errors::HTTPInvalidStatus,
-          /Graph service returned 403 for tenant mytenant.*uh-oh!/
-        )
+        it 'raises an HTTPInvalidStatus with the code and message' do
+          expect { subject }.to raise_error(
+            MicrosoftSync::Errors::HTTPInvalidStatus,
+            /Graph service returned #{code} for tenant mytenant.*uh-oh!/
+          )
+        end
       end
     end
   end
@@ -392,6 +394,19 @@ describe MicrosoftSync::GraphService do
 
       it 'raises a GroupHasNoOwners error' do
         expect { subject }.to raise_error(MicrosoftSync::Errors::GroupHasNoOwners)
+      end
+    end
+
+    context 'when Microsoft returns a 409 saying "group is already provisioned"' do
+      let(:response) do
+        {
+          status: 409,
+          body: "{\r\n  \"error\": {\r\n    \"code\": \"Conflict\",\r\n    \"message\": \"Failed to execute Templates backend request CreateTeamFromGroupWithTemplateRequest. Request Url: https://teams.microsoft.com/fabric/amer/templates/api/groups/16786176-b111-1111-1111-111111111110/team, Request Method: PUT, Response Status Code: Conflict, Response Headers: Strict-Transport-Security: max-age=2592000\\r\\nx-operationid: 11111111111111111111111111111111\\r\\nx-telemetryid: 00-11111111111111111111111111111111-111111111111111b-00\\r\\nX-MSEdge-Ref: Ref A: 11111111111111111111111111111111 Ref B: BLUEDGE1111 Ref C: 2021-04-15T23:08:28Z\\r\\nDate: Thu, 15 Apr 2021 23:08:28 GMT\\r\\n, ErrorMessage : {\\\"errors\\\":[{\\\"message\\\":\\\"The group is already provisioned\\\",\\\"errorCode\\\":\\\"Unknown\\\"}],\\\"operationId\\\":\\\"11111111111111111111111111111111\\\"}\",\r\n    \"innerError\": {\r\n      \"date\": \"2021-04-15T23:08:28\",\r\n      \"request-id\": \"11111111-1111-1111-1111-111111111111\",\r\n      \"client-request-id\": \"11111111-1111-1111-1111-111111111111\"\r\n    }\r\n  }\r\n}"
+        }
+      end
+
+      it 'raises a TeamAlreadyExists error' do
+        expect { subject }.to raise_error(MicrosoftSync::Errors::TeamAlreadyExists)
       end
     end
   end
