@@ -26,7 +26,7 @@ export default {
   argTypes: {}
 }
 
-const Template = args => <ThreadingToolbar.Reply {...args} />
+const Template = args => <ThreadingToolbar.Reply delimiterKey="reply" {...args} />
 
 export const Default = Template.bind({})
 Default.args = {}

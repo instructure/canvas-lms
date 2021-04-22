@@ -67,5 +67,9 @@ Like.propTypes = {
    * Number of likes for the post. Displays nothing if
    * less than one
    */
-  likeCount: PropTypes.number.isRequired
+  likeCount: PropTypes.number.isRequired,
+  /**
+   * Key consumed by ThreadingToolbar's InlineList
+   */
+  delimiterKey: PropTypes.string.isRequired
 }

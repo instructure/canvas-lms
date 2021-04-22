@@ -104,10 +104,17 @@ export const DiscussionThreadContainer = props => {
 
   const threadActions = []
   if (!props.deleted) {
-    threadActions.push(<ThreadingToolbar.Reply key={`reply-${props.id}`} onClick={() => {}} />)
+    threadActions.push(
+      <ThreadingToolbar.Reply
+        key={`reply-${props.id}`}
+        delimiterKey={`reply-delimiter-${props.id}`}
+        onClick={() => {}}
+      />
+    )
     threadActions.push(
       <ThreadingToolbar.Like
         key={`like-${props.id}`}
+        delimiterKey={`like-delimiter-${props.id}`}
         onClick={toggleRating}
         isLiked={props.rating}
         likeCount={props.ratingSum || 0}
@@ -121,6 +128,7 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Expansion
         key={`expand-${props.id}`}
+        delimiterKey={`expand-delimiter-${props.id}`}
         expandText={I18n.t('%{replies} replies, %{unread} unread', {
           replies: props.rootEntryParticipantCounts?.repliesCount,
           unread: props.rootEntryParticipantCounts?.unreadCount
