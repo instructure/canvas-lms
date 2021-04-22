@@ -108,7 +108,7 @@ namespace :canvas do
         if Hash === subtree
           load_tree(key, subtree)
         else
-          Imperium::KV.put(key, subtree, cas: 0)
+          Diplomat::Kv.put(key, subtree.to_s, { cas: 0 })
         end
       end
     end

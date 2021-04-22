@@ -122,7 +122,7 @@ module Services
       private
       def setting(key)
         Canvas::DynamicSettings.find("address-book", default_ttl: 5.minutes)[key]
-      rescue Imperium::TimeoutError => e
+      rescue Diplomat::KeyNotFound => e
         Canvas::Errors.capture_exception(:address_book, e, :warn)
         nil
       end

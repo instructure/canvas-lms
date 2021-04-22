@@ -20,7 +20,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-require 'imperium/testing'
 
 describe "API Authentication", type: :request do
 
@@ -615,7 +614,7 @@ describe "API Authentication", type: :request do
     end
 
     it "recovers gracefully if consul is missing encryption data" do
-      allow(Imperium::KV).to receive(:get).and_return(Imperium::Testing.kv_not_found_response(options: %i{recurse}))
+      allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
       check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       assert_status(200)
     end

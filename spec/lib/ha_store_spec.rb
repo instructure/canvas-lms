@@ -90,7 +90,7 @@ describe ActiveSupport::Cache::HaStore do
   describe "#delete" do
     it "triggers a consul event when configured" do
       # will get called twice; once with rails52: prefix, once without
-      expect(Imperium::Events.default_client).to receive(:fire).with("invalidate", match(/mykey$/), anything).twice
+      expect(Diplomat::Event).to receive(:fire).with("invalidate", match(/mykey$/), nil, nil, nil, nil).twice
       store.delete('mykey')
     end
   end
@@ -144,7 +144,7 @@ describe ActiveSupport::Cache::HaStore do
 
     before do
       allow(MultiCache).to receive(:cache).and_return(store)
-      allow(Imperium::Events.default_client).to receive(:fire)
+      allow(Diplomat::Event).to receive(:fire)
     end
 
     it "uses MultiCache as store for feature_flags cache_key" do

@@ -40,12 +40,6 @@ module DynamicSettings
       @data.merge!(kvs)
     end
 
-    # TODO: Make this return something API compatible with
-    #   Imperium::KVGETResponse once we're actually using Consul's metadata
-    def fetch_object(_, **_)
-      raise NotImplementedError, "Fetching full metadata objects from fallback data isn't implemented yet."
-    end
-
     def for_prefix(prefix_extension, **_)
       self.class.new(@data[prefix_extension])
     end

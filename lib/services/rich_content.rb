@@ -54,8 +54,7 @@ module Services
           RICH_CONTENT_APP_HOST: settings['app-host'],
           RICH_CONTENT_SKIP_SIDEBAR: settings['skip-sidebar']
         }
-      rescue Imperium::TimeoutError,
-             Imperium::UnableToConnectError,
+      rescue Diplomat::KeyNotFound,
              Canvas::DynamicSettings::ConsulError => e
         Canvas::Errors.capture_exception(:rce_flag, e)
         { RICH_CONTENT_APP_HOST: 'error' }
