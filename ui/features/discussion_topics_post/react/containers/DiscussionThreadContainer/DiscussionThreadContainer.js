@@ -176,6 +176,7 @@ export const DiscussionThreadContainer = props => {
                 id={props.id}
                 isUnread={!props.read}
                 onToggleUnread={toggleUnread}
+                onMarkAllAsUnread={() => {}}
                 onDelete={props.permissions.delete ? onDelete : null}
               />
             </Flex.Item>
