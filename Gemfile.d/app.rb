@@ -69,13 +69,13 @@ gem 'i18nliner', '0.1.2'
   gem 'ruby2ruby', '2.4.4', require: false
   gem 'ruby_parser', '3.15.0', require: false
 gem 'icalendar', '2.7.0', require: false
-gem 'imperium', '0.5.2', require: false
+gem 'diplomat', '2.5.1', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
 gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.8.2'
-gem 'inst-jobs', '2.2.0'
+gem 'inst-jobs', '2.2.1'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.1.0'

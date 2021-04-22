@@ -17,7 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DynamicSettings
-  class UnexpectedConsulResponse < StandardError; end
   # A class for reading values from Consul
   #
   # @attr prefix [String] The prefix to be prepended to keys for querying.
@@ -37,8 +36,6 @@ module DynamicSettings
     # @param cluster [String] An optional cluster to override region or global settings
     # @param default_ttl [ActiveSupport::Duration] The TTL to use for cached
     #   values when not specified to the fetch methods.
-    # @param kv_client [Imperium::KV] The client to use for connecting to
-    #   Consul, defaults to Imperium::KV.default_client
     # @param data_center [String] Which regional datacenter to address for queries
     # @param query_logging [Boolean] when enabled (true), will output query logs and timing for each request
     def initialize(prefix = nil,
@@ -47,7 +44,6 @@ module DynamicSettings
                     environment: nil,
                     cluster: nil,
                     default_ttl: DEFAULT_TTL,
-                    kv_client: Imperium::KV.default_client,
                     data_center: nil,
                     query_logging: true)
       @prefix = prefix
@@ -56,7 +52,6 @@ module DynamicSettings
       @environment = environment
       @cluster = cluster
       @default_ttl = default_ttl
-      @kv_client = kv_client
       @data_center = data_center
       @query_logging = query_logging
     end
@@ -108,7 +103,7 @@ module DynamicSettings
       # we could have one ttl again
       subtree_ttl = ttl * 2
       cache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
-        values = unpackaged_kv_fetch(tree_key, :recurse, :stale)
+        values = kv_fetch(tree_key, recurse: true, stale: true, convert_to_hash: true)
         if values.nil?
           # no sense trying to populate the subkeys
           # when there's no tree
@@ -130,20 +125,20 @@ module DynamicSettings
           # is in the cache now.  It's better to fall back to asking consul in those cases.
           # these values will still get overwritten the next time the parent tree expires,
           # and they'll still go away eventually if we REMOVE a key from a subtree in consul.
-          unpackaged_kv_fetch(full_key, :stale)
+          kv_fetch(full_key, stale: true)
         end
         return cache_result if cache_result
       end
 
       fallback_keys.each do |full_key|
         result = cache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: ttl) do
-          unpackaged_kv_fetch(full_key, :stale)
+          kv_fetch(full_key, stale: true)
         end
         return result if result
       end
       DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
       nil
-    rescue Imperium::TimeoutError, UnexpectedConsulResponse, Errno::ECONNREFUSED => e
+    rescue Diplomat::KeyNotFound, Errno::ECONNREFUSED => e
       raise unless cache.respond_to?(:fetch_without_expiration)
 
       cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
@@ -172,7 +167,6 @@ module DynamicSettings
         environment: environment,
         cluster: cluster,
         default_ttl: default_ttl,
-        kv_client: @kv_client,
         data_center: @data_center
       )
     end
@@ -182,47 +176,45 @@ module DynamicSettings
     # @param kvs [Hash] Key value pairs where the hash key is the key
     #   and the hash value is the value
     # @param global [boolean] Is it a global key?
-    # @return [Imperium::TransactionResponse]
+    # @return Consul txn response
     def set_keys(kvs, global: false)
       opts = @data_center.present? && global ? { dc: @data_center } : {}
-      @kv_client.transaction(opts) do |tx|
-        kvs.each { |k, v| tx.set(full_key(k, global: global), v) }
-      end
+      Diplomat::Kv.txn(kvs.map do |k, v|
+        {
+          KV: {
+            Verb: "set",
+            Key: full_key(k, global: global),
+            Value: Base64.strict_encode64(v)
+          }
+        }
+      end)
     end
 
     private
-
-    # useful for making sure the outcome from consul
-    # was one of the expected outcomes (200 or 404) and pulling off the
-    # actual payload so we don't have to repeat
-    # this kind of guard clause on every fetch
-    def unpackaged_kv_fetch(full_key, *options)
-      result = kv_fetch(full_key, *options)
-      # result should always be a KVGetResponse, nil is a problem
-      # because it SHOULD be a 404 with a nil
-      if result&.status == 200 || result&.status == 404
-        # if 404, this just means the value doesn't exist in the consul store
-        # and the values will be nil, so caching nil in that case is safe
-        result.values
-      else
-        # we don't want to store "nil" in the cache if something bad happened
-        # when talking to consul
-        raise(UnexpectedConsulResponse, "Unexpected consul result: #{result}-#{result&.status}")
-      end
-    end
 
     # bit of helper indirection
     # so that we can log actual
     # QUERIES (vs things fetched from the cache)
     # in one place, and process error states as actual
     # errors
-    def kv_fetch(full_key, *options)
+    def kv_fetch(full_key, **options)
       result = nil
+      error = nil
       ms = 1000 * Benchmark.realtime do
-        result = @kv_client.get(full_key, *options)
+        begin
+          result = Diplomat::Kv.get(full_key, options)
+        rescue => e
+          error = e
+        end
       end
       timing = format("CONSUL (%.2fms)", ms)
-      DynamicSettings.logger.debug("  #{timing} get (#{full_key}) -> status:#{result&.status}") if @query_logging
+      status = 'OK'
+      unless error.nil?
+        status = error.is_a?(Diplomat::KeyNotFound) && error.message == full_key ? 'NOT_FOUND' : 'ERROR'
+      end
+      DynamicSettings.logger.debug("  #{timing} get (#{full_key}) -> status:#{status}") if @query_logging
+      return nil if status == 'NOT_FOUND'
+      raise error if error
       result
     end
 
