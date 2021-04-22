@@ -5,12 +5,19 @@
 # which is a safe assumption for the test/build
 # environments
 ADMIN_URL=http://pulsar:8080/
+DISPATCHER_URL=pulsar://pulsar:6650/
 
 function check_ready {
-  bin/pulsar-admin --admin-url $ADMIN_URL tenants list
-  PULSAR_STATUS=$?
-  if [ $PULSAR_STATUS -eq 0 ]; then
-    return 0
+  bin/pulsar-client --url $DISPATCHER_URL produce my-topic --messages "hello-pulsar"
+  DISPATCHER_STATUS=$?
+  if [ $DISPATCHER_STATUS -eq 0 ]; then
+    echo "dispatcher ready..."
+    bin/pulsar-admin --admin-url $ADMIN_URL tenants list
+    ADMIN_STATUS=$?
+    if [ $ADMIN_STATUS -eq 0 ]; then
+      return 0
+    fi
+    echo "admin NOT ready..."
   fi
   return 1
 }
@@ -20,7 +27,7 @@ until check_ready; do
   echo "Waiting for pulsar to be ready ... $CHECK_COUNT ... "
   sleep 5
   CHECK_COUNT=$((CHECK_COUNT+1))
-  if [$CHECK_COUNT -gt 20]; then
+  if [ "$CHECK_COUNT" -gt "20" ]; then
     echo ":cry: I don't think pulsar is ever going to be ready..."
     exit 1
   fi
