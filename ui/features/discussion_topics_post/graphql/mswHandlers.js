@@ -116,6 +116,20 @@ const defaultEntry = {
     update: true,
     __typename: 'DiscussionEntryPermissions'
   },
+  __typename: 'DiscussionEntry'
+}
+
+const defaultTopic = {
+  allowRating: true,
+  assignment: null,
+  author: {
+    avatarUrl: imageUrl,
+    id: 'VXNlci0x',
+    name: 'Matthew Lemon',
+    _id: '1',
+    __typename: 'User'
+  },
+  canUnpublish: false,
   courseSections: [
     {
       createdAt: '2020-12-01T12:37:07-07:00',
@@ -126,119 +140,107 @@ const defaultEntry = {
       __typename: 'Section'
     }
   ],
-  __typename: 'DiscussionEntry'
+  createdAt: '2020-11-23T11:40:44-07:00',
+  delayedPostAt: null,
+  discussionType: 'side_comment',
+  editor: {
+    avatarUrl: imageUrl,
+    id: 'VXNlci0x',
+    name: 'Matthew Lemon',
+    _id: '1',
+    __typename: 'User'
+  },
+  entryCounts: {
+    repliesCount: 2,
+    unreadCount: 0,
+    __typename: 'DiscussionEntryCounts'
+  },
+  id: 'RGlzY3Vzc2lvbi0x',
+  isSectionSpecific: false,
+  onlyGradersCanRate: false,
+  permissions: {
+    attach: true,
+    create: true,
+    delete: true,
+    duplicate: false,
+    rate: true,
+    read: true,
+    readAsAdmin: true,
+    readReplies: true,
+    reply: true,
+    update: true,
+    __typename: 'DiscussionPermissions'
+  },
+  postedAt: '2020-11-23T11:40:44-07:00',
+  published: true,
+  requireInitialPost: false,
+  rootDiscussionEntriesConnection: {
+    nodes: [
+      {
+        author: {
+          avatarUrl: imageUrl,
+          id: 'VXNlci0x',
+          name: 'Matthew Lemon',
+          _id: '1',
+          __typename: 'User'
+        },
+        createdAt: '2021-04-05T13:40:50-06:00',
+        deleted: false,
+        editor: null,
+        id: '49',
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00',
+          __typename: 'DiscussionEntry'
+        },
+        message: '<p>This is the parent reply</p>',
+        permissions: {
+          attach: true,
+          create: true,
+          delete: true,
+          rate: true,
+          read: true,
+          reply: true,
+          update: true,
+          __typename: 'DiscussionEntryPermissions'
+        },
+        rating: false,
+        ratingCount: null,
+        ratingSum: null,
+        read: true,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1,
+          __typename: 'RootEntryParticipantCount'
+        },
+        subentriesCount: 1,
+        updatedAt: '2021-04-05T13:40:50-06:00',
+        _id: '49',
+        __typename: 'DiscussionEntry'
+      }
+    ],
+    pageInfo: {
+      endCursor: 'MTg',
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: 'MQ',
+      __typename: 'PageInfo'
+    },
+    __typename: 'DiscussionEntryConnection'
+  },
+  rootEntriesTotalPages: 1,
+  subscribed: true,
+  title: 'Cookie Cat',
+  message: 'This is a Discussion Topic Message',
+  updatedAt: '2021-04-13T17:49:23-06:00',
+  _id: '1',
+  __typename: 'Discussion'
 }
 
 export const handlers = [
   graphql.query('GetDiscussionQuery', (req, res, ctx) => {
     return res(
       ctx.data({
-        legacyNode: {
-          allowRating: true,
-          assignment: null,
-          author: {
-            avatarUrl: imageUrl,
-            id: 'VXNlci0x',
-            name: 'Matthew Lemon',
-            _id: '1',
-            __typename: 'User'
-          },
-          canUnpublish: false,
-          courseSections: [],
-          createdAt: '2020-11-23T11:40:44-07:00',
-          delayedPostAt: null,
-          discussionType: 'side_comment',
-          editor: {
-            avatarUrl: imageUrl,
-            id: 'VXNlci0x',
-            name: 'Matthew Lemon',
-            _id: '1',
-            __typename: 'User'
-          },
-          entryCounts: {
-            repliesCount: 2,
-            unreadCount: 0,
-            __typename: 'DiscussionEntryCounts'
-          },
-          id: 'RGlzY3Vzc2lvbi0x',
-          isSectionSpecific: false,
-          onlyGradersCanRate: false,
-          permissions: {
-            attach: true,
-            create: true,
-            delete: true,
-            duplicate: false,
-            rate: true,
-            read: true,
-            readAsAdmin: true,
-            readReplies: true,
-            reply: true,
-            update: true,
-            __typename: 'DiscussionPermissions'
-          },
-          postedAt: '2020-11-23T11:40:44-07:00',
-          published: true,
-          subscribed: true,
-          requireInitialPost: false,
-          rootDiscussionEntriesConnection: {
-            nodes: [
-              {
-                author: {
-                  avatarUrl: imageUrl,
-                  id: 'VXNlci0x',
-                  name: 'Matthew Lemon',
-                  _id: '1',
-                  __typename: 'User'
-                },
-                createdAt: '2021-04-05T13:40:50-06:00',
-                deleted: false,
-                editor: null,
-                id: '49',
-                lastReply: {
-                  createdAt: '2021-04-05T13:41:42-06:00',
-                  __typename: 'DiscussionEntry'
-                },
-                message: '<p>This is the parent reply</p>',
-                permissions: {
-                  attach: true,
-                  create: true,
-                  delete: true,
-                  rate: true,
-                  read: true,
-                  reply: true,
-                  update: true,
-                  __typename: 'DiscussionEntryPermissions'
-                },
-                rating: false,
-                ratingCount: null,
-                ratingSum: null,
-                read: true,
-                rootEntryParticipantCounts: {
-                  unreadCount: 1,
-                  repliesCount: 1,
-                  __typename: 'RootEntryParticipantCount'
-                },
-                subentriesCount: 1,
-                updatedAt: '2021-04-05T13:40:50-06:00',
-                _id: '49',
-                __typename: 'DiscussionEntry'
-              }
-            ],
-            pageInfo: {
-              endCursor: 'MTg',
-              hasNextPage: false,
-              hasPreviousPage: false,
-              startCursor: 'MQ',
-              __typename: 'PageInfo'
-            },
-            __typename: 'DiscussionEntryConnection'
-          },
-          title: 'Cookie Cat',
-          message: 'This is a Discussion Topic Message',
-          updatedAt: '2021-04-13T17:49:23-06:00',
-          _id: '1',
-          __typename: 'Discussion'
-        }
+        legacyNode: defaultTopic
       })
     )
   }),
@@ -272,51 +274,9 @@ export const handlers = [
       ctx.data({
         deleteDiscussionEntry: {
           discussionEntry: {
-            author: {
-              avatarUrl: imageUrl,
-              id: 'VXNlci0x',
-              name: 'Matthew Lemon',
-              _id: '1',
-              __typename: 'User'
-            },
-            createdAt: '2021-04-05T13:40:50-06:00',
+            ...defaultEntry,
             deleted: true,
-            editor: {
-              avatarUrl: imageUrl,
-              id: 'VXNlci0x',
-              name: 'Matthew Lemon',
-              _id: '1',
-              __typename: 'User'
-            },
-            id: '49',
-            lastReply: {
-              createdAt: '2021-04-05T13:41:42-06:00',
-              __typename: 'DiscussionEntry'
-            },
-            message: null,
-            permissions: {
-              attach: true,
-              create: true,
-              delete: true,
-              rate: true,
-              read: true,
-              reply: true,
-              update: true,
-              __typename: 'DiscussionEntryPermissions'
-            },
-            rating: false,
-            ratingCount: null,
-            ratingSum: null,
-            read: true,
-            rootEntryParticipantCounts: {
-              repliesCount: 1,
-              unreadCount: 1,
-              __typename: 'RootEntryParticipantCount'
-            },
-            subentriesCount: 1,
-            updatedAt: '2021-04-05T13:40:50-06:00',
-            _id: '49',
-            __typename: 'DiscussionEntry'
+            message: null
           },
           errors: null,
           __typename: 'DeleteDiscussionEntryPayload'

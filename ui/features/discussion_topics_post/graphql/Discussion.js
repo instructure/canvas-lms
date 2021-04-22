@@ -93,7 +93,8 @@ export const Discussion = {
     editor: User.shape,
     assignment: Assignment.shape,
     permissions: DiscussionPermissions.shape,
-    courseSections: arrayOf(Section.shape)
+    courseSections: arrayOf(Section.shape),
+    rootEntriesTotalPages: number
   })
 }
 

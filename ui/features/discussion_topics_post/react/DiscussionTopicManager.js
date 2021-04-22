@@ -32,7 +32,8 @@ const DiscussionTopicManager = props => {
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables: {
       discussionID: props.discussionTopicId,
-      perPage: PER_PAGE
+      perPage: PER_PAGE,
+      page: btoa(0)
     }
   })
 
@@ -58,7 +59,10 @@ const DiscussionTopicManager = props => {
     <>
       <DiscussionTopicContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionThreadsContainer
+        discussionTopicId={props.discussionTopicId}
         threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
+        pageInfo={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.pageInfo}
+        totalPages={discussionTopicQuery.data.legacyNode.rootEntriesTotalPages}
       />
     </>
   )

@@ -45,6 +45,7 @@ describe('DiscussionThreadContainer', () => {
 
   const defaultProps = () => {
     return {
+      discussionTopicId: 1,
       threads: [
         {
           _id: '49',
@@ -82,7 +83,14 @@ describe('DiscussionThreadContainer', () => {
             update: true
           }
         }
-      ]
+      ],
+      pageInfo: {
+        endCursor: 'MQ',
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: 'MQ'
+      },
+      totalPages: 2
     }
   }
 
@@ -97,12 +105,13 @@ describe('DiscussionThreadContainer', () => {
   }
 
   it('should render', () => {
-    const {container} = setup()
+    const {container} = setup(defaultProps())
     expect(container).toBeTruthy()
   })
 
   it('should render when threads are empty', () => {
     const {container} = setup({
+      ...defaultProps(),
       threads: []
     })
     expect(container).toBeTruthy()
@@ -110,6 +119,7 @@ describe('DiscussionThreadContainer', () => {
 
   it('should render when threads are null', () => {
     const {container} = setup({
+      ...defaultProps(),
       threads: null
     })
     expect(container).toBeTruthy()
@@ -124,5 +134,18 @@ describe('DiscussionThreadContainer', () => {
     fireEvent.click(expandButton)
 
     expect(await findByText('This is the child reply')).toBeTruthy()
+  })
+
+  it('renders the pagination component if there are more than 1 pages', () => {
+    const {getByTestId} = setup(defaultProps())
+    expect(getByTestId('pagination')).toBeInTheDocument()
+  })
+
+  it('does not render the pagination component if there is only 1 page', () => {
+    const {queryByTestId} = setup({
+      ...defaultProps(),
+      totalPages: 1
+    })
+    expect(queryByTestId('pagination')).toBeNull()
   })
 })
