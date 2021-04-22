@@ -26,7 +26,10 @@ const fauxFile =
 
 describe('showFilePreview', () => {
   beforeEach(() => {
-    fetchMock.mock('/api/v1/files/2282?include[]=enhanced_preview_url', fauxFile)
+    fetchMock.mock(
+      '/api/v1/files/2282?include[]=enhanced_preview_url&verifier=abc&use_verifiers=1',
+      fauxFile
+    )
   })
 
   afterEach(() => {
@@ -35,19 +38,22 @@ describe('showFilePreview', () => {
   })
 
   it('creates the container if one does not exist', async () => {
-    await showFilePreview('2282')
+    await showFilePreview('2282', 'abc')
     expect(document.getElementById('file_preview_container')).not.toBeNull()
   })
 
   it('displays the file preview', async () => {
-    await showFilePreview('2282')
+    await showFilePreview('2282', 'abc')
     await findByLabelText(document.body, 'File Preview Overlay')
     expect(getByLabelText(document.body, 'File Preview Overlay')).toBeInTheDocument()
   })
 
   it('displays a flash error message if file is not found', async () => {
-    fetchMock.mock('/api/v1/files/2283?include[]=enhanced_preview_url', 404)
-    await showFilePreview('2283')
+    fetchMock.mock(
+      '/api/v1/files/2283?include[]=enhanced_preview_url&verifier=abc&use_verifiers=1',
+      404
+    )
+    await showFilePreview('2283', 'abc')
     // there are 2 because flash alerts are displayed onscreen and in the flash_screenreader_holder
     const err_msg = await findAllByText(document.body, 'Failed getting file to preview')
     expect(err_msg[0]).toBeInTheDocument()

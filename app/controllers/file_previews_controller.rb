@@ -34,8 +34,8 @@ class FilePreviewsController < ApplicationController
         status: :not_found,
         formats: [:html]
     end
-    if authorized_action(@file, @current_user, :read)
-      unless @file.grants_right?(@current_user, session, :download)
+    if read_allowed(@file, @current_user, session, params)
+      unless download_allowed(@file, @current_user, session, params)
         @lock_info = @file.locked_for?(@current_user)
         return render template: 'file_previews/lock_explanation', layout: false
       end
@@ -70,5 +70,19 @@ class FilePreviewsController < ApplicationController
         return render template: 'file_previews/no_preview', layout: false
       end
     end
+  end
+
+  def read_allowed(attachment, user, session, params)
+    if params[:verifier]
+      verifier_checker = Attachments::Verification.new(attachment)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
+    end
+    authorized_action(attachment, user, :read)
+  end
+
+  def download_allowed(attachment, user, session, params)
+    verifier_checker = Attachments::Verification.new(attachment)
+    (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
+      (attachment.grants_right?(user, session, :download))
   end
 end
