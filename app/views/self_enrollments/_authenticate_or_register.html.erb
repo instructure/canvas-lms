@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%= render :partial => 'enrollment_agree' %>
+
 <form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="ic-Self-enrollment-form">
   <%= registration_summary || content_tag(:div, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
   <p><%= t("Please enter your %{label_name}:", :label_name => @login_label_name) %></p>

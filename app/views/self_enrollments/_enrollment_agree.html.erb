@@ -1,0 +1,21 @@
+<style>
+#agree-window.hidden {
+  display: none;
+}
+#enroll_form {
+  display: none;
+}
+#enroll_form.enrollment-form-show {
+    display: block;
+}
+</style>
+<div id="agree-window">
+<a href="https://www.aoi-zemi.com/info/privacy" target="_blank">個人情報の取り扱い</a>に同意しますか？</a></br>
+<button onclick="agree()">同意します</button>
+</div>
+<script>
+  function agree() {
+    document.getElementById('agree-window').classList.add('hidden');
+    document.getElementById('enroll_form').classList.add('enrollment-form-show');
+  }
+</script>
