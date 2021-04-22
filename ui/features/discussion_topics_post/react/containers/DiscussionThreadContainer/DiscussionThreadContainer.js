@@ -104,7 +104,7 @@ export const DiscussionThreadContainer = props => {
 
   const threadActions = []
   if (!props.deleted) {
-    threadActions.push(<ThreadingToolbar.Reply key={`reply-${props.id}`} onReply={() => {}} />)
+    threadActions.push(<ThreadingToolbar.Reply key={`reply-${props.id}`} onClick={() => {}} />)
     threadActions.push(
       <ThreadingToolbar.Like
         key={`like-${props.id}`}
