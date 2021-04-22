@@ -71,7 +71,9 @@ class Eportfolio < ActiveRecord::Base
 
   set_policy do
     given do |user|
-      user&.eportfolios_enabled? && !user.eportfolios.active.flagged_or_marked_as_spam.exists?
+      user&.eportfolios_enabled? &&
+        !user.eportfolios.active.flagged_or_marked_as_spam.exists? &&
+        (user.enrollments.exists? || user.account_users.exists?)
     end
     can :create
 
