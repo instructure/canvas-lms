@@ -33,6 +33,10 @@ $preview-html-background: whitesmoke;
 // Since this was a slightly complex layout I've separated this into
 // it's on area in the stylesheet to help break it out
 
+body.student-annotation-container .ic-Layout-contentMain {
+  padding: 0;
+}
+
 .ef-file-arrow_container {
   flex: 0 0 auto;
   justify-content: center;
