@@ -8,7 +8,7 @@ if [[ -z "${MASTER_BOUNCER_KEY-}" ]]; then
   exit 1
 fi
 
-docker-compose --file $(pwd)/docker-compose.new-jenkins.canvas.yml run \
+docker-compose --file $(pwd)/docker-compose.new-jenkins.canvas.yml --project-name linter-master-bouncer run \
   -e MASTER_BOUNCER_KEY=$MASTER_BOUNCER_KEY \
   -e GERRIT_HOST=$GERRIT_HOST \
   -e GERRIT_PROJECT=canvas-lms \
