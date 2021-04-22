@@ -414,6 +414,62 @@ describe "assignments" do
       end
     end
 
+    context "student annotation" do
+      before do
+        Account.site_admin.enable_feature!(:annotated_document_submissions)
+        attachment = attachment_model(content_type: "application/pdf", context: @course)
+        @assignment = @course.assignments.create(name: "Student Annotation", submission_types: 'student_annotation,online_text_entry', annotatable_attachment_id: attachment.id)
+      end
+
+       it "creates a student annotation assignment with annotatable attachment with usage rights" do
+        get "/courses/#{@course.id}/assignments"
+
+        wait_for_new_page_load { f(".new_assignment").click }
+        f('#assignment_name').send_keys("Annotated Test")
+
+        replace_content(f('#assignment_points_possible'), "10")
+        click_option('#assignment_submission_type', 'Online')
+
+        ['#assignment_annotated_document','#assignment_text_entry'].each do |element|
+          f(element).click
+        end
+
+        wait_for_ajaximations
+
+        expect(f('#assignment_annotated_document_info')).to be_displayed
+
+        #select attachment from file explorer
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+
+        #set usage rights
+        f('#usageRightSelector').click
+        fxpath('//*[@id="usageRightSelector"]/option[2]').click
+        f('#copyrightHolder').send_keys('Me')
+
+        submit_assignment_form
+        wait_for_ajaximations
+
+        expect(f('#assignment_show fieldset')).to include_text('a text entry box or a student annotation')
+      end
+
+      it 'displays annotatbale document to student and submits assignment for grading' do
+        course_with_student_logged_in(active_all: true, course: @course)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f('.submit_assignment_link').click
+
+        expect(f('.submit_annotated_document_option')).to be_displayed
+        f('.submit_annotated_document_option').click
+
+        expect(fxpath('//*[@id="submit_annotated_document_form"]/div/iframe')).to be_displayed
+
+        f('#submit_annotated_document_form .btn-primary').click
+        wait_for_ajaximations
+        expect(f('#right-side-wrapper')).to include_text("Submitted!")
+      end
+    end
+
     context "frozen assignment" do
       before do
         stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
