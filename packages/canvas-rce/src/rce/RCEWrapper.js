@@ -763,7 +763,6 @@ class RCEWrapper extends React.Component {
   }
 
   handleFocusHtmlEditor = event => {
-    this._elementRef.current.querySelector('.CodeMirror')?.CodeMirror.setCursor(0, 0)
     this.handleFocus(event)
   }
 
